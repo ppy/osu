@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Utils;
@@ -13,10 +12,10 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
@@ -30,6 +29,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const int rolling_hits_for_engaged_colour = 5;
 
+        public override Quad ScreenSpaceDrawQuad => MainPiece.Drawable.ScreenSpaceDrawQuad;
+
         /// <summary>
         /// Rolling number of tick hits. This increases for hits and decreases for misses.
         /// </summary>
@@ -39,6 +40,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private Color4 colourIdle;
         private Color4 colourEngaged;
+
+        public override bool DisplayResult => false;
 
         public DrawableDrumRoll()
             : this(null)
@@ -140,14 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (timeOffset < 0)
                 return;
 
-            int countHit = NestedHitObjects.Count(o => o.IsHit);
-
-            if (countHit >= HitObject.RequiredGoodHits)
-            {
-                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Ok);
-            }
-            else
-                ApplyResult(r => r.Type = r.Judgement.MinResult);
+            ApplyResult(r => r.Type = r.Judgement.MaxResult);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)

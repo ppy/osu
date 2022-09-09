@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -36,6 +37,10 @@ namespace osu.Game.Overlays.Profile
 
             // todo: pending implementation.
             // TabControl.AddItem(LayoutStrings.HeaderUsersModding);
+
+            // Haphazardly guaranteed by OverlayHeader constructor (see CreateBackground / CreateContent).
+            Debug.Assert(centreHeaderContainer != null);
+            Debug.Assert(detailHeaderContainer != null);
 
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }

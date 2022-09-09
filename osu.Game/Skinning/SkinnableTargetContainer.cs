@@ -85,7 +85,7 @@ namespace osu.Game.Skinning
             if (!(component is Drawable drawable))
                 throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
 
-            content.Remove(drawable);
+            content.Remove(drawable, true);
             components.Remove(component);
         }
 

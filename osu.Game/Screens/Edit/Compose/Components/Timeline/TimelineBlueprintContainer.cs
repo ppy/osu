@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 if (placementBlueprint != null)
                 {
-                    SelectionBlueprints.Remove(placementBlueprint);
+                    SelectionBlueprints.Remove(placementBlueprint, true);
                     placementBlueprint = null;
                 }
             }

@@ -106,11 +106,14 @@ namespace osu.Game.Tournament.Models
         }
 
         /// <summary>
-        /// Initialise this match with zeroed scores. Will be a noop if either team is not present.
+        /// Initialise this match with zeroed scores. Will be a noop if either team is not present or if either of the scores are non-zero.
         /// </summary>
         public void StartMatch()
         {
             if (Team1.Value == null || Team2.Value == null)
+                return;
+
+            if (Team1Score.Value > 0 || Team2Score.Value > 0)
                 return;
 
             Team1Score.Value = 0;
