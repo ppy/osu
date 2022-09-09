@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Name => "Barrel Roll";
         public override string Acronym => "BR";
-        public override string Description => "The whole playfield is on a wheel!";
+        public override LocalisableString Description => "The whole playfield is on a wheel!";
         public override double ScoreMultiplier => 1;
 
         public override string SettingDescription => $"{SpinSpeed.Value:N2} rpm {Direction.Value.GetDescription().ToLowerInvariant()}";

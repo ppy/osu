@@ -70,7 +70,11 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Forcefully reload the current <see cref="WorkingBeatmap"/>'s track from disk.
         /// </summary>
-        public void ReloadCurrentTrack() => changeTrack();
+        public void ReloadCurrentTrack()
+        {
+            changeTrack();
+            TrackChanged?.Invoke(current, TrackChangeDirection.None);
+        }
 
         /// <summary>
         /// Returns whether the beatmap track is playing.

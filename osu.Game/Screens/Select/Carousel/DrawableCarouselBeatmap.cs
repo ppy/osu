@@ -22,6 +22,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -64,10 +65,10 @@ namespace osu.Game.Screens.Select.Carousel
         private BeatmapDifficultyCache difficultyCache { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private CollectionManager collectionManager { get; set; }
-
-        [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
 
         private IBindable<StarDifficulty?> starDifficultyBindable;
         private CancellationTokenSource starDifficultyCancellationSource;
@@ -237,14 +238,11 @@ namespace osu.Game.Screens.Select.Carousel
                 if (beatmapInfo.OnlineID > 0 && beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineID)));
 
-                if (collectionManager != null)
-                {
-                    var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmapInfo)).Cast<OsuMenuItem>().ToList();
-                    if (manageCollectionsDialog != null)
-                        collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+                var collectionItems = realm.Realm.All<BeatmapCollection>().AsEnumerable().Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmapInfo)).Cast<OsuMenuItem>().ToList();
+                if (manageCollectionsDialog != null)
+                    collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
-                    items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
-                }
+                items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
 
                 if (hideRequested != null)
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => hideRequested(beatmapInfo)));

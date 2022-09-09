@@ -204,6 +204,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (!AllowSelection)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.SelectNext:
@@ -224,9 +227,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void selectNext(int direction)
         {
-            if (!AllowSelection)
-                return;
-
             var visibleItems = ListContainer.AsEnumerable().Where(r => r.IsPresent);
 
             PlaylistItem item;

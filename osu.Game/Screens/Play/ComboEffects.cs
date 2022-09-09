@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Play
         private ISamplePlaybackDisabler samplePlaybackDisabler { get; set; }
 
         [Resolved]
-        private GameplayClock gameplayClock { get; set; }
+        private IGameplayClock gameplayClock { get; set; }
 
         private void onComboChange(ValueChangedEvent<int> combo)
         {

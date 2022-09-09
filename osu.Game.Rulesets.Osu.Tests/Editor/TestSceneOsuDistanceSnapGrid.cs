@@ -59,10 +59,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 }
             });
 
-            editorClock = new EditorClock(editorBeatmap);
-
             base.Content.Children = new Drawable[]
             {
+                editorClock = new EditorClock(editorBeatmap),
                 snapProvider,
                 Content
             };

@@ -9,6 +9,8 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Lists;
@@ -56,7 +58,7 @@ namespace osu.Game.Beatmaps
             this.resources = resources;
             this.host = host;
             this.files = files;
-            largeTextureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(files));
+            largeTextureStore = new LargeTextureStore(host?.Renderer ?? new DummyRenderer(), host?.CreateTextureLoaderStore(files));
             this.trackStore = trackStore;
         }
 
@@ -110,6 +112,7 @@ namespace osu.Game.Beatmaps
 
         TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
+        IRenderer IStorageResourceProvider.Renderer => host?.Renderer ?? new DummyRenderer();
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
         RealmAccess IStorageResourceProvider.RealmAccess => null;
         IResourceStore<byte[]> IStorageResourceProvider.Files => files;
