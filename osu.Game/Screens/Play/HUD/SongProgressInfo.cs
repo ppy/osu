@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using System;
 
@@ -14,9 +15,9 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class SongProgressInfo : Container
     {
-        private OsuSpriteText timeCurrent;
-        private OsuSpriteText timeLeft;
-        private OsuSpriteText progress;
+        private SizePreservingSpriteText timeCurrent;
+        private SizePreservingSpriteText timeLeft;
+        private SizePreservingSpriteText progress;
 
         private double startTime;
         private double endTime;
@@ -46,36 +47,71 @@ namespace osu.Game.Screens.Play.HUD
             if (clock != null)
                 gameplayClock = clock;
 
+            AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                timeCurrent = new OsuSpriteText
+                new Container
                 {
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    Colour = colours.BlueLighter,
-                    Font = OsuFont.Numeric,
-                    Margin = new MarginPadding
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    AutoSizeAxes = Axes.Both,
+                    Child = new UprightAspectMaintainingContainer
                     {
-                        Left = margin,
-                    },
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        AutoSizeAxes = Axes.Both,
+                        Scaling = ScaleMode.Vertical,
+                        ScalingFactor = 0.5f,
+                        Child = timeCurrent = new SizePreservingSpriteText
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Colour = colours.BlueLighter,
+                            Font = OsuFont.Numeric,
+                        }
+                    }
                 },
-                progress = new OsuSpriteText
+                new Container
                 {
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
-                    Colour = colours.BlueLighter,
-                    Font = OsuFont.Numeric,
-                },
-                timeLeft = new OsuSpriteText
-                {
-                    Origin = Anchor.BottomRight,
-                    Anchor = Anchor.BottomRight,
-                    Colour = colours.BlueLighter,
-                    Font = OsuFont.Numeric,
-                    Margin = new MarginPadding
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Child = new UprightAspectMaintainingContainer
                     {
-                        Right = margin,
-                    },
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        AutoSizeAxes = Axes.Both,
+                        Scaling = ScaleMode.Vertical,
+                        ScalingFactor = 0.5f,
+                        Child = progress = new SizePreservingSpriteText
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Colour = colours.BlueLighter,
+                            Font = OsuFont.Numeric,
+                        }
+                    }
+                },
+                new Container
+                {
+                    Origin = Anchor.CentreRight,
+                    Anchor = Anchor.CentreRight,
+                    AutoSizeAxes = Axes.Both,
+                    Child = new UprightAspectMaintainingContainer
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        AutoSizeAxes = Axes.Both,
+                        Scaling = ScaleMode.Vertical,
+                        ScalingFactor = 0.5f,
+                        Child = timeLeft = new SizePreservingSpriteText
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Colour = colours.BlueLighter,
+                            Font = OsuFont.Numeric,
+                        }
+                    }
                 }
             };
         }
