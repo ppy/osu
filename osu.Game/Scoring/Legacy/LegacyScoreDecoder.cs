@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -22,6 +24,8 @@ namespace osu.Game.Scoring.Legacy
     {
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
+
+        private float beatmapOffset;
 
         public Score Parse(Stream stream)
         {
@@ -71,6 +75,9 @@ namespace osu.Game.Scoring.Legacy
 
                 currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
                 scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
+
+                // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
+                beatmapOffset = currentBeatmap.BeatmapInfo.BeatmapVersion < 5 ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
                 /* score.HpGraphString = */
                 sr.ReadString();
@@ -229,7 +236,7 @@ namespace osu.Game.Scoring.Legacy
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
-            float lastTime = 0;
+            float lastTime = beatmapOffset;
             ReplayFrame currentFrame = null;
 
             string[] frames = reader.ReadToEnd().Split(',');

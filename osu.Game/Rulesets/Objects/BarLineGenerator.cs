@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,9 +43,9 @@ namespace osu.Game.Rulesets.Objects
                 int currentBeat = 0;
 
                 // Stop on the beat before the next timing point, or if there is no next timing point stop slightly past the last object
-                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time - currentTimingPoint.BeatLength : lastHitTime + currentTimingPoint.BeatLength * (int)currentTimingPoint.TimeSignature;
+                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time - currentTimingPoint.BeatLength : lastHitTime + currentTimingPoint.BeatLength * currentTimingPoint.TimeSignature.Numerator;
 
-                double barLength = currentTimingPoint.BeatLength * (int)currentTimingPoint.TimeSignature;
+                double barLength = currentTimingPoint.BeatLength * currentTimingPoint.TimeSignature.Numerator;
 
                 for (double t = currentTimingPoint.Time; Precision.DefinitelyBigger(endTime, t); t += barLength, currentBeat++)
                 {
@@ -60,7 +62,7 @@ namespace osu.Game.Rulesets.Objects
                     BarLines.Add(new TBarLine
                     {
                         StartTime = t,
-                        Major = currentBeat % (int)currentTimingPoint.TimeSignature == 0
+                        Major = currentBeat % currentTimingPoint.TimeSignature.Numerator == 0
                     });
                 }
             }

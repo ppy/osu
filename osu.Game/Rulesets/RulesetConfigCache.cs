@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
@@ -13,14 +15,14 @@ namespace osu.Game.Rulesets
 {
     public class RulesetConfigCache : Component, IRulesetConfigCache
     {
-        private readonly RealmContextFactory realmFactory;
+        private readonly RealmAccess realm;
         private readonly RulesetStore rulesets;
 
         private readonly Dictionary<string, IRulesetConfigManager> configCache = new Dictionary<string, IRulesetConfigManager>();
 
-        public RulesetConfigCache(RealmContextFactory realmFactory, RulesetStore rulesets)
+        public RulesetConfigCache(RealmAccess realm, RulesetStore rulesets)
         {
-            this.realmFactory = realmFactory;
+            this.realm = realm;
             this.rulesets = rulesets;
         }
 
@@ -28,7 +30,7 @@ namespace osu.Game.Rulesets
         {
             base.LoadComplete();
 
-            var settingsStore = new SettingsStore(realmFactory);
+            var settingsStore = new SettingsStore(realm);
 
             // let's keep things simple for now and just retrieve all the required configs at startup..
             foreach (var ruleset in rulesets.AvailableRulesets)

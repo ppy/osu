@@ -4,14 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Humanizer;
 using MessagePack;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Utils;
 
 namespace osu.Game.Online.API
 {
@@ -20,7 +20,7 @@ namespace osu.Game.Online.API
     {
         [JsonProperty("acronym")]
         [Key(0)]
-        public string Acronym { get; set; }
+        public string Acronym { get; set; } = string.Empty;
 
         [JsonProperty("settings")]
         [Key(1)]
@@ -42,7 +42,7 @@ namespace osu.Game.Online.API
                 var bindable = (IBindable)property.GetValue(mod);
 
                 if (!bindable.IsDefault)
-                    Settings.Add(property.Name.Underscore(), bindable);
+                    Settings.Add(property.Name.ToSnakeCase(), bindable.GetUnderlyingSettingValue());
             }
         }
 
@@ -51,21 +51,33 @@ namespace osu.Game.Online.API
             Mod resultMod = ruleset.CreateModFromAcronym(Acronym);
 
             if (resultMod == null)
-                throw new InvalidOperationException($"There is no mod in the ruleset ({ruleset.ShortName}) matching the acronym {Acronym}.");
+            {
+                Logger.Log($"There is no mod in the ruleset ({ruleset.ShortName}) matching the acronym {Acronym}.");
+                return new UnknownMod(Acronym);
+            }
 
             if (Settings.Count > 0)
             {
                 foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
                 {
-                    if (!Settings.TryGetValue(property.Name.Underscore(), out object settingValue))
+                    if (!Settings.TryGetValue(property.Name.ToSnakeCase(), out object settingValue))
                         continue;
 
-                    resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
+                    try
+                    {
+                        resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Failed to copy mod setting value '{settingValue ?? "null"}' to \"{property.Name}\": {ex.Message}");
+                    }
                 }
             }
 
             return resultMod;
         }
+
+        public bool ShouldSerializeSettings() => Settings.Count > 0;
 
         public bool Equals(APIMod other)
         {
@@ -89,13 +101,13 @@ namespace osu.Game.Online.API
 
             public bool Equals(KeyValuePair<string, object> x, KeyValuePair<string, object> y)
             {
-                object xValue = ModUtils.GetSettingUnderlyingValue(x.Value);
-                object yValue = ModUtils.GetSettingUnderlyingValue(y.Value);
+                object xValue = x.Value.GetUnderlyingSettingValue();
+                object yValue = y.Value.GetUnderlyingSettingValue();
 
                 return x.Key == y.Key && EqualityComparer<object>.Default.Equals(xValue, yValue);
             }
 
-            public int GetHashCode(KeyValuePair<string, object> obj) => HashCode.Combine(obj.Key, ModUtils.GetSettingUnderlyingValue(obj.Value));
+            public int GetHashCode(KeyValuePair<string, object> obj) => HashCode.Combine(obj.Key, obj.Value.GetUnderlyingSettingValue());
         }
     }
 }

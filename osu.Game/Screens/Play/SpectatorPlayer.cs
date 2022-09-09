@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -43,6 +45,20 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
+            {
+                if (GameplayClockContainer is MasterGameplayClockContainer master)
+                {
+                    if (master.UserPlaybackRate.Value > 1 && waiting.NewValue)
+                        master.UserPlaybackRate.Value = 1;
+                }
+            }, true);
+        }
+
         protected override void StartGameplay()
         {
             base.StartGameplay();
@@ -72,12 +88,13 @@ namespace osu.Game.Screens.Play
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;
                 convertedFrame.Time = frame.Time;
+                convertedFrame.Header = frame.Header;
 
                 score.Replay.Frames.Add(convertedFrame);
             }
 
             if (isFirstBundle && score.Replay.Frames.Count > 0)
-                NonFrameStableSeek(score.Replay.Frames[0].Time);
+                SetGameplayStartTime(score.Replay.Frames[0].Time);
         }
 
         protected override Score CreateScore(IBeatmap beatmap) => score;
@@ -90,11 +107,11 @@ namespace osu.Game.Screens.Play
             DrawableRuleset?.SetReplayScore(score);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             SpectatorClient.OnNewFrames -= userSentFrames;
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         protected override void Dispose(bool isDisposing)

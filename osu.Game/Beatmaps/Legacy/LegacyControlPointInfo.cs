@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -54,12 +56,12 @@ namespace osu.Game.Beatmaps.Legacy
         {
             switch (newPoint)
             {
-                case SampleControlPoint _:
+                case SampleControlPoint:
                     // intentionally don't use SamplePointAt (we always need to consider the first sample point).
                     var existing = BinarySearch(SamplePoints, time);
                     return newPoint.IsRedundant(existing);
 
-                case DifficultyControlPoint _:
+                case DifficultyControlPoint:
                     return newPoint.IsRedundant(DifficultyPointAt(time));
 
                 default:

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using System.IO;
 using osu.Framework.Allocation;
@@ -124,9 +126,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             base.LoadComplete();
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
 
             this.FadeOut(250);
         }

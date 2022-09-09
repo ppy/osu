@@ -1,41 +1,44 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.UI;
+#nullable disable
+
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Osu.Edit;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Replays;
-using osu.Game.Rulesets.Replays.Types;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
-using osu.Game.Rulesets.Osu.Scoring;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
-using osu.Game.Skinning;
-using System;
-using System.Linq;
-using osu.Framework.Extensions.EnumExtensions;
+using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Setup;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -50,6 +53,8 @@ namespace osu.Game.Rulesets.Osu
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
 
         public const string SHORT_NAME = "osu";
+
+        public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -118,19 +123,19 @@ namespace osu.Game.Rulesets.Osu
             {
                 switch (mod)
                 {
-                    case OsuModAutopilot _:
+                    case OsuModAutopilot:
                         value |= LegacyMods.Autopilot;
                         break;
 
-                    case OsuModSpunOut _:
+                    case OsuModSpunOut:
                         value |= LegacyMods.SpunOut;
                         break;
 
-                    case OsuModTarget _:
+                    case OsuModTarget:
                         value |= LegacyMods.Target;
                         break;
 
-                    case OsuModTouchDevice _:
+                    case OsuModTouchDevice:
                         value |= LegacyMods.TouchDevice;
                         break;
                 }
@@ -159,6 +164,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
                         new OsuModHidden(),
                         new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
+                        new OsuModStrictTracking()
                     };
 
                 case ModType.Conversion:
@@ -169,6 +175,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModClassic(),
                         new OsuModRandom(),
                         new OsuModMirror(),
+                        new MultiMod(new OsuModAlternate(), new OsuModSingleTap())
                     };
 
                 case ModType.Automation:
@@ -193,6 +200,8 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModApproachDifferent(),
                         new OsuModMuted(),
                         new OsuModNoScope(),
+                        new MultiMod(new OsuModMagnetised(), new OsuModRepel()),
+                        new ModAdaptiveSpeed()
                     };
 
                 case ModType.System:
@@ -210,7 +219,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(RulesetInfo, beatmap);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new OsuPerformanceCalculator(this, attributes, score);
+        public override PerformanceCalculator CreatePerformanceCalculator() => new OsuPerformanceCalculator();
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
@@ -247,7 +256,7 @@ namespace osu.Game.Rulesets.Osu
             };
         }
 
-        public override string GetDisplayNameForHitResult(HitResult result)
+        public override LocalisableString GetDisplayNameForHitResult(HitResult result)
         {
             switch (result)
             {
@@ -277,22 +286,10 @@ namespace osu.Game.Rulesets.Osu
                 {
                     Columns = new[]
                     {
-                        new StatisticItem("Timing Distribution",
-                            new HitEventTimingDistributionGraph(timedHitEvents)
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Height = 250
-                            }),
-                    }
-                },
-                new StatisticRow
-                {
-                    Columns = new[]
-                    {
-                        new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score, playableBeatmap)
+                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 250
+                            AutoSizeAxes = Axes.Y
                         }),
                     }
                 },
@@ -300,10 +297,33 @@ namespace osu.Game.Rulesets.Osu
                 {
                     Columns = new[]
                     {
-                        new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
                         {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }, true),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }, true),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        {
+                            new AverageHitError(timedHitEvents),
                             new UnstableRate(timedHitEvents)
-                        }))
+                        }), true)
                     }
                 }
             };

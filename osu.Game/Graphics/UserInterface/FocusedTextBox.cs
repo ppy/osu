@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
@@ -23,12 +21,17 @@ namespace osu.Game.Graphics.UserInterface
 
         private bool allowImmediateFocus => host?.OnScreenKeyboardOverlapsGameWindow != true;
 
+        /// <summary>
+        /// Whether the content of the text box should be cleared on the first "back" key press.
+        /// </summary>
+        protected virtual bool ClearTextOnBackKey => true;
+
         public void TakeFocus()
         {
             if (!allowImmediateFocus)
                 return;
 
-            Scheduler.Add(() => GetContainingInputManager().ChangeFocus(this), false);
+            Scheduler.Add(() => GetContainingInputManager().ChangeFocus(this));
         }
 
         public new void KillFocus() => base.KillFocus();
@@ -80,11 +83,12 @@ namespace osu.Game.Graphics.UserInterface
 
             if (!HasFocus) return false;
 
-            if (e.Action == GlobalAction.Back)
+            if (ClearTextOnBackKey && e.Action == GlobalAction.Back)
             {
                 if (Text.Length > 0)
                 {
                     Text = string.Empty;
+                    PlayFeedbackSample(FeedbackSampleType.TextRemove);
                     return true;
                 }
             }

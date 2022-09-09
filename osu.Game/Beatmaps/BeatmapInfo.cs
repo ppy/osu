@@ -2,61 +2,69 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Scoring;
 using Realms;
-
-#nullable enable
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// A single beatmap difficulty.
+    /// A realm model containing metadata for a single beatmap difficulty.
+    /// This should generally include anything which is required to be filtered on at song select, or anything pertaining to storage of beatmaps in the client.
     /// </summary>
+    /// <remarks>
+    /// There are some legacy fields in this model which are not persisted to realm. These are isolated in a code region within the class and should eventually be migrated to `Beatmap`.
+    /// </remarks>
     [ExcludeFromDynamicCompile]
     [Serializable]
     [MapTo("Beatmap")]
     public class BeatmapInfo : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo, IEquatable<BeatmapInfo>
     {
         [PrimaryKey]
-        public Guid ID { get; set; } = Guid.NewGuid();
+        public Guid ID { get; set; }
 
         public string DifficultyName { get; set; } = string.Empty;
 
-        public RulesetInfo Ruleset { get; set; }
+        public RulesetInfo Ruleset { get; set; } = null!;
 
-        public BeatmapDifficulty Difficulty { get; set; }
+        public BeatmapDifficulty Difficulty { get; set; } = null!;
 
-        public BeatmapMetadata Metadata { get; set; }
+        public BeatmapMetadata Metadata { get; set; } = null!;
 
+        [JsonIgnore]
         [Backlink(nameof(ScoreInfo.BeatmapInfo))]
         public IQueryable<ScoreInfo> Scores { get; } = null!;
 
-        public BeatmapInfo(RulesetInfo ruleset, BeatmapDifficulty difficulty, BeatmapMetadata metadata)
-        {
-            Ruleset = ruleset;
-            Difficulty = difficulty;
-            Metadata = metadata;
-        }
+        public BeatmapUserSettings UserSettings { get; set; } = null!;
 
-        [UsedImplicitly]
-        public BeatmapInfo() // TODO: consider removing this and migrating all usages to ctor with parameters.
+        public BeatmapInfo(RulesetInfo? ruleset = null, BeatmapDifficulty? difficulty = null, BeatmapMetadata? metadata = null)
         {
-            Ruleset = new RulesetInfo
+            ID = Guid.NewGuid();
+            Ruleset = ruleset ?? new RulesetInfo
             {
                 OnlineID = 0,
                 ShortName = @"osu",
                 Name = @"null placeholder ruleset"
             };
-            Difficulty = new BeatmapDifficulty();
-            Metadata = new BeatmapMetadata();
+            Difficulty = difficulty ?? new BeatmapDifficulty();
+            Metadata = metadata ?? new BeatmapMetadata();
+            UserSettings = new BeatmapUserSettings();
+        }
+
+        [UsedImplicitly]
+        private BeatmapInfo()
+        {
         }
 
         public BeatmapSetInfo? BeatmapSet { get; set; }
@@ -83,12 +91,47 @@ namespace osu.Game.Beatmaps
 
         public string Hash { get; set; } = string.Empty;
 
-        public double StarRating { get; set; }
+        /// <summary>
+        /// Defaults to -1 (meaning not-yet-calculated).
+        /// Will likely be superseded with a better storage considering ruleset/mods.
+        /// </summary>
+        public double StarRating { get; set; } = -1;
 
+        [Indexed]
         public string MD5Hash { get; set; } = string.Empty;
+
+        public string OnlineMD5Hash { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The last time of a local modification (via the editor).
+        /// </summary>
+        public DateTimeOffset? LastLocalUpdate { get; set; }
+
+        /// <summary>
+        /// The last time online metadata was applied to this beatmap.
+        /// </summary>
+        public DateTimeOffset? LastOnlineUpdate { get; set; }
+
+        /// <summary>
+        /// Whether this beatmap matches the online version, based on fetched online metadata.
+        /// Will return <c>true</c> if no online metadata is available.
+        /// </summary>
+        public bool MatchesOnlineVersion => LastOnlineUpdate == null || MD5Hash == OnlineMD5Hash;
 
         [JsonIgnore]
         public bool Hidden { get; set; }
+
+        /// <summary>
+        /// Reset any fetched online linking information (and history).
+        /// </summary>
+        public void ResetOnlineInfo()
+        {
+            OnlineID = -1;
+            LastOnlineUpdate = null;
+            OnlineMD5Hash = string.Empty;
+            if (Status != BeatmapOnlineStatus.LocallyModified)
+                Status = BeatmapOnlineStatus.None;
+        }
 
         #region Properties we may not want persisted (but also maybe no harm?)
 
@@ -100,19 +143,34 @@ namespace osu.Game.Beatmaps
 
         public bool LetterboxInBreaks { get; set; }
 
-        public bool WidescreenStoryboard { get; set; }
+        public bool WidescreenStoryboard { get; set; } = true;
 
         public bool EpilepsyWarning { get; set; }
 
-        public bool SamplesMatchPlaybackRate { get; set; }
+        public bool SamplesMatchPlaybackRate { get; set; } = true;
 
-        public double DistanceSpacing { get; set; }
+        /// <summary>
+        /// The time at which this beatmap was last played by the local user.
+        /// </summary>
+        public DateTimeOffset? LastPlayed { get; set; }
+
+        /// <summary>
+        /// The ratio of distance travelled per time unit.
+        /// Generally used to decouple the spacing between hit objects from the enforced "velocity" of the beatmap (see <see cref="DifficultyControlPoint.SliderVelocity"/>).
+        /// </summary>
+        /// <remarks>
+        /// The most common method of understanding is that at a default value of 1.0, the time-to-distance ratio will match the slider velocity of the beatmap
+        /// at the current point in time. Increasing this value will make hit objects more spaced apart when compared to the cursor movement required to track a slider.
+        ///
+        /// This is only a hint property, used by the editor in <see cref="IDistanceSnapProvider"/> implementations. It does not directly affect the beatmap or gameplay.
+        /// </remarks>
+        public double DistanceSpacing { get; set; } = 1.0;
 
         public int BeatDivisor { get; set; }
 
         public int GridSize { get; set; }
 
-        public double TimelineZoom { get; set; }
+        public double TimelineZoom { get; set; } = 1.0;
 
         [Ignored]
         public CountdownType Countdown { get; set; } = CountdownType.Normal;
@@ -137,14 +195,23 @@ namespace osu.Game.Beatmaps
         public bool AudioEquals(BeatmapInfo? other) => other != null
                                                        && BeatmapSet != null
                                                        && other.BeatmapSet != null
-                                                       && BeatmapSet.Hash == other.BeatmapSet.Hash
-                                                       && Metadata.AudioFile == other.Metadata.AudioFile;
+                                                       && compareFiles(this, other, m => m.AudioFile);
 
         public bool BackgroundEquals(BeatmapInfo? other) => other != null
                                                             && BeatmapSet != null
                                                             && other.BeatmapSet != null
-                                                            && BeatmapSet.Hash == other.BeatmapSet.Hash
-                                                            && Metadata.BackgroundFile == other.Metadata.BackgroundFile;
+                                                            && compareFiles(this, other, m => m.BackgroundFile);
+
+        private static bool compareFiles(BeatmapInfo x, BeatmapInfo y, Func<IBeatmapMetadataInfo, string> getFilename)
+        {
+            Debug.Assert(x.BeatmapSet != null);
+            Debug.Assert(y.BeatmapSet != null);
+
+            string? fileHashX = x.BeatmapSet.GetFile(getFilename(x.Metadata))?.File.Hash;
+            string? fileHashY = y.BeatmapSet.GetFile(getFilename(y.Metadata))?.File.Hash;
+
+            return fileHashX == fileHashY;
+        }
 
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
@@ -152,19 +219,6 @@ namespace osu.Game.Beatmaps
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
 
         #region Compatibility properties
-
-        [Ignored]
-        public int RulesetID
-        {
-            get => Ruleset.OnlineID;
-            set
-            {
-                if (!string.IsNullOrEmpty(Ruleset.InstantiationInfo))
-                    throw new InvalidOperationException($"Cannot set a {nameof(RulesetID)} when {nameof(Ruleset)} is already set to an actual ruleset.");
-
-                Ruleset.OnlineID = value;
-            }
-        }
 
         [Ignored]
         [Obsolete("Use BeatmapInfo.Difficulty instead.")] // can be removed 20220719
@@ -180,7 +234,12 @@ namespace osu.Game.Beatmaps
         [Ignored]
         public APIBeatmap? OnlineInfo { get; set; }
 
+        /// <summary>
+        /// The maximum achievable combo on this beatmap, populated for online info purposes only.
+        /// Todo: This should never be used nor exist, but is still relied on in <see cref="ScoresContainer.Scores"/> since <see cref="IBeatmapInfo"/> can't be used yet. For now this is obsoleted until it is removed.
+        /// </summary>
         [Ignored]
+        [Obsolete("Use ScoreManager.GetMaximumAchievableComboAsync instead.")]
         public int? MaxCombo { get; set; }
 
         [Ignored]

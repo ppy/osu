@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -134,7 +132,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// <remarks>
         /// Invoked when the entry became dead.
         /// </remarks>
-        protected virtual void RemoveDrawable(TEntry entry, TDrawable drawable) => RemoveInternal(drawable);
+        protected virtual void RemoveDrawable(TEntry entry, TDrawable drawable) => RemoveInternal(drawable, false);
 
         private void entryCrossedBoundary(LifetimeEntry lifetimeEntry, LifetimeBoundaryKind kind, LifetimeBoundaryCrossingDirection direction)
         {

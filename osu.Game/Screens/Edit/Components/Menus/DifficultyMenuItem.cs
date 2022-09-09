@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
@@ -22,6 +24,6 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 Action.Value = () => difficultyChangeFunc.Invoke(beatmapInfo);
         }
 
-        public override IconUsage? GetIconForState(bool state) => state ? (IconUsage?)FontAwesome.Solid.Check : null;
+        public override IconUsage? GetIconForState(bool state) => state ? FontAwesome.Solid.Check : null;
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Android.Content.PM;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -27,7 +29,7 @@ namespace osu.Android
         {
             gameActivity.RunOnUiThread(() =>
             {
-                gameActivity.RequestedOrientation = userPlaying.NewValue ? ScreenOrientation.Locked : ScreenOrientation.FullUser;
+                gameActivity.RequestedOrientation = userPlaying.NewValue ? ScreenOrientation.Locked : gameActivity.DefaultOrientation;
             });
         }
     }

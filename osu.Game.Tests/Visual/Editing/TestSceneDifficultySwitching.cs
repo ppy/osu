@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -13,6 +15,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps.IO;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -37,11 +40,8 @@ namespace osu.Game.Tests.Visual.Editing
             base.SetUpSteps();
         }
 
-        protected override void LoadEditor()
-        {
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(importedBeatmapSet.Beatmaps.First());
-            base.LoadEditor();
-        }
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
+            => beatmaps.GetWorkingBeatmap(importedBeatmapSet.Beatmaps.First());
 
         [Test]
         public void TestBasicSwitch()
@@ -84,8 +84,8 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("set target difficulty", () =>
             {
                 targetDifficulty = sameRuleset
-                    ? importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo) && beatmap.RulesetID == Beatmap.Value.BeatmapInfo.RulesetID)
-                    : importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo) && beatmap.RulesetID != Beatmap.Value.BeatmapInfo.RulesetID);
+                    ? importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo) && beatmap.Ruleset.ShortName == Beatmap.Value.BeatmapInfo.Ruleset.ShortName)
+                    : importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo) && beatmap.Ruleset.ShortName != Beatmap.Value.BeatmapInfo.Ruleset.ShortName);
             });
             switchToDifficulty(() => targetDifficulty);
             confirmEditingBeatmap(() => targetDifficulty);

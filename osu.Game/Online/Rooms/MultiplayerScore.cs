@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,7 +67,11 @@ namespace osu.Game.Online.Rooms
 
         public ScoreInfo CreateScoreInfo(RulesetStore rulesets, PlaylistItem playlistItem, [NotNull] BeatmapInfo beatmap)
         {
-            var rulesetInstance = playlistItem.Ruleset.Value.CreateInstance();
+            var ruleset = rulesets.GetRuleset(playlistItem.RulesetID);
+            if (ruleset == null)
+                throw new InvalidOperationException($"Couldn't create score with unknown ruleset: {playlistItem.RulesetID}");
+
+            var rulesetInstance = ruleset.CreateInstance();
 
             var scoreInfo = new ScoreInfo
             {
@@ -73,7 +79,7 @@ namespace osu.Game.Online.Rooms
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
                 BeatmapInfo = beatmap,
-                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID) ?? throw new InvalidOperationException(),
+                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {playlistItem.RulesetID} not found locally"),
                 Statistics = Statistics,
                 User = User,
                 Accuracy = Accuracy,

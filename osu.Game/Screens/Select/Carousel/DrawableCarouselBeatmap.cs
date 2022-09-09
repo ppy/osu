@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -19,11 +22,13 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -49,7 +54,9 @@ namespace osu.Game.Screens.Select.Carousel
         private Action<BeatmapInfo> hideRequested;
 
         private Triangles triangles;
+
         private StarCounter starCounter;
+        private DifficultyIcon difficultyIcon;
 
         [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
@@ -58,10 +65,10 @@ namespace osu.Game.Screens.Select.Carousel
         private BeatmapDifficultyCache difficultyCache { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private CollectionManager collectionManager { get; set; }
-
-        [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
 
         private IBindable<StarDifficulty?> starDifficultyBindable;
         private CancellationTokenSource starDifficultyCancellationSource;
@@ -109,8 +116,9 @@ namespace osu.Game.Screens.Select.Carousel
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        new DifficultyIcon(beatmapInfo, shouldShowTooltip: false)
+                        difficultyIcon = new DifficultyIcon(beatmapInfo)
                         {
+                            ShowTooltip = false,
                             Scale = new Vector2(1.8f),
                         },
                         new FillFlowContainer
@@ -136,14 +144,7 @@ namespace osu.Game.Screens.Select.Carousel
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = "mapped by",
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Text = $"{beatmapInfo.Metadata.Author.Username}",
-                                            Font = OsuFont.GetFont(italics: true),
+                                            Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmapInfo.Metadata.Author.Username),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },
@@ -153,17 +154,12 @@ namespace osu.Game.Screens.Select.Carousel
                                 {
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(4, 0),
+                                    Scale = new Vector2(0.8f),
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new TopLocalRank(beatmapInfo)
-                                        {
-                                            Scale = new Vector2(0.8f),
-                                        },
-                                        starCounter = new StarCounter
-                                        {
-                                            Scale = new Vector2(0.8f),
-                                        }
+                                        new TopLocalRank(beatmapInfo),
+                                        starCounter = new StarCounter()
                                     }
                                 }
                             }
@@ -219,6 +215,8 @@ namespace osu.Game.Screens.Select.Carousel
                 starDifficultyBindable.BindValueChanged(d =>
                 {
                     starCounter.Current = (float)(d.NewValue?.Stars ?? 0);
+                    if (d.NewValue != null)
+                        difficultyIcon.Current.Value = d.NewValue.Value;
                 }, true);
             }
 
@@ -235,39 +233,22 @@ namespace osu.Game.Screens.Select.Carousel
                     items.Add(new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested(beatmapInfo)));
 
                 if (editRequested != null)
-                    items.Add(new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested(beatmapInfo)));
+                    items.Add(new OsuMenuItem(CommonStrings.ButtonsEdit, MenuItemType.Standard, () => editRequested(beatmapInfo)));
 
                 if (beatmapInfo.OnlineID > 0 && beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineID)));
 
-                if (collectionManager != null)
-                {
-                    var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
-                    if (manageCollectionsDialog != null)
-                        collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+                var collectionItems = realm.Realm.All<BeatmapCollection>().AsEnumerable().Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmapInfo)).Cast<OsuMenuItem>().ToList();
+                if (manageCollectionsDialog != null)
+                    collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
-                    items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
-                }
+                items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
 
                 if (hideRequested != null)
-                    items.Add(new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
+                    items.Add(new OsuMenuItem(CommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
 
                 return items.ToArray();
             }
-        }
-
-        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
-        {
-            return new ToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
-            {
-                if (s)
-                    collection.Beatmaps.Add(beatmapInfo);
-                else
-                    collection.Beatmaps.Remove(beatmapInfo);
-            })
-            {
-                State = { Value = collection.Beatmaps.Contains(beatmapInfo) }
-            };
         }
 
         protected override void Dispose(bool isDisposing)

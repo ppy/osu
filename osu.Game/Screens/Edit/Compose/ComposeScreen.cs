@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -82,7 +84,12 @@ namespace osu.Game.Screens.Edit.Compose
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) => updateClipboardActionAvailability());
+
+            // May be null in the case of a ruleset that doesn't have editor support, see CreateMainContent().
+            if (composer == null)
+                return;
+
+            EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, _) => updateClipboardActionAvailability());
             clipboard.BindValueChanged(_ => updateClipboardActionAvailability());
             composer.OnLoadComplete += _ => updateClipboardActionAvailability();
             updateClipboardActionAvailability();

@@ -1,12 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Skinning;
 using osuTK;
@@ -34,6 +39,8 @@ namespace osu.Game.Screens.Play.HUD
         /// <inheritdoc cref="ISkinnableDrawable.UsesFixedAnchor"/>
         public bool UsesFixedAnchor { get; set; }
 
+        public Dictionary<string, object> Settings { get; set; } = new Dictionary<string, object>();
+
         public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();
 
         [JsonConstructor]
@@ -58,6 +65,14 @@ namespace osu.Game.Screens.Play.HUD
             if (component is ISkinnableDrawable skinnable)
                 UsesFixedAnchor = skinnable.UsesFixedAnchor;
 
+            foreach (var (_, property) in component.GetSettingsSourceProperties())
+            {
+                var bindable = (IBindable)property.GetValue(component);
+
+                if (!bindable.IsDefault)
+                    Settings.Add(property.Name.ToSnakeCase(), bindable.GetUnderlyingSettingValue());
+            }
+
             if (component is Container<Drawable> container)
             {
                 foreach (var child in container.OfType<ISkinnableDrawable>().OfType<Drawable>())
@@ -71,9 +86,26 @@ namespace osu.Game.Screens.Play.HUD
         /// <returns>The new instance.</returns>
         public Drawable CreateInstance()
         {
-            Drawable d = (Drawable)Activator.CreateInstance(Type);
-            d.ApplySkinnableInfo(this);
-            return d;
+            try
+            {
+                Drawable d = (Drawable)Activator.CreateInstance(Type);
+                d.ApplySkinnableInfo(this);
+                return d;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Unable to create skin component {Type.Name}");
+                return Drawable.Empty();
+            }
+        }
+
+        public static Type[] GetAllAvailableDrawables()
+        {
+            return typeof(OsuGame).Assembly.GetTypes()
+                                  .Where(t => !t.IsInterface && !t.IsAbstract)
+                                  .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
+                                  .OrderBy(t => t.Name)
+                                  .ToArray();
         }
     }
 }

@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay;
@@ -22,6 +25,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public OngoingOperationTracker OngoingOperationTracker { get; }
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker { get; }
         public TestRoomRequestsHandler RequestsHandler { get; }
+        public TestUserLookupCache UserLookupCache { get; }
+        public BeatmapLookupCache BeatmapLookupCache { get; }
 
         /// <summary>
         /// All cached dependencies which are also <see cref="Drawable"/> components.
@@ -38,6 +43,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             OngoingOperationTracker = new OngoingOperationTracker();
             AvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
             RoomManager = CreateRoomManager();
+            UserLookupCache = new TestUserLookupCache();
+            BeatmapLookupCache = new BeatmapLookupCache();
 
             dependencies = new DependencyContainer(new CachedModelDependencyContainer<Room>(null) { Model = { BindTarget = SelectedRoom } });
 
@@ -47,6 +54,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             CacheAs(OngoingOperationTracker);
             CacheAs(AvailabilityTracker);
             CacheAs(new OverlayColourProvider(OverlayColourScheme.Plum));
+            CacheAs<UserLookupCache>(UserLookupCache);
+            CacheAs(BeatmapLookupCache);
         }
 
         public object Get(Type type)

@@ -1,29 +1,27 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Graphics.Audio;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
@@ -39,6 +37,9 @@ namespace osu.Game.Tests.Gameplay
     {
         [Resolved]
         private OsuConfigManager config { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [Test]
         public void TestRetrieveTopLevelSample()
@@ -73,11 +74,9 @@ namespace osu.Game.Tests.Gameplay
             AddStep("create container", () =>
             {
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                working.LoadTrack();
 
                 Add(gameplayContainer = new MasterGameplayClockContainer(working, 0)
                 {
-                    IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
                         Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
@@ -85,90 +84,42 @@ namespace osu.Game.Tests.Gameplay
                 });
             });
 
-            AddStep("reset clock", () => gameplayContainer.Start());
+            AddStep("reset clock", () => gameplayContainer.Reset(startClock: true));
 
             AddUntilStep("sample played", () => sample.RequestedPlaying);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
         }
 
+        /// <summary>
+        /// Sample at 0ms, start time at 1000ms (so the sample should not be played).
+        /// </summary>
         [Test]
         public void TestSampleHasLifetimeEndWithInitialClockTime()
         {
-            GameplayClockContainer gameplayContainer = null;
+            MasterGameplayClockContainer gameplayContainer = null;
             DrawableStoryboardSample sample = null;
 
             AddStep("create container", () =>
             {
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                working.LoadTrack();
 
-                Add(gameplayContainer = new MasterGameplayClockContainer(working, 1000, true)
+                const double start_time = 1000;
+
+                Add(gameplayContainer = new MasterGameplayClockContainer(working, start_time)
                 {
-                    IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
                         Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
                     }
                 });
+
+                gameplayContainer.Reset(start_time);
             });
 
             AddStep("start time", () => gameplayContainer.Start());
 
             AddUntilStep("sample not played", () => !sample.RequestedPlaying);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
-        }
-
-        [TestCase(typeof(OsuModDoubleTime), 1.5)]
-        [TestCase(typeof(OsuModHalfTime), 0.75)]
-        [TestCase(typeof(ModWindUp), 1.5)]
-        [TestCase(typeof(ModWindDown), 0.75)]
-        [TestCase(typeof(OsuModDoubleTime), 2)]
-        [TestCase(typeof(OsuModHalfTime), 0.5)]
-        [TestCase(typeof(ModWindUp), 2)]
-        [TestCase(typeof(ModWindDown), 0.5)]
-        public void TestSamplePlaybackWithRateMods(Type expectedMod, double expectedRate)
-        {
-            GameplayClockContainer gameplayContainer = null;
-            StoryboardSampleInfo sampleInfo = null;
-            TestDrawableStoryboardSample sample = null;
-
-            Mod testedMod = Activator.CreateInstance(expectedMod) as Mod;
-
-            switch (testedMod)
-            {
-                case ModRateAdjust m:
-                    m.SpeedChange.Value = expectedRate;
-                    break;
-
-                case ModTimeRamp m:
-                    m.FinalRate.Value = m.InitialRate.Value = expectedRate;
-                    break;
-            }
-
-            AddStep("setup storyboard sample", () =>
-            {
-                Beatmap.Value = new TestCustomSkinWorkingBeatmap(new OsuRuleset().RulesetInfo, this);
-                SelectedMods.Value = new[] { testedMod };
-
-                var beatmapSkinSourceContainer = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
-
-                Add(gameplayContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
-                {
-                    Child = beatmapSkinSourceContainer
-                });
-
-                beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(sampleInfo = new StoryboardSampleInfo("test-sample", 1, 1))
-                {
-                    Clock = gameplayContainer.GameplayClock
-                });
-            });
-
-            AddStep("start", () => gameplayContainer.Start());
-
-            AddAssert("sample playback rate matches mod rates", () =>
-                testedMod != null && Precision.AlmostEquals(
-                    sample.ChildrenOfType<DrawableSample>().First().AggregateFrequency.Value,
-                    ((IApplicableToRate)testedMod).ApplyToRate(sampleInfo.StartTime)));
         }
 
         [Test]
@@ -192,11 +143,11 @@ namespace osu.Game.Tests.Gameplay
 
                 beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
                 {
-                    Clock = gameplayContainer.GameplayClock
+                    Clock = gameplayContainer
                 });
             });
 
-            AddStep("start", () => gameplayContainer.Start());
+            AddStep("reset clock", () => gameplayContainer.Reset(startClock: true));
 
             AddUntilStep("sample played", () => sample.IsPlayed);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
@@ -207,7 +158,7 @@ namespace osu.Game.Tests.Gameplay
         private class TestSkin : LegacySkin
         {
             public TestSkin(string resourceName, IStorageResourceProvider resources)
-                : base(DefaultLegacySkin.CreateInfo(), new TestResourceStore(resourceName), resources, "skin.ini")
+                : base(DefaultLegacySkin.CreateInfo(), resources, new TestResourceStore(resourceName))
             {
             }
         }
@@ -258,10 +209,11 @@ namespace osu.Game.Tests.Gameplay
 
         #region IResourceStorageProvider
 
+        public IRenderer Renderer => host.Renderer;
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
         public new IResourceStore<byte[]> Resources => base.Resources;
-        public RealmContextFactory RealmContextFactory => null;
+        public RealmAccess RealmAccess => null;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
 
         #endregion

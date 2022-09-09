@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using Moq;
 using NUnit.Framework;
+using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
@@ -53,7 +56,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestAcceptable()
         {
-            var context = getContext(new Texture(1920, 1080));
+            var context = getContext(new DummyRenderer().CreateTexture(1920, 1080));
 
             Assert.That(check.Run(context), Is.Empty);
         }
@@ -61,7 +64,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestTooHighResolution()
         {
-            var context = getContext(new Texture(3840, 2160));
+            var context = getContext(new DummyRenderer().CreateTexture(3840, 2160));
 
             var issues = check.Run(context).ToList();
 
@@ -72,7 +75,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestLowResolution()
         {
-            var context = getContext(new Texture(640, 480));
+            var context = getContext(new DummyRenderer().CreateTexture(640, 480));
 
             var issues = check.Run(context).ToList();
 
@@ -83,7 +86,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestTooLowResolution()
         {
-            var context = getContext(new Texture(100, 100));
+            var context = getContext(new DummyRenderer().CreateTexture(100, 100));
 
             var issues = check.Run(context).ToList();
 
@@ -94,7 +97,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestTooUncompressed()
         {
-            var context = getContext(new Texture(1920, 1080), new MemoryStream(new byte[1024 * 1024 * 3]));
+            var context = getContext(new DummyRenderer().CreateTexture(1920, 1080), new MemoryStream(new byte[1024 * 1024 * 3]));
 
             var issues = check.Run(context).ToList();
 
@@ -105,7 +108,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestStreamClosed()
         {
-            var background = new Texture(1920, 1080);
+            var background = new DummyRenderer().CreateTexture(1920, 1080);
             var stream = new Mock<MemoryStream>(new byte[1024 * 1024]);
 
             var context = getContext(background, stream.Object);

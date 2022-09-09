@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Bindables;
@@ -70,7 +72,7 @@ namespace osu.Game.Tournament.IO
 
         public IEnumerable<string> ListTournaments() => AllTournaments.GetDirectories(string.Empty);
 
-        public override void Migrate(Storage newStorage)
+        public override bool Migrate(Storage newStorage)
         {
             // this migration only happens once on moving to the per-tournament storage system.
             // listed files are those known at that point in time.
@@ -94,6 +96,8 @@ namespace osu.Game.Tournament.IO
             ChangeTargetStorage(newStorage);
             storageConfig.SetValue(StorageConfig.CurrentTournament, default_tournament);
             storageConfig.Save();
+
+            return true;
         }
 
         private void moveFileIfExists(string file, DirectoryInfo destination)

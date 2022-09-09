@@ -1,7 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -28,6 +31,12 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             Direction.Value = ScrollingDirection.Down;
             TimeRange.Value = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            KeyBindingInputManager.Add(new CatchTouchInputMapper());
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);

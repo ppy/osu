@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -105,7 +107,7 @@ namespace osu.Game.Scoring
         public string ModsJson
         {
             get => JsonConvert.SerializeObject(APIMods);
-            set => APIMods = JsonConvert.DeserializeObject<APIMod[]>(value);
+            set => APIMods = !string.IsNullOrEmpty(value) ? JsonConvert.DeserializeObject<APIMod[]>(value) : Array.Empty<APIMod>();
         }
 
         [NotMapped]

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -19,7 +21,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, Array.Empty<Mod>());
 
-            return new ScoreAccessibleReplayPlayer(ruleset.GetAutoplayMod()?.CreateReplayScore(beatmap, Array.Empty<Mod>()));
+            return new ScoreAccessibleReplayPlayer(ruleset.GetAutoplayMod()?.CreateScoreFromReplayData(beatmap, Array.Empty<Mod>()));
         }
 
         protected override void AddCheckSteps()

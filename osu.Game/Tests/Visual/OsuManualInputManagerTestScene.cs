@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -36,11 +38,11 @@ namespace osu.Game.Tests.Visual
 
         protected OsuManualInputManagerTestScene()
         {
-            MenuCursorContainer cursorContainer;
+            GlobalCursorDisplay cursorDisplay;
 
-            CompositeDrawable mainContent = cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
+            CompositeDrawable mainContent = cursorDisplay = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both };
 
-            cursorContainer.Child = content = new OsuTooltipContainer(cursorContainer.Cursor)
+            cursorDisplay.Child = content = new OsuTooltipContainer(cursorDisplay.MenuCursor)
             {
                 RelativeSizeAxes = Axes.Both
             };
@@ -127,9 +129,9 @@ namespace osu.Game.Tests.Visual
             where T : Drawable
         {
             if (typeof(T) == typeof(Button))
-                AddUntilStep($"wait for {typeof(T).Name} enabled", () => (this.ChildrenOfType<T>().Single() as Button)?.Enabled.Value == true);
+                AddUntilStep($"wait for {typeof(T).Name} enabled", () => (this.ChildrenOfType<T>().Single() as ClickableContainer)?.Enabled.Value == true);
             else
-                AddUntilStep($"wait for {typeof(T).Name} enabled", () => this.ChildrenOfType<T>().Single().ChildrenOfType<Button>().Single().Enabled.Value);
+                AddUntilStep($"wait for {typeof(T).Name} enabled", () => this.ChildrenOfType<T>().Single().ChildrenOfType<ClickableContainer>().Single().Enabled.Value);
 
             AddStep($"click {typeof(T).Name}", () =>
             {

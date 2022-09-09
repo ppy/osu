@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -28,17 +30,20 @@ namespace osu.Game.Storyboards.Drawables
             LifetimeStart = sampleInfo.StartTime;
         }
 
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+        [Resolved(CanBeNull = true)]
+        private IReadOnlyList<Mod> mods { get; set; }
 
         protected override void SkinChanged(ISkinSource skin)
         {
             base.SkinChanged(skin);
 
-            foreach (var mod in mods.Value.OfType<IApplicableToSample>())
+            if (mods != null)
             {
-                foreach (var sample in DrawableSamples)
-                    mod.ApplyToSample(sample);
+                foreach (var mod in mods.OfType<IApplicableToSample>())
+                {
+                    foreach (var sample in DrawableSamples)
+                        mod.ApplyToSample(sample);
+                }
             }
         }
 

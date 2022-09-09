@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Pippidon.Replays
 
         protected override bool IsImportant(PippidonReplayFrame frame) => true;
 
-        public override void CollectPendingInputs(List<IInput> inputs)
+        protected override void CollectReplayInputs(List<IInput> inputs)
         {
             var position = Interpolation.ValueAt(CurrentTime, StartFrame.Position, EndFrame.Position, StartFrame.Time, EndFrame.Time);
 

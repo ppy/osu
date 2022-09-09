@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -41,7 +43,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("ensure manager loaded", () => beatmaps != null);
             ensureSoleilyRemoved();
             createButtonWithBeatmap(createSoleily());
-            AddAssert("button state not downloaded", () => downloadButton.DownloadState == DownloadState.NotDownloaded);
+            AddUntilStep("button state not downloaded", () => downloadButton.DownloadState == DownloadState.NotDownloaded);
             AddStep("import soleily", () => beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()));
 
             AddUntilStep("wait for beatmap import", () => beatmaps.GetAllUsableBeatmapSets().Any(b => b.OnlineID == 241526));
@@ -50,7 +52,7 @@ namespace osu.Game.Tests.Visual.Online
             createButtonWithBeatmap(createSoleily());
             AddUntilStep("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
             ensureSoleilyRemoved();
-            AddAssert("button state not downloaded", () => downloadButton.DownloadState == DownloadState.NotDownloaded);
+            AddUntilStep("button state not downloaded", () => downloadButton.DownloadState == DownloadState.NotDownloaded);
         }
 
         private void ensureSoleilyRemoved()

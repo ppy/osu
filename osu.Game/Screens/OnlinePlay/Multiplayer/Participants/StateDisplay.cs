@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -112,6 +114,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     break;
 
                 case MultiplayerUserState.Loaded:
+                case MultiplayerUserState.ReadyForGameplay:
                     text.Text = "loaded";
                     icon.Icon = FontAwesome.Solid.DotCircle;
                     icon.Colour = colours.YellowLight;

@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// The user readable description of this mod.
         /// </summary>
-        string Description { get; }
+        LocalisableString Description { get; }
 
         /// <summary>
         /// The type of this mod.
@@ -38,6 +39,18 @@ namespace osu.Game.Rulesets.Mods
         /// Should be <c>false</c> for cases where the user is not interacting with the game (so it can be excluded from multiplayer selection, for example).
         /// </summary>
         bool UserPlayable { get; }
+
+        /// <summary>
+        /// Whether this mod is valid for multiplayer matches.
+        /// Should be <c>false</c> for mods that make gameplay duration dependent on user input (e.g. <see cref="ModAdaptiveSpeed"/>).
+        /// </summary>
+        bool ValidForMultiplayer { get; }
+
+        /// <summary>
+        /// Whether this mod is valid as a free mod in multiplayer matches.
+        /// Should be <c>false</c> for mods that affect the gameplay duration (e.g. <see cref="ModRateAdjust"/> and <see cref="ModTimeRamp"/>).
+        /// </summary>
+        bool ValidForMultiplayerAsFreeMod { get; }
 
         /// <summary>
         /// Create a fresh <see cref="Mod"/> instance based on this mod.

@@ -3,8 +3,6 @@
 
 using osu.Game.Rulesets.Catch.Objects;
 
-#nullable enable
-
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
     /// <summary>

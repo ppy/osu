@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -18,7 +20,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public new ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)base.HitObjectContainer;
 
         [Resolved]
-        protected IScrollingInfo ScrollingInfo { get; private set; }
+        public IScrollingInfo ScrollingInfo { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load()

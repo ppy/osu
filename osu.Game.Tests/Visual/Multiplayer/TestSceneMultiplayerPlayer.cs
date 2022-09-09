@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
@@ -28,15 +30,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("initialise gameplay", () =>
             {
-                Stack.Push(player = new MultiplayerPlayer(Client.APIRoom, new PlaylistItem
+                Stack.Push(player = new MultiplayerPlayer(MultiplayerClient.ServerAPIRoom, new PlaylistItem(Beatmap.Value.BeatmapInfo)
                 {
-                    Beatmap = { Value = Beatmap.Value.BeatmapInfo },
-                    Ruleset = { Value = Beatmap.Value.BeatmapInfo.Ruleset }
-                }, Client.Room?.Users.ToArray()));
+                    RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
+                }, MultiplayerClient.ServerRoom?.Users.ToArray()));
             });
 
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen() && player.IsLoaded);
-            AddStep("start gameplay", () => ((IMultiplayerClient)Client).MatchStarted());
+            AddStep("start gameplay", () => ((IMultiplayerClient)MultiplayerClient).GameplayStarted());
         }
 
         [Test]

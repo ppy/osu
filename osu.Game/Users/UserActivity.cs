@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
@@ -48,6 +50,16 @@ namespace osu.Game.Users
             }
 
             public override string Status => $@"{base.Status} with others";
+        }
+
+        public class SpectatingMultiplayerGame : InGame
+        {
+            public SpectatingMultiplayerGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+
+            public override string Status => $"Watching others {base.Status.ToLowerInvariant()}";
         }
 
         public class InPlaylistGame : InGame

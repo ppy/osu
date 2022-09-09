@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -27,6 +29,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
         {
             BackgroundColour = colours.Orange1;
             SpriteText.Colour = colourProvider.Background6;
+
+            Content.CornerRadius = 0;
 
             Text = "Test!";
         }

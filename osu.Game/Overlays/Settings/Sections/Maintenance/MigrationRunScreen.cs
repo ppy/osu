@@ -1,16 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osuTK;
 
@@ -22,6 +27,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
+
+        [Resolved]
+        private INotificationOverlay notifications { get; set; }
+
+        [Resolved]
+        private Storage storage { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         public override bool AllowBackButton => false;
 
@@ -84,32 +98,48 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             Beatmap.Value = Beatmap.Default;
 
+            var originalStorage = new NativeStorage(storage.GetFullPath(string.Empty), host);
+
             migrationTask = Task.Run(PerformMigration)
-                                .ContinueWith(t =>
+                                .ContinueWith(task =>
                                 {
-                                    if (t.IsFaulted)
-                                        Logger.Log($"Error during migration: {t.Exception?.Message}", level: LogLevel.Error);
+                                    if (task.IsFaulted)
+                                    {
+                                        Logger.Error(task.Exception, $"Error during migration: {task.Exception?.Message}");
+                                    }
+                                    else if (!task.GetResultSafely())
+                                    {
+                                        notifications.Post(new SimpleNotification
+                                        {
+                                            Text = "Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up.",
+                                            Activated = () =>
+                                            {
+                                                originalStorage.PresentExternally();
+                                                return true;
+                                            }
+                                        });
+                                    }
 
                                     Schedule(this.Exit);
                                 });
         }
 
-        protected virtual void PerformMigration() => game?.Migrate(destination.FullName);
+        protected virtual bool PerformMigration() => game?.Migrate(destination.FullName) != false;
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             this.FadeOut().Delay(250).Then().FadeIn(250);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             // block until migration is finished
             if (migrationTask?.IsCompleted == false)
                 return true;
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
     }
 }

@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,10 +18,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public class GameplayChatDisplay : MatchChatDisplay, IKeyBindingHandler<GlobalAction>
     {
-        [Resolved]
+        [Resolved(CanBeNull = true)]
+        [CanBeNull]
         private ILocalUserPlayInfo localUserInfo { get; set; }
 
-        private IBindable<bool> localUserPlaying = new Bindable<bool>();
+        private readonly IBindable<bool> localUserPlaying = new Bindable<bool>();
 
         public override bool PropagatePositionalInputSubTree => !localUserPlaying.Value;
 
@@ -46,7 +50,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            localUserPlaying = localUserInfo.IsPlaying.GetBoundCopy();
+            if (localUserInfo != null)
+                localUserPlaying.BindTo(localUserInfo.IsPlaying);
+
             localUserPlaying.BindValueChanged(playing =>
             {
                 // for now let's never hold focus. this avoid misdirected gameplay keys entering chat.

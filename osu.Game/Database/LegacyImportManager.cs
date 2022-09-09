@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -10,7 +11,6 @@ using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.IO;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
@@ -25,33 +25,83 @@ namespace osu.Game.Database
     public class LegacyImportManager : Component
     {
         [Resolved]
-        private SkinManager skins { get; set; }
+        private SkinManager skins { get; set; } = null!;
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private ScoreManager scores { get; set; }
+        private ScoreManager scores { get; set; } = null!;
 
         [Resolved]
-        private CollectionManager collections { get; set; }
+        private OsuGame? game { get; set; }
 
         [Resolved]
-        private OsuGame game { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; } = null!;
 
         [Resolved]
-        private DialogOverlay dialogOverlay { get; set; }
+        private RealmAccess realmAccess { get; set; } = null!;
 
-        [Resolved(CanBeNull = true)]
-        private DesktopGameHost desktopGameHost { get; set; }
+        [Resolved(canBeNull: true)] // canBeNull required while we remain on mono for mobile platforms.
+        private DesktopGameHost? desktopGameHost { get; set; }
 
-        private StableStorage cachedStorage;
+        [Resolved]
+        private INotificationOverlay? notifications { get; set; }
+
+        private StableStorage? cachedStorage;
 
         public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
-        public async Task ImportFromStableAsync(StableContent content)
+        public void UpdateStorage(string stablePath) => cachedStorage = new StableStorage(stablePath, desktopGameHost);
+
+        public virtual async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
         {
-            var stableStorage = await getStableStorage().ConfigureAwait(false);
+            var stableStorage = GetCurrentStableStorage();
+
+            if (stableStorage == null)
+                return 0;
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            switch (content)
+            {
+                case StableContent.Beatmaps:
+                    return await new LegacyBeatmapImporter(beatmaps).GetAvailableCount(stableStorage);
+
+                case StableContent.Skins:
+                    return await new LegacySkinImporter(skins).GetAvailableCount(stableStorage);
+
+                case StableContent.Collections:
+                    return await new LegacyCollectionImporter(realmAccess).GetAvailableCount(stableStorage);
+
+                case StableContent.Scores:
+                    return await new LegacyScoreImporter(scores).GetAvailableCount(stableStorage);
+
+                default:
+                    throw new ArgumentException($"Only one {nameof(StableContent)} flag should be specified.");
+            }
+        }
+
+        public async Task ImportFromStableAsync(StableContent content, bool interactiveLocateIfNotFound = true)
+        {
+            var stableStorage = GetCurrentStableStorage();
+
+            if (stableStorage == null)
+            {
+                if (!interactiveLocateIfNotFound)
+                    return;
+
+                var taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+                Schedule(() => dialogOverlay.Push(new StableDirectoryLocationDialog(taskCompletionSource)));
+                string stablePath = await taskCompletionSource.Task.ConfigureAwait(false);
+
+                UpdateStorage(stablePath);
+                stableStorage = GetCurrentStableStorage();
+            }
+
+            if (stableStorage == null)
+                return;
+
             var importTasks = new List<Task>();
 
             Task beatmapImportTask = Task.CompletedTask;
@@ -62,7 +112,14 @@ namespace osu.Game.Database
                 importTasks.Add(new LegacySkinImporter(skins).ImportFromStableAsync(stableStorage));
 
             if (content.HasFlagFast(StableContent.Collections))
-                importTasks.Add(beatmapImportTask.ContinueWith(_ => collections.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
+            {
+                importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyCollectionImporter(realmAccess)
+                {
+                    // Other legacy importers import via model managers which handle the posting of notifications.
+                    // Collections are an exception.
+                    PostNotification = n => notifications?.Post(n)
+                }.ImportFromStorage(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
+            }
 
             if (content.HasFlagFast(StableContent.Scores))
                 importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyScoreImporter(scores).ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
@@ -70,20 +127,16 @@ namespace osu.Game.Database
             await Task.WhenAll(importTasks.ToArray()).ConfigureAwait(false);
         }
 
-        private async Task<StableStorage> getStableStorage()
+        public StableStorage? GetCurrentStableStorage()
         {
             if (cachedStorage != null)
                 return cachedStorage;
 
-            var stableStorage = game.GetStorageForStableInstall();
+            var stableStorage = game?.GetStorageForStableInstall();
             if (stableStorage != null)
                 return cachedStorage = stableStorage;
 
-            var taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
-            Schedule(() => dialogOverlay.Push(new StableDirectoryLocationDialog(taskCompletionSource)));
-            string stablePath = await taskCompletionSource.Task.ConfigureAwait(false);
-
-            return cachedStorage = new StableStorage(stablePath, desktopGameHost);
+            return null;
         }
     }
 

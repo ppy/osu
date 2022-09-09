@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -149,7 +151,7 @@ namespace osu.Game.Skinning
             bool wasPlaying = IsPlaying;
 
             // Remove all pooled samples (return them to the pool), and dispose the rest.
-            samplesContainer.RemoveAll(s => s.IsInPool);
+            samplesContainer.RemoveAll(s => s.IsInPool, false);
             samplesContainer.Clear();
 
             foreach (var s in samples)

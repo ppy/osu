@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -19,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<float, SizeSlider>
+                new SettingsSlider<float, SizeSlider<float>>
                 {
                     LabelText = SkinSettingsStrings.GameplayCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
@@ -29,6 +31,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = SkinSettingsStrings.AutoCursorSize,
                     Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = SkinSettingsStrings.GameplayCursorDuringTouch,
+                    Current = config.GetBindable<bool>(OsuSetting.GameplayCursorDuringTouch)
                 },
             };
 

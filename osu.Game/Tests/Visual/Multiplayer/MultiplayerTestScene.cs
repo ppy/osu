@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using NUnit.Framework;
+#nullable disable
+
 using osu.Game.Online.Rooms;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -17,14 +18,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public const int PLAYER_1_ID = 55;
         public const int PLAYER_2_ID = 56;
 
-        public TestMultiplayerClient Client => OnlinePlayDependencies.Client;
+        public TestMultiplayerClient MultiplayerClient => OnlinePlayDependencies.MultiplayerClient;
         public new TestMultiplayerRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
-        public TestUserLookupCache LookupCache => OnlinePlayDependencies?.LookupCache;
         public TestSpectatorClient SpectatorClient => OnlinePlayDependencies?.SpectatorClient;
 
         protected new MultiplayerTestSceneDependencies OnlinePlayDependencies => (MultiplayerTestSceneDependencies)base.OnlinePlayDependencies;
 
-        public bool RoomJoined => Client.RoomJoined;
+        public bool RoomJoined => MultiplayerClient.RoomJoined;
 
         private readonly bool joinRoom;
 
@@ -33,24 +33,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
             this.joinRoom = joinRoom;
         }
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
-        {
-            if (joinRoom)
-                SelectedRoom.Value = CreateRoom();
-        });
-
         protected virtual Room CreateRoom()
         {
             return new Room
             {
                 Name = { Value = "test name" },
+                Type = { Value = MatchType.HeadToHead },
                 Playlist =
                 {
-                    new PlaylistItem
+                    new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
                     {
-                        Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                        Ruleset = { Value = Ruleset.Value }
+                        RulesetID = Ruleset.Value.OnlineID
                     }
                 }
             };
@@ -62,7 +55,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             if (joinRoom)
             {
-                AddStep("join room", () => RoomManager.CreateRoom(SelectedRoom.Value));
+                AddStep("join room", () =>
+                {
+                    SelectedRoom.Value = CreateRoom();
+                    RoomManager.CreateRoom(SelectedRoom.Value);
+                });
+
                 AddUntilStep("wait for room join", () => RoomJoined);
             }
         }

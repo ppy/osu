@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,11 +61,11 @@ namespace osu.Game.Online.Rooms
         {
             ID = item.ID;
             OwnerID = item.OwnerID;
-            BeatmapID = item.BeatmapID;
-            BeatmapChecksum = item.Beatmap.Value?.MD5Hash ?? string.Empty;
+            BeatmapID = item.Beatmap.OnlineID;
+            BeatmapChecksum = item.Beatmap.MD5Hash;
             RulesetID = item.RulesetID;
-            RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray();
-            AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray();
+            RequiredMods = item.RequiredMods.ToArray();
+            AllowedMods = item.AllowedMods.ToArray();
             Expired = item.Expired;
             PlaylistOrder = item.PlaylistOrder ?? 0;
             PlayedAt = item.PlayedAt;

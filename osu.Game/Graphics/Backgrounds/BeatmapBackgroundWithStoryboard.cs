@@ -1,14 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
+using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Graphics.Backgrounds
@@ -19,6 +20,9 @@ namespace osu.Game.Graphics.Backgrounds
 
         [Resolved(CanBeNull = true)]
         private MusicController? musicController { get; set; }
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         public BeatmapBackgroundWithStoryboard(WorkingBeatmap beatmap, string fallbackTextureName = "Backgrounds/bg1")
             : base(beatmap, fallbackTextureName)
@@ -39,7 +43,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 RelativeSizeAxes = Axes.Both,
                 Volume = { Value = 0 },
-                Child = new DrawableStoryboard(Beatmap.Storyboard) { Clock = storyboardClock }
+                Child = new DrawableStoryboard(Beatmap.Storyboard, mods.Value) { Clock = storyboardClock }
             }, AddInternal);
         }
 
