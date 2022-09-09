@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -78,11 +77,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 judgementsFlow.Clear();
                 judgementsFlow.Height = HitShapeCount.Value * (drawable_judgement_size + HitShapeSpacing.Value) - HitShapeSpacing.Value;
             }, true);
-            HitShape.BindValueChanged(_ =>
-            {
-                judgementsFlow.Shape = getShapeStyle(HitShape.Value);
-                judgementsFlow.Clear();
-            }, true);
         }
 
         public override void Clear() => judgementsFlow.Clear();
@@ -90,7 +84,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private class JudgementFlow : FillFlowContainer<HitErrorShape>
         {
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
-            internal string Shape = null!;
+
+            public readonly Bindable<ShapeStyle> Shape = new Bindable<ShapeStyle>();
 
             public JudgementFlow()
             {
@@ -102,7 +97,10 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             public void Push(Color4 colour, int maxErrorShapeCount)
             {
-                Add(new HitErrorShape(colour, drawable_judgement_size, Shape));
+                Add(new HitErrorShape(colour, drawable_judgement_size)
+                {
+                    Shape = { BindTarget = Shape },
+                });
 
                 if (Children.Count > maxErrorShapeCount)
                     Children.FirstOrDefault(c => !c.IsRemoved)?.Remove();
@@ -113,35 +111,43 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             public bool IsRemoved { get; private set; }
 
-            public HitErrorShape(Color4 colour, int size, string shape)
+            public readonly Bindable<ShapeStyle> Shape = new Bindable<ShapeStyle>();
+
+            private readonly Color4 colour;
+
+            public HitErrorShape(Color4 colour, int size)
             {
+                this.colour = colour;
                 Size = new Vector2(size);
-
-                switch (shape)
-                {
-                    case "circle":
-                        Child = new Circle
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            Colour = colour
-                        };
-                        break;
-
-                    case "square":
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            Colour = colour
-                        };
-                        break;
-                }
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
+                Shape.BindValueChanged(shape =>
+                {
+                    switch (shape.NewValue)
+                    {
+                        case ShapeStyle.Circle:
+                            Child = new Circle
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                Colour = colour
+                            };
+                            break;
+
+                        case ShapeStyle.Square:
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                Colour = colour
+                            };
+                            break;
+                    }
+                }, true);
 
                 Child.FadeInFromZero(animation_duration, Easing.OutQuint);
                 Child.MoveToY(-DrawSize.Y);
@@ -153,21 +159,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 IsRemoved = true;
 
                 this.FadeOut(animation_duration, Easing.OutQuint).Expire();
-            }
-        }
-
-        private string getShapeStyle(ShapeStyle shape)
-        {
-            switch (shape)
-            {
-                case ShapeStyle.Circle:
-                    return "circle";
-
-                case ShapeStyle.Square:
-                    return "square";
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(shape), shape, @"Unsupported animation style");
             }
         }
 
