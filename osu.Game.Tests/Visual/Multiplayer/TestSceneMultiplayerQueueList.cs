@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -27,15 +29,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private MultiplayerQueueList playlist;
         private BeatmapManager beatmaps;
-        private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
         private BeatmapInfo importedBeatmap;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
 
@@ -50,7 +51,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(500, 300),
-                    Items = { BindTarget = MultiplayerClient.APIRoom!.Playlist }
+                    Items = { BindTarget = MultiplayerClient.ClientAPIRoom!.Playlist }
                 };
             });
 
@@ -68,7 +69,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestDeleteButtonAlwaysVisibleForHost()
         {
             AddStep("set all players queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
-            AddUntilStep("wait for queue mode change", () => MultiplayerClient.APIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
 
             addPlaylistItem(() => API.LocalUser.Value.OnlineID);
             assertDeleteButtonVisibility(1, true);
@@ -80,7 +81,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestDeleteButtonOnlyVisibleForItemOwnerIfNotHost()
         {
             AddStep("set all players queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
-            AddUntilStep("wait for queue mode change", () => MultiplayerClient.APIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
 
             AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 1234 }));
             AddStep("set other user as host", () => MultiplayerClient.TransferHost(1234));
@@ -99,7 +100,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestCurrentItemDoesNotHaveDeleteButton()
         {
             AddStep("set all players queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
-            AddUntilStep("wait for queue mode change", () => MultiplayerClient.APIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
 
             addPlaylistItem(() => API.LocalUser.Value.OnlineID);
 
@@ -107,7 +108,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertDeleteButtonVisibility(1, true);
 
             AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
-            AddUntilStep("wait for next item to be selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == 2);
+            AddUntilStep("wait for next item to be selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == 2);
             AddUntilStep("wait for two items in playlist", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().Count() == 2);
 
             assertDeleteButtonVisibility(0, false);

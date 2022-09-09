@@ -36,15 +36,18 @@ namespace osu.Game.Screens.Select
         private readonly LoadingLayer loading;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
-        private IBeatmapInfo beatmapInfo;
+        [Resolved]
+        private SongSelect? songSelect { get; set; }
 
-        private APIFailTimes failTimes;
+        private IBeatmapInfo? beatmapInfo;
 
-        private int[] ratings;
+        private APIFailTimes? failTimes;
 
-        public IBeatmapInfo BeatmapInfo
+        private int[]? ratings;
+
+        public IBeatmapInfo? BeatmapInfo
         {
             get => beatmapInfo;
             set
@@ -54,7 +57,7 @@ namespace osu.Game.Screens.Select
                 beatmapInfo = value;
 
                 var onlineInfo = beatmapInfo as IBeatmapOnlineInfo;
-                var onlineSetInfo = beatmapInfo.BeatmapSet as IBeatmapSetOnlineInfo;
+                var onlineSetInfo = beatmapInfo?.BeatmapSet as IBeatmapSetOnlineInfo;
 
                 failTimes = onlineInfo?.FailTimes;
                 ratings = onlineSetInfo?.Ratings;
@@ -138,9 +141,9 @@ namespace osu.Game.Screens.Select
                                                     LayoutEasing = Easing.OutQuad,
                                                     Children = new[]
                                                     {
-                                                        description = new MetadataSection(MetadataType.Description),
-                                                        source = new MetadataSection(MetadataType.Source),
-                                                        tags = new MetadataSection(MetadataType.Tags),
+                                                        description = new MetadataSection(MetadataType.Description, searchOnSongSelect),
+                                                        source = new MetadataSection(MetadataType.Source, searchOnSongSelect),
+                                                        tags = new MetadataSection(MetadataType.Tags, searchOnSongSelect),
                                                     },
                                                 },
                                             },
@@ -173,6 +176,12 @@ namespace osu.Game.Screens.Select
                 },
                 loading = new LoadingLayer(true)
             };
+
+            void searchOnSongSelect(string text)
+            {
+                if (songSelect != null)
+                    songSelect.FilterControl.CurrentTextSearch.Value = text;
+            }
         }
 
         private void updateStatistics()
@@ -215,7 +224,7 @@ namespace osu.Game.Screens.Select
                 });
             };
 
-            lookup.Failure += e =>
+            lookup.Failure += _ =>
             {
                 Schedule(() =>
                 {

@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -71,6 +74,10 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="commitStart">Whether this call is committing a value for HitObject.StartTime and continuing with further adjustments.</param>
         protected void BeginPlacement(bool commitStart = false)
         {
+            var nearestSampleControlPoint = beatmap.HitObjects.LastOrDefault(h => h.GetEndTime() < HitObject.StartTime)?.SampleControlPoint?.DeepClone() as SampleControlPoint;
+
+            HitObject.SampleControlPoint = nearestSampleControlPoint ?? new SampleControlPoint();
+
             placementHandler.BeginPlacement(HitObject);
             if (commitStart)
                 PlacementActive = PlacementState.Active;
@@ -122,10 +129,10 @@ namespace osu.Game.Rulesets.Edit
 
             switch (e)
             {
-                case ScrollEvent _:
+                case ScrollEvent:
                     return false;
 
-                case DoubleClickEvent _:
+                case DoubleClickEvent:
                     return false;
 
                 case MouseButtonEvent mouse:

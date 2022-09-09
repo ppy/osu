@@ -1,13 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Select;
@@ -20,7 +25,9 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestCantExitWithoutSaving()
         {
+            AddUntilStep("Wait for dialog overlay load", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
             AddRepeatStep("Exit", () => InputManager.Key(Key.Escape), 10);
+            AddAssert("Sample playback disabled", () => Editor.SamplePlaybackDisabled.Value);
             AddAssert("Editor is still active screen", () => Game.ScreenStack.CurrentScreen is Editor);
         }
 
@@ -36,6 +43,8 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = "difficulty");
 
             SaveEditor();
+
+            AddAssert("Hash updated", () => !string.IsNullOrEmpty(EditorBeatmap.BeatmapInfo.BeatmapSet?.Hash));
 
             AddAssert("Beatmap has correct metadata", () => EditorBeatmap.BeatmapInfo.Metadata.Artist == "artist" && EditorBeatmap.BeatmapInfo.Metadata.Title == "title");
             AddAssert("Beatmap has correct author", () => EditorBeatmap.BeatmapInfo.Metadata.Author.Username == "author");
@@ -115,8 +124,8 @@ namespace osu.Game.Tests.Visual.Editing
 
             // After placement these must be non-default as defaults are read-only.
             AddAssert("Placed object has non-default control points", () =>
-                EditorBeatmap.HitObjects[0].SampleControlPoint != SampleControlPoint.DEFAULT &&
-                EditorBeatmap.HitObjects[0].DifficultyControlPoint != DifficultyControlPoint.DEFAULT);
+                !ReferenceEquals(EditorBeatmap.HitObjects[0].SampleControlPoint, SampleControlPoint.DEFAULT) &&
+                !ReferenceEquals(EditorBeatmap.HitObjects[0].DifficultyControlPoint, DifficultyControlPoint.DEFAULT));
 
             ReloadEditorToSameBeatmap();
 
@@ -124,8 +133,56 @@ namespace osu.Game.Tests.Visual.Editing
 
             // After placement these must be non-default as defaults are read-only.
             AddAssert("Placed object still has non-default control points", () =>
-                EditorBeatmap.HitObjects[0].SampleControlPoint != SampleControlPoint.DEFAULT &&
-                EditorBeatmap.HitObjects[0].DifficultyControlPoint != DifficultyControlPoint.DEFAULT);
+                !ReferenceEquals(EditorBeatmap.HitObjects[0].SampleControlPoint, SampleControlPoint.DEFAULT) &&
+                !ReferenceEquals(EditorBeatmap.HitObjects[0].DifficultyControlPoint, DifficultyControlPoint.DEFAULT));
+        }
+
+        [Test]
+        public void TestLengthAndStarRatingUpdated()
+        {
+            WorkingBeatmap working = null;
+            double lastStarRating = 0;
+            double lastLength = 0;
+
+            AddStep("Add timing point", () => EditorBeatmap.ControlPointInfo.Add(500, new TimingControlPoint()));
+            AddStep("Change to placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move to playfield", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
+            AddStep("Place single hitcircle", () => InputManager.Click(MouseButton.Left));
+            AddAssert("One hitobject placed", () => EditorBeatmap.HitObjects.Count == 1);
+
+            SaveEditor();
+            AddStep("Get working beatmap", () => working = Game.BeatmapManager.GetWorkingBeatmap(EditorBeatmap.BeatmapInfo, true));
+
+            AddAssert("Beatmap length is zero", () => working.BeatmapInfo.Length == 0);
+            checkDifficultyIncreased();
+
+            AddStep("Move forward", () => InputManager.Key(Key.Right));
+            AddStep("Place another hitcircle", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Two hitobjects placed", () => EditorBeatmap.HitObjects.Count == 2);
+
+            SaveEditor();
+            AddStep("Get working beatmap", () => working = Game.BeatmapManager.GetWorkingBeatmap(EditorBeatmap.BeatmapInfo, true));
+
+            checkDifficultyIncreased();
+            checkLengthIncreased();
+
+            void checkLengthIncreased()
+            {
+                AddStep("Beatmap length increased", () =>
+                {
+                    Assert.That(working.BeatmapInfo.Length, Is.GreaterThan(lastLength));
+                    lastLength = working.BeatmapInfo.Length;
+                });
+            }
+
+            void checkDifficultyIncreased()
+            {
+                AddStep("Beatmap difficulty increased", () =>
+                {
+                    Assert.That(working.BeatmapInfo.StarRating, Is.GreaterThan(lastStarRating));
+                    lastStarRating = working.BeatmapInfo.StarRating;
+                });
+            }
         }
 
         [Test]

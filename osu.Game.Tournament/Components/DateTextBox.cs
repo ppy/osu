@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterface;
@@ -28,7 +30,7 @@ namespace osu.Game.Tournament.Components
         {
             base.Current = new Bindable<string>(string.Empty);
 
-            ((OsuTextBox)Control).OnCommit += (sender, newText) =>
+            ((OsuTextBox)Control).OnCommit += (sender, _) =>
             {
                 try
                 {

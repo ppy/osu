@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Notifications
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            IconBackground.Colour = ColourInfo.GradientVertical(colours.GreenDark, colours.GreenLight);
+            IconContent.Colour = ColourInfo.GradientVertical(colours.GreenDark, colours.GreenLight);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -37,9 +39,12 @@ namespace osu.Game.Screens.Play
         private double displayTime;
 
         private bool isClickable;
+        private bool skipQueued;
 
         [Resolved]
-        private GameplayClock gameplayClock { get; set; }
+        private IGameplayClock gameplayClock { get; set; }
+
+        internal bool IsButtonVisible => fadeContainer.State == Visibility.Visible && buttonContainer.State.Value == Visibility.Visible;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -109,25 +114,45 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
+            displayTime = gameplayClock.CurrentTime;
+
             // skip is not required if there is no extra "empty" time to skip.
             // we may need to remove this if rewinding before the initial player load position becomes a thing.
-            if (fadeOutBeginTime < gameplayClock.CurrentTime)
+            if (fadeOutBeginTime <= displayTime)
             {
                 Expire();
                 return;
             }
 
             button.Action = () => RequestSkip?.Invoke();
-            displayTime = gameplayClock.CurrentTime;
 
             fadeContainer.TriggerShow();
+
+            if (skipQueued)
+            {
+                Scheduler.AddDelayed(() => button.TriggerClick(), 200);
+                skipQueued = false;
+            }
+        }
+
+        public void SkipWhenReady()
+        {
+            if (IsLoaded)
+                button.TriggerClick();
+            else
+                skipQueued = true;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            double progress = fadeOutBeginTime <= displayTime ? 1 : Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
+            // This case causes an immediate expire in `LoadComplete`, but `Update` may run once after that.
+            // Avoid div-by-zero below.
+            if (fadeOutBeginTime <= displayTime)
+                return;
+
+            double progress = Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
 
             remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 

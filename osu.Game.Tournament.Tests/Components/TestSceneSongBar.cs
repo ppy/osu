@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -40,7 +42,7 @@ namespace osu.Game.Tournament.Tests.Components
                 beatmap.Length = 123456;
                 beatmap.BPM = 133;
 
-                songBar.Beatmap = beatmap;
+                songBar.Beatmap = new TournamentBeatmap(beatmap);
             });
             AddStep("set mods to HR", () => songBar.Mods = LegacyMods.HardRock);
             AddStep("set mods to DT", () => songBar.Mods = LegacyMods.DoubleTime);

@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
@@ -34,6 +33,6 @@ namespace osu.Game.Online
         /// <summary>
         /// Reconnect if already connected.
         /// </summary>
-        void Reconnect();
+        Task Reconnect();
     }
 }

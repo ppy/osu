@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -23,8 +25,6 @@ namespace osu.Game.Overlays.Music
     {
         private const float transition_duration = 600;
         private const float playlist_height = 510;
-
-        public IBindableList<Live<BeatmapSetInfo>> BeatmapSets => beatmapSets;
 
         private readonly BindableList<Live<BeatmapSetInfo>> beatmapSets = new BindableList<Live<BeatmapSetInfo>>();
 
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            filter.Search.OnCommit += (sender, newText) =>
+            filter.Search.OnCommit += (_, _) =>
             {
                 list.FirstVisibleSet?.PerformRead(set =>
                 {
@@ -102,9 +102,7 @@ namespace osu.Game.Overlays.Music
         {
             base.LoadComplete();
 
-            // tests might bind externally, in which case we don't want to involve realm.
-            if (beatmapSets.Count == 0)
-                beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
+            beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
 
             list.Items.BindTo(beatmapSets);
             beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);

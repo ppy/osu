@@ -44,12 +44,12 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        private IAdjustableAudioComponent track;
+        private IAdjustableAudioComponent? track;
 
         protected ModTimeRamp()
         {
             // for preview purpose at song select. eventually we'll want to be able to update every frame.
-            FinalRate.BindValueChanged(val => applyRateAdjustment(double.PositiveInfinity), true);
+            FinalRate.BindValueChanged(_ => applyRateAdjustment(double.PositiveInfinity), true);
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 

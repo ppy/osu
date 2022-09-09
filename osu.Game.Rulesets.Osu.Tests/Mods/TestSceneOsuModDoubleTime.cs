@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 Mod = mod,
                 PassCondition = () => Player.ScoreProcessor.JudgedHits >= 2 &&
-                                      Precision.AlmostEquals(Player.GameplayClockContainer.GameplayClock.Rate, mod.SpeedChange.Value)
+                                      Precision.AlmostEquals(Player.GameplayClockContainer.Rate, mod.SpeedChange.Value)
             });
         }
     }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -159,7 +161,6 @@ namespace osu.Game.Overlays.FirstRunSetup
             private void load(AudioManager audio, TextureStore textures, RulesetStore rulesets)
             {
                 Beatmap.Value = new DummyWorkingBeatmap(audio, textures);
-                Beatmap.Value.LoadTrack();
 
                 Ruleset.Value = rulesets.AvailableRulesets.First();
 

@@ -5,8 +5,6 @@ using System;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 
-#nullable enable
-
 namespace osu.Game.Beatmaps
 {
     /// <summary>

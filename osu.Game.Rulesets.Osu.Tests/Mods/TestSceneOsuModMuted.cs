@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void TestModCopy()
         {
-            OsuModMuted muted = null;
+            OsuModMuted muted = null!;
 
             AddStep("create inversed mod", () => muted = new OsuModMuted
             {

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -106,7 +108,7 @@ namespace osu.Game.Rulesets.Objects
 
             if (legacyInfo != null)
                 DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
-            else if (DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+            else if (ReferenceEquals(DifficultyControlPoint, DifficultyControlPoint.DEFAULT))
                 DifficultyControlPoint = new DifficultyControlPoint();
 
             DifficultyControlPoint.Time = StartTime;
@@ -116,7 +118,7 @@ namespace osu.Game.Rulesets.Objects
             // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
             if (legacyInfo != null)
                 SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
-            else if (SampleControlPoint == SampleControlPoint.DEFAULT)
+            else if (ReferenceEquals(SampleControlPoint, SampleControlPoint.DEFAULT))
                 SampleControlPoint = new SampleControlPoint();
 
             SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;

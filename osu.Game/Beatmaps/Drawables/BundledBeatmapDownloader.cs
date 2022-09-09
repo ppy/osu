@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -100,7 +102,7 @@ namespace osu.Game.Beatmaps.Drawables
                 // Matches osu-stable, in order to provide new users with roughly the same randomised selection of bundled beatmaps.
                 var random = new LegacyRandom(DateTime.UtcNow.Year * 1000 + (DateTime.UtcNow.DayOfYear / 7));
 
-                downloadableFilenames.AddRange(sourceFilenames.OrderBy(x => random.NextDouble()).Take(limit ?? int.MaxValue));
+                downloadableFilenames.AddRange(sourceFilenames.OrderBy(_ => random.NextDouble()).Take(limit ?? int.MaxValue));
             }
             catch { }
         }

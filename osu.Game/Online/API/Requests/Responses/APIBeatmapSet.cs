@@ -9,8 +9,6 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Models;
 
-#nullable enable
-
 namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIBeatmapSet : IBeatmapSetOnlineInfo, IBeatmapSetInfo

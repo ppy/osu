@@ -1,12 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -14,6 +18,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning.Editor;
 using osu.Game.Tests.Beatmaps.IO;
+using osuTK;
 using osuTK.Input;
 using static osu.Game.Tests.Visual.Navigation.TestSceneScreenNavigation;
 
@@ -23,29 +28,6 @@ namespace osu.Game.Tests.Visual.Navigation
     {
         private TestPlaySongSelect songSelect;
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
-
-        private void advanceToSongSelect()
-        {
-            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
-            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
-
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
-
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
-        }
-
-        private void openSkinEditor()
-        {
-            AddStep("open skin editor", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.PressKey(Key.ShiftLeft);
-                InputManager.Key(Key.S);
-                InputManager.ReleaseKey(Key.ControlLeft);
-                InputManager.ReleaseKey(Key.ShiftLeft);
-            });
-            AddUntilStep("skin editor loaded", () => skinEditor != null);
-        }
 
         [Test]
         public void TestEditComponentDuringGameplay()
@@ -84,6 +66,68 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("adjust slider via keyboard", () => InputManager.Key(Key.Left));
 
             AddAssert("value is less than default", () => hitErrorMeter.JudgementLineThickness.Value < hitErrorMeter.JudgementLineThickness.Default);
+        }
+
+        [Test]
+        public void TestComponentsDeselectedOnSkinEditorHide()
+        {
+            advanceToSongSelect();
+            openSkinEditor();
+            switchToGameplayScene();
+
+            AddUntilStep("wait for components", () => skinEditor.ChildrenOfType<SkinBlueprint>().Any());
+
+            AddStep("select all components", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.A);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("components selected", () => skinEditor.SelectedComponents.Count > 0);
+
+            toggleSkinEditor();
+
+            AddUntilStep("no components selected", () => skinEditor.SelectedComponents.Count == 0);
+        }
+
+        [Test]
+        public void TestSwitchScreenWhileDraggingComponent()
+        {
+            Vector2 firstBlueprintCentre = Vector2.Zero;
+            ScheduledDelegate movementDelegate = null;
+
+            advanceToSongSelect();
+
+            openSkinEditor();
+
+            AddStep("add skinnable component", () =>
+            {
+                skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick();
+            });
+
+            AddUntilStep("newly added component selected", () => skinEditor.SelectedComponents.Count == 1);
+
+            AddStep("start drag", () =>
+            {
+                firstBlueprintCentre = skinEditor.ChildrenOfType<SkinBlueprint>().First().ScreenSpaceDrawQuad.Centre;
+
+                InputManager.MoveMouseTo(firstBlueprintCentre);
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("start movement", () => movementDelegate = Scheduler.AddDelayed(() => { InputManager.MoveMouseTo(firstBlueprintCentre += new Vector2(1)); }, 10, true));
+
+            toggleSkinEditor();
+            AddStep("exit song select", () => songSelect.Exit());
+
+            AddUntilStep("wait for blueprints removed", () => !skinEditor.ChildrenOfType<SkinBlueprint>().Any());
+
+            AddStep("stop drag", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                movementDelegate?.Cancel();
+            });
         }
 
         [Test]
@@ -144,9 +188,40 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("mod overlay closed", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
         }
 
+        private void advanceToSongSelect()
+        {
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+        }
+
+        private void openSkinEditor()
+        {
+            toggleSkinEditor();
+            AddUntilStep("skin editor loaded", () => skinEditor != null);
+        }
+
+        private void toggleSkinEditor()
+        {
+            AddStep("toggle skin editor", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.S);
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+        }
+
         private void switchToGameplayScene()
         {
-            AddStep("Click gameplay scene button", () => skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay").TriggerClick());
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("Click gameplay scene button", () =>
+            {
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay"));
+                InputManager.Click(MouseButton.Left);
+            });
 
             AddUntilStep("wait for player", () =>
             {

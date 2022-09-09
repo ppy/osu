@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -44,7 +46,7 @@ namespace osu.Game.Tests.Visual.Editing
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = OsuColour.Gray(30)
                             },
-                            scrollContainer = new ZoomableScrollContainer
+                            scrollContainer = new ZoomableScrollContainer(1, 60, 1)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,

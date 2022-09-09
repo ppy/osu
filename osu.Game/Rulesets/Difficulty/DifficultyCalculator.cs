@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +33,11 @@ namespace osu.Game.Rulesets.Difficulty
 
         private readonly IRulesetInfo ruleset;
         private readonly IWorkingBeatmap beatmap;
+
+        /// <summary>
+        /// A yymmdd version which is used to discern when reprocessing is required.
+        /// </summary>
+        public virtual int Version => 0;
 
         protected DifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
         {
@@ -67,7 +74,7 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    skill.ProcessInternal(hitObject);
+                    skill.Process(hitObject);
                 }
             }
 
@@ -108,7 +115,7 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    skill.ProcessInternal(hitObject);
+                    skill.Process(hitObject);
                 }
 
                 attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));

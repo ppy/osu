@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Cursor;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
@@ -22,20 +23,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new OsuContextMenuContainer
+            InternalChild = new OsuScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new OsuScrollContainer
+                ScrollbarVisible = false,
+                Child = panels = new FillFlowContainer<ParticipantPanel>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = panels = new FillFlowContainer<ParticipantPanel>
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 2)
-                    }
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 2)
                 }
             };
         }

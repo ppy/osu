@@ -254,7 +254,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
 
         private class CustomFilterCriteria : IRulesetFilterCriteria
         {
-            public string CustomValue { get; set; }
+            public string? CustomValue { get; set; }
 
             public bool Matches(BeatmapInfo beatmapInfo) => true;
 

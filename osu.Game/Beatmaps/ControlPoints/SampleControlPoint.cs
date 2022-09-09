@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -11,7 +12,7 @@ namespace osu.Game.Beatmaps.ControlPoints
     /// <remarks>
     /// Note that going forward, this control point type should always be assigned directly to HitObjects.
     /// </remarks>
-    public class SampleControlPoint : ControlPoint
+    public class SampleControlPoint : ControlPoint, IEquatable<SampleControlPoint>
     {
         public const string DEFAULT_BANK = "normal";
 
@@ -71,7 +72,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public virtual HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
             => hitSampleInfo.With(newBank: hitSampleInfo.Bank ?? SampleBank, newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume);
 
-        public override bool IsRedundant(ControlPoint existing)
+        public override bool IsRedundant(ControlPoint? existing)
             => existing is SampleControlPoint existingSample
                && SampleBank == existingSample.SampleBank
                && SampleVolume == existingSample.SampleVolume;
@@ -83,5 +84,16 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             base.CopyFrom(other);
         }
+
+        public override bool Equals(ControlPoint? other)
+            => other is SampleControlPoint otherSampleControlPoint
+               && Equals(otherSampleControlPoint);
+
+        public bool Equals(SampleControlPoint? other)
+            => base.Equals(other)
+               && SampleBank == other.SampleBank
+               && SampleVolume == other.SampleVolume;
+
+        public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), SampleBank, SampleVolume);
     }
 }

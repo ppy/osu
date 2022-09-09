@@ -16,7 +16,7 @@ namespace osu.Game.Extensions
         /// </summary>
         public static void AddCursor(this WebRequest webRequest, Cursor cursor)
         {
-            cursor?.Properties.ForEach(x =>
+            cursor.Properties.ForEach(x =>
             {
                 webRequest.AddParameter("cursor[" + x.Key + "]", (x.Value as JValue)?.ToString(CultureInfo.InvariantCulture) ?? x.Value.ToString());
             });

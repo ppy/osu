@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty
@@ -24,11 +26,12 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_SCORE_MULTIPLIER = 15;
         protected const int ATTRIB_ID_FLASHLIGHT = 17;
         protected const int ATTRIB_ID_SLIDER_FACTOR = 19;
+        protected const int ATTRIB_ID_SPEED_NOTE_COUNT = 21;
 
         /// <summary>
         /// The mods which were applied to the beatmap.
         /// </summary>
-        public Mod[] Mods { get; set; }
+        public Mod[] Mods { get; set; } = Array.Empty<Mod>();
 
         /// <summary>
         /// The combined star rating of all skills.
@@ -72,7 +75,8 @@ namespace osu.Game.Rulesets.Difficulty
         /// Reads osu-web database attribute mappings into this <see cref="DifficultyAttributes"/> object.
         /// </summary>
         /// <param name="values">The attribute mappings.</param>
-        public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
+        /// <param name="onlineInfo">The <see cref="IBeatmapOnlineInfo"/> where more information about the beatmap may be extracted from (such as AR/CS/OD/etc).</param>
+        public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
         }
     }

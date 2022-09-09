@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -102,11 +104,11 @@ namespace osu.Game.Overlays
             filterControl.CardSize.BindValueChanged(_ => onCardSizeChanged());
 
             apiUser = api.LocalUser.GetBoundCopy();
-            apiUser.BindValueChanged(_ =>
+            apiUser.BindValueChanged(_ => Schedule(() =>
             {
                 if (api.IsLoggedIn)
                     addContentToResultsArea(Drawable.Empty());
-            });
+            }));
         }
 
         public void ShowWithSearch(string query)

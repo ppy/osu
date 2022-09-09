@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -259,10 +257,14 @@ namespace osu.Game.Overlays.Chat
             }
 
             [BackgroundDependencyLoader]
-            private void load(UserProfileOverlay? profile, ChannelManager? chatManager)
+            private void load(UserProfileOverlay? profile, ChannelManager? chatManager, ChatOverlay? chatOverlay)
             {
                 Action = () => profile?.ShowUser(sender);
-                startChatAction = () => chatManager?.OpenPrivateChannel(sender);
+                startChatAction = () =>
+                {
+                    chatManager?.OpenPrivateChannel(sender);
+                    chatOverlay?.Show();
+                };
             }
 
             public MenuItem[] ContextMenuItems

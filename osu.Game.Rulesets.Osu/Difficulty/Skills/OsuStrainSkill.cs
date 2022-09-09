@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -12,6 +14,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public abstract class OsuStrainSkill : StrainSkill
     {
+        /// <summary>
+        /// The default multiplier applied by <see cref="OsuStrainSkill"/> to the final difficulty value after all other calculations.
+        /// May be overridden via <see cref="DifficultyMultiplier"/>.
+        /// </summary>
+        public const double DEFAULT_DIFFICULTY_MULTIPLIER = 1.06;
+
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
@@ -26,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// The final multiplier to be applied to <see cref="DifficultyValue"/> after all other calculations.
         /// </summary>
-        protected virtual double DifficultyMultiplier => 1.06;
+        protected virtual double DifficultyMultiplier => DEFAULT_DIFFICULTY_MULTIPLIER;
 
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)

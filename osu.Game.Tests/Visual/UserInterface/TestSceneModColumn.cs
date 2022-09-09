@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -11,9 +9,11 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Utils;
@@ -26,6 +26,9 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [TestCase(ModType.DifficultyReduction)]
         [TestCase(ModType.DifficultyIncrease)]
@@ -134,14 +137,16 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestKeyboardSelection()
+        public void TestSequentialKeyboardSelection()
         {
+            AddStep("set sequential hotkey mode", () => configManager.SetValue(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential));
+
             ModColumn column = null!;
             AddStep("create content", () => Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding(30),
-                Child = column = new ModColumn(ModType.DifficultyReduction, true, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P })
+                Child = column = new ModColumn(ModType.DifficultyReduction, true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -160,9 +165,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set filter to NF", () => setFilter(mod => mod.Acronym == "NF"));
 
             AddStep("press W", () => InputManager.Key(Key.W));
+            AddAssert("NF panel not selected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
+
+            AddStep("press Q", () => InputManager.Key(Key.Q));
             AddAssert("NF panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
 
-            AddStep("press W again", () => InputManager.Key(Key.W));
+            AddStep("press Q again", () => InputManager.Key(Key.Q));
             AddAssert("NF panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
 
             AddStep("filter out everything", () => setFilter(_ => false));
@@ -171,6 +179,113 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("NF panel not selected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
 
             AddStep("clear filter", () => setFilter(null));
+        }
+
+        [Test]
+        public void TestClassicKeyboardExclusiveSelection()
+        {
+            AddStep("set classic hotkey mode", () => configManager.SetValue(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Classic));
+
+            ModColumn column = null!;
+            AddStep("create content", () => Child = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding(30),
+                Child = column = new ModColumn(ModType.DifficultyIncrease, false)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AvailableMods = getExampleModsFor(ModType.DifficultyIncrease)
+                }
+            });
+
+            AddUntilStep("wait for panel load", () => column.IsLoaded && column.ItemsLoaded);
+
+            AddStep("press A", () => InputManager.Key(Key.A));
+            AddAssert("HR panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "HR").Active.Value);
+
+            AddStep("press A again", () => InputManager.Key(Key.A));
+            AddAssert("HR panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "HR").Active.Value);
+
+            AddStep("press D", () => InputManager.Key(Key.D));
+            AddAssert("DT panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "DT").Active.Value);
+
+            AddStep("press D again", () => InputManager.Key(Key.D));
+            AddAssert("DT panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "DT").Active.Value);
+            AddAssert("NC panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NC").Active.Value);
+
+            AddStep("press D again", () => InputManager.Key(Key.D));
+            AddAssert("DT panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "DT").Active.Value);
+            AddAssert("NC panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NC").Active.Value);
+
+            AddStep("press Shift-D", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.D);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            AddAssert("DT panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "DT").Active.Value);
+            AddAssert("NC panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NC").Active.Value);
+
+            AddStep("press J", () => InputManager.Key(Key.J));
+            AddAssert("no change", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Active.Value).Mod.Acronym == "NC");
+
+            AddStep("filter everything but NC", () => setFilter(mod => mod.Acronym == "NC"));
+
+            AddStep("press A", () => InputManager.Key(Key.A));
+            AddAssert("no change", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Active.Value).Mod.Acronym == "NC");
+        }
+
+        [Test]
+        public void TestClassicKeyboardIncompatibleSelection()
+        {
+            AddStep("set classic hotkey mode", () => configManager.SetValue(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Classic));
+
+            ModColumn column = null!;
+            AddStep("create content", () => Child = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding(30),
+                Child = column = new ModColumn(ModType.DifficultyIncrease, true)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AvailableMods = getExampleModsFor(ModType.DifficultyIncrease)
+                }
+            });
+
+            AddUntilStep("wait for panel load", () => column.IsLoaded && column.ItemsLoaded);
+
+            AddStep("press A", () => InputManager.Key(Key.A));
+            AddAssert("HR panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "HR").Active.Value);
+
+            AddStep("press A again", () => InputManager.Key(Key.A));
+            AddAssert("HR panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "HR").Active.Value);
+
+            AddStep("press D", () => InputManager.Key(Key.D));
+            AddAssert("DT panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "DT").Active.Value);
+            AddAssert("NC panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NC").Active.Value);
+
+            AddStep("press D again", () => InputManager.Key(Key.D));
+            AddAssert("DT panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "DT").Active.Value);
+            AddAssert("NC panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NC").Active.Value);
+
+            AddStep("press Shift-D", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.D);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            AddAssert("DT panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "DT").Active.Value);
+            AddAssert("NC panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NC").Active.Value);
+
+            AddStep("press J", () => InputManager.Key(Key.J));
+            AddAssert("no change", () => this.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
+
+            AddStep("filter everything but NC", () => setFilter(mod => mod.Acronym == "NC"));
+
+            AddStep("press A", () => InputManager.Key(Key.A));
+            AddAssert("no change", () => this.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
         }
 
         private void setFilter(Func<Mod, bool>? filter)
@@ -183,8 +298,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public new bool SelectionAnimationRunning => base.SelectionAnimationRunning;
 
-            public TestModColumn(ModType modType, bool allowBulkSelection)
-                : base(modType, allowBulkSelection)
+            public TestModColumn(ModType modType, bool allowIncompatibleSelection)
+                : base(modType, allowIncompatibleSelection)
             {
             }
         }

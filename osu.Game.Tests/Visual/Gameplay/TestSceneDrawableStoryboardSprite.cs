@@ -72,6 +72,18 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestZeroScale()
+        {
+            const string lookup_name = "hitcircleoverlay";
+
+            AddStep("allow skin lookup", () => storyboard.UseSkinSprites = true);
+            AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
+            AddAssert("sprites present", () => sprites.All(s => s.IsPresent));
+            AddStep("scale sprite", () => sprites.ForEach(s => s.VectorScale = new Vector2(0, 1)));
+            AddAssert("sprites not present", () => sprites.All(s => !s.IsPresent));
+        }
+
+        [Test]
         public void TestNegativeScale()
         {
             const string lookup_name = "hitcircleoverlay";

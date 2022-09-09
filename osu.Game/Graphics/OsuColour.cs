@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
@@ -100,26 +102,31 @@ namespace osu.Game.Graphics
         /// <summary>
         /// Retrieves the colour for a <see cref="HitResult"/>.
         /// </summary>
-        public Color4 ForHitResult(HitResult judgement)
+        public Color4 ForHitResult(HitResult result)
         {
-            switch (judgement)
+            switch (result)
             {
-                case HitResult.Perfect:
-                case HitResult.Great:
-                    return Blue;
-
-                case HitResult.Ok:
-                case HitResult.Good:
-                    return Green;
+                case HitResult.SmallTickMiss:
+                case HitResult.LargeTickMiss:
+                case HitResult.Miss:
+                    return Red;
 
                 case HitResult.Meh:
                     return Yellow;
 
-                case HitResult.Miss:
-                    return Red;
+                case HitResult.Ok:
+                    return Green;
+
+                case HitResult.Good:
+                    return GreenLight;
+
+                case HitResult.SmallTickHit:
+                case HitResult.LargeTickHit:
+                case HitResult.Great:
+                    return Blue;
 
                 default:
-                    return Color4.White;
+                    return BlueLight;
             }
         }
 
@@ -135,6 +142,9 @@ namespace osu.Game.Graphics
         {
             switch (status)
             {
+                case BeatmapOnlineStatus.LocallyModified:
+                    return Color4.OrangeRed;
+
                 case BeatmapOnlineStatus.Ranked:
                 case BeatmapOnlineStatus.Approved:
                     return Color4Extensions.FromHex(@"b3ff66");

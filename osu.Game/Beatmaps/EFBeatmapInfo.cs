@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -126,7 +128,7 @@ namespace osu.Game.Beatmaps
         public List<EFScoreInfo> Scores { get; set; }
 
         [JsonIgnore]
-        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarRating);
+        public DifficultyRating DifficultyRating => StarDifficulty.GetDifficultyRating(StarRating);
 
         public override string ToString() => this.GetDisplayTitle();
 

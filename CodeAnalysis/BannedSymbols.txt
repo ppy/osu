@@ -16,3 +16,10 @@ M:Realms.CollectionExtensions.SubscribeForNotifications`1(System.Linq.IQueryable
 M:Realms.CollectionExtensions.SubscribeForNotifications`1(System.Collections.Generic.IList{``0},Realms.NotificationCallbackDelegate{``0});Use osu.Game.Database.RealmObjectExtensions.QueryAsyncWithNotifications(IList<T>,NotificationCallbackDelegate<T>) instead.
 M:System.Threading.Tasks.Task.Wait();Don't use Task.Wait. Use Task.WaitSafely() to ensure we avoid deadlocks.
 P:System.Threading.Tasks.Task`1.Result;Don't use Task.Result. Use Task.GetResultSafely() to ensure we avoid deadlocks.
+M:System.Threading.ManualResetEventSlim.Wait();Specify a timeout to avoid waiting forever.
+M:System.String.ToLower();string.ToLower() changes behaviour depending on CultureInfo.CurrentCulture. Use string.ToLowerInvariant() instead. If wanting culture-sensitive behaviour, explicitly provide CultureInfo.CurrentCulture or use LocalisableString.
+M:System.String.ToUpper();string.ToUpper() changes behaviour depending on CultureInfo.CurrentCulture. Use string.ToUpperInvariant() instead. If wanting culture-sensitive behaviour, explicitly provide CultureInfo.CurrentCulture or use LocalisableString.
+M:Humanizer.InflectorExtensions.Pascalize(System.String);Humanizer's .Pascalize() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToPascalCase() instead.
+M:Humanizer.InflectorExtensions.Camelize(System.String);Humanizer's .Camelize() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToCamelCase() instead.
+M:Humanizer.InflectorExtensions.Underscore(System.String);Humanizer's .Underscore() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToSnakeCase() instead.
+M:Humanizer.InflectorExtensions.Kebaberize(System.String);Humanizer's .Kebaberize() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToKebabCase() instead.

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -40,8 +38,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load()
         {
-            volume.BindValueChanged(volume => updateText());
-            bank.BindValueChanged(bank => updateText(), true);
+            volume.BindValueChanged(_ => updateText());
+            bank.BindValueChanged(_ => updateText(), true);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -121,7 +119,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
                 // on commit, ensure that the value is correct by sourcing it from the objects' control points again.
                 // this ensures that committing empty text causes a revert to the previous value.
-                bank.OnCommit += (_, __) => bank.Current.Value = getCommonBank(relevantControlPoints);
+                bank.OnCommit += (_, _) => bank.Current.Value = getCommonBank(relevantControlPoints);
 
                 volume.Current.BindValueChanged(val => updateVolumeFor(relevantObjects, val.NewValue));
             }
@@ -133,7 +131,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             private static string? getCommonBank(SampleControlPoint[] relevantControlPoints) => relevantControlPoints.Select(point => point.SampleBank).Distinct().Count() == 1 ? relevantControlPoints.First().SampleBank : null;
-            private static int? getCommonVolume(SampleControlPoint[] relevantControlPoints) => relevantControlPoints.Select(point => point.SampleVolume).Distinct().Count() == 1 ? (int?)relevantControlPoints.First().SampleVolume : null;
+            private static int? getCommonVolume(SampleControlPoint[] relevantControlPoints) => relevantControlPoints.Select(point => point.SampleVolume).Distinct().Count() == 1 ? relevantControlPoints.First().SampleVolume : null;
 
             private void updateBankFor(IEnumerable<HitObject> objects, string? newBank)
             {

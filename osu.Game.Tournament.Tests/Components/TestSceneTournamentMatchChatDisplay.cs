@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -25,16 +27,16 @@ namespace osu.Game.Tournament.Tests.Components
             Colour = "f2ca34"
         };
 
-        private readonly APIUser redUser = new APIUser
+        private readonly TournamentUser redUser = new TournamentUser
         {
             Username = "BanchoBot",
-            Id = 3,
+            OnlineID = 3,
         };
 
-        private readonly APIUser blueUser = new APIUser
+        private readonly TournamentUser blueUser = new TournamentUser
         {
             Username = "Zallius",
-            Id = 4,
+            OnlineID = 4,
         };
 
         [Cached]
@@ -57,11 +59,11 @@ namespace osu.Game.Tournament.Tests.Components
             {
                 Team1 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<APIUser> { redUser } }
+                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { redUser } }
                 },
                 Team2 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<APIUser> { blueUser } }
+                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { blueUser } }
                 }
             };
 
@@ -80,19 +82,19 @@ namespace osu.Game.Tournament.Tests.Components
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = redUser,
+                Sender = redUser.ToAPIUser(),
                 Content = "I am team red."
             }));
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = redUser,
+                Sender = redUser.ToAPIUser(),
                 Content = "I plan to win!"
             }));
 
             AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = blueUser,
+                Sender = blueUser.ToAPIUser(),
                 Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
             }));
 

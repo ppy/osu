@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -111,7 +113,7 @@ namespace osu.Game.Tests.Visual.Editing
                        .TriggerClick();
             });
 
-            AddUntilStep("wait for track playing", () => Clock.IsRunning);
+            AddUntilStep("wait for track playing", () => EditorClock.IsRunning);
 
             AddStep("click reset button", () =>
             {
@@ -120,7 +122,7 @@ namespace osu.Game.Tests.Visual.Editing
                        .TriggerClick();
             });
 
-            AddUntilStep("wait for track stopped", () => !Clock.IsRunning);
+            AddUntilStep("wait for track stopped", () => !EditorClock.IsRunning);
         }
 
         protected override void Dispose(bool isDisposing)

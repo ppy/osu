@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
@@ -249,8 +251,8 @@ namespace osu.Game.Overlays.Comments
                     if (bundle.HasMore)
                     {
                         int loadedTopLevelComments = 0;
-                        pinnedContent.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
-                        content.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
+                        pinnedContent.Children.OfType<DrawableComment>().ForEach(_ => loadedTopLevelComments++);
+                        content.Children.OfType<DrawableComment>().ForEach(_ => loadedTopLevelComments++);
 
                         moreButton.Current.Value = bundle.TopLevelCount - loadedTopLevelComments;
                         moreButton.IsLoading = false;

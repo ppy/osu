@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mania.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Mods
@@ -20,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override string Description => @"Replaces all hold notes with normal notes.";
+        public override LocalisableString Description => @"Replaces all hold notes with normal notes.";
 
         public override IconUsage? Icon => FontAwesome.Solid.DotCircle;
 

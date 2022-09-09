@@ -1,15 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
-using osu.Game.Rulesets;
 using osu.Game.Localisation;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -34,9 +33,9 @@ namespace osu.Game.Overlays.Settings.Sections
                     if (section != null)
                         Add(section);
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.Error(e, "Failed to load ruleset settings");
+                    Logger.Log($"Failed to load ruleset settings for {ruleset.RulesetInfo.Name}. Please check for an update from the developer.", level: LogLevel.Error);
                 }
             }
         }

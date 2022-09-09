@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
@@ -23,7 +25,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             protected override MultipleSelectionFilterTabItem CreateTabItem(ScoreRank value) => new RankItem(value);
 
-            protected override IEnumerable<ScoreRank> GetValues() => base.GetValues().Reverse();
+            protected override IEnumerable<ScoreRank> GetValues() => base.GetValues().Where(r => r > ScoreRank.F).Reverse();
         }
 
         private class RankItem : MultipleSelectionFilterTabItem

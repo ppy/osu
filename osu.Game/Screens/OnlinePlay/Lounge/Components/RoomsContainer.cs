@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -85,9 +87,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         matchingFilter &= r.FilterTerms.Any(term => term.ToString().Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
                     }
 
+                    matchingFilter &= matchPermissions(r, criteria.Permissions);
+
                     r.MatchingFilter = matchingFilter;
                 }
             });
+
+            static bool matchPermissions(DrawableLoungeRoom room, RoomPermissionsFilter accessType)
+            {
+                switch (accessType)
+                {
+                    case RoomPermissionsFilter.All:
+                        return true;
+
+                    case RoomPermissionsFilter.Public:
+                        return !room.Room.HasPassword.Value;
+
+                    case RoomPermissionsFilter.Private:
+                        return room.Room.HasPassword.Value;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(accessType), accessType, $"Unsupported {nameof(RoomPermissionsFilter)} in filter");
+                }
+            }
         }
 
         private void roomsChanged(object sender, NotifyCollectionChangedEventArgs args)
@@ -116,7 +138,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             foreach (var r in rooms)
             {
-                roomFlow.RemoveAll(d => d.Room == r);
+                roomFlow.RemoveAll(d => d.Room == r, true);
 
                 // selection may have a lease due to being in a sub screen.
                 if (!SelectedRoom.Disabled)

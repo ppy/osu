@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Specialized;
 using System.Linq;
@@ -22,7 +24,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
             controlPointGroups.UnbindAll();
             controlPointGroups.BindTo(beatmap.ControlPointInfo.Groups);
-            controlPointGroups.BindCollectionChanged((sender, args) =>
+            controlPointGroups.BindCollectionChanged((_, args) =>
             {
                 switch (args.Action)
                 {
@@ -47,7 +49,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     case NotifyCollectionChangedAction.Remove:
                         foreach (var group in args.OldItems.OfType<ControlPointGroup>())
                         {
-                            var matching = Children.SingleOrDefault(gv => gv.Group == group);
+                            var matching = Children.SingleOrDefault(gv => ReferenceEquals(gv.Group, group));
 
                             if (matching != null)
                                 matching.Expire();
