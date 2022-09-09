@@ -35,6 +35,11 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly HashSet<TouchSource> allowedTouches = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().Take(allowed_touches_limit).ToHashSet();
 
         /// <summary>
+        /// A hash set that contains all the <see cref="allowedTouches"/> that are currently active.
+        /// </summary>
+        private readonly HashSet<TouchSource> activeAllowedTouches = new HashSet<TouchSource>();
+
+        /// <summary>
         /// A dictionary that maps <see cref="TouchSource"/> into a respective <see cref="OsuAction"/> for an emulated keyboard input.
         /// </summary>
         private readonly Dictionary<TouchSource, OsuAction> touchActions = new Dictionary<TouchSource, OsuAction>();
@@ -54,17 +59,18 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private bool isCursorTouch(TouchSource source) => !isTapTouch(source);
 
-        private bool isTouchInputAllowed(int index) => index <= last_allowed_touch_index;
+        private bool isTouchInputAllowed(TouchSource source) => getTouchIndex(source) <= last_allowed_touch_index;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             var source = e.Touch.Source;
-            int sourceIndex = getTouchIndex(source);
 
-            if (!isTouchInputAllowed(sourceIndex))
+            if (!isTouchInputAllowed(source))
                 return false;
 
-            osuInputManager.DragMode = sourceIndex == last_allowed_touch_index;
+            activeAllowedTouches.Add(source);
+
+            osuInputManager.DraggingCursorTouch = activeAllowedTouches.Count == allowed_touches_limit;
 
             if (isCursorTouch(source))
                 return base.OnTouchDown(e);
@@ -77,10 +83,11 @@ namespace osu.Game.Rulesets.Osu.UI
         protected override void OnTouchUp(TouchUpEvent e)
         {
             var source = e.Touch.Source;
-            int sourceIndex = getTouchIndex(source);
 
-            if (!isTouchInputAllowed(sourceIndex))
+            if (!isTouchInputAllowed(source))
                 return;
+
+            activeAllowedTouches.Remove(source);
 
             if (isTapTouch(source))
                 osuInputManager.KeyBindingContainer.TriggerReleased(touchActions[source]);

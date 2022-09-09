@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu
     {
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
-        public bool DragMode;
+        public bool DraggingCursorTouch;
 
         public bool AllowUserPresses
         {
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu
             if (e.Touch.Source != OsuTouchInputMapper.CURSOR_TOUCH)
                 return false;
 
-            if (DragMode)
+            if (DraggingCursorTouch)
             {
                 e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
             }

@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("Touch with another finger (Doubletapping)...", () => touch(TouchSource.Touch3));
 
-            AddAssert("Is dragging", () => osuInputManager.DragMode);
+            AddAssert("Is dragging", () => osuInputManager.DraggingCursorTouch);
 
             AddStep("Release", () =>
             {
