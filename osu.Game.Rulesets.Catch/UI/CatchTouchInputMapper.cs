@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -149,15 +150,14 @@ namespace osu.Game.Rulesets.Catch.UI
             base.OnTouchUp(e);
         }
 
-        private bool handleDown(object source, Vector2 position)
+        private bool handleDown(object inputSource, Vector2 position)
         {
             TouchCatchAction catchAction = getTouchCatchActionFromInput(position);
 
             if (catchAction == TouchCatchAction.None)
                 return false;
 
-            trackedActionSources[source] = catchAction;
-
+            trackedActionSources[inputSource] = catchAction;
             calculateActiveKeys();
 
             return true;
@@ -165,9 +165,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void handleUp(object source)
         {
-            trackedActionSources.Remove(source);
-
-            calculateActiveKeys();
+            if (trackedActionSources.Remove(source))
+                calculateActiveKeys();
         }
 
         private void calculateActiveKeys()
