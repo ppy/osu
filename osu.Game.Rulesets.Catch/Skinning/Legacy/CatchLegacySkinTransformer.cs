@@ -93,15 +93,13 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                 return new LegacyHitExplosion();
 
                             return null;
+
+                        default:
+                            throw new UnsupportedSkinComponentException(component);
                     }
 
-                    break;
-
-                case LegacyComboSplash.LegacyComboSplashComponent _:
+                case LegacyComboSplash.LegacyComboSplashComponent:
                     return new LegacyComboSplash.LegacyComboSplashSide("comboburst-fruits");
-
-                    default:
-                        throw new UnsupportedSkinComponentException(component);
             }
 
             return base.GetDrawableComponent(component);

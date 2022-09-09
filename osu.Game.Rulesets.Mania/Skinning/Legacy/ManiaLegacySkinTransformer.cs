@@ -137,12 +137,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         case ManiaSkinComponents.StageForeground:
                             return new LegacyStageForeground();
 
-                    break;
-
-                case LegacyComboSplash.LegacyComboSplashComponent _:
-                    return new LegacyComboSplash.LegacyComboSplashSide("comboburst-mania");
                         default:
                             throw new UnsupportedSkinComponentException(component);
+                    }
+
+                case LegacyComboSplash.LegacyComboSplashComponent:
+                    return new LegacyComboSplash.LegacyComboSplashSide("comboburst-mania");
             }
 
             return base.GetDrawableComponent(component);

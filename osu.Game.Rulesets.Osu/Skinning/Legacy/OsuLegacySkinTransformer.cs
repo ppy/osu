@@ -130,15 +130,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                         case OsuSkinComponents.ApproachCircle:
                             return new LegacyApproachCircle();
-                    }
 
-                    break;
+                        default:
+                            throw new UnsupportedSkinComponentException(component);
+                    }
 
                 case LegacyComboSplash.LegacyComboSplashComponent:
                     return new LegacyComboSplash.LegacyComboSplashSide("comboburst");
-
-                default:
-                    throw new UnsupportedSkinComponentException(component);
             }
 
             return base.GetDrawableComponent(component);

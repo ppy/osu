@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource("Side, where bursts will appear")]
         public Bindable<Side> BurstsSide { get; } = new Bindable<Side>(Side.Random);
 
-        private IBindable<bool> randomOrder;
+        private IBindable<bool> randomOrder = null!;
 
         private readonly Bindable<int> current = new BindableInt { MinValue = 0 };
 
@@ -39,8 +39,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly Random random = new Random();
 
-        private Container<Sprite> left;
-        private Container<Sprite> right;
+        private Container<Sprite> left = null!;
+        private Container<Sprite> right = null!;
 
         /// <summary>
         /// Stores next burst sprite's index, when non-random order is used.
