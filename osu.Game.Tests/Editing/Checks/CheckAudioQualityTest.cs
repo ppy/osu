@@ -7,10 +7,12 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -109,7 +111,7 @@ namespace osu.Game.Tests.Editing.Checks
         /// <param name="audioBitrate">The bitrate of the audio file the beatmap uses.</param>
         private Mock<IWorkingBeatmap> getMockWorkingBeatmap(int? audioBitrate)
         {
-            var mockTrack = new Mock<Track>();
+            var mockTrack = new Mock<OsuTestScene.ClockBackedTestWorkingBeatmap.TrackVirtualManual>(new FramedClock(), "virtual");
             mockTrack.SetupGet(t => t.Bitrate).Returns(audioBitrate);
 
             var mockWorkingBeatmap = new Mock<IWorkingBeatmap>();

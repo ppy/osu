@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -22,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Acronym => "IN";
         public override double ScoreMultiplier => 1;
 
-        public override string Description => "Hold the keys. To the beat.";
+        public override LocalisableString Description => "Hold the keys. To the beat.";
 
         public override IconUsage? Icon => FontAwesome.Solid.YinYang;
 

@@ -106,7 +106,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        args.OldItems.Cast<TModel>().ForEach(i => flow.RemoveAll(d => d.Model == i));
+                        args.OldItems.Cast<TModel>().ForEach(i => flow.RemoveAll(d => d.Model == i, true));
                         break;
                 }
             };

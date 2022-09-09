@@ -271,8 +271,8 @@ namespace osu.Game.Rulesets.Catch.UI
                     SetHyperDashState();
             }
 
-            caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
-            droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject);
+            caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject, false);
+            droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject, false);
         }
 
         /// <summary>
@@ -430,7 +430,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             var droppedObject = getDroppedObject(caughtObject);
 
-            caughtObjectContainer.Remove(caughtObject);
+            caughtObjectContainer.Remove(caughtObject, false);
 
             droppedObjectTarget.Add(droppedObject);
 
