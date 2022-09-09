@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -108,40 +107,30 @@ namespace osu.Game.Rulesets.Catch.UI
             return handleDown(e.Button, e.ScreenSpaceMousePosition);
         }
 
-        protected override void OnMouseUp(MouseUpEvent e)
+        protected override bool OnTouchDown(TouchDownEvent e)
         {
-            handleUp(e.Button);
-            base.OnMouseUp(e);
+            handleDown(e.Touch.Source, e.ScreenSpaceTouch.Position);
+            return true;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            Show();
-
-            TouchCatchAction touchCatchAction = getTouchCatchActionFromInput(e.ScreenSpaceMousePosition);
-
-            // Loop through the buttons to avoid keeping a button pressed if both mouse buttons are pressed.
-            foreach (MouseButton i in e.PressedButtons)
-                trackedActionSources[i] = touchCatchAction;
-
-            calculateActiveKeys();
+            // multiple mouse buttons may be pressed and handling the same action.
+            foreach (MouseButton button in e.PressedButtons)
+                handleMove(button, e.ScreenSpaceMousePosition);
             return true;
         }
 
         protected override void OnTouchMove(TouchMoveEvent e)
         {
-            Show();
-
-            trackedActionSources[e.Touch.Source] = getTouchCatchActionFromInput(e.ScreenSpaceTouch.Position);
-            calculateActiveKeys();
-
+            handleMove(e.Touch.Source, e.ScreenSpaceTouch.Position);
             base.OnTouchMove(e);
         }
 
-        protected override bool OnTouchDown(TouchDownEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
-            handleDown(e.Touch.Source, e.ScreenSpaceTouch.Position);
-            return true;
+            handleUp(e.Button);
+            base.OnMouseUp(e);
         }
 
         protected override void OnTouchUp(TouchUpEvent e)
@@ -150,15 +139,23 @@ namespace osu.Game.Rulesets.Catch.UI
             base.OnTouchUp(e);
         }
 
-        private bool handleDown(object inputSource, Vector2 position)
+        private void handleMove(object inputSource, Vector2 screenSpaceInputPosition)
         {
-            TouchCatchAction catchAction = getTouchCatchActionFromInput(position);
+            Show();
 
-            if (catchAction == TouchCatchAction.None)
+            trackedActionSources[inputSource] = getTouchCatchActionFromInput(screenSpaceInputPosition);
+            updatePressedActions();
+        }
+
+        private bool handleDown(object inputSource, Vector2 screenSpaceInputPosition)
+        {
+            TouchCatchAction action = getTouchCatchActionFromInput(screenSpaceInputPosition);
+
+            if (action == TouchCatchAction.None)
                 return false;
 
-            trackedActionSources[inputSource] = catchAction;
-            calculateActiveKeys();
+            trackedActionSources[inputSource] = action;
+            updatePressedActions();
 
             return true;
         }
@@ -166,10 +163,10 @@ namespace osu.Game.Rulesets.Catch.UI
         private void handleUp(object source)
         {
             if (trackedActionSources.Remove(source))
-                calculateActiveKeys();
+                updatePressedActions();
         }
 
-        private void calculateActiveKeys()
+        private void updatePressedActions()
         {
             if (trackedActionSources.ContainsValue(TouchCatchAction.DashLeft) || trackedActionSources.ContainsValue(TouchCatchAction.MoveLeft))
                 keyBindingContainer.TriggerPressed(CatchAction.MoveLeft);
@@ -187,15 +184,15 @@ namespace osu.Game.Rulesets.Catch.UI
                 keyBindingContainer.TriggerReleased(CatchAction.Dash);
         }
 
-        private TouchCatchAction getTouchCatchActionFromInput(Vector2 inputPosition)
+        private TouchCatchAction getTouchCatchActionFromInput(Vector2 screenSpaceInputPosition)
         {
-            if (leftDashBox.Contains(inputPosition))
+            if (leftDashBox.Contains(screenSpaceInputPosition))
                 return TouchCatchAction.DashLeft;
-            if (rightDashBox.Contains(inputPosition))
+            if (rightDashBox.Contains(screenSpaceInputPosition))
                 return TouchCatchAction.DashRight;
-            if (leftBox.Contains(inputPosition))
+            if (leftBox.Contains(screenSpaceInputPosition))
                 return TouchCatchAction.MoveLeft;
-            if (rightBox.Contains(inputPosition))
+            if (rightBox.Contains(screenSpaceInputPosition))
                 return TouchCatchAction.MoveRight;
 
             return TouchCatchAction.None;
