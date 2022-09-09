@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(OsuModSpunOut),
             typeof(OsuModStrictTracking),
             typeof(OsuModSuddenDeath),
-            typeof(OsuModHoldOff)
+            typeof(OsuModNoSliding)
         }).ToArray();
 
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SettingsNumberBox))]

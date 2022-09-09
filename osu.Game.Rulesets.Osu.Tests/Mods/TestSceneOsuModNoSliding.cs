@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModHoldOff : OsuModTestScene
+    public class TestSceneOsuModNoSliding : OsuModTestScene
     {
         [TestCase(1)]
         [TestCase(4)]
@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             CreateModTest(new ModTestData
             {
-                Mod = new OsuModHoldOff
+                Mod = new OsuModNoSliding
                 {
                     BeatDivisor = { Value = divisor }
                 },

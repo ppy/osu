@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             typeof(ModClassic),
             typeof(OsuModTarget),
-            typeof(OsuModHoldOff)
+            typeof(OsuModNoSliding)
         };
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)

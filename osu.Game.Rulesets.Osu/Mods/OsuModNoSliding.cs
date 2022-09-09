@@ -15,11 +15,11 @@ using osu.Game.Rulesets.Osu.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModHoldOff : Mod, IApplicableAfterBeatmapConversion
+    public class OsuModNoSliding : Mod, IApplicableAfterBeatmapConversion
     {
-        public override string Name => "Hold Off";
+        public override string Name => "No Sliding";
 
-        public override string Acronym => "HO";
+        public override string Acronym => "NL";
 
         public override double ScoreMultiplier => 1;
 
