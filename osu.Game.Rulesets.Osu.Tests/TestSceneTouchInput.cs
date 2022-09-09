@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("Release", () =>
             {
-                foreach (var source in Enum.GetValues<TouchSource>())
+                foreach (TouchSource source in Enum.GetValues(typeof(TouchSource)))
                     release(source);
             });
         }
