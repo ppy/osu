@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private readonly List<List<UprightAspectMaintainingContainer>> childContainers = new List<List<UprightAspectMaintainingContainer>>(rows);
 
         // Preferably should be set to (4 * 2^n)
-        private const int rotation_step_count = 8;
+        private const int rotation_step_count = 3;
 
         private readonly List<int> flipStates = new List<int>();
         private readonly List<float> rotationSteps = new List<float>();
@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             flipStates.AddRange(new[] { 1, -1 });
             rotationSteps.AddRange(Enumerable.Range(0, rotation_step_count).Select(x => 360f * ((float)x / rotation_step_count)));
-            scaleSteps.AddRange(new[] { 1, 0.5f, 0.3f, 1.5f, 2.0f });
+            scaleSteps.AddRange(new[] { 1, 0.3f, 1.5f });
         }
 
         [Test]
