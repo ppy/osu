@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +17,14 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
-using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -67,7 +70,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private Bindable<bool> isDefault { get; } = new BindableBool(true);
 
-        public IEnumerable<string> FilterTerms => bindings.Select(b => keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text.ToString());
+        public IEnumerable<LocalisableString> FilterTerms => bindings.Select(b => (LocalisableString)keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text);
 
         public KeyBindingRow(object action, List<RealmKeyBinding> bindings)
         {
@@ -79,7 +82,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -386,11 +389,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateStoreFromButton(KeyButton button)
         {
-            using (var realm = realmFactory.CreateContext())
+            realm.Run(r =>
             {
-                var binding = realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
-                realm.Write(() => binding.KeyCombinationString = button.KeyBinding.KeyCombinationString);
-            }
+                var binding = r.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
+                r.Write(() => binding.KeyCombinationString = button.KeyBinding.KeyCombinationString);
+            });
         }
 
         private void updateIsDefaultValue()
@@ -402,7 +405,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             public CancelButton()
             {
-                Text = CommonStrings.Cancel;
+                Text = CommonStrings.ButtonsCancel;
                 Size = new Vector2(80, 20);
             }
         }
@@ -411,7 +414,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             public ClearButton()
             {
-                Text = CommonStrings.Clear;
+                Text = CommonStrings.ButtonsClear;
                 Size = new Vector2(80, 20);
             }
         }

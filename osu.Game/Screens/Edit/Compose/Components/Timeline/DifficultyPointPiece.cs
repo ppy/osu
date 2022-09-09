@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -121,6 +123,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     beatmap.EndChange();
                 });
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(sliderVelocitySlider));
             }
         }
     }

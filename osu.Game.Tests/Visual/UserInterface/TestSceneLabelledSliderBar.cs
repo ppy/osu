@@ -1,13 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 
@@ -15,11 +19,26 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneLabelledSliderBar : OsuTestScene
     {
-        [TestCase(false)]
-        [TestCase(true)]
-        public void TestSliderBar(bool hasDescription) => createSliderBar(hasDescription);
+        [Test]
+        public void TestBasic() => createSliderBar();
 
-        private void createSliderBar(bool hasDescription = false)
+        [Test]
+        public void TestDescription()
+        {
+            createSliderBar();
+            AddStep("set description", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.Description = "this text describes the component"));
+        }
+
+        [Test]
+        public void TestSize()
+        {
+            createSliderBar();
+            AddStep("set zero width", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.ResizeWidthTo(0, 200, Easing.OutQuint)));
+            AddStep("set negative width", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.ResizeWidthTo(-1, 200, Easing.OutQuint)));
+            AddStep("revert back", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.ResizeWidthTo(1, 200, Easing.OutQuint)));
+        }
+
+        private void createSliderBar()
         {
             AddStep("create component", () =>
             {
@@ -36,6 +55,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         new LabelledSliderBar<double>
                         {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             Current = new BindableDouble(5)
                             {
                                 MinValue = 0,
@@ -43,7 +64,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 Precision = 1,
                             },
                             Label = "a sample component",
-                            Description = hasDescription ? "this text describes the component" : string.Empty,
                         },
                     },
                 };
@@ -52,10 +72,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     flow.Add(new OverlayColourContainer(colour)
                     {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Child = new LabelledSliderBar<double>
                         {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             Current = new BindableDouble(5)
                             {
                                 MinValue = 0,
@@ -63,7 +87,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 Precision = 1,
                             },
                             Label = "a sample component",
-                            Description = hasDescription ? "this text describes the component" : string.Empty,
                         }
                     });
                 }

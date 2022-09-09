@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using Realms;
 
 namespace osu.Game.Input.Bindings
 {
@@ -23,10 +26,9 @@ namespace osu.Game.Input.Bindings
         private readonly int? variant;
 
         private IDisposable realmSubscription;
-        private IQueryable<RealmKeyBinding> realmKeyBindings;
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings(variant ?? 0);
 
@@ -49,32 +51,26 @@ namespace osu.Game.Input.Bindings
 
         protected override void LoadComplete()
         {
-            string rulesetName = ruleset?.ShortName;
-
-            realmKeyBindings = realmFactory.Context.All<RealmKeyBinding>()
-                                           .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
-
-            realmSubscription = realmKeyBindings
-                .QueryAsyncWithNotifications((sender, changes, error) =>
-                {
-                    // first subscription ignored as we are handling this in LoadComplete.
-                    if (changes == null)
-                        return;
-
-                    ReloadMappings();
-                });
+            realmSubscription = realm.RegisterForNotifications(queryRealmKeyBindings, (sender, _, _) =>
+            {
+                // The first fire of this is a bit redundant as this is being called in base.LoadComplete,
+                // but this is safest in case the subscription is restored after a context recycle.
+                reloadMappings(sender.AsQueryable());
+            });
 
             base.LoadComplete();
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
+        protected override void ReloadMappings() => reloadMappings(queryRealmKeyBindings(realm.Realm));
 
-            realmSubscription?.Dispose();
+        private IQueryable<RealmKeyBinding> queryRealmKeyBindings(Realm realm)
+        {
+            string rulesetName = ruleset?.ShortName;
+            return realm.All<RealmKeyBinding>()
+                        .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
         }
 
-        protected override void ReloadMappings()
+        private void reloadMappings(IQueryable<RealmKeyBinding> realmKeyBindings)
         {
             var defaults = DefaultKeyBindings.ToList();
 
@@ -92,6 +88,13 @@ namespace osu.Game.Input.Bindings
                 KeyBindings = defaults;
             else
                 KeyBindings = newBindings;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            realmSubscription?.Dispose();
         }
     }
 }

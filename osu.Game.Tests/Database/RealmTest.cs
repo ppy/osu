@@ -4,73 +4,64 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Models;
 using osu.Game.Rulesets;
 
-#nullable enable
-
 namespace osu.Game.Tests.Database
 {
     [TestFixture]
     public abstract class RealmTest
     {
-        private static readonly TemporaryNativeStorage storage;
-
-        static RealmTest()
-        {
-            storage = new TemporaryNativeStorage("realm-test");
-            storage.DeleteDirectory(string.Empty);
-        }
-
-        protected void RunTestWithRealm(Action<RealmContextFactory, OsuStorage> testAction, [CallerMemberName] string caller = "")
+        protected void RunTestWithRealm([InstantHandle] Action<RealmAccess, OsuStorage> testAction, [CallerMemberName] string caller = "")
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
                 host.Run(new RealmTestGame(() =>
                 {
-                    // ReSharper disable once AccessToDisposedClosure
-                    var testStorage = new OsuStorage(host, storage.GetStorageForDirectory(caller));
+                    var defaultStorage = host.Storage;
 
-                    using (var realmFactory = new RealmContextFactory(testStorage, "client"))
+                    var testStorage = new OsuStorage(host, defaultStorage);
+
+                    using (var realm = new RealmAccess(testStorage, OsuGameBase.CLIENT_DATABASE_FILENAME))
                     {
-                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
-                        testAction(realmFactory, testStorage);
+                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
+                        testAction(realm, testStorage);
 
-                        realmFactory.Dispose();
+                        realm.Dispose();
 
-                        Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
-                        realmFactory.Compact();
-                        Logger.Log($"Final database size after compact: {getFileSize(testStorage, realmFactory)}");
+                        Logger.Log($"Final database size: {getFileSize(testStorage, realm)}");
+                        realm.Compact();
+                        Logger.Log($"Final database size after compact: {getFileSize(testStorage, realm)}");
                     }
                 }));
             }
         }
 
-        protected void RunTestWithRealmAsync(Func<RealmContextFactory, Storage, Task> testAction, [CallerMemberName] string caller = "")
+        protected void RunTestWithRealmAsync(Func<RealmAccess, Storage, Task> testAction, [CallerMemberName] string caller = "")
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
                 host.Run(new RealmTestGame(async () =>
                 {
-                    var testStorage = storage.GetStorageForDirectory(caller);
+                    var testStorage = host.Storage;
 
-                    using (var realmFactory = new RealmContextFactory(testStorage, "client"))
+                    using (var realm = new RealmAccess(testStorage, OsuGameBase.CLIENT_DATABASE_FILENAME))
                     {
-                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
-                        await testAction(realmFactory, testStorage);
+                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
+                        await testAction(realm, testStorage);
 
-                        realmFactory.Dispose();
+                        realm.Dispose();
 
-                        Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
-                        realmFactory.Compact();
+                        Logger.Log($"Final database size: {getFileSize(testStorage, realm)}");
+                        realm.Compact();
                     }
                 }));
             }
@@ -114,11 +105,11 @@ namespace osu.Game.Tests.Database
         }
 
         protected static RulesetInfo CreateRuleset() =>
-            new RulesetInfo(0, "osu!", "osu", true);
+            new RulesetInfo("osu", "osu!", string.Empty, 0) { Available = true };
 
         private class RealmTestGame : Framework.Game
         {
-            public RealmTestGame(Func<Task> work)
+            public RealmTestGame([InstantHandle] Func<Task> work)
             {
                 // ReSharper disable once AsyncVoidLambda
                 Scheduler.Add(async () =>
@@ -128,7 +119,7 @@ namespace osu.Game.Tests.Database
                 });
             }
 
-            public RealmTestGame(Action work)
+            public RealmTestGame([InstantHandle] Action work)
             {
                 Scheduler.Add(() =>
                 {
@@ -138,11 +129,11 @@ namespace osu.Game.Tests.Database
             }
         }
 
-        private static long getFileSize(Storage testStorage, RealmContextFactory realmFactory)
+        private static long getFileSize(Storage testStorage, RealmAccess realm)
         {
             try
             {
-                using (var stream = testStorage.GetStream(realmFactory.Filename))
+                using (var stream = testStorage.GetStream(realm.Filename))
                     return stream?.Length ?? 0;
             }
             catch

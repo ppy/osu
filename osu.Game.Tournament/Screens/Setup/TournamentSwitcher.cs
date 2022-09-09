@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -11,6 +13,7 @@ namespace osu.Game.Tournament.Screens.Setup
     internal class TournamentSwitcher : ActionableInfo
     {
         private OsuDropdown<string> dropdown;
+        private OsuButton folderButton;
 
         [Resolved]
         private TournamentGameBase game { get; set; }
@@ -24,7 +27,8 @@ namespace osu.Game.Tournament.Screens.Setup
             dropdown.Items = storage.ListTournaments();
             dropdown.Current.BindValueChanged(v => Button.Enabled.Value = v.NewValue != startupTournament, true);
 
-            Action = () => game.GracefullyExit();
+            Action = () => game.AttemptExit();
+            folderButton.Action = () => storage.PresentExternally();
 
             ButtonText = "Close osu!";
         }
@@ -33,7 +37,13 @@ namespace osu.Game.Tournament.Screens.Setup
         {
             var drawable = base.CreateComponent();
 
-            FlowContainer.Insert(-1, dropdown = new OsuDropdown<string>
+            FlowContainer.Insert(-1, folderButton = new TriangleButton
+            {
+                Text = "Open folder",
+                Width = 100
+            });
+
+            FlowContainer.Insert(-2, dropdown = new OsuDropdown<string>
             {
                 Width = 510
             });

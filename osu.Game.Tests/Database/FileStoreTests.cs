@@ -6,11 +6,9 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Logging;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Models;
-using osu.Game.Stores;
-
-#nullable enable
 
 namespace osu.Game.Tests.Database
 {
@@ -19,10 +17,10 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestImportFile()
         {
-            RunTestWithRealm((realmFactory, storage) =>
+            RunTestWithRealm((realmAccess, storage) =>
             {
-                var realm = realmFactory.Context;
-                var files = new RealmFileStore(realmFactory, storage);
+                var realm = realmAccess.Realm;
+                var files = new RealmFileStore(realmAccess, storage);
 
                 var testData = new MemoryStream(new byte[] { 0, 1, 2, 3 });
 
@@ -36,10 +34,10 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestImportSameFileTwice()
         {
-            RunTestWithRealm((realmFactory, storage) =>
+            RunTestWithRealm((realmAccess, storage) =>
             {
-                var realm = realmFactory.Context;
-                var files = new RealmFileStore(realmFactory, storage);
+                var realm = realmAccess.Realm;
+                var files = new RealmFileStore(realmAccess, storage);
 
                 var testData = new MemoryStream(new byte[] { 0, 1, 2, 3 });
 
@@ -53,10 +51,10 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestDontPurgeReferenced()
         {
-            RunTestWithRealm((realmFactory, storage) =>
+            RunTestWithRealm((realmAccess, storage) =>
             {
-                var realm = realmFactory.Context;
-                var files = new RealmFileStore(realmFactory, storage);
+                var realm = realmAccess.Realm;
+                var files = new RealmFileStore(realmAccess, storage);
 
                 var file = realm.Write(() => files.Add(new MemoryStream(new byte[] { 0, 1, 2, 3 }), realm));
 
@@ -92,10 +90,10 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestPurgeUnreferenced()
         {
-            RunTestWithRealm((realmFactory, storage) =>
+            RunTestWithRealm((realmAccess, storage) =>
             {
-                var realm = realmFactory.Context;
-                var files = new RealmFileStore(realmFactory, storage);
+                var realm = realmAccess.Realm;
+                var files = new RealmFileStore(realmAccess, storage);
 
                 var file = realm.Write(() => files.Add(new MemoryStream(new byte[] { 0, 1, 2, 3 }), realm));
 

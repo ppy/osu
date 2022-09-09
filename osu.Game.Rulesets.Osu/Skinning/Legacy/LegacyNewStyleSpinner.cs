@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -78,7 +80,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 }
             });
 
-            if (!(source.FindProvider(s => s.GetTexture("spinner-top") != null) is DefaultLegacySkin))
+            var topProvider = source.FindProvider(s => s.GetTexture("spinner-top") != null);
+
+            if (topProvider is LegacySkinTransformer transformer && !(transformer.Skin is DefaultLegacySkin))
             {
                 AddInternal(ApproachCircle = new Sprite
                 {
@@ -122,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                     break;
 
-                case DrawableSpinnerBonusTick _:
+                case DrawableSpinnerBonusTick:
                     if (state == ArmedState.Hit)
                         glow.FlashColour(Color4.White, 200);
 

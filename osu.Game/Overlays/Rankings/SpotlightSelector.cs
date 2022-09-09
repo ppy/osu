@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -126,7 +128,7 @@ namespace osu.Game.Overlays.Rankings
             startDateColumn.Value = dateToString(response.Spotlight.StartDate);
             endDateColumn.Value = dateToString(response.Spotlight.EndDate);
             mapCountColumn.Value = response.BeatmapSets.Count.ToLocalisableString(@"N0");
-            participantsColumn.Value = response.Spotlight.Participants?.ToLocalisableString(@"N0");
+            participantsColumn.Value = response.Spotlight.Participants?.ToLocalisableString(@"N0") ?? default;
         }
 
         private LocalisableString dateToString(DateTimeOffset date) => date.ToLocalisableString(@"yyyy-MM-dd");

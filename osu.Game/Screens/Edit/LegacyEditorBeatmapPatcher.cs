@@ -1,15 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using DiffPlex;
+using DiffPlex.Model;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Skinning;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
@@ -32,61 +37,107 @@ namespace osu.Game.Screens.Edit
         {
             // Diff the beatmaps
             var result = new Differ().CreateLineDiffs(readString(currentState), readString(newState), true, false);
+            IBeatmap newBeatmap = null;
 
-            // Find the index of [HitObject] sections. Lines changed prior to this index are ignored.
-            int oldHitObjectsIndex = Array.IndexOf(result.PiecesOld, "[HitObjects]");
-            int newHitObjectsIndex = Array.IndexOf(result.PiecesNew, "[HitObjects]");
+            editorBeatmap.BeginChange();
+            processHitObjects(result, () => newBeatmap ??= readBeatmap(newState));
+            processTimingPoints(() => newBeatmap ??= readBeatmap(newState));
+            editorBeatmap.EndChange();
+        }
 
-            Debug.Assert(oldHitObjectsIndex >= 0);
-            Debug.Assert(newHitObjectsIndex >= 0);
+        private void processTimingPoints(Func<IBeatmap> getNewBeatmap)
+        {
+            ControlPointInfo newControlPoints = EditorBeatmap.ConvertControlPoints(getNewBeatmap().ControlPointInfo);
 
-            var toRemove = new List<int>();
-            var toAdd = new List<int>();
+            // Remove all groups from the current beatmap which don't have a corresponding equal group in the new beatmap.
+            foreach (var oldGroup in editorBeatmap.ControlPointInfo.Groups.ToArray())
+            {
+                var newGroup = newControlPoints.GroupAt(oldGroup.Time);
+
+                if (!oldGroup.Equals(newGroup))
+                    editorBeatmap.ControlPointInfo.RemoveGroup(oldGroup);
+            }
+
+            // Add all groups from the new beatmap which don't have a corresponding equal group in the old beatmap.
+            foreach (var newGroup in newControlPoints.Groups)
+            {
+                var oldGroup = editorBeatmap.ControlPointInfo.GroupAt(newGroup.Time);
+
+                if (!newGroup.Equals(oldGroup))
+                {
+                    foreach (var point in newGroup.ControlPoints)
+                        editorBeatmap.ControlPointInfo.Add(newGroup.Time, point);
+                }
+            }
+        }
+
+        private void processHitObjects(DiffResult result, Func<IBeatmap> getNewBeatmap)
+        {
+            findChangedIndices(result, LegacyDecoder<Beatmap>.Section.HitObjects, out var removedIndices, out var addedIndices);
+
+            for (int i = removedIndices.Count - 1; i >= 0; i--)
+                editorBeatmap.RemoveAt(removedIndices[i]);
+
+            if (addedIndices.Count > 0)
+            {
+                var newBeatmap = getNewBeatmap();
+
+                foreach (int i in addedIndices)
+                    editorBeatmap.Insert(i, newBeatmap.HitObjects[i]);
+            }
+        }
+
+        private void findChangedIndices(DiffResult result, LegacyDecoder<Beatmap>.Section section, out List<int> removedIndices, out List<int> addedIndices)
+        {
+            removedIndices = new List<int>();
+            addedIndices = new List<int>();
+
+            // Find the start and end indices of the relevant section headers in both the old and the new beatmap file. Lines changed outside of the modified ranges are ignored.
+            int oldSectionStartIndex = Array.IndexOf(result.PiecesOld, $"[{section}]");
+            if (oldSectionStartIndex == -1)
+                return;
+
+            int oldSectionEndIndex = Array.FindIndex(result.PiecesOld, oldSectionStartIndex + 1, s => s.StartsWith('['));
+            if (oldSectionEndIndex == -1)
+                oldSectionEndIndex = result.PiecesOld.Length;
+
+            int newSectionStartIndex = Array.IndexOf(result.PiecesNew, $"[{section}]");
+            if (newSectionStartIndex == -1)
+                return;
+
+            int newSectionEndIndex = Array.FindIndex(result.PiecesNew, newSectionStartIndex + 1, s => s.StartsWith('['));
+            if (newSectionEndIndex == -1)
+                newSectionEndIndex = result.PiecesNew.Length;
 
             foreach (var block in result.DiffBlocks)
             {
-                // Removed hitobjects
+                // Removed indices
                 for (int i = 0; i < block.DeleteCountA; i++)
                 {
-                    int hoIndex = block.DeleteStartA + i - oldHitObjectsIndex - 1;
+                    int objectIndex = block.DeleteStartA + i;
 
-                    if (hoIndex < 0)
+                    if (objectIndex <= oldSectionStartIndex || objectIndex >= oldSectionEndIndex)
                         continue;
 
-                    toRemove.Add(hoIndex);
+                    removedIndices.Add(objectIndex - oldSectionStartIndex - 1);
                 }
 
-                // Added hitobjects
+                // Added indices
                 for (int i = 0; i < block.InsertCountB; i++)
                 {
-                    int hoIndex = block.InsertStartB + i - newHitObjectsIndex - 1;
+                    int objectIndex = block.InsertStartB + i;
 
-                    if (hoIndex < 0)
+                    if (objectIndex <= newSectionStartIndex || objectIndex >= newSectionEndIndex)
                         continue;
 
-                    toAdd.Add(hoIndex);
+                    addedIndices.Add(objectIndex - newSectionStartIndex - 1);
                 }
             }
 
             // Sort the indices to ensure that removal + insertion indices don't get jumbled up post-removal or post-insertion.
             // This isn't strictly required, but the differ makes no guarantees about order.
-            toRemove.Sort();
-            toAdd.Sort();
-
-            editorBeatmap.BeginChange();
-
-            // Apply the changes.
-            for (int i = toRemove.Count - 1; i >= 0; i--)
-                editorBeatmap.RemoveAt(toRemove[i]);
-
-            if (toAdd.Count > 0)
-            {
-                IBeatmap newBeatmap = readBeatmap(newState);
-                foreach (int i in toAdd)
-                    editorBeatmap.Insert(i, newBeatmap.HitObjects[i]);
-            }
-
-            editorBeatmap.EndChange();
+            removedIndices.Sort();
+            addedIndices.Sort();
         }
 
         private string readString(byte[] state) => Encoding.UTF8.GetString(state);

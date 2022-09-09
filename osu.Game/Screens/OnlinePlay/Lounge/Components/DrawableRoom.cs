@@ -1,9 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -12,6 +16,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -234,7 +239,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 roomCategory.BindTo(Room.Category);
                 roomCategory.BindValueChanged(c =>
                 {
-                    if (c.NewValue == RoomCategory.Spotlight)
+                    if (c.NewValue > RoomCategory.Normal)
                         specialCategoryPill.Show();
                     else
                         specialCategoryPill.Hide();
@@ -328,6 +333,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             [Resolved]
             private OsuColour colours { get; set; }
 
+            [Resolved]
+            private BeatmapLookupCache beatmapLookupCache { get; set; }
+
             private SpriteText statusText;
             private LinkFlowContainer beatmapText;
 
@@ -382,11 +390,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                SelectedItem.BindValueChanged(onSelectedItemChanged, true);
+                CurrentPlaylistItem.BindValueChanged(onSelectedItemChanged, true);
             }
+
+            private CancellationTokenSource beatmapLookupCancellation;
 
             private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
             {
+                beatmapLookupCancellation?.Cancel();
                 beatmapText.Clear();
 
                 if (Type.Value == MatchType.Playlists)
@@ -395,17 +406,31 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     return;
                 }
 
-                if (item.NewValue?.Beatmap.Value != null)
-                {
-                    statusText.Text = "Currently playing ";
-                    beatmapText.AddLink(item.NewValue.Beatmap.Value.GetDisplayTitleRomanisable(),
-                        LinkAction.OpenBeatmap,
-                        item.NewValue.Beatmap.Value.OnlineID.ToString(),
-                        creationParameters: s =>
-                        {
-                            s.Truncate = true;
-                        });
-                }
+                var beatmap = item.NewValue?.Beatmap;
+                if (beatmap == null)
+                    return;
+
+                var cancellationSource = beatmapLookupCancellation = new CancellationTokenSource();
+                beatmapLookupCache.GetBeatmapAsync(beatmap.OnlineID, cancellationSource.Token)
+                                  .ContinueWith(task => Schedule(() =>
+                                  {
+                                      if (cancellationSource.IsCancellationRequested)
+                                          return;
+
+                                      var retrievedBeatmap = task.GetResultSafely();
+
+                                      statusText.Text = "Currently playing ";
+
+                                      if (retrievedBeatmap != null)
+                                      {
+                                          beatmapText.AddLink(retrievedBeatmap.GetDisplayTitleRomanisable(),
+                                              LinkAction.OpenBeatmap,
+                                              retrievedBeatmap.OnlineID.ToString(),
+                                              creationParameters: s => s.Truncate = true);
+                                      }
+                                      else
+                                          beatmapText.AddText("unknown beatmap");
+                                  }), cancellationSource.Token);
             }
         }
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -23,17 +25,21 @@ namespace osu.Game.Tests.Visual.Playlists
 
         protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new TestDependencies();
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            SelectedRoom.Value = new Room();
+            base.SetUpSteps();
 
-            Child = settings = new TestRoomSettings(SelectedRoom.Value)
+            AddStep("create overlay", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible }
-            };
-        });
+                SelectedRoom.Value = new Room();
+
+                Child = settings = new TestRoomSettings(SelectedRoom.Value)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    State = { Value = Visibility.Visible }
+                };
+            });
+        }
 
         [Test]
         public void TestButtonEnabledOnlyWithNameAndBeatmap()
@@ -49,7 +55,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("set name", () => SelectedRoom.Value.Name.Value = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set beatmap", () => SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } }));
+            AddStep("set beatmap", () => SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)));
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
             AddStep("clear name", () => SelectedRoom.Value.Name.Value = "");
@@ -68,7 +74,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 settings.NameField.Current.Value = expected_name;
                 settings.DurationField.Current.Value = expectedDuration;
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo));
 
                 RoomManager.CreateRequested = r =>
                 {
@@ -94,7 +100,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 var beatmap = CreateBeatmap(Ruleset.Value).BeatmapInfo;
 
                 SelectedRoom.Value.Name.Value = "Test Room";
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = beatmap } });
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(beatmap));
 
                 errorMessage = $"{not_found_prefix} {beatmap.OnlineID}";
 
@@ -121,7 +127,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("setup", () =>
             {
                 SelectedRoom.Value.Name.Value = "Test Room";
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo));
 
                 RoomManager.CreateRequested = _ => failText;
             });

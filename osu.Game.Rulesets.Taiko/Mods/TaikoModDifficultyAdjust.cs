@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             get
             {
-                string scrollSpeed = ScrollSpeed.IsDefault ? string.Empty : $"Scroll x{ScrollSpeed.Value:N1}";
+                string scrollSpeed = ScrollSpeed.IsDefault ? string.Empty : $"Scroll x{ScrollSpeed.Value:N2}";
 
                 return string.Join(", ", new[]
                 {

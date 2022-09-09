@@ -1,10 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Extensions;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -17,6 +18,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -60,7 +62,7 @@ namespace osu.Game.Tests.Visual.Navigation
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                     }
-                }).GetResultSafely()?.Value;
+                })?.Value;
             });
         }
 
@@ -93,6 +95,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestFromSongSelect([Values] ScorePresentType type)
         {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
             var firstImport = importScore(1);
             presentAndConfirm(firstImport, type);
 
@@ -103,6 +108,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestFromSongSelectDifferentRuleset([Values] ScorePresentType type)
         {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
             var firstImport = importScore(1);
             presentAndConfirm(firstImport, type);
 
@@ -135,7 +143,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     BeatmapInfo = beatmap.Beatmaps.First(),
                     Ruleset = ruleset ?? new OsuRuleset().RulesetInfo,
                     User = new GuestUser(),
-                }).GetResultSafely().Value;
+                }).Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);

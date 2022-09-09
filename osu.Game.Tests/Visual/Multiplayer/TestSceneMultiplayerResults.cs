@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
@@ -22,12 +24,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var beatmapInfo = CreateBeatmap(rulesetInfo).BeatmapInfo;
                 var score = TestResources.CreateTestScoreInfo(beatmapInfo);
 
-                PlaylistItem playlistItem = new PlaylistItem
-                {
-                    BeatmapID = beatmapInfo.OnlineID,
-                };
-
-                Stack.Push(screen = new MultiplayerResultsScreen(score, 1, playlistItem));
+                Stack.Push(screen = new MultiplayerResultsScreen(score, 1, new PlaylistItem(beatmapInfo)));
             });
 
             AddUntilStep("wait for loaded", () => screen.IsLoaded);

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -28,10 +30,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(scoreManager = new ScoreManager(rulesets, () => beatmapManager, LocalStorage, ContextFactory, Scheduler));
-            Dependencies.Cache(ContextFactory);
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(scoreManager = new ScoreManager(rulesets, () => beatmapManager, LocalStorage, Realm, API));
+            Dependencies.Cache(Realm);
 
             beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
         }
@@ -124,7 +126,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddUntilStep("Became present", () => topLocalRank.IsPresent);
-            AddAssert("Correct rank", () => topLocalRank.Rank == ScoreRank.B);
+            AddUntilStep("Correct rank", () => topLocalRank.Rank == ScoreRank.B);
 
             AddStep("Add higher score for current user", () =>
             {
@@ -137,7 +139,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo2);
             });
 
-            AddAssert("Correct rank", () => topLocalRank.Rank == ScoreRank.S);
+            AddUntilStep("Correct rank", () => topLocalRank.Rank == ScoreRank.S);
         }
     }
 }

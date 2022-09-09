@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using osu.Framework;
@@ -57,7 +59,7 @@ namespace osu.Game.Graphics.Containers
             drawable.StateChanged += state => selectionChanged(drawable, state);
         }
 
-        public override bool Remove(T drawable)
+        public override bool Remove(T drawable, bool disposeImmediately)
             => throw new NotSupportedException($"Cannot remove drawables from {nameof(SelectionCycleFillFlowContainer<T>)}");
 
         private void setSelected(int? value)

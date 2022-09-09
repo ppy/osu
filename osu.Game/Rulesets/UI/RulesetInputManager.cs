@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -16,14 +18,21 @@ using osu.Game.Configuration;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler
+    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachHUDPieces, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
+        public readonly KeyBindingContainer<T> KeyBindingContainer;
+
+        [Resolved(CanBeNull = true)]
+        private ScoreProcessor scoreProcessor { get; set; }
+
         private ReplayRecorder recorder;
 
         public ReplayRecorder Recorder
@@ -42,8 +51,6 @@ namespace osu.Game.Rulesets.UI
         }
 
         protected override InputState CreateInitialState() => new RulesetInputManagerInputState<T>(base.CreateInitialState());
-
-        protected readonly KeyBindingContainer<T> KeyBindingContainer;
 
         protected override Container<Drawable> Content => content;
 
@@ -66,17 +73,23 @@ namespace osu.Game.Rulesets.UI
 
         public override void HandleInputStateChange(InputStateChangeEvent inputStateChange)
         {
-            if (inputStateChange is ReplayStateChangeEvent<T> replayStateChanged)
+            switch (inputStateChange)
             {
-                foreach (var action in replayStateChanged.ReleasedActions)
-                    KeyBindingContainer.TriggerReleased(action);
+                case ReplayStateChangeEvent<T> stateChangeEvent:
+                    foreach (var action in stateChangeEvent.ReleasedActions)
+                        KeyBindingContainer.TriggerReleased(action);
 
-                foreach (var action in replayStateChanged.PressedActions)
-                    KeyBindingContainer.TriggerPressed(action);
-            }
-            else
-            {
-                base.HandleInputStateChange(inputStateChange);
+                    foreach (var action in stateChangeEvent.PressedActions)
+                        KeyBindingContainer.TriggerPressed(action);
+                    break;
+
+                case ReplayStatisticsFrameEvent statisticsStateChangeEvent:
+                    scoreProcessor?.ResetFromReplayFrame(statisticsStateChangeEvent.Frame);
+                    break;
+
+                default:
+                    base.HandleInputStateChange(inputStateChange);
+                    break;
             }
         }
 
@@ -111,7 +124,7 @@ namespace osu.Game.Rulesets.UI
         {
             switch (e)
             {
-                case MouseDownEvent _:
+                case MouseDownEvent:
                     if (mouseDisabled.Value)
                         return true; // importantly, block upwards propagation so global bindings also don't fire.
 
@@ -156,7 +169,7 @@ namespace osu.Game.Rulesets.UI
                                                    .Select(action => new KeyCounterAction<T>(action)));
         }
 
-        public class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
+        private class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
         {
             public ActionReceptor(KeyCounterDisplay target)
                 : base(target)
@@ -169,6 +182,37 @@ namespace osu.Game.Rulesets.UI
             {
                 foreach (var c in Target.Children.OfType<KeyCounterAction<T>>())
                     c.OnReleased(e.Action, Clock.Rate >= 0);
+            }
+        }
+
+        #endregion
+
+        #region Keys per second Counter Attachment
+
+        public void Attach(ClicksPerSecondCalculator calculator)
+        {
+            var listener = new ActionListener(calculator);
+
+            KeyBindingContainer.Add(listener);
+        }
+
+        private class ActionListener : Component, IKeyBindingHandler<T>
+        {
+            private readonly ClicksPerSecondCalculator calculator;
+
+            public ActionListener(ClicksPerSecondCalculator calculator)
+            {
+                this.calculator = calculator;
+            }
+
+            public bool OnPressed(KeyBindingPressEvent<T> e)
+            {
+                calculator.AddInputTimestamp();
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<T> e)
+            {
             }
         }
 
@@ -209,12 +253,13 @@ namespace osu.Game.Rulesets.UI
     }
 
     /// <summary>
-    /// Supports attaching a <see cref="KeyCounterDisplay"/>.
+    /// Supports attaching various HUD pieces.
     /// Keys will be populated automatically and a receptor will be injected inside.
     /// </summary>
-    public interface ICanAttachKeyCounter
+    public interface ICanAttachHUDPieces
     {
         void Attach(KeyCounterDisplay keyCounter);
+        void Attach(ClicksPerSecondCalculator calculator);
     }
 
     public class RulesetInputManagerInputState<T> : InputState

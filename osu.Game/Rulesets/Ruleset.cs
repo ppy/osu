@@ -1,45 +1,66 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.IO.Stores;
+using osu.Framework.Localisation;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.UI;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
-using osu.Game.Skinning;
-using osu.Game.Users;
-using JetBrains.Annotations;
-using osu.Framework.Extensions;
-using osu.Framework.Extensions.EnumExtensions;
-using osu.Framework.Testing;
-using osu.Game.Extensions;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Filter;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Skinning;
+using osu.Game.Users;
 
 namespace osu.Game.Rulesets
 {
     [ExcludeFromDynamicCompile]
     public abstract class Ruleset
     {
-        public RulesetInfo RulesetInfo { get; internal set; }
+        public RulesetInfo RulesetInfo { get; }
 
         private static readonly ConcurrentDictionary<string, IMod[]> mod_reference_cache = new ConcurrentDictionary<string, IMod[]>();
+
+        /// <summary>
+        /// Version history:
+        /// 2022.205.0   FramedReplayInputHandler.CollectPendingInputs renamed to FramedReplayHandler.CollectReplayInputs.
+        /// 2022.822.0   All strings return values have been converted to LocalisableString to allow for localisation support.
+        /// </summary>
+        public const string CURRENT_RULESET_API_VERSION = "2022.822.0";
+
+        /// <summary>
+        /// Define the ruleset API version supported by this ruleset.
+        /// Ruleset implementations should be updated to support the latest version to ensure they can still be loaded.
+        /// </summary>
+        /// <remarks>
+        /// Generally, all ruleset implementations should point this directly to <see cref="CURRENT_RULESET_API_VERSION"/>.
+        /// This will ensure that each time you compile a new release, it will pull in the most recent version.
+        /// See https://github.com/ppy/osu/wiki/Breaking-Changes for full details on required ongoing changes.
+        /// </remarks>
+        public virtual string RulesetAPIVersionSupported => string.Empty;
 
         /// <summary>
         /// A queryable source containing all available mods.
@@ -93,6 +114,15 @@ namespace osu.Game.Rulesets
             return AllMods.FirstOrDefault(m => m is T)?.CreateInstance() as T;
         }
 
+        /// <summary>
+        /// Creates an enumerable with mods that are supported by the ruleset for the supplied <paramref name="type"/>.
+        /// </summary>
+        /// <remarks>
+        /// If there are no applicable mods from the given <paramref name="type"/> in this ruleset,
+        /// then the proper behaviour is to return an empty enumerable.
+        /// <see langword="null"/> mods should not be present in the returned enumerable.
+        /// </remarks>
+        [ItemNotNull]
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
         /// <summary>
@@ -115,55 +145,55 @@ namespace osu.Game.Rulesets
             {
                 switch (mod)
                 {
-                    case ModNoFail _:
+                    case ModNoFail:
                         value |= LegacyMods.NoFail;
                         break;
 
-                    case ModEasy _:
+                    case ModEasy:
                         value |= LegacyMods.Easy;
                         break;
 
-                    case ModHidden _:
+                    case ModHidden:
                         value |= LegacyMods.Hidden;
                         break;
 
-                    case ModHardRock _:
+                    case ModHardRock:
                         value |= LegacyMods.HardRock;
                         break;
 
-                    case ModPerfect _:
-                        value |= LegacyMods.Perfect;
+                    case ModPerfect:
+                        value |= LegacyMods.Perfect | LegacyMods.SuddenDeath;
                         break;
 
-                    case ModSuddenDeath _:
+                    case ModSuddenDeath:
                         value |= LegacyMods.SuddenDeath;
                         break;
 
-                    case ModNightcore _:
-                        value |= LegacyMods.Nightcore;
+                    case ModNightcore:
+                        value |= LegacyMods.Nightcore | LegacyMods.DoubleTime;
                         break;
 
-                    case ModDoubleTime _:
+                    case ModDoubleTime:
                         value |= LegacyMods.DoubleTime;
                         break;
 
-                    case ModRelax _:
+                    case ModRelax:
                         value |= LegacyMods.Relax;
                         break;
 
-                    case ModHalfTime _:
+                    case ModHalfTime:
                         value |= LegacyMods.HalfTime;
                         break;
 
-                    case ModFlashlight _:
+                    case ModFlashlight:
                         value |= LegacyMods.Flashlight;
                         break;
 
-                    case ModCinema _:
-                        value |= LegacyMods.Cinema;
+                    case ModCinema:
+                        value |= LegacyMods.Cinema | LegacyMods.Autoplay;
                         break;
 
-                    case ModAutoplay _:
+                    case ModAutoplay:
                         value |= LegacyMods.Autoplay;
                         break;
                 }
@@ -201,7 +231,7 @@ namespace osu.Game.Rulesets
         /// Creates a <see cref="ScoreProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The score processor.</returns>
-        public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor();
+        public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor(this);
 
         /// <summary>
         /// Creates a <see cref="HealthProcessor"/> for this <see cref="Ruleset"/>.
@@ -228,25 +258,9 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Optionally creates a <see cref="PerformanceCalculator"/> to generate performance data from the provided score.
         /// </summary>
-        /// <param name="attributes">Difficulty attributes for the beatmap related to the provided score.</param>
-        /// <param name="score">The score to be processed.</param>
         /// <returns>A performance calculator instance for the provided score.</returns>
         [CanBeNull]
-        public virtual PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => null;
-
-        /// <summary>
-        /// Optionally creates a <see cref="PerformanceCalculator"/> to generate performance data from the provided score.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to use as a source for generating <see cref="DifficultyAttributes"/>.</param>
-        /// <param name="score">The score to be processed.</param>
-        /// <returns>A performance calculator instance for the provided score.</returns>
-        [CanBeNull]
-        public PerformanceCalculator CreatePerformanceCalculator(IWorkingBeatmap beatmap, ScoreInfo score)
-        {
-            var difficultyCalculator = CreateDifficultyCalculator(beatmap);
-            var difficultyAttributes = difficultyCalculator.Calculate(score.Mods);
-            return CreatePerformanceCalculator(difficultyAttributes, score);
-        }
+        public virtual PerformanceCalculator CreatePerformanceCalculator() => null;
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
@@ -293,7 +307,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
-        public virtual string GetVariantName(int variant) => string.Empty;
+        public virtual LocalisableString GetVariantName(int variant) => string.Empty;
 
         /// <summary>
         /// For rulesets which support legacy (osu-stable) replay conversion, this method will create an empty replay frame
@@ -318,7 +332,7 @@ namespace osu.Game.Rulesets
         /// <returns>
         /// All valid <see cref="HitResult"/>s along with a display-friendly name.
         /// </returns>
-        public IEnumerable<(HitResult result, string displayName)> GetHitResults()
+        public IEnumerable<(HitResult result, LocalisableString displayName)> GetHitResults()
         {
             var validResults = GetValidHitResults();
 
@@ -356,7 +370,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="result">The result type to get the name for.</param>
         /// <returns>The display name.</returns>
-        public virtual string GetDisplayNameForHitResult(HitResult result) => result.GetDescription();
+        public virtual LocalisableString GetDisplayNameForHitResult(HitResult result) => result.GetLocalisableDescription();
 
         /// <summary>
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.

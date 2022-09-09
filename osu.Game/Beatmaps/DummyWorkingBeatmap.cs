@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,6 +44,10 @@ namespace osu.Game.Beatmaps
             }, audio)
         {
             this.textures = textures;
+
+            // We are guaranteed to have a virtual track.
+            // To ease usability, ensure the track is available from point of construction.
+            LoadTrack();
         }
 
         protected override IBeatmap GetBeatmap() => new Beatmap();

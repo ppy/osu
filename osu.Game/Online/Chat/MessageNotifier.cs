@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -24,7 +26,7 @@ namespace osu.Game.Online.Chat
     public class MessageNotifier : Component
     {
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         [Resolved]
         private ChatOverlay chatOverlay { get; set; }
@@ -77,7 +79,7 @@ namespace osu.Game.Online.Chat
             if (!messages.Any())
                 return;
 
-            var channel = channelManager.JoinedChannels.SingleOrDefault(c => c.Id == messages.First().ChannelId);
+            var channel = channelManager.JoinedChannels.SingleOrDefault(c => c.Id > 0 && c.Id == messages.First().ChannelId);
 
             if (channel == null)
                 return;
@@ -114,7 +116,7 @@ namespace osu.Game.Online.Chat
             if (!notifyOnPrivateMessage.Value || channel.Type != ChannelType.PM)
                 return false;
 
-            notifications.Post(new PrivateMessageNotification(message.Sender.Username, channel));
+            notifications.Post(new PrivateMessageNotification(message, channel));
             return true;
         }
 
@@ -122,7 +124,7 @@ namespace osu.Game.Online.Chat
         {
             if (!notifyOnUsername.Value || !CheckContainsUsername(message.Content, localUser.Value.Username)) return;
 
-            notifications.Post(new MentionNotification(message.Sender.Username, channel));
+            notifications.Post(new MentionNotification(message, channel));
         }
 
         /// <summary>
@@ -136,48 +138,48 @@ namespace osu.Game.Online.Chat
             return Regex.IsMatch(message, $@"(^|\W)({fullName}|{underscoreName})($|\W)", RegexOptions.IgnoreCase);
         }
 
-        public class PrivateMessageNotification : OpenChannelNotification
+        public class PrivateMessageNotification : HighlightMessageNotification
         {
-            public PrivateMessageNotification(string username, Channel channel)
-                : base(channel)
+            public PrivateMessageNotification(Message message, Channel channel)
+                : base(message, channel)
             {
                 Icon = FontAwesome.Solid.Envelope;
-                Text = $"You received a private message from '{username}'. Click to read it!";
+                Text = $"You received a private message from '{message.Sender.Username}'. Click to read it!";
             }
         }
 
-        public class MentionNotification : OpenChannelNotification
+        public class MentionNotification : HighlightMessageNotification
         {
-            public MentionNotification(string username, Channel channel)
-                : base(channel)
+            public MentionNotification(Message message, Channel channel)
+                : base(message, channel)
             {
                 Icon = FontAwesome.Solid.At;
-                Text = $"Your name was mentioned in chat by '{username}'. Click to find out why!";
+                Text = $"Your name was mentioned in chat by '{message.Sender.Username}'. Click to find out why!";
             }
         }
 
-        public abstract class OpenChannelNotification : SimpleNotification
+        public abstract class HighlightMessageNotification : SimpleNotification
         {
-            protected OpenChannelNotification(Channel channel)
+            protected HighlightMessageNotification(Message message, Channel channel)
             {
+                this.message = message;
                 this.channel = channel;
             }
 
+            private readonly Message message;
             private readonly Channel channel;
 
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay, ChannelManager channelManager)
+            private void load(OsuColour colours, ChatOverlay chatOverlay, INotificationOverlay notificationOverlay)
             {
-                IconBackground.Colour = colours.PurpleDark;
+                IconContent.Colour = colours.PurpleDark;
 
                 Activated = delegate
                 {
                     notificationOverlay.Hide();
-                    chatOverlay.Show();
-                    channelManager.CurrentChannel.Value = channel;
-
+                    chatOverlay.HighlightMessage(message, channel);
                     return true;
                 };
             }

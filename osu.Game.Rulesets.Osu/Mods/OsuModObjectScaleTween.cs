@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected virtual float EndScale => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn) };
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween) };
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
@@ -42,13 +42,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             // apply grow effect
             switch (drawable)
             {
-                case DrawableSliderHead _:
-                case DrawableSliderTail _:
+                case DrawableSliderHead:
+                case DrawableSliderTail:
                     // special cases we should *not* be scaling.
                     break;
 
-                case DrawableSlider _:
-                case DrawableHitCircle _:
+                case DrawableSlider:
+                case DrawableHitCircle:
                 {
                     using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                         drawable.ScaleTo(StartScale.Value).Then().ScaleTo(EndScale, h.TimePreempt, Easing.OutSine);

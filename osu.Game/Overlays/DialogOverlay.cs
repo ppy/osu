@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Dialog;
@@ -14,7 +16,7 @@ using osu.Game.Audio.Effects;
 
 namespace osu.Game.Overlays
 {
-    public class DialogOverlay : OsuFocusedOverlayContainer
+    public class DialogOverlay : OsuFocusedOverlayContainer, IDialogOverlay
     {
         private readonly Container dialogContainer;
 
@@ -47,57 +49,68 @@ namespace osu.Game.Overlays
 
         public void Push(PopupDialog dialog)
         {
-            if (dialog == CurrentDialog || dialog.State.Value != Visibility.Visible) return;
+            if (dialog == CurrentDialog || dialog.State.Value == Visibility.Hidden) return;
 
-            // if any existing dialog is being displayed, dismiss it before showing a new one.
-            CurrentDialog?.Hide();
-
+            // Immediately update the externally accessible property as this may be used for checks even before
+            // a DialogOverlay instance has finished loading.
+            var lastDialog = CurrentDialog;
             CurrentDialog = dialog;
-            CurrentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
 
-            dialogContainer.Add(CurrentDialog);
-
-            Show();
-        }
-
-        public override bool IsPresent => dialogContainer.Children.Count > 0;
-
-        protected override bool BlockNonPositionalInput => true;
-
-        private void onDialogOnStateChanged(VisibilityContainer dialog, Visibility v)
-        {
-            if (v != Visibility.Hidden) return;
-
-            // handle the dialog being dismissed.
-            dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
-
-            if (dialog == CurrentDialog)
+            Schedule(() =>
             {
+                // if any existing dialog is being displayed, dismiss it before showing a new one.
+                lastDialog?.Hide();
+
+                // if the new dialog is hidden before added to the dialogContainer, bypass any further operations.
+                if (dialog.State.Value == Visibility.Hidden)
+                {
+                    dismiss();
+                    return;
+                }
+
+                dialogContainer.Add(dialog);
+                Show();
+
+                dialog.State.BindValueChanged(state =>
+                {
+                    if (state.NewValue != Visibility.Hidden) return;
+
+                    // Trigger the demise of the dialog as soon as it hides.
+                    dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
+
+                    dismiss();
+                });
+            });
+
+            void dismiss()
+            {
+                if (dialog != CurrentDialog) return;
+
+                // Handle the case where the dialog is the currently displayed dialog.
+                // In this scenario, the overlay itself should also be hidden.
                 Hide();
                 CurrentDialog = null;
             }
         }
 
+        public override bool IsPresent => Scheduler.HasPendingTasks || dialogContainer.Children.Count > 0;
+
+        protected override bool BlockNonPositionalInput => true;
+
         protected override void PopIn()
         {
             base.PopIn();
-            this.FadeIn(PopupDialog.ENTER_DURATION, Easing.OutQuint);
             lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-
             lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
 
-            if (CurrentDialog?.State.Value == Visibility.Visible)
-            {
+            // PopOut gets called initially, but we only want to hide dialog when we have been loaded and are present.
+            if (IsLoaded && CurrentDialog?.State.Value == Visibility.Visible)
                 CurrentDialog.Hide();
-                return;
-            }
-
-            this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -108,7 +121,11 @@ namespace osu.Game.Overlays
             switch (e.Action)
             {
                 case GlobalAction.Select:
-                    CurrentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerClick();
+                    var clickableButton =
+                        CurrentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault() ??
+                        CurrentDialog?.Buttons.First();
+
+                    clickableButton?.TriggerClick();
                     return true;
             }
 

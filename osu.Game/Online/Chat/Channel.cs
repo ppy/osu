@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +11,7 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Lists;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Online.Chat
 {
@@ -88,6 +91,12 @@ namespace osu.Game.Online.Chat
         /// Note that this does not guarantee a join has completed. Check Id > 0 for confirmation.
         /// </summary>
         public Bindable<bool> Joined = new Bindable<bool>();
+
+        /// <summary>
+        /// Signals if there is a message to highlight.
+        /// This is automatically cleared by the associated <see cref="DrawableChannel"/> after highlighting.
+        /// </summary>
+        public Bindable<Message> HighlightedMessage = new Bindable<Message>();
 
         [JsonConstructor]
         public Channel()

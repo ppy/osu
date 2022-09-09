@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -110,7 +112,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
             AddAssert("ensure passing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == true);
-            AddAssert("submitted score has correct ruleset ID", () => Player.SubmittedScore?.ScoreInfo.RulesetID == new TaikoRuleset().RulesetInfo.ID);
+            AddAssert("submitted score has correct ruleset ID", () => Player.SubmittedScore?.ScoreInfo.Ruleset.ShortName == new TaikoRuleset().RulesetInfo.ShortName);
         }
 
         [Test]
@@ -130,7 +132,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
             AddAssert("ensure passing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == true);
-            AddAssert("submitted score has correct ruleset ID", () => Player.SubmittedScore?.ScoreInfo.RulesetID == new ManiaRuleset().RulesetInfo.ID);
+            AddAssert("submitted score has correct ruleset ID", () => Player.SubmittedScore?.ScoreInfo.Ruleset.ShortName == new ManiaRuleset().RulesetInfo.ShortName);
         }
 
         [Test]
@@ -159,7 +161,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddStep("exit", () => Player.Exit());
 
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
@@ -176,7 +178,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             addFakeHit();
 
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddStep("exit", () => Player.Exit());
 
             AddAssert("ensure failing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == false);
@@ -237,7 +239,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             createPlayerTest(false, r =>
             {
                 var beatmap = createTestBeatmap(r);
-                beatmap.BeatmapInfo.OnlineID = -1;
+                beatmap.BeatmapInfo.ResetOnlineInfo();
                 return beatmap;
             });
 
@@ -363,21 +365,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 ImportedScore = score;
 
-                // It was discovered that Score members could sometimes be half-populated.
-                // In particular, the RulesetID property could be set to 0 even on non-osu! maps.
-                // We want to test that the state of that property is consistent in this test.
-                // EF makes this impossible.
-                //
-                // First off, because of the EF navigational property-explicit foreign key field duality,
-                // it can happen that - for example - the Ruleset navigational property is correctly initialised to mania,
-                // but the RulesetID foreign key property is not initialised and remains 0.
-                // EF silently bypasses this by prioritising the Ruleset navigational property over the RulesetID foreign key one.
-                //
-                // Additionally, adding an entity to an EF DbSet CAUSES SIDE EFFECTS with regard to the foreign key property.
-                // In the above instance, if a ScoreInfo with Ruleset = {mania} and RulesetID = 0 is attached to an EF context,
-                // RulesetID WILL BE SILENTLY SET TO THE CORRECT VALUE of 3.
-                //
-                // For the above reasons, actual importing is disabled in this test.
+                // Calling base.ImportScore is omitted as it will fail for the test method which uses a custom ruleset.
+                // This can be resolved by doing something similar to what TestScenePlayerLocalScoreImport is doing,
+                // but requires a bit of restructuring.
             }
         }
     }

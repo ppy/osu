@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Game.Rulesets.UI;
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -32,27 +31,27 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class FailAnimation : Container
     {
-        public Action OnComplete;
+        public Action? OnComplete;
 
         private readonly DrawableRuleset drawableRuleset;
         private readonly BindableDouble trackFreq = new BindableDouble(1);
         private readonly BindableDouble volumeAdjustment = new BindableDouble(0.5);
 
-        private Container filters;
+        private Container filters = null!;
 
-        private Box redFlashLayer;
+        private Box redFlashLayer = null!;
 
-        private Track track;
+        private Track track = null!;
 
-        private AudioFilter failLowPassFilter;
-        private AudioFilter failHighPassFilter;
+        private AudioFilter failLowPassFilter = null!;
+        private AudioFilter failHighPassFilter = null!;
 
         private const float duration = 2500;
 
-        private Sample failSample;
+        private Sample? failSample;
 
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
         protected override Container<Drawable> Content { get; } = new Container
         {
@@ -64,8 +63,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The player screen background, used to adjust appearance on failing.
         /// </summary>
-        [CanBeNull]
-        public BackgroundScreen Background { private get; set; }
+        public BackgroundScreen? Background { private get; set; }
 
         public FailAnimation(DrawableRuleset drawableRuleset)
         {
@@ -103,6 +101,7 @@ namespace osu.Game.Screens.Play
         }
 
         private bool started;
+        private bool filtersRemoved;
 
         /// <summary>
         /// Start the fail animation playing.
@@ -111,6 +110,7 @@ namespace osu.Game.Screens.Play
         public void Start()
         {
             if (started) throw new InvalidOperationException("Animation cannot be started more than once.");
+            if (filtersRemoved) throw new InvalidOperationException("Animation cannot be started after filters have been removed.");
 
             started = true;
 
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Play
 
             failHighPassFilter.CutoffTo(300);
             failLowPassFilter.CutoffTo(300, duration, Easing.OutCubic);
-            failSample.Play();
+            failSample?.Play();
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
             track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
@@ -153,16 +153,20 @@ namespace osu.Game.Screens.Play
 
         public void RemoveFilters(bool resetTrackFrequency = true)
         {
-            if (resetTrackFrequency)
-                track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+            filtersRemoved = true;
 
-            track?.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
+            if (!started)
+                return;
+
+            if (resetTrackFrequency)
+                track.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+
+            track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             if (filters.Parent == null)
                 return;
 
-            RemoveInternal(filters);
-            filters.Dispose();
+            RemoveInternal(filters, true);
         }
 
         protected override void Update()
@@ -196,7 +200,7 @@ namespace osu.Game.Screens.Play
                 dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
 
                 // need to reapply the fail drop after judgement state changes
-                obj.ApplyCustomUpdateState += (o, _) => dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
+                obj.ApplyCustomUpdateState += (_, _) => dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
 
                 appliedObjects.Add(obj);
             }
