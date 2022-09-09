@@ -19,16 +19,16 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchTouchInputMapper : VisibilityContainer
     {
-        private Dictionary<object, TouchCatchAction> trackedActions = new Dictionary<object, TouchCatchAction>();
+        private Dictionary<object, TouchCatchAction> trackedActionSources = new Dictionary<object, TouchCatchAction>();
 
         private KeyBindingContainer<CatchAction> keyBindingContainer = null!;
 
         private Container mainContent = null!;
 
-        private ArrowHitbox leftBox = null!;
-        private ArrowHitbox rightBox = null!;
-        private ArrowHitbox leftDashBox = null!;
-        private ArrowHitbox rightDashBox = null!;
+        private InputArea leftBox = null!;
+        private InputArea rightBox = null!;
+        private InputArea leftDashBox = null!;
+        private InputArea rightDashBox = null!;
 
         public override bool PropagatePositionalInputSubTree => true;
         public override bool PropagateNonPositionalInputSubTree => true;
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Catch.UI
                             Origin = Anchor.CentreLeft,
                             Children = new Drawable[]
                             {
-                                leftBox = new ArrowHitbox(TouchCatchAction.MoveLeft, ref trackedActions, colours.Gray3)
+                                leftBox = new InputArea(TouchCatchAction.MoveLeft, ref trackedActionSources, colours.Gray3)
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Catch.UI
                                     RelativePositionAxes = Axes.Both,
                                     Width = 0.5f,
                                 },
-                                leftDashBox = new ArrowHitbox(TouchCatchAction.DashLeft, ref trackedActions, colours.Gray2)
+                                leftDashBox = new InputArea(TouchCatchAction.DashLeft, ref trackedActionSources, colours.Gray2)
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Catch.UI
                             Origin = Anchor.CentreRight,
                             Children = new Drawable[]
                             {
-                                rightBox = new ArrowHitbox(TouchCatchAction.MoveRight, ref trackedActions, colours.Gray3)
+                                rightBox = new InputArea(TouchCatchAction.MoveRight, ref trackedActionSources, colours.Gray3)
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Catch.UI
                                     RelativePositionAxes = Axes.Both,
                                     Width = 0.5f,
                                 },
-                                rightDashBox = new ArrowHitbox(TouchCatchAction.DashRight, ref trackedActions, colours.Gray2)
+                                rightDashBox = new InputArea(TouchCatchAction.DashRight, ref trackedActionSources, colours.Gray2)
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             // Loop through the buttons to avoid keeping a button pressed if both mouse buttons are pressed.
             foreach (MouseButton i in e.PressedButtons)
-                trackedActions[i] = touchCatchAction;
+                trackedActionSources[i] = touchCatchAction;
 
             calculateActiveKeys();
             return true;
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             Show();
 
-            trackedActions[e.Touch.Source] = getTouchCatchActionFromInput(e.ScreenSpaceTouch.Position);
+            trackedActionSources[e.Touch.Source] = getTouchCatchActionFromInput(e.ScreenSpaceTouch.Position);
             calculateActiveKeys();
 
             base.OnTouchMove(e);
@@ -165,24 +165,6 @@ namespace osu.Game.Rulesets.Catch.UI
             base.OnTouchUp(e);
         }
 
-        private void calculateActiveKeys()
-        {
-            if (trackedActions.ContainsValue(TouchCatchAction.DashLeft) || trackedActions.ContainsValue(TouchCatchAction.MoveLeft))
-                keyBindingContainer.TriggerPressed(CatchAction.MoveLeft);
-            else
-                keyBindingContainer.TriggerReleased(CatchAction.MoveLeft);
-
-            if (trackedActions.ContainsValue(TouchCatchAction.DashRight) || trackedActions.ContainsValue(TouchCatchAction.MoveRight))
-                keyBindingContainer.TriggerPressed(CatchAction.MoveRight);
-            else
-                keyBindingContainer.TriggerReleased(CatchAction.MoveRight);
-
-            if (trackedActions.ContainsValue(TouchCatchAction.DashRight) || trackedActions.ContainsValue(TouchCatchAction.DashLeft))
-                keyBindingContainer.TriggerPressed(CatchAction.Dash);
-            else
-                keyBindingContainer.TriggerReleased(CatchAction.Dash);
-        }
-
         private bool handleDown(object source, Vector2 position)
         {
             TouchCatchAction catchAction = getTouchCatchActionFromInput(position);
@@ -190,7 +172,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (catchAction == TouchCatchAction.None)
                 return false;
 
-            trackedActions[source] = catchAction;
+            trackedActionSources[source] = catchAction;
 
             calculateActiveKeys();
 
@@ -199,9 +181,27 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void handleUp(object source)
         {
-            trackedActions.Remove(source);
+            trackedActionSources.Remove(source);
 
             calculateActiveKeys();
+        }
+
+        private void calculateActiveKeys()
+        {
+            if (trackedActionSources.ContainsValue(TouchCatchAction.DashLeft) || trackedActionSources.ContainsValue(TouchCatchAction.MoveLeft))
+                keyBindingContainer.TriggerPressed(CatchAction.MoveLeft);
+            else
+                keyBindingContainer.TriggerReleased(CatchAction.MoveLeft);
+
+            if (trackedActionSources.ContainsValue(TouchCatchAction.DashRight) || trackedActionSources.ContainsValue(TouchCatchAction.MoveRight))
+                keyBindingContainer.TriggerPressed(CatchAction.MoveRight);
+            else
+                keyBindingContainer.TriggerReleased(CatchAction.MoveRight);
+
+            if (trackedActionSources.ContainsValue(TouchCatchAction.DashRight) || trackedActionSources.ContainsValue(TouchCatchAction.DashLeft))
+                keyBindingContainer.TriggerPressed(CatchAction.Dash);
+            else
+                keyBindingContainer.TriggerReleased(CatchAction.Dash);
         }
 
         private TouchCatchAction getTouchCatchActionFromInput(Vector2 inputPosition)
@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Catch.UI
             mainContent.FadeOut(300);
         }
 
-        private class ArrowHitbox : CompositeDrawable, IKeyBindingHandler<CatchAction>
+        private class InputArea : CompositeDrawable, IKeyBindingHandler<CatchAction>
         {
             private readonly TouchCatchAction handledAction;
 
@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             private bool isHiglighted;
 
-            public ArrowHitbox(TouchCatchAction handledAction, ref Dictionary<object, TouchCatchAction> trackedActions, Color4 colour)
+            public InputArea(TouchCatchAction handledAction, ref Dictionary<object, TouchCatchAction> trackedActions, Color4 colour)
             {
                 this.handledAction = handledAction;
                 this.trackedActions = trackedActions;
