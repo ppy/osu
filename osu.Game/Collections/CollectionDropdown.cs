@@ -75,7 +75,14 @@ namespace osu.Game.Collections
             // changes. It's not great but honestly the whole dropdown menu structure isn't great. This needs to be fixed, but I'll issue
             // a warning that it's going to be a frustrating journey.
             Current.Value = allBeatmaps;
-            Schedule(() => Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection.ID == selectedItem?.ID) ?? filters[0]);
+            Schedule(() =>
+            {
+                // current may have changed before the scheduled call is run.
+                if (Current.Value != allBeatmaps)
+                    return;
+
+                Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection.ID == selectedItem?.ID) ?? filters[0];
+            });
 
             // Trigger a re-filter if the current item was in the change set.
             if (selectedItem != null && changes != null)

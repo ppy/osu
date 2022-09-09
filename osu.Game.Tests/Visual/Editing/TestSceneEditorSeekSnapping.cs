@@ -28,6 +28,11 @@ namespace osu.Game.Tests.Visual.Editing
         {
             base.LoadComplete();
 
+            Child = new TimingPointVisualiser(Beatmap.Value.Beatmap, 5000) { Clock = EditorClock };
+        }
+
+        protected override Beatmap CreateEditorClockBeatmap()
+        {
             var testBeatmap = new Beatmap
             {
                 ControlPointInfo = new ControlPointInfo(),
@@ -45,9 +50,7 @@ namespace osu.Game.Tests.Visual.Editing
             testBeatmap.ControlPointInfo.Add(450, new TimingControlPoint { BeatLength = 100 });
             testBeatmap.ControlPointInfo.Add(500, new TimingControlPoint { BeatLength = 307.69230769230802 });
 
-            Beatmap.Value = CreateWorkingBeatmap(testBeatmap);
-
-            Child = new TimingPointVisualiser(testBeatmap, 5000) { Clock = Clock };
+            return testBeatmap;
         }
 
         /// <summary>
@@ -59,17 +62,17 @@ namespace osu.Game.Tests.Visual.Editing
             reset();
 
             // Forwards
-            AddStep("Seek(0)", () => Clock.Seek(0));
+            AddStep("Seek(0)", () => EditorClock.Seek(0));
             checkTime(0);
-            AddStep("Seek(33)", () => Clock.Seek(33));
+            AddStep("Seek(33)", () => EditorClock.Seek(33));
             checkTime(33);
-            AddStep("Seek(89)", () => Clock.Seek(89));
+            AddStep("Seek(89)", () => EditorClock.Seek(89));
             checkTime(89);
 
             // Backwards
-            AddStep("Seek(25)", () => Clock.Seek(25));
+            AddStep("Seek(25)", () => EditorClock.Seek(25));
             checkTime(25);
-            AddStep("Seek(0)", () => Clock.Seek(0));
+            AddStep("Seek(0)", () => EditorClock.Seek(0));
             checkTime(0);
         }
 
@@ -82,19 +85,19 @@ namespace osu.Game.Tests.Visual.Editing
         {
             reset();
 
-            AddStep("Seek(0), Snap", () => Clock.SeekSnapped(0));
+            AddStep("Seek(0), Snap", () => EditorClock.SeekSnapped(0));
             checkTime(0);
-            AddStep("Seek(50), Snap", () => Clock.SeekSnapped(50));
+            AddStep("Seek(50), Snap", () => EditorClock.SeekSnapped(50));
             checkTime(50);
-            AddStep("Seek(100), Snap", () => Clock.SeekSnapped(100));
+            AddStep("Seek(100), Snap", () => EditorClock.SeekSnapped(100));
             checkTime(100);
-            AddStep("Seek(175), Snap", () => Clock.SeekSnapped(175));
+            AddStep("Seek(175), Snap", () => EditorClock.SeekSnapped(175));
             checkTime(175);
-            AddStep("Seek(350), Snap", () => Clock.SeekSnapped(350));
+            AddStep("Seek(350), Snap", () => EditorClock.SeekSnapped(350));
             checkTime(350);
-            AddStep("Seek(400), Snap", () => Clock.SeekSnapped(400));
+            AddStep("Seek(400), Snap", () => EditorClock.SeekSnapped(400));
             checkTime(400);
-            AddStep("Seek(450), Snap", () => Clock.SeekSnapped(450));
+            AddStep("Seek(450), Snap", () => EditorClock.SeekSnapped(450));
             checkTime(450);
         }
 
@@ -107,17 +110,17 @@ namespace osu.Game.Tests.Visual.Editing
         {
             reset();
 
-            AddStep("Seek(24), Snap", () => Clock.SeekSnapped(24));
+            AddStep("Seek(24), Snap", () => EditorClock.SeekSnapped(24));
             checkTime(0);
-            AddStep("Seek(26), Snap", () => Clock.SeekSnapped(26));
+            AddStep("Seek(26), Snap", () => EditorClock.SeekSnapped(26));
             checkTime(50);
-            AddStep("Seek(150), Snap", () => Clock.SeekSnapped(150));
+            AddStep("Seek(150), Snap", () => EditorClock.SeekSnapped(150));
             checkTime(100);
-            AddStep("Seek(170), Snap", () => Clock.SeekSnapped(170));
+            AddStep("Seek(170), Snap", () => EditorClock.SeekSnapped(170));
             checkTime(175);
-            AddStep("Seek(274), Snap", () => Clock.SeekSnapped(274));
+            AddStep("Seek(274), Snap", () => EditorClock.SeekSnapped(274));
             checkTime(175);
-            AddStep("Seek(276), Snap", () => Clock.SeekSnapped(276));
+            AddStep("Seek(276), Snap", () => EditorClock.SeekSnapped(276));
             checkTime(350);
         }
 
@@ -129,15 +132,15 @@ namespace osu.Game.Tests.Visual.Editing
         {
             reset();
 
-            AddStep("SeekForward", () => Clock.SeekForward());
+            AddStep("SeekForward", () => EditorClock.SeekForward());
             checkTime(50);
-            AddStep("SeekForward", () => Clock.SeekForward());
+            AddStep("SeekForward", () => EditorClock.SeekForward());
             checkTime(100);
-            AddStep("SeekForward", () => Clock.SeekForward());
+            AddStep("SeekForward", () => EditorClock.SeekForward());
             checkTime(200);
-            AddStep("SeekForward", () => Clock.SeekForward());
+            AddStep("SeekForward", () => EditorClock.SeekForward());
             checkTime(400);
-            AddStep("SeekForward", () => Clock.SeekForward());
+            AddStep("SeekForward", () => EditorClock.SeekForward());
             checkTime(450);
         }
 
@@ -149,17 +152,17 @@ namespace osu.Game.Tests.Visual.Editing
         {
             reset();
 
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(50);
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(100);
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(175);
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(350);
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(400);
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(450);
         }
 
@@ -172,29 +175,30 @@ namespace osu.Game.Tests.Visual.Editing
         {
             reset();
 
-            AddStep("Seek(49)", () => Clock.Seek(49));
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("Seek(49)", () => EditorClock.Seek(49));
+            checkTime(49);
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(50);
-            AddStep("Seek(49.999)", () => Clock.Seek(49.999));
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("Seek(49.999)", () => EditorClock.Seek(49.999));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(100);
-            AddStep("Seek(99)", () => Clock.Seek(99));
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("Seek(99)", () => EditorClock.Seek(99));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(100);
-            AddStep("Seek(99.999)", () => Clock.Seek(99.999));
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("Seek(99.999)", () => EditorClock.Seek(99.999));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(150);
-            AddStep("Seek(174)", () => Clock.Seek(174));
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("Seek(174)", () => EditorClock.Seek(174));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(175);
-            AddStep("Seek(349)", () => Clock.Seek(349));
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("Seek(349)", () => EditorClock.Seek(349));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(350);
-            AddStep("Seek(399)", () => Clock.Seek(399));
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("Seek(399)", () => EditorClock.Seek(399));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(400);
-            AddStep("Seek(449)", () => Clock.Seek(449));
-            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddStep("Seek(449)", () => EditorClock.Seek(449));
+            AddStep("SeekForward, Snap", () => EditorClock.SeekForward(true));
             checkTime(450);
         }
 
@@ -206,16 +210,17 @@ namespace osu.Game.Tests.Visual.Editing
         {
             reset();
 
-            AddStep("Seek(450)", () => Clock.Seek(450));
-            AddStep("SeekBackward", () => Clock.SeekBackward());
+            AddStep("Seek(450)", () => EditorClock.Seek(450));
+            checkTime(450);
+            AddStep("SeekBackward", () => EditorClock.SeekBackward());
             checkTime(400);
-            AddStep("SeekBackward", () => Clock.SeekBackward());
+            AddStep("SeekBackward", () => EditorClock.SeekBackward());
             checkTime(350);
-            AddStep("SeekBackward", () => Clock.SeekBackward());
+            AddStep("SeekBackward", () => EditorClock.SeekBackward());
             checkTime(150);
-            AddStep("SeekBackward", () => Clock.SeekBackward());
+            AddStep("SeekBackward", () => EditorClock.SeekBackward());
             checkTime(50);
-            AddStep("SeekBackward", () => Clock.SeekBackward());
+            AddStep("SeekBackward", () => EditorClock.SeekBackward());
             checkTime(0);
         }
 
@@ -227,18 +232,19 @@ namespace osu.Game.Tests.Visual.Editing
         {
             reset();
 
-            AddStep("Seek(450)", () => Clock.Seek(450));
-            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddStep("Seek(450)", () => EditorClock.Seek(450));
+            checkTime(450);
+            AddStep("SeekBackward, Snap", () => EditorClock.SeekBackward(true));
             checkTime(400);
-            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddStep("SeekBackward, Snap", () => EditorClock.SeekBackward(true));
             checkTime(350);
-            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddStep("SeekBackward, Snap", () => EditorClock.SeekBackward(true));
             checkTime(175);
-            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddStep("SeekBackward, Snap", () => EditorClock.SeekBackward(true));
             checkTime(100);
-            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddStep("SeekBackward, Snap", () => EditorClock.SeekBackward(true));
             checkTime(50);
-            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddStep("SeekBackward, Snap", () => EditorClock.SeekBackward(true));
             checkTime(0);
         }
 
@@ -251,17 +257,18 @@ namespace osu.Game.Tests.Visual.Editing
         {
             reset();
 
-            AddStep("Seek(451)", () => Clock.Seek(451));
-            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddStep("Seek(451)", () => EditorClock.Seek(451));
+            checkTime(451);
+            AddStep("SeekBackward, Snap", () => EditorClock.SeekBackward(true));
             checkTime(450);
-            AddStep("Seek(450.999)", () => Clock.Seek(450.999));
-            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddStep("Seek(450.999)", () => EditorClock.Seek(450.999));
+            AddStep("SeekBackward, Snap", () => EditorClock.SeekBackward(true));
             checkTime(450);
-            AddStep("Seek(401)", () => Clock.Seek(401));
-            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddStep("Seek(401)", () => EditorClock.Seek(401));
+            AddStep("SeekBackward, Snap", () => EditorClock.SeekBackward(true));
             checkTime(400);
-            AddStep("Seek(401.999)", () => Clock.Seek(401.999));
-            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddStep("Seek(401.999)", () => EditorClock.Seek(401.999));
+            AddStep("SeekBackward, Snap", () => EditorClock.SeekBackward(true));
             checkTime(400);
         }
 
@@ -275,36 +282,37 @@ namespace osu.Game.Tests.Visual.Editing
 
             double lastTime = 0;
 
-            AddStep("Seek(0)", () => Clock.Seek(0));
+            AddStep("Seek(0)", () => EditorClock.Seek(0));
+            checkTime(0);
 
             for (int i = 0; i < 9; i++)
             {
                 AddStep("SeekForward, Snap", () =>
                 {
-                    lastTime = Clock.CurrentTime;
-                    Clock.SeekForward(true);
+                    lastTime = EditorClock.CurrentTime;
+                    EditorClock.SeekForward(true);
                 });
-                AddAssert("Time > lastTime", () => Clock.CurrentTime > lastTime);
+                AddAssert("Time > lastTime", () => EditorClock.CurrentTime > lastTime);
             }
 
             for (int i = 0; i < 9; i++)
             {
                 AddStep("SeekBackward, Snap", () =>
                 {
-                    lastTime = Clock.CurrentTime;
-                    Clock.SeekBackward(true);
+                    lastTime = EditorClock.CurrentTime;
+                    EditorClock.SeekBackward(true);
                 });
-                AddAssert("Time < lastTime", () => Clock.CurrentTime < lastTime);
+                AddAssert("Time < lastTime", () => EditorClock.CurrentTime < lastTime);
             }
 
             checkTime(0);
         }
 
-        private void checkTime(double expectedTime) => AddAssert($"Current time is {expectedTime}", () => Clock.CurrentTime, () => Is.EqualTo(expectedTime));
+        private void checkTime(double expectedTime) => AddUntilStep($"Current time is {expectedTime}", () => EditorClock.CurrentTime, () => Is.EqualTo(expectedTime));
 
         private void reset()
         {
-            AddStep("Reset", () => Clock.Seek(0));
+            AddStep("Reset", () => EditorClock.Seek(0));
         }
 
         private class TimingPointVisualiser : CompositeDrawable

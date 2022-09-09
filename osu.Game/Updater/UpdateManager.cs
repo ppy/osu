@@ -99,7 +99,7 @@ namespace osu.Game.Updater
             private void load(OsuColour colours, ChangelogOverlay changelog, INotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.CheckSquare;
-                IconBackground.Colour = colours.BlueDark;
+                IconContent.Colour = colours.BlueDark;
 
                 Activated = delegate
                 {

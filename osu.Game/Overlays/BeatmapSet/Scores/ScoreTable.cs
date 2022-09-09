@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         /// <summary>
         /// The statistics that appear in the table, in order of appearance.
         /// </summary>
-        private readonly List<(HitResult result, string displayName)> statisticResultTypes = new List<(HitResult, string)>();
+        private readonly List<(HitResult result, LocalisableString displayName)> statisticResultTypes = new List<(HitResult, LocalisableString)>();
 
         private bool showPerformancePoints;
 
@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (result.IsBonus())
                     continue;
 
-                string displayName = ruleset.GetDisplayNameForHitResult(result);
+                var displayName = ruleset.GetDisplayNameForHitResult(result);
 
                 columns.Add(new TableColumn(displayName, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
                 statisticResultTypes.Add((result, displayName));

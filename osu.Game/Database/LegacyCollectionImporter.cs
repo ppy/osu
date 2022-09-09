@@ -89,7 +89,7 @@ namespace osu.Game.Database
 
                         if (existing != null)
                         {
-                            foreach (string newBeatmap in existing.BeatmapMD5Hashes)
+                            foreach (string newBeatmap in collection.BeatmapMD5Hashes)
                             {
                                 if (!existing.BeatmapMD5Hashes.Contains(newBeatmap))
                                     existing.BeatmapMD5Hashes.Add(newBeatmap);

@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestStoryboardNoSkipOutro()
         {
             CreateTest();
-            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
         }
 
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
-            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
             AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value == Visibility.Visible);
         }
 
@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 AddStep("set ShowResults = false", () => showResults = false);
             });
-            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
             AddWaitStep("wait", 10);
             AddAssert("no score shown", () => !Player.IsScoreShown);
         }
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestStoryboardEndsBeforeCompletion()
         {
             CreateTest(() => AddStep("set storyboard duration to .1s", () => currentStoryboardDuration = 100));
-            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
         }
@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("skip overlay content not visible", () => fadeContainer().State == Visibility.Hidden);
 
             AddUntilStep("skip overlay content becomes visible", () => fadeContainer().State == Visibility.Visible);
-            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
         }
 
         [Test]

@@ -154,7 +154,7 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private int onlineID = 1;
+        private ulong onlineID = 1;
 
         private APIScoresCollection createScores()
         {

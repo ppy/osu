@@ -404,9 +404,9 @@ namespace osu.Game.Tests.Visual
 
                 public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
 
-                public Track GetVirtual(double length = double.PositiveInfinity)
+                public Track GetVirtual(double length = double.PositiveInfinity, string name = "virtual")
                 {
-                    var track = new TrackVirtualManual(referenceClock) { Length = length };
+                    var track = new TrackVirtualManual(referenceClock, name) { Length = length };
                     AddItem(track);
                     return track;
                 }
@@ -421,7 +421,8 @@ namespace osu.Game.Tests.Visual
 
                 private bool running;
 
-                public TrackVirtualManual(IFrameBasedClock referenceClock)
+                public TrackVirtualManual(IFrameBasedClock referenceClock, string name = "virtual")
+                    : base(name)
                 {
                     this.referenceClock = referenceClock;
                     Length = double.PositiveInfinity;

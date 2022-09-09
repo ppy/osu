@@ -77,7 +77,6 @@ namespace osu.Game.Tests.Gameplay
 
                 Add(gameplayContainer = new MasterGameplayClockContainer(working, 0)
                 {
-                    IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
                         Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
@@ -85,12 +84,15 @@ namespace osu.Game.Tests.Gameplay
                 });
             });
 
-            AddStep("reset clock", () => gameplayContainer.Start());
+            AddStep("reset clock", () => gameplayContainer.Reset(startClock: true));
 
             AddUntilStep("sample played", () => sample.RequestedPlaying);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
         }
 
+        /// <summary>
+        /// Sample at 0ms, start time at 1000ms (so the sample should not be played).
+        /// </summary>
         [Test]
         public void TestSampleHasLifetimeEndWithInitialClockTime()
         {
@@ -105,13 +107,13 @@ namespace osu.Game.Tests.Gameplay
 
                 Add(gameplayContainer = new MasterGameplayClockContainer(working, start_time)
                 {
-                    StartTime = start_time,
-                    IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
                         Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
                     }
                 });
+
+                gameplayContainer.Reset(start_time);
             });
 
             AddStep("start time", () => gameplayContainer.Start());
@@ -141,11 +143,11 @@ namespace osu.Game.Tests.Gameplay
 
                 beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
                 {
-                    Clock = gameplayContainer.GameplayClock
+                    Clock = gameplayContainer
                 });
             });
 
-            AddStep("start", () => gameplayContainer.Start());
+            AddStep("reset clock", () => gameplayContainer.Reset(startClock: true));
 
             AddUntilStep("sample played", () => sample.IsPlayed);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
