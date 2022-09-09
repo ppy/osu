@@ -390,11 +390,6 @@ namespace osu.Game
             var framedClock = new FramedClock(beatmap.Track);
 
             beatmapClock.ChangeSource(framedClock);
-
-            // Normally the internal decoupled clock will seek the *track* to the decoupled time, but we blocked this.
-            // It won't behave nicely unless we also set it to the track's time.
-            // Probably another thing which should be fixed in the decoupled mess (or just replaced).
-            beatmapClock.Seek(beatmap.Track.CurrentTime);
         }
 
         protected virtual void InitialiseFonts()
