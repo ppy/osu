@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -31,7 +32,7 @@ namespace osu.Game.Tests.Mods
             return Array.Empty<Mod>();
         }
 
-        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => throw new NotImplementedException();
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
 
@@ -60,7 +61,7 @@ namespace osu.Game.Tests.Mods
         {
             public override double ScoreMultiplier => 1.0;
 
-            public override string Description => "This is a customisable test mod.";
+            public override LocalisableString Description => "This is a customisable test mod.";
 
             public override ModType Type => ModType.Conversion;
 

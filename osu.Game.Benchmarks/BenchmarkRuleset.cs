@@ -11,9 +11,9 @@ namespace osu.Game.Benchmarks
 {
     public class BenchmarkRuleset : BenchmarkTest
     {
-        private OsuRuleset ruleset;
-        private APIMod apiModDoubleTime;
-        private APIMod apiModDifficultyAdjust;
+        private OsuRuleset ruleset = null!;
+        private APIMod apiModDoubleTime = null!;
+        private APIMod apiModDifficultyAdjust = null!;
 
         public override void SetUp()
         {

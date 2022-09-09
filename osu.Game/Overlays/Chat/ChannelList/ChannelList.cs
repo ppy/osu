@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -101,7 +99,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             FillFlowContainer<ChannelListItem> flow = getFlowForChannel(channel);
 
             channelMap.Remove(channel);
-            flow.Remove(item);
+            flow.Remove(item, true);
 
             updateVisibility();
         }

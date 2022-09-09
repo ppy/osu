@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -108,9 +110,9 @@ namespace osu.Game.Beatmaps
 
         public Track LoadTrack() => track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
-        public void PrepareTrackForPreviewLooping()
+        public void PrepareTrackForPreview(bool looping)
         {
-            Track.Looping = true;
+            Track.Looping = looping;
             Track.RestartPoint = Metadata.PreviewTime;
 
             if (Track.RestartPoint == -1)
@@ -144,6 +146,7 @@ namespace osu.Game.Beatmaps
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
         /// This generally happens via MusicController when changing the global beatmap.
         /// </summary>
+        [NotNull]
         public Track Track
         {
             get

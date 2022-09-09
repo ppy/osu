@@ -31,19 +31,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     {
         private const float circle_size = 38;
 
-        private Container repeatsContainer;
+        private Container? repeatsContainer;
 
-        public Action<DragEvent> OnDragHandled;
+        public Action<DragEvent?>? OnDragHandled = null!;
 
         [UsedImplicitly]
         private readonly Bindable<double> startTime;
 
-        private Bindable<int> indexInCurrentComboBindable;
+        private Bindable<int>? indexInCurrentComboBindable;
 
-        private Bindable<int> comboIndexBindable;
-        private Bindable<int> comboIndexWithOffsetsBindable;
+        private Bindable<int>? comboIndexBindable;
+        private Bindable<int>? comboIndexWithOffsetsBindable;
 
-        private Bindable<Color4> displayColourBindable;
+        private Bindable<Color4> displayColourBindable = null!;
 
         private readonly ExtendableCircle circle;
         private readonly Border border;
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly OsuSpriteText comboIndexText;
 
         [Resolved]
-        private ISkinSource skin { get; set; }
+        private ISkinSource skin { get; set; } = null!;
 
         public TimelineHitObjectBlueprint(HitObject item)
             : base(item)
@@ -122,7 +122,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 case IHasComboInformation comboInfo:
                     indexInCurrentComboBindable = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
-                    indexInCurrentComboBindable.BindValueChanged(_ => updateComboIndex(), true);
+                    indexInCurrentComboBindable.BindValueChanged(_ =>
+                    {
+                        comboIndexText.Text = (indexInCurrentComboBindable.Value + 1).ToString();
+                    }, true);
 
                     comboIndexBindable = comboInfo.ComboIndexBindable.GetBoundCopy();
                     comboIndexWithOffsetsBindable = comboInfo.ComboIndexWithOffsetsBindable.GetBoundCopy();
@@ -146,8 +149,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // base logic hides selected blueprints when not selected, but timeline doesn't do that.
             updateColour();
         }
-
-        private void updateComboIndex() => comboIndexText.Text = (indexInCurrentComboBindable.Value + 1).ToString();
 
         private void updateColour()
         {
@@ -181,11 +182,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             colouredComponents.Colour = OsuColour.ForegroundTextColourFor(averageColour);
         }
 
-        private SamplePointPiece sampleOverrideDisplay;
-        private DifficultyPointPiece difficultyOverrideDisplay;
+        private SamplePointPiece? sampleOverrideDisplay;
+        private DifficultyPointPiece? difficultyOverrideDisplay;
 
-        private DifficultyControlPoint difficultyControlPoint;
-        private SampleControlPoint sampleControlPoint;
+        private DifficultyControlPoint difficultyControlPoint = null!;
+        private SampleControlPoint sampleControlPoint = null!;
 
         protected override void Update()
         {
@@ -203,7 +204,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     updateRepeats(repeats);
             }
 
-            if (difficultyControlPoint != Item.DifficultyControlPoint)
+            if (!ReferenceEquals(difficultyControlPoint, Item.DifficultyControlPoint))
             {
                 difficultyControlPoint = Item.DifficultyControlPoint;
                 difficultyOverrideDisplay?.Expire();
@@ -218,7 +219,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             }
 
-            if (sampleControlPoint != Item.SampleControlPoint)
+            if (!ReferenceEquals(sampleControlPoint, Item.SampleControlPoint))
             {
                 sampleControlPoint = Item.SampleControlPoint;
                 sampleOverrideDisplay?.Expire();
@@ -274,16 +275,27 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public class DragArea : Circle
         {
-            private readonly HitObject hitObject;
+            private readonly HitObject? hitObject;
 
             [Resolved]
-            private Timeline timeline { get; set; }
+            private EditorBeatmap beatmap { get; set; } = null!;
 
-            public Action<DragEvent> OnDragHandled;
+            [Resolved]
+            private IBeatSnapProvider beatSnapProvider { get; set; } = null!;
+
+            [Resolved]
+            private Timeline timeline { get; set; } = null!;
+
+            [Resolved(CanBeNull = true)]
+            private IEditorChangeHandler? changeHandler { get; set; }
+
+            private ScheduledDelegate? dragOperation;
+
+            public Action<DragEvent?>? OnDragHandled;
 
             public override bool HandlePositionalInput => hitObject != null;
 
-            public DragArea(HitObject hitObject)
+            public DragArea(HitObject? hitObject)
             {
                 this.hitObject = hitObject;
 
@@ -354,22 +366,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 this.FadeTo(IsHovered || hasMouseDown ? 1f : 0.9f, 200, Easing.OutQuint);
             }
 
-            [Resolved]
-            private EditorBeatmap beatmap { get; set; }
-
-            [Resolved]
-            private IBeatSnapProvider beatSnapProvider { get; set; }
-
-            [Resolved(CanBeNull = true)]
-            private IEditorChangeHandler changeHandler { get; set; }
-
             protected override bool OnDragStart(DragStartEvent e)
             {
                 changeHandler?.BeginChange();
                 return true;
             }
-
-            private ScheduledDelegate dragOperation;
 
             protected override void OnDrag(DragEvent e)
             {
@@ -391,7 +392,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                                 if (e.CurrentState.Keyboard.ShiftPressed)
                                 {
-                                    if (hitObject.DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+                                    if (ReferenceEquals(hitObject.DifficultyControlPoint, DifficultyControlPoint.DEFAULT))
                                         hitObject.DifficultyControlPoint = new DifficultyControlPoint();
 
                                     double newVelocity = hitObject.DifficultyControlPoint.SliderVelocity * (repeatHitObject.Duration / proposedDuration);

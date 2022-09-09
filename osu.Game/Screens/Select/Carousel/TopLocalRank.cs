@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -55,7 +57,7 @@ namespace osu.Game.Screens.Select.Carousel
                                  + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
                                  + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName)
                          .OrderByDescending(s => s.TotalScore),
-                    (items, changes, ___) =>
+                    (items, _, _) =>
                     {
                         Rank = items.FirstOrDefault()?.Rank;
                         // Required since presence is changed via IsPresent override

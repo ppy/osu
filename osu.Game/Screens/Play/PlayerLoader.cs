@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -50,8 +48,6 @@ namespace osu.Game.Screens.Play
 
         // We show the previous screen status
         protected override UserActivity? InitialActivity => null;
-
-        protected override bool PlayResumeSound => false;
 
         protected BeatmapMetadataDisplay MetadataInfo { get; private set; } = null!;
 
@@ -126,6 +122,8 @@ namespace osu.Game.Screens.Play
         private ScheduledDelegate? scheduledPushPlayer;
 
         private EpilepsyWarning? epilepsyWarning;
+
+        private bool quickRestart;
 
         [Resolved(CanBeNull = true)]
         private INotificationOverlay? notificationOverlay { get; set; }
@@ -365,6 +363,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             CurrentPlayer = createPlayer();
+            CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
 
@@ -379,8 +378,9 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void restartRequested()
+        private void restartRequested(bool quickRestartRequested)
         {
+            quickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
         }
@@ -530,7 +530,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, AudioManager audioManager, INotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
             {
                 Icon = FontAwesome.Solid.VolumeMute;
-                IconBackground.Colour = colours.RedDark;
+                IconContent.Colour = colours.RedDark;
 
                 Activated = delegate
                 {
@@ -553,6 +553,8 @@ namespace osu.Game.Screens.Play
 
         #region Low battery warning
 
+        private const double low_battery_threshold = 0.25;
+
         private Bindable<bool> batteryWarningShownOnce = null!;
 
         private void showBatteryWarningIfNeeded()
@@ -561,7 +563,7 @@ namespace osu.Game.Screens.Play
 
             if (!batteryWarningShownOnce.Value)
             {
-                if (!batteryInfo.IsCharging && batteryInfo.ChargeLevel <= 0.25)
+                if (batteryInfo.OnBattery && batteryInfo.ChargeLevel <= low_battery_threshold)
                 {
                     notificationOverlay?.Post(new BatteryWarningNotification());
                     batteryWarningShownOnce.Value = true;
@@ -582,7 +584,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, INotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.BatteryQuarter;
-                IconBackground.Colour = colours.RedDark;
+                IconContent.Colour = colours.RedDark;
 
                 Activated = delegate
                 {

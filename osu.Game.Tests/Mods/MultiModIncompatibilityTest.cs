@@ -27,10 +27,10 @@ namespace osu.Game.Tests.Mods
         [TestCase(typeof(ManiaRuleset))]
         public void TestAllMultiModsFromRulesetAreIncompatible(Type rulesetType)
         {
-            var ruleset = (Ruleset)Activator.CreateInstance(rulesetType);
+            var ruleset = Activator.CreateInstance(rulesetType) as Ruleset;
             Assert.That(ruleset, Is.Not.Null);
 
-            var allMultiMods = getMultiMods(ruleset);
+            var allMultiMods = getMultiMods(ruleset!);
 
             Assert.Multiple(() =>
             {

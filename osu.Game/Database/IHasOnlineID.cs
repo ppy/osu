@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable enable
-
 namespace osu.Game.Database
 {
     public interface IHasOnlineID<out T>

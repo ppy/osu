@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -8,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -184,7 +187,7 @@ namespace osu.Game.Tournament
             var lastScreen = currentScreen;
             currentScreen = target;
 
-            if (currentScreen is IProvideVideo)
+            if (currentScreen.ChildrenOfType<TourneyVideo>().FirstOrDefault()?.VideoAvailable == true)
             {
                 video.FadeOut(200);
 
@@ -202,12 +205,12 @@ namespace osu.Game.Tournament
 
             switch (currentScreen)
             {
-                case MapPoolScreen _:
+                case MapPoolScreen:
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
                     chatContainer.ResizeWidthTo(1, 500, Easing.OutQuint);
                     break;
 
-                case GameplayScreen _:
+                case GameplayScreen:
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
                     chatContainer.ResizeWidthTo(0.5f, 500, Easing.OutQuint);
                     break;

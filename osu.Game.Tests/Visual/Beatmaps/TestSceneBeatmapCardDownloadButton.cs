@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards.Buttons;
 using osu.Game.Configuration;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
@@ -56,6 +59,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    State = { Value = DownloadState.NotDownloaded },
                     Scale = new Vector2(2)
                 };
             });

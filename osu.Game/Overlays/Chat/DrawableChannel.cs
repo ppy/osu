@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -179,7 +181,7 @@ namespace osu.Game.Overlays.Chat
             {
                 Trace.Assert(updated.Id.HasValue, "An updated message was returned with no ID.");
 
-                ChatLineFlow.Remove(found);
+                ChatLineFlow.Remove(found, false);
                 found.Message = updated;
                 ChatLineFlow.Add(found);
             }
