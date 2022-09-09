@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -51,8 +49,6 @@ namespace osu.Game.Screens.Play
         // We show the previous screen status
         protected override UserActivity? InitialActivity => null;
 
-        protected override bool PlayResumeSound => false;
-
         protected BeatmapMetadataDisplay MetadataInfo { get; private set; } = null!;
 
         /// <summary>
@@ -92,11 +88,15 @@ namespace osu.Game.Screens.Play
             !playerConsumed
             // don't push unless the player is completely loaded
             && CurrentPlayer?.LoadState == LoadState.Ready
-            // don't push if the user is hovering one of the panes, unless they are idle.
-            && (IsHovered || idleTracker.IsIdle.Value)
-            // don't push if the user is dragging a slider or otherwise.
+            // don't push unless the player is ready to start gameplay
+            && ReadyForGameplay;
+
+        protected virtual bool ReadyForGameplay =>
+            // not ready if the user is hovering one of the panes, unless they are idle.
+            (IsHovered || idleTracker.IsIdle.Value)
+            // not ready if the user is dragging a slider or otherwise.
             && inputManager.DraggedDrawable == null
-            // don't push if a focused overlay is visible, like settings.
+            // not ready if a focused overlay is visible, like settings.
             && inputManager.FocusedDrawable == null;
 
         private readonly Func<Player> createPlayer;
@@ -122,6 +122,8 @@ namespace osu.Game.Screens.Play
         private ScheduledDelegate? scheduledPushPlayer;
 
         private EpilepsyWarning? epilepsyWarning;
+
+        private bool quickRestart;
 
         [Resolved(CanBeNull = true)]
         private INotificationOverlay? notificationOverlay { get; set; }
@@ -210,9 +212,9 @@ namespace osu.Game.Screens.Play
 
         #region Screen handling
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             ApplyToBackground(b =>
             {
@@ -236,9 +238,9 @@ namespace osu.Game.Screens.Play
             showBatteryWarningIfNeeded();
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
             Debug.Assert(CurrentPlayer != null);
 
@@ -254,9 +256,9 @@ namespace osu.Game.Screens.Play
             contentIn();
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
 
             BackgroundBrightnessReduction = false;
 
@@ -268,7 +270,7 @@ namespace osu.Game.Screens.Play
             highPassFilter.CutoffTo(0);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             cancelLoad();
             ContentOut();
@@ -284,7 +286,7 @@ namespace osu.Game.Screens.Play
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -361,14 +363,24 @@ namespace osu.Game.Screens.Play
                 return;
 
             CurrentPlayer = createPlayer();
+            CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
 
-            LoadTask = LoadComponentAsync(CurrentPlayer, _ => MetadataInfo.Loading = false);
+            LoadTask = LoadComponentAsync(CurrentPlayer, _ =>
+            {
+                MetadataInfo.Loading = false;
+                OnPlayerLoaded();
+            });
         }
 
-        private void restartRequested()
+        protected virtual void OnPlayerLoaded()
         {
+        }
+
+        private void restartRequested(bool quickRestartRequested)
+        {
+            quickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
         }
@@ -518,7 +530,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, AudioManager audioManager, INotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
             {
                 Icon = FontAwesome.Solid.VolumeMute;
-                IconBackground.Colour = colours.RedDark;
+                IconContent.Colour = colours.RedDark;
 
                 Activated = delegate
                 {
@@ -541,6 +553,8 @@ namespace osu.Game.Screens.Play
 
         #region Low battery warning
 
+        private const double low_battery_threshold = 0.25;
+
         private Bindable<bool> batteryWarningShownOnce = null!;
 
         private void showBatteryWarningIfNeeded()
@@ -549,7 +563,7 @@ namespace osu.Game.Screens.Play
 
             if (!batteryWarningShownOnce.Value)
             {
-                if (!batteryInfo.IsCharging && batteryInfo.ChargeLevel <= 0.25)
+                if (batteryInfo.OnBattery && batteryInfo.ChargeLevel <= low_battery_threshold)
                 {
                     notificationOverlay?.Post(new BatteryWarningNotification());
                     batteryWarningShownOnce.Value = true;
@@ -570,7 +584,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, INotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.BatteryQuarter;
-                IconBackground.Colour = colours.RedDark;
+                IconContent.Colour = colours.RedDark;
 
                 Activated = delegate
                 {

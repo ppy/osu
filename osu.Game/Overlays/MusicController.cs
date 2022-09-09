@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +14,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -67,7 +70,11 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Forcefully reload the current <see cref="WorkingBeatmap"/>'s track from disk.
         /// </summary>
-        public void ReloadCurrentTrack() => changeTrack();
+        public void ReloadCurrentTrack()
+        {
+            changeTrack();
+            TrackChanged?.Invoke(current, TrackChangeDirection.None);
+        }
 
         /// <summary>
         /// Returns whether the beatmap track is playing.
@@ -104,10 +111,12 @@ namespace osu.Game.Overlays
                 if (beatmap.Disabled)
                     return;
 
+                Logger.Log($"{nameof(MusicController)} skipping next track to {nameof(EnsurePlayingSomething)}");
                 NextTrack();
             }
             else if (!IsPlaying)
             {
+                Logger.Log($"{nameof(MusicController)} starting playback to {nameof(EnsurePlayingSomething)}");
                 Play();
             }
         }
@@ -128,9 +137,9 @@ namespace osu.Game.Overlays
                 UserPauseRequested = false;
 
             if (restart)
-                CurrentTrack.Restart();
+                CurrentTrack.RestartAsync();
             else if (!IsPlaying)
-                CurrentTrack.Start();
+                CurrentTrack.StartAsync();
 
             return true;
         }
@@ -147,7 +156,7 @@ namespace osu.Game.Overlays
         {
             UserPauseRequested |= requestedByUser;
             if (CurrentTrack.IsRunning)
-                CurrentTrack.Stop();
+                CurrentTrack.StopAsync();
         }
 
         /// <summary>
@@ -245,7 +254,7 @@ namespace osu.Game.Overlays
         {
             // if not scheduled, the previously track will be stopped one frame later (see ScheduleAfterChildren logic in GameBase).
             // we probably want to move this to a central method for switching to a new working beatmap in the future.
-            Schedule(() => CurrentTrack.Restart());
+            Schedule(() => CurrentTrack.RestartAsync());
         }
 
         private WorkingBeatmap current;
@@ -267,7 +276,7 @@ namespace osu.Game.Overlays
 
             TrackChangeDirection direction = TrackChangeDirection.None;
 
-            bool audioEquals = newWorking?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) ?? false;
+            bool audioEquals = newWorking?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) == true;
 
             if (current != null)
             {
@@ -290,15 +299,8 @@ namespace osu.Game.Overlays
 
             current = newWorking;
 
-            if (!audioEquals || CurrentTrack.IsDummyDevice)
-            {
+            if (lastWorking == null || !lastWorking.TryTransferTrack(current))
                 changeTrack();
-            }
-            else
-            {
-                // transfer still valid track to new working beatmap
-                current.TransferTrack(lastWorking.Track);
-            }
 
             TrackChanged?.Invoke(current, direction);
 
@@ -377,6 +379,8 @@ namespace osu.Game.Overlays
             }
         }
 
+        private AudioAdjustments modTrackAdjustments;
+
         /// <summary>
         /// Resets the adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="AllowTrackAdjustments"/> is <c>true</c>.
         /// </summary>
@@ -385,6 +389,7 @@ namespace osu.Game.Overlays
         /// </remarks>
         public void ResetTrackAdjustments()
         {
+            // todo: we probably want a helper method rather than this.
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Balance);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Frequency);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
@@ -392,8 +397,10 @@ namespace osu.Game.Overlays
 
             if (allowTrackAdjustments)
             {
+                CurrentTrack.BindAdjustments(modTrackAdjustments = new AudioAdjustments());
+
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
-                    mod.ApplyToTrack(CurrentTrack);
+                    mod.ApplyToTrack(modTrackAdjustments);
             }
         }
     }

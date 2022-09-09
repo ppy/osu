@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,7 +21,6 @@ using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -70,9 +67,14 @@ namespace osu.Game.Online.Multiplayer
         public virtual event Action? LoadRequested;
 
         /// <summary>
+        /// Invoked when the multiplayer server requests loading of play to be aborted.
+        /// </summary>
+        public event Action? LoadAborted;
+
+        /// <summary>
         /// Invoked when the multiplayer server requests gameplay to be started.
         /// </summary>
-        public event Action? MatchStarted;
+        public event Action? GameplayStarted;
 
         /// <summary>
         /// Invoked when the multiplayer server has finished collating results.
@@ -88,7 +90,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The joined <see cref="MultiplayerRoom"/>.
         /// </summary>
-        public virtual MultiplayerRoom? Room
+        public virtual MultiplayerRoom? Room // virtual for moq
         {
             get
             {
@@ -147,7 +149,7 @@ namespace osu.Game.Online.Multiplayer
                 // clean up local room state on server disconnect.
                 if (!connected.NewValue && Room != null)
                 {
-                    Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
+                    Logger.Log("Clearing room due to multiplayer server connection loss.", LoggingTarget.Runtime, LogLevel.Important);
                     LeaveRoom();
                 }
             }));
@@ -192,6 +194,10 @@ namespace osu.Game.Online.Multiplayer
 
                     APIRoom.Playlist.Clear();
                     APIRoom.Playlist.AddRange(joinedRoom.Playlist.Select(createPlaylistItem));
+                    APIRoom.CurrentPlaylistItem.Value = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
+
+                    // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
+                    APIRoom.EndDate.Value = null;
 
                     Debug.Assert(LocalUser != null);
                     addUserToAPIRoom(LocalUser);
@@ -259,8 +265,9 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="matchType">The type of the match, if any.</param>
         /// <param name="queueMode">The new queue mode, if any.</param>
         /// <param name="autoStartDuration">The new auto-start countdown duration, if any.</param>
+        /// <param name="autoSkip">The new auto-skip setting.</param>
         public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<QueueMode> queueMode = default,
-                                   Optional<TimeSpan> autoStartDuration = default)
+                                   Optional<TimeSpan> autoStartDuration = default, Optional<bool> autoSkip = default)
         {
             if (Room == null)
                 throw new InvalidOperationException("Must be joined to a match to change settings.");
@@ -272,6 +279,7 @@ namespace osu.Game.Online.Multiplayer
                 MatchType = matchType.GetOr(Room.Settings.MatchType),
                 QueueMode = queueMode.GetOr(Room.Settings.QueueMode),
                 AutoStartDuration = autoStartDuration.GetOr(Room.Settings.AutoStartDuration),
+                AutoSkip = autoSkip.GetOr(Room.Settings.AutoSkip)
             });
         }
 
@@ -409,7 +417,7 @@ namespace osu.Game.Online.Multiplayer
 
                 UserJoined?.Invoke(user);
                 RoomUpdated?.Invoke();
-            });
+            }, false);
         }
 
         Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user) =>
@@ -544,8 +552,14 @@ namespace osu.Game.Online.Multiplayer
 
                 switch (e)
                 {
-                    case CountdownChangedEvent countdownChangedEvent:
-                        Room.Countdown = countdownChangedEvent.Countdown;
+                    case CountdownStartedEvent countdownStartedEvent:
+                        Room.ActiveCountdowns.Add(countdownStartedEvent.Countdown);
+                        break;
+
+                    case CountdownStoppedEvent countdownStoppedEvent:
+                        MultiplayerCountdown? countdown = Room.ActiveCountdowns.FirstOrDefault(countdown => countdown.ID == countdownStoppedEvent.ID);
+                        if (countdown != null)
+                            Room.ActiveCountdowns.Remove(countdown);
                         break;
                 }
 
@@ -604,14 +618,27 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.MatchStarted()
+        Task IMultiplayerClient.LoadAborted()
         {
             Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
 
-                MatchStarted?.Invoke();
+                LoadAborted?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.GameplayStarted()
+        {
+            Scheduler.Add(() =>
+            {
+                if (Room == null)
+                    return;
+
+                GameplayStarted?.Invoke();
             }, false);
 
             return Task.CompletedTask;
@@ -719,6 +746,8 @@ namespace osu.Game.Online.Multiplayer
             APIRoom.Type.Value = Room.Settings.MatchType;
             APIRoom.QueueMode.Value = Room.Settings.QueueMode;
             APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;
+            APIRoom.CurrentPlaylistItem.Value = APIRoom.Playlist.Single(item => item.ID == settings.PlaylistItemId);
+            APIRoom.AutoSkip.Value = Room.Settings.AutoSkip;
 
             RoomUpdated?.Invoke();
         }

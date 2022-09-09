@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,12 +67,10 @@ namespace osu.Game.Screens.Ranking.Expanded
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             string creator = metadata.Author.Username;
 
-            int? beatmapMaxCombo = scoreManager.GetMaximumAchievableComboAsync(score).GetResultSafely();
-
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, beatmapMaxCombo),
+                new ComboStatistic(score.MaxCombo, scoreManager.GetMaximumAchievableCombo(score)),
                 new PerformanceStatistic(score),
             };
 
@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     FillMode = FillMode.Fit,
                                 }
                             },
-                            scoreCounter = new TotalScoreCounter
+                            scoreCounter = new TotalScoreCounter(!withFlair)
                             {
                                 Margin = new MarginPadding { Top = 0, Bottom = 5 },
                                 Current = { Value = 0 },
@@ -159,6 +159,8 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Origin = Anchor.TopCentre,
                                         Text = beatmap.DifficultyName,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
+                                        MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                                        Truncate = true,
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
                                     {

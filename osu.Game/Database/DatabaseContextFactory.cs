@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -151,7 +153,7 @@ namespace osu.Game.Database
         {
             Logger.Log($"Creating full EF database backup at {backupFilename}", LoggingTarget.Database);
 
-            using (var source = storage.GetStream(DATABASE_NAME))
+            using (var source = storage.GetStream(DATABASE_NAME, mode: FileMode.Open))
             using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
                 source.CopyTo(destination);
         }
@@ -207,6 +209,10 @@ namespace osu.Game.Database
 
         public void SetMigrationCompletion() => migrationComplete.Set();
 
-        public void WaitForMigrationCompletion() => migrationComplete.Wait();
+        public void WaitForMigrationCompletion()
+        {
+            if (!migrationComplete.Wait(300000))
+                throw new TimeoutException("Migration took too long (likely stuck).");
+        }
     }
 }

@@ -1,8 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets;
@@ -26,6 +27,51 @@ namespace osu.Game.Tests.Visual.Editing
             beatmap.ControlPointInfo.Add(2000, new TimingControlPoint { BeatLength = 500 });
 
             return beatmap;
+        }
+
+        [Test]
+        public void TestSeekToFirst()
+        {
+            pressAndCheckTime(Key.Z, 2170);
+            pressAndCheckTime(Key.Z, 0);
+            pressAndCheckTime(Key.Z, 2170);
+
+            AddAssert("track not running", () => !EditorClock.IsRunning);
+        }
+
+        [Test]
+        public void TestRestart()
+        {
+            pressAndCheckTime(Key.V, 227170);
+
+            AddAssert("track not running", () => !EditorClock.IsRunning);
+
+            AddStep("press X", () => InputManager.Key(Key.X));
+
+            AddAssert("track running", () => EditorClock.IsRunning);
+            AddAssert("time restarted", () => EditorClock.CurrentTime < 100000);
+        }
+
+        [Test]
+        public void TestPauseResume()
+        {
+            AddAssert("track not running", () => !EditorClock.IsRunning);
+
+            AddStep("press C", () => InputManager.Key(Key.C));
+            AddAssert("track running", () => EditorClock.IsRunning);
+
+            AddStep("press C", () => InputManager.Key(Key.C));
+            AddAssert("track not running", () => !EditorClock.IsRunning);
+        }
+
+        [Test]
+        public void TestSeekToLast()
+        {
+            pressAndCheckTime(Key.V, 227170);
+            pressAndCheckTime(Key.V, 229170);
+            pressAndCheckTime(Key.V, 227170);
+
+            AddAssert("track not running", () => !EditorClock.IsRunning);
         }
 
         [Test]
@@ -73,7 +119,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void pressAndCheckTime(Key key, double expectedTime)
         {
             AddStep($"press {key}", () => InputManager.Key(key));
-            AddUntilStep($"time is {expectedTime}", () => Precision.AlmostEquals(expectedTime, EditorClock.CurrentTime, 1));
+            AddUntilStep($"time is {expectedTime}", () => EditorClock.CurrentTime, () => Is.EqualTo(expectedTime).Within(1));
         }
     }
 }

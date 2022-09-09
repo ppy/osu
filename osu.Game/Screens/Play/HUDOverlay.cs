@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -47,6 +50,9 @@ namespace osu.Game.Screens.Play
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
+        [Cached]
+        private readonly ClicksPerSecondCalculator clicksPerSecondCalculator;
+
         public Bindable<bool> ShowHealthBar = new Bindable<bool>(true);
 
         private readonly DrawableRuleset drawableRuleset;
@@ -66,9 +72,11 @@ namespace osu.Game.Screens.Play
         private readonly FillFlowContainer bottomRightElements;
         private readonly FillFlowContainer topRightElements;
 
-        internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+        internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
 
-        private bool holdingForHUD;
+        public IBindable<bool> HoldingForHUD => holdingForHUD;
+
+        private readonly BindableBool holdingForHUD = new BindableBool();
 
         private readonly SkinnableTargetContainer mainComponents;
 
@@ -84,11 +92,15 @@ namespace osu.Game.Screens.Play
             Children = new Drawable[]
             {
                 CreateFailingLayer(),
-                mainComponents = new MainComponentsContainer(),
+                mainComponents = new MainComponentsContainer
+                {
+                    AlwaysPresent = true,
+                },
                 topRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
+                    AlwaysPresent = true,
                     Margin = new MarginPadding(10),
                     Spacing = new Vector2(10),
                     AutoSizeAxes = Axes.Both,
@@ -114,7 +126,8 @@ namespace osu.Game.Screens.Play
                         KeyCounter = CreateKeyCounter(),
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
-                }
+                },
+                clicksPerSecondCalculator = new ClicksPerSecondCalculator()
             };
         }
 
@@ -144,7 +157,8 @@ namespace osu.Game.Screens.Play
             hideTargets.ForEach(d => d.Hide());
         }
 
-        public override void Hide() => throw new InvalidOperationException($"{nameof(HUDOverlay)} should not be hidden as it will remove the ability of a user to quit. Use {nameof(ShowHud)} instead.");
+        public override void Hide() =>
+            throw new InvalidOperationException($"{nameof(HUDOverlay)} should not be hidden as it will remove the ability of a user to quit. Use {nameof(ShowHud)} instead.");
 
         protected override void LoadComplete()
         {
@@ -152,7 +166,8 @@ namespace osu.Game.Screens.Play
 
             ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING)));
 
-            IsBreakTime.BindValueChanged(_ => updateVisibility());
+            holdingForHUD.BindValueChanged(_ => updateVisibility());
+            IsPlaying.BindValueChanged(_ => updateVisibility());
             configVisibilityMode.BindValueChanged(_ => updateVisibility(), true);
 
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
@@ -204,7 +219,7 @@ namespace osu.Game.Screens.Play
             if (ShowHud.Disabled)
                 return;
 
-            if (holdingForHUD)
+            if (holdingForHUD.Value)
             {
                 ShowHud.Value = true;
                 return;
@@ -218,7 +233,7 @@ namespace osu.Game.Screens.Play
 
                 case HUDVisibilityMode.HideDuringGameplay:
                     // always show during replay as we want the seek bar to be visible.
-                    ShowHud.Value = replayLoaded.Value || IsBreakTime.Value;
+                    ShowHud.Value = replayLoaded.Value || !IsPlaying.Value;
                     break;
 
                 case HUDVisibilityMode.Always:
@@ -249,7 +264,11 @@ namespace osu.Game.Screens.Play
 
         protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
-            (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
+            if (drawableRuleset is ICanAttachHUDPieces attachTarget)
+            {
+                attachTarget.Attach(KeyCounter);
+                attachTarget.Attach(clicksPerSecondCalculator);
+            }
 
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
@@ -287,8 +306,7 @@ namespace osu.Game.Screens.Play
             switch (e.Action)
             {
                 case GlobalAction.HoldForHUD:
-                    holdingForHUD = true;
-                    updateVisibility();
+                    holdingForHUD.Value = true;
                     return true;
 
                 case GlobalAction.ToggleInGameInterface:
@@ -318,8 +336,7 @@ namespace osu.Game.Screens.Play
             switch (e.Action)
             {
                 case GlobalAction.HoldForHUD:
-                    holdingForHUD = false;
-                    updateVisibility();
+                    holdingForHUD.Value = false;
                     break;
             }
         }
@@ -344,7 +361,7 @@ namespace osu.Game.Screens.Play
                 // When the scoring mode changes, relative positions of elements may change (see DefaultSkin.GetDrawableComponent).
                 // This is a best effort implementation for cases where users haven't customised layouts.
                 scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
-                scoringMode.BindValueChanged(val => Reload());
+                scoringMode.BindValueChanged(_ => Reload());
             }
         }
     }

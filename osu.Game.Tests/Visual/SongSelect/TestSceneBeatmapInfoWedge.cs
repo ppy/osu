@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using JetBrains.Annotations;
 using NUnit.Framework;
@@ -52,13 +53,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Margin = new MarginPadding { Top = 20 }
             });
 
-            AddStep("show", () =>
-            {
-                infoWedge.Show();
-                infoWedge.Beatmap = Beatmap.Value;
-            });
+            AddStep("show", () => infoWedge.Show());
 
-            // select part is redundant, but wait for load isn't
             selectBeatmap(Beatmap.Value.Beatmap);
 
             AddWaitStep("wait for select", 3);
@@ -90,19 +86,19 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 switch (instance)
                 {
-                    case OsuRuleset _:
+                    case OsuRuleset:
                         testInfoLabels(5);
                         break;
 
-                    case TaikoRuleset _:
+                    case TaikoRuleset:
                         testInfoLabels(5);
                         break;
 
-                    case CatchRuleset _:
+                    case CatchRuleset:
                         testInfoLabels(5);
                         break;
 
-                    case ManiaRuleset _:
+                    case ManiaRuleset:
                         testInfoLabels(4);
                         break;
 
@@ -127,6 +123,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check info labels count", () => infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Count() == expectedCount);
         }
 
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("reset mods", () => SelectedMods.SetDefault());
+        }
+
         [Test]
         public void TestNullBeatmap()
         {
@@ -147,24 +149,48 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestBPMUpdates()
         {
-            const float bpm = 120;
+            const double bpm = 120;
             IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / bpm });
 
             OsuModDoubleTime doubleTime = null;
 
             selectBeatmap(beatmap);
-            checkDisplayedBPM(bpm);
+            checkDisplayedBPM($"{bpm}");
 
             AddStep("select DT", () => SelectedMods.Value = new[] { doubleTime = new OsuModDoubleTime() });
-            checkDisplayedBPM(bpm * 1.5f);
+            checkDisplayedBPM($"{bpm * 1.5f}");
 
             AddStep("change DT rate", () => doubleTime.SpeedChange.Value = 2);
-            checkDisplayedBPM(bpm * 2);
+            checkDisplayedBPM($"{bpm * 2}");
+        }
 
-            void checkDisplayedBPM(float target) =>
-                AddUntilStep($"displayed bpm is {target}", () => this.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Any(
-                    label => label.Statistic.Name == "BPM" && label.Statistic.Content == target.ToString(CultureInfo.InvariantCulture)));
+        [TestCase(120, 125, null, "120-125 (mostly 120)")]
+        [TestCase(120, 120.6, null, "120-121 (mostly 120)")]
+        [TestCase(120, 120.4, null, "120")]
+        [TestCase(120, 120.6, "DT", "180-182 (mostly 180)")]
+        [TestCase(120, 120.4, "DT", "180")]
+        public void TestVaryingBPM(double commonBpm, double otherBpm, string mod, string expectedDisplay)
+        {
+            IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / commonBpm });
+            beatmap.ControlPointInfo.Add(100, new TimingControlPoint { BeatLength = 60 * 1000 / otherBpm });
+            beatmap.ControlPointInfo.Add(200, new TimingControlPoint { BeatLength = 60 * 1000 / commonBpm });
+
+            if (mod != null)
+                AddStep($"select {mod}", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateModFromAcronym(mod) });
+
+            selectBeatmap(beatmap);
+            checkDisplayedBPM(expectedDisplay);
+        }
+
+        private void checkDisplayedBPM(string target)
+        {
+            AddUntilStep($"displayed bpm is {target}", () =>
+            {
+                var label = infoWedge.DisplayedContent.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Single(l => l.Statistic.Name == "BPM");
+                return label.Statistic.Content == target;
+            });
         }
 
         private void setRuleset(RulesetInfo rulesetInfo)

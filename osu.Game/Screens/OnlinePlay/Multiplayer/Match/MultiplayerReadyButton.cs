@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -55,9 +57,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            if (countdown != room?.Countdown)
+            MultiplayerCountdown newCountdown = room?.ActiveCountdowns.SingleOrDefault(c => c is MatchStartCountdown);
+
+            if (newCountdown != countdown)
             {
-                countdown = room?.Countdown;
+                countdown = newCountdown;
                 countdownChangeTime = Time.Current;
             }
 
@@ -92,7 +96,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 updateButtonText();
 
-                int secondsRemaining = countdownTimeRemaining.Seconds;
+                int secondsRemaining = (int)countdownTimeRemaining.TotalSeconds;
 
                 playTickSound(secondsRemaining);
 
@@ -197,7 +201,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
-                    if (room?.Host?.Equals(localUser) == true && room.Countdown == null)
+                    if (room?.Host?.Equals(localUser) == true && !room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
                         setGreen();
                     else
                         setYellow();
@@ -232,8 +236,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             get
             {
-                if (room?.Countdown != null && multiplayerClient.IsHost && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready && !room.Settings.AutoStartEnabled)
+                if (room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true
+                    && multiplayerClient.IsHost
+                    && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready
+                    && !room.Settings.AutoStartEnabled)
+                {
                     return "Cancel countdown";
+                }
 
                 return base.TooltipText;
             }

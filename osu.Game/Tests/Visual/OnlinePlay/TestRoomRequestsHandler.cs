@@ -1,9 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -44,9 +48,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             switch (request)
             {
                 case CreateRoomRequest createRoomRequest:
-                    var apiRoom = new Room();
-
-                    apiRoom.CopyFrom(createRoomRequest.Room);
+                    var apiRoom = cloneRoom(createRoomRequest.Room);
 
                     // Passwords are explicitly not copied between rooms.
                     apiRoom.HasPassword.Value = !string.IsNullOrEmpty(createRoomRequest.Room.Password.Value);
@@ -134,6 +136,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     return true;
 
                 case GetBeatmapsRequest getBeatmapsRequest:
+                {
                     var result = new List<APIBeatmap>();
 
                     foreach (int id in getBeatmapsRequest.BeatmapIds)
@@ -152,6 +155,24 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                     getBeatmapsRequest.TriggerSuccess(new GetBeatmapsResponse { Beatmaps = result });
                     return true;
+                }
+
+                case GetBeatmapSetRequest getBeatmapSetRequest:
+                {
+                    var baseBeatmap = getBeatmapSetRequest.Type == BeatmapSetLookupType.BeatmapId
+                        ? beatmapManager.QueryBeatmap(b => b.OnlineID == getBeatmapSetRequest.ID)
+                        : beatmapManager.QueryBeatmap(b => b.BeatmapSet.OnlineID == getBeatmapSetRequest.ID);
+
+                    if (baseBeatmap == null)
+                    {
+                        baseBeatmap = new TestBeatmap(new RulesetInfo { OnlineID = 0 }).BeatmapInfo;
+                        baseBeatmap.OnlineID = getBeatmapSetRequest.ID;
+                        baseBeatmap.BeatmapSet!.OnlineID = getBeatmapSetRequest.ID;
+                    }
+
+                    getBeatmapSetRequest.TriggerSuccess(OsuTestScene.CreateAPIBeatmapSet(baseBeatmap));
+                    return true;
+                }
             }
 
             return false;
@@ -178,12 +199,31 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         private Room createResponseRoom(Room room, bool withParticipants)
         {
-            var responseRoom = new Room();
-            responseRoom.CopyFrom(room);
+            var responseRoom = cloneRoom(room);
+
+            // Password is hidden from the response, and is only propagated via HasPassword.
+            bool hadPassword = responseRoom.HasPassword.Value;
             responseRoom.Password.Value = null;
+            responseRoom.HasPassword.Value = hadPassword;
+
             if (!withParticipants)
                 responseRoom.RecentParticipants.Clear();
+
             return responseRoom;
+        }
+
+        private Room cloneRoom(Room source)
+        {
+            var result = JsonConvert.DeserializeObject<Room>(JsonConvert.SerializeObject(source));
+            Debug.Assert(result != null);
+
+            // Playlist item IDs aren't serialised.
+            if (source.CurrentPlaylistItem.Value != null)
+                result.CurrentPlaylistItem.Value.ID = source.CurrentPlaylistItem.Value.ID;
+            for (int i = 0; i < source.Playlist.Count; i++)
+                result.Playlist[i].ID = source.Playlist[i].ID;
+
+            return result;
         }
     }
 }

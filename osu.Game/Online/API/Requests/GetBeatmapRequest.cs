@@ -5,8 +5,6 @@ using osu.Framework.IO.Network;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 
-#nullable enable
-
 namespace osu.Game.Online.API.Requests
 {
     public class GetBeatmapRequest : APIRequest<APIBeatmap>

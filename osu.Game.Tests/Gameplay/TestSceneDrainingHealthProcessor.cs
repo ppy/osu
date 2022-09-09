@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -158,6 +160,40 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("revert hit result", () => processor.RevertResult(result));
             assertHealthNotEqualTo(1);
+        }
+
+        [Test]
+        public void TestFailConditions()
+        {
+            var beatmap = createBeatmap(0, 1000);
+            createProcessor(beatmap);
+
+            AddStep("setup fail conditions", () => processor.FailConditions += ((_, result) => result.Type == HitResult.Miss));
+
+            AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
+            AddAssert("not failed", () => !processor.HasFailed);
+            AddStep("apply miss hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Miss }));
+            AddAssert("failed", () => processor.HasFailed);
+        }
+
+        [TestCase(HitResult.Miss)]
+        [TestCase(HitResult.Meh)]
+        public void TestMultipleFailConditions(HitResult resultApplied)
+        {
+            var beatmap = createBeatmap(0, 1000);
+            createProcessor(beatmap);
+
+            AddStep("setup multiple fail conditions", () =>
+            {
+                processor.FailConditions += ((_, result) => result.Type == HitResult.Miss);
+                processor.FailConditions += ((_, result) => result.Type == HitResult.Meh);
+            });
+
+            AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
+            AddAssert("not failed", () => !processor.HasFailed);
+
+            AddStep($"apply {resultApplied.ToString().ToLowerInvariant()} hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
+            AddAssert("failed", () => processor.HasFailed);
         }
 
         [Test]

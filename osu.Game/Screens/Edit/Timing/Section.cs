@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -44,9 +46,15 @@ namespace osu.Game.Screens.Edit.Timing
             AutoSizeAxes = Axes.Y;
 
             Masking = true;
+            CornerRadius = 5;
 
             InternalChildren = new Drawable[]
             {
+                new Box
+                {
+                    Colour = colours.Background4,
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -69,14 +77,9 @@ namespace osu.Game.Screens.Edit.Timing
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new Box
-                        {
-                            Colour = colours.Background3,
-                            RelativeSizeAxes = Axes.Both,
-                        },
                         Flow = new FillFlowContainer
                         {
-                            Padding = new MarginPadding(20),
+                            Padding = new MarginPadding(10) { Top = 0 },
                             Spacing = new Vector2(20),
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

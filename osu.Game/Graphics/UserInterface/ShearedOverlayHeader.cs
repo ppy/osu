@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -66,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                 },
                 Children = new Drawable[]
                 {
-                    underlayContainer = new Container
+                    underlayContainer = new InputBlockingContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = HEIGHT,

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -23,7 +25,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// <summary>
         /// The accuracy value corresponding to the <see cref="ScoreRank"/> displayed by this badge.
         /// </summary>
-        public readonly float Accuracy;
+        public readonly double Accuracy;
 
         private readonly ScoreRank rank;
 
@@ -35,7 +37,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// </summary>
         /// <param name="accuracy">The accuracy value corresponding to <paramref name="rank"/>.</param>
         /// <param name="rank">The <see cref="ScoreRank"/> to be displayed in this <see cref="RankBadge"/>.</param>
-        public RankBadge(float accuracy, ScoreRank rank)
+        public RankBadge(double accuracy, ScoreRank rank)
         {
             Accuracy = accuracy;
             this.rank = rank;
@@ -90,7 +92,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             base.Update();
 
             // Starts at -90deg (top) and moves counter-clockwise by the accuracy
-            rankContainer.Position = circlePosition(-MathF.PI / 2 - (1 - Accuracy) * MathF.PI * 2);
+            rankContainer.Position = circlePosition(-MathF.PI / 2 - (1 - (float)Accuracy) * MathF.PI * 2);
         }
 
         private Vector2 circlePosition(float t)

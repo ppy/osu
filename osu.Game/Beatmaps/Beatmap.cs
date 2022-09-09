@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
@@ -12,9 +14,6 @@ using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
 {
-    /// <summary>
-    /// A Beatmap containing converted HitObjects.
-    /// </summary>
     public class Beatmap<T> : IBeatmap<T>
         where T : HitObject
     {

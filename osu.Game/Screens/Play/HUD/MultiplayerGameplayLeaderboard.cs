@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -17,9 +20,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Spectator;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
@@ -43,8 +44,6 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
 
-        private readonly RulesetInfo ruleset;
-        private readonly ScoreProcessor scoreProcessor;
         private readonly MultiplayerRoomUser[] playingUsers;
         private Bindable<ScoringMode> scoringMode;
 
@@ -55,57 +54,56 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Construct a new leaderboard.
         /// </summary>
-        /// <param name="ruleset">The ruleset.</param>
-        /// <param name="scoreProcessor">A score processor instance to handle score calculation for scores of users in the match.</param>
         /// <param name="users">IDs of all users in this match.</param>
-        public MultiplayerGameplayLeaderboard(RulesetInfo ruleset, ScoreProcessor scoreProcessor, MultiplayerRoomUser[] users)
+        public MultiplayerGameplayLeaderboard(MultiplayerRoomUser[] users)
         {
-            // todo: this will eventually need to be created per user to support different mod combinations.
-            this.ruleset = ruleset;
-            this.scoreProcessor = scoreProcessor;
-
             playingUsers = users;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, IAPIProvider api)
+        private void load(OsuConfigManager config, IAPIProvider api, CancellationToken cancellationToken)
         {
             scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
 
             foreach (var user in playingUsers)
             {
-                var trackedUser = CreateUserData(user, ruleset, scoreProcessor);
+                var scoreProcessor = new SpectatorScoreProcessor(user.UserID);
+                scoreProcessor.Mode.BindTo(scoringMode);
+                scoreProcessor.TotalScore.BindValueChanged(_ => Scheduler.AddOnce(updateTotals));
+                AddInternal(scoreProcessor);
 
-                trackedUser.ScoringMode.BindTo(scoringMode);
-                trackedUser.Score.BindValueChanged(_ => Scheduler.AddOnce(updateTotals));
-
+                var trackedUser = new TrackedUserData(user, scoreProcessor);
                 UserScores[user.UserID] = trackedUser;
 
                 if (trackedUser.Team is int team && !TeamScores.ContainsKey(team))
                     TeamScores.Add(team, new BindableLong());
             }
 
-            userLookupCache.GetUsersAsync(playingUsers.Select(u => u.UserID).ToArray()).ContinueWith(task => Schedule(() =>
-            {
-                var users = task.GetResultSafely();
+            userLookupCache.GetUsersAsync(playingUsers.Select(u => u.UserID).ToArray(), cancellationToken)
+                           .ContinueWith(task =>
+                           {
+                               Schedule(() =>
+                               {
+                                   var users = task.GetResultSafely();
 
-                for (int i = 0; i < users.Length; i++)
-                {
-                    var user = users[i] ?? new APIUser
-                    {
-                        Id = playingUsers[i].UserID,
-                        Username = "Unknown user",
-                    };
+                                   for (int i = 0; i < users.Length; i++)
+                                   {
+                                       var user = users[i] ?? new APIUser
+                                       {
+                                           Id = playingUsers[i].UserID,
+                                           Username = "Unknown user",
+                                       };
 
-                    var trackedUser = UserScores[user.Id];
+                                       var trackedUser = UserScores[user.Id];
 
-                    var leaderboardScore = Add(user, user.Id == api.LocalUser.Value.Id);
-                    leaderboardScore.Accuracy.BindTo(trackedUser.Accuracy);
-                    leaderboardScore.TotalScore.BindTo(trackedUser.Score);
-                    leaderboardScore.Combo.BindTo(trackedUser.CurrentCombo);
-                    leaderboardScore.HasQuit.BindTo(trackedUser.UserQuit);
-                }
-            }));
+                                       var leaderboardScore = Add(user, user.Id == api.LocalUser.Value.Id);
+                                       leaderboardScore.Accuracy.BindTo(trackedUser.ScoreProcessor.Accuracy);
+                                       leaderboardScore.TotalScore.BindTo(trackedUser.ScoreProcessor.TotalScore);
+                                       leaderboardScore.Combo.BindTo(trackedUser.ScoreProcessor.Combo);
+                                       leaderboardScore.HasQuit.BindTo(trackedUser.UserQuit);
+                                   }
+                               });
+                           }, cancellationToken);
         }
 
         protected override void LoadComplete()
@@ -118,19 +116,14 @@ namespace osu.Game.Screens.Play.HUD
                 spectatorClient.WatchUser(user.UserID);
 
                 if (!multiplayerClient.CurrentMatchPlayingUserIds.Contains(user.UserID))
-                    usersChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { user.UserID }));
+                    playingUsersChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { user.UserID }));
             }
 
             // bind here is to support players leaving the match.
             // new players are not supported.
             playingUserIds.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
-            playingUserIds.BindCollectionChanged(usersChanged);
-
-            // this leaderboard should be guaranteed to be completely loaded before the gameplay starts (is a prerequisite in MultiplayerPlayer).
-            spectatorClient.OnNewFrames += handleIncomingFrames;
+            playingUserIds.BindCollectionChanged(playingUsersChanged);
         }
-
-        protected virtual TrackedUserData CreateUserData(MultiplayerRoomUser user, RulesetInfo ruleset, ScoreProcessor scoreProcessor) => new TrackedUserData(user, ruleset, scoreProcessor);
 
         protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(APIUser user, bool isTracked)
         {
@@ -157,7 +150,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void usersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void playingUsersChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -174,15 +167,6 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void handleIncomingFrames(int userId, FrameDataBundle bundle) => Schedule(() =>
-        {
-            if (!UserScores.TryGetValue(userId, out var trackedData))
-                return;
-
-            trackedData.Frames.Add(new TimedFrame(bundle.Frames.First().Time, bundle.Header));
-            trackedData.UpdateScore();
-        });
-
         private void updateTotals()
         {
             if (!hasTeams)
@@ -196,7 +180,7 @@ namespace osu.Game.Screens.Play.HUD
                     continue;
 
                 if (TeamScores.TryGetValue(u.Team.Value, out var team))
-                    team.Value += (int)Math.Round(u.Score.Value);
+                    team.Value += (int)Math.Round(u.ScoreProcessor.TotalScore.Value);
             }
         }
 
@@ -207,83 +191,26 @@ namespace osu.Game.Screens.Play.HUD
             if (spectatorClient != null)
             {
                 foreach (var user in playingUsers)
-                {
                     spectatorClient.StopWatchingUser(user.UserID);
-                }
-
-                spectatorClient.OnNewFrames -= handleIncomingFrames;
             }
         }
 
         protected class TrackedUserData
         {
             public readonly MultiplayerRoomUser User;
-            public readonly ScoreProcessor ScoreProcessor;
+            public readonly SpectatorScoreProcessor ScoreProcessor;
 
-            public readonly BindableDouble Score = new BindableDouble();
-            public readonly BindableDouble Accuracy = new BindableDouble(1);
-            public readonly BindableInt CurrentCombo = new BindableInt();
             public readonly BindableBool UserQuit = new BindableBool();
-
-            public readonly IBindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
-
-            public readonly List<TimedFrame> Frames = new List<TimedFrame>();
 
             public int? Team => (User.MatchState as TeamVersusUserState)?.TeamID;
 
-            private readonly ScoreInfo scoreInfo;
-
-            public TrackedUserData(MultiplayerRoomUser user, RulesetInfo ruleset, ScoreProcessor scoreProcessor)
+            public TrackedUserData(MultiplayerRoomUser user, SpectatorScoreProcessor scoreProcessor)
             {
                 User = user;
                 ScoreProcessor = scoreProcessor;
-
-                scoreInfo = new ScoreInfo { Ruleset = ruleset };
-
-                ScoringMode.BindValueChanged(_ => UpdateScore());
             }
 
             public void MarkUserQuit() => UserQuit.Value = true;
-
-            public virtual void UpdateScore()
-            {
-                if (Frames.Count == 0)
-                    return;
-
-                SetFrame(Frames.Last());
-            }
-
-            protected void SetFrame(TimedFrame frame)
-            {
-                var header = frame.Header;
-
-                scoreInfo.MaxCombo = header.MaxCombo;
-                scoreInfo.Statistics = header.Statistics;
-
-                Score.Value = ScoreProcessor.ComputePartialScore(ScoringMode.Value, scoreInfo);
-
-                Accuracy.Value = header.Accuracy;
-                CurrentCombo.Value = header.Combo;
-            }
-        }
-
-        protected class TimedFrame : IComparable<TimedFrame>
-        {
-            public readonly double Time;
-            public readonly FrameHeader Header;
-
-            public TimedFrame(double time)
-            {
-                Time = time;
-            }
-
-            public TimedFrame(double time, FrameHeader header)
-            {
-                Time = time;
-                Header = header;
-            }
-
-            public int CompareTo(TimedFrame other) => Time.CompareTo(other.Time);
         }
     }
 }

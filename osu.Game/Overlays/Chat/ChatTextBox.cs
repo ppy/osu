@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -14,6 +13,8 @@ namespace osu.Game.Overlays.Chat
 
         public override bool HandleLeftRightArrows => !ShowSearch.Value;
 
+        protected override bool ClearTextOnBackKey => false;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.Chat
             {
                 bool showSearch = change.NewValue;
 
-                PlaceholderText = showSearch ? "type here to search" : "type here";
+                PlaceholderText = showSearch ? HomeStrings.SearchPlaceholder : ChatStrings.InputPlaceholder;
                 Text = string.Empty;
             }, true);
         }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,6 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat.ChannelList;
+using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -25,7 +28,6 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly Bindable<Channel> selected = new Bindable<Channel>();
 
-        private OsuSpriteText selectorText;
         private OsuSpriteText selectedText;
         private OsuSpriteText leaveText;
         private ChannelList channelList;
@@ -45,19 +47,10 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         new Dimension(GridSizeMode.Absolute, 20),
                         new Dimension(GridSizeMode.Absolute, 20),
-                        new Dimension(GridSizeMode.Absolute, 20),
                         new Dimension(),
                     },
                     Content = new[]
                     {
-                        new Drawable[]
-                        {
-                            selectorText = new OsuSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                            },
-                        },
                         new Drawable[]
                         {
                             selectedText = new OsuSpriteText
@@ -89,7 +82,6 @@ namespace osu.Game.Tests.Visual.Online
 
                 channelList.OnRequestSelect += channel =>
                 {
-                    channelList.SelectorActive.Value = false;
                     selected.Value = channel;
                 };
 
@@ -97,15 +89,9 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     leaveText.Text = $"OnRequestLeave: {channel.Name}";
                     leaveText.FadeOutFromOne(1000, Easing.InQuint);
-                    selected.Value = null;
+                    selected.Value = channelList.ChannelListingChannel;
                     channelList.RemoveChannel(channel);
                 };
-
-                channelList.SelectorActive.BindValueChanged(change =>
-                {
-                    selectorText.Text = $"Channel Selector Active: {change.NewValue}";
-                    selected.Value = null;
-                }, true);
 
                 selected.BindValueChanged(change =>
                 {
@@ -128,6 +114,12 @@ namespace osu.Game.Tests.Visual.Online
                 for (int i = 0; i < 10; i++)
                     channelList.AddChannel(createRandomPrivateChannel());
             });
+
+            AddStep("Add Announce Channels", () =>
+            {
+                for (int i = 0; i < 2; i++)
+                    channelList.AddChannel(createRandomAnnounceChannel());
+            });
         }
 
         [Test]
@@ -135,34 +127,36 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Unread Selected", () =>
             {
-                if (selected.Value != null)
+                if (validItem)
                     channelList.GetItem(selected.Value).Unread.Value = true;
             });
 
             AddStep("Read Selected", () =>
             {
-                if (selected.Value != null)
+                if (validItem)
                     channelList.GetItem(selected.Value).Unread.Value = false;
             });
 
             AddStep("Add Mention Selected", () =>
             {
-                if (selected.Value != null)
+                if (validItem)
                     channelList.GetItem(selected.Value).Mentions.Value++;
             });
 
             AddStep("Add 98 Mentions Selected", () =>
             {
-                if (selected.Value != null)
+                if (validItem)
                     channelList.GetItem(selected.Value).Mentions.Value += 98;
             });
 
             AddStep("Clear Mentions Selected", () =>
             {
-                if (selected.Value != null)
+                if (validItem)
                     channelList.GetItem(selected.Value).Mentions.Value = 0;
             });
         }
+
+        private bool validItem => selected.Value != null && !(selected.Value is ChannelListing.ChannelListingChannel);
 
         private Channel createRandomPublicChannel()
         {
@@ -183,6 +177,17 @@ namespace osu.Game.Tests.Visual.Online
                 Id = id,
                 Username = $"test user {id}",
             });
+        }
+
+        private Channel createRandomAnnounceChannel()
+        {
+            int id = RNG.Next(0, 10000);
+            return new Channel
+            {
+                Name = $"Announce {id}",
+                Type = ChannelType.Announce,
+                Id = id,
+            };
         }
     }
 }

@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModFlashlight : ModFlashlight<TaikoHitObject>
     {
-        public override double ScoreMultiplier => 1.12;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public override BindableFloat SizeMultiplier { get; } = new BindableFloat
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, playfield);
 
-        private TaikoPlayfield playfield;
+        private TaikoPlayfield playfield = null!;
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private class TaikoFlashlight : Flashlight
         {
-            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
+            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
             private readonly TaikoPlayfield taikoPlayfield;
 
             public TaikoFlashlight(TaikoModFlashlight modFlashlight, TaikoPlayfield taikoPlayfield)

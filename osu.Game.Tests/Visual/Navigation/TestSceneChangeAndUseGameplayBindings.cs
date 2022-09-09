@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -59,8 +61,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for player", () =>
             {
-                // dismiss any notifications that may appear (ie. muted notification).
-                clickMouseInCentre();
+                DismissAnyNotifications();
                 return player != null;
             });
 
@@ -71,12 +72,6 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("press 's'", () => InputManager.Key(Key.S));
             AddAssert("key counter did increase", () => keyCounter.CountPresses == 1);
-        }
-
-        private void clickMouseInCentre()
-        {
-            InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre);
-            InputManager.Click(MouseButton.Left);
         }
 
         private KeyBindingsSubsection osuBindingSubsection => keyBindingPanel

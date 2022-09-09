@@ -1,15 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Graphics.Containers;
-using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -24,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         // Must be set to update IsHovered as it's used in relax mod to detect osu hit objects.
         public override bool HandlePositionalInput => true;
 
-        protected override float SamplePlaybackPosition => HitObject.X / OsuPlayfield.BASE_SIZE.X;
+        protected override float SamplePlaybackPosition => CalculateDrawableRelativePosition(this);
 
         /// <summary>
         /// Whether this <see cref="DrawableOsuHitObject"/> can be hit, given a time value.
@@ -75,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         // This is a bit ugly but we don't have the concept of InternalContent so it'll have to do for now. (https://github.com/ppy/osu-framework/issues/1690)
         protected override void AddInternal(Drawable drawable) => shakeContainer.Add(drawable);
         protected override void ClearInternal(bool disposeChildren = true) => shakeContainer.Clear(disposeChildren);
-        protected override bool RemoveInternal(Drawable drawable) => shakeContainer.Remove(drawable);
+        protected override bool RemoveInternal(Drawable drawable, bool disposeImmediately) => shakeContainer.Remove(drawable, disposeImmediately);
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
@@ -88,6 +90,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
         public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
+
+        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent.ScreenSpaceDrawQuad.AABBFloat;
+
+        /// <summary>
+        /// Calculates the position of the given <paramref name="drawable"/> relative to the playfield area.
+        /// </summary>
+        /// <param name="drawable">The drawable to calculate its relative position.</param>
+        protected float CalculateDrawableRelativePosition(Drawable drawable) => (drawable.ScreenSpaceDrawQuad.Centre.X - parentScreenSpaceRectangle.X) / parentScreenSpaceRectangle.Width;
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
     }

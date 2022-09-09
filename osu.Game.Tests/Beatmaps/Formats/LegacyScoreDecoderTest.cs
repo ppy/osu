@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -60,6 +62,24 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.IsTrue(Precision.AlmostEquals(0.8889, score.ScoreInfo.Accuracy, 0.0001));
                 Assert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
+
+                Assert.That(score.Replay.Frames, Is.Not.Empty);
+            }
+        }
+
+        [Test]
+        public void TestDecodeTaikoReplay()
+        {
+            var decoder = new TestLegacyScoreDecoder();
+
+            using (var resourceStream = TestResources.OpenResource("Replays/taiko-replay.osr"))
+            {
+                var score = decoder.Parse(resourceStream);
+
+                Assert.AreEqual(1, score.ScoreInfo.Ruleset.OnlineID);
+                Assert.AreEqual(4, score.ScoreInfo.Statistics[HitResult.Great]);
+                Assert.AreEqual(2, score.ScoreInfo.Statistics[HitResult.LargeBonus]);
+                Assert.AreEqual(4, score.ScoreInfo.MaxCombo);
 
                 Assert.That(score.Replay.Frames, Is.Not.Empty);
             }

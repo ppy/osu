@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -371,7 +373,11 @@ namespace osu.Game.Beatmaps.Formats
             string[] split = line.Split(',');
 
             double time = getOffsetTime(Parsing.ParseDouble(split[0].Trim()));
-            double beatLength = Parsing.ParseDouble(split[1].Trim());
+
+            // beatLength is allowed to be NaN to handle an edge case in which some beatmaps use NaN slider velocity to disable slider tick generation (see LegacyDifficultyControlPoint).
+            double beatLength = Parsing.ParseDouble(split[1].Trim(), allowNaN: true);
+
+            // If beatLength is NaN, speedMultiplier should still be 1 because all comparisons against NaN are false.
             double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
             TimeSignature timeSignature = TimeSignature.SimpleQuadruple;
@@ -410,6 +416,9 @@ namespace osu.Game.Beatmaps.Formats
 
             if (timingChange)
             {
+                if (double.IsNaN(beatLength))
+                    throw new InvalidDataException("Beat length cannot be NaN in a timing control point");
+
                 var controlPoint = CreateTimingControlPoint();
 
                 controlPoint.BeatLength = beatLength;
@@ -431,9 +440,10 @@ namespace osu.Game.Beatmaps.Formats
                 OmitFirstBarLine = omitFirstBarSignature,
             };
 
-            bool isOsuRuleset = beatmap.BeatmapInfo.Ruleset.OnlineID == 0;
-            // scrolling rulesets use effect points rather than difficulty points for scroll speed adjustments.
-            if (!isOsuRuleset)
+            int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
+
+            // osu!taiko and osu!mania use effect points rather than difficulty points for scroll speed adjustments.
+            if (onlineRulesetID == 1 || onlineRulesetID == 3)
                 effectPoint.ScrollSpeed = speedMultiplier;
 
             addControlPoint(time, effectPoint, timingChange);

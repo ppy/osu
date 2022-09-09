@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -9,6 +11,10 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A materialised beatmap.
+    /// Generally this interface will be implemented alongside <see cref="IBeatmap{T}"/>, which exposes the ruleset-typed hit objects.
+    /// </summary>
     public interface IBeatmap
     {
         /// <summary>
@@ -63,6 +69,9 @@ namespace osu.Game.Beatmaps
         IBeatmap Clone();
     }
 
+    /// <summary>
+    /// A materialised beatmap containing converted HitObjects.
+    /// </summary>
     public interface IBeatmap<out T> : IBeatmap
         where T : HitObject
     {

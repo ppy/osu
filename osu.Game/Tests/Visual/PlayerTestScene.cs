@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -37,17 +39,17 @@ namespace osu.Game.Tests.Visual
             base.SetUpSteps();
 
             if (!HasCustomSteps)
-                CreateTest(null);
+                CreateTest();
         }
 
-        protected void CreateTest(Action action)
+        protected void CreateTest([CanBeNull] Action action = null)
         {
             if (action != null && !HasCustomSteps)
                 throw new InvalidOperationException($"Cannot add custom test steps without {nameof(HasCustomSteps)} being set.");
 
             action?.Invoke();
 
-            AddStep(CreatePlayerRuleset().Description, LoadPlayer);
+            AddStep($"Load player for {CreatePlayerRuleset().Description}", LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 

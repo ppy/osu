@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -27,6 +29,13 @@ namespace osu.Game.Screens
 
             ScreenPushed += screenPushed;
             ScreenExited += ScreenChanged;
+        }
+
+        public void PushSynchronously(OsuScreen screen)
+        {
+            LoadComponent(screen);
+
+            Push(screen);
         }
 
         private void screenPushed(IScreen prev, IScreen next)

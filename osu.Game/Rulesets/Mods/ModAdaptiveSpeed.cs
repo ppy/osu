@@ -5,9 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Audio;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -25,13 +24,16 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Acronym => "AS";
 
-        public override string Description => "Let track speed adapt to you.";
+        public override LocalisableString Description => "Let track speed adapt to you.";
 
         public override ModType Type => ModType.Fun;
 
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier => 0.5;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp) };
+        public override bool ValidForMultiplayer => false;
+        public override bool ValidForMultiplayerAsFreeMod => false;
+
+        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp), typeof(ModAutoplay) };
 
         [SettingSource("Initial rate", "The starting speed of the track")]
         public BindableNumber<double> InitialRate { get; } = new BindableDouble
@@ -76,7 +78,7 @@ namespace osu.Game.Rulesets.Mods
         // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
         private const double rate_change_on_miss = 0.95d;
 
-        private ITrack track;
+        private IAdjustableAudioComponent? track;
         private double targetRate = 1d;
 
         /// <summary>
@@ -138,7 +140,7 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.BindValueChanged(adjustPitchChanged);
         }
 
-        public void ApplyToTrack(ITrack track)
+        public void ApplyToTrack(IAdjustableAudioComponent track)
         {
             this.track = track;
 
@@ -148,7 +150,7 @@ namespace osu.Game.Rulesets.Mods
             recentRates.AddRange(Enumerable.Repeat(InitialRate.Value, recent_rate_count));
         }
 
-        public void ApplyToSample(DrawableSample sample)
+        public void ApplyToSample(IAdjustableAudioComponent sample)
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
@@ -162,7 +164,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            drawable.OnNewResult += (o, result) =>
+            drawable.OnNewResult += (_, result) =>
             {
                 if (ratesForRewinding.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;
@@ -174,7 +176,7 @@ namespace osu.Game.Rulesets.Mods
 
                 updateTargetRate();
             };
-            drawable.OnRevertResult += (o, result) =>
+            drawable.OnRevertResult += (_, result) =>
             {
                 if (!ratesForRewinding.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;
@@ -207,7 +209,6 @@ namespace osu.Game.Rulesets.Mods
         private void adjustPitchChanged(ValueChangedEvent<bool> adjustPitchSetting)
         {
             track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
-
             track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
         }
 

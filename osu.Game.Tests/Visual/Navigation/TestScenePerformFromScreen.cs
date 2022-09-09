@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -230,7 +232,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             public int ExitAttempts { get; private set; }
 
-            public override bool OnExiting(IScreen next)
+            public override bool OnExiting(ScreenExitEvent e)
             {
                 ExitAttempts++;
 
@@ -240,7 +242,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     return true;
                 }
 
-                return base.OnExiting(next);
+                return base.OnExiting(e);
             }
         }
 
@@ -257,7 +259,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 SubScreenStack.Push(Blocker = new DialogBlockingScreen());
             }
 
-            public override bool OnExiting(IScreen next)
+            public override bool OnExiting(ScreenExitEvent e)
             {
                 if (SubScreenStack.CurrentScreen != null)
                 {
@@ -265,7 +267,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     return true;
                 }
 
-                return base.OnExiting(next);
+                return base.OnExiting(e);
             }
         }
     }
