@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
@@ -14,6 +12,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Sprites
 {
+    /// <summary>
+    /// A wrapped version of <see cref="OsuSpriteText"/> which will expand in size based on text content, but never shrink back down.
+    /// </summary>
     public class SizePreservingSpriteText : CompositeDrawable
     {
         private readonly OsuSpriteText text = new OsuSpriteText();
