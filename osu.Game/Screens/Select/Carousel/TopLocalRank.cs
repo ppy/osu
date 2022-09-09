@@ -49,8 +49,6 @@ namespace osu.Game.Screens.Select.Carousel
 
             InternalChild = updateable = new UpdateableRank
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
                 Size = new Vector2(40, 20),
                 Alpha = 0,
             };
