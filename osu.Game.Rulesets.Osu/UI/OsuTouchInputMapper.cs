@@ -15,21 +15,21 @@ namespace osu.Game.Rulesets.Osu.UI
         public const TouchSource CURSOR_TOUCH = TouchSource.Touch1;
 
         /// <summary>
-        /// How many taps (taps referring as streaming touch input) can be registered.
+        /// How many streaming touches are allowed to be registered.
         /// </summary>
         private const int tap_touches_limit = 2;
 
         /// <summary>
-        /// How many concurrent touches can be registered.
+        /// How many touches are allowed to be registered.
         /// </summary>
-        private const int concurrent_touches_limit = tap_touches_limit + 1;
+        private const int allowed_touches_limit = tap_touches_limit + 1;
 
         /// <summary>
-        /// The index for the last concurrent able touch.
+        /// The index for the last allowed touch.
         /// </summary>
-        private const int last_concurrent_touch_index = concurrent_touches_limit - 1;
+        private const int last_allowed_touch_index = allowed_touches_limit - 1;
 
-        private readonly HashSet<TouchSource> allowedTouchSources = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().Take(concurrent_touches_limit).ToHashSet();
+        private readonly HashSet<TouchSource> allowedTouches = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().Take(allowed_touches_limit).ToHashSet();
 
         private readonly Dictionary<TouchSource, OsuAction> touchActions = new Dictionary<TouchSource, OsuAction>();
 
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.UI
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
             osuInputManager = inputManager;
-            foreach (var source in allowedTouchSources)
+            foreach (var source in allowedTouches)
                 touchActions.Add(source, getTouchIndex(source) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
         }
 
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private bool isCursorTouch(TouchSource source) => !isTapTouch(source);
 
-        private bool isValidTouchInput(int index) => index <= last_concurrent_touch_index;
+        private bool isValidTouchInput(int index) => index <= last_allowed_touch_inde;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!isValidTouchInput(sourceIndex))
                 return false;
 
-            osuInputManager.DragMode = sourceIndex == last_concurrent_touch_index;
+            osuInputManager.DragMode = sourceIndex == last_allowed_touch_inde;
 
             if (isCursorTouch(source))
                 return base.OnTouchDown(e);
