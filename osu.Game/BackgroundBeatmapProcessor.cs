@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
@@ -45,12 +46,12 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            Task.Run(async () =>
+            Task.Run(() =>
             {
                 Logger.Log("Beginning background beatmap processing..");
                 checkForOutdatedStarRatings();
-                await processBeatmapSetsWithMissingMetrics();
-                await processScoresWithMissingStatistics();
+                processBeatmapSetsWithMissingMetrics();
+                processScoresWithMissingStatistics();
             }).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -99,7 +100,7 @@ namespace osu.Game
             }
         }
 
-        private async Task processBeatmapSetsWithMissingMetrics()
+        private void processBeatmapSetsWithMissingMetrics()
         {
             HashSet<Guid> beatmapSetIds = new HashSet<Guid>();
 
@@ -123,7 +124,7 @@ namespace osu.Game
                 while (localUserPlayInfo?.IsPlaying.Value == true)
                 {
                     Logger.Log("Background processing sleeping due to active gameplay...");
-                    await Task.Delay(TimeToSleepDuringGameplay);
+                    Thread.Sleep(TimeToSleepDuringGameplay);
                 }
 
                 realmAccess.Run(r =>
@@ -146,7 +147,7 @@ namespace osu.Game
             }
         }
 
-        private async Task processScoresWithMissingStatistics()
+        private void processScoresWithMissingStatistics()
         {
             HashSet<Guid> scoreIds = new HashSet<Guid>();
 
@@ -168,7 +169,7 @@ namespace osu.Game
                 while (localUserPlayInfo?.IsPlaying.Value == true)
                 {
                     Logger.Log("Background processing sleeping due to active gameplay...");
-                    await Task.Delay(TimeToSleepDuringGameplay);
+                    Thread.Sleep(TimeToSleepDuringGameplay);
                 }
 
                 try
