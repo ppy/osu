@@ -9,11 +9,24 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
     public class TestSceneOsuModZoomed : OsuModTestScene
     {
         [Test]
-        public void TestZoomed() => CreateModTest(new ModTestData
+        public void TestBasic() => CreateModTest(new ModTestData
         {
             Mod = new OsuModZoomed(),
             PassCondition = () => true,
             Autoplay = false,
+        });
+
+        [Test]
+        public void TestZeroDelay() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModZoomed
+            {
+                FinalZoom = { Value = 2 },
+                FinalZoomCombo = { Value = 0 },
+                MovementDelay = { Value = 0 }
+            },
+            PassCondition = () => true,
+            Autoplay = true,
         });
     }
 }
