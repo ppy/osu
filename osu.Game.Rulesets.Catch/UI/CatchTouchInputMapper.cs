@@ -131,6 +131,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
+            Show();
+
             TouchCatchAction touchCatchAction = getTouchCatchActionFromInput(e.ScreenSpaceMousePosition);
 
             // Loop through the buttons to avoid keeping a button pressed if both mouse buttons are pressed.
@@ -143,6 +145,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override void OnTouchMove(TouchMoveEvent e)
         {
+            Show();
+
             trackedActions[e.Touch.Source] = getTouchCatchActionFromInput(e.ScreenSpaceTouch.Position);
             calculateActiveKeys();
 
@@ -185,8 +189,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (catchAction == TouchCatchAction.None)
                 return false;
-
-            Show();
 
             trackedActions[source] = catchAction;
 
