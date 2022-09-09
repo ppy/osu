@@ -15,12 +15,14 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Beatmaps.Drawables.Cards.Buttons;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
@@ -292,6 +294,23 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
             AddStep("Hover away", () => InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapCardNormal>().Last()));
             AddUntilStep("card is not expanded", () => !firstCard().Expanded.Value);
+
+            BeatmapCardNormal firstCard() => this.ChildrenOfType<BeatmapCardNormal>().First();
+        }
+
+        [Test]
+        public void TestPlayButtonByTouchInput()
+        {
+            AddStep("create cards", () => Child = createContent(OverlayColourScheme.Blue, beatmapSetInfo => new BeatmapCardNormal(beatmapSetInfo)));
+
+            // mimics touch input
+            AddStep("touch play button area on first card", () =>
+            {
+                InputManager.MoveMouseTo(firstCard().ChildrenOfType<PlayButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("first card is playing", () => firstCard().ChildrenOfType<PlayButton>().Single().Playing.Value);
 
             BeatmapCardNormal firstCard() => this.ChildrenOfType<BeatmapCardNormal>().First();
         }
