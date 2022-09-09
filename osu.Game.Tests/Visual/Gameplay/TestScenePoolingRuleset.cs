@@ -158,21 +158,24 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("clean up", () => drawableRuleset.NewResult -= onNewResult);
         }
 
-        private void createTest(IBeatmap beatmap, int poolSize, Func<IFrameBasedClock> createClock = null) => AddStep("create test", () =>
+        private void createTest(IBeatmap beatmap, int poolSize, Func<IFrameBasedClock> createClock = null)
         {
-            var ruleset = new TestPoolingRuleset();
-
-            drawableRuleset = (TestDrawablePoolingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
-            drawableRuleset.FrameStablePlayback = true;
-            drawableRuleset.PoolSize = poolSize;
-
-            Child = new Container
+            AddStep("create test", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                Clock = createClock?.Invoke() ?? new FramedOffsetClock(Clock, false) { Offset = -Clock.CurrentTime },
-                Child = drawableRuleset
-            };
-        });
+                var ruleset = new TestPoolingRuleset();
+
+                drawableRuleset = (TestDrawablePoolingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
+                drawableRuleset.FrameStablePlayback = true;
+                drawableRuleset.PoolSize = poolSize;
+
+                Child = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Clock = createClock?.Invoke() ?? new FramedOffsetClock(Clock, false) { Offset = -Clock.CurrentTime },
+                    Child = drawableRuleset
+                };
+            });
+        }
 
         #region Ruleset
 

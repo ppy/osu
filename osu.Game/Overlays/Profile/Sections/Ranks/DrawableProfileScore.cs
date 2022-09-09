@@ -19,6 +19,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring.Drawables;
 using osu.Game.Utils;
 using osuTK;
 
@@ -218,39 +219,42 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private Drawable createDrawablePerformance()
         {
-            if (Score.PP.HasValue)
+            if (!Score.PP.HasValue)
             {
-                return new FillFlowContainer
+                if (Score.Beatmap?.Status.GrantsPerformancePoints() == true)
+                    return new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(16), Colour = colourProvider.Highlight1 };
+
+                return new OsuSpriteText
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Children = new[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                            Text = $"{Score.PP:0}",
-                            Colour = colourProvider.Highlight1
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                            Text = "pp",
-                            Colour = colourProvider.Light3
-                        }
-                    }
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                    Text = "-",
+                    Colour = colourProvider.Highlight1
                 };
             }
 
-            return new OsuSpriteText
+            return new FillFlowContainer
             {
-                Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                Text = "-",
-                Colour = colourProvider.Highlight1
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Children = new[]
+                {
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                        Text = $"{Score.PP:0}",
+                        Colour = colourProvider.Highlight1
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                        Text = "pp",
+                        Colour = colourProvider.Light3
+                    }
+                }
             };
         }
 

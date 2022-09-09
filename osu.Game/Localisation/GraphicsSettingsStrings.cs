@@ -129,6 +129,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString UseHardwareAcceleration => new TranslatableString(getKey(@"use_hardware_acceleration"), @"Use hardware acceleration");
 
+        /// <summary>
+        /// "JPG (web-friendly)"
+        /// </summary>
+        public static LocalisableString Jpg => new TranslatableString(getKey(@"jpg_web_friendly"), @"JPG (web-friendly)");
+
+        /// <summary>
+        /// "PNG (lossless)"
+        /// </summary>
+        public static LocalisableString Png => new TranslatableString(getKey(@"png_lossless"), @"PNG (lossless)");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

@@ -263,27 +263,30 @@ namespace osu.Game.Tests.Visual.Gameplay
             return beatmap;
         }
 
-        private void createTest(IBeatmap beatmap, Action<TestDrawableScrollingRuleset> overrideAction = null) => AddStep("create test", () =>
+        private void createTest(IBeatmap beatmap, Action<TestDrawableScrollingRuleset> overrideAction = null)
         {
-            var ruleset = new TestScrollingRuleset();
-
-            drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
-            drawableRuleset.FrameStablePlayback = false;
-
-            overrideAction?.Invoke(drawableRuleset);
-
-            Child = new Container
+            AddStep("create test", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Y,
-                Height = 0.75f,
-                Width = 400,
-                Masking = true,
-                Clock = new FramedClock(testClock),
-                Child = drawableRuleset
-            };
-        });
+                var ruleset = new TestScrollingRuleset();
+
+                drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
+                drawableRuleset.FrameStablePlayback = false;
+
+                overrideAction?.Invoke(drawableRuleset);
+
+                Child = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Y,
+                    Height = 0.75f,
+                    Width = 400,
+                    Masking = true,
+                    Clock = new FramedClock(testClock),
+                    Child = drawableRuleset
+                };
+            });
+        }
 
         #region Ruleset
 

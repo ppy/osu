@@ -32,7 +32,6 @@ namespace osu.Game.Tests.Skins
             imported?.PerformRead(s =>
             {
                 beatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps[0]);
-                beatmap.LoadTrack();
             });
         }
 
@@ -40,6 +39,10 @@ namespace osu.Game.Tests.Skins
         public void TestRetrieveOggSample() => AddAssert("sample is non-null", () => beatmap.Skin.GetSample(new SampleInfo("sample")) != null);
 
         [Test]
-        public void TestRetrieveOggTrack() => AddAssert("track is non-null", () => !(beatmap.Track is TrackVirtual));
+        public void TestRetrieveOggTrack() => AddAssert("track is non-null", () =>
+        {
+            using (var track = beatmap.LoadTrack())
+                return track is not TrackVirtual;
+        });
     }
 }

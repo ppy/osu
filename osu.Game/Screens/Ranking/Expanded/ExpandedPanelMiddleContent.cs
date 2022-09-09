@@ -67,12 +67,10 @@ namespace osu.Game.Screens.Ranking.Expanded
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             string creator = metadata.Author.Username;
 
-            int? beatmapMaxCombo = scoreManager.GetMaximumAchievableComboAsync(score).GetResultSafely();
-
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, beatmapMaxCombo),
+                new ComboStatistic(score.MaxCombo, scoreManager.GetMaximumAchievableCombo(score)),
                 new PerformanceStatistic(score),
             };
 

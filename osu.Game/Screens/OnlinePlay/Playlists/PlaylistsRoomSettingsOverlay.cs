@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Specialized;
 using System.Linq;
@@ -29,9 +27,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class PlaylistsRoomSettingsOverlay : RoomSettingsOverlay
     {
-        public Action EditPlaylist;
+        public Action? EditPlaylist;
 
-        private MatchSettings settings;
+        private MatchSettings settings = null!;
 
         protected override OsuButton SubmitButton => settings.ApplyButton;
 
@@ -55,28 +53,30 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             private const float disabled_alpha = 0.2f;
 
-            public Action EditPlaylist;
+            public Action? EditPlaylist;
 
-            public OsuTextBox NameField, MaxParticipantsField, MaxAttemptsField;
-            public OsuDropdown<TimeSpan> DurationField;
-            public RoomAvailabilityPicker AvailabilityPicker;
-            public TriangleButton ApplyButton;
+            public OsuTextBox NameField = null!, MaxParticipantsField = null!, MaxAttemptsField = null!;
+            public OsuDropdown<TimeSpan> DurationField = null!;
+            public RoomAvailabilityPicker AvailabilityPicker = null!;
+            public TriangleButton ApplyButton = null!;
 
             public bool IsLoading => loadingLayer.State.Value == Visibility.Visible;
 
-            public OsuSpriteText ErrorText;
+            public OsuSpriteText ErrorText = null!;
 
-            private LoadingLayer loadingLayer;
-            private DrawableRoomPlaylist playlist;
-            private OsuSpriteText playlistLength;
+            private LoadingLayer loadingLayer = null!;
+            private DrawableRoomPlaylist playlist = null!;
+            private OsuSpriteText playlistLength = null!;
 
-            private PurpleTriangleButton editPlaylistButton;
-
-            [Resolved(CanBeNull = true)]
-            private IRoomManager manager { get; set; }
+            private PurpleTriangleButton editPlaylistButton = null!;
 
             [Resolved]
-            private IAPIProvider api { get; set; }
+            private IRoomManager? manager { get; set; }
+
+            [Resolved]
+            private IAPIProvider api { get; set; } = null!;
+
+            private IBindable<APIUser> localUser = null!;
 
             private readonly Room room;
 
@@ -304,7 +304,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
 
-                api.LocalUser.BindValueChanged(populateDurations, true);
+                localUser = api.LocalUser.GetBoundCopy();
+                localUser.BindValueChanged(populateDurations, true);
 
                 playlist.Items.BindTo(Playlist);
                 Playlist.BindCollectionChanged(onPlaylistChanged, true);

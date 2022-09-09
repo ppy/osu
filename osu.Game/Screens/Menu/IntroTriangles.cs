@@ -84,9 +84,17 @@ namespace osu.Game.Screens.Menu
                         return;
 
                     if (!UsingThemedIntro)
+                    {
+                        // If the user has requested no theme, fallback to the same intro voice and delay as IntroCircles.
+                        // The triangles intro voice and theme are combined which makes it impossible to use.
                         welcome?.Play();
+                        Scheduler.AddDelayed(StartTrack, IntroCircles.TRACK_START_DELAY);
+                    }
+                    else
+                        StartTrack();
 
-                    StartTrack();
+                    // no-op for the case of themed intro, no harm in calling for both scenarios as a safety measure.
+                    decoupledClock.Start();
                 });
             }
         }
@@ -97,11 +105,6 @@ namespace osu.Game.Screens.Menu
 
             // important as there is a clock attached to a track which will likely be disposed before returning to this screen.
             intro.Expire();
-        }
-
-        protected override void StartTrack()
-        {
-            decoupledClock.Start();
         }
 
         private class TrianglesIntroSequence : CompositeDrawable
@@ -252,8 +255,7 @@ namespace osu.Game.Screens.Menu
                     {
                         lazerLogo.FadeOut().OnComplete(_ =>
                         {
-                            logoContainerSecondary.Remove(lazerLogo);
-                            lazerLogo.Dispose(); // explicit disposal as we are pushing a new screen and the expire may not get run.
+                            logoContainerSecondary.Remove(lazerLogo, true);
 
                             logo.FadeIn();
 

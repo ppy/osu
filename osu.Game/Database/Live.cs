@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 
 namespace osu.Game.Database
 {
@@ -18,19 +19,19 @@ namespace osu.Game.Database
         /// Perform a read operation on this live object.
         /// </summary>
         /// <param name="perform">The action to perform.</param>
-        public abstract void PerformRead(Action<T> perform);
+        public abstract void PerformRead([InstantHandle] Action<T> perform);
 
         /// <summary>
         /// Perform a read operation on this live object.
         /// </summary>
         /// <param name="perform">The action to perform.</param>
-        public abstract TReturn PerformRead<TReturn>(Func<T, TReturn> perform);
+        public abstract TReturn PerformRead<TReturn>([InstantHandle] Func<T, TReturn> perform);
 
         /// <summary>
         /// Perform a write operation on this live object.
         /// </summary>
         /// <param name="perform">The action to perform.</param>
-        public abstract void PerformWrite(Action<T> perform);
+        public abstract void PerformWrite([InstantHandle] Action<T> perform);
 
         /// <summary>
         /// Whether this instance is tracking data which is managed by the database backing.

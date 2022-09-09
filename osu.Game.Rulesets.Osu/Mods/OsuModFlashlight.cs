@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -53,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override float DefaultFlashlightSize => 180;
 
-        private OsuFlashlight flashlight;
+        private OsuFlashlight flashlight = null!;
 
         protected override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(this);
 

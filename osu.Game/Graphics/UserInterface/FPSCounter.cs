@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
-using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -44,8 +43,6 @@ namespace osu.Game.Graphics.UserInterface
 
         private bool isDisplayed;
 
-        private ScheduledDelegate? fadeOutDelegate;
-
         private double aimDrawFPS;
         private double aimUpdateFPS;
 
@@ -53,6 +50,11 @@ namespace osu.Game.Graphics.UserInterface
         private ThrottledFrameClock drawClock = null!;
         private ThrottledFrameClock updateClock = null!;
         private ThrottledFrameClock inputClock = null!;
+
+        /// <summary>
+        /// The last time value where the display was required (due to a significant change or hovering).
+        /// </summary>
+        private double lastDisplayRequiredTime;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -131,13 +133,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            displayTemporarily();
+            requestDisplay();
 
             showFpsDisplay.BindValueChanged(showFps =>
             {
                 State.Value = showFps.NewValue ? Visibility.Visible : Visibility.Hidden;
                 if (showFps.NewValue)
-                    displayTemporarily();
+                    requestDisplay();
             }, true);
 
             State.BindValueChanged(state => showFpsDisplay.Value = state.NewValue == Visibility.Visible);
@@ -150,41 +152,25 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             background.FadeTo(1, 200);
-            displayTemporarily();
+            requestDisplay();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             background.FadeTo(idle_background_alpha, 200);
-            displayTemporarily();
+            requestDisplay();
             base.OnHoverLost(e);
-        }
-
-        private void displayTemporarily()
-        {
-            if (!isDisplayed)
-            {
-                mainContent.FadeTo(1, 300, Easing.OutQuint);
-                isDisplayed = true;
-            }
-
-            fadeOutDelegate?.Cancel();
-            fadeOutDelegate = null;
-
-            if (!IsHovered)
-            {
-                fadeOutDelegate = Scheduler.AddDelayed(() =>
-                {
-                    mainContent.FadeTo(0, 300, Easing.OutQuint);
-                    isDisplayed = false;
-                }, 2000);
-            }
         }
 
         protected override void Update()
         {
             base.Update();
+
+            // If the game goes into a suspended state (ie. debugger attached or backgrounded on a mobile device)
+            // we want to ignore really long periods of no processing.
+            if (updateClock.ElapsedFrameTime > 10000)
+                return;
 
             mainContent.Width = Math.Max(mainContent.Width, counters.DrawWidth);
 
@@ -196,15 +182,15 @@ namespace osu.Game.Graphics.UserInterface
             // use elapsed frame time rather then FramesPerSecond to better catch stutter frames.
             bool hasDrawSpike = displayedFpsCount > (1000 / spike_time_ms) && drawClock.ElapsedFrameTime > spike_time_ms;
 
-            // note that we use an elapsed time here of 1 intentionally.
-            // this weights all updates equally. if we passed in the elapsed time, longer frames would be weighted incorrectly lower.
-            displayedFrameTime = Interpolation.DampContinuously(displayedFrameTime, updateClock.ElapsedFrameTime, hasUpdateSpike ? 0 : 100, 1);
+            const float damp_time = 100;
+
+            displayedFrameTime = Interpolation.DampContinuously(displayedFrameTime, updateClock.ElapsedFrameTime, hasUpdateSpike ? 0 : damp_time, updateClock.ElapsedFrameTime);
 
             if (hasDrawSpike)
                 // show spike time using raw elapsed value, to account for `FramesPerSecond` being so averaged spike frames don't show.
                 displayedFpsCount = 1000 / drawClock.ElapsedFrameTime;
             else
-                displayedFpsCount = Interpolation.DampContinuously(displayedFpsCount, drawClock.FramesPerSecond, 100, Time.Elapsed);
+                displayedFpsCount = Interpolation.DampContinuously(displayedFpsCount, drawClock.FramesPerSecond, damp_time, Time.Elapsed);
 
             if (Time.Current - lastUpdate > min_time_between_updates)
             {
@@ -221,7 +207,23 @@ namespace osu.Game.Graphics.UserInterface
                                          || 1000 / displayedFrameTime < aimUpdateFPS * 0.8;
 
             if (hasSignificantChanges)
-                displayTemporarily();
+                requestDisplay();
+            else if (isDisplayed && Time.Current - lastDisplayRequiredTime > 2000 && !IsHovered)
+            {
+                mainContent.FadeTo(0, 300, Easing.OutQuint);
+                isDisplayed = false;
+            }
+        }
+
+        private void requestDisplay()
+        {
+            lastDisplayRequiredTime = Time.Current;
+
+            if (!isDisplayed)
+            {
+                mainContent.FadeTo(1, 300, Easing.OutQuint);
+                isDisplayed = true;
+            }
         }
 
         private void updateFpsDisplay()

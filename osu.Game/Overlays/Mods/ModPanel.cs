@@ -57,6 +57,18 @@ namespace osu.Game.Overlays.Mods
             Filtered.BindValueChanged(_ => updateFilterState(), true);
         }
 
+        protected override void Select()
+        {
+            modState.PendingConfiguration = Mod.RequiresConfiguration;
+            Active.Value = true;
+        }
+
+        protected override void Deselect()
+        {
+            modState.PendingConfiguration = false;
+            Active.Value = false;
+        }
+
         #region Filtering support
 
         private void updateFilterState()

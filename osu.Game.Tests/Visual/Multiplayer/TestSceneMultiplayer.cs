@@ -49,7 +49,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiplayer : ScreenTestScene
     {
         private BeatmapManager beatmaps = null!;
-        private RulesetStore rulesets = null!;
         private BeatmapSetInfo importedSet = null!;
 
         private TestMultiplayerComponents multiplayerComponents = null!;
@@ -63,8 +62,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
 
@@ -672,7 +671,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
             {
                 double time = i;
-                AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.GameplayClock.CurrentTime > time);
+                AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.CurrentTime > time);
             }
 
             AddUntilStep("wait for results", () => multiplayerComponents.CurrentScreen is ResultsScreen);

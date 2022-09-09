@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -31,7 +32,7 @@ namespace osu.Game.Screens.Play
 
         protected const float TRANSITION_TIME = 500;
 
-        protected abstract string Message { get; }
+        protected abstract LocalisableString Message { get; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 

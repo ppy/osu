@@ -27,12 +27,9 @@ namespace osu.Game.Online.Rooms
     /// This differs from a regular download tracking composite as this accounts for the
     /// databased beatmap set's checksum, to disallow from playing with an altered version of the beatmap.
     /// </summary>
-    public class OnlinePlayBeatmapAvailabilityTracker : CompositeDrawable
+    public class OnlinePlayBeatmapAvailabilityTracker : CompositeComponent
     {
         public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
-
-        // Required to allow child components to update. Can potentially be replaced with a `CompositeComponent` class if or when we make one.
-        protected override bool RequiresChildrenUpdate => true;
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
@@ -117,6 +114,7 @@ namespace osu.Game.Online.Rooms
 
             switch (downloadTracker.State.Value)
             {
+                case DownloadState.Unknown:
                 case DownloadState.NotDownloaded:
                     availability.Value = BeatmapAvailability.NotDownloaded();
                     break;
