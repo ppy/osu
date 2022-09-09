@@ -11,7 +11,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.UI
@@ -55,18 +54,19 @@ namespace osu.Game.Rulesets.Catch.UI
                             Width = width,
                             Children = new Drawable[]
                             {
-                                leftBox = new InputArea(TouchCatchAction.MoveLeft, trackedActionSources, colours.Gray3)
+                                leftDashBox = new InputArea(TouchCatchAction.DashLeft, trackedActionSources)
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.5f,
+                                },
+                                leftBox = new InputArea(TouchCatchAction.MoveLeft, trackedActionSources)
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.5f,
+                                    Colour = colours.GrayC,
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                 },
-                                leftDashBox = new InputArea(TouchCatchAction.DashLeft, trackedActionSources, colours.Gray2)
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Width = 0.5f,
-                                }
                             }
                         },
                         new Container
@@ -77,12 +77,13 @@ namespace osu.Game.Rulesets.Catch.UI
                             Origin = Anchor.TopRight,
                             Children = new Drawable[]
                             {
-                                rightBox = new InputArea(TouchCatchAction.MoveRight, trackedActionSources, colours.Gray3)
+                                rightBox = new InputArea(TouchCatchAction.MoveRight, trackedActionSources)
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.5f,
+                                    Colour = colours.GrayC,
                                 },
-                                rightDashBox = new InputArea(TouchCatchAction.DashRight, trackedActionSources, colours.Gray2)
+                                rightDashBox = new InputArea(TouchCatchAction.DashRight, trackedActionSources)
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.5f,
@@ -212,7 +213,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             private bool isHighlighted;
 
-            public InputArea(TouchCatchAction handledAction, IEnumerable<KeyValuePair<object, TouchCatchAction>> trackedActions, Color4 colour)
+            public InputArea(TouchCatchAction handledAction, IEnumerable<KeyValuePair<object, TouchCatchAction>> trackedActions)
             {
                 this.handledAction = handledAction;
                 this.trackedActions = trackedActions;
@@ -227,8 +228,8 @@ namespace osu.Game.Rulesets.Catch.UI
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Alpha = 0.8f,
-                                Colour = colour,
+                                Alpha = 0.2f,
+                                Colour = OsuColour.Gray(0.8f),
                             },
                             highlightOverlay = new Box
                             {
