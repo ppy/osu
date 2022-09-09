@@ -114,6 +114,7 @@ namespace osu.Game.Online.Rooms
 
             switch (downloadTracker.State.Value)
             {
+                case DownloadState.Unknown:
                 case DownloadState.NotDownloaded:
                     availability.Value = BeatmapAvailability.NotDownloaded();
                     break;

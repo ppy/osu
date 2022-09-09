@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
 
@@ -9,12 +9,6 @@ namespace osu.Game.Screens.Play
 {
     public interface IGameplayClock : IFrameBasedClock
     {
-        /// <summary>
-        /// The rate of gameplay when playback is at 100%.
-        /// This excludes any seeking / user adjustments.
-        /// </summary>
-        double TrueGameplayRate { get; }
-
         /// <summary>
         /// The time from which the clock should start. Will be seeked to on calling <see cref="GameplayClockContainer.Reset"/>.
         /// </summary>
@@ -25,9 +19,9 @@ namespace osu.Game.Screens.Play
         double StartTime { get; }
 
         /// <summary>
-        /// All adjustments applied to this clock which don't come from gameplay or mods.
+        /// All adjustments applied to this clock which come from mods.
         /// </summary>
-        IEnumerable<double> NonGameplayAdjustments { get; }
+        IAdjustableAudioComponent AdjustmentsFromMods { get; }
 
         IBindable<bool> IsPaused { get; }
     }

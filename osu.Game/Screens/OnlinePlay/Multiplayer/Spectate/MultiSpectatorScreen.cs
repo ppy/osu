@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -42,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; } = null!;
+
+        private IAggregateAudioAdjustment? boundAdjustments;
 
         private readonly PlayerArea[] instances;
         private MasterGameplayClockContainer masterClockContainer = null!;
@@ -157,6 +160,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             base.LoadComplete();
 
             masterClockContainer.Reset();
+
+            // Start with adjustments from the first player to keep a sane state.
+            bindAudioAdjustments(instances.First());
         }
 
         protected override void Update()
@@ -169,9 +175,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                                               .OrderBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime))
                                               .FirstOrDefault();
 
+                // Only bind adjustments if there's actually a valid source, else just use the previous ones to ensure no sudden changes to audio.
+                if (currentAudioSource != null)
+                    bindAudioAdjustments(currentAudioSource);
+
                 foreach (var instance in instances)
                     instance.Mute = instance != currentAudioSource;
             }
+        }
+
+        private void bindAudioAdjustments(PlayerArea first)
+        {
+            if (boundAdjustments != null)
+                masterClockContainer.AdjustmentsFromMods.UnbindAdjustments(boundAdjustments);
+
+            boundAdjustments = first.ClockAdjustmentsFromMods;
+            masterClockContainer.AdjustmentsFromMods.BindAdjustments(boundAdjustments);
         }
 
         private bool isCandidateAudioSource(SpectatorPlayerClock? clock)

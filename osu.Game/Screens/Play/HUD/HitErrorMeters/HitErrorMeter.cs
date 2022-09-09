@@ -59,30 +59,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         protected Color4 GetColourForHitResult(HitResult result)
         {
-            switch (result)
-            {
-                case HitResult.SmallTickMiss:
-                case HitResult.LargeTickMiss:
-                case HitResult.Miss:
-                    return colours.Red;
-
-                case HitResult.Meh:
-                    return colours.Yellow;
-
-                case HitResult.Ok:
-                    return colours.Green;
-
-                case HitResult.Good:
-                    return colours.GreenLight;
-
-                case HitResult.SmallTickHit:
-                case HitResult.LargeTickHit:
-                case HitResult.Great:
-                    return colours.Blue;
-
-                default:
-                    return colours.BlueLight;
-            }
+            return colours.ForHitResult(result);
         }
 
         /// <summary>

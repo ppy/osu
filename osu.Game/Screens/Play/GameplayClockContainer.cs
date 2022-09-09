@@ -2,15 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Play
@@ -46,7 +44,7 @@ namespace osu.Game.Screens.Play
         /// </remarks>
         public double StartTime { get; protected set; }
 
-        public virtual IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
+        public IAdjustableAudioComponent AdjustmentsFromMods { get; } = new AudioAdjustments();
 
         private readonly BindableBool isPaused = new BindableBool(true);
 
@@ -196,7 +194,9 @@ namespace osu.Game.Screens.Play
 
         void IAdjustableClock.Reset() => Reset();
 
-        public void ResetSpeedAdjustments() => throw new NotImplementedException();
+        public virtual void ResetSpeedAdjustments()
+        {
+        }
 
         double IAdjustableClock.Rate
         {
@@ -222,23 +222,5 @@ namespace osu.Game.Screens.Play
         public double FramesPerSecond => GameplayClock.FramesPerSecond;
 
         public FrameTimeInfo TimeInfo => GameplayClock.TimeInfo;
-
-        public double TrueGameplayRate
-        {
-            get
-            {
-                double baseRate = Rate;
-
-                foreach (double adjustment in NonGameplayAdjustments)
-                {
-                    if (Precision.AlmostEquals(adjustment, 0))
-                        return 0;
-
-                    baseRate /= adjustment;
-                }
-
-                return baseRate;
-            }
-        }
     }
 }
