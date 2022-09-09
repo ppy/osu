@@ -29,12 +29,12 @@ namespace osu.Game.Scoring
         private readonly ScoreImporter scoreImporter;
 
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, IAPIProvider api,
-                            OsuConfigManager configManager = null, BeatmapDifficultyCache difficultyCache = null)
+                            OsuConfigManager configManager = null)
             : base(storage, realm)
         {
             this.configManager = configManager;
 
-            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm, api, difficultyCache)
+            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm, api)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
@@ -183,7 +183,7 @@ namespace osu.Game.Scoring
         /// Populates the <see cref="ScoreInfo.MaximumStatistics"/> for a given <see cref="ScoreInfo"/>.
         /// </summary>
         /// <param name="score">The score to populate the statistics of.</param>
-        public Task PopulateMaximumStatistics(ScoreInfo score) => scoreImporter.PopulateMaximumStatistics(score);
+        public void PopulateMaximumStatistics(ScoreInfo score) => scoreImporter.PopulateMaximumStatistics(score);
 
         #region Implementation of IPresentImports<ScoreInfo>
 

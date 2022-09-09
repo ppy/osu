@@ -175,7 +175,7 @@ namespace osu.Game
                 {
                     var score = scoreManager.Query(s => s.ID == id);
 
-                    await scoreManager.PopulateMaximumStatistics(score);
+                    scoreManager.PopulateMaximumStatistics(score);
 
                     // Can't use async overload because we're not on the update thread.
                     // ReSharper disable once MethodHasAsyncOverload
