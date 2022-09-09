@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Notifications
             base.LoadComplete();
 
             // we may have received changes before we were displayed.
-            updateState();
+            Scheduler.AddOnce(updateState);
         }
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -87,8 +87,8 @@ namespace osu.Game.Overlays.Notifications
 
                 state = value;
 
-                if (IsLoaded)
-                    Schedule(updateState);
+                Scheduler.AddOnce(updateState);
+                attemptPostCompletion();
             }
         }
 
@@ -141,9 +141,31 @@ namespace osu.Game.Overlays.Notifications
 
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
-                    Completed();
+                    attemptPostCompletion();
+                    base.Close();
                     break;
             }
+        }
+
+        private bool completionSent;
+
+        /// <summary>
+        /// Attempt to post a completion notification.
+        /// </summary>
+        private void attemptPostCompletion()
+        {
+            if (state != ProgressNotificationState.Completed) return;
+
+            // This notification may not have been posted yet (and thus may not have a target to post the completion to).
+            // Completion posting will be re-attempted in a scheduled invocation.
+            if (CompletionTarget == null)
+                return;
+
+            if (completionSent)
+                return;
+
+            CompletionTarget.Invoke(CreateCompletionNotification());
+            completionSent = true;
         }
 
         private ProgressNotificationState state;
@@ -154,13 +176,9 @@ namespace osu.Game.Overlays.Notifications
             Text = CompletionText
         };
 
-        protected void Completed()
-        {
-            CompletionTarget?.Invoke(CreateCompletionNotification());
-            base.Close();
-        }
-
         public override bool DisplayOnTop => false;
+
+        public override bool IsImportant => false;
 
         private readonly ProgressBar progressBar;
         private Color4 colourQueued;

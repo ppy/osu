@@ -255,8 +255,7 @@ namespace osu.Game.Screens.Menu
                     {
                         lazerLogo.FadeOut().OnComplete(_ =>
                         {
-                            logoContainerSecondary.Remove(lazerLogo);
-                            lazerLogo.Dispose(); // explicit disposal as we are pushing a new screen and the expire may not get run.
+                            logoContainerSecondary.Remove(lazerLogo, true);
 
                             logo.FadeIn();
 

@@ -173,7 +173,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     if (isIterating)
                         AddUntilStep("selection changed", () => !carousel.SelectedBeatmapInfo?.Equals(selection) == true);
                     else
-                        AddUntilStep("selection not changed", () => carousel.SelectedBeatmapInfo.Equals(selection));
+                        AddUntilStep("selection not changed", () => carousel.SelectedBeatmapInfo?.Equals(selection) == true);
                 }
             }
         }
@@ -382,7 +382,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             // buffer the selection
             setSelected(3, 2);
 
-            AddStep("get search text", () => searchText = carousel.SelectedBeatmapSet.Metadata.Title);
+            AddStep("get search text", () => searchText = carousel.SelectedBeatmapSet!.Metadata.Title);
 
             setSelected(1, 3);
 
@@ -701,7 +701,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             setSelected(2, 1);
             AddAssert("Selection is non-null", () => currentSelection != null);
 
-            AddStep("Remove selected", () => carousel.RemoveBeatmapSet(carousel.SelectedBeatmapSet));
+            AddStep("Remove selected", () => carousel.RemoveBeatmapSet(carousel.SelectedBeatmapSet!));
             waitForSelection(2);
 
             AddStep("Remove first", () => carousel.RemoveBeatmapSet(carousel.BeatmapSets.First()));
@@ -804,7 +804,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("filter to ruleset 0", () =>
                 carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
-            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmapInfo.Ruleset.OnlineID == 0);
+            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmapInfo?.Ruleset.OnlineID == 0);
 
             AddStep("remove mixed set", () =>
             {
@@ -854,7 +854,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 AddStep("Restore no filter", () =>
                 {
                     carousel.Filter(new FilterCriteria(), false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
+                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet!.ID);
                 });
             }
 
@@ -899,10 +899,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 AddStep("Restore different ruleset filter", () =>
                 {
                     carousel.Filter(new FilterCriteria { Ruleset = rulesets.GetRuleset(1) }, false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
+                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet!.ID);
                 });
 
-                AddAssert("selection changed", () => !carousel.SelectedBeatmapInfo.Equals(manySets.First().Beatmaps.First()));
+                AddAssert("selection changed", () => !carousel.SelectedBeatmapInfo!.Equals(manySets.First().Beatmaps.First()));
             }
 
             AddAssert("Selection was random", () => eagerSelectedIDs.Count > 2);

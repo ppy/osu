@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             FillFlowContainer<ChannelListItem> flow = getFlowForChannel(channel);
 
             channelMap.Remove(channel);
-            flow.Remove(item);
+            flow.Remove(item, true);
 
             updateVisibility();
         }
