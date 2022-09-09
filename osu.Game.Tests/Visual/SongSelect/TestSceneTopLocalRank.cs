@@ -1,14 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -49,12 +47,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Create local rank", () =>
             {
-                Add(topLocalRank = new TopLocalRank(importedBeatmap)
+                Child = topLocalRank = new TopLocalRank(importedBeatmap)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Scale = new Vector2(10),
-                });
+                };
             });
 
             AddAssert("No rank displayed initially", () => topLocalRank.DisplayedRank == null);
@@ -63,7 +61,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestBasicImportDelete()
         {
-            ScoreInfo? testScoreInfo = null;
+            ScoreInfo testScoreInfo = null!;
 
             AddStep("Add score for current user", () =>
             {
@@ -77,10 +75,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
 
-            AddStep("Delete score", () =>
-            {
-                scoreManager.Delete(testScoreInfo.AsNonNull());
-            });
+            AddStep("Delete score", () => scoreManager.Delete(testScoreInfo));
 
             AddUntilStep("No rank displayed", () => topLocalRank.DisplayedRank == null);
         }
@@ -88,11 +83,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestRulesetChange()
         {
-            ScoreInfo testScoreInfo;
-
             AddStep("Add score for current user", () =>
             {
-                testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
+                var testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
 
                 testScoreInfo.User = API.LocalUser.Value;
                 testScoreInfo.Rank = ScoreRank.B;
@@ -112,11 +105,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestHigherScoreSet()
         {
-            ScoreInfo? testScoreInfo = null;
-
             AddStep("Add score for current user", () =>
             {
-                testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
+                var testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
 
                 testScoreInfo.User = API.LocalUser.Value;
                 testScoreInfo.Rank = ScoreRank.B;
@@ -131,28 +122,20 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var testScoreInfo2 = TestResources.CreateTestScoreInfo(importedBeatmap);
 
                 testScoreInfo2.User = API.LocalUser.Value;
-                testScoreInfo2.Rank = ScoreRank.S;
-                testScoreInfo2.TotalScore = testScoreInfo.AsNonNull().TotalScore + 1;
-                testScoreInfo2.Statistics = new Dictionary<HitResult, int>
-                {
-                    [HitResult.Miss] = 0,
-                    [HitResult.Perfect] = 970,
-                    [HitResult.SmallTickHit] = 75,
-                    [HitResult.LargeTickHit] = 150,
-                    [HitResult.LargeBonus] = 10,
-                    [HitResult.SmallBonus] = 50
-                };
+                testScoreInfo2.Rank = ScoreRank.X;
+                testScoreInfo2.TotalScore = 1000000;
+                testScoreInfo2.Statistics = testScoreInfo2.MaximumStatistics;
 
                 scoreManager.Import(testScoreInfo2);
             });
 
-            AddUntilStep("S rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.S);
+            AddUntilStep("SS rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.X);
         }
 
         [Test]
         public void TestLegacyScore()
         {
-            ScoreInfo? testScoreInfo = null;
+            ScoreInfo testScoreInfo = null!;
 
             AddStep("Add legacy score for current user", () =>
             {
@@ -160,7 +143,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 testScoreInfo.User = API.LocalUser.Value;
                 testScoreInfo.Rank = ScoreRank.B;
-                testScoreInfo.TotalScore = scoreManager.GetTotalScoreAsync(testScoreInfo, ScoringMode.Classic).GetResultSafely();
+                testScoreInfo.TotalScore = scoreManager.GetTotalScore(testScoreInfo, ScoringMode.Classic);
 
                 scoreManager.Import(testScoreInfo);
             });
@@ -172,26 +155,18 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var testScoreInfo2 = TestResources.CreateTestScoreInfo(importedBeatmap);
 
                 testScoreInfo2.User = API.LocalUser.Value;
-                testScoreInfo2.Rank = ScoreRank.S;
-                testScoreInfo2.Statistics = new Dictionary<HitResult, int>
-                {
-                    [HitResult.Miss] = 0,
-                    [HitResult.Perfect] = 970,
-                    [HitResult.SmallTickHit] = 75,
-                    [HitResult.LargeTickHit] = 150,
-                    [HitResult.LargeBonus] = 10,
-                    [HitResult.SmallBonus] = 50
-                };
+                testScoreInfo2.Rank = ScoreRank.X;
+                testScoreInfo2.Statistics = testScoreInfo2.MaximumStatistics;
+                testScoreInfo2.TotalScore = scoreManager.GetTotalScore(testScoreInfo2);
 
-                testScoreInfo2.TotalScore = scoreManager.GetTotalScoreAsync(testScoreInfo.AsNonNull()).GetResultSafely();
-
-                // ensure standardised total score is less than classic, otherwise this test is pointless.
-                Debug.Assert(testScoreInfo2.TotalScore < testScoreInfo.AsNonNull().TotalScore);
+                // ensure second score has a total score (standardised) less than first one (classic)
+                // despite having better statistics, otherwise this test is pointless.
+                Debug.Assert(testScoreInfo2.TotalScore < testScoreInfo.TotalScore);
 
                 scoreManager.Import(testScoreInfo2);
             });
 
-            AddUntilStep("S rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.S);
+            AddUntilStep("SS rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.X);
         }
     }
 }
