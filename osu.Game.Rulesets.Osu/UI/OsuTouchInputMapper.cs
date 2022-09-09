@@ -29,8 +29,14 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         private const int last_allowed_touch_index = allowed_touches_limit - 1;
 
+        /// <summary>
+        /// A hash set that contains all the <see cref="TouchSource"/>'s that can be mapped to a given <see cref="OsuAction"/>.
+        /// </summary>
         private readonly HashSet<TouchSource> allowedTouches = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().Take(allowed_touches_limit).ToHashSet();
 
+        /// <summary>
+        /// A dictionary that maps <see cref="TouchSource"/> into a respective <see cref="OsuAction"/> for an emulated keyboard input.
+        /// </summary>
         private readonly Dictionary<TouchSource, OsuAction> touchActions = new Dictionary<TouchSource, OsuAction>();
 
         private readonly OsuInputManager osuInputManager;
@@ -48,17 +54,17 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private bool isCursorTouch(TouchSource source) => !isTapTouch(source);
 
-        private bool isValidTouchInput(int index) => index <= last_allowed_touch_inde;
+        private bool isTouchInputAllowed(int index) => index <= last_allowed_touch_index;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             var source = e.Touch.Source;
             int sourceIndex = getTouchIndex(source);
 
-            if (!isValidTouchInput(sourceIndex))
+            if (!isTouchInputAllowed(sourceIndex))
                 return false;
 
-            osuInputManager.DragMode = sourceIndex == last_allowed_touch_inde;
+            osuInputManager.DragMode = sourceIndex == last_allowed_touch_index;
 
             if (isCursorTouch(source))
                 return base.OnTouchDown(e);
@@ -73,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.UI
             var source = e.Touch.Source;
             int sourceIndex = getTouchIndex(source);
 
-            if (!isValidTouchInput(sourceIndex))
+            if (!isTouchInputAllowed(sourceIndex))
                 return;
 
             if (isTapTouch(source))
