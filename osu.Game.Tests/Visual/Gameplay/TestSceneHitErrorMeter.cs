@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("ensure max circles not exceeded", () =>
             {
                 return this.ChildrenOfType<ColourHitErrorMeter>()
-                           .All(m => m.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count() <= 10);
+                           .All(m => m.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count() <= max_displayed_judgements);
             });
 
             AddStep("show displays", () =>
