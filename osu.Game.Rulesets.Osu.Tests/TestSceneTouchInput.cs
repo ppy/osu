@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneTouchInput : TestSceneOsuPlayer
     {
-        private OsuInputManager osuInputManager => Player.DrawableRuleset.ChildrenOfType<OsuInputManager>().Single();
+        private OsuInputManager osuInputManager => Player.DrawableRuleset.ChildrenOfType<OsuInputManager>().First();
         private OsuTouchInputMapper touchInputMapper => osuInputManager.TouchInputMapper;
 
         private void touch(TouchSource source) => InputManager.BeginTouch(new Touch(source, osuInputManager.ScreenSpaceDrawQuad.Centre));
@@ -22,11 +22,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTouchInput()
         {
-            AddStep("Touch with cursor finger", () => touch(OsuTouchInputMapper.CURSOR_TOUCH));
+            AddStep("Touch with cursor finger", () => touch(TouchSource.Touch1));
 
             AddStep("Touch with other finger", () => touch(TouchSource.Touch2));
 
-            AddAssert("Pressed other key", () => osuInputManager.PressedActions.Contains(OsuAction.RightButton));
+            AddAssert("Pressed other finger key", () => osuInputManager.PressedActions.Contains(OsuAction.RightButton));
 
             AddStep("Touch with another finger (Doubletapping)...", () => touch(TouchSource.Touch3));
 
