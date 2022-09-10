@@ -49,12 +49,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
             {
                 var point = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
-                double val = obj.TimePreempt + obj.StartTime % (point.BeatLength * BeatDivisor.Value);
+                double newPreempt = obj.TimePreempt + (obj.StartTime +5) % (point.BeatLength * BeatDivisor.Value);
                 applyFadeInAdjustment(obj);
 
                 void applyFadeInAdjustment(OsuHitObject osuObject)
                 {
-                    osuObject.TimePreempt = val;
+                    osuObject.TimePreempt = newPreempt;
                     foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                         applyFadeInAdjustment(nested);
                 }
