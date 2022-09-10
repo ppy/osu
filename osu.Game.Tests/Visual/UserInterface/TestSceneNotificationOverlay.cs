@@ -48,6 +48,35 @@ namespace osu.Game.Tests.Visual.UserInterface
         });
 
         [Test]
+        public void TestDismissWithoutActivationCloseButton()
+        {
+            bool activated = false;
+            SimpleNotification notification = null!;
+
+            AddStep("post", () =>
+            {
+                activated = false;
+                notificationOverlay.Post(notification = new SimpleNotification
+                {
+                    Text = @"Welcome to osu!. Enjoy your stay!",
+                    Activated = () => activated = true,
+                });
+            });
+
+            AddStep("click to activate", () =>
+            {
+                InputManager.MoveMouseTo(notificationOverlay
+                                         .ChildrenOfType<Notification>().Single()
+                                         .ChildrenOfType<Notification.CloseButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for closed", () => notification.WasClosed);
+            AddAssert("was not activated", () => !activated);
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+        }
+
+        [Test]
         public void TestDismissWithoutActivationRightClick()
         {
             bool activated = false;

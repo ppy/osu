@@ -218,7 +218,7 @@ namespace osu.Game.Overlays.Notifications
             Expire();
         }
 
-        private class CloseButton : OsuClickableContainer
+        internal class CloseButton : OsuClickableContainer
         {
             private SpriteIcon icon = null!;
             private Box background = null!;
