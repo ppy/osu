@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -30,6 +31,11 @@ namespace osu.Game.Rulesets.Osu.UI
         private const int last_allowed_touch_index = allowed_touches_limit - 1;
 
         private readonly OsuInputManager osuInputManager;
+
+        /// <summary>
+        /// Our <see cref="KeyBindingContainer"/> used to trigger the touch actions from the <see cref="touchActions"/>.
+        /// </summary>
+        private KeyBindingContainer<OsuAction> keyBindingContainer => osuInputManager.KeyBindingContainer;
 
         /// <summary>
         /// A hash set that contains all the <see cref="TouchSource"/>'s that can be mapped to a given <see cref="OsuAction"/>.
@@ -83,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.UI
             if (IsCursorTouch(source))
                 return base.OnTouchDown(e);
 
-            osuInputManager.KeyBindingContainer.TriggerPressed(touchActions[source]);
+            keyBindingContainer.TriggerPressed(touchActions[source]);
 
             return base.OnTouchDown(e);
         }
@@ -98,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.UI
             activeAllowedTouches.Remove(source);
 
             if (IsTapTouch(source))
-                osuInputManager.KeyBindingContainer.TriggerReleased(touchActions[source]);
+                keyBindingContainer.TriggerReleased(touchActions[source]);
 
             base.OnTouchUp(e);
         }
