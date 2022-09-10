@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -24,15 +25,21 @@ namespace osu.Game.Rulesets.Osu.Tests
         private OsuInputManager osuInputManager => Player.DrawableRuleset.ChildrenOfType<OsuInputManager>().First();
         private OsuTouchInputMapper touchInputMapper => osuInputManager.TouchInputMapper;
 
-        private void touch(TouchSource source, Vector2 position) => InputManager.BeginTouch(new Touch(source, position));
+        private Vector2 touchPosition => Player.DrawableRuleset.Playfield.ToScreenSpace(circlePosition);
 
-        private void release(TouchSource source, Vector2 position) => InputManager.EndTouch(new Touch(source, position));
+        private void touch(TouchSource source)
+        {
+            InputManager.Click(MouseButton.Button1);
+            InputManager.BeginTouch(new Touch(source, touchPosition));
+        }
+
+        private void release(TouchSource source) => InputManager.EndTouch(new Touch(source, touchPosition));
 
         private int delayMultiplier = 1;
 
         private void waitHitDelay() => AddUntilStep("Can hit", () =>
         {
-            bool waited = Player.GameplayClockContainer.Clock.CurrentTime >= hit_delay * delayMultiplier;
+            bool waited = Player.GameplayClockContainer.Clock.CurrentTime >= hit_delay * delayMultiplier + 500;
 
             if (waited)
                 delayMultiplier++;
@@ -46,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             waitHitDelay();
 
             // Cursor touch
-            AddStep("Touch with cursor finger", () => touch(TouchSource.Touch1, Player.DrawableRuleset.Playfield.ToScreenSpace(circlePosition)));
+            AddStep("Touch with cursor finger", () => touch(TouchSource.Touch1));
 
             AddAssert("The touch is a cursor touch", () => touchInputMapper.IsCursorTouch(TouchSource.Touch1));
             AddAssert("Allowing other touch", () => touchInputMapper.AllowingOtherTouch);
@@ -54,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             waitHitDelay();
 
             // Left button touch
-            AddStep("Touch with other finger", () => touch(TouchSource.Touch2, osuInputManager.ScreenSpaceDrawQuad.Centre));
+            AddStep("Touch with other finger", () => touch(TouchSource.Touch2));
 
             AddAssert("Pressed other finger key", () => osuInputManager.PressedActions.Contains(OsuAction.RightButton));
             AddAssert("The touch is a tap touch", () => touchInputMapper.IsTapTouch(TouchSource.Touch2));
@@ -64,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             waitHitDelay();
 
             // Right button touch
-            AddStep("Touch with another finger (Doubletapping)...", () => touch(TouchSource.Touch3, osuInputManager.ScreenSpaceDrawQuad.Centre - new Vector2(100)));
+            AddStep("Touch with another finger (Doubletapping)...", () => touch(TouchSource.Touch3));
 
             AddAssert("The other touch is also a tap touch", () => touchInputMapper.IsTapTouch(TouchSource.Touch3));
             AddAssert("Both keys are pressed", () => osuInputManager.PressedActions.Count() == 2);
@@ -74,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             waitHitDelay();
 
             // Invalid touch
-            AddStep("Touch with an invalid touch", () => touch(TouchSource.Touch4, osuInputManager.ScreenSpaceDrawQuad.Centre - new Vector2(150)));
+            AddStep("Touch with an invalid touch", () => touch(TouchSource.Touch4));
 
             AddAssert("Touch is blocked", () => !touchInputMapper.AllowingOtherTouch);
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 2);
@@ -83,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Release", () =>
             {
                 foreach (TouchSource source in Enum.GetValues(typeof(TouchSource)))
-                    release(source, osuInputManager.CurrentState.Touch.GetTouchPosition(source).GetValueOrDefault());
+                    release(source);
             });
         }
 
