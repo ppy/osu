@@ -37,7 +37,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         private readonly ContextMenuContainer contextMenuContainer;
         private readonly BeatmapLeaderboard leaderboard;
 
-        private RulesetStore rulesetStore;
         private BeatmapManager beatmapManager;
         private ScoreManager scoreManager;
 
@@ -72,9 +71,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RealmRulesetStore(Realm));
-            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, Scheduler));
+            dependencies.Cache(new RealmRulesetStore(Realm));
+            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
+            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, API));
             Dependencies.Cache(Realm);
 
             return dependencies;

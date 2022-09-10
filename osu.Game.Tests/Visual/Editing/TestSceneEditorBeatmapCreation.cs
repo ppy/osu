@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -55,8 +56,10 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestCreateNewBeatmap()
         {
+            AddAssert("status is none", () => EditorBeatmap.BeatmapInfo.Status == BeatmapOnlineStatus.None);
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap in database", () => beatmapManager.QueryBeatmapSet(s => s.ID == currentBeatmapSetID)?.Value.DeletePending == false);
+            AddAssert("status is modified", () => EditorBeatmap.BeatmapInfo.Status == BeatmapOnlineStatus.LocallyModified);
         }
 
         [Test]
@@ -103,6 +106,8 @@ namespace osu.Game.Tests.Visual.Editing
          */
         public void TestAddAudioTrack()
         {
+            AddAssert("track is virtual", () => Beatmap.Value.Track is TrackVirtual);
+
             AddAssert("switch track to real track", () =>
             {
                 var setup = Editor.ChildrenOfType<SetupScreen>().First();
@@ -131,7 +136,22 @@ namespace osu.Game.Tests.Visual.Editing
                 }
             });
 
+            AddAssert("track is not virtual", () => Beatmap.Value.Track is not TrackVirtual);
             AddAssert("track length changed", () => Beatmap.Value.Track.Length > 60000);
+
+            AddStep("test play", () => Editor.TestGameplay());
+
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog != null);
+            AddStep("confirm save", () => InputManager.Key(Key.Number1));
+
+            AddUntilStep("wait for return to editor", () => Editor.IsCurrentScreen());
+
+            AddAssert("track is still not virtual", () => Beatmap.Value.Track is not TrackVirtual);
+            AddAssert("track length correct", () => Beatmap.Value.Track.Length > 60000);
+
+            AddUntilStep("track not playing", () => !EditorClock.IsRunning);
+            AddStep("play track", () => InputManager.Key(Key.Space));
+            AddUntilStep("wait for track playing", () => EditorClock.IsRunning);
         }
 
         [Test]
@@ -190,6 +210,8 @@ namespace osu.Game.Tests.Visual.Editing
             });
             AddAssert("created difficulty has no objects", () => EditorBeatmap.HitObjects.Count == 0);
 
+            AddAssert("status is modified", () => EditorBeatmap.BeatmapInfo.Status == BeatmapOnlineStatus.LocallyModified);
+
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = secondDifficultyName);
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () =>
@@ -200,7 +222,7 @@ namespace osu.Game.Tests.Visual.Editing
                 return beatmap != null
                        && beatmap.DifficultyName == secondDifficultyName
                        && set != null
-                       && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName));
+                       && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName) && s.Beatmaps.All(b => s.Status == BeatmapOnlineStatus.LocallyModified));
             });
         }
 
@@ -276,7 +298,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("approach rate correctly copied", () => EditorBeatmap.Difficulty.ApproachRate == 4);
             AddAssert("combo colours correctly copied", () => EditorBeatmap.BeatmapSkin.AsNonNull().ComboColours.Count == 2);
 
-            AddAssert("status not copied", () => EditorBeatmap.BeatmapInfo.Status == BeatmapOnlineStatus.None);
+            AddAssert("status is modified", () => EditorBeatmap.BeatmapInfo.Status == BeatmapOnlineStatus.LocallyModified);
             AddAssert("online ID not copied", () => EditorBeatmap.BeatmapInfo.OnlineID == -1);
 
             AddStep("save beatmap", () => Editor.Save());

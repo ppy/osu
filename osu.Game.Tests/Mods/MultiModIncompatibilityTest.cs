@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,10 +27,10 @@ namespace osu.Game.Tests.Mods
         [TestCase(typeof(ManiaRuleset))]
         public void TestAllMultiModsFromRulesetAreIncompatible(Type rulesetType)
         {
-            var ruleset = (Ruleset)Activator.CreateInstance(rulesetType);
+            var ruleset = Activator.CreateInstance(rulesetType) as Ruleset;
             Assert.That(ruleset, Is.Not.Null);
 
-            var allMultiMods = getMultiMods(ruleset);
+            var allMultiMods = getMultiMods(ruleset!);
 
             Assert.Multiple(() =>
             {

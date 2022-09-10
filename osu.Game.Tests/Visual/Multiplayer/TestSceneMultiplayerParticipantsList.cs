@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
@@ -368,12 +369,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             ParticipantsList? participantsList = null;
 
-            AddStep("create new list", () => Child = participantsList = new ParticipantsList
+            AddStep("create new list", () => Child = new OsuContextMenuContainer
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Y,
-                Size = new Vector2(380, 0.7f)
+                RelativeSizeAxes = Axes.Both,
+                Child = participantsList = new ParticipantsList
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Y,
+                    Size = new Vector2(380, 0.7f)
+                }
             });
 
             AddUntilStep("wait for list to load", () => participantsList?.IsLoaded == true);

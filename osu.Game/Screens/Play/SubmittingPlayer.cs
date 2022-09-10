@@ -8,11 +8,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -30,6 +32,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private SpectatorClient spectatorClient { get; set; }
 
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
@@ -78,7 +83,10 @@ namespace osu.Game.Screens.Play
 
             api.Queue(req);
 
-            tcs.Task.WaitSafely();
+            // Generally a timeout would not happen here as APIAccess will timeout first.
+            if (!tcs.Task.Wait(60000))
+                handleTokenFailure(new InvalidOperationException("Token retrieval timed out (request never run)"));
+
             return true;
 
             void handleTokenFailure(Exception exception)
@@ -117,12 +125,34 @@ namespace osu.Game.Screens.Play
             await submitScore(score).ConfigureAwait(false);
         }
 
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        protected override void StartGameplay()
+        {
+            base.StartGameplay();
+
+            // User expectation is that last played should be updated when entering the gameplay loop
+            // from multiplayer / playlists / solo.
+            realm.WriteAsync(r =>
+            {
+                var realmBeatmap = r.Find<BeatmapInfo>(Beatmap.Value.BeatmapInfo.ID);
+                if (realmBeatmap != null)
+                    realmBeatmap.LastPlayed = DateTimeOffset.Now;
+            });
+
+            spectatorClient.BeginPlaying(GameplayState, Score);
+        }
+
         public override bool OnExiting(ScreenExitEvent e)
         {
             bool exiting = base.OnExiting(e);
 
             if (LoadedBeatmapSuccessfully)
+            {
                 submitScore(Score.DeepClone());
+                spectatorClient.EndPlaying(GameplayState);
+            }
 
             return exiting;
         }
@@ -168,7 +198,7 @@ namespace osu.Game.Screens.Play
 
             request.Failure += e =>
             {
-                Logger.Error(e, "Failed to submit score");
+                Logger.Error(e, $"Failed to submit score ({e.Message})");
                 scoreSubmissionSource.SetResult(false);
             };
 

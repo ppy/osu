@@ -17,7 +17,6 @@ using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Handlers;
@@ -139,7 +138,7 @@ namespace osu.Game
 
         protected RealmKeyBindingStore KeyBindingStore { get; private set; }
 
-        protected MenuCursorContainer MenuCursorContainer { get; private set; }
+        protected GlobalCursorDisplay GlobalCursorDisplay { get; private set; }
 
         protected MusicController MusicController { get; private set; }
 
@@ -186,13 +185,17 @@ namespace osu.Game
 
         private RealmAccess realm;
 
+        /// <summary>
+        /// For now, this is used as a source specifically for beat synced components.
+        /// Going forward, it could potentially be used as the single source-of-truth for beatmap timing.
+        /// </summary>
+        private readonly FramedBeatmapClock beatmapClock = new FramedBeatmapClock(true);
+
         protected override Container<Drawable> Content => content;
 
         private Container content;
 
         private DependencyContainer dependencies;
-
-        private Bindable<bool> fpsDisplayVisible;
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(global_track_volume_adjust);
 
@@ -214,6 +217,10 @@ namespace osu.Game
         public OsuGameBase()
         {
             Name = @"osu!";
+
+#if DEBUG
+            Name += " (development)";
+#endif
 
             allowableExceptions = UnhandledExceptionsBeforeCrash;
         }
@@ -247,7 +254,7 @@ namespace osu.Game
 
             dependencies.CacheAs(Storage);
 
-            var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
+            var largeStore = new LargeTextureStore(Host.Renderer, Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
             largeStore.AddTextureSource(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
 
@@ -272,9 +279,9 @@ namespace osu.Game
             dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, API, LocalConfig));
 
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
@@ -283,13 +290,14 @@ namespace osu.Game
             AddInternal(difficultyCache);
 
             // TODO: OsuGame or OsuGameBase?
-            beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage);
-
+            dependencies.CacheAs(beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage));
             dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(multiplayerClient = new OnlineMultiplayerClient(endpoints));
-            dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints, beatmapUpdater));
+            dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
 
-            BeatmapManager.ProcessBeatmap = set => beatmapUpdater.Process(set);
+            AddInternal(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
+
+            BeatmapManager.ProcessBeatmap = args => beatmapUpdater.Process(args.beatmapSet, !args.isBatch);
 
             dependencies.Cache(userCache = new UserLookupCache());
             AddInternal(userCache);
@@ -342,10 +350,10 @@ namespace osu.Game
                 RelativeSizeAxes = Axes.Both,
                 Child = CreateScalingContainer().WithChildren(new Drawable[]
                 {
-                    (MenuCursorContainer = new MenuCursorContainer
+                    (GlobalCursorDisplay = new GlobalCursorDisplay
                     {
                         RelativeSizeAxes = Axes.Both
-                    }).WithChild(content = new OsuTooltipContainer(MenuCursorContainer.Cursor)
+                    }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
                     {
                         RelativeSizeAxes = Axes.Both
                     }),
@@ -366,8 +374,22 @@ namespace osu.Game
             AddInternal(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);
 
+            MusicController.TrackChanged += onTrackChanged;
+            AddInternal(beatmapClock);
+
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
+        }
+
+        private void onTrackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction)
+        {
+            // FramedBeatmapClock uses a decoupled clock internally which will mutate the source if it is an `IAdjustableClock`.
+            // We don't want this for now, as the intention of beatmapClock is to be a read-only source for beat sync components.
+            //
+            // Encapsulating in a FramedClock will avoid any mutations.
+            var framedClock = new FramedClock(beatmap.Track);
+
+            beatmapClock.ChangeSource(framedClock);
         }
 
         protected virtual void InitialiseFonts()
@@ -402,19 +424,6 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Light");
             AddFont(Resources, @"Fonts/Venera/Venera-Bold");
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // TODO: This is temporary until we reimplement the local FPS display.
-            // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
-            fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
-            fpsDisplayVisible.ValueChanged += visible => { FrameStatistics.Value = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
-            fpsDisplayVisible.TriggerChange();
-
-            FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
@@ -598,7 +607,7 @@ namespace osu.Game
         }
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.BeatmapLoaded ? Beatmap.Value.Beatmap.ControlPointInfo : null;
-        IClock IBeatSyncProvider.Clock => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track : (IClock)null;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
+        IClock IBeatSyncProvider.Clock => beatmapClock;
+        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
     }
 }

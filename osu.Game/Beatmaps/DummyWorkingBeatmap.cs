@@ -44,6 +44,10 @@ namespace osu.Game.Beatmaps
             }, audio)
         {
             this.textures = textures;
+
+            // We are guaranteed to have a virtual track.
+            // To ease usability, ensure the track is available from point of construction.
+            LoadTrack();
         }
 
         protected override IBeatmap GetBeatmap() => new Beatmap();

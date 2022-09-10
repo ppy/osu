@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Schedule
 {
-    public class ScheduleScreen : TournamentScreen // IProvidesVideo
+    public class ScheduleScreen : TournamentScreen
     {
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Container mainContainer;

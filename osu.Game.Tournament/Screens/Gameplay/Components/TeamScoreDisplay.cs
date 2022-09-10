@@ -25,6 +25,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         public bool ShowScore
         {
+            get => teamDisplay.ShowScore;
             set => teamDisplay.ShowScore = value;
         }
 
@@ -41,6 +42,8 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         {
             currentMatch.BindTo(ladder.CurrentMatch);
             currentMatch.BindValueChanged(matchChanged);
+
+            currentTeam.BindValueChanged(teamChanged);
 
             updateMatch();
         }
@@ -67,7 +70,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             // team may change to same team, which means score is not in a good state.
             // thus we handle this manually.
-            teamChanged(currentTeam.Value);
+            currentTeam.TriggerChange();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -88,12 +91,16 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             return base.OnMouseDown(e);
         }
 
-        private void teamChanged(TournamentTeam team)
+        private void teamChanged(ValueChangedEvent<TournamentTeam> team)
         {
+            bool wasShowingScores = teamDisplay?.ShowScore ?? false;
+
             InternalChildren = new Drawable[]
             {
-                teamDisplay = new TeamDisplay(team, teamColour, currentTeamScore, currentMatch.Value?.PointsToWin ?? 0),
+                teamDisplay = new TeamDisplay(team.NewValue, teamColour, currentTeamScore, currentMatch.Value?.PointsToWin ?? 0),
             };
+
+            teamDisplay.ShowScore = wasShowingScores;
         }
     }
 }
