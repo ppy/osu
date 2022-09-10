@@ -68,6 +68,8 @@ namespace osu.Game.Overlays.Mods
 
         protected override Container<Drawable> Content => content;
 
+        protected readonly RollingCounter<double> Counter;
+
         protected ModsEffectDisplay()
         {
             Height = HEIGHT;
@@ -133,7 +135,7 @@ namespace osu.Game.Overlays.Mods
                                     Direction = FillDirection.Horizontal,
                                     Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                     Spacing = new Vector2(2, 0),
-                                    Child = new EffectCounter(CounterFormat)
+                                    Child = Counter = new EffectCounter(CounterFormat)
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
