@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private Vector2 circlePosition => new Vector2(200);
 
         private OsuInputManager osuInputManager => Player.DrawableRuleset.ChildrenOfType<OsuInputManager>().First();
-        private OsuTouchInputMapper touchInputMapper => osuInputManager.TouchInputMapper;
+        private OsuTouchInputMapper touchInputMapper => osuInputManager.ChildrenOfType<OsuTouchInputMapper>().First();
 
         private Vector2 touchPosition => Player.DrawableRuleset.Playfield.ToScreenSpace(circlePosition);
 

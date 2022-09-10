@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu
     {
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
-        public readonly OsuTouchInputMapper TouchInputMapper;
+        private readonly OsuTouchInputMapper touchInputMapper;
 
         public bool AllowUserPresses
         {
@@ -36,11 +36,11 @@ namespace osu.Game.Rulesets.Osu
         public OsuInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {
-            TouchInputMapper = new OsuTouchInputMapper(this) { RelativeSizeAxes = Axes.Both };
+            touchInputMapper = new OsuTouchInputMapper(this) { RelativeSizeAxes = Axes.Both };
         }
 
         [BackgroundDependencyLoader]
-        private void load() => Add(TouchInputMapper);
+        private void load() => Add(touchInputMapper);
 
         protected override bool Handle(UIEvent e)
         {
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu
         {
             var source = e.Touch.Source;
 
-            if (TouchInputMapper.DraggingCursorMode && TouchInputMapper.IsCursorTouch(source))
+            if (touchInputMapper.DraggingCursorMode && touchInputMapper.IsCursorTouch(source))
                 e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
 
             return base.HandleMouseTouchStateChange(e);
