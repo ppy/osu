@@ -16,10 +16,9 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
-    public sealed class DifficultyMultiplierDisplay : ModsEffectDisplay<double>
+    public sealed class DifficultyMultiplierDisplay : ModsEffectDisplay
     {
         protected override LocalisableString Label => DifficultyMultiplierDisplayStrings.DifficultyMultiplier;
-        protected override ModEffect CalculateEffect(double value) => CalculateForSign(value.CompareTo(1d));
 
         private readonly MultiplierCounter multiplierCounter;
 

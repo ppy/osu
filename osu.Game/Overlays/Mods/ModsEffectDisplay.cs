@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Mods
     /// <summary>
     /// Base class for displays of mods effects.
     /// </summary>
-    public abstract class ModsEffectDisplay<TValue> : Container, IHasCurrentValue<TValue>
+    public abstract class ModsEffectDisplay : Container, IHasCurrentValue<double>
     {
         public const float HEIGHT = 42;
         private const float transition_duration = 200;
@@ -28,13 +28,13 @@ namespace osu.Game.Overlays.Mods
         private readonly Box labelBackground;
         private readonly Container content;
 
-        public Bindable<TValue> Current
+        public Bindable<double> Current
         {
             get => current.Current;
             set => current.Current = value;
         }
 
-        private readonly BindableWithCurrent<TValue> current = new BindableWithCurrent<TValue>();
+        private readonly BindableWithCurrent<double> current = new BindableWithCurrent<double>();
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -52,7 +52,13 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         /// <param name="value">Value to calculate for. Will arrive from <see cref="Current"/> bindable once it changes.</param>
         /// <returns>Effect of the value.</returns>
-        protected abstract ModEffect CalculateEffect(TValue value);
+        /// <remarks>
+        /// Default implementation compares the value with <see cref="Current"/>.<see cref="Bindable{T}.Default"/>, bigger value counts as difficulty increase.
+        /// </remarks>
+        protected virtual ModEffect CalculateEffect(double value)
+        {
+            return CalculateForSign(value.CompareTo(Current.Default));
+        }
 
         protected virtual float ValueAreaWidth => 56;
 
