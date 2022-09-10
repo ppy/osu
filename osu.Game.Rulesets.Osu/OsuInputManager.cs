@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu
     {
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
-        public OsuTouchInputMapper TouchInputMapper;
+        public readonly OsuTouchInputMapper TouchInputMapper;
 
         public bool AllowUserPresses
         {
