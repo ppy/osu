@@ -93,22 +93,22 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             HitObjects = new List<HitObject>
             {
-                new HitCircle()
+                new HitCircle
                 {
                     StartTime = hit_delay,
                     Position = circlePosition
                 },
-                new HitCircle()
+                new HitCircle
                 {
                     StartTime = hit_delay * 2,
                     Position = circlePosition
                 },
-                new HitCircle()
+                new HitCircle
                 {
                     StartTime = hit_delay * 3,
                     Position = circlePosition
                 },
-                new HitCircle()
+                new HitCircle
                 {
                     StartTime = hit_delay * 4,
                     Position = circlePosition
