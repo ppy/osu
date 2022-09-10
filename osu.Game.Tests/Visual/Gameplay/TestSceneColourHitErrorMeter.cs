@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestShapeChange()
+        public void TestJudgementAmountChange()
         {
             AddRepeatStep("Add judgement", applyOneJudgement, 10);
             AddStep("Judgement count change to 4", () => colourHitErrorMeter.HitShapeCount.Value = 4);
