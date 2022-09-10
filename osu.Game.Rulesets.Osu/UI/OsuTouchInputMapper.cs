@@ -65,19 +65,20 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// Updates <see cref="DraggingCursorMode"/> on wheter we are dragging currently.
         /// </summary>
-        /// <remarks>
-        /// This should only be called when we are on a tap touch for optimization purpouses since a cursor touch will never trigger a change intro drag mode.
-        /// </remarks>
         private void updateDraggingCursorMode() => DraggingCursorMode = activeTouchesAmount >= allowed_touches_limit;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             var source = e.Touch.Source;
 
-            if (++activeTouchesAmount > allowed_touches_limit || IsCursorTouch(source))
+            if (++activeTouchesAmount > allowed_touches_limit)
                 return base.OnTouchDown(e);
 
             updateDraggingCursorMode();
+
+            if (IsCursorTouch(source))
+                return base.OnTouchDown(e);
+
             keyBindingContainer.TriggerPressed(touchActions[source]);
 
             return base.OnTouchDown(e);
@@ -95,11 +96,10 @@ namespace osu.Game.Rulesets.Osu.UI
                 return;
             }
 
+            updateDraggingCursorMode();
+
             if (IsTapTouch(source))
-            {
-                updateDraggingCursorMode();
                 keyBindingContainer.TriggerReleased(touchActions[source]);
-            }
 
             base.OnTouchUp(e);
         }
