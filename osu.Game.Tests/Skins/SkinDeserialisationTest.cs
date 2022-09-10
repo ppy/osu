@@ -36,7 +36,9 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-default-20220723.osk",
             "Archives/modified-classic-20220723.osk",
             // Covers legacy song progress, UR counter, colour hit error metre.
-            "Archives/modified-classic-20220801.osk"
+            "Archives/modified-classic-20220801.osk",
+            // Covers clicks/s counter
+            "Archives/modified-default-20220818.osk"
         };
 
         /// <summary>
