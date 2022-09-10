@@ -41,12 +41,12 @@ namespace osu.Game.Rulesets.Osu.UI
         /// Tracks the amount of active touches.
         /// </summary>
         /// <remarks>
-        /// Since <see cref="OsuInputManager"/>'s active sources uses an internal hash set, the time complexity for this should be o(n)
+        /// Since <see cref="OsuInputManager"/>'s active sources uses an internal hash set, the time complexity for this should be o(1)
         /// </remarks>
         private int activeTouchesAmount => osuInputManager.CurrentState.Touch.ActiveSources.Count();
 
         /// <summary>
-        /// When we enter drag cursor mode, the cursor will stop being mapped to a <see cref="OsuAction"/> and the other valid touches can be used as streaming keys.
+        /// When we enter drag cursor mode, the cursor will stop being mapped to a <see cref="OsuAction"/> and the other valid touches can be used as tap keys.
         /// </summary>
         public bool DraggingCursorMode => activeTouchesAmount >= allowed_touches_limit;
 
