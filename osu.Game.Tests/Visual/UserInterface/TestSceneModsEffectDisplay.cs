@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
@@ -54,28 +53,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("colours are correct", () => testDisplay.Container.Colour == colourProvider.Background5 && background.Colour == colours.ForModType(ModType.DifficultyIncrease));
         }
 
-        private class TestDisplay : ModsEffectDisplay<int>
+        private class TestDisplay : ModsEffectDisplay
         {
-            private readonly OsuSpriteText text;
-
             public Container<Drawable> Container => Content;
 
             protected override LocalisableString Label => "Test display";
-            protected override ModEffect CalculateEffect(int value) => CalculateForSign(value.CompareTo(50));
 
             public TestDisplay()
             {
-                Add(text = new OsuSpriteText
-                {
-                    Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold),
-                    Text = "50"
-                });
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                Current.BindValueChanged(e => text.Text = e.NewValue.ToString(), true);
+                Current.Default = 50;
             }
         }
     }
