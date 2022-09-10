@@ -121,7 +121,18 @@ namespace osu.Game.Beatmaps
         protected override void Update()
         {
             base.Update();
-            finalClockSource.ProcessFrame();
+
+            if (Source != null && Source is not IAdjustableClock && Source.CurrentTime < decoupledClock.CurrentTime)
+            {
+                // InterpolatingFramedClock won't interpolate backwards unless its source has an ElapsedFrameTime.
+                // See https://github.com/ppy/osu-framework/blob/ba1385330cc501f34937e08257e586c84e35d772/osu.Framework/Timing/InterpolatingFramedClock.cs#L91-L93
+                // This is not always the case here when doing large seeks.
+                // (Of note, this is not an issue if the source is adjustable, as the source is seeked to be in time by DecoupleableInterpolatingFramedClock).
+                // Rather than trying to get around this by fixing the framework clock stack, let's work around it for now.
+                Seek(Source.CurrentTime);
+            }
+            else
+                finalClockSource.ProcessFrame();
         }
 
         public double TotalAppliedOffset
