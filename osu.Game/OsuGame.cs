@@ -159,6 +159,8 @@ namespace osu.Game
 
         protected FirstRunSetupOverlay FirstRunOverlay { get; private set; }
 
+        private FPSCounter fpsCounter;
+
         private VolumeOverlay volume;
 
         private OsuLogo osuLogo;
@@ -714,7 +716,7 @@ namespace osu.Game
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
             // in the cursor being shown for a few frames during the intro.
             // This prevents the cursor from showing until we have a screen with CursorVisible = true
-            MenuCursorContainer.CanShowCursor = menuScreen?.CursorVisible ?? false;
+            GlobalCursorDisplay.ShowCursor = menuScreen?.CursorVisible ?? false;
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => Notifications.Post(n);
@@ -802,8 +804,8 @@ namespace osu.Game
                     Children = new Drawable[]
                     {
                         overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                         leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
@@ -813,6 +815,13 @@ namespace osu.Game
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
+
+            loadComponentSingleFile(fpsCounter = new FPSCounter
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Margin = new MarginPadding(5),
+            }, topMostOverlayContent.Add);
 
             if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
                 loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
@@ -830,7 +839,9 @@ namespace osu.Game
                 OnHome = delegate
                 {
                     CloseAllOverlays(false);
-                    menuScreen?.MakeCurrent();
+
+                    if (menuScreen?.GetChildScreen() != null)
+                        menuScreen.MakeCurrent();
                 },
             }, topMostOverlayContent.Add);
 
@@ -848,11 +859,6 @@ namespace osu.Game
                 d.Anchor = Anchor.TopRight;
                 d.Origin = Anchor.TopRight;
             }), rightFloatingOverlayContent.Add, true);
-
-            loadComponentSingleFile(new CollectionManager(Storage)
-            {
-                PostNotification = n => Notifications.Post(n),
-            }, Add, true);
 
             loadComponentSingleFile(legacyImportManager, Add);
 
@@ -894,6 +900,8 @@ namespace osu.Game
             loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
+
+            loadComponentSingleFile(new BackgroundBeatmapProcessor(), Add);
 
             chatOverlay.State.BindValueChanged(_ => updateChatPollRate());
             // Multiplayer modes need to increase poll rate temporarily.
@@ -1114,6 +1122,10 @@ namespace osu.Game
 
             switch (e.Action)
             {
+                case GlobalAction.ToggleFPSDisplay:
+                    fpsCounter.ToggleVisibility();
+                    return true;
+
                 case GlobalAction.ToggleSkinEditor:
                     skinEditor.ToggleVisibility();
                     return true;
@@ -1126,6 +1138,13 @@ namespace osu.Game
                 case GlobalAction.ToggleGameplayMouseButtons:
                     var mouseDisableButtons = LocalConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons);
                     mouseDisableButtons.Value = !mouseDisableButtons.Value;
+                    return true;
+
+                case GlobalAction.ToggleProfile:
+                    if (userProfile.State.Value == Visibility.Visible)
+                        userProfile.Hide();
+                    else
+                        ShowUser(API.LocalUser.Value);
                     return true;
 
                 case GlobalAction.RandomSkin:
@@ -1216,7 +1235,7 @@ namespace osu.Game
             ScreenOffsetContainer.X = horizontalOffset;
             overlayContent.X = horizontalOffset * 1.2f;
 
-            MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
+            GlobalCursorDisplay.ShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
 
         private void screenChanged(IScreen current, IScreen newScreen)

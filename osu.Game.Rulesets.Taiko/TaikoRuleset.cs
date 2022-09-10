@@ -1,32 +1,32 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Taiko.Mods;
-using osu.Game.Rulesets.Taiko.UI;
-using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.Taiko.Replays;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Difficulty;
-using osu.Game.Rulesets.Taiko.Scoring;
-using osu.Game.Scoring;
-using System;
-using System.Linq;
-using osu.Framework.Extensions.EnumExtensions;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Edit;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Replays;
+using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Legacy;
+using osu.Game.Rulesets.Taiko.UI;
+using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 
@@ -45,6 +45,8 @@ namespace osu.Game.Rulesets.Taiko
         public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new TaikoLegacySkinTransformer(skin);
 
         public const string SHORT_NAME = "taiko";
+
+        public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -190,15 +192,12 @@ namespace osu.Game.Rulesets.Taiko
             };
         }
 
-        public override string GetDisplayNameForHitResult(HitResult result)
+        public override LocalisableString GetDisplayNameForHitResult(HitResult result)
         {
             switch (result)
             {
-                case HitResult.SmallTickHit:
-                    return "drum tick";
-
                 case HitResult.SmallBonus:
-                    return "strong bonus";
+                    return "bonus";
             }
 
             return base.GetDisplayNameForHitResult(result);

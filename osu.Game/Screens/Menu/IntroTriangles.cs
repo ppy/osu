@@ -72,13 +72,29 @@ namespace osu.Game.Screens.Menu
                     RelativeSizeAxes = Axes.Both,
                     Clock = decoupledClock,
                     LoadMenu = LoadMenu
-                }, t =>
+                }, _ =>
                 {
-                    AddInternal(t);
-                    if (!UsingThemedIntro)
-                        welcome?.Play();
+                    AddInternal(intro);
 
-                    StartTrack();
+                    // There is a chance that the intro timed out before being displayed, and this scheduled callback could
+                    // happen during the outro rather than intro.
+                    // In such a scenario, we don't want to play the intro sample, nor attempt to start the intro track
+                    // (that may have already been since disposed by MusicController).
+                    if (DidLoadMenu)
+                        return;
+
+                    if (!UsingThemedIntro)
+                    {
+                        // If the user has requested no theme, fallback to the same intro voice and delay as IntroCircles.
+                        // The triangles intro voice and theme are combined which makes it impossible to use.
+                        welcome?.Play();
+                        Scheduler.AddDelayed(StartTrack, IntroCircles.TRACK_START_DELAY);
+                    }
+                    else
+                        StartTrack();
+
+                    // no-op for the case of themed intro, no harm in calling for both scenarios as a safety measure.
+                    decoupledClock.Start();
                 });
             }
         }
@@ -89,11 +105,6 @@ namespace osu.Game.Screens.Menu
 
             // important as there is a clock attached to a track which will likely be disposed before returning to this screen.
             intro.Expire();
-        }
-
-        protected override void StartTrack()
-        {
-            decoupledClock.Start();
         }
 
         private class TrianglesIntroSequence : CompositeDrawable
@@ -244,8 +255,7 @@ namespace osu.Game.Screens.Menu
                     {
                         lazerLogo.FadeOut().OnComplete(_ =>
                         {
-                            logoContainerSecondary.Remove(lazerLogo);
-                            lazerLogo.Dispose(); // explicit disposal as we are pushing a new screen and the expire may not get run.
+                            logoContainerSecondary.Remove(lazerLogo, true);
 
                             logo.FadeIn();
 

@@ -1,15 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Game;
@@ -17,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osuTK;
-using osuTK.Graphics;
 using Squirrel;
 using Squirrel.SimpleSplat;
 
@@ -26,8 +21,8 @@ namespace osu.Desktop.Updater
     [SupportedOSPlatform("windows")]
     public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
-        private UpdateManager updateManager;
-        private INotificationOverlay notificationOverlay;
+        private UpdateManager? updateManager;
+        private INotificationOverlay notificationOverlay = null!;
 
         public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
@@ -50,12 +45,12 @@ namespace osu.Desktop.Updater
 
         protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
 
-        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
+        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification? notification = null)
         {
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
 
-            const string github_token = null; // TODO: populate.
+            const string? github_token = null; // TODO: populate.
 
             try
             {
@@ -145,7 +140,7 @@ namespace osu.Desktop.Updater
         private class UpdateCompleteNotification : ProgressCompletionNotification
         {
             [Resolved]
-            private OsuGame game { get; set; }
+            private OsuGame game { get; set; } = null!;
 
             public UpdateCompleteNotification(SquirrelUpdateManager updateManager)
             {
@@ -154,7 +149,7 @@ namespace osu.Desktop.Updater
                 Activated = () =>
                 {
                     updateManager.PrepareUpdateAsync()
-                                 .ContinueWith(_ => updateManager.Schedule(() => game?.AttemptExit()));
+                                 .ContinueWith(_ => updateManager.Schedule(() => game.AttemptExit()));
                     return true;
                 };
             }
@@ -179,17 +174,11 @@ namespace osu.Desktop.Updater
             {
                 IconContent.AddRange(new Drawable[]
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
-                    },
                     new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.Solid.Upload,
-                        Colour = Color4.White,
                         Size = new Vector2(20),
                     }
                 });

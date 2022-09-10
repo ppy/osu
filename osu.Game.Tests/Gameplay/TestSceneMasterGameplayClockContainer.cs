@@ -41,13 +41,11 @@ namespace osu.Game.Tests.Gameplay
             AddStep("create container", () =>
             {
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                working.LoadTrack();
-
                 Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0);
             });
 
             AddStep("start clock", () => gameplayClockContainer.Start());
-            AddUntilStep("elapsed greater than zero", () => gameplayClockContainer.GameplayClock.ElapsedFrameTime > 0);
+            AddUntilStep("elapsed greater than zero", () => gameplayClockContainer.ElapsedFrameTime > 0);
         }
 
         [Test]
@@ -58,22 +56,20 @@ namespace osu.Game.Tests.Gameplay
             AddStep("create container", () =>
             {
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                working.LoadTrack();
-
                 Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0);
             });
 
             AddStep("start clock", () => gameplayClockContainer.Start());
-            AddUntilStep("current time greater 2000", () => gameplayClockContainer.GameplayClock.CurrentTime > 2000);
+            AddUntilStep("current time greater 2000", () => gameplayClockContainer.CurrentTime > 2000);
 
             double timeAtReset = 0;
             AddStep("reset clock", () =>
             {
-                timeAtReset = gameplayClockContainer.GameplayClock.CurrentTime;
+                timeAtReset = gameplayClockContainer.CurrentTime;
                 gameplayClockContainer.Reset();
             });
 
-            AddAssert("current time < time at reset", () => gameplayClockContainer.GameplayClock.CurrentTime < timeAtReset);
+            AddAssert("current time < time at reset", () => gameplayClockContainer.CurrentTime < timeAtReset);
         }
 
         [Test]
@@ -102,8 +98,6 @@ namespace osu.Game.Tests.Gameplay
             AddStep("create container", () =>
             {
                 working = new ClockBackedTestWorkingBeatmap(new OsuRuleset().RulesetInfo, new FramedClock(new ManualClock()), Audio);
-                working.LoadTrack();
-
                 Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0);
 
                 gameplayClockContainer.Reset(startClock: !whileStopped);
