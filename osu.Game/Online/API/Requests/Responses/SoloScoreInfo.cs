@@ -81,12 +81,12 @@ namespace osu.Game.Online.API.Requests.Responses
         public int? LegacyTotalScore { get; set; }
 
         [JsonProperty("legacy_score_id")]
-        public uint? LegacyScoreId { get; set; }
+        public ulong? LegacyScoreId { get; set; }
 
         #region osu-web API additions (not stored to database).
 
         [JsonProperty("id")]
-        public long? ID { get; set; }
+        public ulong? ID { get; set; }
 
         [JsonProperty("user")]
         public APIUser? User { get; set; }
@@ -190,6 +190,6 @@ namespace osu.Game.Online.API.Requests.Responses
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
         };
 
-        public long OnlineID => ID ?? -1;
+        public long OnlineID => (long?)ID ?? -1;
     }
 }

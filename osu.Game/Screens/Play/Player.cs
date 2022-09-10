@@ -996,12 +996,8 @@ namespace osu.Game.Screens.Play
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);
 
-            // Our mods are local copies of the global mods so they need to be re-applied to the track.
-            // This is done through the music controller (for now), because resetting speed adjustments on the beatmap track also removes adjustments provided by DrawableTrack.
-            // Todo: In the future, player will receive in a track and will probably not have to worry about this...
-            musicController.ResetTrackAdjustments();
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrack>())
-                mod.ApplyToTrack(musicController.CurrentTrack);
+                mod.ApplyToTrack(GameplayClockContainer.AdjustmentsFromMods);
 
             updateGameplayState();
 
@@ -1053,6 +1049,7 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
 
             fadeOut();
+
             return base.OnExiting(e);
         }
 
