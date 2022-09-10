@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,6 +12,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 
@@ -26,7 +28,7 @@ namespace osu.Game.Overlays.Mods
 
         private readonly Box contentBackground;
         private readonly Box labelBackground;
-        private readonly Container content;
+        private readonly FillFlowContainer content;
 
         public Bindable<double> Current
         {
@@ -61,6 +63,8 @@ namespace osu.Game.Overlays.Mods
         }
 
         protected virtual float ValueAreaWidth => 56;
+
+        protected virtual string CounterFormat => "N0";
 
         protected override Container<Drawable> Content => content;
 
@@ -121,12 +125,20 @@ namespace osu.Game.Overlays.Mods
                                         }
                                     }
                                 },
-                                content = new Container
+                                content = new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)
+                                    Direction = FillDirection.Horizontal,
+                                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                    Spacing = new Vector2(2, 0),
+                                    Child = new EffectCounter(CounterFormat)
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Current = { BindTarget = Current }
+                                    }
                                 }
                             }
                         }
@@ -202,6 +214,25 @@ namespace osu.Game.Overlays.Mods
             NotChanged,
             DifficultyReduction,
             DifficultyIncrease
+        }
+
+        private class EffectCounter : RollingCounter<double>
+        {
+            private readonly string? format;
+
+            public EffectCounter(string? format)
+            {
+                this.format = format;
+            }
+
+            protected override double RollingDuration => 500;
+
+            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString(format);
+
+            protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
+            {
+                Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
+            };
         }
     }
 }
