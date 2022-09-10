@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "WD";
         public override LocalisableString Description => "Sloooow doooown...";
         public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleDown;
-        public override double ScoreMultiplier => 1.0;
 
         [SettingSource("Initial rate", "The starting speed of the track")]
         public override BindableNumber<double> InitialRate { get; } = new BindableDouble
