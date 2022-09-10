@@ -89,6 +89,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                     HitObject.DifficultyControlPoint = nearestDifficultyPoint ?? new DifficultyControlPoint();
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
+
+                    // Replacing the DifficultyControlPoint above doesn't trigger any kind of invalidation.
+                    // Without re-applying defaults, velocity won't be updated.
+                    ApplyDefaultsToHitObject();
                     break;
 
                 case SliderPlacementState.Body:
