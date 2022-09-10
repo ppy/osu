@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         private const int hit_delay = 1000;
 
+        private int delayMultiplier = 1;
+
         private Vector2 circlePosition => new Vector2(200);
 
         private OsuInputManager osuInputManager => Player.DrawableRuleset.ChildrenOfType<OsuInputManager>().First();
@@ -29,8 +31,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void touch(TouchSource source) => InputManager.BeginTouch(new Touch(source, touchPosition));
 
         private void release(TouchSource source) => InputManager.EndTouch(new Touch(source, touchPosition));
-
-        private int delayMultiplier = 1;
 
         private void waitHitDelay() => AddUntilStep("Can hit", () =>
         {
