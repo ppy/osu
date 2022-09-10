@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// Tracks all active tap <see cref="TouchSource"/>s that can be mapped into a given <see cref="OsuAction"/> through the <see cref="tapTouchActions"/>.
         /// </summary>
-        private HashSet<TouchSource> activeTapTouches = new HashSet<TouchSource>();
+        public HashSet<TouchSource> ActiveTapTouches = new HashSet<TouchSource>();
 
         /// <summary>
         /// Tracks the amount of active touches.
@@ -59,13 +59,18 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public bool IsCursorTouch(TouchSource source) => !IsTapTouch(source);
 
+        /// <summary>
+        /// Whether we didn't reached the limit of allowed simultaneous touches.
+        /// </summary>
+        public bool AllowingOtherTouch => activeTouchesAmount <= allowed_touches_limit;
+
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             var source = e.Touch.Source;
 
-            if (activeTouchesAmount <= allowed_touches_limit && IsTapTouch(source))
+            if (AllowingOtherTouch && IsTapTouch(source))
             {
-                activeTapTouches.Add(source);
+                ActiveTapTouches.Add(source);
                 keyBindingContainer.TriggerPressed(tapTouchActions[source]);
             }
 
@@ -76,9 +81,9 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             var source = e.Touch.Source;
 
-            if (activeTapTouches.Contains(source))
+            if (ActiveTapTouches.Contains(source))
             {
-                activeTapTouches.Remove(source);
+                ActiveTapTouches.Remove(source);
                 keyBindingContainer.TriggerReleased(tapTouchActions[source]);
             }
 
