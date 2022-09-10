@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu
         {
             var source = e.Touch.Source;
 
-            if (TouchInputMapper.IsTouchBlocked(source) || TouchInputMapper.IsTapTouch(source))
+            if (TouchInputMapper.IsTapTouch(source))
                 return true;
 
             if (TouchInputMapper.DraggingCursorMode)

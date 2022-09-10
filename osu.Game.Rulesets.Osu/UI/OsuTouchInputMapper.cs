@@ -13,41 +13,24 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuTouchInputMapper : Drawable
     {
-        /// <summary>
-        /// How many streaming touches are allowed to be registered.
-        /// </summary>
-        private const int tap_touches_limit = 2;
-
-        /// <summary>
-        /// How many touches are allowed to be registered.
-        /// </summary>
-        private const int allowed_touches_limit = tap_touches_limit + 1;
-
-        /// <summary>
-        /// The index for the last allowed touch.
-        /// </summary>
-        private const int last_allowed_touch_index = allowed_touches_limit - 1;
+        public const TouchSource CURSOR_TOUCH = TouchSource.Touch1;
 
         private readonly OsuInputManager osuInputManager;
+
+        /// <summary>
+        /// The maximum amount of touches that should be allowed.
+        /// </summary>
+        private const int allowed_touches_limit = 3;
+
+        /// <summary>
+        /// The last touch index that is allowed to map to a given <see cref="OsuAction"/>.
+        /// </summary>
+        private const int last_allowed_touch_index = allowed_touches_limit - 1;
 
         /// <summary>
         /// Our <see cref="KeyBindingContainer"/> used to trigger the touch actions from the <see cref="touchActions"/>.
         /// </summary>
         private KeyBindingContainer<OsuAction> keyBindingContainer => osuInputManager.KeyBindingContainer;
-
-        /// <summary>
-        /// A hash set that contains all the <see cref="TouchSource"/>'s that can be mapped to a given <see cref="OsuAction"/>.
-        /// </summary>
-        private readonly HashSet<TouchSource> allowedTouches = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().Take(allowed_touches_limit).ToHashSet();
-
-        /// <summary>
-        /// A hash set that contains all the <see cref="allowedTouches"/> that are currently active.
-        /// </summary>
-        /// <remarks>
-        /// Although inputs that aren't valid are being blocked from being passed to us by our <see cref="osuInputManager"/>
-        /// this does not mean that the <see cref="osuInputManager"/>'s active touches only contains valid touches, that's the reason for this to exist.
-        /// </remarks>
-        private readonly HashSet<TouchSource> activeAllowedTouches = new HashSet<TouchSource>();
 
         /// <summary>
         /// A dictionary that maps <see cref="TouchSource"/> into a respective <see cref="OsuAction"/> for an emulated keyboard input.
@@ -59,12 +42,17 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         public bool DraggingCursorMode;
 
+        /// <summary>
+        /// Tracks the amount of active touches.
+        /// </summary>
+        private int activeTouchesAmount;
+
         private int getTouchIndex(TouchSource source) => source - TouchSource.Touch1;
 
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
             osuInputManager = inputManager;
-            foreach (var source in allowedTouches)
+            foreach (TouchSource source in Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().Take(allowed_touches_limit))
                 touchActions.Add(source, getTouchIndex(source) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
         }
 
@@ -72,21 +60,24 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public bool IsCursorTouch(TouchSource source) => !IsTapTouch(source);
 
-        public bool IsTouchBlocked(TouchSource source) => getTouchIndex(source) > last_allowed_touch_index;
+        private bool isTouchDisallowed(TouchSource source) => getTouchIndex(source) > last_allowed_touch_index;
+
+        /// <summary>
+        /// Updates <see cref="DraggingCursorMode"/> on wheter we are dragging currently.
+        /// </summary>
+        /// <remarks>
+        /// This should only be called when we are on a tap touch for optimization purpouses since a cursor touch will never trigger a change intro drag mode.
+        /// </remarks>
+        private void updateDraggingCursorMode() => DraggingCursorMode = activeTouchesAmount >= allowed_touches_limit;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             var source = e.Touch.Source;
 
-            if (IsTouchBlocked(source))
-                return true;
-
-            activeAllowedTouches.Add(source);
-            DraggingCursorMode = activeAllowedTouches.Count == allowedTouches.Count;
-
-            if (IsCursorTouch(source))
+            if (++activeTouchesAmount > allowed_touches_limit || IsCursorTouch(source))
                 return base.OnTouchDown(e);
 
+            updateDraggingCursorMode();
             keyBindingContainer.TriggerPressed(touchActions[source]);
 
             return base.OnTouchDown(e);
@@ -96,13 +87,19 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             var source = e.Touch.Source;
 
-            if (IsTouchBlocked(source))
-                return;
+            activeTouchesAmount--;
 
-            activeAllowedTouches.Remove(source);
+            if (isTouchDisallowed(source))
+            {
+                base.OnTouchUp(e);
+                return;
+            }
 
             if (IsTapTouch(source))
+            {
+                updateDraggingCursorMode();
                 keyBindingContainer.TriggerReleased(touchActions[source]);
+            }
 
             base.OnTouchUp(e);
         }
