@@ -5,55 +5,55 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneTouchInput : TestSceneOsuPlayer
     {
-        private const int hit_delay = 1000;
-
-        private int delayMultiplier = 1;
-
-        private Vector2 circlePosition => new Vector2(200);
-
         private OsuInputManager osuInputManager => Player.DrawableRuleset.ChildrenOfType<OsuInputManager>().First();
+
         private OsuTouchInputMapper touchInputMapper => osuInputManager.ChildrenOfType<OsuTouchInputMapper>().First();
 
-        private Vector2 touchPosition => Player.DrawableRuleset.Playfield.ToScreenSpace(circlePosition);
+        private Vector2 touchPosition => osuInputManager.ScreenSpaceDrawQuad.Centre;
 
         private void touch(TouchSource source) => InputManager.BeginTouch(new Touch(source, touchPosition));
 
         private void release(TouchSource source) => InputManager.EndTouch(new Touch(source, touchPosition));
 
-        private void waitHitDelay() => AddUntilStep("Can hit", () =>
-        {
-            bool waited = Player.GameplayClockContainer.Clock.CurrentTime >= hit_delay * delayMultiplier + 500;
-
-            if (waited)
-                delayMultiplier++;
-
-            return waited;
-        });
-
         [Test]
         public void TestTouchInput()
         {
-            waitHitDelay();
+            // Cleanup
+            AddStep("Release touches", () =>
+            {
+                foreach (TouchSource source in Enum.GetValues(typeof(TouchSource)))
+                    release(source);
+            });
+
+            // Setup
+            AddStep("Create key counter", () => osuInputManager.Add(new Container
+            {
+                Children = new Drawable[] { new OsuActionKeyCounter(OsuAction.LeftButton), new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 200 } } },
+                Position = touchPosition - new Vector2(250, 0)
+            }));
 
             // Cursor touch
             AddStep("Touch with cursor finger", () => touch(TouchSource.Touch1));
 
             AddAssert("The touch is a cursor touch", () => touchInputMapper.IsCursorTouch(TouchSource.Touch1));
             AddAssert("Allowing other touch", () => touchInputMapper.AllowingOtherTouch);
-
-            waitHitDelay();
 
             // Left button touch
             AddStep("Touch with other finger", () => touch(TouchSource.Touch2));
@@ -63,8 +63,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 1);
             AddAssert("Allowing other touch", () => touchInputMapper.AllowingOtherTouch);
 
-            waitHitDelay();
-
             // Right button touch
             AddStep("Touch with another finger (Doubletapping)...", () => touch(TouchSource.Touch3));
 
@@ -73,47 +71,40 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 2);
             AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping);
 
-            waitHitDelay();
-
             // Invalid touch
             AddStep("Touch with an invalid touch", () => touch(TouchSource.Touch4));
 
             AddAssert("Touch is blocked", () => !touchInputMapper.AllowingOtherTouch);
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 2);
-
-            // Cleanup
-            AddStep("Release", () =>
-            {
-                foreach (TouchSource source in Enum.GetValues(typeof(TouchSource)))
-                    release(source);
-            });
         }
 
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap { HitObjects = new List<HitObject> { new HitCircle { StartTime = 99999 } } };
+
+        public class OsuActionKeyCounter : KeyCounter, IKeyBindingHandler<OsuAction>
         {
-            HitObjects = new List<HitObject>
+            public OsuAction Action { get; }
+
+            public OsuActionKeyCounter(OsuAction action)
+                : base(action.ToString())
             {
-                new HitCircle
-                {
-                    StartTime = hit_delay,
-                    Position = circlePosition
-                },
-                new HitCircle
-                {
-                    StartTime = hit_delay * 2,
-                    Position = circlePosition
-                },
-                new HitCircle
-                {
-                    StartTime = hit_delay * 3,
-                    Position = circlePosition
-                },
-                new HitCircle
-                {
-                    StartTime = hit_delay * 4,
-                    Position = circlePosition
-                },
+                Action = action;
             }
-        };
+
+            public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
+            {
+                if (e.Action == Action)
+                {
+                    IsLit = true;
+                    Increment();
+                }
+
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
+            {
+                if (e.Action == Action) IsLit = false;
+            }
+        }
     }
 }
