@@ -12,11 +12,13 @@ using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneNotificationOverlay : OsuTestScene
+    public class TestSceneNotificationOverlay : OsuManualInputManagerTestScene
     {
         private NotificationOverlay notificationOverlay = null!;
 
@@ -32,7 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             TimeToCompleteProgress = 2000;
             progressingNotifications.Clear();
 
-            Content.Children = new Drawable[]
+            Children = new Drawable[]
             {
                 notificationOverlay = new NotificationOverlay
                 {
@@ -44,6 +46,60 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             notificationOverlay.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count.NewValue}"; };
         });
+
+        [Test]
+        public void TestDismissWithoutActivationRightClick()
+        {
+            bool activated = false;
+            SimpleNotification notification = null!;
+
+            AddStep("post", () =>
+            {
+                activated = false;
+                notificationOverlay.Post(notification = new SimpleNotification
+                {
+                    Text = @"Welcome to osu!. Enjoy your stay!",
+                    Activated = () => activated = true,
+                });
+            });
+
+            AddStep("click to activate", () =>
+            {
+                InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<Notification>().Single());
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddUntilStep("wait for closed", () => notification.WasClosed);
+            AddAssert("was not activated", () => !activated);
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+        }
+
+        [Test]
+        public void TestActivate()
+        {
+            bool activated = false;
+            SimpleNotification notification = null!;
+
+            AddStep("post", () =>
+            {
+                activated = false;
+                notificationOverlay.Post(notification = new SimpleNotification
+                {
+                    Text = @"Welcome to osu!. Enjoy your stay!",
+                    Activated = () => activated = true,
+                });
+            });
+
+            AddStep("click to activate", () =>
+            {
+                InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<Notification>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for closed", () => notification.WasClosed);
+            AddAssert("was activated", () => activated);
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+        }
 
         [Test]
         public void TestPresence()
