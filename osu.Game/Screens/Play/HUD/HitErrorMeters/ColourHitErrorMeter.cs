@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             HitShapeCount.BindValueChanged(_ =>
             {
                 //Used to clear out the overflowing judgement children when the value is lowered
-                judgementsFlow.RemoveAll(_ => true);
+                judgementsFlow.RemoveAll(_ => true, true);
                 judgementsFlow.Height = HitShapeCount.Value * (drawable_judgement_size + HitShapeSpacing.Value) - HitShapeSpacing.Value;
             }, true);
             HitShape.BindValueChanged(_ => judgementsFlow.Shape.Value = HitShape.Value, true);
