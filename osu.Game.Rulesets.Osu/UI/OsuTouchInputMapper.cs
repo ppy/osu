@@ -13,8 +13,6 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuTouchInputMapper : Drawable
     {
-        public const TouchSource CURSOR_TOUCH = TouchSource.Touch1;
-
         /// <summary>
         /// How many streaming touches are allowed to be registered.
         /// </summary>
