@@ -44,9 +44,9 @@ namespace osu.Game.Rulesets.Osu.UI
         private int activeTouchesAmount => osuInputManager.CurrentState.Touch.ActiveSources.Count();
 
         /// <summary>
-        /// When we enter drag cursor mode, the cursor will stop being mapped to a <see cref="OsuAction"/> and the other valid touches can be used as tap keys.
+        /// Used to track whether the mapped inputs will only map for tap touches, this only happens if there are <see cref="allowed_touches_limit"/> touches being pressed or more.
         /// </summary>
-        public bool DraggingCursorMode => activeTouchesAmount >= allowed_touches_limit;
+        public bool TapOnlyMapping => activeTouchesAmount >= allowed_touches_limit;
 
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {

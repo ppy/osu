@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("The other touch is also a tap touch", () => touchInputMapper.IsTapTouch(TouchSource.Touch3));
             AddAssert("Both keys are pressed", () => osuInputManager.PressedActions.Count() == 2);
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 2);
-            AddAssert("Dragging cursor", () => touchInputMapper.DraggingCursorMode);
+            AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping);
 
             waitHitDelay();
 

@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu
         {
             var source = e.Touch.Source;
 
-            if (touchInputMapper.DraggingCursorMode && touchInputMapper.IsCursorTouch(source))
+            if (touchInputMapper.TapOnlyMapping && touchInputMapper.IsCursorTouch(source))
                 e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
 
             return base.HandleMouseTouchStateChange(e);
