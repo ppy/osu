@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         private const int last_allowed_touch_index = allowed_touches_limit - 1;
 
+        private readonly OsuInputManager osuInputManager;
+
         /// <summary>
         /// A hash set that contains all the <see cref="TouchSource"/>'s that can be mapped to a given <see cref="OsuAction"/>.
         /// </summary>
@@ -37,6 +39,10 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// A hash set that contains all the <see cref="allowedTouches"/> that are currently active.
         /// </summary>
+        /// <remarks>
+        /// Although inputs that aren't valid are being blocked from being passed to us by our <see cref="osuInputManager"/>
+        /// this does not mean that the <see cref="osuInputManager"/>'s active touches only contains valid touches, that's the reason for this to exist.
+        /// </remarks>
         private readonly HashSet<TouchSource> activeAllowedTouches = new HashSet<TouchSource>();
 
         /// <summary>
@@ -44,7 +50,10 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         private readonly Dictionary<TouchSource, OsuAction> touchActions = new Dictionary<TouchSource, OsuAction>();
 
-        private readonly OsuInputManager osuInputManager;
+        /// <summary>
+        /// When we enter drag cursor mode, the cursor will stop being mapped to a <see cref="OsuAction"/> and the other valid touches can be used as streaming keys.
+        /// </summary>
+        public bool DraggingCursorMode;
 
         private int getTouchIndex(TouchSource source) => source - TouchSource.Touch1;
 
@@ -55,41 +64,40 @@ namespace osu.Game.Rulesets.Osu.UI
                 touchActions.Add(source, getTouchIndex(source) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
         }
 
-        private bool isTapTouch(TouchSource source) => source != CURSOR_TOUCH || !osuInputManager.AllowUserCursorMovement;
+        public bool IsTapTouch(TouchSource source) => source != CURSOR_TOUCH || !osuInputManager.AllowUserCursorMovement;
 
-        private bool isCursorTouch(TouchSource source) => !isTapTouch(source);
+        public bool IsCursorTouch(TouchSource source) => !IsTapTouch(source);
 
-        private bool isTouchInputAllowed(TouchSource source) => getTouchIndex(source) <= last_allowed_touch_index;
+        public bool IsTouchBlocked(TouchSource source) => getTouchIndex(source) > last_allowed_touch_index;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             var source = e.Touch.Source;
 
-            if (!isTouchInputAllowed(source))
-                return false;
+            if (IsTouchBlocked(source))
+                return true;
 
             activeAllowedTouches.Add(source);
+            DraggingCursorMode = activeAllowedTouches.Count == allowedTouches.Count;
 
-            osuInputManager.DraggingCursorTouch = activeAllowedTouches.Count == allowed_touches_limit;
-
-            if (isCursorTouch(source))
+            if (IsCursorTouch(source))
                 return base.OnTouchDown(e);
 
             osuInputManager.KeyBindingContainer.TriggerPressed(touchActions[source]);
 
-            return true;
+            return base.OnTouchDown(e);
         }
 
         protected override void OnTouchUp(TouchUpEvent e)
         {
             var source = e.Touch.Source;
 
-            if (!isTouchInputAllowed(source))
+            if (IsTouchBlocked(source))
                 return;
 
             activeAllowedTouches.Remove(source);
 
-            if (isTapTouch(source))
+            if (IsTapTouch(source))
                 osuInputManager.KeyBindingContainer.TriggerReleased(touchActions[source]);
 
             base.OnTouchUp(e);

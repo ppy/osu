@@ -6,8 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
@@ -33,12 +31,6 @@ namespace osu.Game.Rulesets.Osu.UI
         public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            KeyBindingInputManager.Add(new OsuTouchInputMapper((OsuInputManager)KeyBindingInputManager) { RelativeSizeAxes = Axes.Both });
         }
 
         public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h) => null;

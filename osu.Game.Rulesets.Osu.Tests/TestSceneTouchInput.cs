@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     public class TestSceneTouchInput : TestSceneOsuPlayer
     {
         private OsuInputManager osuInputManager => Player.DrawableRuleset.ChildrenOfType<OsuInputManager>().Single();
+        private OsuTouchInputMapper touchInputMapper => osuInputManager.TouchInputMapper;
 
         private void touch(TouchSource source) => InputManager.BeginTouch(new Touch(source, osuInputManager.ScreenSpaceDrawQuad.Centre));
 
@@ -21,9 +22,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTouchInput()
         {
-            AddStep("Touch", () => touch(OsuTouchInputMapper.CURSOR_TOUCH));
-
-            AddAssert("Pressed", () => osuInputManager.CurrentState.Touch.IsActive(OsuTouchInputMapper.CURSOR_TOUCH));
+            AddStep("Touch with cursor finger", () => touch(OsuTouchInputMapper.CURSOR_TOUCH));
 
             AddStep("Touch with other finger", () => touch(TouchSource.Touch2));
 
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("Touch with another finger (Doubletapping)...", () => touch(TouchSource.Touch3));
 
-            AddAssert("Is dragging", () => osuInputManager.DraggingCursorTouch);
+            AddAssert("Dragging cursor", () => touchInputMapper.DraggingCursorMode);
 
             AddStep("Release", () =>
             {

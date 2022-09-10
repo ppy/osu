@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.ComponentModel;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu
     {
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
-        public bool DraggingCursorTouch;
+        public OsuTouchInputMapper TouchInputMapper;
 
         public bool AllowUserPresses
         {
@@ -36,7 +36,11 @@ namespace osu.Game.Rulesets.Osu
         public OsuInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {
+            TouchInputMapper = new OsuTouchInputMapper(this) { RelativeSizeAxes = Axes.Both };
         }
+
+        [BackgroundDependencyLoader]
+        private void load() => Add(TouchInputMapper);
 
         protected override bool Handle(UIEvent e)
         {
@@ -47,13 +51,13 @@ namespace osu.Game.Rulesets.Osu
 
         protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
         {
-            if (e.Touch.Source != OsuTouchInputMapper.CURSOR_TOUCH)
-                return false;
+            var source = e.Touch.Source;
 
-            if (DraggingCursorTouch)
-            {
+            if (TouchInputMapper.IsTouchBlocked(source) || TouchInputMapper.IsTapTouch(source))
+                return true;
+
+            if (TouchInputMapper.DraggingCursorMode)
                 e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
-            }
 
             return base.HandleMouseTouchStateChange(e);
         }
