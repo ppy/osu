@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private bool isTouchDisallowed(TouchSource source) => getTouchIndex(source) > last_allowed_touch_index;
 
         /// <summary>
-        /// Updates <see cref="DraggingCursorMode"/> on wheter we are dragging currently.
+        /// Updates <see cref="DraggingCursorMode"/> on whether we are dragging currently.
         /// </summary>
         private void updateDraggingCursorMode() => DraggingCursorMode = activeTouchesAmount >= allowed_touches_limit;
 
