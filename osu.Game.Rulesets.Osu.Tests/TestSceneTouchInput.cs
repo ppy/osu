@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -27,11 +26,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Vector2 touchPosition => Player.DrawableRuleset.Playfield.ToScreenSpace(circlePosition);
 
-        private void touch(TouchSource source)
-        {
-            InputManager.Click(MouseButton.Button1);
-            InputManager.BeginTouch(new Touch(source, touchPosition));
-        }
+        private void touch(TouchSource source) => InputManager.BeginTouch(new Touch(source, touchPosition));
 
         private void release(TouchSource source) => InputManager.EndTouch(new Touch(source, touchPosition));
 
