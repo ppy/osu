@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private const int animation_duration = 200;
         private const int drawable_judgement_size = 8;
 
-        [SettingSource("Hit error amount", "Number of hit error shapes")]
+        [SettingSource("Judgement count", "Number of displayed judgements")]
         public BindableNumber<int> HitShapeCount { get; } = new BindableNumber<int>(20)
         {
             MinValue = 1,
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             Precision = 1
         };
 
-        [SettingSource("Opacity", "Visibility of object")]
+        [SettingSource("Opacity", "Visibility of the displayed judgements")]
         public BindableNumber<float> HitShapeOpacity { get; } = new BindableNumber<float>(1)
         {
             MinValue = 0.01f,
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             Precision = 0.01f,
         };
 
-        [SettingSource("Spacing", "Space between hit error shapes")]
+        [SettingSource("Spacing", "Space between each displayed judgement")]
         public BindableNumber<float> HitShapeSpacing { get; } = new BindableNumber<float>(2)
         {
             MinValue = 0,
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             Precision = 0.1f
         };
 
-        [SettingSource("Shape", "The shape of each displayed error")]
+        [SettingSource("Shape", "The shape of each displayed judgement")]
         public Bindable<ShapeStyle> HitShape { get; } = new Bindable<ShapeStyle>();
 
         private readonly JudgementFlow judgementsFlow;
@@ -74,9 +74,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }, true);
             HitShapeCount.BindValueChanged(_ =>
             {
-                judgementsFlow.Clear();
+                //Used to clear out the overflowing judgement children when the value is lowered
+                judgementsFlow.RemoveAll(_ => true);
                 judgementsFlow.Height = HitShapeCount.Value * (drawable_judgement_size + HitShapeSpacing.Value) - HitShapeSpacing.Value;
             }, true);
+            HitShape.BindValueChanged(_ => judgementsFlow.Shape.Value = HitShape.Value, true);
         }
 
         public override void Clear() => judgementsFlow.Clear();
