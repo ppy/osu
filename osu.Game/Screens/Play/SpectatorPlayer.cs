@@ -11,7 +11,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Spectator;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
@@ -81,14 +80,12 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            var legacyRuleset = GameplayState.Ruleset as ILegacyRuleset;
-            Debug.Assert(legacyRuleset != null);
-
             bool isFirstBundle = score.Replay.Frames.Count == 0;
 
             foreach (var frame in bundle.Frames)
             {
-                IConvertibleReplayFrame convertibleFrame = legacyRuleset.CreateConvertibleReplayFrame();
+                IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame();
+                Debug.Assert(convertibleFrame != null);
                 convertibleFrame.FromLegacy(frame, GameplayState.Beatmap);
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;

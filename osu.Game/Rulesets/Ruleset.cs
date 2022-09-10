@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -301,6 +302,13 @@ namespace osu.Game.Rulesets
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
         public virtual LocalisableString GetVariantName(int variant) => string.Empty;
+
+        /// <summary>
+        /// For rulesets which support legacy (osu-stable) replay conversion, this method will create an empty replay frame
+        /// for conversion use.
+        /// </summary>
+        /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
+        public virtual IConvertibleReplayFrame? CreateConvertibleReplayFrame() => null;
 
         /// <summary>
         /// Creates the statistics for a <see cref="ScoreInfo"/> to be displayed in the results screen.
