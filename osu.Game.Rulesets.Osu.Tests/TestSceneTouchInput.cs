@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneTouchInput : TestSceneOsuPlayer
     {
+        private const int hit_delay = 1000;
+
         private Vector2 circlePosition => new Vector2(200);
 
         private OsuInputManager osuInputManager => Player.DrawableRuleset.ChildrenOfType<OsuInputManager>().First();
@@ -26,14 +28,30 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void release(TouchSource source, Vector2 position) => InputManager.EndTouch(new Touch(source, position));
 
+        private int delayMultiplier = 1;
+
+        private void waitHitDelay() => AddUntilStep("Can hit", () =>
+        {
+            bool waited = Player.GameplayClockContainer.Clock.CurrentTime >= hit_delay * delayMultiplier;
+
+            if (waited)
+                delayMultiplier++;
+
+            return waited;
+        });
+
         [Test]
         public void TestTouchInput()
         {
+            waitHitDelay();
+
             // Cursor touch
             AddStep("Touch with cursor finger", () => touch(TouchSource.Touch1, Player.DrawableRuleset.Playfield.ToScreenSpace(circlePosition)));
 
             AddAssert("The touch is a cursor touch", () => touchInputMapper.IsCursorTouch(TouchSource.Touch1));
             AddAssert("Allowing other touch", () => touchInputMapper.AllowingOtherTouch);
+
+            waitHitDelay();
 
             // Left button touch
             AddStep("Touch with other finger", () => touch(TouchSource.Touch2, osuInputManager.ScreenSpaceDrawQuad.Centre));
@@ -43,6 +61,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 1);
             AddAssert("Allowing other touch", () => touchInputMapper.AllowingOtherTouch);
 
+            waitHitDelay();
+
             // Right button touch
             AddStep("Touch with another finger (Doubletapping)...", () => touch(TouchSource.Touch3, osuInputManager.ScreenSpaceDrawQuad.Centre - new Vector2(100)));
 
@@ -50,6 +70,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Both keys are pressed", () => osuInputManager.PressedActions.Count() == 2);
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 2);
             AddAssert("Dragging cursor", () => touchInputMapper.DraggingCursorMode);
+
+            waitHitDelay();
 
             // Invalid touch
             AddStep("Touch with an invalid touch", () => touch(TouchSource.Touch4, osuInputManager.ScreenSpaceDrawQuad.Centre - new Vector2(150)));
@@ -71,17 +93,22 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 new HitCircle()
                 {
-                    StartTime = 1000,
+                    StartTime = hit_delay,
                     Position = circlePosition
                 },
                 new HitCircle()
                 {
-                    StartTime = 2000,
+                    StartTime = hit_delay * 2,
                     Position = circlePosition
                 },
                 new HitCircle()
                 {
-                    StartTime = 3000,
+                    StartTime = hit_delay * 3,
+                    Position = circlePosition
+                },
+                new HitCircle()
+                {
+                    StartTime = hit_delay * 4,
                     Position = circlePosition
                 },
             }
