@@ -53,10 +53,10 @@ namespace osu.Game.Online.Multiplayer
         public IList<MultiplayerPlaylistItem> Playlist { get; set; } = new List<MultiplayerPlaylistItem>();
 
         /// <summary>
-        /// The currently running countdowns.
+        /// The currently-running countdown.
         /// </summary>
         [Key(7)]
-        public IList<MultiplayerCountdown> ActiveCountdowns { get; set; } = new List<MultiplayerCountdown>();
+        public MultiplayerCountdown? Countdown { get; set; }
 
         [JsonConstructor]
         [SerializationConstructor]

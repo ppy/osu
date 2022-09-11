@@ -13,7 +13,7 @@ namespace osu.Game.Online.Multiplayer
     /// and forcing progression of any clients that are blocking load due to user interaction.
     /// </summary>
     [MessagePackObject]
-    public sealed class ForceGameplayStartCountdown : MultiplayerCountdown
+    public class ForceGameplayStartCountdown : MultiplayerCountdown
     {
     }
 }

@@ -552,14 +552,8 @@ namespace osu.Game.Online.Multiplayer
 
                 switch (e)
                 {
-                    case CountdownStartedEvent countdownStartedEvent:
-                        Room.ActiveCountdowns.Add(countdownStartedEvent.Countdown);
-                        break;
-
-                    case CountdownStoppedEvent countdownStoppedEvent:
-                        MultiplayerCountdown? countdown = Room.ActiveCountdowns.FirstOrDefault(countdown => countdown.ID == countdownStoppedEvent.ID);
-                        if (countdown != null)
-                            Room.ActiveCountdowns.Remove(countdown);
+                    case CountdownChangedEvent countdownChangedEvent:
+                        Room.Countdown = countdownChangedEvent.Countdown;
                         break;
                 }
 
