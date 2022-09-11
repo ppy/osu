@@ -2,16 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -56,6 +59,8 @@ namespace osu.Game.Overlays.Notifications
 
         protected Container MainContent;
 
+        private readonly DragContainer dragContainer;
+
         public virtual bool Read { get; set; }
 
         protected virtual IconUsage CloseButtonIcon => FontAwesome.Solid.Check;
@@ -80,7 +85,11 @@ namespace osu.Game.Overlays.Notifications
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
                 },
-                MainContent = new Container
+                dragContainer = new DragContainer(this)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                }.WithChild(MainContent = new Container
                 {
                     CornerRadius = 6,
                     Masking = true,
@@ -144,7 +153,7 @@ namespace osu.Game.Overlays.Notifications
                             Blending = BlendingParameters.Additive,
                         },
                     }
-                }
+                })
             };
         }
 
@@ -213,9 +222,124 @@ namespace osu.Game.Overlays.Notifications
 
             WasClosed = true;
 
-            Closed?.Invoke();
-            this.FadeOut(100);
+            if (dragContainer.FlingLeft())
+            {
+                Light.FadeOut(100);
+                this.FadeOut(600, Easing.In);
+            }
+            else
+            {
+                Closed?.Invoke();
+                this.FadeOut(100);
+            }
+
             Expire();
+        }
+
+        private class DragContainer : Container
+        {
+            private Vector2 velocity;
+            private Vector2 lastPosition;
+
+            private readonly Notification notification;
+
+            public DragContainer(Notification notification)
+            {
+                this.notification = notification;
+                notification.Closed += () => FlingLeft();
+            }
+
+            public override RectangleF BoundingBox
+            {
+                get
+                {
+                    var childBounding = Children.First().BoundingBox;
+
+                    if (X < 0) childBounding *= new Vector2(1, Math.Max(0, 1 + (X / 800)));
+                    if (Y > 0) childBounding *= new Vector2(1, Math.Max(0, 1 - (Y / 800)));
+
+                    return childBounding;
+                }
+            }
+
+            protected override bool OnDragStart(DragStartEvent e) => true;
+
+            protected override void OnDrag(DragEvent e)
+            {
+                Vector2 change = e.MousePosition - e.MouseDownPosition;
+
+                // Diminish the drag distance as we go further to simulate "rubber band" feeling.
+                change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.9f) / change.Length;
+
+                // Only apply Y change if dragging to the left.
+                if (change.X > 0)
+                    change.Y = 0;
+
+                this.MoveTo(change);
+            }
+
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                if (Rotation < -10 || velocity.X < -0.3f)
+                {
+                    FlingLeft();
+                }
+                else
+                {
+                    this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
+                    this.RotateTo(0, 800, Easing.OutElastic);
+                }
+
+                base.OnDragEnd(e);
+            }
+
+            private bool flinging;
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                Rotation = Math.Min(0, X * 0.1f);
+
+                if (flinging)
+                {
+                    velocity.Y += (float)Clock.ElapsedFrameTime * 0.005f;
+                    Position += (float)Clock.ElapsedFrameTime * velocity;
+                }
+                else
+                {
+                    Vector2 change = (Position - lastPosition) / (float)Clock.ElapsedFrameTime;
+
+                    if (velocity.X == 0)
+                        velocity = change;
+                    else
+                    {
+                        velocity = new Vector2(
+                            (float)Interpolation.DampContinuously(velocity.X, change.X, 40, Clock.ElapsedFrameTime),
+                            (float)Interpolation.DampContinuously(velocity.Y, change.Y, 40, Clock.ElapsedFrameTime)
+                        );
+                    }
+
+                    lastPosition = Position;
+                }
+            }
+
+            public bool FlingLeft()
+            {
+                if (this.FindClosestParent<NotificationOverlayToastTray>() == null)
+                    return false;
+
+                if (flinging)
+                    return true;
+
+                if (velocity.X > -0.3f)
+                    velocity.X = -0.3f - 0.5f * RNG.NextSingle();
+
+                flinging = true;
+                ClearTransforms();
+                notification.Close();
+                return true;
+            }
         }
 
         internal class CloseButton : OsuClickableContainer
