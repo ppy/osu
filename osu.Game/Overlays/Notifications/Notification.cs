@@ -68,10 +68,21 @@ namespace osu.Game.Overlays.Notifications
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        private bool isInToastTray;
+
         /// <summary>
         /// Whether this notification is in the <see cref="NotificationOverlayToastTray"/>.
         /// </summary>
-        public bool IsInTray { get; set; }
+        public bool IsInToastTray
+        {
+            private get => isInToastTray;
+            set
+            {
+                isInToastTray = value;
+                if (!isInToastTray)
+                    dragContainer.ResetPosition();
+            }
+        }
 
         private readonly Box initialFlash;
 
@@ -267,10 +278,13 @@ namespace osu.Game.Overlays.Notifications
                 }
             }
 
-            protected override bool OnDragStart(DragStartEvent e) => notification.IsInTray;
+            protected override bool OnDragStart(DragStartEvent e) => notification.IsInToastTray;
 
             protected override void OnDrag(DragEvent e)
             {
+                if (!notification.IsInToastTray)
+                    return;
+
                 Vector2 change = e.MousePosition - e.MouseDownPosition;
 
                 // Diminish the drag distance as we go further to simulate "rubber band" feeling.
@@ -286,14 +300,9 @@ namespace osu.Game.Overlays.Notifications
             protected override void OnDragEnd(DragEndEvent e)
             {
                 if (Rotation < -10 || velocity.X < -0.3f)
-                {
                     FlingLeft();
-                }
                 else
-                {
-                    this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-                    this.RotateTo(0, 800, Easing.OutElastic);
-                }
+                    ResetPosition();
 
                 base.OnDragEnd(e);
             }
@@ -331,7 +340,7 @@ namespace osu.Game.Overlays.Notifications
 
             public bool FlingLeft()
             {
-                if (!notification.IsInTray)
+                if (!notification.IsInToastTray)
                     return false;
 
                 if (flinging)
@@ -344,6 +353,12 @@ namespace osu.Game.Overlays.Notifications
                 ClearTransforms();
                 notification.Close();
                 return true;
+            }
+
+            public void ResetPosition()
+            {
+                this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
+                this.RotateTo(0, 800, Easing.OutElastic);
             }
         }
 
