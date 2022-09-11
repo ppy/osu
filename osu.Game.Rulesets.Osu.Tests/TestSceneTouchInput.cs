@@ -45,7 +45,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
             AddStep("Create key counter", () => osuInputManager.Add(new Container
             {
-                Children = new Drawable[] {
+                Children = new Drawable[]
+                {
                     leftKeyCounter = new OsuActionKeyCounter(OsuAction.LeftButton),
                     new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } }
                 },
