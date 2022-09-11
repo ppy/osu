@@ -65,7 +65,6 @@ namespace osu.Game.Rulesets.Osu
             if (touchInputMapper.IsTapTouch(source))
                 return true;
 
-
             return base.HandleMouseTouchStateChange(e);
         }
 

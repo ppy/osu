@@ -38,9 +38,6 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// Tracks the amount of active touches.
         /// </summary>
-        /// <remarks>
-        /// Since <see cref="OsuInputManager"/>'s active sources uses an internal hash set, the time complexity for this should be o(1)
-        /// </remarks>
         private int activeTouchesAmount => osuInputManager.CurrentState.Touch.ActiveSources.Count();
 
         /// <summary>
