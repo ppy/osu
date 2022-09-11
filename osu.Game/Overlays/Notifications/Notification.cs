@@ -68,6 +68,11 @@ namespace osu.Game.Overlays.Notifications
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        /// <summary>
+        /// Whether this notification is in the <see cref="NotificationOverlayToastTray"/>.
+        /// </summary>
+        public bool IsInTray { get; set; }
+
         private readonly Box initialFlash;
 
         private Box background = null!;
@@ -262,7 +267,7 @@ namespace osu.Game.Overlays.Notifications
                 }
             }
 
-            protected override bool OnDragStart(DragStartEvent e) => true;
+            protected override bool OnDragStart(DragStartEvent e) => notification.IsInTray;
 
             protected override void OnDrag(DragEvent e)
             {
@@ -326,7 +331,7 @@ namespace osu.Game.Overlays.Notifications
 
             public bool FlingLeft()
             {
-                if (this.FindClosestParent<NotificationOverlayToastTray>() == null)
+                if (!notification.IsInTray)
                     return false;
 
                 if (flinging)
