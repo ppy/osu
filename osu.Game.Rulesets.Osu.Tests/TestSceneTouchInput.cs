@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private OsuActionKeyCounter leftKeyCounter = null!;
 
-        private OsuActionKeyCounter rightKeyCounter = null!;
-
         private Vector2 touchPosition => osuInputManager.ScreenSpaceDrawQuad.Centre;
 
         private void touch(TouchSource source) => InputManager.BeginTouch(new Touch(source, touchPosition));
@@ -49,14 +47,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Children = new Drawable[] {
                     leftKeyCounter = new OsuActionKeyCounter(OsuAction.LeftButton),
-                    rightKeyCounter = new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } }
+                    new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } }
                 },
                 Position = osuInputManager.ToLocalSpace(ScreenSpaceDrawQuad.Centre)
             }));
         }
 
-        private string getTouchString(TouchSource source) => NumberToWordsExtension.ToOrdinalWords(source - TouchSource.Touch1 + 1);
-
+        private string getTouchString(TouchSource source) => (source - TouchSource.Touch1 + 1).ToOrdinalWords();
 
         private void addTouchWithFingerStep(TouchSource source) => AddStep($"Touch with {getTouchString(source)} finger", () => touch(source));
 
