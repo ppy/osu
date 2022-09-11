@@ -41,6 +41,11 @@ namespace osu.Game.Rulesets.Osu.UI
         private int activeTouchesAmount => osuInputManager.CurrentState.Touch.ActiveSources.Count();
 
         /// <summary>
+        /// Tracks whether we just entered a tap only mapping state.
+        /// </summary>
+        public bool EnteredTapOnlyMapping;
+
+        /// <summary>
         /// Used to track whether the mapped inputs will only map for tap touches, this only happens if there are <see cref="allowed_touches_limit"/> touches being pressed or more.
         /// </summary>
         public bool TapOnlyMapping => activeTouchesAmount >= allowed_touches_limit;
@@ -70,8 +75,19 @@ namespace osu.Game.Rulesets.Osu.UI
 
             if (IsTapTouch(source))
             {
-                if (TapOnlyMapping && osuInputManager.CurrentState.Touch.IsActive(TouchSource.Touch1))
-                    osuInputManager.HandleTouchTapOnlyMapping();
+                if (TapOnlyMapping)
+                {
+                    if (!EnteredTapOnlyMapping)
+                    {
+                        EnteredTapOnlyMapping = true;
+                        if (osuInputManager.CurrentState.Touch.IsActive(TouchSource.Touch1))
+                            osuInputManager.HandleTouchTapOnlyMapping();
+                    }
+                }
+                else
+                {
+                    EnteredTapOnlyMapping = false;
+                }
 
                 ActiveTapTouches.Add(source);
                 keyBindingContainer.TriggerPressed(tapTouchActions[source]);

@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             expectTapTouchesAmount(2);
             assertTapTouch(TouchSource.Touch3);
-            AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping);
+            AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping && touchInputMapper.EnteredTapOnlyMapping);
             AddAssert("Both keys are pressed", () => osuInputManager.PressedActions.Count() == 2);
             AddAssert($"The {getTouchString(TouchSource.Touch3)} finger input was handled", () => leftKeyCounter.CountPresses == 2);
         }
