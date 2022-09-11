@@ -32,47 +32,62 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void release(TouchSource source) => InputManager.EndTouch(new Touch(source, touchPosition));
 
-        [Test]
-        public void TestTouchInput()
+        [SetUpSteps]
+        public void Setup()
         {
-            // Cleanup
             AddStep("Release touches", () =>
             {
                 foreach (TouchSource source in Enum.GetValues(typeof(TouchSource)))
                     release(source);
             });
-
-            // Setup
             AddStep("Create key counter", () => osuInputManager.Add(new Container
             {
                 Children = new Drawable[] { new OsuActionKeyCounter(OsuAction.LeftButton), new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } } },
                 Position = osuInputManager.ToLocalSpace(ScreenSpaceDrawQuad.Centre)
             }));
+        }
 
-            // Left button touch 
-            AddStep("Touch with cursor finger", () => touch(TouchSource.Touch1));
+        [Test]
+        public void TestOneFingerInput()
+        {
+            AddStep("Touch with first finger", () => touch(TouchSource.Touch1));
 
             AddAssert("The touch is a cursor touch", () => touchInputMapper.IsCursorTouch(TouchSource.Touch1));
             AddAssert("Allowing other touch", () => touchInputMapper.AllowingOtherTouch);
+        }
 
-            // Right button touch
-            AddStep("Touch with other finger", () => touch(TouchSource.Touch2));
+        [Test]
+        public void TestTwoFingersInput()
+        {
+            AddStep("Touch with first finger", () => touch(TouchSource.Touch1));
+            AddStep("Touch with second finger", () => touch(TouchSource.Touch2));
 
             AddAssert("Pressed other finger key", () => osuInputManager.PressedActions.Contains(OsuAction.RightButton));
             AddAssert("The touch is a tap touch", () => touchInputMapper.IsTapTouch(TouchSource.Touch2));
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 1);
             AddAssert("Allowing other touch", () => touchInputMapper.AllowingOtherTouch);
+        }
 
-            // Left button touch (again)
-            AddStep("Touch with another finger (Doubletapping)...", () => touch(TouchSource.Touch3));
+        [Test]
+        public void TestThreeFingersInput()
+        {
+            AddStep("Touch with first finger", () => touch(TouchSource.Touch1));
+            AddStep("Touch with second finger", () => touch(TouchSource.Touch2));
+            AddStep("Touch with third finger", () => touch(TouchSource.Touch3));
 
-            AddAssert("The other touch is also a tap touch", () => touchInputMapper.IsTapTouch(TouchSource.Touch3));
-            AddAssert("Both keys are pressed", () => osuInputManager.PressedActions.Count() == 2);
+            AddAssert("The third touch is a tap touch", () => touchInputMapper.IsTapTouch(TouchSource.Touch3));
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 2);
             AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping);
+            AddAssert("Both keys are pressed", () => osuInputManager.PressedActions.Count() == 2);
+        }
 
-            // Invalid touch
-            AddStep("Touch with an invalid touch", () => touch(TouchSource.Touch4));
+        [Test]
+        public void TestInvalidFingerInput()
+        {
+            AddStep("Touch with first finger", () => touch(TouchSource.Touch1));
+            AddStep("Touch with second finger", () => touch(TouchSource.Touch2));
+            AddStep("Touch with third finger", () => touch(TouchSource.Touch3));
+            AddStep("Touch with an invalid finger", () => touch(TouchSource.Touch4));
 
             AddAssert("Touch is blocked", () => !touchInputMapper.AllowingOtherTouch);
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 2);
