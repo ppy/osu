@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private OsuActionKeyCounter leftKeyCounter = null!;
 
+        private OsuActionKeyCounter rightKeyCounter = null!;
+
         private Vector2 touchPosition => osuInputManager.ScreenSpaceDrawQuad.Centre;
 
         private void touch(TouchSource source) => InputManager.BeginTouch(new Touch(source, touchPosition));
@@ -48,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Children = new Drawable[]
                 {
                     leftKeyCounter = new OsuActionKeyCounter(OsuAction.LeftButton),
-                    new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } }
+                    rightKeyCounter =  new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } }
                 },
                 Position = osuInputManager.ToLocalSpace(ScreenSpaceDrawQuad.Centre)
             }));
@@ -65,6 +67,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void expectTapTouchesAmount(int expect) => AddAssert($"Has {expect} tap touches active", () => touchInputMapper.ActiveTapTouches.Count == expect);
 
         private void assertAllowingTouchInput() => AddAssert("Allowing other touch input", () => touchInputMapper.AllowingOtherTouch);
+
+        private string getExpectKeyCounterText(string name, int expect) => $"The {name} key was pressed {expect} times";
+
+        private bool getExpectKeyCounterCondition(KeyCounter counter, int expect) => counter.CountPresses == expect;
+
+        private void expectLeftKeyCounterPressedTimes(int expect) => AddAssert(getExpectKeyCounterText("left", expect), () => getExpectKeyCounterCondition(leftKeyCounter, expect));
+
+        private void expectRightKeyCounterPressedTimes(int expect) => AddAssert(getExpectKeyCounterText("right", expect), () => getExpectKeyCounterCondition(rightKeyCounter, expect));
 
         private void steppedTouchWithTwoFingers()
         {
@@ -84,6 +94,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addFirstFingerTouchStep();
 
             assertAllowingTouchInput();
+            expectLeftKeyCounterPressedTimes(1);
             AddAssert("The touch is a cursor touch", () => touchInputMapper.IsCursorTouch(TouchSource.Touch1));
         }
 
@@ -95,7 +106,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertTapTouch(TouchSource.Touch2);
             expectTapTouchesAmount(1);
             assertAllowingTouchInput();
-            AddAssert("Pressed other finger key", () => osuInputManager.PressedActions.Contains(OsuAction.RightButton));
+            expectLeftKeyCounterPressedTimes(1);
+            expectRightKeyCounterPressedTimes(1);
         }
 
         [Test]
@@ -105,9 +117,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             expectTapTouchesAmount(2);
             assertTapTouch(TouchSource.Touch3);
+            expectRightKeyCounterPressedTimes(1);
+            expectLeftKeyCounterPressedTimes(2);
             AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping && touchInputMapper.EnteredTapOnlyMapping);
-            AddAssert("Both keys are pressed", () => osuInputManager.PressedActions.Count() == 2);
-            AddAssert($"The {getTouchString(TouchSource.Touch3)} finger input was handled", () => leftKeyCounter.CountPresses == 2);
         }
 
         [Test]
@@ -117,6 +129,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             addTouchWithFingerStep(TouchSource.Touch4);
 
             expectTapTouchesAmount(2);
+            expectLeftKeyCounterPressedTimes(2);
+            expectRightKeyCounterPressedTimes(1);
             AddAssert("Touch input is blocked", () => !touchInputMapper.AllowingOtherTouch);
         }
 
