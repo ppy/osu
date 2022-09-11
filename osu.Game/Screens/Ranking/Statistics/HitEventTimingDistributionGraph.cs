@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -209,13 +210,12 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         private class Bar : CompositeDrawable
         {
-            private float totalValue => values.Sum(v => v.Value);
-            private float basalHeight => BoundingBox.Width / BoundingBox.Height;
-            private float availableHeight => 1 - basalHeight;
-
             private readonly IReadOnlyList<KeyValuePair<HitResult, int>> values;
             private readonly float maxValue;
             private readonly bool isCentre;
+            private readonly float totalValue;
+            private readonly BindableFloat basalHeight;
+            private readonly BindableFloat offsetAdjustment;
 
             private Circle[] boxOriginals;
             private Circle boxAdjustment;
@@ -228,6 +228,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                 this.values = values.OrderBy(v => v.Key.GetIndexForOrderedDisplay()).ToList();
                 this.maxValue = maxValue;
                 this.isCentre = isCentre;
+                totalValue = values.Sum(v => v.Value);
+                basalHeight = new BindableFloat();
+                offsetAdjustment = new BindableFloat(totalValue);
 
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
@@ -254,38 +257,70 @@ namespace osu.Game.Screens.Ranking.Statistics
                 else
                 {
                     // A bin with no value draws a grey dot instead.
-                    InternalChildren = boxOriginals = new[]
+                    Circle dot = new Circle
                     {
-                        new Circle
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Colour = isCentre ? Color4.White : Color4.Gray,
-                            Height = 0,
-                        },
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Colour = isCentre ? Color4.White : Color4.Gray,
+                        Height = 0,
                     };
+                    InternalChildren = boxOriginals = new[] { dot };
+                    basalHeight.BindValueChanged(e => dot.Height = e.NewValue);
                 }
+
+                offsetAdjustment.BindValueChanged(_ => drawAdjustmentBar());
             }
 
             private const double duration = 300;
 
-            private float offsetForValue(float value)
+            private float calculateBasalHeight() => DrawHeight == 0 ? 0 : DrawWidth / DrawHeight;
+
+            private float offsetForValue(float value) => (1 - basalHeight.Value) * value / maxValue;
+
+            private float heightForValue(float value) => MathF.Max(basalHeight.Value + offsetForValue(value), 0);
+
+            private void draw()
             {
-                return availableHeight * value / maxValue;
+                resizeBars();
+
+                if (boxAdjustment != null)
+                    drawAdjustmentBar();
             }
 
-            private float heightForValue(float value)
+            private void resizeBars()
             {
-                return basalHeight + offsetForValue(value);
+                float offsetValue = 0;
+
+                for (int i = 0; i < values.Count; i++)
+                {
+                    boxOriginals[i].Y = offsetForValue(offsetValue) * BoundingBox.Height;
+                    boxOriginals[i].Height = heightForValue(values[i].Value);
+                    offsetValue -= values[i].Value;
+                }
+            }
+
+            private void drawAdjustmentBar()
+            {
+                bool hasAdjustment = offsetAdjustment.Value != totalValue;
+
+                boxAdjustment.ResizeHeightTo(heightForValue(offsetAdjustment.Value), duration, Easing.OutQuint);
+                boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
+                float height = calculateBasalHeight();
+
+                basalHeight.Set(height);
+
+                if (!values.Any())
+                    return;
+
                 foreach (var boxOriginal in boxOriginals)
-                    boxOriginal.Height = basalHeight;
+                    boxOriginal.Height = height;
 
                 float offsetValue = 0;
 
@@ -295,6 +330,15 @@ namespace osu.Game.Screens.Ranking.Statistics
                     boxOriginals[i].ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
                     offsetValue -= values[i].Value;
                 }
+
+                basalHeight.BindValueChanged(_ => draw());
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                basalHeight.Set(calculateBasalHeight());
             }
 
             public void UpdateOffset(float adjustment)
@@ -318,8 +362,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     });
                 }
 
-                boxAdjustment.ResizeHeightTo(heightForValue(adjustment), duration, Easing.OutQuint);
-                boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
+                offsetAdjustment.Set(adjustment);
             }
         }
     }
