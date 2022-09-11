@@ -27,6 +27,10 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private OsuTouchInputMapper touchInputMapper => osuInputManager.ChildrenOfType<OsuTouchInputMapper>().First();
 
+        private OsuActionKeyCounter leftKeyCounter = null!;
+
+        private OsuActionKeyCounter rightKeyCounter = null!;
+
         private Vector2 touchPosition => osuInputManager.ScreenSpaceDrawQuad.Centre;
 
         private void touch(TouchSource source) => InputManager.BeginTouch(new Touch(source, touchPosition));
@@ -43,7 +47,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
             AddStep("Create key counter", () => osuInputManager.Add(new Container
             {
-                Children = new Drawable[] { new OsuActionKeyCounter(OsuAction.LeftButton), new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } } },
+                Children = new Drawable[] {
+                    leftKeyCounter = new OsuActionKeyCounter(OsuAction.LeftButton),
+                    rightKeyCounter = new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } }
+                },
                 Position = osuInputManager.ToLocalSpace(ScreenSpaceDrawQuad.Centre)
             }));
         }
@@ -97,6 +104,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertTapTouch(TouchSource.Touch3);
             AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping);
             AddAssert("Both keys are pressed", () => osuInputManager.PressedActions.Count() == 2);
+            AddAssert($"The {getTouchString(TouchSource.Touch3)} finger input was handled", () => leftKeyCounter.CountPresses == 2);
         }
 
         [Test]
@@ -108,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addTouchWithFingerStep(TouchSource.Touch4);
 
             expectTapTouchesAmount(2);
-            AddAssert("Touch is blocked", () => !touchInputMapper.AllowingOtherTouch);
+            AddAssert("Touch input is blocked", () => !touchInputMapper.AllowingOtherTouch);
         }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap { HitObjects = new List<HitObject> { new HitCircle { StartTime = 99999 } } };
