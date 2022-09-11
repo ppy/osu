@@ -60,15 +60,23 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void addFirstFingerTouchStep() => addTouchWithFingerStep(TouchSource.Touch1);
 
-        private void addSecondFingerTouchStep() => addTouchWithFingerStep(TouchSource.Touch2);
-
-        private void addThirdFingerTouchStep() => addTouchWithFingerStep(TouchSource.Touch3);
-
         private void assertTapTouch(TouchSource source) => AddAssert($"The {getTouchString(source)} touch is a tap touch", () => touchInputMapper.IsTapTouch(source));
 
         private void expectTapTouchesAmount(int expect) => AddAssert($"Has {expect} tap touches active", () => touchInputMapper.ActiveTapTouches.Count == expect);
 
         private void assertAllowingTouchInput() => AddAssert("Allowing other touch input", () => touchInputMapper.AllowingOtherTouch);
+
+        private void steppedTouchWithTwoFingers()
+        {
+            addFirstFingerTouchStep();
+            addTouchWithFingerStep(TouchSource.Touch2);
+        }
+
+        private void steppedTouchWithThreeFingers()
+        {
+            steppedTouchWithTwoFingers();
+            addTouchWithFingerStep(TouchSource.Touch3);
+        }
 
         [Test]
         public void TestOneFingerInput()
@@ -82,8 +90,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTwoFingersInput()
         {
-            addFirstFingerTouchStep();
-            addSecondFingerTouchStep();
+            steppedTouchWithTwoFingers();
 
             assertTapTouch(TouchSource.Touch2);
             expectTapTouchesAmount(1);
@@ -94,9 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestThreeFingersInput()
         {
-            addFirstFingerTouchStep();
-            addSecondFingerTouchStep();
-            addThirdFingerTouchStep();
+            steppedTouchWithThreeFingers();
 
             expectTapTouchesAmount(2);
             assertTapTouch(TouchSource.Touch3);
@@ -108,9 +113,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestInvalidFingerInput()
         {
-            addFirstFingerTouchStep();
-            addSecondFingerTouchStep();
-            addThirdFingerTouchStep();
+            steppedTouchWithThreeFingers();
             addTouchWithFingerStep(TouchSource.Touch4);
 
             expectTapTouchesAmount(2);
