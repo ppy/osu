@@ -104,6 +104,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addFirstFingerTouchStep();
 
             assertAllowingTouchInput();
+            expectTapTouchesAmount(0);
             expectKeyCountersCountingBe(1, 0);
             expectPressedCurrently(OsuAction.LeftButton);
             AddAssert("The touch is a cursor touch", () => touchInputMapper.IsCursorTouch(TouchSource.Touch1));
