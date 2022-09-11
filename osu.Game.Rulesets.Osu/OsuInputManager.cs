@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
@@ -53,8 +54,17 @@ namespace osu.Game.Rulesets.Osu
         {
             var source = e.Touch.Source;
 
-            if (touchInputMapper.TapOnlyMapping && touchInputMapper.IsCursorTouch(source))
-                e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
+            if (touchInputMapper.TapOnlyMapping && CurrentState.Touch.IsActive(TouchSource.Touch1))
+            {
+                var firstTouchPosition = CurrentState.Touch.GetTouchPosition(TouchSource.Touch1)!.Value;
+                var inactiveFirstTouchEvent = new TouchStateChangeEvent(e.State, e.Input, new Touch(TouchSource.Touch1, firstTouchPosition), false, firstTouchPosition);
+
+                base.HandleMouseTouchStateChange(inactiveFirstTouchEvent);
+            }
+
+            if (touchInputMapper.IsTapTouch(source))
+                return true;
+
 
             return base.HandleMouseTouchStateChange(e);
         }
