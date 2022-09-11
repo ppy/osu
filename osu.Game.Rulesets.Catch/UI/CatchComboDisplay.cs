@@ -4,9 +4,13 @@
 #nullable disable
 
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -22,9 +26,67 @@ namespace osu.Game.Rulesets.Catch.UI
         [CanBeNull]
         public ICatchComboCounter ComboCounter => Drawable as ICatchComboCounter;
 
+        private Bindable<HUDVisibilityMode> hudVisibilityMode = null!;
+
+        private readonly BindableBool replayLoaded = new BindableBool();
+
+        private readonly BindableBool showCombo = new BindableBool();
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         public CatchComboDisplay()
             : base(new CatchSkinComponent(CatchSkinComponents.CatchComboCounter), _ => Empty())
         {
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(DrawableRuleset drawableRuleset)
+        {
+            hudVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
+
+            hudVisibilityMode.BindValueChanged(s =>
+            {
+                updateVisibilityState();
+            });
+
+            if (drawableRuleset != null)
+                replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
+
+            replayLoaded.BindValueChanged(s =>
+            {
+                updateVisibilityState();
+            });
+
+            showCombo.BindValueChanged(s =>
+            {
+                if (ComboCounter == null) return;
+
+                if (!s.NewValue)
+                {
+                    ComboCounter.Hide();
+                }
+            });
+
+            updateVisibilityState();
+
+            void updateVisibilityState()
+            {
+                switch (hudVisibilityMode.Value)
+                {
+                    case HUDVisibilityMode.Never:
+                        showCombo.Value = false;
+                        break;
+
+                    case HUDVisibilityMode.HideDuringGameplay:
+                        showCombo.Value = replayLoaded.Value;
+                        break;
+
+                    case HUDVisibilityMode.Always:
+                        showCombo.Value = true;
+                        break;
+                }
+            }
         }
 
         protected override void SkinChanged(ISkinSource skin)
@@ -57,6 +119,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void updateCombo(int newCombo, Color4? hitObjectColour)
         {
+            if (!showCombo.Value) return;
+
             currentCombo = newCombo;
             ComboCounter?.UpdateCombo(newCombo, hitObjectColour);
         }
