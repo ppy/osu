@@ -45,8 +45,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             // Setup
             AddStep("Create key counter", () => osuInputManager.Add(new Container
             {
-                Children = new Drawable[] { new OsuActionKeyCounter(OsuAction.LeftButton), new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 200 } } },
-                Position = touchPosition - new Vector2(250, 0)
+                Children = new Drawable[] { new OsuActionKeyCounter(OsuAction.LeftButton), new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } } },
+                Position = osuInputManager.ToLocalSpace(ScreenSpaceDrawQuad.Centre)
             }));
 
             // Cursor touch
