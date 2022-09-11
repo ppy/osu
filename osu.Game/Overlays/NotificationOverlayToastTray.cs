@@ -118,7 +118,7 @@ namespace osu.Game.Overlays
                     return;
 
                 // Notification hovered; delay dismissal.
-                if (notification.IsHovered)
+                if (notification.IsHovered || notification.IsDragged)
                 {
                     scheduleDismissal();
                     return;
