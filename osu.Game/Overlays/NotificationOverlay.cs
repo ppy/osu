@@ -159,7 +159,7 @@ namespace osu.Game.Overlays
 
             if (State.Value == Visibility.Hidden)
             {
-                notification.IsInTray = true;
+                notification.IsInToastTray = true;
                 toastTray.Post(notification);
             }
             else
@@ -170,7 +170,7 @@ namespace osu.Game.Overlays
 
         private void addPermanently(Notification notification)
         {
-            notification.IsInTray = false;
+            notification.IsInToastTray = false;
 
             var ourType = notification.GetType();
             int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
