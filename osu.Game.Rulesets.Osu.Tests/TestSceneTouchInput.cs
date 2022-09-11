@@ -78,11 +78,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping);
             AddAssert("The third touch is a tap touch", () => touchInputMapper.IsTapTouch(TouchSource.Touch3));
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 2);
-            AddAssert("Disabled left key", () => !osuInputManager.PressedActions.Contains(OsuAction.LeftButton));
-
-            AddStep("Release third finger", () => release(TouchSource.Touch3));
-            AddStep("Touch with third finger once again", () => touch(TouchSource.Touch3));
-
             AddAssert("Both keys are pressed", () => osuInputManager.PressedActions.Count() == 2);
         }
 
