@@ -54,18 +54,19 @@ namespace osu.Game.Rulesets.Osu
         {
             var source = e.Touch.Source;
 
-            if (touchInputMapper.TapOnlyMapping && CurrentState.Touch.IsActive(TouchSource.Touch1))
-            {
-                var firstTouchPosition = CurrentState.Touch.GetTouchPosition(TouchSource.Touch1)!.Value;
-                var inactiveFirstTouchEvent = new TouchStateChangeEvent(e.State, e.Input, new Touch(TouchSource.Touch1, firstTouchPosition), false, firstTouchPosition);
-
-                base.HandleMouseTouchStateChange(inactiveFirstTouchEvent);
-            }
-
             if (touchInputMapper.IsTapTouch(source))
                 return true;
 
             return base.HandleMouseTouchStateChange(e);
+        }
+
+        /// <summary>
+        /// Disables mouse input for the first touch, so <see cref="OsuTouchInputMapper"/> can handle input for both keys for streaming.
+        /// </summary>
+        public void HandleTouchTapOnlyMapping()
+        {
+            var firstTouchPosition = CurrentState.Touch.GetTouchPosition(TouchSource.Touch1)!.Value;
+            base.HandleMouseTouchStateChange(new TouchStateChangeEvent(CurrentState, null, new Touch(TouchSource.Touch1, firstTouchPosition), false, firstTouchPosition));
         }
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer

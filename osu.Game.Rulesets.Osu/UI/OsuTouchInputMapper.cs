@@ -65,8 +65,14 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             var source = e.Touch.Source;
 
-            if (AllowingOtherTouch && IsTapTouch(source))
+            if (!AllowingOtherTouch)
+                return base.OnTouchDown(e);
+
+            if (IsTapTouch(source))
             {
+                if (TapOnlyMapping && osuInputManager.CurrentState.Touch.IsActive(TouchSource.Touch1))
+                    osuInputManager.HandleTouchTapOnlyMapping();
+
                 ActiveTapTouches.Add(source);
                 keyBindingContainer.TriggerPressed(tapTouchActions[source]);
             }
