@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -47,50 +48,67 @@ namespace osu.Game.Rulesets.Osu.Tests
             }));
         }
 
+        private string getTouchString(TouchSource source) => NumberToWordsExtension.ToOrdinalWords(source - TouchSource.Touch1 + 1);
+
+
+        private void addTouchWithFingerStep(TouchSource source) => AddStep($"Touch with {getTouchString(source)} finger", () => touch(source));
+
+        private void addFirstFingerTouchStep() => addTouchWithFingerStep(TouchSource.Touch1);
+
+        private void addSecondFingerTouchStep() => addTouchWithFingerStep(TouchSource.Touch2);
+
+        private void addThirdFingerTouchStep() => addTouchWithFingerStep(TouchSource.Touch3);
+
+        private void assertTapTouch(TouchSource source) => AddAssert($"The {getTouchString(source)} touch is a tap touch", () => touchInputMapper.IsTapTouch(source));
+
+        private void expectTapTouchesAmount(int expect) => AddAssert($"Has {expect} tap touches active", () => touchInputMapper.ActiveTapTouches.Count == expect);
+
+        private void assertAllowingTouchInput() => AddAssert("Allowing other touch input", () => touchInputMapper.AllowingOtherTouch);
+
         [Test]
         public void TestOneFingerInput()
         {
-            AddStep("Touch with first finger", () => touch(TouchSource.Touch1));
+            addFirstFingerTouchStep();
 
+            assertAllowingTouchInput();
             AddAssert("The touch is a cursor touch", () => touchInputMapper.IsCursorTouch(TouchSource.Touch1));
-            AddAssert("Allowing other touch", () => touchInputMapper.AllowingOtherTouch);
         }
 
         [Test]
         public void TestTwoFingersInput()
         {
-            AddStep("Touch with first finger", () => touch(TouchSource.Touch1));
-            AddStep("Touch with second finger", () => touch(TouchSource.Touch2));
+            addFirstFingerTouchStep();
+            addSecondFingerTouchStep();
 
+            assertTapTouch(TouchSource.Touch2);
+            expectTapTouchesAmount(1);
+            assertAllowingTouchInput();
             AddAssert("Pressed other finger key", () => osuInputManager.PressedActions.Contains(OsuAction.RightButton));
-            AddAssert("The touch is a tap touch", () => touchInputMapper.IsTapTouch(TouchSource.Touch2));
-            AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 1);
-            AddAssert("Allowing other touch", () => touchInputMapper.AllowingOtherTouch);
         }
 
         [Test]
         public void TestThreeFingersInput()
         {
-            AddStep("Touch with first finger", () => touch(TouchSource.Touch1));
-            AddStep("Touch with second finger", () => touch(TouchSource.Touch2));
-            AddStep("Touch with third finger", () => touch(TouchSource.Touch3));
+            addFirstFingerTouchStep();
+            addSecondFingerTouchStep();
+            addThirdFingerTouchStep();
 
+            expectTapTouchesAmount(2);
+            assertTapTouch(TouchSource.Touch3);
             AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping);
-            AddAssert("The third touch is a tap touch", () => touchInputMapper.IsTapTouch(TouchSource.Touch3));
-            AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 2);
             AddAssert("Both keys are pressed", () => osuInputManager.PressedActions.Count() == 2);
         }
 
         [Test]
         public void TestInvalidFingerInput()
         {
-            AddStep("Touch with first finger", () => touch(TouchSource.Touch1));
-            AddStep("Touch with second finger", () => touch(TouchSource.Touch2));
-            AddStep("Touch with third finger", () => touch(TouchSource.Touch3));
-            AddStep("Touch with an invalid finger", () => touch(TouchSource.Touch4));
+            addFirstFingerTouchStep();
+            addSecondFingerTouchStep();
+            addThirdFingerTouchStep();
+            addTouchWithFingerStep(TouchSource.Touch4);
 
+            expectTapTouchesAmount(2);
             AddAssert("Touch is blocked", () => !touchInputMapper.AllowingOtherTouch);
-            AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 2);
         }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap { HitObjects = new List<HitObject> { new HitCircle { StartTime = 99999 } } };
