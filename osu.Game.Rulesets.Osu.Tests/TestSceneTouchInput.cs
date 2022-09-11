@@ -49,13 +49,13 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Position = osuInputManager.ToLocalSpace(ScreenSpaceDrawQuad.Centre)
             }));
 
-            // Cursor touch
+            // Left button touch 
             AddStep("Touch with cursor finger", () => touch(TouchSource.Touch1));
 
             AddAssert("The touch is a cursor touch", () => touchInputMapper.IsCursorTouch(TouchSource.Touch1));
             AddAssert("Allowing other touch", () => touchInputMapper.AllowingOtherTouch);
 
-            // Left button touch
+            // Right button touch
             AddStep("Touch with other finger", () => touch(TouchSource.Touch2));
 
             AddAssert("Pressed other finger key", () => osuInputManager.PressedActions.Contains(OsuAction.RightButton));
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Check active tap touches", () => touchInputMapper.ActiveTapTouches.Count == 1);
             AddAssert("Allowing other touch", () => touchInputMapper.AllowingOtherTouch);
 
-            // Right button touch
+            // Left button touch (again)
             AddStep("Touch with another finger (Doubletapping)...", () => touch(TouchSource.Touch3));
 
             AddAssert("The other touch is also a tap touch", () => touchInputMapper.IsTapTouch(TouchSource.Touch3));
