@@ -18,14 +18,13 @@ namespace osu.Game.Skinning
         private readonly HitResult result;
 
         private readonly float finalScale;
+        private readonly bool forceTransforms;
 
-        private readonly bool allowTransforms;
-
-        public LegacyJudgementPieceOld(HitResult result, Func<Drawable> createMainDrawable, float finalScale = 1f, bool allowTransforms = false)
+        public LegacyJudgementPieceOld(HitResult result, Func<Drawable> createMainDrawable, float finalScale = 1f, bool forceTransforms = false)
         {
             this.result = result;
             this.finalScale = finalScale;
-            this.allowTransforms = allowTransforms;
+            this.forceTransforms = forceTransforms;
 
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.Centre;
@@ -47,7 +46,7 @@ namespace osu.Game.Skinning
             this.Delay(fade_out_delay).FadeOut(fade_out_length);
 
             // legacy judgements don't play any transforms if they are an animation.... UNLESS they are the temporary displayed judgement from new piece.
-            if (!allowTransforms && animation?.FrameCount > 1)
+            if (animation?.FrameCount > 1 && !forceTransforms)
                 return;
 
             switch (result)
