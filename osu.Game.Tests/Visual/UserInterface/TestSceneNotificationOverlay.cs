@@ -12,6 +12,7 @@ using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Updater;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -132,6 +133,35 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddWaitStep("wait 3", 3);
 
             AddStep("cancel notification", () => notification.State = ProgressNotificationState.Cancelled);
+        }
+
+        [Test]
+        public void TestUpdateNotificationFlow()
+        {
+            bool applyUpdate = false;
+
+            AddStep(@"post update", () =>
+            {
+                applyUpdate = false;
+
+                var updateNotification = new UpdateManager.UpdateProgressNotification
+                {
+                    CompletionClickAction = () => applyUpdate = true
+                };
+
+                notificationOverlay.Post(updateNotification);
+                progressingNotifications.Add(updateNotification);
+            });
+
+            checkProgressingCount(1);
+            waitForCompletion();
+
+            UpdateManager.UpdateApplicationCompleteNotification? completionNotification = null;
+            AddUntilStep("wait for completion notification",
+                () => (completionNotification = notificationOverlay.ChildrenOfType<UpdateManager.UpdateApplicationCompleteNotification>().SingleOrDefault()) != null);
+            AddStep("click notification", () => completionNotification?.TriggerClick());
+
+            AddUntilStep("wait for update applied", () => applyUpdate);
         }
 
         [Test]
