@@ -49,6 +49,43 @@ namespace osu.Game.Tests.Visual.UserInterface
         });
 
         [Test]
+        public void TestForwardWithFlingRight()
+        {
+            bool activated = false;
+            SimpleNotification notification = null!;
+
+            AddStep("post", () =>
+            {
+                activated = false;
+                notificationOverlay.Post(notification = new SimpleNotification
+                {
+                    Text = @"Welcome to osu!. Enjoy your stay!",
+                    Activated = () => activated = true,
+                });
+            });
+
+            AddStep("start drag", () =>
+            {
+                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single());
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single().ScreenSpaceDrawQuad.Centre + new Vector2(500, 0));
+            });
+
+            AddStep("fling away", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("was not closed", () => !notification.WasClosed);
+            AddAssert("was not activated", () => !activated);
+            AddAssert("is not read", () => !notification.Read);
+            AddAssert("is not toast", () => !notification.IsInToastTray);
+
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+            AddAssert("unread count one", () => notificationOverlay.UnreadCount.Value == 1);
+        }
+
+        [Test]
         public void TestDismissWithoutActivationFling()
         {
             bool activated = false;
