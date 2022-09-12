@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.Notifications
                                     },
                                     new CloseButton(CloseButtonIcon)
                                     {
-                                        Action = Close,
+                                        Action = () => Close(true),
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
                                     }
@@ -214,7 +214,7 @@ namespace osu.Game.Overlays.Notifications
             // right click doesn't trigger OnClick so we need to handle here until that changes.
             if (e.Button != MouseButton.Left)
             {
-                Close();
+                Close(true);
                 return true;
             }
 
@@ -227,7 +227,7 @@ namespace osu.Game.Overlays.Notifications
             if (e.Button == MouseButton.Left)
                 Activated?.Invoke();
 
-            Close();
+            Close(true);
             return true;
         }
 
@@ -245,13 +245,13 @@ namespace osu.Game.Overlays.Notifications
 
         public bool WasClosed;
 
-        public virtual void Close()
+        public virtual void Close(bool userTriggered)
         {
             if (WasClosed) return;
 
             WasClosed = true;
 
-            if (dragContainer.FlingLeft())
+            if (userTriggered && dragContainer.FlingLeft())
                 this.FadeOut(600, Easing.In);
             else
             {
@@ -272,7 +272,6 @@ namespace osu.Game.Overlays.Notifications
             public DragContainer(Notification notification)
             {
                 this.notification = notification;
-                notification.Closed += () => FlingLeft();
             }
 
             public override RectangleF BoundingBox
@@ -363,7 +362,7 @@ namespace osu.Game.Overlays.Notifications
 
                 flinging = true;
                 ClearTransforms();
-                notification.Close();
+                notification.Close(true);
                 return true;
             }
 

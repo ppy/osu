@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.Notifications
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
                     attemptPostCompletion();
-                    base.Close();
+                    base.Close(false);
                     break;
             }
         }
@@ -235,12 +235,12 @@ namespace osu.Game.Overlays.Notifications
             });
         }
 
-        public override void Close()
+        public override void Close(bool userTriggered)
         {
             switch (State)
             {
                 case ProgressNotificationState.Cancelled:
-                    base.Close();
+                    base.Close(userTriggered);
                     break;
 
                 case ProgressNotificationState.Active:

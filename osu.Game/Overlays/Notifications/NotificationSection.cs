@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Notifications
 
         private void clearAll()
         {
-            notifications.Children.ForEach(c => c.Close());
+            notifications.Children.ForEach(c => c.Close(true));
         }
 
         protected override void Update()
