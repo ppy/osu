@@ -839,7 +839,9 @@ namespace osu.Game
                 OnHome = delegate
                 {
                     CloseAllOverlays(false);
-                    menuScreen?.MakeCurrent();
+
+                    if (menuScreen?.GetChildScreen() != null)
+                        menuScreen.MakeCurrent();
                 },
             }, topMostOverlayContent.Add);
 

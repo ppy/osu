@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +18,7 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneHitEventTimingDistributionGraph : OsuTestScene
     {
-        private HitEventTimingDistributionGraph graph;
+        private HitEventTimingDistributionGraph graph = null!;
 
         private static readonly HitObject placeholder_object = new HitCircle();
 
@@ -41,6 +39,65 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestAroundCentre()
         {
             createTest(Enumerable.Range(-150, 300).Select(i => new HitEvent(i / 50f, HitResult.Perfect, placeholder_object, placeholder_object, null)).ToList());
+        }
+
+        [Test]
+        public void TestSparse()
+        {
+            createTest(new List<HitEvent>
+            {
+                new HitEvent(-7, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(-6, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(-5, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(5, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(6, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(7, HitResult.Perfect, placeholder_object, placeholder_object, null),
+            });
+        }
+
+        [Test]
+        public void TestVariousTypesOfHitResult()
+        {
+            createTest(CreateDistributedHitEvents(0, 50).Select(h =>
+            {
+                double offset = Math.Abs(h.TimeOffset);
+                HitResult result = offset > 36 ? HitResult.Miss
+                    : offset > 32 ? HitResult.Meh
+                    : offset > 24 ? HitResult.Ok
+                    : offset > 16 ? HitResult.Good
+                    : offset > 8 ? HitResult.Great
+                    : HitResult.Perfect;
+                return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
+            }).ToList());
+        }
+
+        [Test]
+        public void TestMultipleWindowsOfHitResult()
+        {
+            var wide = CreateDistributedHitEvents(0, 50).Select(h =>
+            {
+                double offset = Math.Abs(h.TimeOffset);
+                HitResult result = offset > 36 ? HitResult.Miss
+                    : offset > 32 ? HitResult.Meh
+                    : offset > 24 ? HitResult.Ok
+                    : offset > 16 ? HitResult.Good
+                    : offset > 8 ? HitResult.Great
+                    : HitResult.Perfect;
+
+                return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
+            });
+            var narrow = CreateDistributedHitEvents(0, 50).Select(h =>
+            {
+                double offset = Math.Abs(h.TimeOffset);
+                HitResult result = offset > 25 ? HitResult.Miss
+                    : offset > 20 ? HitResult.Meh
+                    : offset > 15 ? HitResult.Ok
+                    : offset > 10 ? HitResult.Good
+                    : offset > 5 ? HitResult.Great
+                    : HitResult.Perfect;
+                return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
+            });
+            createTest(wide.Concat(narrow).ToList());
         }
 
         [Test]
