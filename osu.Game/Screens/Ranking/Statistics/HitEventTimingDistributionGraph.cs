@@ -221,6 +221,8 @@ namespace osu.Game.Screens.Ranking.Statistics
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
+            private const double duration = 300;
+
             public Bar(IDictionary<HitResult, int> values, float maxValue, bool isCentre)
             {
                 this.values = values.OrderBy(v => v.Key.GetIndexForOrderedDisplay()).ToList();
@@ -270,7 +272,61 @@ namespace osu.Game.Screens.Ranking.Statistics
                 offsetAdjustment.BindValueChanged(_ => drawAdjustmentBar());
             }
 
-            private const double duration = 300;
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                float height = calculateBasalHeight();
+
+                basalHeight.Value = height;
+
+                if (!values.Any())
+                    return;
+
+                foreach (var boxOriginal in boxOriginals)
+                    boxOriginal.Height = height;
+
+                float offsetValue = 0;
+
+                for (int i = 0; i < values.Count; i++)
+                {
+                    boxOriginals[i].MoveToY(offsetForValue(offsetValue) * BoundingBox.Height, duration, Easing.OutQuint);
+                    boxOriginals[i].ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
+                    offsetValue -= values[i].Value;
+                }
+
+                basalHeight.BindValueChanged(_ => draw());
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                basalHeight.Value = calculateBasalHeight();
+            }
+
+            public void UpdateOffset(float adjustment)
+            {
+                bool hasAdjustment = adjustment != totalValue;
+
+                if (boxAdjustment == null)
+                {
+                    if (!hasAdjustment)
+                        return;
+
+                    AddInternal(boxAdjustment = new Circle
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Colour = Color4.Yellow,
+                        Blending = BlendingParameters.Additive,
+                        Alpha = 0.6f,
+                        Height = 0,
+                    });
+                }
+
+                offsetAdjustment.Set(adjustment);
+            }
 
             private float calculateBasalHeight() => DrawHeight == 0 ? 0 : DrawWidth / DrawHeight;
 
@@ -304,63 +360,6 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 boxAdjustment.ResizeHeightTo(heightForValue(offsetAdjustment.Value), duration, Easing.OutQuint);
                 boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                float height = calculateBasalHeight();
-
-                basalHeight.Set(height);
-
-                if (!values.Any())
-                    return;
-
-                foreach (var boxOriginal in boxOriginals)
-                    boxOriginal.Height = height;
-
-                float offsetValue = 0;
-
-                for (int i = 0; i < values.Count; i++)
-                {
-                    boxOriginals[i].MoveToY(offsetForValue(offsetValue) * BoundingBox.Height, duration, Easing.OutQuint);
-                    boxOriginals[i].ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
-                    offsetValue -= values[i].Value;
-                }
-
-                basalHeight.BindValueChanged(_ => draw());
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                basalHeight.Set(calculateBasalHeight());
-            }
-
-            public void UpdateOffset(float adjustment)
-            {
-                bool hasAdjustment = adjustment != totalValue;
-
-                if (boxAdjustment == null)
-                {
-                    if (!hasAdjustment)
-                        return;
-
-                    AddInternal(boxAdjustment = new Circle
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Colour = Color4.Yellow,
-                        Blending = BlendingParameters.Additive,
-                        Alpha = 0.6f,
-                        Height = 0,
-                    });
-                }
-
-                offsetAdjustment.Set(adjustment);
             }
         }
     }
