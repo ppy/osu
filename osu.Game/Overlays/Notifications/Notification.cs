@@ -63,6 +63,8 @@ namespace osu.Game.Overlays.Notifications
 
         public virtual bool Read { get; set; }
 
+        public new bool IsDragged => dragContainer.IsDragged;
+
         protected virtual IconUsage CloseButtonIcon => FontAwesome.Solid.Check;
 
         [Resolved]
