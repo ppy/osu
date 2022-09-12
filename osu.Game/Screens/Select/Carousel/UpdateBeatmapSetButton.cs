@@ -11,6 +11,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
@@ -22,6 +24,15 @@ namespace osu.Game.Screens.Select.Carousel
         private SpriteIcon icon = null!;
         private Box progressFill = null!;
 
+        [Resolved]
+        private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved(canBeNull: true)]
+        private LoginOverlay? loginOverlay { get; set; }
+
         public UpdateBeatmapSetButton(BeatmapSetInfo beatmapSetInfo)
         {
             this.beatmapSetInfo = beatmapSetInfo;
@@ -31,9 +42,6 @@ namespace osu.Game.Screens.Select.Carousel
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.CentreLeft;
         }
-
-        [Resolved]
-        private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -90,6 +98,12 @@ namespace osu.Game.Screens.Select.Carousel
 
             Action = () =>
             {
+                if (!api.IsLoggedIn)
+                {
+                    loginOverlay?.Show();
+                    return;
+                }
+
                 beatmapDownloader.DownloadAsUpdate(beatmapSetInfo);
                 attachExistingDownload();
             };
