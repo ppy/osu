@@ -16,7 +16,6 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
@@ -80,7 +79,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly IBeatmapProcessor beatmapProcessor;
 
-        private readonly Dictionary<HitObject, List<IUnbindable>> hitObjectBindables = new Dictionary<HitObject, List<IUnbindable>>();
+        private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
         public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
         {
@@ -98,7 +97,7 @@ namespace osu.Game.Screens.Edit
             beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
 
             foreach (var obj in HitObjects)
-                trackBindables(obj);
+                trackStartTime(obj);
         }
 
         /// <summary>
@@ -223,7 +222,7 @@ namespace osu.Game.Screens.Edit
         /// <param name="hitObject">The <see cref="HitObject"/> to insert.</param>
         public void Insert(int index, HitObject hitObject)
         {
-            trackBindables(hitObject);
+            trackStartTime(hitObject);
 
             mutableHitObjects.Insert(index, hitObject);
 
@@ -300,9 +299,9 @@ namespace osu.Game.Screens.Edit
 
             mutableHitObjects.RemoveAt(index);
 
-            var bindables = hitObjectBindables[hitObject];
-            bindables.ForEach(b => b.UnbindAll());
-            hitObjectBindables.Remove(hitObject);
+            var bindable = startTimeBindables[hitObject];
+            bindable.UnbindAll();
+            startTimeBindables.Remove(hitObject);
 
             BeginChange();
             batchPendingDeletes.Add(hitObject);
@@ -326,25 +325,25 @@ namespace osu.Game.Screens.Edit
 
             beatmapProcessor?.PreProcess();
 
-            foreach (var h in batchPendingUpdates) processHitObject(h);
             foreach (var h in batchPendingDeletes) processHitObject(h);
             foreach (var h in batchPendingInserts) processHitObject(h);
+            foreach (var h in batchPendingUpdates) processHitObject(h);
 
             beatmapProcessor?.PostProcess();
 
             // callbacks may modify the lists so let's be safe about it
-            var updates = batchPendingUpdates.ToArray();
-            batchPendingUpdates.Clear();
-
             var deletes = batchPendingDeletes.ToArray();
             batchPendingDeletes.Clear();
 
             var inserts = batchPendingInserts.ToArray();
             batchPendingInserts.Clear();
 
-            foreach (var h in updates) HitObjectUpdated?.Invoke(h);
+            var updates = batchPendingUpdates.ToArray();
+            batchPendingUpdates.Clear();
+
             foreach (var h in deletes) HitObjectRemoved?.Invoke(h);
             foreach (var h in inserts) HitObjectAdded?.Invoke(h);
+            foreach (var h in updates) HitObjectUpdated?.Invoke(h);
 
             updateInProgress.Value = false;
         }
@@ -356,12 +355,10 @@ namespace osu.Game.Screens.Edit
 
         private void processHitObject(HitObject hitObject) => hitObject.ApplyDefaults(ControlPointInfo, PlayableBeatmap.Difficulty);
 
-        private void trackBindables(HitObject hitObject)
+        private void trackStartTime(HitObject hitObject)
         {
-            var bindables = new List<IUnbindable>(3);
-
-            var startTimeBindable = hitObject.StartTimeBindable.GetBoundCopy();
-            startTimeBindable.ValueChanged += _ =>
+            startTimeBindables[hitObject] = hitObject.StartTimeBindable.GetBoundCopy();
+            startTimeBindables[hitObject].ValueChanged += _ =>
             {
                 // For now we'll remove and re-add the hitobject. This is not optimal and can be improved if required.
                 mutableHitObjects.Remove(hitObject);
@@ -371,20 +368,6 @@ namespace osu.Game.Screens.Edit
 
                 Update(hitObject);
             };
-            bindables.Add(startTimeBindable);
-
-            if (hitObject is IHasComboInformation hasCombo)
-            {
-                var comboIndexBindable = hasCombo.ComboIndexBindable.GetBoundCopy();
-                comboIndexBindable.ValueChanged += _ => Update(hitObject);
-                bindables.Add(comboIndexBindable);
-
-                var indexInCurrentComboBindable = hasCombo.IndexInCurrentComboBindable.GetBoundCopy();
-                indexInCurrentComboBindable.ValueChanged += _ => Update(hitObject);
-                bindables.Add(indexInCurrentComboBindable);
-            }
-
-            hitObjectBindables[hitObject] = bindables;
         }
 
         private int findInsertionIndex(IReadOnlyList<HitObject> list, double startTime)
