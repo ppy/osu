@@ -254,11 +254,9 @@ namespace osu.Game.Overlays.Notifications
             if (runFlingAnimation && dragContainer.FlingLeft())
                 this.FadeOut(600, Easing.In);
             else
-            {
-                Closed?.Invoke();
                 this.FadeOut(100);
-            }
 
+            Closed?.Invoke();
             Expire();
         }
 
@@ -311,7 +309,7 @@ namespace osu.Game.Overlays.Notifications
             protected override void OnDragEnd(DragEndEvent e)
             {
                 if (Rotation < -10 || velocity.X < -0.3f)
-                    FlingLeft();
+                    notification.Close(true);
                 else
                     ResetPosition();
 
@@ -362,7 +360,6 @@ namespace osu.Game.Overlays.Notifications
 
                 flinging = true;
                 ClearTransforms();
-                notification.Close(true);
                 return true;
             }
 
