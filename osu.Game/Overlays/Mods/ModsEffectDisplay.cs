@@ -49,22 +49,9 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected abstract LocalisableString Label { get; }
 
-        /// <summary>
-        /// Calculates, does current value increase difficulty or decrease it.
-        /// </summary>
-        /// <param name="value">Value to calculate for. Will arrive from <see cref="Current"/> bindable once it changes.</param>
-        /// <returns>Effect of the value.</returns>
-        /// <remarks>
-        /// Default implementation compares the value with <see cref="Current"/>.<see cref="Bindable{T}.Default"/>, bigger value counts as difficulty increase.
-        /// </remarks>
-        protected virtual ModEffect CalculateEffect(double value)
-        {
-            return CalculateForSign(value.CompareTo(Current.Default));
-        }
-
         protected virtual float ValueAreaWidth => 56;
 
-        protected virtual string CounterFormat => "N0";
+        protected virtual string CounterFormat => @"N0";
 
         protected override Container<Drawable> Content => content;
 
@@ -159,7 +146,7 @@ namespace osu.Game.Overlays.Mods
         {
             Current.BindValueChanged(e =>
             {
-                var effect = CalculateEffect(e.NewValue);
+                var effect = CalculateEffectForComparison(e.NewValue.CompareTo(Current.Default));
                 setColours(effect);
             }, true);
         }
@@ -192,14 +179,12 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        #region Quick implementations for CalculateEffect
-
         /// <summary>
         /// Converts signed integer into <see cref="ModEffect"/>. Negative values are counted as difficulty reduction, positive as increase.
         /// </summary>
-        /// <param name="comparison">Value to convert. Can be obtained from CompareTo.</param>
-        /// <returns>Effect.</returns>
-        protected ModEffect CalculateForSign(int comparison)
+        /// <param name="comparison">Value to convert. Will arrive from comparison between <see cref="Current"/> bindable once it changes and it's <see cref="Bindable{T}.Default"/>.</param>
+        /// <returns>Effect of the value.</returns>
+        protected virtual ModEffect CalculateEffectForComparison(int comparison)
         {
             if (comparison == 0)
                 return ModEffect.NotChanged;
@@ -208,8 +193,6 @@ namespace osu.Game.Overlays.Mods
 
             return ModEffect.DifficultyIncrease;
         }
-
-        #endregion
 
         protected enum ModEffect
         {
