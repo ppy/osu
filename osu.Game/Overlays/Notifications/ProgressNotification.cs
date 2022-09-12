@@ -226,6 +226,7 @@ namespace osu.Game.Overlays.Notifications
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
+                    Depth = float.MaxValue,
                 },
                 loadingSpinner = new LoadingSpinner
                 {
