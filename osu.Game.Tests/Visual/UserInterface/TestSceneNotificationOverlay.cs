@@ -220,6 +220,26 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestReadState()
+        {
+            SimpleNotification notification = null!;
+            AddStep(@"post", () => notificationOverlay.Post(notification = new BackgroundNotification { Text = @"Welcome to osu!. Enjoy your stay!" }));
+            AddUntilStep("check is toast", () => !notification.IsInToastTray);
+            AddAssert("light is not visible", () => notification.ChildrenOfType<Notification.NotificationLight>().Single().Alpha == 0);
+
+            AddUntilStep("wait for forward to overlay", () => !notification.IsInToastTray);
+
+            setState(Visibility.Visible);
+            AddAssert("state is not read", () => !notification.Read);
+            AddUntilStep("light is visible", () => notification.ChildrenOfType<Notification.NotificationLight>().Single().Alpha == 1);
+
+            setState(Visibility.Hidden);
+            setState(Visibility.Visible);
+            AddAssert("state is read", () => notification.Read);
+            AddUntilStep("light is not visible", () => notification.ChildrenOfType<Notification.NotificationLight>().Single().Alpha == 0);
+        }
+
+        [Test]
         public void TestBasicFlow()
         {
             setState(Visibility.Visible);
