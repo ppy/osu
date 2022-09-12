@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -23,13 +21,13 @@ namespace osu.Game.Tests.Editing
     [HeadlessTest]
     public class TestSceneHitObjectComposerDistanceSnapping : EditorClockTestScene
     {
-        private TestHitObjectComposer composer;
+        private TestHitObjectComposer composer = null!;
 
         [Cached(typeof(EditorBeatmap))]
         [Cached(typeof(IBeatSnapProvider))]
         private readonly EditorBeatmap editorBeatmap;
 
-        protected override Container<Drawable> Content { get; }
+        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         public TestSceneHitObjectComposerDistanceSnapping()
         {
@@ -40,15 +38,9 @@ namespace osu.Game.Tests.Editing
                 {
                     editorBeatmap = new EditorBeatmap(new OsuBeatmap
                     {
-                        BeatmapInfo =
-                        {
-                            Ruleset = new OsuRuleset().RulesetInfo,
-                        },
+                        BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                     }),
-                    Content = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    }
+                    Content
                 },
             });
         }
@@ -205,7 +197,7 @@ namespace osu.Game.Tests.Editing
             assertSnappedDistance(400, 400);
         }
 
-        private void assertSnapDistance(float expectedDistance, HitObject hitObject = null)
+        private void assertSnapDistance(float expectedDistance, HitObject? hitObject = null)
             => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(hitObject ?? new HitObject()), () => Is.EqualTo(expectedDistance));
 
         private void assertDurationToDistance(double duration, float expectedDistance)

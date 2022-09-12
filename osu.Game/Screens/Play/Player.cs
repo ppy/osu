@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -640,8 +641,7 @@ namespace osu.Game.Screens.Play
             bool wasFrameStable = DrawableRuleset.FrameStablePlayback;
             DrawableRuleset.FrameStablePlayback = false;
 
-            GameplayClockContainer.StartTime = time;
-            GameplayClockContainer.Reset();
+            GameplayClockContainer.Reset(time);
 
             // Delay resetting frame-stable playback for one frame to give the FrameStabilityContainer a chance to seek.
             frameStablePlaybackResetDelegate = ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
@@ -828,8 +828,16 @@ namespace osu.Game.Screens.Play
 
         private bool onFail()
         {
+            // Failing after the quit sequence has started may cause weird side effects with the fail animation / effects.
+            if (GameplayState.HasQuit)
+                return false;
+
             if (!CheckModsAllowFailure())
                 return false;
+
+            Debug.Assert(!GameplayState.HasFailed);
+            Debug.Assert(!GameplayState.HasPassed);
+            Debug.Assert(!GameplayState.HasQuit);
 
             GameplayState.HasFailed = true;
 
@@ -988,12 +996,8 @@ namespace osu.Game.Screens.Play
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);
 
-            // Our mods are local copies of the global mods so they need to be re-applied to the track.
-            // This is done through the music controller (for now), because resetting speed adjustments on the beatmap track also removes adjustments provided by DrawableTrack.
-            // Todo: In the future, player will receive in a track and will probably not have to worry about this...
-            musicController.ResetTrackAdjustments();
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrack>())
-                mod.ApplyToTrack(musicController.CurrentTrack);
+                mod.ApplyToTrack(GameplayClockContainer.AdjustmentsFromMods);
 
             updateGameplayState();
 
@@ -1012,7 +1016,7 @@ namespace osu.Game.Screens.Play
             if (GameplayClockContainer.IsRunning)
                 throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
 
-            GameplayClockContainer.Reset(true);
+            GameplayClockContainer.Reset(startClock: true);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -1045,6 +1049,7 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
 
             fadeOut();
+
             return base.OnExiting(e);
         }
 

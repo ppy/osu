@@ -26,16 +26,7 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestImportantNotificationDoesntInterruptSetup()
         {
             AddStep("post important notification", () => Game.Notifications.Post(new SimpleNotification { Text = "Important notification" }));
-            AddAssert("no notification posted", () => Game.Notifications.UnreadCount.Value == 0);
             AddAssert("first-run setup still visible", () => Game.FirstRunOverlay.State.Value == Visibility.Visible);
-
-            AddUntilStep("finish first-run setup", () =>
-            {
-                Game.FirstRunOverlay.NextButton.TriggerClick();
-                return Game.FirstRunOverlay.State.Value == Visibility.Hidden;
-            });
-            AddWaitStep("wait for post delay", 5);
-            AddAssert("notifications shown", () => Game.Notifications.State.Value == Visibility.Visible);
             AddAssert("notification posted", () => Game.Notifications.UnreadCount.Value == 1);
         }
 
