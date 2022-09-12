@@ -293,11 +293,13 @@ namespace osu.Game.Overlays.Notifications
                 Vector2 change = e.MousePosition - e.MouseDownPosition;
 
                 // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-                change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.9f) / change.Length;
+                change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.8f) / change.Length;
 
                 // Only apply Y change if dragging to the left.
-                if (change.X > 0)
+                if (change.X >= 0)
                     change.Y = 0;
+                else
+                    change.Y *= (float)Interpolation.ApplyEasing(Easing.InOutQuart, Math.Min(1, -change.X / 200));
 
                 this.MoveTo(change);
             }
