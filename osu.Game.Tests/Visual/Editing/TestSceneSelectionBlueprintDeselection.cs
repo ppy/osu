@@ -4,14 +4,18 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
 using osuTK.Input;
 
-namespace osu.Game.Rulesets.Osu.Tests.Editor
+namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneSelectionBlueprintDeselection : TestSceneOsuEditor
+    public class TestSceneSelectionBlueprintDeselection : EditorTestScene
     {
+        protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
+
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
 
         [Test]
