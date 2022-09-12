@@ -148,7 +148,7 @@ namespace osu.Game.Updater
                 StartDownload();
             }
 
-            public override void Close()
+            public override void Close(bool userTriggered)
             {
                 // cancelling updates is not currently supported by the underlying updater.
                 // only allow dismissing for now.
@@ -156,7 +156,7 @@ namespace osu.Game.Updater
                 switch (State)
                 {
                     case ProgressNotificationState.Cancelled:
-                        base.Close();
+                        base.Close(userTriggered);
                         break;
                 }
             }
@@ -177,7 +177,7 @@ namespace osu.Game.Updater
             public void FailDownload()
             {
                 State = ProgressNotificationState.Cancelled;
-                Close();
+                Close(false);
             }
         }
     }
