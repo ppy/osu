@@ -98,6 +98,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestCorrectAnimationStartTime()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("animation-starts-before-alpha.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                Assert.AreEqual(1, background.Elements.Count);
+
+                Assert.AreEqual(2000, background.Elements[0].StartTime);
+                // This property should be used in DrawableStoryboardAnimation as a starting point for animation playback.
+                Assert.AreEqual(1000, (background.Elements[0] as StoryboardAnimation)?.EarliestTransformTime);
+            }
+        }
+
+        [Test]
         public void TestOutOfOrderStartTimes()
         {
             var decoder = new LegacyStoryboardDecoder();
