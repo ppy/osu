@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Children = new Drawable[]
                 {
                     leftKeyCounter = new OsuActionKeyCounter(OsuAction.LeftButton),
-                    rightKeyCounter =  new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } }
+                    rightKeyCounter = new OsuActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } }
                 },
                 Position = osuInputManager.ToLocalSpace(ScreenSpaceDrawQuad.Centre)
             }));
