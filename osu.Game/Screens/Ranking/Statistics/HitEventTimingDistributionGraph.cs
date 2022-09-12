@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -211,8 +210,9 @@ namespace osu.Game.Screens.Ranking.Statistics
             private readonly float maxValue;
             private readonly bool isCentre;
             private readonly float totalValue;
-            private readonly BindableFloat basalHeight;
-            private readonly BindableFloat offsetAdjustment;
+
+            private float basalHeight;
+            private float offsetAdjustment;
 
             private Circle[] boxOriginals = null!;
 
@@ -229,8 +229,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 this.maxValue = maxValue;
                 this.isCentre = isCentre;
                 totalValue = values.Sum(v => v.Value);
-                basalHeight = new BindableFloat();
-                offsetAdjustment = new BindableFloat(totalValue);
+                offsetAdjustment = totalValue;
 
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
@@ -266,25 +265,20 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Height = 0,
                     };
                     InternalChildren = boxOriginals = new[] { dot };
-                    basalHeight.BindValueChanged(e => dot.Height = e.NewValue);
                 }
-
-                offsetAdjustment.BindValueChanged(_ => drawAdjustmentBar());
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                float height = calculateBasalHeight();
-
-                basalHeight.Value = height;
-
                 if (!values.Any())
                     return;
 
+                updateBasalHeight();
+
                 foreach (var boxOriginal in boxOriginals)
-                    boxOriginal.Height = height;
+                    boxOriginal.Height = basalHeight;
 
                 float offsetValue = 0;
 
@@ -294,14 +288,12 @@ namespace osu.Game.Screens.Ranking.Statistics
                     boxOriginals[i].ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
                     offsetValue -= values[i].Value;
                 }
-
-                basalHeight.BindValueChanged(_ => draw());
             }
 
             protected override void Update()
             {
                 base.Update();
-                basalHeight.Value = calculateBasalHeight();
+                updateBasalHeight();
             }
 
             public void UpdateOffset(float adjustment)
@@ -325,14 +317,27 @@ namespace osu.Game.Screens.Ranking.Statistics
                     });
                 }
 
-                offsetAdjustment.Set(adjustment);
+                offsetAdjustment = adjustment;
+                drawAdjustmentBar();
             }
 
-            private float calculateBasalHeight() => DrawHeight == 0 ? 0 : DrawWidth / DrawHeight;
+            private void updateBasalHeight()
+            {
+                float newBasalHeight = DrawHeight == 0 ? 0 : DrawWidth / DrawHeight;
 
-            private float offsetForValue(float value) => (1 - basalHeight.Value) * value / maxValue;
+                if (newBasalHeight == basalHeight)
+                    return;
 
-            private float heightForValue(float value) => MathF.Max(basalHeight.Value + offsetForValue(value), 0);
+                basalHeight = newBasalHeight;
+                foreach (var dot in boxOriginals)
+                    dot.Height = basalHeight;
+
+                draw();
+            }
+
+            private float offsetForValue(float value) => (1 - basalHeight) * value / maxValue;
+
+            private float heightForValue(float value) => MathF.Max(basalHeight + offsetForValue(value), 0);
 
             private void draw()
             {
@@ -356,9 +361,9 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             private void drawAdjustmentBar()
             {
-                bool hasAdjustment = offsetAdjustment.Value != totalValue;
+                bool hasAdjustment = offsetAdjustment != totalValue;
 
-                boxAdjustment.ResizeHeightTo(heightForValue(offsetAdjustment.Value), duration, Easing.OutQuint);
+                boxAdjustment.ResizeHeightTo(heightForValue(offsetAdjustment), duration, Easing.OutQuint);
                 boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
             }
         }
