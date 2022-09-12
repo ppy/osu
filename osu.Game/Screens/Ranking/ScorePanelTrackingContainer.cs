@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Ranking
             if (InternalChildren.Count == 0)
                 throw new InvalidOperationException("Score panel container is not attached.");
 
-            RemoveInternal(Panel);
+            RemoveInternal(Panel, false);
         }
 
         /// <summary>

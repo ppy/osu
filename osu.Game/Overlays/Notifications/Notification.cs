@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -18,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -26,7 +25,7 @@ namespace osu.Game.Overlays.Notifications
         /// <summary>
         /// User requested close.
         /// </summary>
-        public event Action Closed;
+        public event Action? Closed;
 
         public abstract LocalisableString Text { get; set; }
 
@@ -38,7 +37,7 @@ namespace osu.Game.Overlays.Notifications
         /// <summary>
         /// Run on user activating the notification. Return true to close.
         /// </summary>
-        public Func<bool> Activated;
+        public Func<bool>? Activated;
 
         /// <summary>
         /// Should we show at the top of our section on display?
@@ -48,22 +47,32 @@ namespace osu.Game.Overlays.Notifications
         public virtual string PopInSampleName => "UI/notification-pop-in";
 
         protected NotificationLight Light;
-        private readonly CloseButton closeButton;
+
         protected Container IconContent;
+
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
 
-        protected Container NotificationContent;
+        protected Container MainContent;
 
         public virtual bool Read { get; set; }
+
+        protected virtual IconUsage CloseButtonIcon => FontAwesome.Solid.Check;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        private readonly Box initialFlash;
+
+        private Box background = null!;
 
         protected Notification()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            AddRangeInternal(new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 Light = new NotificationLight
                 {
@@ -71,9 +80,9 @@ namespace osu.Game.Overlays.Notifications
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
                 },
-                NotificationContent = new Container
+                MainContent = new Container
                 {
-                    CornerRadius = 8,
+                    CornerRadius = 6,
                     Masking = true,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -81,69 +90,106 @@ namespace osu.Game.Overlays.Notifications
                     AutoSizeEasing = Easing.OutQuint,
                     Children = new Drawable[]
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.White,
-                        },
-                        new Container
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Padding = new MarginPadding(5),
                             AutoSizeAxes = Axes.Y,
-                            Children = new Drawable[]
+                            RowDimensions = new[]
                             {
-                                IconContent = new Container
-                                {
-                                    Size = new Vector2(40),
-                                    Masking = true,
-                                    CornerRadius = 5,
-                                },
-                                content = new Container
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding
-                                    {
-                                        Left = 45,
-                                        Right = 30
-                                    },
-                                }
-                            }
-                        },
-                        closeButton = new CloseButton
-                        {
-                            Alpha = 0,
-                            Action = Close,
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            Margin = new MarginPadding
-                            {
-                                Right = 5
+                                new Dimension(GridSizeMode.AutoSize, minSize: 60)
                             },
-                        }
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(),
+                                new Dimension(GridSizeMode.AutoSize),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    IconContent = new Container
+                                    {
+                                        Width = 40,
+                                        RelativeSizeAxes = Axes.Y,
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding(10),
+                                        Children = new Drawable[]
+                                        {
+                                            content = new Container
+                                            {
+                                                Masking = true,
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                            },
+                                        }
+                                    },
+                                    new CloseButton(CloseButtonIcon)
+                                    {
+                                        Action = Close,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                    }
+                                }
+                            },
+                        },
+                        initialFlash = new Box
+                        {
+                            Colour = Color4.White.Opacity(0.8f),
+                            RelativeSizeAxes = Axes.Both,
+                            Blending = BlendingParameters.Additive,
+                        },
                     }
                 }
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            MainContent.Add(background = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Colour = colourProvider.Background3,
+                Depth = float.MaxValue
             });
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            closeButton.FadeIn(75);
+            background.FadeColour(colourProvider.Background2, 200, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            closeButton.FadeOut(75);
+            background.FadeColour(colourProvider.Background3, 200, Easing.OutQuint);
             base.OnHoverLost(e);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            // right click doesn't trigger OnClick so we need to handle here until that changes.
+            if (e.Button != MouseButton.Left)
+            {
+                Close();
+                return true;
+            }
+
+            return base.OnMouseDown(e);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Activated?.Invoke() ?? true)
-                Close();
+            // Clicking with anything but left button should dismiss but not perform the activation action.
+            if (e.Button == MouseButton.Left)
+                Activated?.Invoke();
 
+            Close();
             return true;
         }
 
@@ -152,8 +198,11 @@ namespace osu.Game.Overlays.Notifications
             base.LoadComplete();
 
             this.FadeInFromZero(200);
-            NotificationContent.MoveToX(DrawSize.X);
-            NotificationContent.MoveToX(0, 500, Easing.OutQuint);
+
+            MainContent.MoveToX(DrawSize.X);
+            MainContent.MoveToX(0, 500, Easing.OutQuint);
+
+            initialFlash.FadeOutFromOne(2000, Easing.OutQuart);
         }
 
         public bool WasClosed;
@@ -169,42 +218,57 @@ namespace osu.Game.Overlays.Notifications
             Expire();
         }
 
-        private class CloseButton : OsuClickableContainer
+        internal class CloseButton : OsuClickableContainer
         {
-            private Color4 hoverColour;
+            private SpriteIcon icon = null!;
+            private Box background = null!;
 
-            public CloseButton()
+            private readonly IconUsage iconUsage;
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            public CloseButton(IconUsage iconUsage)
             {
-                Colour = OsuColour.Gray(0.2f);
-                AutoSizeAxes = Axes.Both;
+                this.iconUsage = iconUsage;
+            }
 
-                Children = new[]
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RelativeSizeAxes = Axes.Y;
+                Width = 28;
+
+                Children = new Drawable[]
                 {
-                    new SpriteIcon
+                    background = new Box
+                    {
+                        Colour = OsuColour.Gray(0).Opacity(0.15f),
+                        Alpha = 0,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    icon = new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.TimesCircle,
-                        Size = new Vector2(20),
+                        Icon = iconUsage,
+                        Size = new Vector2(12),
+                        Colour = colourProvider.Foreground1,
                     }
                 };
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                hoverColour = colours.Yellow;
-            }
-
             protected override bool OnHover(HoverEvent e)
             {
-                this.FadeColour(hoverColour, 200);
+                background.FadeIn(200, Easing.OutQuint);
+                icon.FadeColour(colourProvider.Content1, 200, Easing.OutQuint);
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                this.FadeColour(OsuColour.Gray(0.2f), 200);
+                background.FadeOut(200, Easing.OutQuint);
+                icon.FadeColour(colourProvider.Foreground1, 200, Easing.OutQuint);
                 base.OnHoverLost(e);
             }
         }
@@ -212,7 +276,7 @@ namespace osu.Game.Overlays.Notifications
         public class NotificationLight : Container
         {
             private bool pulsate;
-            private Container pulsateLayer;
+            private Container pulsateLayer = null!;
 
             public bool Pulsate
             {
