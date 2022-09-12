@@ -119,7 +119,9 @@ namespace osu.Game.Skinning
             Realm.Run(r =>
             {
                 // choose from only user skins, removing the current selection to ensure a new one is chosen.
-                var randomChoices = r.All<SkinInfo>().Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
+                var randomChoices = r.All<SkinInfo>()
+                                     .Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID)
+                                     .ToArray();
 
                 if (randomChoices.Length == 0)
                 {
@@ -296,6 +298,22 @@ namespace osu.Game.Skinning
 
                 Delete(items.ToList(), silent);
             });
+        }
+
+        public void SetSkinFromConfiguration(string guidString)
+        {
+            Live<SkinInfo> skinInfo = null;
+
+            if (Guid.TryParse(guidString, out var guid))
+                skinInfo = Query(s => s.ID == guid);
+
+            if (skinInfo == null)
+            {
+                if (guid == SkinInfo.CLASSIC_SKIN)
+                    skinInfo = DefaultLegacySkin.SkinInfo;
+            }
+
+            CurrentSkinInfo.Value = skinInfo ?? DefaultSkin.SkinInfo;
         }
     }
 }
