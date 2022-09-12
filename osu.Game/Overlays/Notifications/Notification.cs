@@ -75,12 +75,17 @@ namespace osu.Game.Overlays.Notifications
         /// </summary>
         public bool IsInToastTray
         {
-            private get => isInToastTray;
+            get => isInToastTray;
             set
             {
                 isInToastTray = value;
+
                 if (!isInToastTray)
+                {
                     dragContainer.ResetPosition();
+                    if (!Read)
+                        Light.FadeIn(100);
+                }
             }
         }
 
@@ -97,6 +102,7 @@ namespace osu.Game.Overlays.Notifications
             {
                 Light = new NotificationLight
                 {
+                    Alpha = 0,
                     Margin = new MarginPadding { Right = 5 },
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
@@ -239,10 +245,7 @@ namespace osu.Game.Overlays.Notifications
             WasClosed = true;
 
             if (dragContainer.FlingLeft())
-            {
-                Light.FadeOut(100);
                 this.FadeOut(600, Easing.In);
-            }
             else
             {
                 Closed?.Invoke();
