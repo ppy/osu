@@ -155,7 +155,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             checkProgressingCount(1);
             waitForCompletion();
-            AddStep("click notification", () => notificationOverlay.ChildrenOfType<Notification>().Single().TriggerClick());
+
+            UpdateManager.UpdateApplicationCompleteNotification? completionNotification = null;
+            AddUntilStep("wait for completion notification",
+                () => (completionNotification = notificationOverlay.ChildrenOfType<UpdateManager.UpdateApplicationCompleteNotification>().SingleOrDefault()) != null);
+            AddStep("click notification", () => completionNotification?.TriggerClick());
 
             AddUntilStep("wait for update applied", () => applyUpdate);
         }

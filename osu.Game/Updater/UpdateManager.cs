@@ -110,7 +110,7 @@ namespace osu.Game.Updater
             }
         }
 
-        protected class UpdateApplicationCompleteNotification : ProgressCompletionNotification
+        public class UpdateApplicationCompleteNotification : ProgressCompletionNotification
         {
             public UpdateApplicationCompleteNotification()
             {
@@ -120,7 +120,10 @@ namespace osu.Game.Updater
 
         public class UpdateProgressNotification : ProgressNotification
         {
-            protected override Notification CreateCompletionNotification() => new UpdateApplicationCompleteNotification();
+            protected override Notification CreateCompletionNotification() => new UpdateApplicationCompleteNotification
+            {
+                Activated = CompletionClickAction
+            };
 
             [BackgroundDependencyLoader]
             private void load()
