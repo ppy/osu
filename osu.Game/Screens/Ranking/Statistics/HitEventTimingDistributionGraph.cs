@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +46,12 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         private readonly IReadOnlyList<HitEvent> hitEvents;
 
+        private readonly IDictionary<HitResult, int>[] bins;
+        private double binSize;
+        private double hitOffset;
+
+        private Bar[]? barDrawables;
+
         /// <summary>
         /// Creates a new <see cref="HitEventTimingDistributionGraph"/>.
         /// </summary>
@@ -55,21 +59,14 @@ namespace osu.Game.Screens.Ranking.Statistics
         public HitEventTimingDistributionGraph(IReadOnlyList<HitEvent> hitEvents)
         {
             this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit()).ToList();
+            bins = Enumerable.Range(0, total_timing_distribution_bins).Select(_ => new Dictionary<HitResult, int>()).ToArray<IDictionary<HitResult, int>>();
         }
-
-        private IDictionary<HitResult, int>[] bins;
-        private double binSize;
-        private double hitOffset;
-
-        private Bar[] barDrawables;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (hitEvents == null || hitEvents.Count == 0)
+            if (hitEvents.Count == 0)
                 return;
-
-            bins = Enumerable.Range(0, total_timing_distribution_bins).Select(_ => new Dictionary<HitResult, int>()).ToArray<IDictionary<HitResult, int>>();
 
             binSize = Math.Ceiling(hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins);
 
@@ -217,11 +214,12 @@ namespace osu.Game.Screens.Ranking.Statistics
             private readonly BindableFloat basalHeight;
             private readonly BindableFloat offsetAdjustment;
 
-            private Circle[] boxOriginals;
-            private Circle boxAdjustment;
+            private Circle[] boxOriginals = null!;
+
+            private Circle? boxAdjustment;
 
             [Resolved]
-            private OsuColour colours { get; set; }
+            private OsuColour colours { get; set; } = null!;
 
             public Bar(IDictionary<HitResult, int> values, float maxValue, bool isCentre)
             {
