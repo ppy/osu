@@ -70,6 +70,8 @@ namespace osu.Game.Overlays.Notifications
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        public override bool PropagatePositionalInputSubTree => base.PropagatePositionalInputSubTree && !WasClosed;
+
         private bool isInToastTray;
 
         /// <summary>
@@ -327,7 +329,7 @@ namespace osu.Game.Overlays.Notifications
                     velocity.Y += (float)Clock.ElapsedFrameTime * 0.005f;
                     Position += (float)Clock.ElapsedFrameTime * velocity;
                 }
-                else
+                else if (Clock.ElapsedFrameTime > 0)
                 {
                     Vector2 change = (Position - lastPosition) / (float)Clock.ElapsedFrameTime;
 
