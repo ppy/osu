@@ -280,12 +280,15 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
+            var processor = rulesetInstance.CreateBeatmapProcessor(converted);
 
-            foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
-                mod.ApplyToBeatmapProcessor(processor);
+            if (processor != null)
+            {
+                foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
+                    mod.ApplyToBeatmapProcessor(processor);
 
-            processor?.PreProcess();
+                processor.PreProcess();
+            }
 
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
             foreach (var obj in converted.HitObjects)
