@@ -26,7 +26,7 @@ namespace osu.Game.Storyboards
 
         public readonly CommandTimelineGroup TimelineGroup = new CommandTimelineGroup();
 
-        public virtual double StartTime
+        public double StartTime
         {
             get
             {
