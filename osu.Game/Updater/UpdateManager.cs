@@ -132,9 +132,17 @@ namespace osu.Game.Updater
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.Solid.Upload,
-                        Size = new Vector2(14),
+                        Size = new Vector2(34),
+                        Colour = OsuColour.Gray(0.2f),
+                        Depth = float.MaxValue,
                     }
                 });
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                StartDownload();
             }
 
             public override void Close()
