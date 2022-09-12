@@ -235,12 +235,12 @@ namespace osu.Game.Overlays.Notifications
             });
         }
 
-        public override void Close(bool userTriggered)
+        public override void Close(bool runFlingAnimation)
         {
             switch (State)
             {
                 case ProgressNotificationState.Cancelled:
-                    base.Close(userTriggered);
+                    base.Close(runFlingAnimation);
                     break;
 
                 case ProgressNotificationState.Active:
