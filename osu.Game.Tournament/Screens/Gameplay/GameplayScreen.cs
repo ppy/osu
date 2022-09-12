@@ -199,16 +199,19 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     case TourneyState.Idle:
                         contract();
 
-                        const float delay_before_progression = 4000;
-
-                        // if we've returned to idle and the last screen was ranking
-                        // we should automatically proceed after a short delay
-                        if (lastState == TourneyState.Ranking && !warmup.Value)
+                        if (LadderInfo.AutoProgressScreens.Value)
                         {
-                            if (CurrentMatch.Value?.Completed.Value == true)
-                                scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, delay_before_progression);
-                            else if (CurrentMatch.Value?.Completed.Value == false)
-                                scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, delay_before_progression);
+                            const float delay_before_progression = 4000;
+
+                            // if we've returned to idle and the last screen was ranking
+                            // we should automatically proceed after a short delay
+                            if (lastState == TourneyState.Ranking && !warmup.Value)
+                            {
+                                if (CurrentMatch.Value?.Completed.Value == true)
+                                    scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, delay_before_progression);
+                                else if (CurrentMatch.Value?.Completed.Value == false)
+                                    scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, delay_before_progression);
+                            }
                         }
 
                         break;

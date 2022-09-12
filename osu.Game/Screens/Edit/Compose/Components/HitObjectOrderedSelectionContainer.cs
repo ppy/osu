@@ -35,10 +35,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.Add(drawable);
         }
 
-        public override bool Remove(SelectionBlueprint<HitObject> drawable)
+        public override bool Remove(SelectionBlueprint<HitObject> drawable, bool disposeImmediately)
         {
             SortInternal();
-            return base.Remove(drawable);
+            return base.Remove(drawable, disposeImmediately);
         }
 
         protected override int Compare(Drawable x, Drawable y)
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (result != 0) return result;
             }
 
-            return CompareReverseChildID(y, x);
+            return CompareReverseChildID(x, y);
         }
 
         protected override void Dispose(bool isDisposing)

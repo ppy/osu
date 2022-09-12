@@ -25,6 +25,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         public bool ShowScore
         {
+            get => teamDisplay.ShowScore;
             set => teamDisplay.ShowScore = value;
         }
 
@@ -92,10 +93,14 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private void teamChanged(ValueChangedEvent<TournamentTeam> team)
         {
+            bool wasShowingScores = teamDisplay?.ShowScore ?? false;
+
             InternalChildren = new Drawable[]
             {
                 teamDisplay = new TeamDisplay(team.NewValue, teamColour, currentTeamScore, currentMatch.Value?.PointsToWin ?? 0),
             };
+
+            teamDisplay.ShowScore = wasShowingScores;
         }
     }
 }

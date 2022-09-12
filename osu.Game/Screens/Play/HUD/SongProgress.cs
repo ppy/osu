@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (isInIntro)
             {
-                double introStartTime = GameplayClock.StartTime ?? 0;
+                double introStartTime = GameplayClock.StartTime;
 
                 double introOffsetCurrent = currentTime - introStartTime;
                 double introDuration = FirstHitTime - introStartTime;

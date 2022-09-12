@@ -2,15 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
 
@@ -22,7 +20,7 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     [Cached(typeof(IGameplayClock))]
     [Cached(typeof(IFrameStableClock))]
-    public sealed class FrameStabilityContainer : Container, IHasReplayHandler, IFrameStableClock, IGameplayClock
+    public sealed class FrameStabilityContainer : Container, IHasReplayHandler, IFrameStableClock
     {
         public ReplayInputHandler? ReplayInputHandler { get; set; }
 
@@ -263,27 +261,11 @@ namespace osu.Game.Rulesets.UI
 
         public FrameTimeInfo TimeInfo => framedClock.TimeInfo;
 
-        public double TrueGameplayRate
-        {
-            get
-            {
-                double baseRate = Rate;
+        public double StartTime => parentGameplayClock?.StartTime ?? 0;
 
-                foreach (double adjustment in NonGameplayAdjustments)
-                {
-                    if (Precision.AlmostEquals(adjustment, 0))
-                        return 0;
+        private readonly AudioAdjustments gameplayAdjustments = new AudioAdjustments();
 
-                    baseRate /= adjustment;
-                }
-
-                return baseRate;
-            }
-        }
-
-        public double? StartTime => parentGameplayClock?.StartTime;
-
-        public IEnumerable<double> NonGameplayAdjustments => parentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<double>();
+        public IAdjustableAudioComponent AdjustmentsFromMods => parentGameplayClock?.AdjustmentsFromMods ?? gameplayAdjustments;
 
         #endregion
 

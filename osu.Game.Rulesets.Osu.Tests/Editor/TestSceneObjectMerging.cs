@@ -3,9 +3,11 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 using osuTK.Input;
@@ -14,6 +16,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public class TestSceneObjectMerging : TestSceneOsuEditor
     {
+        private OsuSelectionHandler selectionHandler => Editor.ChildrenOfType<OsuSelectionHandler>().First();
+
         [Test]
         public void TestSimpleMerge()
         {
@@ -28,6 +32,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 EditorBeatmap.SelectedHitObjects.Add(circle1);
                 EditorBeatmap.SelectedHitObjects.Add(circle2);
             });
+
+            moveMouseToHitObject(1);
+            AddAssert("merge option available", () => selectionHandler.ContextMenuItems.Any(o => o.Text.Value == "Merge selection"));
 
             mergeSelection();
 
@@ -77,6 +84,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 return sliderCreatedFor(args);
             });
 
+            AddAssert("samples exist", sliderSampleExist);
+
             AddStep("undo", () => Editor.Undo());
             AddAssert("merged objects restored", () => circle1 is not null && circle2 is not null && slider is not null && objectsRestored(circle1, slider, circle2));
         }
@@ -122,6 +131,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 return sliderCreatedFor(args);
             });
 
+            AddAssert("samples exist", sliderSampleExist);
+
             AddAssert("merged slider matches first slider", () =>
             {
                 var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
@@ -165,7 +176,60 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 (pos: circle1.Position, pathType: PathType.Linear),
                 (pos: circle2.Position, pathType: null)));
 
+            AddAssert("samples exist", sliderSampleExist);
+
             AddAssert("spinner not merged", () => EditorBeatmap.HitObjects.Contains(spinner));
+        }
+
+        [Test]
+        public void TestIllegalMerge()
+        {
+            HitCircle? circle1 = null;
+            HitCircle? circle2 = null;
+
+            AddStep("add two circles on the same position", () =>
+            {
+                circle1 = new HitCircle();
+                circle2 = new HitCircle { Position = circle1.Position + Vector2.UnitX };
+                EditorClock.Seek(0);
+                EditorBeatmap.Add(circle1);
+                EditorBeatmap.Add(circle2);
+                EditorBeatmap.SelectedHitObjects.Add(circle1);
+                EditorBeatmap.SelectedHitObjects.Add(circle2);
+            });
+
+            moveMouseToHitObject(1);
+            AddAssert("merge option not available", () => selectionHandler.ContextMenuItems.Length > 0 && selectionHandler.ContextMenuItems.All(o => o.Text.Value != "Merge selection"));
+            mergeSelection();
+            AddAssert("circles not merged", () => circle1 is not null && circle2 is not null
+                                                                      && EditorBeatmap.HitObjects.Contains(circle1) && EditorBeatmap.HitObjects.Contains(circle2));
+        }
+
+        [Test]
+        public void TestSameStartTimeMerge()
+        {
+            HitCircle? circle1 = null;
+            HitCircle? circle2 = null;
+
+            AddStep("add two circles at the same time", () =>
+            {
+                circle1 = new HitCircle();
+                circle2 = new HitCircle { Position = circle1.Position + 100 * Vector2.UnitX };
+                EditorClock.Seek(0);
+                EditorBeatmap.Add(circle1);
+                EditorBeatmap.Add(circle2);
+                EditorBeatmap.SelectedHitObjects.Add(circle1);
+                EditorBeatmap.SelectedHitObjects.Add(circle2);
+            });
+
+            moveMouseToHitObject(1);
+            AddAssert("merge option available", () => selectionHandler.ContextMenuItems.Any(o => o.Text.Value == "Merge selection"));
+
+            mergeSelection();
+
+            AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
+                (pos: circle1.Position, pathType: PathType.Linear),
+                (pos: circle2.Position, pathType: null)));
         }
 
         private void mergeSelection()
@@ -208,6 +272,28 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             }
 
             return true;
+        }
+
+        private bool sliderSampleExist()
+        {
+            if (EditorBeatmap.SelectedHitObjects.Count != 1)
+                return false;
+
+            var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
+
+            return mergedSlider.Samples[0] is not null;
+        }
+
+        private void moveMouseToHitObject(int index)
+        {
+            AddStep($"hover mouse over hit object {index}", () =>
+            {
+                if (EditorBeatmap.HitObjects.Count <= index)
+                    return;
+
+                Vector2 position = ((OsuHitObject)EditorBeatmap.HitObjects[index]).Position;
+                InputManager.MoveMouseTo(selectionHandler.ToScreenSpace(position));
+            });
         }
     }
 }

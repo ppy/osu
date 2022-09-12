@@ -9,12 +9,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
+using osu.Game.Storyboards;
 using osuTK;
 using osuTK.Graphics;
 
@@ -28,10 +30,14 @@ namespace osu.Game.Tests.Visual.Editing
 
         protected EditorBeatmap EditorBeatmap { get; private set; }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        [Resolved]
+        private AudioManager audio { get; set; }
+
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) => new WaveformTestBeatmap(audio);
+
+        protected override void LoadComplete()
         {
-            Beatmap.Value = new WaveformTestBeatmap(audio);
+            base.LoadComplete();
 
             var playable = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
             EditorBeatmap = new EditorBeatmap(playable);
@@ -68,11 +74,11 @@ namespace osu.Game.Tests.Visual.Editing
             });
         }
 
-        protected override void LoadComplete()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            base.LoadComplete();
-
-            Clock.Seek(2500);
+            AddUntilStep("wait for track loaded", () => MusicController.TrackLoaded);
+            AddStep("seek forward", () => EditorClock.Seek(2500));
         }
 
         public abstract Drawable CreateTestComponent();
