@@ -1,12 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
@@ -19,14 +19,24 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneComboCounter : CatchSkinnableTestScene
     {
-        private ScoreProcessor scoreProcessor;
+        private OsuConfigManager localConfig = null!;
+
+        private ScoreProcessor scoreProcessor = null!;
 
         private Color4 judgedObjectColour = Color4.White;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(localConfig = new OsuConfigManager(LocalStorage));
+        }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
             scoreProcessor = new ScoreProcessor(new CatchRuleset());
+
+            localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
 
             SetContents(_ => new CatchComboDisplay
             {
@@ -51,9 +61,15 @@ namespace osu.Game.Rulesets.Catch.Tests
                     1f
                 );
             });
+
+            AddStep("set hud to never show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
+            AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 5);
+
+            AddStep("set hud to show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always));
+            AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 5);
         }
 
-        private void performJudgement(HitResult type, Judgement judgement = null)
+        private void performJudgement(HitResult type, Judgement? judgement = null)
         {
             var judgedObject = new DrawableFruit(new Fruit()) { AccentColour = { Value = judgedObjectColour } };
 
