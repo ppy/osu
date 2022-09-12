@@ -77,11 +77,10 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 if (TapOnlyMapping)
                 {
-                    if (!EnteredTapOnlyMapping)
+                    if (!EnteredTapOnlyMapping && osuInputManager.CurrentState.Touch.IsActive(TouchSource.Touch1))
                     {
                         EnteredTapOnlyMapping = true;
-                        if (osuInputManager.CurrentState.Touch.IsActive(TouchSource.Touch1))
-                            osuInputManager.HandleTouchTapOnlyMapping();
+                        osuInputManager.HandleTouchTapOnlyMapping();
                     }
                 }
                 else
