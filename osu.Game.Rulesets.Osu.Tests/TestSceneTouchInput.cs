@@ -120,6 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertAllowingTouchInput();
             expectBothKeysPressed();
             expectKeyCountersCountingBe(1, 1);
+            AddAssert("Next touch will be tap only mapped", () => touchInputMapper.NextTouchWillBeTapOnlyMapping);
         }
 
         private void assertAcceptedOnlyThreeSequentialInputs()
