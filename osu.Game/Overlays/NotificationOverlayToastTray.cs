@@ -78,7 +78,6 @@ namespace osu.Game.Overlays
                 {
                     LayoutDuration = 150,
                     LayoutEasing = Easing.OutQuart,
-                    Spacing = new Vector2(3),
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },

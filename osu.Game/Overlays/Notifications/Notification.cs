@@ -113,6 +113,9 @@ namespace osu.Game.Overlays.Notifications
                 },
                 dragContainer = new DragContainer(this)
                 {
+                    // Use margin instead of FillFlow spacing to fix extra padding appearing when notification shrinks
+                    // in height.
+                    Padding = new MarginPadding { Vertical = 3f },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 }.WithChild(MainContent = new Container
