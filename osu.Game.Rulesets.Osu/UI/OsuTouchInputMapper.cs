@@ -41,13 +41,18 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// A dictionary that maps <see cref="TouchSource"/> into a respective <see cref="OsuAction"/>.
         /// </summary>
-        private readonly Dictionary<TouchSource, OsuAction> tapTouchActions = new Dictionary<TouchSource, OsuAction>();
+        private readonly Dictionary<TouchSource, OsuAction> tapTouchActions = Enum.GetValues(typeof(TouchSource))
+            .Cast<TouchSource>()
+            .ToDictionary(source => source, source => (source - TouchSource.Touch1) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
 
         /// <summary>
         /// Tracks all active tap <see cref="TouchSource"/>s that can be mapped into a given <see cref="OsuAction"/> through the <see cref="tapTouchActions"/>.
         /// </summary>
         private readonly HashSet<TouchSource> activeTapTouches = new HashSet<TouchSource>();
 
+        /// <summary>
+        /// Tracks how many active tap touches are active currently.
+        /// </summary>
         public int ActiveTapTouchesCount => activeTapTouches.Count;
 
         /// <summary>
@@ -75,8 +80,6 @@ namespace osu.Game.Rulesets.Osu.UI
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
             osuInputManager = inputManager;
-            foreach (var source in Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>())
-                tapTouchActions.Add(source, (source - TouchSource.Touch1) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
         }
 
         /// <summary>
