@@ -42,6 +42,8 @@ namespace osu.Game.Overlays.Notifications
         /// </summary>
         public Func<bool>? Activated;
 
+        public Action? ForwardToOverlay { get; set; }
+
         /// <summary>
         /// Should we show at the top of our section on display?
         /// </summary>
@@ -310,6 +312,8 @@ namespace osu.Game.Overlays.Notifications
             {
                 if (Rotation < -10 || velocity.X < -0.3f)
                     notification.Close(true);
+                else if (X > 30 || velocity.X > 0.3f)
+                    notification.ForwardToOverlay?.Invoke();
                 else
                     ResetPosition();
 
