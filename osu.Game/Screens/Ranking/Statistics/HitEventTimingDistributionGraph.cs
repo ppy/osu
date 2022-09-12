@@ -278,7 +278,10 @@ namespace osu.Game.Screens.Ranking.Statistics
                 updateBasalHeight();
 
                 foreach (var boxOriginal in boxOriginals)
+                {
+                    boxOriginal.Y = 0;
                     boxOriginal.Height = basalHeight;
+                }
 
                 float offsetValue = 0;
 
