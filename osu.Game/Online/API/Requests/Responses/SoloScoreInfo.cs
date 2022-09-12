@@ -18,9 +18,6 @@ namespace osu.Game.Online.API.Requests.Responses
     [Serializable]
     public class SoloScoreInfo : IHasOnlineID<long>
     {
-        [JsonProperty("replay")]
-        public bool HasReplay { get; set; }
-
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
 
@@ -77,10 +74,19 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("maximum_statistics")]
         public Dictionary<HitResult, int> MaximumStatistics { get; set; } = new Dictionary<HitResult, int>();
 
+        /// <summary>
+        /// Used to preserve the total score for legacy scores.
+        /// </summary>
+        [JsonProperty("legacy_total_score")]
+        public int? LegacyTotalScore { get; set; }
+
+        [JsonProperty("legacy_score_id")]
+        public ulong? LegacyScoreId { get; set; }
+
         #region osu-web API additions (not stored to database).
 
         [JsonProperty("id")]
-        public long? ID { get; set; }
+        public ulong? ID { get; set; }
 
         [JsonProperty("user")]
         public APIUser? User { get; set; }
@@ -104,6 +110,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("pp")]
         public double? PP { get; set; }
+
+        [JsonProperty("has_replay")]
+        public bool HasReplay { get; set; }
 
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeUser() => false;
@@ -181,6 +190,6 @@ namespace osu.Game.Online.API.Requests.Responses
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
         };
 
-        public long OnlineID => ID ?? -1;
+        public long OnlineID => (long?)ID ?? -1;
     }
 }

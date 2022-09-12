@@ -16,12 +16,24 @@ namespace osu.Game.Online.Multiplayer
     public abstract class MultiplayerCountdown
     {
         /// <summary>
+        /// A unique identifier for this countdown.
+        /// </summary>
+        [Key(0)]
+        public int ID { get; set; }
+
+        /// <summary>
         /// The amount of time remaining in the countdown.
         /// </summary>
         /// <remarks>
-        /// This is only sent once from the server upon initial retrieval of the <see cref="MultiplayerRoom"/> or via a <see cref="CountdownChangedEvent"/>.
+        /// This is only sent once from the server upon initial retrieval of the <see cref="MultiplayerRoom"/> or via a <see cref="CountdownStartedEvent"/>.
         /// </remarks>
-        [Key(0)]
+        [Key(1)]
         public TimeSpan TimeRemaining { get; set; }
+
+        /// <summary>
+        /// Whether only a single instance of this <see cref="MultiplayerCountdown"/> type may be active at any one time.
+        /// </summary>
+        [IgnoreMember]
+        public virtual bool IsExclusive => true;
     }
 }

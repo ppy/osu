@@ -2,15 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Play
@@ -46,7 +44,7 @@ namespace osu.Game.Screens.Play
         /// </remarks>
         public double StartTime { get; protected set; }
 
-        public virtual IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
+        public IAdjustableAudioComponent AdjustmentsFromMods { get; } = new AudioAdjustments();
 
         private readonly BindableBool isPaused = new BindableBool(true);
 
@@ -88,9 +86,7 @@ namespace osu.Game.Screens.Play
 
             ensureSourceClockSet();
 
-            // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
-            // This accounts for the clock source potentially taking time to enter a completely stopped state
-            Seek(GameplayClock.CurrentTime);
+            PrepareStart();
 
             // The case which caused this to be added is FrameStabilityContainer, which manages its own current and elapsed time.
             // Because we generally update our own current time quicker than children can query it (via Start/Seek/Update),
@@ -112,10 +108,18 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
+        /// When <see cref="Start"/> is called, this will be run to give an opportunity to prepare the clock at the correct
+        /// start location.
+        /// </summary>
+        protected virtual void PrepareStart()
+        {
+        }
+
+        /// <summary>
         /// Seek to a specific time in gameplay.
         /// </summary>
         /// <param name="time">The destination time to seek to.</param>
-        public void Seek(double time)
+        public virtual void Seek(double time)
         {
             Logger.Log($"{nameof(GameplayClockContainer)} seeking to {time}");
 
@@ -190,7 +194,9 @@ namespace osu.Game.Screens.Play
 
         void IAdjustableClock.Reset() => Reset();
 
-        public void ResetSpeedAdjustments() => throw new NotImplementedException();
+        public virtual void ResetSpeedAdjustments()
+        {
+        }
 
         double IAdjustableClock.Rate
         {
@@ -216,23 +222,5 @@ namespace osu.Game.Screens.Play
         public double FramesPerSecond => GameplayClock.FramesPerSecond;
 
         public FrameTimeInfo TimeInfo => GameplayClock.TimeInfo;
-
-        public double TrueGameplayRate
-        {
-            get
-            {
-                double baseRate = Rate;
-
-                foreach (double adjustment in NonGameplayAdjustments)
-                {
-                    if (Precision.AlmostEquals(adjustment, 0))
-                        return 0;
-
-                    baseRate /= adjustment;
-                }
-
-                return baseRate;
-            }
-        }
     }
 }

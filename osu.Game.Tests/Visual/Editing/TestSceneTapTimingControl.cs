@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual.Editing
                        .TriggerClick();
             });
 
-            AddUntilStep("wait for track playing", () => Clock.IsRunning);
+            AddUntilStep("wait for track playing", () => EditorClock.IsRunning);
 
             AddStep("click reset button", () =>
             {
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Editing
                        .TriggerClick();
             });
 
-            AddUntilStep("wait for track stopped", () => !Clock.IsRunning);
+            AddUntilStep("wait for track stopped", () => !EditorClock.IsRunning);
         }
 
         protected override void Dispose(bool isDisposing)

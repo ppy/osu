@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -13,6 +14,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// </summary>
     public class MultiSpectatorPlayer : SpectatorPlayer
     {
+        /// <summary>
+        /// All adjustments applied to the clock of this <see cref="MultiSpectatorPlayer"/> which come from mods.
+        /// </summary>
+        public IAggregateAudioAdjustment ClockAdjustmentsFromMods => clockAdjustmentsFromMods;
+
+        private readonly AudioAdjustments clockAdjustmentsFromMods = new AudioAdjustments();
         private readonly SpectatorPlayerClock spectatorPlayerClock;
 
         /// <summary>
@@ -53,6 +60,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-            => new GameplayClockContainer(spectatorPlayerClock);
+        {
+            var gameplayClockContainer = new GameplayClockContainer(spectatorPlayerClock);
+            clockAdjustmentsFromMods.BindAdjustments(gameplayClockContainer.AdjustmentsFromMods);
+            return gameplayClockContainer;
+        }
     }
 }

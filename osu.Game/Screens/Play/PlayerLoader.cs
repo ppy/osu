@@ -363,7 +363,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             CurrentPlayer = createPlayer();
-            CurrentPlayer.Configuration.AutomaticallySkipIntro = quickRestart;
+            CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
 
@@ -530,7 +530,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, AudioManager audioManager, INotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
             {
                 Icon = FontAwesome.Solid.VolumeMute;
-                IconBackground.Colour = colours.RedDark;
+                IconContent.Colour = colours.RedDark;
 
                 Activated = delegate
                 {
@@ -584,7 +584,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, INotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.BatteryQuarter;
-                IconBackground.Colour = colours.RedDark;
+                IconContent.Colour = colours.RedDark;
 
                 Activated = delegate
                 {
