@@ -227,7 +227,7 @@ namespace osu.Game.Overlays.Notifications
             if (e.Button == MouseButton.Left)
                 Activated?.Invoke();
 
-            Close(true);
+            Close(false);
             return true;
         }
 
@@ -245,13 +245,13 @@ namespace osu.Game.Overlays.Notifications
 
         public bool WasClosed;
 
-        public virtual void Close(bool userTriggered)
+        public virtual void Close(bool runFlingAnimation)
         {
             if (WasClosed) return;
 
             WasClosed = true;
 
-            if (userTriggered && dragContainer.FlingLeft())
+            if (runFlingAnimation && dragContainer.FlingLeft())
                 this.FadeOut(600, Easing.In);
             else
             {
