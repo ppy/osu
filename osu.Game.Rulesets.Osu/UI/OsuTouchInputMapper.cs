@@ -14,9 +14,14 @@ namespace osu.Game.Rulesets.Osu.UI
     public class OsuTouchInputMapper : Drawable
     {
         /// <summary>
-        /// The maximum amount of touches that should be allowed.
+        /// The default cursor touch it may fail <see cref="IsCursorTouch(TouchSource)"/> on cases where there aren't any cursor touches, such as when autopilot is on.
         /// </summary>
-        private const int allowed_touches_limit = 3;
+        public const TouchSource DEFAULT_CURSOR_TOUCH = TouchSource.Touch1;
+
+        /// <summary>
+        /// The maximum amount of tap touches that should be allowed.
+        /// </summary>
+        private const int allowed_tap_touches_limit = 2;
 
         private readonly OsuInputManager osuInputManager;
 
@@ -38,19 +43,26 @@ namespace osu.Game.Rulesets.Osu.UI
         public int ActiveTapTouchesCount => activeTapTouches.Count;
 
         /// <summary>
-        /// Tracks the amount of active touches.
-        /// </summary>
-        private int activeTouchesAmount => osuInputManager.CurrentState.Touch.ActiveSources.Count();
-
-        /// <summary>
         /// Tracks whether we just entered a tap only mapping state.
         /// </summary>
         public bool EnteredTapOnlyMapping;
 
         /// <summary>
-        /// Used to track whether the mapped inputs will only map for tap touches, this only happens if there are <see cref="allowed_touches_limit"/> touches being pressed or more.
+        /// Checks whether given tap touches count is supposed to trigger tap only mapping. 
         /// </summary>
-        public bool TapOnlyMapping => activeTouchesAmount >= allowed_touches_limit;
+        /// <param name="count">The count to check agains the <see cref="allowed_tap_touches_limit"/></param>
+        /// <returns></returns>
+        private bool checkTapOnlyMapping(int count) => count >= allowed_tap_touches_limit;
+
+        /// <summary>
+        /// Tracks whether the mapped inputs will only map for tap touches, this only happens if there are <see cref="allowed_tap_touches_limit"/> touches being pressed or more.
+        /// </summary>
+        public bool TapOnlyMapping => checkTapOnlyMapping(ActiveTapTouchesCount);
+
+        /// <summary>
+        /// Tracks wheter the next touch will begin <see cref="TapOnlyMapping"/>.
+        /// </summary>
+        public bool NextTouchWillBeTapOnlyMapping => checkTapOnlyMapping(ActiveTapTouchesCount + 1);
 
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
@@ -66,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// Whether we didn't reached the limit of allowed simultaneous touches.
         /// </summary>
-        public bool AllowingOtherTouch => activeTouchesAmount <= allowed_touches_limit;
+        public bool AllowingOtherTouch => ActiveTapTouchesCount <= allowed_tap_touches_limit;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
@@ -77,9 +89,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
             if (IsTapTouch(source))
             {
-                if (TapOnlyMapping)
+                if (NextTouchWillBeTapOnlyMapping)
                 {
-                    if (!EnteredTapOnlyMapping && osuInputManager.CurrentState.Touch.IsActive(TouchSource.Touch1))
+                    if (!EnteredTapOnlyMapping && osuInputManager.CurrentState.Touch.IsActive(DEFAULT_CURSOR_TOUCH) && IsCursorTouch(DEFAULT_CURSOR_TOUCH))
                     {
                         EnteredTapOnlyMapping = true;
                         osuInputManager.HandleTouchTapOnlyMapping();
