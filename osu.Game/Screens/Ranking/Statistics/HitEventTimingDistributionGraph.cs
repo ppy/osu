@@ -323,7 +323,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             private void updateBasalHeight()
             {
-                float newBasalHeight = DrawHeight == 0 ? 0 : DrawWidth / DrawHeight;
+                float newBasalHeight = DrawHeight > DrawWidth ? DrawWidth / DrawHeight : 1;
 
                 if (newBasalHeight == basalHeight)
                     return;
@@ -353,7 +353,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 for (int i = 0; i < values.Count; i++)
                 {
-                    boxOriginals[i].Y = offsetForValue(offsetValue) * BoundingBox.Height;
+                    boxOriginals[i].Y = offsetForValue(offsetValue) * DrawHeight;
                     boxOriginals[i].Height = heightForValue(values[i].Value);
                     offsetValue -= values[i].Value;
                 }
