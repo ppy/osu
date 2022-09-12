@@ -33,7 +33,9 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// Tracks all active tap <see cref="TouchSource"/>s that can be mapped into a given <see cref="OsuAction"/> through the <see cref="tapTouchActions"/>.
         /// </summary>
-        public HashSet<TouchSource> ActiveTapTouches = new HashSet<TouchSource>();
+        private readonly HashSet<TouchSource> activeTapTouches = new HashSet<TouchSource>();
+
+        public int ActiveTapTouchesCount => activeTapTouches.Count;
 
         /// <summary>
         /// Tracks the amount of active touches.
@@ -53,11 +55,11 @@ namespace osu.Game.Rulesets.Osu.UI
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
             osuInputManager = inputManager;
-            foreach (var source in Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().Where(source => (source != TouchSource.Touch1 || !osuInputManager.AllowUserCursorMovement)))
+            foreach (var source in Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>())
                 tapTouchActions.Add(source, (source - TouchSource.Touch1) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
         }
 
-        public bool IsTapTouch(TouchSource source) => tapTouchActions.ContainsKey(source);
+        public bool IsTapTouch(TouchSource source) => source != TouchSource.Touch1 || !osuInputManager.AllowUserCursorMovement;
 
         public bool IsCursorTouch(TouchSource source) => !IsTapTouch(source);
 
@@ -88,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     EnteredTapOnlyMapping = false;
                 }
 
-                ActiveTapTouches.Add(source);
+                activeTapTouches.Add(source);
                 keyBindingContainer.TriggerPressed(tapTouchActions[source]);
             }
 
@@ -99,9 +101,9 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             var source = e.Touch.Source;
 
-            if (ActiveTapTouches.Contains(source))
+            if (activeTapTouches.Contains(source))
             {
-                ActiveTapTouches.Remove(source);
+                activeTapTouches.Remove(source);
                 keyBindingContainer.TriggerReleased(tapTouchActions[source]);
             }
 
