@@ -49,6 +49,40 @@ namespace osu.Game.Tests.Visual.UserInterface
         });
 
         [Test]
+        public void TestDismissWithoutActivationFling()
+        {
+            bool activated = false;
+            SimpleNotification notification = null!;
+
+            AddStep("post", () =>
+            {
+                activated = false;
+                notificationOverlay.Post(notification = new SimpleNotification
+                {
+                    Text = @"Welcome to osu!. Enjoy your stay!",
+                    Activated = () => activated = true,
+                });
+            });
+
+            AddStep("start drag", () =>
+            {
+                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single());
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single().ScreenSpaceDrawQuad.Centre + new Vector2(-500, 0));
+            });
+
+            AddStep("fling away", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for closed", () => notification.WasClosed);
+            AddAssert("was not activated", () => !activated);
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+            AddAssert("unread count zero", () => notificationOverlay.UnreadCount.Value == 0);
+        }
+
+        [Test]
         public void TestDismissWithoutActivationCloseButton()
         {
             bool activated = false;
@@ -75,6 +109,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait for closed", () => notification.WasClosed);
             AddAssert("was not activated", () => !activated);
             AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+            AddAssert("unread count zero", () => notificationOverlay.UnreadCount.Value == 0);
         }
 
         [Test]
