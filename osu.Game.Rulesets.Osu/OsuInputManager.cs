@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -19,8 +18,6 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuInputManager : RulesetInputManager<OsuAction>
     {
-        private readonly BindableBool mouseDisabled = new BindableBool();
-
         private readonly OsuTouchInputMapper touchInputMapper;
 
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
@@ -49,15 +46,6 @@ namespace osu.Game.Rulesets.Osu
         private void load(OsuConfigManager config)
         {
             Add(touchInputMapper);
-
-            mouseDisabled.BindTo(config.GetBindable<bool>(OsuSetting.MouseDisableButtons));
-            mouseDisabled.ValueChanged += e =>
-            {
-                // We must recheck tap only mapping when mouse disabling changes.
-                // so we can disable the input from the cursor properly.
-                if (touchInputMapper.TapOnlyMapping)
-                    HandleTouchTapOnlyMapping();
-            };
         }
 
         protected override bool Handle(UIEvent e)
@@ -78,15 +66,11 @@ namespace osu.Game.Rulesets.Osu
         }
 
         /// <summary>
-        /// Disables mouse input for the first touch, so <see cref="OsuTouchInputMapper"/> can handle input for both keys for streaming.
+        /// Disables mouse action input for the first touch, so all the tapping must be done by other fingers.
         /// </summary>
         /// <returns>Whether we entered an touch tap only mapping state</returns>
         public bool HandleTouchTapOnlyMapping()
         {
-            // We shouldn't block the action mouse input if the mouse is disabled. because it isn't producing any actions in the first place.
-            if (mouseDisabled.Value)
-                return false;
-
             // We don't want to block the default cursor touch action input when the default cursor touch isn't a proper cursor touch.
             // this because it will completely block the first input with mods which don't accept cursor input such as autopilot.
             if (!touchInputMapper.IsCursorTouch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH))
