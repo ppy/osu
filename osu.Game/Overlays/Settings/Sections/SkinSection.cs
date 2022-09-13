@@ -76,8 +76,6 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             base.LoadComplete();
 
-            skinDropdown.Current = skins.CurrentSkinInfo;
-
             realmSubscription = realm.RegisterForNotifications(_ => realm.Realm.All<SkinInfo>()
                                                                          .Where(s => !s.DeletePending)
                                                                          .OrderByDescending(s => s.Protected) // protected skins should be at the top.
