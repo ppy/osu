@@ -838,6 +838,7 @@ namespace osu.Game.Screens.Play
                     return;
 
                 leaderboard.Expanded.BindTo(LeaderboardExpandedState);
+
                 AddLeaderboardToHUD(leaderboard);
             });
         }
@@ -849,7 +850,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Bottom = 75, Left = 20 },
         };
 
-        protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.Add(leaderboard);
+        protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.Add(leaderboard, !Configuration.AlwaysShowLeaderboard);
 
         private void updateLeaderboardExpandedState() =>
             LeaderboardExpandedState.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
