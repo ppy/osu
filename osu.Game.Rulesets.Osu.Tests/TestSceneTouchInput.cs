@@ -99,6 +99,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
+        public void TestTouchSources()
+        {
+            AddAssert("Cursor touch is properly set", () => touchInputMapper.IsCursorTouch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH));
+            AddAssert("All other touches are tap touches", () => Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().Skip(1).All(source => touchInputMapper.IsTapTouch(source)));
+        }
+
+        [Test]
         public void TestOneFingerInput()
         {
             addFirstFingerTouchStep();
@@ -107,7 +114,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             expectTapTouchesAmount(0);
             expectKeyCountersCountingBe(1, 0);
             expectPressedCurrently(OsuAction.LeftButton);
-            AddAssert("The touch is a cursor touch", () => touchInputMapper.IsCursorTouch(TouchSource.Touch1));
         }
 
         [Test]
@@ -115,7 +121,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             steppedTouchWithTwoFingers();
 
-            assertTapTouch(TouchSource.Touch2);
             expectTapTouchesAmount(1);
             assertAllowingTouchInput();
             expectBothKeysPressed();
@@ -135,7 +140,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             steppedTouchWithThreeFingers();
 
-            assertTapTouch(TouchSource.Touch3);
             assertAcceptedOnlyThreeSequentialInputs();
             AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping && touchInputMapper.EnteredTapOnlyMapping);
             AddAssert("Touch input is blocked", () => !touchInputMapper.AllowingOtherTouch);
