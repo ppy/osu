@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Play
 
             hideTargets = new List<Drawable> { mainComponents, KeyCounter, topRightElements };
 
-            if (alwaysShowLeaderboard)
+            if (!alwaysShowLeaderboard)
                 hideTargets.Add(LeaderboardFlow);
         }
 
