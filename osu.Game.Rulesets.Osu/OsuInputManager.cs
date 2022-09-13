@@ -11,6 +11,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -63,10 +64,17 @@ namespace osu.Game.Rulesets.Osu
         /// <summary>
         /// Disables mouse input for the first touch, so <see cref="OsuTouchInputMapper"/> can handle input for both keys for streaming.
         /// </summary>
-        public void HandleTouchTapOnlyMapping()
+        /// <returns>Whether we entered an touch tap only mapping state</returns>
+        public bool HandleTouchTapOnlyMapping()
         {
-            var firstTouchPosition = CurrentState.Touch.GetTouchPosition(TouchSource.Touch1)!.Value;
-            base.HandleMouseTouchStateChange(new TouchStateChangeEvent(CurrentState, null, new Touch(TouchSource.Touch1, firstTouchPosition), false, firstTouchPosition));
+            Vector2? cursorTouchPosition;
+
+            if (!touchInputMapper.IsCursorTouch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH) || ((cursorTouchPosition = CurrentState.Touch.GetTouchPosition(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH)) == null))
+                return false;
+
+            base.HandleMouseTouchStateChange(new TouchStateChangeEvent(CurrentState, null, new Touch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH, cursorTouchPosition.Value), false, cursorTouchPosition));
+
+            return true;
         }
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
