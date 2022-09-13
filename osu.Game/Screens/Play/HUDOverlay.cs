@@ -79,9 +79,15 @@ namespace osu.Game.Screens.Play
 
         private readonly SkinnableTargetContainer mainComponents;
 
+        /// <summary>
+        /// A flow which sits at the left side of the screen to house leaderboard (and related) components.
+        /// Will automatically be positioned to avoid colliding with top scoring elements.
+        /// </summary>
+        public readonly FillFlowContainer LeaderboardFlow;
+
         private readonly List<Drawable> hideTargets;
 
-        public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+        public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
@@ -126,10 +132,19 @@ namespace osu.Game.Screens.Play
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
                 },
-                clicksPerSecondCalculator = new ClicksPerSecondCalculator()
+                LeaderboardFlow = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(5)
+                },
+                clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
             };
 
             hideTargets = new List<Drawable> { mainComponents, KeyCounter, topRightElements };
+
+            if (alwaysShowLeaderboard)
+                hideTargets.Add(LeaderboardFlow);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -174,13 +189,6 @@ namespace osu.Game.Screens.Play
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
 
-        public void Add(Drawable drawable, bool hideWithHUD)
-        {
-            base.Add(drawable);
-            if (hideWithHUD)
-                hideTargets.Add(drawable);
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -220,6 +228,14 @@ namespace osu.Game.Screens.Play
                 bottomRightElements.Y = BottomScoringElementsHeight = -MathHelper.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
             else
                 bottomRightElements.Y = 0;
+
+            adjustLeaderboardPosition();
+        }
+
+        private void adjustLeaderboardPosition()
+        {
+            const float padding = 44; // enough margin to avoid the hit error display.
+            LeaderboardFlow.Position = new Vector2(padding, padding + TopScoringElementsHeight);
         }
 
         private void updateVisibility()

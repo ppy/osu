@@ -420,7 +420,7 @@ namespace osu.Game.Screens.Play
                     // display the cursor above some HUD elements.
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                     DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
-                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods)
+                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration.AlwaysShowLeaderboard)
                     {
                         HoldToQuit =
                         {
@@ -843,14 +843,9 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        protected virtual GameplayLeaderboard CreateGameplayLeaderboard() => new SoloGameplayLeaderboard(Score.ScoreInfo.User)
-        {
-            Anchor = Anchor.BottomLeft,
-            Origin = Anchor.BottomLeft,
-            Margin = new MarginPadding { Bottom = 75, Left = 20 },
-        };
+        protected virtual GameplayLeaderboard CreateGameplayLeaderboard() => new SoloGameplayLeaderboard(Score.ScoreInfo.User);
 
-        protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.Add(leaderboard, !Configuration.AlwaysShowLeaderboard);
+        protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.LeaderboardFlow.Add(leaderboard);
 
         private void updateLeaderboardExpandedState() =>
             LeaderboardExpandedState.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
