@@ -39,7 +39,9 @@ namespace osu.Game.Online.Leaderboards
         /// <summary>
         /// The currently displayed scores.
         /// </summary>
-        public IEnumerable<TScoreInfo> Scores => scores;
+        public IBindableList<TScoreInfo> Scores => scores;
+
+        private readonly BindableList<TScoreInfo> scores = new BindableList<TScoreInfo>();
 
         /// <summary>
         /// Whether the current scope should refetch in response to changes in API connectivity state.
@@ -67,8 +69,6 @@ namespace osu.Game.Online.Leaderboards
         private IAPIProvider api { get; set; }
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-
-        private ICollection<TScoreInfo> scores;
 
         private TScope scope;
 
@@ -169,7 +169,7 @@ namespace osu.Game.Online.Leaderboards
                     throw new InvalidOperationException($"State {state} cannot be set by a leaderboard implementation.");
             }
 
-            Debug.Assert(scores?.Any() != true);
+            Debug.Assert(scores.Any() != true);
 
             setState(state);
         }
@@ -181,7 +181,10 @@ namespace osu.Game.Online.Leaderboards
         /// <param name="userScore">The user top score, if any.</param>
         protected void SetScores(IEnumerable<TScoreInfo> scores, TScoreInfo userScore = default)
         {
-            this.scores = scores?.ToList();
+            this.scores.Clear();
+            if (scores != null)
+                this.scores.AddRange(scores);
+
             userScoreContainer.Score.Value = userScore;
 
             if (userScore == null)
@@ -247,7 +250,7 @@ namespace osu.Game.Online.Leaderboards
                 .Expire();
             scoreFlowContainer = null;
 
-            if (scores?.Any() != true)
+            if (scores.Any() != true)
             {
                 setState(LeaderboardState.NoScores);
                 return;

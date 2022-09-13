@@ -5,9 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -15,31 +18,36 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSoloGameplayLeaderboard : OsuTestScene
+    public class TestSceneSoloGameplayLeaderboard : OsuTestScene, ILeaderboardScoreSource
     {
         [Cached]
         private readonly ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
 
-        private SoloGameplayLeaderboard leaderboard = null!;
+        private readonly BindableList<ScoreInfo> scores = new BindableList<ScoreInfo>();
 
-        [SetUp]
-        public void SetUp() => Schedule(() =>
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            var trackingUser = new APIUser
-            {
-                Username = "local user",
-                Id = 2,
-            };
+            AddStep("clear scores", () => scores.Clear());
 
-            Child = leaderboard = new SoloGameplayLeaderboard(trackingUser)
+            AddStep("create component", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Expanded = { Value = true },
-            };
+                var trackingUser = new APIUser
+                {
+                    Username = "local user",
+                    Id = 2,
+                };
 
-            leaderboard.ShowScores(createSampleScores());
-        });
+                Child = new SoloGameplayLeaderboard(trackingUser)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Expanded = { Value = true },
+                };
+            });
+
+            AddStep("add scores", () => scores.AddRange(createSampleScores()));
+        }
 
         [Test]
         public void TestLocalUser()
@@ -48,6 +56,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddSliderStep("accuracy", 0f, 1f, 0.5f, v => scoreProcessor.Accuracy.Value = v);
             AddSliderStep("combo", 0, 1000, 0, v => scoreProcessor.Combo.Value = v);
         }
+
+        IBindableList<ScoreInfo> ILeaderboardScoreSource.Scores => scores;
 
         private static List<ScoreInfo> createSampleScores()
         {
