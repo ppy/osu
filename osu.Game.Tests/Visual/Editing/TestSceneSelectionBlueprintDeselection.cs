@@ -28,13 +28,17 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorClock.Seek(0);
                 circle1 = new HitCircle();
                 var circle2 = new HitCircle();
+
                 EditorBeatmap.Add(circle1);
                 EditorBeatmap.Add(circle2);
+
                 EditorBeatmap.SelectedHitObjects.Add(circle1);
                 EditorBeatmap.SelectedHitObjects.Add(circle2);
             });
 
             AddStep("delete the first circle", () => EditorBeatmap.Remove(circle1));
+            AddAssert("one hitobject remains", () => EditorBeatmap.HitObjects.Count == 1);
+            AddAssert("one hitobject selected", () => EditorBeatmap.SelectedHitObjects.Count == 1);
         }
 
         [Test]
@@ -63,6 +67,9 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.PressKey(Key.Delete);
                 InputManager.ReleaseKey(Key.Delete);
             });
+
+            AddAssert("10 hitobjects remain", () => EditorBeatmap.HitObjects.Count == 10);
+            AddAssert("no hitobjects selected", () => EditorBeatmap.SelectedHitObjects.Count == 0);
         }
     }
 }
