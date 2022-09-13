@@ -41,14 +41,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private readonly TaskCompletionSource<bool> resultsReady = new TaskCompletionSource<bool>();
 
-        private MultiplayerGameplayLeaderboard leaderboard;
-
         private readonly MultiplayerRoomUser[] users;
-
-        private readonly Bindable<bool> leaderboardExpanded = new BindableBool();
 
         private LoadingLayer loadingDisplay;
         private FillFlowContainer leaderboardFlow;
+
+        private MultiplayerGameplayLeaderboard multiplayerLeaderboard;
 
         /// <summary>
         /// Construct a multiplayer player.
@@ -81,36 +79,31 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Spacing = new Vector2(5)
             });
 
-            HUDOverlay.HoldingForHUD.BindValueChanged(_ => updateLeaderboardExpandedState());
-            LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
-
-            // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
-            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(users), l =>
-            {
-                if (!LoadedBeatmapSuccessfully)
-                    return;
-
-                leaderboard.Expanded.BindTo(leaderboardExpanded);
-
-                leaderboardFlow.Insert(0, l);
-
-                if (leaderboard.TeamScores.Count >= 2)
-                {
-                    LoadComponentAsync(new GameplayMatchScoreDisplay
-                    {
-                        Team1Score = { BindTarget = leaderboard.TeamScores.First().Value },
-                        Team2Score = { BindTarget = leaderboard.TeamScores.Last().Value },
-                        Expanded = { BindTarget = HUDOverlay.ShowHud },
-                    }, scoreDisplay => leaderboardFlow.Insert(1, scoreDisplay));
-                }
-            });
-
             LoadComponentAsync(new GameplayChatDisplay(Room)
             {
-                Expanded = { BindTarget = leaderboardExpanded },
+                Expanded = { BindTarget = LeaderboardExpandedState },
             }, chat => leaderboardFlow.Insert(2, chat));
 
             HUDOverlay.Add(loadingDisplay = new LoadingLayer(true) { Depth = float.MaxValue });
+        }
+
+        protected override GameplayLeaderboard CreateGameplayLeaderboard() => multiplayerLeaderboard = new MultiplayerGameplayLeaderboard(users);
+
+        protected override void AddLeaderboardToHUD(GameplayLeaderboard leaderboard)
+        {
+            Debug.Assert(leaderboard == multiplayerLeaderboard);
+
+            leaderboardFlow.Insert(0, leaderboard);
+
+            if (multiplayerLeaderboard.TeamScores.Count >= 2)
+            {
+                LoadComponentAsync(new GameplayMatchScoreDisplay
+                {
+                    Team1Score = { BindTarget = multiplayerLeaderboard.TeamScores.First().Value },
+                    Team2Score = { BindTarget = multiplayerLeaderboard.TeamScores.Last().Value },
+                    Expanded = { BindTarget = HUDOverlay.ShowHud },
+                }, scoreDisplay => leaderboardFlow.Insert(1, scoreDisplay));
+            }
         }
 
         protected override void LoadAsyncComplete()
@@ -166,9 +159,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.ChangeState(MultiplayerUserState.ReadyForGameplay);
             }
         }
-
-        private void updateLeaderboardExpandedState() =>
-            leaderboardExpanded.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
 
         private void failAndBail(string message = null)
         {
@@ -232,8 +222,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             Debug.Assert(Room.RoomID.Value != null);
 
-            return leaderboard.TeamScores.Count == 2
-                ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem, leaderboard.TeamScores)
+            return multiplayerLeaderboard.TeamScores.Count == 2
+                ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem, multiplayerLeaderboard.TeamScores)
                 : new MultiplayerResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem);
         }
 
