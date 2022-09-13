@@ -16,9 +16,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class GameplayLeaderboard : CompositeDrawable
+    public abstract class GameplayLeaderboard : CompositeDrawable
     {
-        private readonly int maxPanels;
         private readonly Cached sorting = new Cached();
 
         public Bindable<bool> Expanded = new Bindable<bool>();
@@ -30,14 +29,13 @@ namespace osu.Game.Screens.Play.HUD
 
         private GameplayLeaderboardScore? trackedScore;
 
+        private const int max_panels = 8;
+
         /// <summary>
         /// Create a new leaderboard.
         /// </summary>
-        /// <param name="maxPanels">The maximum panels to show at once. Defines the maximum height of this component.</param>
-        public GameplayLeaderboard(int maxPanels = 8)
+        protected GameplayLeaderboard()
         {
-            this.maxPanels = maxPanels;
-
             Width = GameplayLeaderboardScore.EXTENDED_WIDTH + GameplayLeaderboardScore.SHEAR_WIDTH;
 
             InternalChildren = new Drawable[]
@@ -91,7 +89,7 @@ namespace osu.Game.Screens.Play.HUD
             Flow.Add(drawable);
             drawable.TotalScore.BindValueChanged(_ => sorting.Invalidate(), true);
 
-            int displayCount = Math.Min(Flow.Count, maxPanels);
+            int displayCount = Math.Min(Flow.Count, max_panels);
             Height = displayCount * (GameplayLeaderboardScore.PANEL_HEIGHT + Flow.Spacing.Y);
             requiresScroll = displayCount != Flow.Count;
 
