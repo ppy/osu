@@ -49,6 +49,11 @@ namespace osu.Game.Screens.Edit
         public event Action<HitObject> HitObjectUpdated;
 
         /// <summary>
+        /// Invoked after <see cref="HitObjects"/> is updated during <see cref="UpdateState"/> and blueprints need to be sorted immediately to prevent a crash.
+        /// </summary>
+        public event Action SelectionBlueprintsShouldBeSorted;
+
+        /// <summary>
         /// All currently selected <see cref="HitObject"/>s.
         /// </summary>
         public readonly BindableList<HitObject> SelectedHitObjects = new BindableList<HitObject>();
@@ -330,6 +335,9 @@ namespace osu.Game.Screens.Edit
             foreach (var h in batchPendingUpdates) processHitObject(h);
 
             beatmapProcessor?.PostProcess();
+
+            // Signal selection blueprint sorting because it is possible that the beatmap processor changed the order of the selection blueprints
+            SelectionBlueprintsShouldBeSorted?.Invoke();
 
             // callbacks may modify the lists so let's be safe about it
             var deletes = batchPendingDeletes.ToArray();

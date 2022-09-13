@@ -24,10 +24,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            editorBeatmap.HitObjectUpdated += hitObjectUpdated;
+            editorBeatmap.SelectionBlueprintsShouldBeSorted += SortInternal;
         }
-
-        private void hitObjectUpdated(HitObject _) => SortInternal();
 
         public override void Add(SelectionBlueprint<HitObject> drawable)
         {
@@ -72,7 +70,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.Dispose(isDisposing);
 
             if (editorBeatmap != null)
-                editorBeatmap.HitObjectUpdated -= hitObjectUpdated;
+                editorBeatmap.SelectionBlueprintsShouldBeSorted -= SortInternal;
         }
     }
 }
