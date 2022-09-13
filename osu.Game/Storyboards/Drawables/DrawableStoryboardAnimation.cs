@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -113,6 +114,21 @@ namespace osu.Game.Storyboards.Drawables
             }
 
             Animation.ApplyTransforms(this);
+        }
+
+        [Resolved]
+        private IGameplayClock gameplayClock { get; set; }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Framework animation class tries its best to synchronise the animation at LoadComplete,
+            // but in some cases (such as fast forward) this results in an incorrect start offset.
+            //
+            // In the case of storyboard animations, we want to synchronise with game time perfectly
+            // so let's get a correct time based on gameplay clock and earliest transform.
+            PlaybackPosition = gameplayClock.CurrentTime - Animation.EarliestTransformTime;
         }
 
         private void skinSourceChanged()

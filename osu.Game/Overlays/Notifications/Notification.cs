@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -170,11 +171,25 @@ namespace osu.Game.Overlays.Notifications
             base.OnHoverLost(e);
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            // right click doesn't trigger OnClick so we need to handle here until that changes.
+            if (e.Button != MouseButton.Left)
+            {
+                Close();
+                return true;
+            }
+
+            return base.OnMouseDown(e);
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
-            if (Activated?.Invoke() ?? true)
-                Close();
+            // Clicking with anything but left button should dismiss but not perform the activation action.
+            if (e.Button == MouseButton.Left)
+                Activated?.Invoke();
 
+            Close();
             return true;
         }
 
@@ -203,7 +218,7 @@ namespace osu.Game.Overlays.Notifications
             Expire();
         }
 
-        private class CloseButton : OsuClickableContainer
+        internal class CloseButton : OsuClickableContainer
         {
             private SpriteIcon icon = null!;
             private Box background = null!;
