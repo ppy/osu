@@ -6,10 +6,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -22,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public class PlaySongSelect : SongSelect
+    public class PlaySongSelect : SongSelect, ILeaderboardScoreSource
     {
         private OsuScreen playerLoader;
 
@@ -37,14 +39,25 @@ namespace osu.Game.Screens.Select
         private void load(OsuColour colours)
         {
             BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
-
-            ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }
 
         protected void PresentScore(ScoreInfo score) =>
             FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
 
-        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
+        protected override BeatmapDetailArea CreateBeatmapDetailArea()
+        {
+            var playBeatmapDetailArea = new PlayBeatmapDetailArea
+            {
+                Leaderboard =
+                {
+                    ScoreSelected = PresentScore
+                }
+            };
+
+            Scores.BindTo(playBeatmapDetailArea.Leaderboard.Scores);
+
+            return playBeatmapDetailArea;
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -121,5 +134,7 @@ namespace osu.Game.Screens.Select
                 playerLoader = null;
             }
         }
+
+        IBindableList<ScoreInfo> ILeaderboardScoreSource.Scores { get; } = new BindableList<ScoreInfo>();
     }
 }

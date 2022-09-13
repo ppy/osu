@@ -4,6 +4,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -14,6 +16,8 @@ namespace osu.Game.Screens.Play.HUD
     {
         private readonly IUser trackingUser;
 
+        private readonly IBindableList<ScoreInfo> scores = new BindableList<ScoreInfo>();
+
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
 
@@ -22,7 +26,16 @@ namespace osu.Game.Screens.Play.HUD
             this.trackingUser = trackingUser;
         }
 
-        public void ShowScores(IEnumerable<IScoreInfo> scores)
+        [BackgroundDependencyLoader(true)]
+        private void load(ILeaderboardScoreSource? scoreSource)
+        {
+            if (scoreSource != null)
+                scores.BindTo(scoreSource.Scores);
+
+            scores.BindCollectionChanged((_, __) => Scheduler.AddOnce(showScores, scores), true);
+        }
+
+        private void showScores(IEnumerable<IScoreInfo> scores)
         {
             Clear();
 

@@ -23,7 +23,7 @@ using Realms;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
+    public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>, ILeaderboardScoreSource
     {
         public Action<ScoreInfo> ScoreSelected;
 
@@ -152,7 +152,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 SetScores(
                     scoreManager.OrderByTotalScore(r.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
-                    r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo));
+                    r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
+                );
             });
 
             return req;
