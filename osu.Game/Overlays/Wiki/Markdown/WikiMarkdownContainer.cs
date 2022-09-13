@@ -15,6 +15,8 @@ namespace osu.Game.Overlays.Wiki.Markdown
 {
     public class WikiMarkdownContainer : OsuMarkdownContainer
     {
+        protected override bool Footnotes => true;
+
         public string CurrentPath
         {
             set => DocumentUrl = value;
