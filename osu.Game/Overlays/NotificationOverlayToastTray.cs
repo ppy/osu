@@ -78,7 +78,6 @@ namespace osu.Game.Overlays
                 {
                     LayoutDuration = 150,
                     LayoutEasing = Easing.OutQuart,
-                    Spacing = new Vector2(3),
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },
@@ -118,7 +117,7 @@ namespace osu.Game.Overlays
                     return;
 
                 // Notification hovered; delay dismissal.
-                if (notification.IsHovered)
+                if (notification.IsHovered || notification.IsDragged)
                 {
                     scheduleDismissal();
                     return;
