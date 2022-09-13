@@ -176,6 +176,9 @@ namespace osu.Game.Overlays
             }
             else
             {
+                // new results may contain beatmaps from a previous page,
+                // this is dodgy but matches web behaviour for now.
+                // see: https://github.com/ppy/osu-web/issues/9270
                 newCards = newCards.Except(foundContent);
 
                 panelLoadTask = LoadComponentsAsync(newCards, loaded =>
