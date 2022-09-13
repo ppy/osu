@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
@@ -44,9 +43,9 @@ namespace osu.Game.Rulesets.UI
         public ShaderManager ShaderManager { get; }
 
         /// <summary>
-        /// The ruleset config manager.
+        /// The ruleset config manager. May be null if ruleset does not expose a configuration manager.
         /// </summary>
-        public IRulesetConfigManager RulesetConfigManager { get; private set; }
+        public IRulesetConfigManager? RulesetConfigManager { get; }
 
         public DrawableRulesetDependencies(Ruleset ruleset, IReadOnlyDependencyContainer parent)
             : base(parent)
@@ -93,10 +92,9 @@ namespace osu.Game.Rulesets.UI
 
             isDisposed = true;
 
-            SampleStore?.Dispose();
-            TextureStore?.Dispose();
-            ShaderManager?.Dispose();
-            RulesetConfigManager = null;
+            if (ShaderManager.IsNotNull()) SampleStore.Dispose();
+            if (TextureStore.IsNotNull()) TextureStore.Dispose();
+            if (ShaderManager.IsNotNull()) ShaderManager.Dispose();
         }
 
         #endregion
@@ -157,7 +155,7 @@ namespace osu.Game.Rulesets.UI
 
             public void Dispose()
             {
-                primary?.Dispose();
+                if (primary.IsNotNull()) primary.Dispose();
             }
         }
 
@@ -182,7 +180,7 @@ namespace osu.Game.Rulesets.UI
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing);
-                primary?.Dispose();
+                if (primary.IsNotNull()) primary.Dispose();
             }
         }
 
@@ -198,12 +196,12 @@ namespace osu.Game.Rulesets.UI
                 this.fallback = fallback;
             }
 
-            public override byte[] LoadRaw(string name) => primary.LoadRaw(name) ?? fallback.LoadRaw(name);
+            public override byte[]? LoadRaw(string name) => primary.LoadRaw(name) ?? fallback.LoadRaw(name);
 
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing);
-                primary?.Dispose();
+                if (primary.IsNotNull()) primary.Dispose();
             }
         }
     }
