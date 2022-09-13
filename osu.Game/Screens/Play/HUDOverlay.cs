@@ -35,11 +35,6 @@ namespace osu.Game.Screens.Play
         public const Easing FADE_EASING = Easing.OutQuint;
 
         /// <summary>
-        /// The total height of all the top of screen scoring elements.
-        /// </summary>
-        public float TopScoringElementsHeight { get; private set; }
-
-        /// <summary>
         /// The total height of all the bottom of screen scoring elements.
         /// </summary>
         public float BottomScoringElementsHeight { get; private set; }
@@ -136,6 +131,7 @@ namespace osu.Game.Screens.Play
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding(44), // enough margin to avoid the hit error display
                     Spacing = new Vector2(5)
                 },
                 clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
@@ -193,22 +189,36 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            Vector2? lowestTopScreenSpace = null;
+            float? lowestTopScreenSpaceLeft = null;
+            float? lowestTopScreenSpaceRight = null;
+
             Vector2? highestBottomScreenSpace = null;
 
             // LINQ cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
             foreach (var element in mainComponents.Components.Cast<Drawable>())
             {
                 // for now align top-right components with the bottom-edge of the lowest top-anchored hud element.
-                if (element.Anchor.HasFlagFast(Anchor.TopRight) || (element.Anchor.HasFlagFast(Anchor.y0) && element.RelativeSizeAxes == Axes.X))
+                if (element.Anchor.HasFlagFast(Anchor.y0))
                 {
                     // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
                     if (element is LegacyHealthDisplay)
                         continue;
 
-                    var bottomRight = element.ScreenSpaceDrawQuad.BottomRight;
-                    if (lowestTopScreenSpace == null || bottomRight.Y > lowestTopScreenSpace.Value.Y)
-                        lowestTopScreenSpace = bottomRight;
+                    float bottom = element.ScreenSpaceDrawQuad.BottomRight.Y;
+
+                    bool isRelativeX = element.RelativeSizeAxes == Axes.X;
+
+                    if (element.Anchor.HasFlagFast(Anchor.TopRight) || isRelativeX)
+                    {
+                        if (lowestTopScreenSpaceRight == null || bottom > lowestTopScreenSpaceRight.Value)
+                            lowestTopScreenSpaceRight = bottom;
+                    }
+
+                    if (element.Anchor.HasFlagFast(Anchor.TopLeft) || isRelativeX)
+                    {
+                        if (lowestTopScreenSpaceLeft == null || bottom > lowestTopScreenSpaceLeft.Value)
+                            lowestTopScreenSpaceLeft = bottom;
+                    }
                 }
                 // and align bottom-right components with the top-edge of the highest bottom-anchored hud element.
                 else if (element.Anchor.HasFlagFast(Anchor.BottomRight) || (element.Anchor.HasFlagFast(Anchor.y2) && element.RelativeSizeAxes == Axes.X))
@@ -219,23 +229,20 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            if (lowestTopScreenSpace.HasValue)
-                topRightElements.Y = TopScoringElementsHeight = MathHelper.Clamp(ToLocalSpace(lowestTopScreenSpace.Value).Y, 0, DrawHeight - topRightElements.DrawHeight);
+            if (lowestTopScreenSpaceRight.HasValue)
+                topRightElements.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - topRightElements.DrawHeight);
             else
                 topRightElements.Y = 0;
+
+            if (lowestTopScreenSpaceLeft.HasValue)
+                LeaderboardFlow.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - LeaderboardFlow.DrawHeight);
+            else
+                LeaderboardFlow.Y = 0;
 
             if (highestBottomScreenSpace.HasValue)
                 bottomRightElements.Y = BottomScoringElementsHeight = -MathHelper.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
             else
                 bottomRightElements.Y = 0;
-
-            adjustLeaderboardPosition();
-        }
-
-        private void adjustLeaderboardPosition()
-        {
-            const float padding = 44; // enough margin to avoid the hit error display.
-            LeaderboardFlow.Position = new Vector2(padding, padding + TopScoringElementsHeight);
         }
 
         private void updateVisibility()
