@@ -51,7 +51,13 @@ namespace osu.Game.Database
             ID = id;
         }
 
-        public bool Equals(Live<T>? other) => ID == other?.ID;
+        public bool Equals(Live<T>? other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
+
+            return ID == other.ID;
+        }
 
         public override int GetHashCode() => HashCode.Combine(ID);
 
