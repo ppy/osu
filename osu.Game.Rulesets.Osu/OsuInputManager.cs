@@ -66,11 +66,11 @@ namespace osu.Game.Rulesets.Osu
         }
 
         /// <summary>
-        /// Disables mouse action input for the first touch, so all the tapping must be done by other fingers.
+        /// Blocks <see cref="OsuAction.LeftButton"/> from being propagated by the <see cref="OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH"/>, so all the tapping must be done by other fingers.
         /// this can only happen in certain conditions so it may return false.
         /// </summary>
-        /// <returns>Whether we disabled the mouse action input</returns>
-        public bool HandleTouchTapOnlyMapping()
+        /// <returns>Whether we disabled <see cref="OsuAction.LeftButton"/> from being propagated by the <see cref="OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH"/></returns>
+        public bool BlockTouchCursorAction()
         {
             // We don't want to block the default cursor touch action input when the default cursor touch isn't a proper cursor touch.
             // this because it will completely block the first input with mods which don't accept cursor input such as autopilot.

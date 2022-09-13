@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         /// <summary>
         /// The cursor touch represents the <see cref="TouchSource"/> that controls whether your cursor is at the screen, this being the first touch.
-        /// on mods where you can't control your cursor with touch input (e.g autopilot) it isn't considered being a "cursor touch" therefore it will fail
-        /// returning true when calling <see cref="IsCursorTouch(TouchSource)"/> and will be considered a tap touch instead.
+        /// on mods where you can't control your cursor with touch input (e.g autopilot) it isn't considered being a "cursor touch" therefore it won't
+        /// return true when calling <see cref="IsCursorTouch(TouchSource)"/> and will be considered a tap touch instead.
         /// </summary>
         public const TouchSource DEFAULT_CURSOR_TOUCH = TouchSource.Touch1;
 
@@ -59,26 +59,27 @@ namespace osu.Game.Rulesets.Osu.UI
         public int ActiveTapTouchesCount => activeTapTouches.Count;
 
         /// <summary>
-        /// Tracks whether we just entered a tap only mapping state.
+        /// Tracks whether we just blocked the cursor actions. so we don't try to block the cursor actions when they are already blocked.
         /// </summary>
-        public bool EnteredTapOnlyMapping;
+        public bool JustBlockedCursorActions;
 
         /// <summary>
-        /// Checks whether tap touch only mapping would be triggered by a given limit.
+        /// Checks whether the cursor actions should be blocked by a given limit of active tap touches.
         /// </summary>
-        /// <param name="limit">How many tap touches are necessary to reach tap only mapping</param>
-        /// <returns>Whether the active tap touches is greater or equal to the given limit</returns>
-        private bool checkTapOnlyMapping(int limit) => ActiveTapTouchesCount >= limit;
+        /// <param name="limit">How many tap touches are necessary for the cursor actions to be blocked</param>
+        /// <returns>Whether the cursor actions should be blocked</returns>
+        private bool checkBlockCursorActions(int limit) => ActiveTapTouchesCount >= limit;
 
         /// <summary>
-        /// Tracks whether the mapped inputs will only map for tap touches, this only happens if there are <see cref="allowed_tap_touches_limit"/> touches being pressed or more.
+        /// Tracks whether the <see cref="OsuAction.LeftButton"/> that is propagated by the cursor touch should be blocked.
+        /// this allows for all the tapping work to be handled by the tap <see cref="TouchSource"/>s
         /// </summary>
-        public bool TapOnlyMapping => checkTapOnlyMapping(allowed_tap_touches_limit);
+        public bool BlockCursorAction => checkBlockCursorActions(allowed_tap_touches_limit);
 
         /// <summary>
-        /// Tracks wheter the next touch will begin <see cref="TapOnlyMapping"/>.
+        /// Tracks wheter the next tap <see cref="TouchSource"/> will trigger <see cref="BlockCursorAction"/>.
         /// </summary>
-        public bool NextTouchWillBeTapOnlyMapping => checkTapOnlyMapping(allowed_tap_touches_limit_decremented);
+        public bool BlockCursorActionOnNextTap => checkBlockCursorActions(allowed_tap_touches_limit_decremented);
 
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
@@ -116,14 +117,14 @@ namespace osu.Game.Rulesets.Osu.UI
 
             if (IsTapTouch(source))
             {
-                if (NextTouchWillBeTapOnlyMapping)
+                if (BlockCursorActionOnNextTap)
                 {
-                    if (!EnteredTapOnlyMapping)
-                        EnteredTapOnlyMapping = osuInputManager.HandleTouchTapOnlyMapping();
+                    if (!JustBlockedCursorActions)
+                        JustBlockedCursorActions = osuInputManager.BlockTouchCursorAction();
                 }
                 else
                 {
-                    EnteredTapOnlyMapping = false;
+                    JustBlockedCursorActions = false;
                 }
 
                 activeTapTouches.Add(source);

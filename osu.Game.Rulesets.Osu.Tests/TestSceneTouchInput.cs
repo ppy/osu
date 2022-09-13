@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertAllowingTouchInput();
             expectBothKeysPressed();
             expectKeyCountersCountingBe(1, 1);
-            AddAssert("Next touch will be tap only mapped", () => touchInputMapper.NextTouchWillBeTapOnlyMapping);
+            AddAssert("Next touch will be tap only mapped", () => touchInputMapper.BlockCursorActionOnNextTap);
         }
 
         private void assertAcceptedOnlyThreeSequentialInputs()
@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             steppedTouchWithThreeFingers();
 
             assertAcceptedOnlyThreeSequentialInputs();
-            AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping && touchInputMapper.EnteredTapOnlyMapping);
+            AddAssert("Tap only key mapping", () => touchInputMapper.BlockCursorAction && touchInputMapper.JustBlockedCursorActions);
             AddAssert("Touch input is blocked", () => !touchInputMapper.AllowingOtherTouch);
         }
 
