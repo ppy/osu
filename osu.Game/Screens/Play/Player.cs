@@ -34,6 +34,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -375,6 +376,8 @@ namespace osu.Game.Screens.Play
 
             if (Configuration.AutomaticallySkipIntro)
                 skipIntroOverlay.SkipWhenReady();
+
+            loadLeaderboard();
         }
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
@@ -819,6 +822,39 @@ namespace osu.Game.Screens.Play
             // Block global volume adjust if the user has asked for it (special case when holding "Alt").
             return mouseWheelDisabled.Value && !e.AltPressed;
         }
+
+        #region Gameplay leaderboard
+
+        protected readonly Bindable<bool> LeaderboardExpandedState = new BindableBool();
+
+        private void loadLeaderboard()
+        {
+            HUDOverlay.HoldingForHUD.BindValueChanged(_ => updateLeaderboardExpandedState());
+            LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
+
+            LoadComponentAsync(CreateGameplayLeaderboard(), leaderboard =>
+            {
+                if (!LoadedBeatmapSuccessfully)
+                    return;
+
+                leaderboard.Expanded.BindTo(LeaderboardExpandedState);
+                AddLeaderboardToHUD(leaderboard);
+            });
+        }
+
+        protected virtual GameplayLeaderboard CreateGameplayLeaderboard() => new SoloGameplayLeaderboard(Score.ScoreInfo.User)
+        {
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+            Margin = new MarginPadding { Bottom = 75, Left = 20 },
+        };
+
+        protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.Add(leaderboard);
+
+        private void updateLeaderboardExpandedState() =>
+            LeaderboardExpandedState.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
+
+        #endregion
 
         #region Fail Logic
 
