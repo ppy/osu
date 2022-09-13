@@ -60,7 +60,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 AllowPause = false,
                 AllowRestart = false,
                 AllowSkipping = room.AutoSkip.Value,
-                AutomaticallySkipIntro = room.AutoSkip.Value
+                AutomaticallySkipIntro = room.AutoSkip.Value,
+                AlwaysShowLeaderboard = true,
             })
         {
             this.users = users;

@@ -9,7 +9,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -80,7 +79,7 @@ namespace osu.Game.Screens.Play
 
         private readonly SkinnableTargetContainer mainComponents;
 
-        private IEnumerable<Drawable> hideTargets => new Drawable[] { mainComponents, KeyCounter, topRightElements };
+        private readonly List<Drawable> hideTargets;
 
         public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
@@ -129,6 +128,8 @@ namespace osu.Game.Screens.Play
                 },
                 clicksPerSecondCalculator = new ClicksPerSecondCalculator()
             };
+
+            hideTargets = new List<Drawable> { mainComponents, KeyCounter, topRightElements };
         }
 
         [BackgroundDependencyLoader(true)]
@@ -171,6 +172,13 @@ namespace osu.Game.Screens.Play
             configVisibilityMode.BindValueChanged(_ => updateVisibility(), true);
 
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
+        }
+
+        public void Add(Drawable drawable, bool hideWithHUD)
+        {
+            base.Add(drawable);
+            if (hideWithHUD)
+                hideTargets.Add(drawable);
         }
 
         protected override void Update()
