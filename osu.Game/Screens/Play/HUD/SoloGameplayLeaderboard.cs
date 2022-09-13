@@ -1,32 +1,43 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public class SoloGameplayLeaderboard : GameplayLeaderboard
     {
-        [BackgroundDependencyLoader]
-        private void load(Player player, ScoreProcessor processor, ILeaderboard leaderboard)
+        private readonly IUser trackingUser;
+
+        [Resolved]
+        private ScoreProcessor scoreProcessor { get; set; } = null!;
+
+        public SoloGameplayLeaderboard(IUser trackingUser)
         {
-            ILeaderboardScore local = Add(player.Score.ScoreInfo.User, true);
+            this.trackingUser = trackingUser;
+        }
 
-            local.TotalScore.BindTarget = processor.TotalScore;
-            local.Accuracy.BindTarget = processor.Accuracy;
-            local.Combo.BindTarget = processor.Combo;
+        public void ShowScores(IEnumerable<IScoreInfo> scores)
+        {
+            Clear();
 
-            foreach (var s in leaderboard.Scores)
+            if (!scores.Any())
+                return;
+
+            ILeaderboardScore local = Add(trackingUser, true);
+
+            local.TotalScore.BindTarget = scoreProcessor.TotalScore;
+            local.Accuracy.BindTarget = scoreProcessor.Accuracy;
+            local.Combo.BindTarget = scoreProcessor.Combo;
+
+            foreach (var s in scores)
             {
-                // todo: APIUser is pain for IScoreInfo.
-                var score = Add(new APIUser
-                {
-                    Id = s.User.OnlineID,
-                    Username = s.User.Username,
-                }, false);
+                var score = Add(s.User, false);
 
                 score.TotalScore.Value = s.TotalScore;
                 score.Accuracy.Value = s.Accuracy;
