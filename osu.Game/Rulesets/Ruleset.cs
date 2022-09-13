@@ -1,13 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
@@ -100,7 +97,7 @@ namespace osu.Game.Rulesets
         /// Returns a fresh instance of the mod matching the specified acronym.
         /// </summary>
         /// <param name="acronym">The acronym to query for .</param>
-        public Mod CreateModFromAcronym(string acronym)
+        public Mod? CreateModFromAcronym(string acronym)
         {
             return AllMods.FirstOrDefault(m => m.Acronym == acronym)?.CreateInstance();
         }
@@ -108,7 +105,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Returns a fresh instance of the mod matching the specified type.
         /// </summary>
-        public T CreateMod<T>()
+        public T? CreateMod<T>()
             where T : Mod
         {
             return AllMods.FirstOrDefault(m => m is T)?.CreateInstance() as T;
@@ -122,7 +119,6 @@ namespace osu.Game.Rulesets
         /// then the proper behaviour is to return an empty enumerable.
         /// <see langword="null"/> mods should not be present in the returned enumerable.
         /// </remarks>
-        [ItemNotNull]
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
         /// <summary>
@@ -202,10 +198,9 @@ namespace osu.Game.Rulesets
             return value;
         }
 
-        [CanBeNull]
-        public ModAutoplay GetAutoplayMod() => CreateMod<ModAutoplay>();
+        public ModAutoplay? GetAutoplayMod() => CreateMod<ModAutoplay>();
 
-        public virtual ISkin CreateLegacySkinProvider([NotNull] ISkin skin, IBeatmap beatmap) => null;
+        public virtual ISkin? CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => null;
 
         protected Ruleset()
         {
@@ -225,7 +220,7 @@ namespace osu.Game.Rulesets
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
-        public abstract DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
+        public abstract DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null);
 
         /// <summary>
         /// Creates a <see cref="ScoreProcessor"/> for this <see cref="Ruleset"/>.
@@ -251,7 +246,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> to be processed.</param>
         /// <returns>The <see cref="IBeatmapProcessor"/>.</returns>
-        public virtual IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => null;
+        public virtual IBeatmapProcessor? CreateBeatmapProcessor(IBeatmap beatmap) => null;
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap);
 
@@ -259,12 +254,11 @@ namespace osu.Game.Rulesets
         /// Optionally creates a <see cref="PerformanceCalculator"/> to generate performance data from the provided score.
         /// </summary>
         /// <returns>A performance calculator instance for the provided score.</returns>
-        [CanBeNull]
-        public virtual PerformanceCalculator CreatePerformanceCalculator() => null;
+        public virtual PerformanceCalculator? CreatePerformanceCalculator() => null;
 
-        public virtual HitObjectComposer CreateHitObjectComposer() => null;
+        public virtual HitObjectComposer? CreateHitObjectComposer() => null;
 
-        public virtual IBeatmapVerifier CreateBeatmapVerifier() => null;
+        public virtual IBeatmapVerifier? CreateBeatmapVerifier() => null;
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
 
@@ -272,13 +266,13 @@ namespace osu.Game.Rulesets
 
         public abstract string Description { get; }
 
-        public virtual RulesetSettingsSubsection CreateSettings() => null;
+        public virtual RulesetSettingsSubsection? CreateSettings() => null;
 
         /// <summary>
         /// Creates the <see cref="IRulesetConfigManager"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <param name="settings">The <see cref="SettingsStore"/> to store the settings.</param>
-        public virtual IRulesetConfigManager CreateConfig(SettingsStore settings) => null;
+        public virtual IRulesetConfigManager? CreateConfig(SettingsStore? settings) => null;
 
         /// <summary>
         /// A unique short name to reference this ruleset in online requests.
@@ -314,7 +308,7 @@ namespace osu.Game.Rulesets
         /// for conversion use.
         /// </summary>
         /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
-        public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
+        public virtual IConvertibleReplayFrame? CreateConvertibleReplayFrame() => null;
 
         /// <summary>
         /// Creates the statistics for a <see cref="ScoreInfo"/> to be displayed in the results screen.
@@ -322,7 +316,6 @@ namespace osu.Game.Rulesets
         /// <param name="score">The <see cref="ScoreInfo"/> to create the statistics for. The score is guaranteed to have <see cref="ScoreInfo.HitEvents"/> populated.</param>
         /// <param name="playableBeatmap">The <see cref="IBeatmap"/>, converted for this <see cref="Ruleset"/> with all relevant <see cref="Mod"/>s applied.</param>
         /// <returns>The <see cref="StatisticRow"/>s to display. Each <see cref="StatisticRow"/> may contain 0 or more <see cref="StatisticItem"/>.</returns>
-        [NotNull]
         public virtual StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => Array.Empty<StatisticRow>();
 
         /// <summary>
@@ -375,13 +368,11 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.
         /// </summary>
-        [CanBeNull]
-        public virtual IRulesetFilterCriteria CreateRulesetFilterCriteria() => null;
+        public virtual IRulesetFilterCriteria? CreateRulesetFilterCriteria() => null;
 
         /// <summary>
         /// Can be overridden to add a ruleset-specific section to the editor beatmap setup screen.
         /// </summary>
-        [CanBeNull]
-        public virtual RulesetSetupSection CreateEditorSetupSection() => null;
+        public virtual RulesetSetupSection? CreateEditorSetupSection() => null;
     }
 }
