@@ -53,20 +53,17 @@ namespace osu.Game.Rulesets.UI
         {
             var resources = ruleset.CreateResourceStore();
 
-            if (resources != null)
-            {
-                var host = parent.Get<GameHost>();
+            var host = parent.Get<GameHost>();
 
-                TextureStore = new TextureStore(host.Renderer, parent.Get<GameHost>().CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
-                CacheAs(TextureStore = new FallbackTextureStore(host.Renderer, TextureStore, parent.Get<TextureStore>()));
+            TextureStore = new TextureStore(host.Renderer, parent.Get<GameHost>().CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
+            CacheAs(TextureStore = new FallbackTextureStore(host.Renderer, TextureStore, parent.Get<TextureStore>()));
 
-                SampleStore = parent.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
-                SampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
-                CacheAs(SampleStore = new FallbackSampleStore(SampleStore, parent.Get<ISampleStore>()));
+            SampleStore = parent.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
+            SampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+            CacheAs(SampleStore = new FallbackSampleStore(SampleStore, parent.Get<ISampleStore>()));
 
-                ShaderManager = new ShaderManager(host.Renderer, new NamespacedResourceStore<byte[]>(resources, @"Shaders"));
-                CacheAs(ShaderManager = new FallbackShaderManager(host.Renderer, ShaderManager, parent.Get<ShaderManager>()));
-            }
+            ShaderManager = new ShaderManager(host.Renderer, new NamespacedResourceStore<byte[]>(resources, @"Shaders"));
+            CacheAs(ShaderManager = new FallbackShaderManager(host.Renderer, ShaderManager, parent.Get<ShaderManager>()));
 
             RulesetConfigManager = parent.Get<IRulesetConfigCache>().GetConfigFor(ruleset);
             if (RulesetConfigManager != null)
