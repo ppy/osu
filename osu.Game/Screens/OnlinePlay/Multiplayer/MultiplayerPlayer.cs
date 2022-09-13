@@ -9,8 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
@@ -21,7 +19,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -44,7 +41,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private readonly MultiplayerRoomUser[] users;
 
         private LoadingLayer loadingDisplay;
-        private FillFlowContainer leaderboardFlow;
 
         private MultiplayerGameplayLeaderboard multiplayerLeaderboard;
 
@@ -73,17 +69,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!LoadedBeatmapSuccessfully)
                 return;
 
-            HUDOverlay.Add(leaderboardFlow = new FillFlowContainer
-            {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(5)
-            });
-
             LoadComponentAsync(new GameplayChatDisplay(Room)
             {
                 Expanded = { BindTarget = LeaderboardExpandedState },
-            }, chat => leaderboardFlow.Insert(2, chat));
+            }, chat => HUDOverlay.LeaderboardFlow.Insert(2, chat));
 
             HUDOverlay.Add(loadingDisplay = new LoadingLayer(true) { Depth = float.MaxValue });
         }
@@ -94,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             Debug.Assert(leaderboard == multiplayerLeaderboard);
 
-            leaderboardFlow.Insert(0, leaderboard);
+            HUDOverlay.LeaderboardFlow.Insert(0, leaderboard);
 
             if (multiplayerLeaderboard.TeamScores.Count >= 2)
             {
@@ -103,7 +92,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     Team1Score = { BindTarget = multiplayerLeaderboard.TeamScores.First().Value },
                     Team2Score = { BindTarget = multiplayerLeaderboard.TeamScores.Last().Value },
                     Expanded = { BindTarget = HUDOverlay.ShowHud },
-                }, scoreDisplay => leaderboardFlow.Insert(1, scoreDisplay));
+                }, scoreDisplay => HUDOverlay.LeaderboardFlow.Insert(1, scoreDisplay));
             }
         }
 
@@ -167,23 +156,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Logger.Log(message, LoggingTarget.Runtime, LogLevel.Important);
 
             Schedule(() => PerformExit(false));
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!LoadedBeatmapSuccessfully)
-                return;
-
-            adjustLeaderboardPosition();
-        }
-
-        private void adjustLeaderboardPosition()
-        {
-            const float padding = 44; // enough margin to avoid the hit error display.
-
-            leaderboardFlow.Position = new Vector2(padding, padding + HUDOverlay.TopScoringElementsHeight);
         }
 
         private void onGameplayStarted() => Scheduler.Add(() =>
