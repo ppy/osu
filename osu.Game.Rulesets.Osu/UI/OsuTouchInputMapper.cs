@@ -138,6 +138,8 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             var source = e.Touch.Source;
 
+            // We must only disable active tap touches. this guarantees that their assigned actions were properly trigged.
+            // this because a touch source which surpasses the limit of allowed fingers can be passed to this event and this could bring ux issues.
             if (activeTapTouches.Contains(source))
             {
                 activeTapTouches.Remove(source);
