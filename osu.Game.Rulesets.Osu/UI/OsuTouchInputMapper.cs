@@ -64,22 +64,22 @@ namespace osu.Game.Rulesets.Osu.UI
         public bool JustBlockedCursorActions;
 
         /// <summary>
-        /// Checks whether the cursor actions should be blocked by a given limit of active tap touches.
+        /// Checks whether the <see cref="OsuAction.LeftButton"/> propagated by the cursor touch should be blocked by a given limit of active tap touches.
         /// </summary>
         /// <param name="limit">How many tap touches are necessary for the cursor actions to be blocked</param>
-        /// <returns>Whether the cursor actions should be blocked</returns>
-        private bool checkBlockCursorActions(int limit) => ActiveTapTouchesCount >= limit;
+        /// <returns>Whether the <see cref="OsuAction.LeftButton"/> should be blocked from being propagated by the cursor touch.</returns>
+        private bool checkBlockCursorAction(int limit) => ActiveTapTouchesCount >= limit;
 
         /// <summary>
         /// Tracks whether the <see cref="OsuAction.LeftButton"/> that is propagated by the cursor touch should be blocked.
         /// this allows for all the tapping work to be handled by the tap <see cref="TouchSource"/>s
         /// </summary>
-        public bool BlockCursorAction => checkBlockCursorActions(allowed_tap_touches_limit);
+        public bool BlockCursorAction => checkBlockCursorAction(allowed_tap_touches_limit);
 
         /// <summary>
         /// Tracks wheter the next tap <see cref="TouchSource"/> will trigger <see cref="BlockCursorAction"/>.
         /// </summary>
-        public bool BlockCursorActionOnNextTap => checkBlockCursorActions(allowed_tap_touches_limit_decremented);
+        public bool BlockCursorActionOnNextTap => checkBlockCursorAction(allowed_tap_touches_limit_decremented);
 
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
