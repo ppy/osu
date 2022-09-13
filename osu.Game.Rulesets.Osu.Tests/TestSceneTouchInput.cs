@@ -106,6 +106,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
+        public void TestTouchSourcesWithDisabledCursorMovement()
+        {
+            AddStep("Disable cursor movement", () => osuInputManager.AllowUserCursorMovement = false);
+            AddAssert("All touches are tap touches", () => Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().All(source => touchInputMapper.IsTapTouch(source)));
+        }
+
+        [Test]
         public void TestOneFingerInput()
         {
             addFirstFingerTouchStep();
