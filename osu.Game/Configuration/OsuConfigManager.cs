@@ -109,6 +109,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.BeatmapSkins, true);
             SetDefault(OsuSetting.BeatmapColours, true);
             SetDefault(OsuSetting.BeatmapHitsounds, true);
+            SetDefault(OsuSetting.DisplayEpilepsyWarning, true);
 
             SetDefault(OsuSetting.CursorRotation, true);
 
@@ -348,6 +349,7 @@ namespace osu.Game.Configuration
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
+        DisplayEpilepsyWarning,
         ExternalLinkWarning,
         PreferNoVideo,
         Scaling,

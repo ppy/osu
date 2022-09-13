@@ -40,6 +40,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GraphicsSettingsStrings.StoryboardVideo,
                     Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = GraphicsSettingsStrings.DisplayEpilepsyWarning,
+                    Current = config.GetBindable<bool>(OsuSetting.DisplayEpilepsyWarning)
+                },
             };
         }
     }

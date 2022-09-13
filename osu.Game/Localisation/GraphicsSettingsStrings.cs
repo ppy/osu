@@ -100,6 +100,11 @@ namespace osu.Game.Localisation
         public static LocalisableString StoryboardVideo => new TranslatableString(getKey(@"storyboard_video"), @"Storyboard / video");
 
         /// <summary>
+        /// "Display epilepsy warning"
+        /// </summary>
+        public static LocalisableString DisplayEpilepsyWarning => new TranslatableString(getKey(@"epilepsy_warning"), @"Display epilepsy warning");
+
+        /// <summary>
         /// "Hit lighting"
         /// </summary>
         public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"Hit lighting");

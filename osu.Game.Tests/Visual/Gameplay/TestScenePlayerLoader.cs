@@ -45,6 +45,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private SessionStatics sessionStatics { get; set; }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [Cached(typeof(INotificationOverlay))]
         private readonly NotificationOverlay notificationOverlay;
 
@@ -310,21 +313,23 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestEpilepsyWarning(bool warning)
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        public void TestEpilepsyWarning(bool warning, bool displayWarningSetting)
         {
             saveVolumes();
             setFullVolume();
 
+            AddStep("change display epilepsy warning setting", () => config.SetValue(OsuSetting.DisplayEpilepsyWarning, displayWarningSetting));
             AddStep("change epilepsy warning", () => epilepsyWarning = warning);
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => (getWarning() != null) == warning);
+            AddAssert($"epilepsy warning {(warning && displayWarningSetting ? "present" : "absent")}", () => (getWarning() != null) == (warning && displayWarningSetting));
 
-            if (warning)
+            if (warning && displayWarningSetting)
             {
                 AddUntilStep("sound volume decreased", () => Beatmap.Value.Track.AggregateVolume.Value == 0.25);
                 AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);

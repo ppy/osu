@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Audio.Effects;
@@ -123,6 +124,10 @@ namespace osu.Game.Screens.Play
 
         private EpilepsyWarning? epilepsyWarning;
 
+        private Bindable<bool> displayEpilepsyWarningSetting = null!;
+
+        private Bindable<bool> showStoryboardSetting = null!;
+
         private bool quickRestart;
 
         [Resolved(CanBeNull = true)]
@@ -143,8 +148,11 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics, AudioManager audio)
+        private void load(SessionStatics sessionStatics, AudioManager audio, OsuConfigManager config)
         {
+            displayEpilepsyWarningSetting = config.GetBindable<bool>(OsuSetting.DisplayEpilepsyWarning);
+            showStoryboardSetting = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
 
@@ -193,7 +201,7 @@ namespace osu.Game.Screens.Play
                 highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass)
             };
 
-            if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
+            if (Beatmap.Value.BeatmapInfo.EpilepsyWarning && displayEpilepsyWarningSetting.Value)
             {
                 AddInternal(epilepsyWarning = new EpilepsyWarning
                 {
@@ -420,6 +428,11 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
+            if (!showStoryboardSetting.Value)
+            {
+                epilepsyWarning?.Expire();
+            }
+
             // if a push has already been scheduled, no further action is required.
             // this value is reset via cancelLoad() to allow a second usage of the same PlayerLoader screen.
             if (scheduledPushPlayer != null)
@@ -468,7 +481,9 @@ namespace osu.Game.Screens.Play
                     ValidForResume = false;
 
                     if (consumedPlayer.LoadedBeatmapSuccessfully)
+                    {
                         this.Push(consumedPlayer);
+                    }
                     else
                         this.Exit();
                 });
