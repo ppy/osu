@@ -21,6 +21,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
@@ -125,11 +126,11 @@ namespace osu.Game.Screens.Play.HUD
             playingUserIds.BindCollectionChanged(playingUsersChanged);
         }
 
-        protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(APIUser user, bool isTracked)
+        protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(IUser user, bool isTracked)
         {
             var leaderboardScore = base.CreateLeaderboardScoreDrawable(user, isTracked);
 
-            if (UserScores[user.Id].Team is int team)
+            if (UserScores[user.OnlineID].Team is int team)
             {
                 leaderboardScore.BackgroundColour = getTeamColour(team).Lighten(1.2f);
                 leaderboardScore.TextColour = Color4.White;

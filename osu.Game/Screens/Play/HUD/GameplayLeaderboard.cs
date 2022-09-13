@@ -10,7 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play.HUD
         /// Whether the player should be tracked on the leaderboard.
         /// Set to <c>true</c> for the local player or a player whose replay is currently being played.
         /// </param>
-        public ILeaderboardScore Add(APIUser? user, bool isTracked)
+        public ILeaderboardScore Add(IUser? user, bool isTracked)
         {
             var drawable = CreateLeaderboardScoreDrawable(user, isTracked);
 
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Play.HUD
             scroll.ScrollToStart(false);
         }
 
-        protected virtual GameplayLeaderboardScore CreateLeaderboardScoreDrawable(APIUser? user, bool isTracked) =>
+        protected virtual GameplayLeaderboardScore CreateLeaderboardScoreDrawable(IUser? user, bool isTracked) =>
             new GameplayLeaderboardScore(user, isTracked);
 
         protected override void Update()
