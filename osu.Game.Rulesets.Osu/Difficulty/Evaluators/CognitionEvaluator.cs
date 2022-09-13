@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             foreach (var loopObj in pastVisibleObjects)
             {
+                var prevLoopObj = loopObj.Previous(0) as OsuDifficultyHitObject;
+
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
@@ -46,6 +48,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
+
+                // Objects that are arranged in a mostly-linear fashion should be easy to read (such as circles in a stream).
+                if (prevLoopObj != null && loopObj.Angle.IsNotNull() && prevLoopObj.Angle.IsNotNull())
+                    loopDifficulty *= 1 - Math.Pow(Math.Sin(0.5 * loopObj.Angle.Value), 5);
 
                 pastObjectDifficultyInfluence += loopDifficulty;
             }
@@ -59,9 +65,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 var timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
                 var isRhythmChange = (currObj.StrainTime - prevObj.StrainTime < 5);
 
-                var timeDifficultyFactor = 1200 / pastObjectDifficultyInfluence;
+                var timeDifficultyFactor = 800 / pastObjectDifficultyInfluence;
 
-                hiddenDifficulty += Math.Pow(2 * timeSpentInvisible / timeDifficultyFactor, 1.6);
+                hiddenDifficulty += Math.Pow(7 * timeSpentInvisible / timeDifficultyFactor, 1);
 
                 if (isRhythmChange)
                     hiddenDifficulty *= 1.1;
