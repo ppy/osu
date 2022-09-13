@@ -14,12 +14,15 @@ namespace osu.Game.Rulesets.Osu.UI
     public class OsuTouchInputMapper : Drawable
     {
         /// <summary>
-        /// The default cursor touch it may fail <see cref="IsCursorTouch(TouchSource)"/> on cases where there aren't any cursor touches, such as when autopilot is on.
+        /// The cursor touch represents the <see cref="TouchSource"/> that controls whether your cursor is at the screen, this being the first touch.
+        /// on mods where you can't control your cursor with touch input (e.g autopilot) it isn't considered being a "cursor touch" therefore it will fail
+        /// returning true when calling <see cref="IsCursorTouch(TouchSource)"/> and will be considered a tap touch instead.
         /// </summary>
         public const TouchSource DEFAULT_CURSOR_TOUCH = TouchSource.Touch1;
 
         /// <summary>
         /// The maximum amount of tap touches that should be allowed.
+        /// we should ignore any taps that are added beyond this limit.
         /// </summary>
         private const int allowed_tap_touches_limit = 2;
 
@@ -29,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private const int allowed_tap_touches_limit_decremented = allowed_tap_touches_limit - 1;
 
         /// <summary>
-        /// Our parent <see cref="OsuInputManager"/>
+        /// Our parent <see cref="OsuInputManager"/>.
         /// </summary>
         private readonly OsuInputManager osuInputManager;
 
@@ -46,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.UI
                                                                                   .ToDictionary(source => source, source => (source - TouchSource.Touch1) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
 
         /// <summary>
-        /// Tracks all active tap <see cref="TouchSource"/>s that can be mapped into a given <see cref="OsuAction"/> through the <see cref="tapTouchActions"/>.
+        /// Tracks all currently active tap <see cref="TouchSource"/>s that can be mapped into a given <see cref="OsuAction"/> through the <see cref="tapTouchActions"/>.
         /// </summary>
         private readonly HashSet<TouchSource> activeTapTouches = new HashSet<TouchSource>();
 
@@ -63,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// Checks whether tap touch only mapping would be triggered by a given limit.
         /// </summary>
-        /// <param name="limit">The limit that the active tap touches should be to enter tap only mapping.</param>
+        /// <param name="limit">How many tap touches are necessary to reach tap only mapping</param>
         /// <returns>Whether the active tap touches is greater or equal to the given limit</returns>
         private bool checkTapOnlyMapping(int limit) => ActiveTapTouchesCount >= limit;
 
@@ -85,15 +88,18 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// Checks whether a given <see cref="TouchSource"/> is a tap touch and should be mapped into a <see cref="OsuAction"/>.
         /// </summary>
-        /// <param name="source"></param>
+        /// <param name="source">The <see cref="TouchSource"/> to check.</param>
         /// <returns>Whether the given source is a tap.</returns>
         public bool IsTapTouch(TouchSource source) => source != TouchSource.Touch1 || !osuInputManager.AllowUserCursorMovement;
 
         /// <summary>
         /// Checks whether a given <see cref="TouchSource"/> is a cursor touch and shouldn't be mapped into a <see cref="OsuAction"/> by us.
         /// </summary>
-        /// <param name="source"></param>
-        /// <returns>Whether the given source is the cursor.</returns>
+        /// <param name="source">The <see cref="TouchSource"/> to check.</param>
+        /// <returns>
+        /// Whether the given source is the cursor touch, usually it must be <see cref="DEFAULT_CURSOR_TOUCH"/>
+        /// it may not be the case with mods that block the cursor movement (e.g autopilot).
+        /// </returns>
         public bool IsCursorTouch(TouchSource source) => !IsTapTouch(source);
 
         /// <summary>

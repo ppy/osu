@@ -67,11 +67,18 @@ namespace osu.Game.Rulesets.Osu
         /// <returns>Whether we entered an touch tap only mapping state</returns>
         public bool HandleTouchTapOnlyMapping()
         {
-            Vector2? cursorTouchPosition;
-
-            if (!touchInputMapper.IsCursorTouch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH) || ((cursorTouchPosition = CurrentState.Touch.GetTouchPosition(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH)) == null))
+            // We don't want to block the default cursor touch action input when the default cursor touch isn't a proper cursor touch.
+            // this because it will completely block the first input with mods which don't accept cursor input such as autopilot.
+            if (!touchInputMapper.IsCursorTouch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH))
                 return false;
 
+            Vector2? cursorTouchPosition = CurrentState.Touch.GetTouchPosition(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH);
+
+            // We shouldn't disable the cursor action input if the cursor isn't even active in the first place.
+            if (cursorTouchPosition == null)
+                return false;
+
+            // Disables the actions for the cursor touch, all tapping must be done by the other fingers now.
             base.HandleMouseTouchStateChange(new TouchStateChangeEvent(CurrentState, null, new Touch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH, cursorTouchPosition.Value), false, cursorTouchPosition));
 
             return true;

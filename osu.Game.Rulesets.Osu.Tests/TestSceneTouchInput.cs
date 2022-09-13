@@ -138,6 +138,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertTapTouch(TouchSource.Touch3);
             assertAcceptedOnlyThreeSequentialInputs();
             AddAssert("Tap only key mapping", () => touchInputMapper.TapOnlyMapping && touchInputMapper.EnteredTapOnlyMapping);
+            AddAssert("Touch input is blocked", () => !touchInputMapper.AllowingOtherTouch);
         }
 
         [Test]
@@ -147,7 +148,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             addTouchWithFingerStep(TouchSource.Touch4);
 
             assertAcceptedOnlyThreeSequentialInputs();
-            AddAssert("Touch input is blocked", () => !touchInputMapper.AllowingOtherTouch);
         }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap { HitObjects = new List<HitObject> { new HitCircle { StartTime = 99999 } } };
