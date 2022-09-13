@@ -49,9 +49,13 @@ namespace osu.Game.Screens.Edit
         public event Action<HitObject> HitObjectUpdated;
 
         /// <summary>
-        /// Invoked after <see cref="HitObjects"/> is updated during <see cref="UpdateState"/> and blueprints need to be sorted immediately to prevent a crash.
+        /// Invoked after any state changes occurred which triggered a beatmap reprocess via an <see cref="IBeatmapProcessor"/>.
         /// </summary>
-        public event Action SelectionBlueprintsShouldBeSorted;
+        /// <remarks>
+        /// Beatmap processing may change the order of hitobjects. This event gives external components a chance to handle any changes
+        /// not covered by the <see cref="HitObjectAdded"/> / <see cref="HitObjectUpdated"/> / <see cref="HitObjectRemoved"/> events.
+        /// </remarks>
+        public event Action BeatmapReprocessed;
 
         /// <summary>
         /// All currently selected <see cref="HitObject"/>s.
@@ -336,8 +340,7 @@ namespace osu.Game.Screens.Edit
 
             beatmapProcessor?.PostProcess();
 
-            // Signal selection blueprint sorting because it is possible that the beatmap processor changed the order of the selection blueprints
-            SelectionBlueprintsShouldBeSorted?.Invoke();
+            BeatmapReprocessed?.Invoke();
 
             // callbacks may modify the lists so let's be safe about it
             var deletes = batchPendingDeletes.ToArray();
