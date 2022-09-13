@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -53,6 +54,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private IBindable<Vector2> sliderPosition;
         private IBindable<float> sliderScale;
 
+        [UsedImplicitly]
+        private readonly IBindable<int> sliderVersion;
+
         public PathControlPointPiece(Slider slider, PathControlPoint controlPoint)
         {
             this.slider = slider;
@@ -61,7 +65,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             // we don't want to run the path type update on construction as it may inadvertently change the slider.
             cachePoints(slider);
 
-            slider.Path.Version.BindValueChanged(_ =>
+            sliderVersion = slider.Path.Version.GetBoundCopy();
+            sliderVersion.BindValueChanged(_ =>
             {
                 cachePoints(slider);
                 updatePathType();
