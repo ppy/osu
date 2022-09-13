@@ -1,11 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
@@ -31,7 +28,7 @@ namespace osu.Game.Screens.Play.HUD
         private bool requiresScroll;
         private readonly OsuScrollContainer scroll;
 
-        private GameplayLeaderboardScore trackedScore;
+        private GameplayLeaderboardScore? trackedScore;
 
         /// <summary>
         /// Create a new leaderboard.
@@ -77,7 +74,7 @@ namespace osu.Game.Screens.Play.HUD
         /// Whether the player should be tracked on the leaderboard.
         /// Set to <c>true</c> for the local player or a player whose replay is currently being played.
         /// </param>
-        public ILeaderboardScore Add([CanBeNull] APIUser user, bool isTracked)
+        public ILeaderboardScore Add(APIUser? user, bool isTracked)
         {
             var drawable = CreateLeaderboardScoreDrawable(user, isTracked);
 
@@ -108,7 +105,7 @@ namespace osu.Game.Screens.Play.HUD
             scroll.ScrollToStart(false);
         }
 
-        protected virtual GameplayLeaderboardScore CreateLeaderboardScoreDrawable(APIUser user, bool isTracked) =>
+        protected virtual GameplayLeaderboardScore CreateLeaderboardScoreDrawable(APIUser? user, bool isTracked) =>
             new GameplayLeaderboardScore(user, isTracked);
 
         protected override void Update()
