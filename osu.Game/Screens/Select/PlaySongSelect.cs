@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -26,14 +24,16 @@ namespace osu.Game.Screens.Select
 {
     public class PlaySongSelect : SongSelect, ILeaderboardScoreSource
     {
-        private OsuScreen playerLoader;
+        private OsuScreen? playerLoader;
 
         [Resolved(CanBeNull = true)]
-        private INotificationOverlay notifications { get; set; }
+        private INotificationOverlay? notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;
 
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
+
+        private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -46,15 +46,13 @@ namespace osu.Game.Screens.Select
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea()
         {
-            var playBeatmapDetailArea = new PlayBeatmapDetailArea
+            playBeatmapDetailArea = new PlayBeatmapDetailArea
             {
                 Leaderboard =
                 {
                     ScoreSelected = PresentScore
                 }
             };
-
-            Scores.BindTo(playBeatmapDetailArea.Leaderboard.Scores);
 
             return playBeatmapDetailArea;
         }
@@ -74,9 +72,9 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(e);
         }
 
-        private IReadOnlyList<Mod> modsAtGameplayStart;
+        private IReadOnlyList<Mod>? modsAtGameplayStart;
 
-        private ModAutoplay getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
+        private ModAutoplay? getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
 
         protected override bool OnStart()
         {
@@ -135,6 +133,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        IBindableList<ScoreInfo> ILeaderboardScoreSource.Scores { get; } = new BindableList<ScoreInfo>();
+        IBindableList<ScoreInfo> ILeaderboardScoreSource.Scores => playBeatmapDetailArea.Leaderboard.Scores;
     }
 }
