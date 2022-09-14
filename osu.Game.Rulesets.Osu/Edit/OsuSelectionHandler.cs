@@ -186,13 +186,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (h is IHasPath path)
                 {
-                    var controlPoints = path.Path.ControlPoints.Select(p =>
-                        new PathControlPoint(RotatePointAroundOrigin(p.Position, Vector2.Zero, delta), p.Type)).ToArray();
-
-                    // Importantly, update as a single operation so automatic adjustment of control points to different
-                    // curve types does not unexpectedly trigger and change the slider's shape.
-                    path.Path.ControlPoints.Clear();
-                    path.Path.ControlPoints.AddRange(controlPoints);
+                    foreach (PathControlPoint t in path.Path.ControlPoints)
+                        t.Position = RotatePointAroundOrigin(t.Position, Vector2.Zero, delta);
                 }
             }
 

@@ -66,11 +66,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             cachePoints(slider);
 
             sliderVersion = slider.Path.Version.GetBoundCopy();
-            sliderVersion.BindValueChanged(_ =>
+
+            // schedule ensure that updates are only applied after all operations from a single frame are applied.
+            // this avoids inadvertently changing the slider path type for bach operations.
+            sliderVersion.BindValueChanged(_ => Scheduler.AddOnce(() =>
             {
                 cachePoints(slider);
                 updatePathType();
-            });
+            }));
 
             controlPoint.Changed += updateMarkerDisplay;
 
