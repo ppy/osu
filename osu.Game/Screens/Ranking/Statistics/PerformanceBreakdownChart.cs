@@ -234,7 +234,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
-                    Text = percentage.ToLocalisableString("0%"),
+                    Text = $"{percentage.ToLocalisableString("0%")}({Math.Round(attribute.Value, 2, MidpointRounding.AwayFromZero)} / {Math.Round(perfectAttribute.Value, 2, MidpointRounding.AwayFromZero)})",
                     Colour = Colour4.White
                 }
             };

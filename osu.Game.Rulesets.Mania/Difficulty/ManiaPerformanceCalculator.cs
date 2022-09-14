@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             return new ManiaPerformanceAttributes
             {
-                Difficulty = difficultyValue,
+                Difficulty = difficultyValue * multiplier,
                 Total = totalValue
             };
         }
