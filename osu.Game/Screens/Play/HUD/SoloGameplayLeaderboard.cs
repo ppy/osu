@@ -18,8 +18,14 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly IBindableList<ScoreInfo> scores = new BindableList<ScoreInfo>();
 
+        // hold references to ensure bindables are updated.
+        private readonly List<Bindable<long>> scoreBindables = new List<Bindable<long>>();
+
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
+
+        [Resolved]
+        private ScoreManager scoreManager { get; set; } = null!;
 
         public SoloGameplayLeaderboard(IUser trackingUser)
         {
@@ -32,12 +38,13 @@ namespace osu.Game.Screens.Play.HUD
             if (scoreSource != null)
                 scores.BindTo(scoreSource.Scores);
 
-            scores.BindCollectionChanged((_, __) => Scheduler.AddOnce(showScores, scores), true);
+            scores.BindCollectionChanged((_, _) => Scheduler.AddOnce(showScores), true);
         }
 
-        private void showScores(IEnumerable<IScoreInfo> scores)
+        private void showScores()
         {
             Clear();
+            scoreBindables.Clear();
 
             if (!scores.Any())
                 return;
@@ -52,7 +59,12 @@ namespace osu.Game.Screens.Play.HUD
             {
                 var score = Add(s.User, false);
 
-                score.TotalScore.Value = s.TotalScore;
+                var bindableTotal = scoreManager.GetBindableTotalScore(s);
+
+                // Direct binding not possible due to differing types (see https://github.com/ppy/osu/issues/20298).
+                bindableTotal.BindValueChanged(total => score.TotalScore.Value = total.NewValue, true);
+                scoreBindables.Add(bindableTotal);
+
                 score.Accuracy.Value = s.Accuracy;
                 score.Combo.Value = s.MaxCombo;
             }
