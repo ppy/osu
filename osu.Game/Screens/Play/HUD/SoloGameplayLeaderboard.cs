@@ -55,6 +55,9 @@ namespace osu.Game.Screens.Play.HUD
             local.Accuracy.BindTarget = scoreProcessor.Accuracy;
             local.Combo.BindTarget = scoreProcessor.Combo;
 
+            // Local score should always show lower than any existing scores in cases of ties.
+            local.DisplayOrder.Value = long.MaxValue;
+
             foreach (var s in scores)
             {
                 var score = Add(s.User, false);
@@ -67,6 +70,7 @@ namespace osu.Game.Screens.Play.HUD
 
                 score.Accuracy.Value = s.Accuracy;
                 score.Combo.Value = s.MaxCombo;
+                score.DisplayOrder.Value = s.OnlineID > 0 ? s.OnlineID : s.Date.ToUnixTimeSeconds();
             }
         }
     }

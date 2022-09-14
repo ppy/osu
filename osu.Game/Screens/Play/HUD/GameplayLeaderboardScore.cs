@@ -55,6 +55,7 @@ namespace osu.Game.Screens.Play.HUD
         public BindableDouble Accuracy { get; } = new BindableDouble(1);
         public BindableInt Combo { get; } = new BindableInt();
         public BindableBool HasQuit { get; } = new BindableBool();
+        public Bindable<long> DisplayOrder { get; } = new Bindable<long>();
 
         public Color4? BackgroundColour { get; set; }
 
