@@ -46,7 +46,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             if (mods.Any(m => m is OsuModTouchDevice))
+            {
                 aimRating = Math.Pow(aimRating, 0.8);
+                flashlightRating = Math.Pow(flashlightRating, 0.8);
+            }
 
             if (mods.Any(h => h is OsuModRelax))
             {

@@ -228,12 +228,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!score.Mods.Any(h => h is OsuModFlashlight))
                 return 0.0;
 
-            double rawFlashlight = attributes.FlashlightDifficulty;
-
-            if (score.Mods.Any(m => m is OsuModTouchDevice))
-                rawFlashlight = Math.Pow(rawFlashlight, 0.8);
-
-            double flashlightValue = Math.Pow(rawFlashlight, 2.0) * 25.0;
+            double flashlightValue = Math.Pow(attributes.FlashlightDifficulty, 2.0) * 25.0;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
