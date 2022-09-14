@@ -58,8 +58,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private string getTouchString(TouchSource source) => (source - TouchSource.Touch1 + 1).ToOrdinalWords();
 
-        private void assertTapTouch(TouchSource source) => AddAssert($"The {getTouchString(source)} touch is a tap touch", () => touchInputMapper.IsTapTouch(source));
-
         private void expectTapTouchesAmount(int expect) => AddAssert($"Has {expect} tap touches active", () => touchInputMapper.ActiveTapTouchesCount == expect);
 
         private void assertAllowingTouchInput() => AddAssert("Allowing other touch input", () => touchInputMapper.AllowingOtherTouch);
