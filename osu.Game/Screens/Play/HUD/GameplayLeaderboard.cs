@@ -88,6 +88,7 @@ namespace osu.Game.Screens.Play.HUD
 
             Flow.Add(drawable);
             drawable.TotalScore.BindValueChanged(_ => sorting.Invalidate(), true);
+            drawable.DisplayOrder.BindValueChanged(_ => sorting.Invalidate(), true);
 
             int displayCount = Math.Min(Flow.Count, max_panels);
             Height = displayCount * (GameplayLeaderboardScore.PANEL_HEIGHT + Flow.Spacing.Y);
@@ -160,7 +161,10 @@ namespace osu.Game.Screens.Play.HUD
             if (sorting.IsValid)
                 return;
 
-            var orderedByScore = Flow.OrderByDescending(i => i.TotalScore.Value).ToList();
+            var orderedByScore = Flow
+                                 .OrderByDescending(i => i.TotalScore.Value)
+                                 .ThenBy(i => i.DisplayOrder.Value)
+                                 .ToList();
 
             for (int i = 0; i < Flow.Count; i++)
             {
