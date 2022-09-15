@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize);
+        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize, InvalidationSource.Self);
         private ScheduledDelegate scheduledCreate;
 
         protected override void Update()
