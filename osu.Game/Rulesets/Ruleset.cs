@@ -200,7 +200,13 @@ namespace osu.Game.Rulesets
 
         public ModAutoplay? GetAutoplayMod() => CreateMod<ModAutoplay>();
 
-        public virtual ISkin? CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => null;
+        /// <summary>
+        /// Create a transformer which adds lookups specific to a ruleset to skin sources.
+        /// </summary>
+        /// <param name="skin">The source skin.</param>
+        /// <param name="beatmap">The current beatmap.</param>
+        /// <returns>A skin with a transformer applied, or null if no transformation is provided by this ruleset.</returns>
+        public virtual ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap) => null;
 
         protected Ruleset()
         {

@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 var tintingSkin = skinManager.GetSkin(DefaultLegacySkin.CreateInfo());
                 tintingSkin.Configuration.ConfigDictionary["AllowSliderBallTint"] = "1";
 
-                var provider = Ruleset.Value.CreateInstance().CreateLegacySkinProvider(tintingSkin, Beatmap.Value.Beatmap);
+                var provider = Ruleset.Value.CreateInstance().CreateSkinTransformer(tintingSkin, Beatmap.Value.Beatmap);
 
                 Child = new SkinProvidingContainer(provider)
                 {
