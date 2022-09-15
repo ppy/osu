@@ -27,7 +27,7 @@ namespace osu.Game.Skinning
         public static SkinInfo CreateInfo() => new SkinInfo
         {
             ID = osu.Game.Skinning.SkinInfo.DEFAULT_SKIN_TRIANGLES,
-            Name = "osu! (triangles)",
+            Name = "osu! \"triangles\" (2017)",
             Creator = "team osu!",
             Protected = true,
             InstantiationInfo = typeof(DefaultSkinTriangles).GetInvariantInstantiationInfo()
