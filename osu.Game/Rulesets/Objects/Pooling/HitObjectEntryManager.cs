@@ -55,9 +55,11 @@ namespace osu.Game.Rulesets.Objects.Pooling
             if (entryMap.ContainsKey(hitObject))
                 throw new InvalidOperationException($@"The {nameof(HitObjectLifetimeEntry)} is already added to this {nameof(HitObjectEntryManager)}.");
 
+            // Add the entry.
             entryMap[hitObject] = entry;
             childrenMap[hitObject] = new List<HitObjectLifetimeEntry>();
 
+            // If the entry has a parent, set it and add the entry to the parent's children.
             if (parent != null)
             {
                 parentMap[entry] = parent;
@@ -74,14 +76,15 @@ namespace osu.Game.Rulesets.Objects.Pooling
             HitObject hitObject = entry.HitObject;
 
             if (!entryMap.ContainsKey(hitObject))
-                throw new InvalidOperationException($@"The {nameof(HitObjectLifetimeEntry)} is not contained in this {nameof(HitObjectLifetimeEntry)}.");
+                throw new InvalidOperationException($@"The {nameof(HitObjectLifetimeEntry)} is not contained in this {nameof(HitObjectEntryManager)}.");
 
             entryMap.Remove(hitObject);
 
+            // If the entry has a parent, unset it and remove the entry from the parents' children.
             if (parentMap.Remove(entry, out var parent) && childrenMap.TryGetValue(parent, out var parentChildEntries))
                 parentChildEntries.Remove(entry);
 
-            // Remove all entries of the nested hit objects
+            // Remove all the entries' children.
             if (childrenMap.Remove(hitObject, out var childEntries))
             {
                 foreach (var childEntry in childEntries)
@@ -105,9 +108,11 @@ namespace osu.Game.Rulesets.Objects.Pooling
             if (!childrenMap.Remove(hitObject, out var childEntries))
                 return;
 
+            // Remove all the entries' children. At this point the parents' (this entries') children list has been removed from the map, so this does not cause upwards traversal.
             foreach (var entry in childEntries)
                 Remove(entry);
 
+            // The removed children list needs to be added back to the map for the entry to potentially receive children.
             childEntries.Clear();
             childrenMap[hitObject] = childEntries;
         }
