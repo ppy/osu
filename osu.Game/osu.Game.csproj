@@ -40,7 +40,7 @@
     <PackageReference Include="Sentry" Version="3.20.1" />
     <PackageReference Include="SharpCompress" Version="0.32.2" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.0.4" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.1" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
