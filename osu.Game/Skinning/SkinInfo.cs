@@ -47,7 +47,17 @@ namespace osu.Game.Skinning
                 ? typeof(LegacySkin)
                 : Type.GetType(InstantiationInfo).AsNonNull();
 
-            return (Skin)Activator.CreateInstance(type, this, resources);
+            try
+            {
+                return (Skin)Activator.CreateInstance(type, this, resources);
+            }
+            catch
+            {
+                // This defaults to triangles to catch the case where a user has a modified triangles skin.
+                // If we ever add more default skins in the future this will need some kind of proper migration rather than
+                // a single catch.
+                return new DefaultSkinTriangles(this, resources);
+            }
         }
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;
