@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         private readonly Dictionary<HitObjectLifetimeEntry, HitObject> parentMap = new Dictionary<HitObjectLifetimeEntry, HitObject>();
 
         /// <summary>
-        /// Stores the list of entries managed by this <see cref="HitObjectEntryManager"/> for each hit object managed by this <see cref="HitObjectEntryManager"/>.
+        /// Stores the list of child entries for each hit object managed by this <see cref="HitObjectEntryManager"/>.
         /// </summary>
         private readonly Dictionary<HitObject, List<HitObjectLifetimeEntry>> childrenMap = new Dictionary<HitObject, List<HitObjectLifetimeEntry>>();
 
