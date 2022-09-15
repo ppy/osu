@@ -36,13 +36,12 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
         /// <summary>
         /// Stores the parent hit object for entries of the nested hit objects.
-        /// A <c>null</c> is stored for entries of the top-level hit objects.
         /// </summary>
         /// <remarks>
         /// The parent hit object of a pooled hit object may be non-pooled.
         /// In that case, no corresponding <see cref="HitObjectLifetimeEntry"/> is stored in this <see cref="HitObjectEntryManager"/>.
         /// </remarks>
-        private readonly Dictionary<HitObjectLifetimeEntry, HitObject?> parentMap = new Dictionary<HitObjectLifetimeEntry, HitObject?>();
+        private readonly Dictionary<HitObjectLifetimeEntry, HitObject> parentMap = new Dictionary<HitObjectLifetimeEntry, HitObject>();
 
         /// <summary>
         /// Stores the list of entries managed by this <see cref="HitObjectEntryManager"/> for each hit object managed by this <see cref="HitObjectEntryManager"/>.
@@ -55,16 +54,17 @@ namespace osu.Game.Rulesets.Objects.Pooling
                 throw new InvalidOperationException($@"The {nameof(HitObjectLifetimeEntry)} is already added to this {nameof(HitObjectEntryManager)}.");
 
             var hitObject = entry.HitObject;
-            parentMap[entry] = parent;
             entryMap[hitObject] = entry;
-
-            if (parent != null && childrenMap.TryGetValue(parent, out var parentChildEntries))
-                parentChildEntries.Add(entry);
-
-            hitObject.DefaultsApplied += onDefaultsApplied;
-
             childrenMap[hitObject] = new List<HitObjectLifetimeEntry>();
 
+            if (parent != null)
+            {
+                parentMap[entry] = parent;
+                if (childrenMap.TryGetValue(parent, out var parentChildEntries))
+                    parentChildEntries.Add(entry);
+            }
+
+            hitObject.DefaultsApplied += onDefaultsApplied;
             OnEntryAdded?.Invoke(entry, parent);
         }
 
@@ -74,13 +74,10 @@ namespace osu.Game.Rulesets.Objects.Pooling
                 throw new InvalidOperationException($@"The {nameof(HitObjectLifetimeEntry)} is not contained in this {nameof(HitObjectLifetimeEntry)}.");
 
             var hitObject = entry.HitObject;
-            parentMap.Remove(entry, out var parent);
             entryMap.Remove(hitObject);
 
-            if (parent != null && childrenMap.TryGetValue(parent, out var parentChildEntries))
+            if (parentMap.Remove(entry, out var parent) && childrenMap.TryGetValue(parent, out var parentChildEntries))
                 parentChildEntries.Remove(entry);
-
-            hitObject.DefaultsApplied -= onDefaultsApplied;
 
             // Remove all entries of the nested hit objects
             if (childrenMap.Remove(entry.HitObject, out var childEntries))
@@ -89,6 +86,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
                     Remove(childEntry);
             }
 
+            hitObject.DefaultsApplied -= onDefaultsApplied;
             OnEntryRemoved?.Invoke(entry, parent);
         }
 
