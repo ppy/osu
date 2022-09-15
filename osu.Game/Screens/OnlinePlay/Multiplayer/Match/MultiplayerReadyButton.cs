@@ -57,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            MultiplayerCountdown newCountdown = room?.ActiveCountdowns.SingleOrDefault(c => c is MatchStartCountdown);
+            MultiplayerCountdown newCountdown = room?.ActiveCountdowns?.SingleOrDefault(c => c is MatchStartCountdown);
 
             if (newCountdown != countdown)
             {
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             get
             {
-                if (room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true
+                if (room?.ActiveCountdowns?.Any(c => c is MatchStartCountdown) == true
                     && multiplayerClient.IsHost
                     && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready
                     && !room.Settings.AutoStartEnabled)

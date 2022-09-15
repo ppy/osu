@@ -80,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            bool countdownActive = multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true;
+            bool countdownActive = multiplayerClient.Room?.ActiveCountdowns?.Any(c => c is MatchStartCountdown) == true;
 
             if (countdownActive)
             {
