@@ -19,6 +19,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using SharpCompress.Compressors;
 using SharpCompress.Compressors.BZip2;
+using SQLitePCL;
 
 namespace osu.Game.Beatmaps
 {
@@ -41,6 +42,10 @@ namespace osu.Game.Beatmaps
 
         public BeatmapUpdaterMetadataLookup(IAPIProvider api, Storage storage)
         {
+            // required to initialise native SQLite libraries on some platforms.
+            Batteries_V2.Init();
+            raw.sqlite3_config(2 /*SQLITE_CONFIG_MULTITHREAD*/);
+
             this.api = api;
             this.storage = storage;
 
@@ -192,7 +197,7 @@ namespace osu.Game.Beatmaps
 
             try
             {
-                using (var db = new SqliteConnection(DatabaseContextFactory.CreateDatabaseConnectionString("online.db", storage)))
+                using (var db = new SqliteConnection(string.Concat("Data Source=", storage.GetFullPath($@"{"online.db"}", true))))
                 {
                     db.Open();
 
