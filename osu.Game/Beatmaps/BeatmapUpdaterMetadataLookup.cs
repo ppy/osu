@@ -42,9 +42,16 @@ namespace osu.Game.Beatmaps
 
         public BeatmapUpdaterMetadataLookup(IAPIProvider api, Storage storage)
         {
-            // required to initialise native SQLite libraries on some platforms.
-            Batteries_V2.Init();
-            raw.sqlite3_config(2 /*SQLITE_CONFIG_MULTITHREAD*/);
+            try
+            {
+                // required to initialise native SQLite libraries on some platforms.
+                Batteries_V2.Init();
+                raw.sqlite3_config(2 /*SQLITE_CONFIG_MULTITHREAD*/);
+            }
+            catch
+            {
+                // may fail if platform not supported.
+            }
 
             this.api = api;
             this.storage = storage;
