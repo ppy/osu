@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -45,7 +46,10 @@ namespace osu.Game.Tests.Visual.Editing
             Dependencies.Cache(EditorBeatmap);
             Dependencies.CacheAs<IBeatSnapProvider>(EditorBeatmap);
 
-            Composer = playable.BeatmapInfo.Ruleset.CreateInstance().CreateHitObjectComposer().With(d => d.Alpha = 0);
+            Composer = playable.BeatmapInfo.Ruleset.CreateInstance().CreateHitObjectComposer();
+            Debug.Assert(Composer != null);
+
+            Composer.Alpha = 0;
 
             Add(new OsuContextMenuContainer
             {

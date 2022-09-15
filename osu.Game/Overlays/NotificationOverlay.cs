@@ -158,7 +158,10 @@ namespace osu.Game.Overlays
             playDebouncedSample(notification.PopInSampleName);
 
             if (State.Value == Visibility.Hidden)
+            {
+                notification.IsInToastTray = true;
                 toastTray.Post(notification);
+            }
             else
                 addPermanently(notification);
 
@@ -167,6 +170,8 @@ namespace osu.Game.Overlays
 
         private void addPermanently(Notification notification)
         {
+            notification.IsInToastTray = false;
+
             var ourType = notification.GetType();
             int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
 
