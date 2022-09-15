@@ -50,10 +50,11 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
         public void Add(HitObjectLifetimeEntry entry, HitObject? parent)
         {
-            if (parentMap.ContainsKey(entry))
+            HitObject hitObject = entry.HitObject;
+
+            if (entryMap.ContainsKey(hitObject))
                 throw new InvalidOperationException($@"The {nameof(HitObjectLifetimeEntry)} is already added to this {nameof(HitObjectEntryManager)}.");
 
-            var hitObject = entry.HitObject;
             entryMap[hitObject] = entry;
             childrenMap[hitObject] = new List<HitObjectLifetimeEntry>();
 
@@ -70,17 +71,18 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
         public void Remove(HitObjectLifetimeEntry entry)
         {
-            if (!parentMap.ContainsKey(entry))
+            HitObject hitObject = entry.HitObject;
+
+            if (!entryMap.ContainsKey(hitObject))
                 throw new InvalidOperationException($@"The {nameof(HitObjectLifetimeEntry)} is not contained in this {nameof(HitObjectLifetimeEntry)}.");
 
-            var hitObject = entry.HitObject;
             entryMap.Remove(hitObject);
 
             if (parentMap.Remove(entry, out var parent) && childrenMap.TryGetValue(parent, out var parentChildEntries))
                 parentChildEntries.Remove(entry);
 
             // Remove all entries of the nested hit objects
-            if (childrenMap.Remove(entry.HitObject, out var childEntries))
+            if (childrenMap.Remove(hitObject, out var childEntries))
             {
                 foreach (var childEntry in childEntries)
                     Remove(childEntry);
