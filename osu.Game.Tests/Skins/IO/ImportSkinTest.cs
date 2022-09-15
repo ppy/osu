@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Skins.IO
             skinManager.CurrentSkinInfo.Value.PerformRead(s =>
             {
                 Assert.IsFalse(s.Protected);
-                Assert.AreEqual(typeof(DefaultSkin), s.CreateInstance(skinManager).GetType());
+                Assert.AreEqual(typeof(DefaultSkinTriangles), s.CreateInstance(skinManager).GetType());
 
                 new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportModelTo(s, exportStream);
 
@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Skins.IO
             {
                 Assert.IsFalse(s.Protected);
                 Assert.AreNotEqual(originalSkinId, s.ID);
-                Assert.AreEqual(typeof(DefaultSkin), s.CreateInstance(skinManager).GetType());
+                Assert.AreEqual(typeof(DefaultSkinTriangles), s.CreateInstance(skinManager).GetType());
             });
 
             return Task.CompletedTask;
