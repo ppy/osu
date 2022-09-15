@@ -232,6 +232,9 @@ namespace osu.Game.Skinning
         {
             skin.SkinInfo.PerformWrite(s =>
             {
+                // Update for safety
+                s.InstantiationInfo = skin.GetType().GetInvariantInstantiationInfo();
+
                 // Serialise out the SkinInfo itself.
                 string skinInfoJson = JsonConvert.SerializeObject(s, new JsonSerializerSettings { Formatting = Formatting.Indented });
 
