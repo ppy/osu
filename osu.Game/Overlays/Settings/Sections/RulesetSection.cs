@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 try
                 {
-                    SettingsSubsection section = ruleset.CreateSettings();
+                    SettingsSubsection? section = ruleset.CreateSettings();
 
                     if (section != null)
                         Add(section);

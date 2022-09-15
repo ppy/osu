@@ -24,6 +24,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -44,8 +45,6 @@ namespace osu.Game.Database
         /// The filename of this realm.
         /// </summary>
         public readonly string Filename;
-
-        private readonly IDatabaseContextFactory? efContextFactory;
 
         private readonly SynchronizationContext? updateThreadSyncContext;
 
@@ -162,11 +161,9 @@ namespace osu.Game.Database
         /// <param name="storage">The game storage which will be used to create the realm backing file.</param>
         /// <param name="filename">The filename to use for the realm backing file. A ".realm" extension will be added automatically if not specified.</param>
         /// <param name="updateThread">The game update thread, used to post realm operations into a thread-safe context.</param>
-        /// <param name="efContextFactory">An EF factory used only for migration purposes.</param>
-        public RealmAccess(Storage storage, string filename, GameThread? updateThread = null, IDatabaseContextFactory? efContextFactory = null)
+        public RealmAccess(Storage storage, string filename, GameThread? updateThread = null)
         {
             this.storage = storage;
-            this.efContextFactory = efContextFactory;
 
             updateThreadSyncContext = updateThread?.SynchronizationContext ?? SynchronizationContext.Current;
 
@@ -876,8 +873,17 @@ namespace osu.Game.Database
             }
         }
 
-        private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
-            efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
+        private string? getRulesetShortNameFromLegacyID(long rulesetId)
+        {
+            try
+            {
+                return new APIBeatmap.APIRuleset { OnlineID = (int)rulesetId }.ShortName;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         /// <summary>
         /// Create a full realm backup.

@@ -200,11 +200,6 @@ namespace osu.Game
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(global_track_volume_adjust);
 
         /// <summary>
-        /// A legacy EF context factory if migration has not been performed to realm yet.
-        /// </summary>
-        protected DatabaseContextFactory EFContextFactory { get; private set; }
-
-        /// <summary>
         /// Number of unhandled exceptions to allow before aborting execution.
         /// </summary>
         /// <remarks>
@@ -242,10 +237,7 @@ namespace osu.Game
 
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
-            if (Storage.Exists(DatabaseContextFactory.DATABASE_NAME))
-                dependencies.Cache(EFContextFactory = new DatabaseContextFactory(Storage));
-
-            dependencies.Cache(realm = new RealmAccess(Storage, CLIENT_DATABASE_FILENAME, Host.UpdateThread, EFContextFactory));
+            dependencies.Cache(realm = new RealmAccess(Storage, CLIENT_DATABASE_FILENAME, Host.UpdateThread));
 
             dependencies.CacheAs<RulesetStore>(RulesetStore = new RealmRulesetStore(realm, Storage));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
