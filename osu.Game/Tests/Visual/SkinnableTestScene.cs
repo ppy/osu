@@ -32,6 +32,7 @@ namespace osu.Game.Tests.Visual
         private TrianglesSkin trianglesSkin;
         private Skin metricsSkin;
         private Skin legacySkin;
+        private Skin argonSkin;
         private Skin specialSkin;
         private Skin oldSkin;
 
@@ -48,6 +49,7 @@ namespace osu.Game.Tests.Visual
         {
             var dllStore = new DllResourceStore(GetType().Assembly);
 
+            argonSkin = new ArgonSkin(this);
             trianglesSkin = new TrianglesSkin(this);
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), this, true);
             legacySkin = new DefaultLegacySkin(this);
@@ -63,11 +65,12 @@ namespace osu.Game.Tests.Visual
 
             var beatmap = CreateBeatmapForSkinProvider();
 
-            Cell(0).Child = createProvider(trianglesSkin, creationFunction, beatmap);
-            Cell(1).Child = createProvider(metricsSkin, creationFunction, beatmap);
-            Cell(2).Child = createProvider(legacySkin, creationFunction, beatmap);
-            Cell(3).Child = createProvider(specialSkin, creationFunction, beatmap);
-            Cell(4).Child = createProvider(oldSkin, creationFunction, beatmap);
+            Cell(0).Child = createProvider(argonSkin, creationFunction, beatmap);
+            Cell(1).Child = createProvider(trianglesSkin, creationFunction, beatmap);
+            Cell(2).Child = createProvider(metricsSkin, creationFunction, beatmap);
+            Cell(3).Child = createProvider(legacySkin, creationFunction, beatmap);
+            Cell(4).Child = createProvider(specialSkin, creationFunction, beatmap);
+            Cell(5).Child = createProvider(oldSkin, creationFunction, beatmap);
         }
 
         protected IEnumerable<Drawable> CreatedDrawables => createdDrawables;
@@ -82,10 +85,7 @@ namespace osu.Game.Tests.Visual
             OutlineBox outlineBox;
             SkinProvidingContainer skinProvider;
 
-            ISkin provider = skin;
-
-            if (provider is LegacySkin legacyProvider)
-                provider = Ruleset.Value.CreateInstance().CreateSkinTransformer(legacyProvider, beatmap);
+            ISkin provider = Ruleset.Value.CreateInstance().CreateSkinTransformer(skin, beatmap) ?? skin;
 
             var children = new Container
             {
