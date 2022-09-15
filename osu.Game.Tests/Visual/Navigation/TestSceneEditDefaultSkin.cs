@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestEditDefaultSkin()
         {
-            AddAssert("is default skin", () => skinManager.CurrentSkinInfo.Value.ID == SkinInfo.DEFAULT_SKIN);
+            AddAssert("is default skin", () => skinManager.CurrentSkinInfo.Value.ID == SkinInfo.DEFAULT_SKIN_TRIANGLES);
 
             AddStep("open settings", () => { Game.Settings.Show(); });
 
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("open skin editor", () => skinEditor.Show());
 
             // Until step required as the skin editor may take time to load (and an extra scheduled frame for the mutable part).
-            AddUntilStep("is modified default skin", () => skinManager.CurrentSkinInfo.Value.ID != SkinInfo.DEFAULT_SKIN);
+            AddUntilStep("is modified default skin", () => skinManager.CurrentSkinInfo.Value.ID != SkinInfo.DEFAULT_SKIN_TRIANGLES);
             AddAssert("is not protected", () => skinManager.CurrentSkinInfo.Value.PerformRead(s => !s.Protected));
 
             AddUntilStep("export button enabled", () => Game.Settings.ChildrenOfType<SkinSection.ExportSkinButton>().SingleOrDefault()?.Enabled.Value == true);

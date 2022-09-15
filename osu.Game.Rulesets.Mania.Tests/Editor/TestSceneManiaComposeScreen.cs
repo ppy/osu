@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestDefaultSkin()
         {
-            AddStep("set default skin", () => skins.CurrentSkinInfo.Value = DefaultSkin.CreateInfo().ToLiveUnmanaged());
+            AddStep("set default skin", () => skins.CurrentSkinInfo.Value = DefaultSkinTriangles.CreateInfo().ToLiveUnmanaged());
         }
 
         [Test]
