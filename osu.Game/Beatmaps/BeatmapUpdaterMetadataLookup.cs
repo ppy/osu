@@ -192,7 +192,7 @@ namespace osu.Game.Beatmaps
 
             try
             {
-                using (var db = new SqliteConnection(DatabaseContextFactory.CreateDatabaseConnectionString("online.db", storage)))
+                using (var db = new SqliteConnection(string.Concat("Data Source=", storage.GetFullPath($@"{"online.db"}", true))))
                 {
                     db.Open();
 
