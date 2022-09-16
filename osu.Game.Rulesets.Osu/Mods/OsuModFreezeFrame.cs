@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
 
         public override IconUsage? Icon => FontAwesome.Solid.Camera;
-
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTarget), typeof(OsuModStrictTracking) };
 
         [SettingSource("Beat divisor")]
@@ -48,13 +47,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
             {
-                var point = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
-                double newPreempt = obj.TimePreempt + (obj.StartTime +5) % (point.BeatLength * BeatDivisor.Value);
+                var lastTimingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime + 1);
+                double controlPointDifference = obj.StartTime + 1 - lastTimingPoint.Time;
+                double remainder = controlPointDifference % (lastTimingPoint.BeatLength * BeatDivisor.Value);
+
+                double finalPreempt = obj.TimePreempt + remainder;
+                obj.TimePreempt = finalPreempt;
                 applyFadeInAdjustment(obj);
 
                 void applyFadeInAdjustment(OsuHitObject osuObject)
                 {
-                    osuObject.TimePreempt = newPreempt;
+                    osuObject.TimePreempt = finalPreempt;
                     foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                         applyFadeInAdjustment(nested);
                 }
