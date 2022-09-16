@@ -24,6 +24,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -187,7 +188,8 @@ namespace osu.Game
         {
             this.args = args;
 
-            forwardLoggedErrorsToNotifications();
+            forwardRuntimeLogsToNotifications();
+            forwardTabletLogsToNotifications();
 
             SentryLogger = new SentryLogger(this);
         }
@@ -992,7 +994,7 @@ namespace osu.Game
                 overlay.Depth = (float)-Clock.CurrentTime;
         }
 
-        private void forwardLoggedErrorsToNotifications()
+        private void forwardRuntimeLogsToNotifications()
         {
             int recentLogCount = 0;
 
@@ -1031,6 +1033,49 @@ namespace osu.Game
                 Interlocked.Increment(ref recentLogCount);
                 Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentLogCount), debounce);
             };
+        }
+
+        private void forwardTabletLogsToNotifications()
+        {
+            bool notifyOnWarning = true;
+
+            Logger.NewEntry += entry =>
+            {
+                if (entry.Level < LogLevel.Important || entry.LoggerName != ITabletHandler.LOGGER_NAME)
+                    return;
+
+                if (entry.Level == LogLevel.Error)
+                {
+                    Schedule(() => Notifications.Post(new SimpleNotification
+                    {
+                        Text = $"Encountered tablet error: \"{entry.Message}\"",
+                        Icon = FontAwesome.Solid.PenSquare,
+                        IconColour = Colours.RedDark,
+                    }));
+                }
+                else if (notifyOnWarning)
+                {
+                    Schedule(() => Notifications.Post(new SimpleNotification
+                    {
+                        Text = @"Encountered tablet warning, your tablet may not function correctly. Click here for a list of all tablets supported.",
+                        Icon = FontAwesome.Solid.PenSquare,
+                        IconColour = Colours.YellowDark,
+                        Activated = () =>
+                        {
+                            OpenUrlExternally("https://opentabletdriver.net/Tablets", true);
+                            return true;
+                        }
+                    }));
+
+                    notifyOnWarning = false;
+                }
+            };
+
+            Schedule(() =>
+            {
+                ITabletHandler tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
+                tablet?.Tablet.BindValueChanged(_ => notifyOnWarning = true, true);
+            });
         }
 
         private Task asyncLoadStream;
