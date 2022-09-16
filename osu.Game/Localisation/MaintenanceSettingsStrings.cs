@@ -29,7 +29,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Collections");
 
-
         /// <summary>
         /// "Scores"
         /// </summary>
