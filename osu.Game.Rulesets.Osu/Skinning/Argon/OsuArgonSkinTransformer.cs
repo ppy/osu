@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
@@ -18,14 +19,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         public Drawable? GetDrawableComponent(ISkinComponent component)
         {
-            if (component is OsuSkinComponent osuComponent)
+            switch (component)
             {
-                switch (osuComponent.Component)
-                {
-                    case OsuSkinComponents.HitCircle:
-                    case OsuSkinComponents.SliderHeadHitCircle:
-                        return new ArgonMainCirclePiece();
-                }
+                case GameplaySkinComponent<HitResult> resultComponent:
+                    return new ArgonJudgementPiece(resultComponent.Component);
+
+                case OsuSkinComponent osuComponent:
+                    switch (osuComponent.Component)
+                    {
+                        case OsuSkinComponents.HitCircle:
+                        case OsuSkinComponents.SliderHeadHitCircle:
+                            return new ArgonMainCirclePiece();
+                    }
+
+                    break;
             }
 
             return null;
