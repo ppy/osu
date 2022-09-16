@@ -141,6 +141,7 @@ namespace osu.Game.Overlays.Notifications
 
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
+                    attemptPostCompletion();
                     break;
             }
         }
