@@ -12,9 +12,9 @@ using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Updater;
 using osuTK;
 using osuTK.Input;
-using osu.Game.Updater;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -49,6 +49,77 @@ namespace osu.Game.Tests.Visual.UserInterface
         });
 
         [Test]
+        public void TestForwardWithFlingRight()
+        {
+            bool activated = false;
+            SimpleNotification notification = null!;
+
+            AddStep("post", () =>
+            {
+                activated = false;
+                notificationOverlay.Post(notification = new SimpleNotification
+                {
+                    Text = @"Welcome to osu!. Enjoy your stay!",
+                    Activated = () => activated = true,
+                });
+            });
+
+            AddStep("start drag", () =>
+            {
+                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single());
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single().ScreenSpaceDrawQuad.Centre + new Vector2(500, 0));
+            });
+
+            AddStep("fling away", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("was not closed", () => !notification.WasClosed);
+            AddAssert("was not activated", () => !activated);
+            AddAssert("is not read", () => !notification.Read);
+            AddAssert("is not toast", () => !notification.IsInToastTray);
+
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+            AddAssert("unread count one", () => notificationOverlay.UnreadCount.Value == 1);
+        }
+
+        [Test]
+        public void TestDismissWithoutActivationFling()
+        {
+            bool activated = false;
+            SimpleNotification notification = null!;
+
+            AddStep("post", () =>
+            {
+                activated = false;
+                notificationOverlay.Post(notification = new SimpleNotification
+                {
+                    Text = @"Welcome to osu!. Enjoy your stay!",
+                    Activated = () => activated = true,
+                });
+            });
+
+            AddStep("start drag", () =>
+            {
+                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single());
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single().ScreenSpaceDrawQuad.Centre + new Vector2(-500, 0));
+            });
+
+            AddStep("fling away", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for closed", () => notification.WasClosed);
+            AddAssert("was not activated", () => !activated);
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+            AddAssert("unread count zero", () => notificationOverlay.UnreadCount.Value == 0);
+        }
+
+        [Test]
         public void TestDismissWithoutActivationCloseButton()
         {
             bool activated = false;
@@ -75,6 +146,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait for closed", () => notification.WasClosed);
             AddAssert("was not activated", () => !activated);
             AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+            AddAssert("unread count zero", () => notificationOverlay.UnreadCount.Value == 0);
         }
 
         [Test]
@@ -218,6 +290,26 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddWaitStep("wait 3", 3);
 
             AddStep("cancel notification", () => notification.State = ProgressNotificationState.Cancelled);
+        }
+
+        [Test]
+        public void TestReadState()
+        {
+            SimpleNotification notification = null!;
+            AddStep(@"post", () => notificationOverlay.Post(notification = new BackgroundNotification { Text = @"Welcome to osu!. Enjoy your stay!" }));
+            AddUntilStep("check is toast", () => !notification.IsInToastTray);
+            AddAssert("light is not visible", () => notification.ChildrenOfType<Notification.NotificationLight>().Single().Alpha == 0);
+
+            AddUntilStep("wait for forward to overlay", () => !notification.IsInToastTray);
+
+            setState(Visibility.Visible);
+            AddAssert("state is not read", () => !notification.Read);
+            AddUntilStep("light is visible", () => notification.ChildrenOfType<Notification.NotificationLight>().Single().Alpha == 1);
+
+            setState(Visibility.Hidden);
+            setState(Visibility.Visible);
+            AddAssert("state is read", () => notification.Read);
+            AddUntilStep("light is not visible", () => notification.ChildrenOfType<Notification.NotificationLight>().Single().Alpha == 0);
         }
 
         [Test]

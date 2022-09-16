@@ -106,14 +106,13 @@ namespace osu.Game.Overlays.Notifications
                     RelativeSizeAxes = Axes.X,
                     LayoutDuration = 150,
                     LayoutEasing = Easing.OutQuart,
-                    Spacing = new Vector2(3),
                 }
             });
         }
 
         private void clearAll()
         {
-            notifications.Children.ForEach(c => c.Close());
+            notifications.Children.ForEach(c => c.Close(true));
         }
 
         protected override void Update()

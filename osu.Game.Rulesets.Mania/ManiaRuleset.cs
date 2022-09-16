@@ -62,7 +62,16 @@ namespace osu.Game.Rulesets.Mania
 
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new ManiaLegacySkinTransformer(skin, beatmap);
+        public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)
+        {
+            switch (skin)
+            {
+                case LegacySkin:
+                    return new ManiaLegacySkinTransformer(skin, beatmap);
+            }
+
+            return null;
+        }
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {

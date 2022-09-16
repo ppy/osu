@@ -122,14 +122,17 @@ namespace osu.Game.Screens.Select
 
         private static bool tryParseEnum<TEnum>(string value, out TEnum result) where TEnum : struct
         {
-            if (Enum.TryParse(value, true, out result)) return true;
+            // First try an exact match.
+            if (Enum.TryParse(value, true, out result))
+                return true;
 
+            // Then try a prefix match.
             string? prefixMatch = Enum.GetNames(typeof(TEnum)).FirstOrDefault(name => name.StartsWith(value, true, CultureInfo.InvariantCulture));
 
             if (prefixMatch == null)
                 return false;
 
-            return Enum.TryParse(value, true, out result);
+            return Enum.TryParse(prefixMatch, true, out result);
         }
 
         private static GroupCollection? tryMatchRegex(string value, string regex)
