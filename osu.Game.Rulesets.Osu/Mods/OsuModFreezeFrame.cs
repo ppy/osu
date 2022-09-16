@@ -1,3 +1,6 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -27,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override IconUsage? Icon => FontAwesome.Solid.Camera;
 
-        [SettingSource("Measure", "How often the hitcircles should be Grouped to freeze")]
+        [SettingSource("Measure", "How often the hit-circles should be Grouped to freeze")]
         public Bindable<BeatDivisor> Divisor { get; } = new Bindable<BeatDivisor>(BeatDivisor.Single_Measure);
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
