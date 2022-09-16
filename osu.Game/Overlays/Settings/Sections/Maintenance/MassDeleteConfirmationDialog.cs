@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
@@ -10,7 +11,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         public MassDeleteConfirmationDialog(Action deleteAction)
         {
-            BodyText = "Everything?";
+            BodyText = MaintenanceSettingsStrings.MassDeleteConfirmation;
             DeleteAction = deleteAction;
         }
     }

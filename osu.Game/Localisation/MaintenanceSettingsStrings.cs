@@ -15,9 +15,70 @@ namespace osu.Game.Localisation
         public static LocalisableString MaintenanceSectionHeader => new TranslatableString(getKey(@"maintenance_section_header"), @"Maintenance");
 
         /// <summary>
+        /// "Beatmaps"
+        /// </summary>
+        public static LocalisableString Beatmaps => new TranslatableString(getKey(@"beatmaps"), @"Beatmaps");
+
+        /// <summary>
+        /// "Skins"
+        /// </summary>
+        public static LocalisableString Skins => new TranslatableString(getKey(@"skins"), @"Skins");
+
+        /// <summary>
+        /// "Collections"
+        /// </summary>
+        public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Collections");
+
+
+        /// <summary>
+        /// "Scores"
+        /// </summary>
+        public static LocalisableString Scores => new TranslatableString(getKey(@"scores"), @"Scores");
+
+        /// <summary>
+        /// "Mod presets"
+        /// </summary>
+        public static LocalisableString ModPresets => new TranslatableString(getKey(@"mod_presets"), @"Mod presets");
+
+        /// <summary>
         /// "Select directory"
         /// </summary>
         public static LocalisableString SelectDirectory => new TranslatableString(getKey(@"select_directory"), @"Select directory");
+
+        /// <summary>
+        /// "Migration in progress"
+        /// </summary>
+        public static LocalisableString MigrationInProgress => new TranslatableString(getKey(@"migration_in_progress"), @"Migration in progress");
+
+        /// <summary>
+        /// "This could take a few minutes depending on the speed of your disk(s)."
+        /// </summary>
+        public static LocalisableString MigrationDescription => new TranslatableString(getKey(@"migration_description"), @"This could take a few minutes depending on the speed of your disk(s).");
+
+        /// <summary>
+        /// "Please avoid interacting with the game!"
+        /// </summary>
+        public static LocalisableString ProhibitedInteractDuringMigration => new TranslatableString(getKey(@"prohibited_interact_during_migration"), @"Please avoid interacting with the game!");
+
+        /// <summary>
+        /// "Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up."
+        /// </summary>
+        public static LocalisableString FailedCleanupNotification => new TranslatableString(getKey(@"failed_cleanup_notification"), @"Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up.");
+
+        /// <summary>
+        /// "Please select a new location"
+        /// </summary>
+        public static LocalisableString SelectNewLocation => new TranslatableString(getKey(@"select_new_location"), @"Please select a new location");
+
+        /// <summary>
+        /// "The target directory already seems to have an osu! install. Use that data instead?"
+        /// </summary>
+        public static LocalisableString TargetDirectoryAlreadyInstalledOsu => new TranslatableString(getKey(@"target_directory_already_installed_osu"), @"The target directory already seems to have an osu! install. Use that data instead?");
+
+        /// <summary>
+        /// "To complete this operation, osu! will close. Please open it again to use the new data location."
+        /// </summary>
+        public static LocalisableString RestartAndReOpenRequiredForCompletion => new TranslatableString(getKey(@"restart_and_re_open_required_for_completion"), @"To complete this operation, osu! will close. Please open it again to use the new data location.");
 
         /// <summary>
         /// "Import beatmaps from stable"
@@ -83,6 +144,56 @@ namespace osu.Game.Localisation
         /// "Restore all recently deleted mod presets"
         /// </summary>
         public static LocalisableString RestoreAllRecentlyDeletedModPresets => new TranslatableString(getKey(@"restore_all_recently_deleted_mod_presets"), @"Restore all recently deleted mod presets");
+
+        /// <summary>
+        /// "Deleted all collections!"
+        /// </summary>
+        public static LocalisableString DeletedAllCollections => new TranslatableString(getKey(@"deleted_all_collections"), @"Deleted all collections!");
+
+        /// <summary>
+        /// "Deleted all mod presets!"
+        /// </summary>
+        public static LocalisableString DeletedAllModPresets => new TranslatableString(getKey(@"deleted_all_mod_presets"), @"Deleted all mod presets!");
+
+        /// <summary>
+        /// "Restored all deleted mod presets!"
+        /// </summary>
+        public static LocalisableString RestoredAllDeletedModPresets => new TranslatableString(getKey(@"restored_all_deleted_mod_presets"), @"Restored all deleted mod presets!");
+
+        /// <summary>
+        /// "Everything?"
+        /// </summary>
+        public static LocalisableString MassDeleteConfirmation => new TranslatableString(getKey(@"mass_delete_confirmation"), @"Everything?");
+
+        /// <summary>
+        /// "All beatmap videos? This cannot be undone!"
+        /// </summary>
+        public static LocalisableString MassVideoDeleteConfirmation => new TranslatableString(getKey(@"mass_video_delete_confirmation"), @"All beatmap videos? This cannot be undone!");
+
+        /// <summary>
+        /// "Failed to automatically locate an osu!stable installation."
+        /// </summary>
+        public static LocalisableString StableDirectoryLocationHeader => new TranslatableString(getKey(@"stable_directory_location_header"), @"Failed to automatically locate an osu!stable installation.");
+
+        /// <summary>
+        /// "An existing install could not be located. If you know where it is, you can help locate it."
+        /// </summary>
+        public static LocalisableString StableDirectoryLocationBody => new TranslatableString(getKey(@"stable_directory_location_body"), @"An existing install could not be located. If you know where it is, you can help locate it.");
+
+        /// <summary>
+        /// "Sure! I know where it is located!"
+        /// </summary>
+        public static LocalisableString StableDirectoryLocationOk => new TranslatableString(getKey(@"stable_directory_location_ok"), @"Sure! I know where it is located!");
+
+        /// <summary>
+        /// "Actually I don't have osu!stable installed."
+        /// </summary>
+        public static LocalisableString StableDirectoryLocationCancel => new TranslatableString(getKey(@"stable_directory_location_cancel"), @"Actually I don't have osu!stable installed.");
+
+        /// <summary>
+        /// "Please select your osu!stable install location"
+        /// </summary>
+        public static LocalisableString StableDirectorySelectHeader => new TranslatableString(getKey(@"stable_directory_select_header"), @"Please select your osu!stable install location");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

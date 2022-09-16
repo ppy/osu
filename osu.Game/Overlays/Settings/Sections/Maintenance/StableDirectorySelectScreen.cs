@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         protected override bool IsValidDirectory(DirectoryInfo info) => info?.GetFiles("osu!.*.cfg").Any() ?? false;
 
-        public override LocalisableString HeaderText => "Please select your osu!stable install location";
+        public override LocalisableString HeaderText => MaintenanceSettingsStrings.StableDirectorySelectHeader;
 
         public StableDirectorySelectScreen(TaskCompletionSource<string> taskCompletionSource)
         {
