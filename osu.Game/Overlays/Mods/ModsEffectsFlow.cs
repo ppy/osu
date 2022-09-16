@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Mods
             Direction = FillDirection.Horizontal;
             Height = ModsEffectDisplay.HEIGHT;
             Margin = new MarginPadding { Horizontal = 100 };
-            Spacing = new Vector2(5, 0);
+            Spacing = new Vector2(7, 0);
             Children = new ModsEffectDisplay[]
             {
                 new BpmDisplay(),
