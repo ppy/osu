@@ -28,12 +28,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 new PopupDialogOkButton
                 {
-                    Text = "Sure! I know where it is located!",
+                    Text = MaintenanceSettingsStrings.StableDirectoryLocationOk,
                     Action = () => Schedule(() => performer.PerformFromScreen(screen => screen.Push(new StableDirectorySelectScreen(taskCompletionSource))))
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = "Actually I don't have osu!stable installed.",
+                    Text = MaintenanceSettingsStrings.StableDirectoryLocationCancel,
                     Action = () => taskCompletionSource.TrySetCanceled()
                 }
             };
