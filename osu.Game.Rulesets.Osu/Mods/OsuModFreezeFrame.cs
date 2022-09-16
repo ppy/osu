@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModFreezeFrame : ModWithVisibilityAdjustment, IHidesApproachCircles, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        public override string Name => "Freeze frame";
+        public override string Name => "Freeze Frame";
 
         public override string Acronym => "FF";
 
@@ -26,10 +26,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
 
         public override IconUsage? Icon => FontAwesome.Solid.Camera;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModTarget), typeof(OsuModStrictTracking) };
 
-        [SettingSource("Beat divisor")]
-        public Bindable<BeatDivisor> Divisor { get; } = new Bindable<BeatDivisor>(BeatDivisor.Measure);
+        [SettingSource("Measure", "How often the hitcircles should be Grouped to freeze")]
+        public Bindable<BeatDivisor> Divisor { get; } = new Bindable<BeatDivisor>(BeatDivisor.Single_Measure);
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -42,11 +41,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
             {
+                // The +1s below are added due to First HitCircle in each measure not appearing appropriately without them.
                 var lastTimingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime + 1);
-                // +1 is added due to First HitCircle in each measure not appearing appropriately without it
                 double controlPointDifference = obj.StartTime + 1 - lastTimingPoint.Time;
-                double remainder = controlPointDifference % (lastTimingPoint.BeatLength * getMeasure(Divisor.Value));
-
+                double remainder = controlPointDifference % (lastTimingPoint.BeatLength * getMeasure(Divisor.Value)) - 1;
                 double finalPreempt = obj.TimePreempt + remainder;
                 applyFadeInAdjustment(obj);
 
@@ -73,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case BeatDivisor.Half_Measure:
                     return 0.5f;
 
-                case BeatDivisor.Measure:
+                case BeatDivisor.Single_Measure:
                     return 1;
 
                 case BeatDivisor.Double_Measure:
@@ -87,11 +85,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
+        //Todo: find better way to represent these Enums to the player
         public enum BeatDivisor
         {
             Quarter_Measure,
             Half_Measure,
-            Measure,
+            Single_Measure,
             Double_Measure,
             Quadruple_Measure
         }
