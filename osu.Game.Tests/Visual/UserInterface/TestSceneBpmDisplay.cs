@@ -27,10 +27,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestBpmDisplay()
         {
-            RollingCounter<int> counter = null!;
+            RollingCounter<double> counter = null!;
             OsuSpriteText dashText = null!;
 
-            int getDisplayedBpm() => counter.Current.Value;
+            int getDisplayedBpm() => (int)counter.Current.Value;
 
             AddStep("create content", () =>
             {
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre
                 };
                 Child = bpmDisplay;
-                counter = bpmDisplay.ChildrenOfType<RollingCounter<int>>().Single();
+                counter = bpmDisplay.ChildrenOfType<RollingCounter<double>>().Single();
                 dashText = bpmDisplay.ChildrenOfType<OsuSpriteText>().Single(t => t.Text == "-");
             });
 
