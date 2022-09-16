@@ -16,7 +16,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModFreezeFrame : ModWithVisibilityAdjustment, IHidesApproachCircles, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModFreezeFrame : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Freeze Frame";
 
