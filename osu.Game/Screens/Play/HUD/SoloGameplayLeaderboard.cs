@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -16,7 +15,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         private readonly IUser trackingUser;
 
-        private readonly IBindableList<ScoreInfo> scores = new BindableList<ScoreInfo>();
+        public readonly IBindableList<ScoreInfo> Scores = new BindableList<ScoreInfo>();
 
         // hold references to ensure bindables are updated.
         private readonly List<Bindable<long>> scoreBindables = new List<Bindable<long>>();
@@ -32,13 +31,10 @@ namespace osu.Game.Screens.Play.HUD
             this.trackingUser = trackingUser;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(ILeaderboardScoreSource? scoreSource)
+        protected override void LoadComplete()
         {
-            if (scoreSource != null)
-                scores.BindTo(scoreSource.Scores);
-
-            scores.BindCollectionChanged((_, _) => Scheduler.AddOnce(showScores), true);
+            base.LoadComplete();
+            Scores.BindCollectionChanged((_, _) => Scheduler.AddOnce(showScores), true);
         }
 
         private void showScores()
@@ -46,7 +42,7 @@ namespace osu.Game.Screens.Play.HUD
             Clear();
             scoreBindables.Clear();
 
-            if (!scores.Any())
+            if (!Scores.Any())
                 return;
 
             ILeaderboardScore local = Add(trackingUser, true);
@@ -58,7 +54,7 @@ namespace osu.Game.Screens.Play.HUD
             // Local score should always show lower than any existing scores in cases of ties.
             local.DisplayOrder.Value = long.MaxValue;
 
-            foreach (var s in scores)
+            foreach (var s in Scores)
             {
                 var score = Add(s.User, false);
 
