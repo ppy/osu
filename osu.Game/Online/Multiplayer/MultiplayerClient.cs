@@ -210,6 +210,8 @@ namespace osu.Game.Online.Multiplayer
 
                     updateLocalRoomSettings(joinedRoom.Settings);
 
+                    postServerShuttingDownNotification();
+
                     OnRoomJoined();
                 }, cancellationSource.Token).ConfigureAwait(false);
             }, cancellationSource.Token).ConfigureAwait(false);
