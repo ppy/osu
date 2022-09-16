@@ -36,7 +36,6 @@ namespace osu.Game.Screens.Ranking.Expanded
         private const float padding = 10;
 
         private readonly ScoreInfo score;
-        private Bindable<bool> bindableUse24HourDisplay;
         private readonly bool withFlair;
 
         private readonly List<StatisticDisplay> statisticDisplays = new List<StatisticDisplay>();
@@ -64,9 +63,8 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyCache beatmapDifficultyCache, OsuConfigManager config)
+        private void load(BeatmapDifficultyCache beatmapDifficultyCache)
         {
-            bindableUse24HourDisplay = config.GetBindable<bool>(OsuSetting.Prefer24HourTime);
             var beatmap = score.BeatmapInfo;
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             string creator = metadata.Author.Username;
@@ -228,7 +226,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             });
 
             if (score.Date != default)
-                AddInternal(new PlayedOnText(score.Date, bindableUse24HourDisplay));
+                AddInternal(new PlayedOnText(score.Date));
 
             var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely();
 
@@ -284,25 +282,34 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         public class PlayedOnText : OsuSpriteText
         {
-            private bool use24HourDisplay;
+            private readonly DateTimeOffset time;
+            private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
 
-            public PlayedOnText(DateTimeOffset time, Bindable<bool> bindableUse24HourDisplay)
+            public PlayedOnText(DateTimeOffset time)
             {
-                use24HourDisplay = bindableUse24HourDisplay.Value;
-                bindableUse24HourDisplay.BindValueChanged(prefer24H =>
-                {
-                    use24HourDisplay = prefer24H.NewValue;
-                    UpdateHourDisplay(time);
-                }, true);
+                this.time = time;
+
                 Anchor = Anchor.BottomCentre;
                 Origin = Anchor.BottomCentre;
                 Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold);
-                UpdateHourDisplay(time);
             }
 
-            public void UpdateHourDisplay(DateTimeOffset time)
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager configManager)
             {
-                Text = use24HourDisplay ? $"Played on {time.ToLocalTime():d MMMM yyyy HH:mm}" : $"Played on {time.ToLocalTime():d MMMM yyyy h:mm tt}";
+                configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                prefer24HourTime.BindValueChanged(_ => updateDisplay(), true);
+            }
+
+            private void updateDisplay()
+            {
+                Text = prefer24HourTime.Value ? $"Played on {time.ToLocalTime():d MMMM yyyy HH:mm}" : $"Played on {time.ToLocalTime():d MMMM yyyy h:mm tt}";
             }
         }
     }
