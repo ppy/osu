@@ -15,6 +15,8 @@ using osu.Framework.Localisation;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -24,7 +26,7 @@ namespace osu.Game.Online.Leaderboards
         private FillFlowContainer<HitResultCell> topScoreStatistics = null!;
         private FillFlowContainer<HitResultCell> bottomScoreStatistics = null!;
         private FillFlowContainer<ModCell> modStatistics = null!;
-
+        private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
         public LeaderboardScoreTooltip()
         {
             AutoSizeAxes = Axes.Both;
@@ -36,8 +38,9 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager configManager)
         {
+            configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -92,6 +95,13 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
+        private void updateDisplay()
+        {
+            if (displayedScore != null)
+            {
+                timestampLabel.Text = prefer24HourTime.Value ? $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy HH:mm}" : $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy h:mm tt}";
+            }
+        }
         private ScoreInfo? displayedScore;
 
         public void SetContent(ScoreInfo score)
@@ -101,7 +111,7 @@ namespace osu.Game.Online.Leaderboards
 
             displayedScore = score;
 
-            timestampLabel.Text = $"Played on {score.Date.ToLocalTime():d MMMM yyyy HH:mm}";
+            prefer24HourTime.BindValueChanged(_ => updateDisplay(), true);
 
             modStatistics.Clear();
             topScoreStatistics.Clear();
