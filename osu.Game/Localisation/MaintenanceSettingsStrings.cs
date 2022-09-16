@@ -15,31 +15,6 @@ namespace osu.Game.Localisation
         public static LocalisableString MaintenanceSectionHeader => new TranslatableString(getKey(@"maintenance_section_header"), @"Maintenance");
 
         /// <summary>
-        /// "Beatmaps"
-        /// </summary>
-        public static LocalisableString Beatmaps => new TranslatableString(getKey(@"beatmaps"), @"Beatmaps");
-
-        /// <summary>
-        /// "Skins"
-        /// </summary>
-        public static LocalisableString Skins => new TranslatableString(getKey(@"skins"), @"Skins");
-
-        /// <summary>
-        /// "Collections"
-        /// </summary>
-        public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Collections");
-
-        /// <summary>
-        /// "Scores"
-        /// </summary>
-        public static LocalisableString Scores => new TranslatableString(getKey(@"scores"), @"Scores");
-
-        /// <summary>
-        /// "Mod presets"
-        /// </summary>
-        public static LocalisableString ModPresets => new TranslatableString(getKey(@"mod_presets"), @"Mod presets");
-
-        /// <summary>
         /// "Select directory"
         /// </summary>
         public static LocalisableString SelectDirectory => new TranslatableString(getKey(@"select_directory"), @"Select directory");

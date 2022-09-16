@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class CollectionsSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => MaintenanceSettingsStrings.Collections;
+        protected override LocalisableString Header => CommonStrings.Collections;
 
         private SettingsButton importCollectionsButton = null!;
 

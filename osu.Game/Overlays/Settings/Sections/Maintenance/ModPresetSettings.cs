@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class ModPresetSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => MaintenanceSettingsStrings.ModPresets;
+        protected override LocalisableString Header => CommonStrings.ModPresets;
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
