@@ -46,11 +46,11 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 },
                 blockAction = new SettingsButton
                 {
-                    Text = "Block realm",
+                    Text = DebugSettingsStrings.BlockRealm,
                 },
                 unblockAction = new SettingsButton
                 {
-                    Text = "Unblock realm",
+                    Text = DebugSettingsStrings.UnblockRealm,
                 },
             };
 

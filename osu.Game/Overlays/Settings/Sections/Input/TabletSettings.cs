@@ -110,11 +110,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                             {
                                 t.NewLine();
-                                t.AddText("If your tablet is not detected, please read ");
-                                t.AddLink("this FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
+                                var formattedSource = MessageFormatter.FormatText(TabletSettingsStrings.NoTabletDetectedDescription(RuntimeInfo.OS == RuntimeInfo.Platform.Windows
                                     ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
-                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux");
-                                t.AddText(" for troubleshooting steps.");
+                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux").ToString());
+                                t.AddLinks(formattedSource.Text, formattedSource.Links);
                             }
                         }),
                     }

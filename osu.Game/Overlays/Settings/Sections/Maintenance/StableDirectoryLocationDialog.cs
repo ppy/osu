@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Screens;
 
@@ -19,8 +20,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         public StableDirectoryLocationDialog(TaskCompletionSource<string> taskCompletionSource)
         {
-            HeaderText = "Failed to automatically locate an osu!stable installation.";
-            BodyText = "An existing install could not be located. If you know where it is, you can help locate it.";
+            HeaderText = MaintenanceSettingsStrings.StableDirectoryLocationHeader;
+            BodyText = MaintenanceSettingsStrings.StableDirectoryLocationBody;
             Icon = FontAwesome.Solid.QuestionCircle;
 
             Buttons = new PopupDialogButton[]

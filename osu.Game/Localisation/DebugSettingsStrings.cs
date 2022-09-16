@@ -49,6 +49,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString CompactRealm => new TranslatableString(getKey(@"compact_realm"), @"Compact realm");
 
+        /// <summary>
+        /// "Block realm"
+        /// </summary>
+        public static LocalisableString BlockRealm => new TranslatableString(getKey(@"block_realm"), @"Block realm");
+
+        /// <summary>
+        /// "Unblock realm"
+        /// </summary>
+        public static LocalisableString UnblockRealm => new TranslatableString(getKey(@"unblock_realm"), @"Unblock realm");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
