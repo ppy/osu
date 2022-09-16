@@ -56,14 +56,12 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
 using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Graphics;
 using Sentry;
-using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Game
 {
@@ -294,25 +292,13 @@ namespace osu.Game
 
             Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ShortName;
 
-            // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<string>(OsuSetting.Skin);
+
+            // Transfer skin from config to realm instance once on startup.
+            SkinManager.SetSkinFromConfiguration(configSkin.Value);
+
+            // Transfer any runtime changes back to configuration file.
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
-            configSkin.ValueChanged += skinId =>
-            {
-                Live<SkinInfo> skinInfo = null;
-
-                if (Guid.TryParse(skinId.NewValue, out var guid))
-                    skinInfo = SkinManager.Query(s => s.ID == guid);
-
-                if (skinInfo == null)
-                {
-                    if (guid == SkinInfo.CLASSIC_SKIN)
-                        skinInfo = DefaultLegacySkin.CreateInfo().ToLiveUnmanaged();
-                }
-
-                SkinManager.CurrentSkinInfo.Value = skinInfo ?? DefaultSkin.CreateInfo().ToLiveUnmanaged();
-            };
-            configSkin.TriggerChange();
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
 
