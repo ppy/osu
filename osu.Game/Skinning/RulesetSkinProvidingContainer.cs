@@ -41,7 +41,7 @@ namespace osu.Game.Skinning
             Ruleset = ruleset;
             Beatmap = beatmap;
 
-            InternalChild = new BeatmapSkinProvidingContainer(beatmapSkin is LegacySkin ? GetLegacyRulesetTransformedSkin(beatmapSkin) : beatmapSkin)
+            InternalChild = new BeatmapSkinProvidingContainer(beatmapSkin is LegacySkin ? GetRulesetTransformedSkin(beatmapSkin) : beatmapSkin)
             {
                 Child = Content = new Container
                 {
@@ -67,16 +67,16 @@ namespace osu.Game.Skinning
 
             Debug.Assert(ParentSource != null);
 
-            foreach (var skin in ParentSource.AllSources)
+            foreach (var source in ParentSource.AllSources)
             {
-                switch (skin)
+                switch (source)
                 {
-                    case LegacySkin legacySkin:
-                        sources.Add(GetLegacyRulesetTransformedSkin(legacySkin));
+                    case Skin skin:
+                        sources.Add(GetRulesetTransformedSkin(skin));
                         break;
 
                     default:
-                        sources.Add(skin);
+                        sources.Add(source);
                         break;
                 }
             }
@@ -94,16 +94,16 @@ namespace osu.Game.Skinning
             SetSources(sources);
         }
 
-        protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
+        protected ISkin GetRulesetTransformedSkin(ISkin skin)
         {
-            if (legacySkin == null)
+            if (skin == null)
                 return null;
 
-            var rulesetTransformed = Ruleset.CreateLegacySkinProvider(legacySkin, Beatmap);
+            var rulesetTransformed = Ruleset.CreateSkinTransformer(skin, Beatmap);
             if (rulesetTransformed != null)
                 return rulesetTransformed;
 
-            return legacySkin;
+            return skin;
         }
 
         protected override void Dispose(bool isDisposing)

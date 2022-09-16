@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Game.Beatmaps;
@@ -34,8 +35,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(CancellationToken cancellationToken)
         {
+            // HUD overlay may not be loaded if load has been cancelled early.
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
             HUDOverlay.PlayerSettingsOverlay.Expire();
             HUDOverlay.HoldToQuit.Expire();
         }
