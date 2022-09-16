@@ -231,7 +231,16 @@ namespace osu.Game.Rulesets.Osu
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new OsuLegacySkinTransformer(skin);
+        public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)
+        {
+            switch (skin)
+            {
+                case LegacySkin:
+                    return new OsuLegacySkinTransformer(skin);
+            }
+
+            return null;
+        }
 
         public int LegacyID => 0;
 

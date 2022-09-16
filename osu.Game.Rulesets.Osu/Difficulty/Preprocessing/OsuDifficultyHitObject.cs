@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
@@ -78,6 +79,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double? Angle { get; private set; }
 
+        /// <summary>
+        /// Retrieves the full hit window for a Great <see cref="HitResult"/>.
+        /// </summary>
+        public double HitWindowGreat { get; private set; }
+
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
 
@@ -89,6 +95,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             StrainTime = Math.Max(DeltaTime, min_delta_time);
+
+            if (BaseObject is Slider sliderObject)
+            {
+                HitWindowGreat = 2 * sliderObject.HeadCircle.HitWindows.WindowFor(HitResult.Great) / clockRate;
+            }
+            else
+            {
+                HitWindowGreat = 2 * BaseObject.HitWindows.WindowFor(HitResult.Great) / clockRate;
+            }
 
             setDistances(clockRate);
         }

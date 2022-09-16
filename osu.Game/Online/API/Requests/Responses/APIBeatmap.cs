@@ -111,7 +111,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public bool Equals(IBeatmapInfo? other) => other is APIBeatmap b && this.MatchesOnlineID(b);
 
-        private class APIRuleset : IRulesetInfo
+        public class APIRuleset : IRulesetInfo
         {
             public int OnlineID { get; set; } = -1;
 
