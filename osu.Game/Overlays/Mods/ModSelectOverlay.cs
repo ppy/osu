@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Mods
             {
                 if (ShowModsEffects)
                 {
-                    Add(customisationArea = new GridContainer()
+                    Add(customisationArea = new GridContainer
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
@@ -156,7 +156,7 @@ namespace osu.Game.Overlays.Mods
                         {
                             new Drawable[]
                             {
-                                new Container()
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
@@ -164,13 +164,13 @@ namespace osu.Game.Overlays.Mods
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = ColourProvider.Dark3,
+                                            Colour = ColourProvider.Dark3
                                         },
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             Height = ModsEffectDisplay.HEIGHT - 14,
-                                            Colour = ColourProvider.Background5,
+                                            Colour = ColourProvider.Background5
                                         },
                                         new ModsEffectsFlow()
                                     }
@@ -421,6 +421,8 @@ namespace osu.Game.Overlays.Mods
 
             customisationArea?.ResizeHeightTo(modAreaHeight, transition_duration, Easing.InOutCubic);
             TopLevelContent.MoveToY(-modAreaHeight, transition_duration, Easing.InOutCubic);
+            effectsContainer.MoveToX(customisationVisible.Value ? distance : 0f, transition_duration, Easing.InOutCubic);
+            effectsContainer.FadeTo(customisationVisible.Value ? 0f : 1f, transition_duration, Easing.InOutCubic);
         }
 
         /// <summary>
