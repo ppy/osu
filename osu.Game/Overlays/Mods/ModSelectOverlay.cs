@@ -66,9 +66,9 @@ namespace osu.Game.Overlays.Mods
         }
 
         /// <summary>
-        /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
+        /// Whether effects of mods should be shown.
         /// </summary>
-        protected virtual bool ShowTotalMultiplier => true;
+        protected virtual bool ShowModsEffects => true;
 
         /// <summary>
         /// Whether per-mod customisation controls are visible.
@@ -109,7 +109,7 @@ namespace osu.Game.Overlays.Mods
         private ColumnFlowContainer columnFlow = null!;
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
 
-        private DifficultyMultiplierDisplay? multiplierDisplay;
+        private ModsEffectsFlow? effectsContainer;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
@@ -154,7 +154,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Padding = new MarginPadding
                         {
-                            Top = (ShowTotalMultiplier ? ModsEffectDisplay.HEIGHT : 0) + PADDING,
+                            Top = (ShowModsEffects ? ModsEffectDisplay.HEIGHT : 0) + PADDING,
                             Bottom = PADDING
                         },
                         RelativeSizeAxes = Axes.Both,
@@ -185,23 +185,9 @@ namespace osu.Game.Overlays.Mods
                 }
             });
 
-            if (ShowTotalMultiplier)
+            if (ShowModsEffects)
             {
-                MainAreaContent.Add(new FillFlowContainer
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.X,
-                    Direction = FillDirection.Horizontal,
-                    Height = ModsEffectDisplay.HEIGHT,
-                    Margin = new MarginPadding { Horizontal = 100 },
-                    Spacing = new Vector2(5, 0),
-                    Children = new Drawable[]
-                    {
-                        new BpmDisplay(),
-                        multiplierDisplay = new DifficultyMultiplierDisplay()
-                    }
-                });
+                MainAreaContent.Add(effectsContainer = new ModsEffectsFlow());
             }
 
             FooterContent.Child = footerButtonFlow = new FillFlowContainer<ShearedButton>
@@ -444,7 +430,7 @@ namespace osu.Game.Overlays.Mods
 
             base.PopIn();
 
-            multiplierDisplay?
+            effectsContainer?
                 .FadeIn(fade_in_duration, Easing.OutQuint)
                 .MoveToY(0, fade_in_duration, Easing.OutQuint);
 
@@ -502,7 +488,7 @@ namespace osu.Game.Overlays.Mods
 
             base.PopOut();
 
-            multiplierDisplay?
+            effectsContainer?
                 .FadeOut(fade_out_duration / 2, Easing.OutQuint)
                 .MoveToY(-distance, fade_out_duration / 2, Easing.OutQuint);
 

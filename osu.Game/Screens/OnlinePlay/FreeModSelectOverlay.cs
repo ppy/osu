@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay
 {
     public class FreeModSelectOverlay : ModSelectOverlay
     {
-        protected override bool ShowTotalMultiplier => false;
+        protected override bool ShowModsEffects => false;
 
         protected override bool AllowCustomisation => false;
 
