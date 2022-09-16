@@ -1041,7 +1041,7 @@ namespace osu.Game
 
             Logger.NewEntry += entry =>
             {
-                if (entry.Level < LogLevel.Important || entry.LoggerName != ITabletHandler.LOGGER_NAME)
+                if (entry.Level < LogLevel.Important || !entry.LoggerName.Equals(ITabletHandler.LOGGER_NAME, StringComparison.OrdinalIgnoreCase))
                     return;
 
                 if (entry.Level == LogLevel.Error)
