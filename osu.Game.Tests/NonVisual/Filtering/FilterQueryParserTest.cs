@@ -192,6 +192,16 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestPartialStatusMatch()
+        {
+            const string query = "status=r";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Min);
+            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Max);
+        }
+
+        [Test]
         public void TestApplyStatusQueries()
         {
             const string query = "I want the pp status=ranked";
