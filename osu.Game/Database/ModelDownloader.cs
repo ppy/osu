@@ -111,7 +111,7 @@ namespace osu.Game.Database
                 {
                     if (error is WebException webException && webException.Message == @"TooManyRequests")
                     {
-                        notification.Close();
+                        notification.Close(false);
                         PostNotification?.Invoke(new TooManyDownloadsNotification());
                     }
                     else

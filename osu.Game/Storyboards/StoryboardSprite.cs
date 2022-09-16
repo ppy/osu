@@ -54,6 +54,14 @@ namespace osu.Game.Storyboards
                         return firstAlpha.startTime;
                 }
 
+                return EarliestTransformTime;
+            }
+        }
+
+        public double EarliestTransformTime
+        {
+            get
+            {
                 // If we got to this point, either no alpha commands were present, or the earliest had a non-zero start value.
                 // The sprite's StartTime will be determined by the earliest command, regardless of type.
                 double earliestStartTime = TimelineGroup.StartTime;

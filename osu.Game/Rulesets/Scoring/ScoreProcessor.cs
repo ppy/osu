@@ -272,7 +272,24 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Computes the total score of a given finalised <see cref="ScoreInfo"/>. This should be used when a score is known to be complete.
+        /// Computes the accuracy of a given <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
+        /// <returns>The score's accuracy.</returns>
+        [Pure]
+        public double ComputeAccuracy(ScoreInfo scoreInfo)
+        {
+            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+
+            // We only extract scoring values from the score's statistics. This is because accuracy is always relative to the point of pass or fail rather than relative to the whole beatmap.
+            extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
+
+            return maximum.BaseScore > 0 ? current.BaseScore / maximum.BaseScore : 1;
+        }
+
+        /// <summary>
+        /// Computes the total score of a given <see cref="ScoreInfo"/>.
         /// </summary>
         /// <remarks>
         /// Does not require <see cref="JudgementProcessor.ApplyBeatmap"/> to have been called before use.
