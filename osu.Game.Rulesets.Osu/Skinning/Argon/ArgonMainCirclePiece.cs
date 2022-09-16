@@ -8,6 +8,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -32,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
+        private readonly FlashPiece flash;
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
@@ -82,6 +84,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     Y = -2,
                     Text = @"1",
                 },
+                flash = new FlashPiece(),
                 ring = new RingPiece(border_thickness),
             };
         }
@@ -104,6 +107,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 outerFill.Colour = innerFill.Colour = colour.NewValue.Darken(4);
                 outerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.1f));
                 innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
+                flash.Colour = colour.NewValue.Multiply(1f);
             }, true);
 
             indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
@@ -119,27 +123,37 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        const double fade_out_time = 600;
-                        const double flash_in = 200;
+                        const double fade_out_time = 800;
+                        const double flash_in = 150;
 
-                        number.FadeOut(flash_in / 4);
-
-                        outerGradient.ResizeTo(Size, fade_out_time / 2, Easing.OutQuint);
-                        outerGradient.FadeOut(flash_in);
-
-                        innerGradient.ResizeTo(Size, fade_out_time * 2, Easing.OutQuint);
-                        innerGradient.FadeOut(flash_in);
-
-                        innerFill.ResizeTo(Size, fade_out_time * 1.5, Easing.OutQuint);
-                        innerFill.FadeOut(flash_in);
+                        number.FadeOut(flash_in / 2);
 
                         outerFill.FadeOut(flash_in);
 
-                        ring.ResizeTo(Size + new Vector2(ring.BorderThickness * 1.5f), fade_out_time / 1.5f, Easing.OutQuint);
-                        ring.FadeOut(fade_out_time);
+                        ring.ResizeTo(Size - new Vector2(ring.BorderThickness * 1.5f), flash_in, Easing.OutQuint);
 
-                        using (BeginDelayedSequence(flash_in))
-                            this.FadeOut(fade_out_time, Easing.OutQuint);
+                        ring.TransformTo(nameof
+                            (BorderColour), ColourInfo.GradientVertical(
+                            accentColour.Value.Opacity(0.5f),
+                            accentColour.Value.Opacity(0)), fade_out_time);
+
+                        flash.FadeTo(1, flash_in * 2, Easing.OutQuint);
+
+                        using (BeginDelayedSequence(flash_in / 8))
+                        {
+                            outerGradient.ResizeTo(outerGradient.Size * 0.8f, flash_in, Easing.OutQuint);
+
+                            using (BeginDelayedSequence(flash_in / 8))
+                            {
+                                innerGradient.ResizeTo(innerGradient.Size * 0.8f, flash_in, Easing.OutQuint);
+                                innerFill.ResizeTo(innerFill.Size * 0.8f, flash_in, Easing.OutQuint);
+                            }
+                        }
+
+                        innerFill.FadeOut(flash_in, Easing.OutQuint);
+                        innerGradient.FadeOut(flash_in, Easing.OutQuint);
+
+                        this.FadeOut(fade_out_time, Easing.OutQuad);
 
                         break;
                 }
@@ -152,6 +166,34 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             if (drawableObject.IsNotNull())
                 drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
+        }
+
+        private class FlashPiece : Circle
+        {
+            public FlashPiece()
+            {
+                Size = new Vector2(OsuHitObject.OBJECT_RADIUS);
+
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+
+                Alpha = 0;
+                Blending = BlendingParameters.Additive;
+
+                Child.Alpha = 0;
+                Child.AlwaysPresent = true;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = Colour,
+                    Radius = OsuHitObject.OBJECT_RADIUS * 1.4f,
+                };
+            }
         }
     }
 }
