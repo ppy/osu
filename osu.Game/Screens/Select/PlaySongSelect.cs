@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -22,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public class PlaySongSelect : SongSelect, ILeaderboardScoreSource
+    public class PlaySongSelect : SongSelect
     {
         private OsuScreen? playerLoader;
 
@@ -111,14 +110,18 @@ namespace osu.Game.Screens.Select
 
             Player createPlayer()
             {
+                Player player;
+
                 var replayGeneratingMod = Mods.Value.OfType<ICreateReplayData>().FirstOrDefault();
 
                 if (replayGeneratingMod != null)
-                {
-                    return new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods));
-                }
+                    player = new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods));
+                else
+                    player = new SoloPlayer();
 
-                return new SoloPlayer();
+                ((IBindableList<ScoreInfo>)player.LeaderboardScores).BindTo(playBeatmapDetailArea.Leaderboard.Scores);
+
+                return player;
             }
         }
 
@@ -132,7 +135,5 @@ namespace osu.Game.Screens.Select
                 playerLoader = null;
             }
         }
-
-        IBindableList<ScoreInfo> ILeaderboardScoreSource.Scores => playBeatmapDetailArea.Leaderboard.Scores;
     }
 }

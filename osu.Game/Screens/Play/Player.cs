@@ -843,7 +843,12 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        protected virtual GameplayLeaderboard CreateGameplayLeaderboard() => new SoloGameplayLeaderboard(Score.ScoreInfo.User);
+        public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
+
+        protected virtual GameplayLeaderboard CreateGameplayLeaderboard() => new SoloGameplayLeaderboard(Score.ScoreInfo.User)
+        {
+            Scores = { BindTarget = LeaderboardScores }
+        };
 
         protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.LeaderboardFlow.Add(leaderboard);
 

@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -18,7 +17,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSoloGameplayLeaderboard : OsuTestScene, ILeaderboardScoreSource
+    public class TestSceneSoloGameplayLeaderboard : OsuTestScene
     {
         [Cached]
         private readonly ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
@@ -40,6 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 Child = new SoloGameplayLeaderboard(trackingUser)
                 {
+                    Scores = { BindTarget = scores },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Expanded = { Value = true },
@@ -56,8 +56,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddSliderStep("accuracy", 0f, 1f, 0.5f, v => scoreProcessor.Accuracy.Value = v);
             AddSliderStep("combo", 0, 1000, 0, v => scoreProcessor.Combo.Value = v);
         }
-
-        IBindableList<ScoreInfo> ILeaderboardScoreSource.Scores => scores;
 
         private static List<ScoreInfo> createSampleScores()
         {
