@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -104,7 +105,8 @@ namespace osu.Game.Overlays.Mods
 
         private readonly BindableBool customisationVisible = new BindableBool();
 
-        private ModSettingsArea modSettingsArea = null!;
+        private ModSettingsArea? modSettingsArea;
+        private Drawable? customisationArea;
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
@@ -137,13 +139,64 @@ namespace osu.Game.Overlays.Mods
                     HandleMouse = { BindTarget = customisationVisible },
                     OnClicked = () => customisationVisible.Value = false
                 },
-                modSettingsArea = new ModSettingsArea
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Height = 0
-                }
             });
+
+            if (AllowCustomisation)
+            {
+                if (ShowModsEffects)
+                {
+                    Add(customisationArea = new GridContainer()
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 0,
+                        RowDimensions = new[] { new Dimension(GridSizeMode.Absolute, 42), new Dimension() },
+                        Content = new[]
+                        {
+                            new Drawable[]
+                            {
+                                new Container()
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = ColourProvider.Dark3,
+                                        },
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = ModsEffectDisplay.HEIGHT - 14,
+                                            Colour = ColourProvider.Background5,
+                                        },
+                                        new ModsEffectsFlow()
+                                    }
+                                }
+                            },
+                            new Drawable[]
+                            {
+                                modSettingsArea = new ModSettingsArea
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(1),
+                                }
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    Add(customisationArea = modSettingsArea = new ModSettingsArea
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Height = 0
+                    });
+                }
+            }
 
             MainAreaContent.AddRange(new Drawable[]
             {
@@ -227,7 +280,7 @@ namespace osu.Game.Overlays.Mods
             // This is an optimisation to prevent refreshing the available settings controls when it can be
             // reasonably assumed that the settings panel is never to be displayed (e.g. FreeModSelectOverlay).
             if (AllowCustomisation)
-                ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
+                (modSettingsArea?.SelectedMods as IBindable<IReadOnlyList<Mod>>)?.BindTo(SelectedMods);
 
             SelectedMods.BindValueChanged(val =>
             {
@@ -366,7 +419,7 @@ namespace osu.Game.Overlays.Mods
 
             float modAreaHeight = customisationVisible.Value ? ModSettingsArea.HEIGHT : 0;
 
-            modSettingsArea.ResizeHeightTo(modAreaHeight, transition_duration, Easing.InOutCubic);
+            customisationArea?.ResizeHeightTo(modAreaHeight, transition_duration, Easing.InOutCubic);
             TopLevelContent.MoveToY(-modAreaHeight, transition_duration, Easing.InOutCubic);
         }
 
