@@ -29,12 +29,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTarget), typeof(OsuModStrictTracking) };
 
         [SettingSource("Beat divisor")]
-        public BindableFloat BeatDivisor { get; } = new BindableFloat(1)
-        {
-            MinValue = .25f,
-            MaxValue = 5,
-            Precision = .25f
-        };
+        public Bindable<BeatDivisor> Divisor { get; } = new Bindable<BeatDivisor>(BeatDivisor.Measure);
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -48,11 +43,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
             {
                 var lastTimingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime + 1);
+                // +1 is added due to First HitCircle in each measure not appearing appropriately without it
                 double controlPointDifference = obj.StartTime + 1 - lastTimingPoint.Time;
-                double remainder = controlPointDifference % (lastTimingPoint.BeatLength * BeatDivisor.Value);
+                double remainder = controlPointDifference % (lastTimingPoint.BeatLength * getMeasure(Divisor.Value));
 
                 double finalPreempt = obj.TimePreempt + remainder;
-                obj.TimePreempt = finalPreempt;
                 applyFadeInAdjustment(obj);
 
                 void applyFadeInAdjustment(OsuHitObject osuObject)
@@ -64,14 +59,41 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) { }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) { }
+
+        private float getMeasure(BeatDivisor divisor)
         {
+            switch (divisor)
+            {
+                case BeatDivisor.Quarter_Measure:
+                    return 0.25f;
+
+                case BeatDivisor.Half_Measure:
+                    return 0.5f;
+
+                case BeatDivisor.Measure:
+                    return 1;
+
+                case BeatDivisor.Double_Measure:
+                    return 2;
+
+                case BeatDivisor.Quadruple_Measure:
+                    return 4;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(divisor), divisor, null);
+            }
         }
 
-        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyFrozenState(hitObject, state);
-
-        private void applyFrozenState(DrawableHitObject drawableObject, ArmedState state)
+        public enum BeatDivisor
         {
+            Quarter_Measure,
+            Half_Measure,
+            Measure,
+            Double_Measure,
+            Quadruple_Measure
         }
     }
 }
