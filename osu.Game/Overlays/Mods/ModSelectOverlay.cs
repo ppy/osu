@@ -154,7 +154,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Padding = new MarginPadding
                         {
-                            Top = (ShowTotalMultiplier ? DifficultyMultiplierDisplay.HEIGHT : 0) + PADDING,
+                            Top = (ShowTotalMultiplier ? ModsEffectDisplay.HEIGHT : 0) + PADDING,
                             Bottom = PADDING
                         },
                         RelativeSizeAxes = Axes.Both,
@@ -193,7 +193,7 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.TopRight,
                     AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
-                    Height = DifficultyMultiplierDisplay.HEIGHT,
+                    Height = ModsEffectDisplay.HEIGHT,
                     Margin = new MarginPadding { Horizontal = 100 },
                     Spacing = new Vector2(5, 0),
                     Children = new Drawable[]

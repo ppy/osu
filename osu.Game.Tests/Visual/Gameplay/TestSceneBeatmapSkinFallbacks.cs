@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Add(expectedComponentsAdjustmentContainer);
             expectedComponentsAdjustmentContainer.UpdateSubTree();
             var expectedInfo = expectedComponentsContainer.CreateSkinnableInfo();
-            Remove(expectedComponentsAdjustmentContainer);
+            Remove(expectedComponentsAdjustmentContainer, true);
 
             return almostEqual(actualInfo, expectedInfo);
         }
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestOsuRuleset : OsuRuleset
         {
-            public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new TestOsuLegacySkinTransformer(skin);
+            public override ISkin CreateSkinTransformer(ISkin skin, IBeatmap beatmap) => new TestOsuLegacySkinTransformer(skin);
 
             private class TestOsuLegacySkinTransformer : OsuLegacySkinTransformer
             {

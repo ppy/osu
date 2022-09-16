@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual
             ISkin provider = skin;
 
             if (provider is LegacySkin legacyProvider)
-                provider = Ruleset.Value.CreateInstance().CreateLegacySkinProvider(legacyProvider, beatmap);
+                provider = Ruleset.Value.CreateInstance().CreateSkinTransformer(legacyProvider, beatmap);
 
             var children = new Container
             {

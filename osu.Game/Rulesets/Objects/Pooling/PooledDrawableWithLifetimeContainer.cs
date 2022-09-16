@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// <remarks>
         /// Invoked when the entry became dead.
         /// </remarks>
-        protected virtual void RemoveDrawable(TEntry entry, TDrawable drawable) => RemoveInternal(drawable);
+        protected virtual void RemoveDrawable(TEntry entry, TDrawable drawable) => RemoveInternal(drawable, false);
 
         private void entryCrossedBoundary(LifetimeEntry lifetimeEntry, LifetimeBoundaryKind kind, LifetimeBoundaryCrossingDirection direction)
         {

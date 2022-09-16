@@ -41,6 +41,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
             Anchor = Origin = Anchor.Centre;
 
+            // needed for touch input to work when card is not hovered/expanded
+            AlwaysPresent = true;
+
             Children = new Drawable[]
             {
                 icon = new SpriteIcon

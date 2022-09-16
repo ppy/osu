@@ -185,6 +185,12 @@ namespace osu.Game
 
         private RealmAccess realm;
 
+        /// <summary>
+        /// For now, this is used as a source specifically for beat synced components.
+        /// Going forward, it could potentially be used as the single source-of-truth for beatmap timing.
+        /// </summary>
+        private readonly FramedBeatmapClock beatmapClock = new FramedBeatmapClock(true);
+
         protected override Container<Drawable> Content => content;
 
         private Container content;
@@ -192,11 +198,6 @@ namespace osu.Game
         private DependencyContainer dependencies;
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(global_track_volume_adjust);
-
-        /// <summary>
-        /// A legacy EF context factory if migration has not been performed to realm yet.
-        /// </summary>
-        protected DatabaseContextFactory EFContextFactory { get; private set; }
 
         /// <summary>
         /// Number of unhandled exceptions to allow before aborting execution.
@@ -236,10 +237,7 @@ namespace osu.Game
 
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
-            if (Storage.Exists(DatabaseContextFactory.DATABASE_NAME))
-                dependencies.Cache(EFContextFactory = new DatabaseContextFactory(Storage));
-
-            dependencies.Cache(realm = new RealmAccess(Storage, CLIENT_DATABASE_FILENAME, Host.UpdateThread, EFContextFactory));
+            dependencies.Cache(realm = new RealmAccess(Storage, CLIENT_DATABASE_FILENAME, Host.UpdateThread));
 
             dependencies.CacheAs<RulesetStore>(RulesetStore = new RealmRulesetStore(realm, Storage));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
@@ -273,7 +271,7 @@ namespace osu.Game
             dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, API, difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, API, LocalConfig));
 
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
 
@@ -368,8 +366,22 @@ namespace osu.Game
             AddInternal(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);
 
+            MusicController.TrackChanged += onTrackChanged;
+            AddInternal(beatmapClock);
+
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
+        }
+
+        private void onTrackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction)
+        {
+            // FramedBeatmapClock uses a decoupled clock internally which will mutate the source if it is an `IAdjustableClock`.
+            // We don't want this for now, as the intention of beatmapClock is to be a read-only source for beat sync components.
+            //
+            // Encapsulating in a FramedClock will avoid any mutations.
+            var framedClock = new FramedClock(beatmap.Track);
+
+            beatmapClock.ChangeSource(framedClock);
         }
 
         protected virtual void InitialiseFonts()
@@ -587,7 +599,7 @@ namespace osu.Game
         }
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.BeatmapLoaded ? Beatmap.Value.Beatmap.ControlPointInfo : null;
-        IClock IBeatSyncProvider.Clock => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track : (IClock)null;
+        IClock IBeatSyncProvider.Clock => beatmapClock;
         ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
     }
 }

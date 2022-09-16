@@ -1,50 +1,48 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.UI;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Osu.Edit;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Replays;
-using osu.Game.Rulesets.Replays.Types;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
-using osu.Game.Rulesets.Osu.Scoring;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
-using osu.Game.Skinning;
-using System;
-using System.Linq;
-using osu.Framework.Extensions.EnumExtensions;
-using osu.Framework.Localisation;
+using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Setup;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu
 {
     public class OsuRuleset : Ruleset, ILegacyRuleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
 
@@ -53,6 +51,8 @@ namespace osu.Game.Rulesets.Osu
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
 
         public const string SHORT_NAME = "osu";
+
+        public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -231,13 +231,22 @@ namespace osu.Game.Rulesets.Osu
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new OsuLegacySkinTransformer(skin);
+        public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)
+        {
+            switch (skin)
+            {
+                case LegacySkin:
+                    return new OsuLegacySkinTransformer(skin);
+            }
+
+            return null;
+        }
 
         public int LegacyID => 0;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
-        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
+        public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
         protected override IEnumerable<HitResult> GetValidHitResults()
         {
