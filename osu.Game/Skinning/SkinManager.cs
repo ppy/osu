@@ -49,9 +49,9 @@ namespace osu.Game.Skinning
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
 
-        public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(Skinning.DefaultSkinTriangles.CreateInfo().ToLiveUnmanaged())
+        public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(TrianglesSkin.CreateInfo().ToLiveUnmanaged())
         {
-            Default = Skinning.DefaultSkinTriangles.CreateInfo().ToLiveUnmanaged()
+            Default = TrianglesSkin.CreateInfo().ToLiveUnmanaged()
         };
 
         private readonly SkinImporter skinImporter;
@@ -86,7 +86,7 @@ namespace osu.Game.Skinning
             var defaultSkins = new[]
             {
                 DefaultLegacySkin = new DefaultLegacySkin(this),
-                DefaultSkinTriangles = new DefaultSkinTriangles(this),
+                DefaultSkinTriangles = new TrianglesSkin(this),
             };
 
             // Ensure the default entries are present.
@@ -125,7 +125,7 @@ namespace osu.Game.Skinning
 
                 if (randomChoices.Length == 0)
                 {
-                    CurrentSkinInfo.Value = Skinning.DefaultSkinTriangles.CreateInfo().ToLiveUnmanaged();
+                    CurrentSkinInfo.Value = TrianglesSkin.CreateInfo().ToLiveUnmanaged();
                     return;
                 }
 
@@ -294,7 +294,7 @@ namespace osu.Game.Skinning
                 Guid currentUserSkin = CurrentSkinInfo.Value.ID;
 
                 if (items.Any(s => s.ID == currentUserSkin))
-                    scheduler.Add(() => CurrentSkinInfo.Value = Skinning.DefaultSkinTriangles.CreateInfo().ToLiveUnmanaged());
+                    scheduler.Add(() => CurrentSkinInfo.Value = TrianglesSkin.CreateInfo().ToLiveUnmanaged());
 
                 Delete(items.ToList(), silent);
             });

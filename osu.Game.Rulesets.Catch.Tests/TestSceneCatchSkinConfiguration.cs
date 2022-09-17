@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             });
         }
 
-        private class TestSkin : DefaultSkinTriangles
+        private class TestSkin : TrianglesSkin
         {
             public bool FlipCatcherPlate { get; set; }
 
