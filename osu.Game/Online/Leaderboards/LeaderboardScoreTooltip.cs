@@ -94,13 +94,11 @@ namespace osu.Game.Online.Leaderboards
                 }
             };
         }
-
-        private void updateDisplay()
+        protected override void LoadComplete()
         {
-            if (displayedScore != null)
-            {
-                timestampLabel.Text = prefer24HourTime.Value ? $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy HH:mm}" : $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy h:mm tt}";
-            }
+            base.LoadComplete();
+
+            prefer24HourTime.BindValueChanged(_ => updateTimestampLabel(), true);
         }
         private ScoreInfo? displayedScore;
 
@@ -111,7 +109,7 @@ namespace osu.Game.Online.Leaderboards
 
             displayedScore = score;
 
-            prefer24HourTime.BindValueChanged(_ => updateDisplay(), true);
+            updateTimestampLabel();
 
             modStatistics.Clear();
             topScoreStatistics.Clear();
@@ -128,6 +126,13 @@ namespace osu.Game.Online.Leaderboards
                     bottomScoreStatistics.Add(new HitResultCell(result));
                 else
                     topScoreStatistics.Add(new HitResultCell(result));
+            }
+        }
+        private void updateTimestampLabel()
+        {
+            if (displayedScore != null)
+            {
+                timestampLabel.Text = prefer24HourTime.Value ? $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy HH:mm}" : $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy h:mm tt}";
             }
         }
 
