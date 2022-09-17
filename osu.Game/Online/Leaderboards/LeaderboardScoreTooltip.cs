@@ -27,6 +27,7 @@ namespace osu.Game.Online.Leaderboards
         private FillFlowContainer<HitResultCell> bottomScoreStatistics = null!;
         private FillFlowContainer<ModCell> modStatistics = null!;
         private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
+
         public LeaderboardScoreTooltip()
         {
             AutoSizeAxes = Axes.Both;
@@ -94,12 +95,14 @@ namespace osu.Game.Online.Leaderboards
                 }
             };
         }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             prefer24HourTime.BindValueChanged(_ => updateTimestampLabel(), true);
         }
+
         private ScoreInfo? displayedScore;
 
         public void SetContent(ScoreInfo score)
@@ -128,11 +131,14 @@ namespace osu.Game.Online.Leaderboards
                     topScoreStatistics.Add(new HitResultCell(result));
             }
         }
+
         private void updateTimestampLabel()
         {
             if (displayedScore != null)
             {
-                timestampLabel.Text = prefer24HourTime.Value ? $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy HH:mm}" : $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy h:mm tt}";
+                timestampLabel.Text = prefer24HourTime.Value
+                    ? $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy HH:mm}"
+                    : $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy h:mm tt}";
             }
         }
 
