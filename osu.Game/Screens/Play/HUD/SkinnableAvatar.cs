@@ -15,10 +15,10 @@ namespace osu.Game.Screens.Play.HUD
     public class SkinnableAvatar : CompositeDrawable, ISkinnableDrawable
     {
         [SettingSource("Corner radius", "How much the edges should be rounded.")]
-        public new BindableFloat CornerRadius { get; set; } = new BindableFloat(0)
+        public new BindableFloat CornerRadius { get; set; } = new BindableFloat
         {
             MinValue = 0,
-            MaxValue = 100,
+            MaxValue = 63,
             Precision = 0.01f
         };
 
