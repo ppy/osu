@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play
 
         private ScheduledDelegate scheduledCreate;
 
-        private bool graphNeedsUpdate = false;
+        private bool graphNeedsUpdate;
 
         private Vector2 previousDrawSize;
 
