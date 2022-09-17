@@ -96,7 +96,6 @@ namespace osu.Game.Screens.Edit
             PlayableBeatmap.ControlPointInfo = ConvertControlPoints(PlayableBeatmap.ControlPointInfo);
 
             this.beatmapInfo = beatmapInfo ?? playableBeatmap.BeatmapInfo;
-            if (this.beatmapInfo.TimelineZoom <= 0) this.beatmapInfo.TimelineZoom = 1;
 
             if (beatmapSkin is Skin skin)
             {
