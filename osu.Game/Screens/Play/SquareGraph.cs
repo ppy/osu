@@ -78,11 +78,13 @@ namespace osu.Game.Screens.Play
         private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize);
         private ScheduledDelegate scheduledCreate;
 
+        private Vector2 previousDrawSize;
+
         protected override void Update()
         {
             base.Update();
 
-            if (values != null && !layout.IsValid)
+            if (values != null && !layout.IsValid && DrawSize != previousDrawSize)
             {
                 columns?.FadeOut(500, Easing.OutQuint).Expire();
 
@@ -90,6 +92,7 @@ namespace osu.Game.Screens.Play
                 scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
 
                 layout.Validate();
+                previousDrawSize = DrawSize;
             }
         }
 
