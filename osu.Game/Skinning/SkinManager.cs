@@ -59,14 +59,14 @@ namespace osu.Game.Skinning
         private readonly IResourceStore<byte[]> userFiles;
 
         /// <summary>
-        /// The default skin.
+        /// The default "triangles" skin.
         /// </summary>
         public Skin DefaultSkinTriangles { get; }
 
         /// <summary>
-        /// The default legacy skin.
+        /// The default "classic" skin.
         /// </summary>
-        public Skin DefaultLegacySkin { get; }
+        public Skin DefaultClassicSkin { get; }
 
         public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
             : base(storage, realm)
@@ -85,7 +85,7 @@ namespace osu.Game.Skinning
 
             var defaultSkins = new[]
             {
-                DefaultLegacySkin = new DefaultLegacySkin(this),
+                DefaultClassicSkin = new DefaultLegacySkin(this),
                 DefaultSkinTriangles = new TrianglesSkin(this),
             };
 
@@ -229,8 +229,8 @@ namespace osu.Game.Skinning
             {
                 yield return CurrentSkin.Value;
 
-                if (CurrentSkin.Value is LegacySkin && CurrentSkin.Value != DefaultLegacySkin)
-                    yield return DefaultLegacySkin;
+                if (CurrentSkin.Value is LegacySkin && CurrentSkin.Value != DefaultClassicSkin)
+                    yield return DefaultClassicSkin;
 
                 if (CurrentSkin.Value != DefaultSkinTriangles)
                     yield return DefaultSkinTriangles;
@@ -310,7 +310,7 @@ namespace osu.Game.Skinning
             if (skinInfo == null)
             {
                 if (guid == SkinInfo.CLASSIC_SKIN)
-                    skinInfo = DefaultLegacySkin.SkinInfo;
+                    skinInfo = DefaultClassicSkin.SkinInfo;
             }
 
             CurrentSkinInfo.Value = skinInfo ?? DefaultSkinTriangles.SkinInfo;
