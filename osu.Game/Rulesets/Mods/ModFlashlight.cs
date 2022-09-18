@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -132,13 +133,8 @@ namespace osu.Game.Rulesets.Mods
 
                 using (BeginAbsoluteSequence(0))
                 {
-                    foreach (var breakPeriod in Breaks)
+                    foreach (BreakPeriod breakPeriod in Breaks.Where(breakPeriod => breakPeriod.HasEffect && breakPeriod.Duration >= FLASHLIGHT_FADE_DURATION * 2))
                     {
-                        if (!breakPeriod.HasEffect)
-                            continue;
-
-                        if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
-
                         this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);
                         this.Delay(breakPeriod.EndTime - FLASHLIGHT_FADE_DURATION).FadeInFromZero(FLASHLIGHT_FADE_DURATION);
                     }
