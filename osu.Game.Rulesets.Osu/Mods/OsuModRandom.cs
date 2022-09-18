@@ -4,9 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -24,6 +27,26 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => "It never gets boring!";
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModTarget)).ToArray();
+
+        [SettingSource("Angle sharpness", "How sharp angles should be", SettingControlType = typeof(SettingsSlider<float>))]
+        public BindableFloat AngleSharpness { get; } = new BindableFloat
+        {
+            Default = 7,
+            Value = 7,
+            MinValue = 1,
+            MaxValue = 10,
+            Precision = 0.1f
+        };
+
+        [SettingSource("Angle variety", "The amount of variety in how sharp angles are", SettingControlType = typeof(SettingsSlider<float>))]
+        public BindableFloat AngleVariety { get; } = new BindableFloat
+        {
+            Default = 3,
+            Value = 3,
+            MinValue = 0,
+            MaxValue = 10,
+            Precision = 0.1f
+        };
 
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
@@ -50,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 if (shouldStartNewSection(osuBeatmap, positionInfos, i))
                 {
-                    sectionOffset = OsuHitObjectGenerationUtils.RandomGaussian(random, 0, 0.0008f);
+                    sectionOffset = getRandomOffset(0.0008f);
                     flowDirection = !flowDirection;
                 }
 
@@ -65,11 +88,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                     float flowChangeOffset = 0;
 
                     // Offsets only the angle of the current hit object.
-                    float oneTimeOffset = OsuHitObjectGenerationUtils.RandomGaussian(random, 0, 0.002f);
+                    float oneTimeOffset = getRandomOffset(0.002f);
 
                     if (shouldApplyFlowChange(positionInfos, i))
                     {
-                        flowChangeOffset = OsuHitObjectGenerationUtils.RandomGaussian(random, 0, 0.002f);
+                        flowChangeOffset = getRandomOffset(0.002f);
                         flowDirection = !flowDirection;
                     }
 
@@ -86,13 +109,32 @@ namespace osu.Game.Rulesets.Osu.Mods
             osuBeatmap.HitObjects = OsuHitObjectGenerationUtils.RepositionHitObjects(positionInfos);
         }
 
+        private float getRandomOffset(float stdDev)
+        {
+            float customMultiplier = AngleVariety.Value / AngleVariety.Default;
+            return OsuHitObjectGenerationUtils.RandomGaussian(random, 0, stdDev * customMultiplier);
+        }
+
         /// <param name="targetDistance">The target distance between the previous and the current <see cref="OsuHitObject"/>.</param>
         /// <param name="offset">The angle (in rad) by which the target angle should be offset.</param>
         /// <param name="flowDirection">Whether the relative angle should be positive or negative.</param>
-        private static float getRelativeTargetAngle(float targetDistance, float offset, bool flowDirection)
+        private float getRelativeTargetAngle(float targetDistance, float offset, bool flowDirection)
         {
-            float angle = (float)(2.16 / (1 + 200 * Math.Exp(0.036 * (targetDistance - 310))) + 0.5 + offset);
+            // Range 0..1
+            float angleSharpness = AngleSharpness.Value / AngleSharpness.MaxValue;
+            float angleWideness = 1 - angleSharpness;
+
+            // Range: -70..30
+            float customOffsetX = angleSharpness * 100 - 70;
+            // Range: -0.075..0.175
+            float customOffsetY = angleWideness * 0.25f - 0.075f;
+
+            targetDistance += customOffsetX;
+            float angle = (float)(2.16 / (1 + 200 * Math.Exp(0.036 * (targetDistance - 310 + customOffsetX))) + 0.5);
+            angle += offset + customOffsetY;
+
             float relativeAngle = (float)Math.PI - angle;
+
             return flowDirection ? -relativeAngle : relativeAngle;
         }
 
