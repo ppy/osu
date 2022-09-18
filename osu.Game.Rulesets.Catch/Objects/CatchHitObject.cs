@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         [JsonIgnore]
         public float X
         {
-            set => originalX.Value = value;
+            set => originalX.Value = Math.Clamp(value, 0, CatchPlayfield.WIDTH);
         }
 
         private HitObjectProperty<float> xOffset;
