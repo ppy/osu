@@ -87,6 +87,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (minimum > maximum)
                 throw new ArgumentException($"{nameof(minimum)} ({minimum}) must be less than {nameof(maximum)} ({maximum})");
 
+            if (initial < minimum || initial > maximum)
+                throw new ArgumentException($"{nameof(initial)} ({initial}) must be between {nameof(minimum)} ({minimum}) and {nameof(maximum)} ({maximum})");
+
             minZoom = minimum;
             maxZoom = maximum;
             CurrentZoom = zoomTarget = initial;
