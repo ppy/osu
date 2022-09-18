@@ -53,8 +53,8 @@ namespace osu.Game.Rulesets.Mods
         public const double FLASHLIGHT_FADE_DURATION = 800;
 
         private const int flashlight_size_decrease_combo = 100;
-        private const int last_flashlight_size_decrease_combo = 200;
-        private const float decrease_flashlight_with_combo_multiplier = 0.1f;
+        private const int flashlight_size_decrease_combo_max = 200;
+        private const float flashlight_size_decrease_with_combo_multiplier = 0.1f;
 
         protected readonly BindableInt Combo = new BindableInt();
 
@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Mods
 
                 using (BeginAbsoluteSequence(0))
                 {
-                    foreach (BreakPeriod breakPeriod in Breaks.Where(breakPeriod => breakPeriod.HasEffect && breakPeriod.Duration >= FLASHLIGHT_FADE_DURATION * 2))
+                    foreach (var breakPeriod in Breaks.Where(breakPeriod => breakPeriod.HasEffect && breakPeriod.Duration >= FLASHLIGHT_FADE_DURATION * 2))
                     {
                         this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);
                         this.Delay(breakPeriod.EndTime - FLASHLIGHT_FADE_DURATION).FadeInFromZero(FLASHLIGHT_FADE_DURATION);
@@ -148,12 +148,12 @@ namespace osu.Game.Rulesets.Mods
             protected float GetSizeFor(int combo)
             {
                 float size = defaultFlashlightSize * sizeMultiplier;
-                int comboForSize = Math.Min(combo, last_flashlight_size_decrease_combo);
+                int comboForSize = Math.Min(combo, flashlight_size_decrease_combo_max);
 
                 if (!comboBasedSize)
                     comboForSize = 0;
 
-                return size * (1 - decrease_flashlight_with_combo_multiplier * MathF.Floor(MathF.Min(comboForSize, last_flashlight_size_decrease_combo) / flashlight_size_decrease_combo));
+                return size * (1 - flashlight_size_decrease_with_combo_multiplier * MathF.Floor(MathF.Min(comboForSize, flashlight_size_decrease_combo_max) / flashlight_size_decrease_combo));
             }
 
             private Vector2 flashlightPosition;
