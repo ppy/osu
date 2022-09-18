@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Osu.Mods;
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
     public class TestSceneOsuModTransform : OsuModTestScene
-
     {
         [Test]
         public void TestRotateSetting()
@@ -36,4 +35,3 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         }
     }
 }
-
