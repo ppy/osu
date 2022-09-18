@@ -142,7 +142,6 @@ namespace osu.Game.Overlays.Notifications
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
                     attemptPostCompletion();
-                    base.Close(false);
                     break;
             }
         }
@@ -166,6 +165,8 @@ namespace osu.Game.Overlays.Notifications
 
             CompletionTarget.Invoke(CreateCompletionNotification());
             completionSent = true;
+
+            Close(false);
         }
 
         private ProgressNotificationState state;
@@ -239,6 +240,7 @@ namespace osu.Game.Overlays.Notifications
         {
             switch (State)
             {
+                case ProgressNotificationState.Completed:
                 case ProgressNotificationState.Cancelled:
                     base.Close(runFlingAnimation);
                     break;
