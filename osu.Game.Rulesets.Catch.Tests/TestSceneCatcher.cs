@@ -108,14 +108,14 @@ namespace osu.Game.Rulesets.Catch.Tests
             float halfWidth = Catcher.CalculateCatchWidth(new BeatmapDifficulty { CircleSize = 0 }) / 2;
             AddStep("catch fruit", () =>
             {
-                attemptCatch(new Fruit { X = -halfWidth + 1 });
-                attemptCatch(new Fruit { X = halfWidth - 1 });
+                attemptCatch(new Fruit { OriginalX = -halfWidth + 1 });
+                attemptCatch(new Fruit { OriginalX = halfWidth - 1 });
             });
             checkPlate(2);
             AddStep("miss fruit", () =>
             {
-                attemptCatch(new Fruit { X = -halfWidth - 1 });
-                attemptCatch(new Fruit { X = halfWidth + 1 });
+                attemptCatch(new Fruit { OriginalX = -halfWidth - 1 });
+                attemptCatch(new Fruit { OriginalX = halfWidth + 1 });
             });
             checkPlate(2);
         }
