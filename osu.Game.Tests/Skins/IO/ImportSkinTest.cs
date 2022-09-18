@@ -226,7 +226,7 @@ namespace osu.Game.Tests.Skins.IO
         {
             var skinManager = osu.Dependencies.Get<SkinManager>();
 
-            skinManager.CurrentSkinInfo.Value = skinManager.DefaultLegacySkin.SkinInfo;
+            skinManager.CurrentSkinInfo.Value = skinManager.DefaultClassicSkin.SkinInfo;
 
             skinManager.EnsureMutableSkin();
 
