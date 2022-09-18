@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -51,11 +50,6 @@ namespace osu.Game.Rulesets.Mods
         where T : HitObject
     {
         public const double FLASHLIGHT_FADE_DURATION = 800;
-
-        private const int flashlight_size_decrease_combo = 100;
-        private const int flashlight_size_decrease_combo_max = 200;
-        private const float flashlight_size_decrease_with_combo_multiplier = 0.1f;
-
         protected readonly BindableInt Combo = new BindableInt();
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
@@ -133,8 +127,13 @@ namespace osu.Game.Rulesets.Mods
 
                 using (BeginAbsoluteSequence(0))
                 {
-                    foreach (var breakPeriod in Breaks.Where(breakPeriod => breakPeriod.HasEffect && breakPeriod.Duration >= FLASHLIGHT_FADE_DURATION * 2))
+                    foreach (var breakPeriod in Breaks)
                     {
+                        if (!breakPeriod.HasEffect)
+                            continue;
+
+                        if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
+
                         this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);
                         this.Delay(breakPeriod.EndTime - FLASHLIGHT_FADE_DURATION).FadeInFromZero(FLASHLIGHT_FADE_DURATION);
                     }
@@ -150,7 +149,12 @@ namespace osu.Game.Rulesets.Mods
                 float size = defaultFlashlightSize * sizeMultiplier;
 
                 if (comboBasedSize)
-                    size *= 1 - flashlight_size_decrease_with_combo_multiplier * MathF.Floor(MathF.Min(combo, flashlight_size_decrease_combo_max) / flashlight_size_decrease_combo);
+                {
+                    if (combo > 200)
+                        size *= 0.8f;
+                    else if (combo > 100)
+                        size *= 0.9f;
+                }
 
                 return size;
             }
