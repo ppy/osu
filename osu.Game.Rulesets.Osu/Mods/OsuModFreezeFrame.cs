@@ -3,8 +3,8 @@
 
 using System;
 using System.Linq;
+using System.ComponentModel;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -20,17 +20,15 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Freeze Frame";
 
-        public override string Acronym => "FF";
+        public override string Acronym => "FR";
 
         public override double ScoreMultiplier => 1;
 
-        public override LocalisableString Description => "Burn the notes into your memory";
+        public override LocalisableString Description => "Burn the notes into your memory.";
 
         public override ModType Type => ModType.Fun;
 
-        public override IconUsage? Icon => FontAwesome.Solid.Camera;
-
-        [SettingSource("Measure", "How often the hit-circles should be Grouped to freeze")]
+        [SettingSource("Beat Divisor", "How often the hitobjects should be grouped according to BPM")]
         public Bindable<BeatDivisor> Divisor { get; } = new Bindable<BeatDivisor>(BeatDivisor.Single_Measure);
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
@@ -88,15 +86,22 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        //Todo: find better way to represent these Enums to the player
         public enum BeatDivisor
         {
+            [Description("1/4")]
             Quarter_Measure,
+
+            [Description("1/2")]
             Half_Measure,
+
+            [Description("1")]
             Single_Measure,
+
+            [Description("2")]
             Double_Measure,
+
+            [Description("4")]
             Quadruple_Measure
         }
     }
 }
-
