@@ -20,11 +20,12 @@ using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler
+    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachHUDPieces, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
         public readonly KeyBindingContainer<T> KeyBindingContainer;
@@ -168,7 +169,7 @@ namespace osu.Game.Rulesets.UI
                                                    .Select(action => new KeyCounterAction<T>(action)));
         }
 
-        public class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
+        private class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
         {
             public ActionReceptor(KeyCounterDisplay target)
                 : base(target)
@@ -181,6 +182,37 @@ namespace osu.Game.Rulesets.UI
             {
                 foreach (var c in Target.Children.OfType<KeyCounterAction<T>>())
                     c.OnReleased(e.Action, Clock.Rate >= 0);
+            }
+        }
+
+        #endregion
+
+        #region Keys per second Counter Attachment
+
+        public void Attach(ClicksPerSecondCalculator calculator)
+        {
+            var listener = new ActionListener(calculator);
+
+            KeyBindingContainer.Add(listener);
+        }
+
+        private class ActionListener : Component, IKeyBindingHandler<T>
+        {
+            private readonly ClicksPerSecondCalculator calculator;
+
+            public ActionListener(ClicksPerSecondCalculator calculator)
+            {
+                this.calculator = calculator;
+            }
+
+            public bool OnPressed(KeyBindingPressEvent<T> e)
+            {
+                calculator.AddInputTimestamp();
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<T> e)
+            {
             }
         }
 
@@ -221,12 +253,13 @@ namespace osu.Game.Rulesets.UI
     }
 
     /// <summary>
-    /// Supports attaching a <see cref="KeyCounterDisplay"/>.
+    /// Supports attaching various HUD pieces.
     /// Keys will be populated automatically and a receptor will be injected inside.
     /// </summary>
-    public interface ICanAttachKeyCounter
+    public interface ICanAttachHUDPieces
     {
         void Attach(KeyCounterDisplay keyCounter);
+        void Attach(ClicksPerSecondCalculator calculator);
     }
 
     public class RulesetInputManagerInputState<T> : InputState

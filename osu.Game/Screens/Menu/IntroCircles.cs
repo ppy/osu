@@ -19,8 +19,9 @@ namespace osu.Game.Screens.Menu
 
         protected override string BeatmapFile => "circles.osz";
 
-        private const double delay_step_one = 2300;
-        private const double delay_step_two = 600;
+        public const double TRACK_START_DELAY = 600;
+
+        private const double delay_for_menu = 2900;
 
         private Sample welcome;
 
@@ -50,8 +51,8 @@ namespace osu.Game.Screens.Menu
 
                     PrepareMenuLoad();
 
-                    Scheduler.AddDelayed(LoadMenu, delay_step_one);
-                }, delay_step_two);
+                    Scheduler.AddDelayed(LoadMenu, delay_for_menu - TRACK_START_DELAY);
+                }, TRACK_START_DELAY);
 
                 logo.ScaleTo(1);
                 logo.FadeIn();

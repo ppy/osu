@@ -94,6 +94,7 @@ namespace osu.Game.Beatmaps
 
             var beatmapSet = new BeatmapSetInfo
             {
+                DateAdded = DateTimeOffset.UtcNow,
                 Beatmaps =
                 {
                     new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata)
@@ -313,12 +314,12 @@ namespace osu.Game.Beatmaps
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
+                beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
                 beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
-                setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
-                setInfo.Status = BeatmapOnlineStatus.LocallyModified;
+                updateHashAndMarkDirty(setInfo);
 
                 Realm.Write(r =>
                 {
@@ -358,6 +359,33 @@ namespace osu.Game.Beatmaps
                     items = items.Where(filter);
 
                 Delete(items.ToList(), silent);
+            });
+        }
+
+        /// <summary>
+        /// Delete a beatmap difficulty immediately.
+        /// </summary>
+        /// <remarks>
+        /// There's no undoing this operation, as we don't have a soft-deletion flag on <see cref="BeatmapInfo"/>.
+        /// This may be a future consideration if there's a user requirement for undeleting support.
+        /// </remarks>
+        public void DeleteDifficultyImmediately(BeatmapInfo beatmapInfo)
+        {
+            Realm.Write(r =>
+            {
+                if (!beatmapInfo.IsManaged)
+                    beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+
+                Debug.Assert(beatmapInfo.BeatmapSet != null);
+                Debug.Assert(beatmapInfo.File != null);
+
+                var setInfo = beatmapInfo.BeatmapSet;
+
+                DeleteFile(setInfo, beatmapInfo.File);
+                setInfo.Beatmaps.Remove(beatmapInfo);
+
+                updateHashAndMarkDirty(setInfo);
+                workingBeatmapCache.Invalidate(setInfo);
             });
         }
 
@@ -413,6 +441,12 @@ namespace osu.Game.Beatmaps
 
         public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
             beatmapImporter.ImportAsUpdate(notification, importTask, original);
+
+        private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
+        {
+            setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
+            setInfo.Status = BeatmapOnlineStatus.LocallyModified;
+        }
 
         #region Implementation of ICanAcceptFiles
 

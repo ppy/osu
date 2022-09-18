@@ -80,14 +80,14 @@ namespace osu.Game.Tests.Visual.Gameplay
                     (typeof(ScoreProcessor), actualComponentsContainer.Dependencies.Get<ScoreProcessor>()),
                     (typeof(HealthProcessor), actualComponentsContainer.Dependencies.Get<HealthProcessor>()),
                     (typeof(GameplayState), actualComponentsContainer.Dependencies.Get<GameplayState>()),
-                    (typeof(GameplayClock), actualComponentsContainer.Dependencies.Get<GameplayClock>())
+                    (typeof(IGameplayClock), actualComponentsContainer.Dependencies.Get<IGameplayClock>())
                 },
             };
 
             Add(expectedComponentsAdjustmentContainer);
             expectedComponentsAdjustmentContainer.UpdateSubTree();
             var expectedInfo = expectedComponentsContainer.CreateSkinnableInfo();
-            Remove(expectedComponentsAdjustmentContainer);
+            Remove(expectedComponentsAdjustmentContainer, true);
 
             return almostEqual(actualInfo, expectedInfo);
         }
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestOsuRuleset : OsuRuleset
         {
-            public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new TestOsuLegacySkinTransformer(skin);
+            public override ISkin CreateSkinTransformer(ISkin skin, IBeatmap beatmap) => new TestOsuLegacySkinTransformer(skin);
 
             private class TestOsuLegacySkinTransformer : OsuLegacySkinTransformer
             {

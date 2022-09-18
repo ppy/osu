@@ -4,10 +4,8 @@
 #nullable disable
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
@@ -31,6 +29,12 @@ namespace osu.Game.Configuration
     [ExcludeFromDynamicCompile]
     public class OsuConfigManager : IniConfigManager<OsuSetting>
     {
+        public OsuConfigManager(Storage storage)
+            : base(storage)
+        {
+            Migrate();
+        }
+
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
@@ -172,24 +176,15 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
         }
 
-        public IDictionary<OsuSetting, string> GetLoggableState() =>
-            new Dictionary<OsuSetting, string>(ConfigStore.Where(kvp => !keyContainsPrivateInformation(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString()));
-
-        private static bool keyContainsPrivateInformation(OsuSetting argKey)
+        protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
         {
-            switch (argKey)
+            switch (lookup)
             {
                 case OsuSetting.Token:
                     return true;
             }
 
             return false;
-        }
-
-        public OsuConfigManager(Storage storage)
-            : base(storage)
-        {
-            Migrate();
         }
 
         public void Migrate()

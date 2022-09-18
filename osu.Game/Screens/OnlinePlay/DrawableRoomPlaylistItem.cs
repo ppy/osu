@@ -561,6 +561,10 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 switch (state.NewValue)
                 {
+                    case DownloadState.Unknown:
+                        // Ignore initial state to ensure the button doesn't briefly appear.
+                        break;
+
                     case DownloadState.LocallyAvailable:
                         // Perform a local query of the beatmap by beatmap checksum, and reset the state if not matching.
                         if (beatmapManager.QueryBeatmap(b => b.MD5Hash == beatmap.MD5Hash) == null)

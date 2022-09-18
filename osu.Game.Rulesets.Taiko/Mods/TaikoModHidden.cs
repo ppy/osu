@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModHidden : ModHidden, IApplicableToDrawableRuleset<TaikoHitObject>
     {
-        public override string Description => @"Beats fade out before you hit them!";
+        public override LocalisableString Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
         /// <summary>
