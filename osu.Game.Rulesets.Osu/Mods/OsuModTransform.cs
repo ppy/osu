@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 default:
                     var h = (OsuHitObject)drawable.HitObject;
-                    float appearDistance = (float)(h.TimePreempt - h.TimeFadeIn) / 2;
+                    float appearDistance = (float)(h.TimePreempt - h.TimeFadeIn);
 
                     Vector2 originalPosition = drawable.Position;
                     Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
