@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Notes per second for single tap", "The maximum number of notes per second that you want to be forced to single tap.")]
         public IBindable<int> SingleTapNotesPerSecond { get; } = new NotesPerSecondSetting();
 
-        protected override bool CheckValidNewAction(OsuAction action) => LastAcceptedAction == null || LastAcceptedAction == action || NotesPerSecond > SingleTapNotesPerSecond.Value;
+        protected override bool CheckValidNewAction(OsuAction action) =>
+            LastAcceptedAction == null || LastAcceptedAction == action || (!SingleTapNotesPerSecond.IsDefault && NotesPerSecond > SingleTapNotesPerSecond.Value);
     }
 }
