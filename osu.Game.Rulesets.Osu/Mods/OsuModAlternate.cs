@@ -3,8 +3,10 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -16,6 +18,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModSingleTap) }).ToArray();
 
-        protected override bool CheckValidNewAction(OsuAction action) => LastAcceptedAction != action;
+        [SettingSource("Notes per second for alternating", "The minimal number of notes per second that you want to be forced to alternate.")]
+        public IBindable<int> AlternateNotesPerSecond { get; } = new NotesPerSecondSetting();
+
+        protected override bool CheckValidNewAction(OsuAction action) => LastAcceptedAction != action || NotesPerSecond < AlternateNotesPerSecond.Value;
     }
 }
