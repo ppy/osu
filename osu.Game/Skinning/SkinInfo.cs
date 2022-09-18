@@ -53,7 +53,8 @@ namespace osu.Game.Skinning
             }
             catch
             {
-                // This defaults to triangles to catch the case where a user has a modified triangles skin.
+                // Since the class was renamed from "DefaultSkin" to "TrianglesSkin", the instantiation would fail
+                // for user modified skins. This aims to amicably handle that.
                 // If we ever add more default skins in the future this will need some kind of proper migration rather than
                 // a single catch.
                 return new TrianglesSkin(this, resources);
