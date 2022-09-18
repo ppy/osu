@@ -50,6 +50,11 @@ namespace osu.Game.Rulesets.Mods
         where T : HitObject
     {
         public const double FLASHLIGHT_FADE_DURATION = 800;
+
+        private const int flashlight_size_decrease_combo = 100;
+        private const int last_flashlight_size_decrease_combo = 200;
+        private const float decrease_flashlight_with_combo_multiplier = 0.1f;
+
         protected readonly BindableInt Combo = new BindableInt();
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
@@ -147,16 +152,12 @@ namespace osu.Game.Rulesets.Mods
             protected float GetSizeFor(int combo)
             {
                 float size = defaultFlashlightSize * sizeMultiplier;
+                int comboForSize = Math.Min(combo, last_flashlight_size_decrease_combo);
 
-                if (comboBasedSize)
-                {
-                    if (combo > 200)
-                        size *= 0.8f;
-                    else if (combo > 100)
-                        size *= 0.9f;
-                }
+                if (!comboBasedSize)
+                    comboForSize = 0;
 
-                return size;
+                return size * (1 - decrease_flashlight_with_combo_multiplier * MathF.Floor(MathF.Min(comboForSize, last_flashlight_size_decrease_combo) / flashlight_size_decrease_combo));
             }
 
             private Vector2 flashlightPosition;
