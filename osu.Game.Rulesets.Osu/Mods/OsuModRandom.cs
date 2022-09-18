@@ -120,13 +120,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="flowDirection">Whether the relative angle should be positive or negative.</param>
         private float getRelativeTargetAngle(float targetDistance, float offset, bool flowDirection)
         {
-            // Range 0..1
+            // Range [0.1;1]
             float angleSharpness = AngleSharpness.Value / AngleSharpness.MaxValue;
+            // Range [0;0.9]
             float angleWideness = 1 - angleSharpness;
 
-            // Range: -70..30
+            // Range: [-60;30]
             float customOffsetX = angleSharpness * 100 - 70;
-            // Range: -0.075..0.175
+            // Range: [-0.075;0.15]
             float customOffsetY = angleWideness * 0.25f - 0.075f;
 
             targetDistance += customOffsetX;
