@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -18,7 +19,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public abstract class InputBlockingMod : Mod, IApplicableToDrawableRuleset<OsuHitObject>
+    public abstract class InputBlockingMod : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IUpdatableByPlayfield
     {
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(OsuModCinema) };
@@ -27,6 +28,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double flash_duration = 1000;
 
         private DrawableRuleset<OsuHitObject> ruleset = null!;
+
+        /// <summary>
+        /// The current number of notes on the second of the current time frame.
+        /// </summary>
+        protected int NotesPerSecond;
 
         protected OsuAction? LastAcceptedAction { get; private set; }
 
@@ -60,6 +66,14 @@ namespace osu.Game.Rulesets.Osu.Mods
             nonGameplayPeriods = new PeriodTracker(periods);
 
             gameplayClock = drawableRuleset.FrameStableClock;
+        }
+
+        public void Update(Playfield playfield)
+        {
+            var hitCircles = playfield.HitObjectContainer.Objects.Select(drawable => drawable.HitObject).OfType<HitCircle>();
+            var hitTimes = hitCircles.Select(ho => ho.StartTime);
+
+            NotesPerSecond = hitTimes.Count(time => time >= playfield.Clock.CurrentTime && time <= playfield.Clock.CurrentTime + 1e3);
         }
 
         protected abstract bool CheckValidNewAction(OsuAction action);
@@ -108,6 +122,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
+            }
+        }
+
+        protected class NotesPerSecondSetting : BindableInt
+        {
+            public NotesPerSecondSetting()
+            {
+                MinValue = 0;
+                MaxValue = 16;
             }
         }
     }
