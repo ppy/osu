@@ -39,6 +39,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                         case OsuSkinComponents.SliderScorePoint:
                             return new ArgonSliderScorePoint();
+
+                        case OsuSkinComponents.ReverseArrow:
+                            return new ArgonReverseArrow();
                     }
 
                     break;
