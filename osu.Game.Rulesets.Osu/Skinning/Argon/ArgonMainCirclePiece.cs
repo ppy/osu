@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         public const float OUTER_GRADIENT_SIZE = OsuHitObject.OBJECT_RADIUS * 2 - BORDER_THICKNESS * 3;
 
+        private readonly Circle outerFill;
         private readonly Circle outerGradient;
         private readonly Circle innerGradient;
         private readonly Circle innerFill;
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
 
-        public ArgonMainCirclePiece()
+        public ArgonMainCirclePiece(bool withOuterFill)
         {
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
@@ -52,6 +53,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             InternalChildren = new Drawable[]
             {
+                outerFill = new Circle // renders white outer border and dark fill
+                {
+                    Size = Size,
+                    Alpha = withOuterFill ? 1 : 0,
+                },
                 outerGradient = new Circle // renders the outer bright gradient
                 {
                     Size = new Vector2(OUTER_GRADIENT_SIZE),
@@ -101,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             accentColour.BindValueChanged(colour =>
             {
-                innerFill.Colour = colour.NewValue.Darken(4);
+                outerFill.Colour = innerFill.Colour = colour.NewValue.Darken(4);
                 outerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.1f));
                 innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
                 flash.Colour = colour.NewValue;
@@ -134,6 +140,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                         // The fill layers add too much noise during the explosion animation.
                         // They will be hidden by the additive effects anyway.
+                        outerFill.FadeOut(flash_in_duration, Easing.OutQuint);
                         innerFill.FadeOut(flash_in_duration, Easing.OutQuint);
 
                         // The inner-most gradient should actually be resizing, but is only visible for
