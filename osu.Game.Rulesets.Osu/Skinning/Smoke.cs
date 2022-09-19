@@ -42,21 +42,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
             }
         }
 
-        private int rotationSeed = RNG.Next();
-
-        protected int RotationSeed
-        {
-            get => rotationSeed;
-            set
-            {
-                if (rotationSeed == value)
-                    return;
-
-                rotationSeed = value;
-                Invalidate(Invalidation.DrawNode);
-            }
-        }
-
         private Texture? texture;
 
         protected Texture? Texture
@@ -195,6 +180,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
             SmokeStartTime = Time.Current;
         }
 
+        private Vector2 nextPointDirection()
+        {
+            float angle = RNG.NextSingle(0, 2 * MathF.PI);
+            return new Vector2(MathF.Sin(angle), -MathF.Cos(angle));
+        }
+
         private void onSmokeMoved(Vector2 position, double time)
         {
             if (!IsActive)
@@ -229,6 +220,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     {
                         Position = pointPos,
                         Time = time,
+                        Direction = nextPointDirection(),
                     });
 
                     pointPos += increment;
@@ -303,6 +295,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             public Vector2 Position;
             public double Time;
+            public Vector2 Direction;
 
             public struct UpperBoundComparer : IComparer<SmokePoint>
             {
@@ -339,9 +332,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             private IFrameBasedClock? clock;
 
-            private int rotationSeed;
-            private Random rotationRNG = new Random();
-
             protected SmokeDrawNode(ITexturedShaderDrawable source)
                 : base(source)
             {
@@ -362,8 +352,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 SmokeStartTime = Source.SmokeStartTime;
                 SmokeEndTime = Source.SmokeEndTime;
-
-                rotationSeed = Source.RotationSeed;
             }
 
             public sealed override void Draw(IRenderer renderer)
@@ -377,6 +365,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 Texture ??= renderer.WhitePixel;
 
                 var shader = GetAppropriateShader(renderer);
+
+                renderer.SetBlend(BlendingParameters.Additive);
+
                 shader.Bind();
                 Texture.Bind();
 
@@ -390,7 +381,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 ? ((SRGBColour)DrawColourInfo.Colour).Linear
                 : DrawColourInfo.Colour.Interpolate(Vector2.Divide(localPos, DrawSize)).Linear;
 
-            protected abstract Color4 ColorAtTime(double pointTime);
+            protected abstract Color4 PointColor(SmokePoint point);
+
+            protected abstract float PointScale(SmokePoint point);
+
+            protected abstract Vector2 PointDirection(SmokePoint point);
 
             protected virtual void UpdateDrawVariables(IRenderer renderer)
             {
@@ -399,7 +394,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 CurrentTime = clock.CurrentTime;
                 TextureRect = Texture.GetTextureRect();
-                rotationRNG = new Random(rotationSeed);
             }
 
             protected virtual void UpdateVertexBuffer()
@@ -408,24 +402,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     drawPointQuad(point);
             }
 
-            private Vector2 nextTextureDirection()
-            {
-                float angle = (float)rotationRNG.NextDouble() * 2 * MathF.PI;
-                return new Vector2(MathF.Sin(angle), -MathF.Cos(angle));
-            }
-
             private void drawPointQuad(SmokePoint point)
             {
                 Debug.Assert(QuadBatch != null);
 
-                var color = ColorAtTime(point.Time);
-                var dir = nextTextureDirection();
+                var color = PointColor(point);
+                float scale = PointScale(point);
+                var dir = PointDirection(point);
                 var ortho = dir.PerpendicularLeft;
 
-                var localTopLeft = point.Position + (Radius * (-ortho - dir)) - PositionOffset;
-                var localTopRight = point.Position + (Radius * (-ortho + dir)) - PositionOffset;
-                var localBotLeft = point.Position + (Radius * (ortho - dir)) - PositionOffset;
-                var localBotRight = point.Position + (Radius * (ortho + dir)) - PositionOffset;
+                var localTopLeft = point.Position + (Radius * scale * (-ortho - dir)) - PositionOffset;
+                var localTopRight = point.Position + (Radius * scale * (-ortho + dir)) - PositionOffset;
+                var localBotLeft = point.Position + (Radius * scale * (ortho - dir)) - PositionOffset;
+                var localBotRight = point.Position + (Radius * scale * (ortho + dir)) - PositionOffset;
 
                 QuadBatch.Add(new TexturedVertex2D
                 {
