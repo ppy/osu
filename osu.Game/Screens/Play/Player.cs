@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -832,23 +833,24 @@ namespace osu.Game.Screens.Play
             HUDOverlay.HoldingForHUD.BindValueChanged(_ => updateLeaderboardExpandedState());
             LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
 
-            LoadComponentAsync(CreateGameplayLeaderboard(), leaderboard =>
+            var gameplayLeaderboard = CreateGameplayLeaderboard();
+
+            if (gameplayLeaderboard != null)
             {
-                if (!LoadedBeatmapSuccessfully)
-                    return;
+                LoadComponentAsync(gameplayLeaderboard, leaderboard =>
+                {
+                    if (!LoadedBeatmapSuccessfully)
+                        return;
 
-                leaderboard.Expanded.BindTo(LeaderboardExpandedState);
+                    leaderboard.Expanded.BindTo(LeaderboardExpandedState);
 
-                AddLeaderboardToHUD(leaderboard);
-            });
+                    AddLeaderboardToHUD(leaderboard);
+                });
+            }
         }
 
-        public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
-
-        protected virtual GameplayLeaderboard CreateGameplayLeaderboard() => new SoloGameplayLeaderboard(Score.ScoreInfo.User)
-        {
-            Scores = { BindTarget = LeaderboardScores }
-        };
+        [CanBeNull]
+        protected virtual GameplayLeaderboard CreateGameplayLeaderboard() => null;
 
         protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.LeaderboardFlow.Add(leaderboard);
 

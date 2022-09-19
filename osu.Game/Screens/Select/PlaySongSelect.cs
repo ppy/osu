@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
@@ -115,11 +114,19 @@ namespace osu.Game.Screens.Select
                 var replayGeneratingMod = Mods.Value.OfType<ICreateReplayData>().FirstOrDefault();
 
                 if (replayGeneratingMod != null)
-                    player = new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods));
+                {
+                    player = new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))
+                    {
+                        LeaderboardScores = { BindTarget = playBeatmapDetailArea.Leaderboard.Scores }
+                    };
+                }
                 else
-                    player = new SoloPlayer();
-
-                ((IBindableList<ScoreInfo>)player.LeaderboardScores).BindTo(playBeatmapDetailArea.Leaderboard.Scores);
+                {
+                    player = new SoloPlayer
+                    {
+                        LeaderboardScores = { BindTarget = playBeatmapDetailArea.Leaderboard.Scores }
+                    };
+                }
 
                 return player;
             }
