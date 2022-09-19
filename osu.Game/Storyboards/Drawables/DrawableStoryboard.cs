@@ -85,7 +85,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock, CancellationToken? cancellationToken, GameHost host, RealmAccess realm)
+        private void load(IGameplayClock clock, CancellationToken? cancellationToken, GameHost host, RealmAccess realm)
         {
             if (clock != null)
                 Clock = clock;

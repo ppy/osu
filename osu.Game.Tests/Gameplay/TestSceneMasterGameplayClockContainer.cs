@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Gameplay
             });
 
             AddStep("start clock", () => gameplayClockContainer.Start());
-            AddUntilStep("elapsed greater than zero", () => gameplayClockContainer.GameplayClock.ElapsedFrameTime > 0);
+            AddUntilStep("elapsed greater than zero", () => gameplayClockContainer.ElapsedFrameTime > 0);
         }
 
         [Test]
@@ -60,16 +60,16 @@ namespace osu.Game.Tests.Gameplay
             });
 
             AddStep("start clock", () => gameplayClockContainer.Start());
-            AddUntilStep("current time greater 2000", () => gameplayClockContainer.GameplayClock.CurrentTime > 2000);
+            AddUntilStep("current time greater 2000", () => gameplayClockContainer.CurrentTime > 2000);
 
             double timeAtReset = 0;
             AddStep("reset clock", () =>
             {
-                timeAtReset = gameplayClockContainer.GameplayClock.CurrentTime;
+                timeAtReset = gameplayClockContainer.CurrentTime;
                 gameplayClockContainer.Reset();
             });
 
-            AddAssert("current time < time at reset", () => gameplayClockContainer.GameplayClock.CurrentTime < timeAtReset);
+            AddAssert("current time < time at reset", () => gameplayClockContainer.CurrentTime < timeAtReset);
         }
 
         [Test]

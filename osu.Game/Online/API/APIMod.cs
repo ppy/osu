@@ -48,7 +48,7 @@ namespace osu.Game.Online.API
 
         public Mod ToMod(Ruleset ruleset)
         {
-            Mod resultMod = ruleset.CreateModFromAcronym(Acronym);
+            Mod? resultMod = ruleset.CreateModFromAcronym(Acronym);
 
             if (resultMod == null)
             {

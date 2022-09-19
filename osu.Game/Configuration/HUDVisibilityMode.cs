@@ -3,17 +3,20 @@
 
 #nullable disable
 
-using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Configuration
 {
     public enum HUDVisibilityMode
     {
+        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.NeverShowHUD))]
         Never,
 
-        [Description("Hide during gameplay")]
+        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.HideDuringGameplay))]
         HideDuringGameplay,
 
+        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.AlwaysShowHUD))]
         Always
     }
 }
