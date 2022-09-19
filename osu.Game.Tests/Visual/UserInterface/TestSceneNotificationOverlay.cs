@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 displayedCount = new OsuSpriteText()
             };
 
-            notificationOverlay.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count.NewValue}"; };
+            notificationOverlay.UnreadCount.ValueChanged += count => { displayedCount.Text = $"unread count: {count.NewValue}"; };
         });
 
         [Test]
@@ -270,6 +270,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait completion", () => notification.State == ProgressNotificationState.Completed);
 
             AddAssert("Completion toast shown", () => notificationOverlay.ToastCount == 1);
+            AddUntilStep("wait forwarded", () => notificationOverlay.ToastCount == 0);
+            AddAssert("only one unread", () => notificationOverlay.UnreadCount.Value == 1);
         }
 
         [Test]
