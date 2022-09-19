@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -265,10 +264,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
             IsActive = false;
             SmokeEndTime = time;
             LifetimeEnd = time + LifetimeAfterSmokeEnd + 100;
-
-            // TODO: HYPER MEGA JANK WTF??
-            if (Parent is SkinnableDrawable)
-                Parent.LifetimeEnd = LifetimeEnd;
         }
 
         protected abstract override DrawNode CreateDrawNode();
