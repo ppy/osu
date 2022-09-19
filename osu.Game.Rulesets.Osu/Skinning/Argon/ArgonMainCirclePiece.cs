@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private readonly Circle innerGradient;
         private readonly Circle innerFill;
 
-        private readonly RingPiece ring;
+        private readonly RingPiece border;
         private readonly OsuSpriteText number;
 
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     Text = @"1",
                 },
                 flash = new FlashPiece(),
-                ring = new RingPiece(border_thickness),
+                border = new RingPiece(border_thickness),
             };
         }
 
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 outerFill.Colour = innerFill.Colour = colour.NewValue.Darken(4);
                 outerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.1f));
                 innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
-                flash.Colour = colour.NewValue.Multiply(1f);
+                flash.Colour = colour.NewValue;
             }, true);
 
             indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
@@ -123,38 +123,51 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 switch (state)
                 {
                     case ArmedState.Hit:
+                        // Fade out time is at a maximum of 800. Must match `DrawableHitCircle`'s arbitrary lifetime spec.
                         const double fade_out_time = 800;
-                        const double flash_in = 150;
 
-                        number.FadeOut(flash_in / 2);
+                        const double flash_in_duration = 150;
+                        const double resize_duration = 300;
 
-                        outerFill.FadeOut(flash_in);
+                        const float shrink_size = 0.8f;
 
-                        ring.ResizeTo(Size - new Vector2(ring.BorderThickness * 1.5f), flash_in, Easing.OutQuint);
+                        // Animating with the number present is distracting.
+                        // The number disappearing is hidden by the bright flash.
+                        number.FadeOut(flash_in_duration / 2);
 
-                        ring.TransformTo(nameof
+                        // The fill layers add too much noise during the explosion animation.
+                        // They will be hidden by the additive effects anyway.
+                        outerFill.FadeOut(flash_in_duration, Easing.OutQuint);
+                        innerFill.FadeOut(flash_in_duration, Easing.OutQuint);
+
+                        // The inner-most gradient should actually be resizing, but is only visible for
+                        // a few milliseconds before it's hidden by the flash, so it's pointless overhead to bother with it.
+                        innerGradient.FadeOut(flash_in_duration, Easing.OutQuint);
+
+                        // The border is always white, but after hit it gets coloured by the skin/beatmap's colouring.
+                        // A gradient is applied to make the border less prominent over the course of the animation.
+                        // Without this, the border dominates the visual presence of the explosion animation in a bad way.
+                        border.TransformTo(nameof
                             (BorderColour), ColourInfo.GradientVertical(
                             accentColour.Value.Opacity(0.5f),
                             accentColour.Value.Opacity(0)), fade_out_time);
 
-                        flash.FadeTo(1, flash_in * 2, Easing.OutQuint);
+                        // The outer ring shrinks immediately, but accounts for its thickness so it doesn't overlap the inner
+                        // gradient layers.
+                        border.ResizeTo(Size * shrink_size + new Vector2(border.BorderThickness), resize_duration, Easing.OutElasticHalf);
 
-                        using (BeginDelayedSequence(flash_in / 8))
-                        {
-                            outerGradient.ResizeTo(outerGradient.Size * 0.8f, flash_in, Easing.OutQuint);
+                        // The outer gradient is resize with a slight delay from the border.
+                        // This is to give it a bomb-like effect, with the border "triggering" its animation when getting close.
+                        using (BeginDelayedSequence(flash_in_duration / 12))
+                            outerGradient.ResizeTo(outerGradient.Size * shrink_size, resize_duration, Easing.OutElasticHalf);
 
-                            using (BeginDelayedSequence(flash_in / 8))
-                            {
-                                innerGradient.ResizeTo(innerGradient.Size * 0.8f, flash_in, Easing.OutQuint);
-                                innerFill.ResizeTo(innerFill.Size * 0.8f, flash_in, Easing.OutQuint);
-                            }
-                        }
-
-                        innerFill.FadeOut(flash_in, Easing.OutQuint);
-                        innerGradient.FadeOut(flash_in, Easing.OutQuint);
+                        // The flash layer starts white to give the wanted brightness, but is almost immediately
+                        // recoloured to the accent colour. This would more correctly be done with two layers (one for the initial flash)
+                        // but works well enough with the colour fade.
+                        flash.FadeTo(1, flash_in_duration, Easing.OutQuint);
+                        flash.FlashColour(Color4.White, flash_in_duration, Easing.OutQuint);
 
                         this.FadeOut(fade_out_time, Easing.OutQuad);
-
                         break;
                 }
             }
@@ -180,6 +193,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 Alpha = 0;
                 Blending = BlendingParameters.Additive;
 
+                // The edge effect provides the fill due to not being rendered hollow.
                 Child.Alpha = 0;
                 Child.AlwaysPresent = true;
             }
@@ -187,11 +201,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             protected override void Update()
             {
                 base.Update();
+
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
                     Colour = Colour,
-                    Radius = OsuHitObject.OBJECT_RADIUS * 1.4f,
+                    Radius = OsuHitObject.OBJECT_RADIUS * 1.2f,
                 };
             }
         }
