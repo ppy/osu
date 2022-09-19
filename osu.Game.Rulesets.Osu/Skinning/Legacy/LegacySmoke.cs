@@ -65,7 +65,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         public LegacySmoke(ISkin skin)
         {
             this.skin = skin;
-            Radius = 3;
         }
 
         protected override void LoadComplete()
@@ -164,12 +163,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 fraction = 1 - MathF.Pow(1 - fraction, 5);
                 float angle = fraction * (finalAngle - initialAngle) + initialAngle;
 
-                return toVector2(angle);
+                return new Vector2(MathF.Sin(angle), -MathF.Cos(angle));
             }
 
             private float nextRotation() => max_rotation * ((float)rotationRNG.NextDouble() * 2 - 1);
-
-            private Vector2 toVector2(float angle) => new Vector2(MathF.Sin(angle), -MathF.Cos(angle));
         }
     }
 }

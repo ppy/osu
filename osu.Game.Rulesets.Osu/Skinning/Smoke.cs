@@ -26,11 +26,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public IShader? TextureShader { get; private set; }
         public IShader? RoundedTextureShader { get; private set; }
 
-        private float radius = 1;
+        private float? radius;
 
         protected float Radius
         {
-            get => radius;
+            get => radius ?? Texture?.DisplayWidth * 0.165f ?? 3;
             set
             {
                 if (radius == value)
