@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Mod[] originalMods = { new OsuModDaycore { SpeedChange = { Value = 0.8 } } };
             Mod[] playerMods = null!;
 
-            AddStep($"Load player with mods", () => LoadPlayer(originalMods));
+            AddStep("load player with mods", () => LoadPlayer(originalMods));
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
 
             AddStep("get mods at start of gameplay", () => playerMods = Player.Score.ScoreInfo.Mods.ToArray());
