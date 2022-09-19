@@ -10,6 +10,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -54,6 +55,20 @@ namespace osu.Game.Rulesets.Osu
             }
 
             return base.HandleMouseTouchStateChange(e);
+        }
+
+        public override void Attach(KeyCounterDisplay keyCounter)
+        {
+            var receptor = new ActionReceptor(keyCounter);
+
+            KeyBindingContainer.Add(receptor);
+
+            keyCounter.SetReceptor(receptor);
+            keyCounter.AddRange(new[]
+            {
+                new KeyCounterAction<OsuAction>(OsuAction.LeftButton),
+                new KeyCounterAction<OsuAction>(OsuAction.RightButton),
+            });
         }
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
