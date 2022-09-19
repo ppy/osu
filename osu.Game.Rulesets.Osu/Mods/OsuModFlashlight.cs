@@ -13,6 +13,8 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -49,11 +51,22 @@ namespace osu.Game.Rulesets.Osu.Mods
             Value = true
         };
 
+        [SettingSource("Disable follow points", "Disables follow points for a more rewarding experience.")]
+        public BindableBool DisableFollowPoints { get; } = new BindableBool();
+
         public override float DefaultFlashlightSize => 180;
 
         private OsuFlashlight flashlight = null!;
 
         protected override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(this);
+
+        public override void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            base.ApplyToDrawableRuleset(drawableRuleset);
+
+            if (DisableFollowPoints.Value)
+                ((OsuPlayfield)drawableRuleset.Playfield).FollowPoints.Hide();
+        }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
