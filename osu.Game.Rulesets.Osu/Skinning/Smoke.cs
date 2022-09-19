@@ -166,17 +166,21 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             base.LoadComplete();
 
+            Anchor = Anchor.TopLeft;
+            Origin = Anchor.TopLeft;
+
+            SmokeStartTime = Time.Current;
+
+            totalDistance = PointInterval;
+
             if (smokeContainer != null)
             {
                 smokeContainer.SmokeMoved += onSmokeMoved;
                 smokeContainer.SmokeEnded += onSmokeEnded;
                 IsActive = true;
+
+                onSmokeMoved(smokeContainer.LastMousePosition, Time.Current);
             }
-
-            Anchor = Anchor.TopLeft;
-            Origin = Anchor.TopLeft;
-
-            SmokeStartTime = Time.Current;
         }
 
         private Vector2 nextPointDirection()

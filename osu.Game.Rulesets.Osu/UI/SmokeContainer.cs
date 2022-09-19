@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.UI
         public event Action<Vector2, double>? SmokeMoved;
         public event Action<double>? SmokeEnded;
 
+        public Vector2 LastMousePosition;
+
         private bool isSmoking;
 
         public override bool ReceivePositionalInputAt(Vector2 _) => true;
@@ -49,6 +51,8 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             if (isSmoking)
                 SmokeMoved?.Invoke(e.MousePosition, Time.Current);
+
+            LastMousePosition = e.MousePosition;
 
             return base.OnMouseMove(e);
         }
