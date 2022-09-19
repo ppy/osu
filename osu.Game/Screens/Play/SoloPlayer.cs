@@ -5,12 +5,14 @@
 
 using System;
 using System.Diagnostics;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.Play
 {
@@ -39,6 +41,14 @@ namespace osu.Game.Screens.Play
 
             return new CreateSoloScoreRequest(Beatmap.Value.BeatmapInfo, rulesetId, Game.VersionHash);
         }
+
+        public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
+
+        protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
+            new SoloGameplayLeaderboard(Score.ScoreInfo.User)
+            {
+                Scores = { BindTarget = LeaderboardScores }
+            };
 
         protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
 
