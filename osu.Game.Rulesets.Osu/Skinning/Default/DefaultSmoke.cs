@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osuTK.Graphics;
@@ -47,6 +46,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 color.A = alpha;
 
                 double timeDoingFadeOut = fadeOutTime - pointTime;
+
                 if (timeDoingFadeOut > 0)
                 {
                     float fraction = Math.Clamp((float)(1 - (timeDoingFadeOut / fade_out_duration)), 0, 1);

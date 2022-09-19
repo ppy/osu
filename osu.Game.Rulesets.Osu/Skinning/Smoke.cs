@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public IShader? RoundedTextureShader { get; private set; }
 
         private float radius = 1;
+
         protected float Radius
         {
             get => radius;
@@ -41,8 +42,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
             }
         }
 
-
         private int rotationSeed = RNG.Next();
+
         protected int RotationSeed
         {
             get => rotationSeed;
@@ -57,6 +58,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         }
 
         private Texture? texture;
+
         protected Texture? Texture
         {
             get => texture;
@@ -68,6 +70,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         }
 
         private double smokeTimeStart = double.MinValue;
+
         protected double SmokeStartTime
         {
             get => smokeTimeStart;
@@ -82,6 +85,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         }
 
         private double smokeTimeEnd = double.MaxValue;
+
         protected double SmokeEndTime
         {
             get => smokeTimeEnd;
@@ -106,6 +110,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         }
 
         private Vector2 topLeft;
+
         protected Vector2 TopLeft
         {
             get => topLeft;
@@ -115,11 +120,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     return;
 
                 topLeft = value;
-                Invalidate(Invalidation.All);
+                Invalidate();
             }
         }
 
         private Vector2 bottomRight;
+
         protected Vector2 BottomRight
         {
             get => bottomRight;
@@ -140,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         protected readonly List<SmokePoint> SmokePoints = new List<SmokePoint>();
 
         private float totalDistance;
-        private Vector2? lastPosition = null;
+        private Vector2? lastPosition;
 
         private const double max_duration = 60_000;
 
@@ -216,6 +222,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 }
 
                 totalDistance %= PointInterval;
+
                 for (int i = 0; i < count; i++)
                 {
                     SmokePoints.Add(new SmokePoint
@@ -335,7 +342,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             private int rotationSeed;
             private Random rotationRNG = new Random();
 
-            public SmokeDrawNode(ITexturedShaderDrawable source)
+            protected SmokeDrawNode(ITexturedShaderDrawable source)
                 : base(source)
             {
             }

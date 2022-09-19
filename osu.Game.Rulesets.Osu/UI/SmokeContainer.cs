@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.UI
         public event Action<Vector2, double>? SmokeMoved;
         public event Action<double>? SmokeEnded;
 
-        private bool isSmoking = false;
+        private bool isSmoking;
 
         public override bool ReceivePositionalInputAt(Vector2 _) => true;
 
