@@ -39,6 +39,11 @@ namespace osu.Game.Skinning
     [ExcludeFromDynamicCompile]
     public class SkinManager : ModelManager<SkinInfo>, ISkinSource, IStorageResourceProvider, IModelImporter<SkinInfo>
     {
+        /// <summary>
+        /// The default "classic" skin.
+        /// </summary>
+        public Skin DefaultClassicSkin { get; }
+
         private readonly AudioManager audio;
 
         private readonly Scheduler scheduler;
@@ -55,20 +60,9 @@ namespace osu.Game.Skinning
 
         private readonly IResourceStore<byte[]> userFiles;
 
-        /// <summary>
-        /// The default "triangles" skin.
-        /// </summary>
         private Skin argonSkin { get; }
 
-        /// <summary>
-        /// The default skin (old).
-        /// </summary>
         private Skin trianglesSkin { get; }
-
-        /// <summary>
-        /// The default "classic" skin.
-        /// </summary>
-        public Skin DefaultClassicSkin { get; }
 
         public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
             : base(storage, realm)
