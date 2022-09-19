@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Game.Skinning;
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             }
         }
 
-        private ISkin skin;
+        private readonly ISkin skin;
 
         public LegacySmoke(ISkin skin)
         {

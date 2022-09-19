@@ -32,7 +32,6 @@ namespace osu.Game.Rulesets.Osu.UI
     public class OsuPlayfield : Playfield
     {
         private readonly PlayfieldBorder playfieldBorder;
-        private readonly SmokeContainer smokeContainer;
         private readonly ProxyContainer approachCircles;
         private readonly ProxyContainer spinnerProxies;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
@@ -55,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.UI
             InternalChildren = new Drawable[]
             {
                 playfieldBorder = new PlayfieldBorder { RelativeSizeAxes = Axes.Both },
-                smokeContainer = new SmokeContainer { RelativeSizeAxes = Axes.Both },
+                new SmokeContainer { RelativeSizeAxes = Axes.Both },
                 spinnerProxies = new ProxyContainer { RelativeSizeAxes = Axes.Both },
                 FollowPoints = new FollowPointRenderer { RelativeSizeAxes = Axes.Both },
                 judgementLayer = new JudgementContainer<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
