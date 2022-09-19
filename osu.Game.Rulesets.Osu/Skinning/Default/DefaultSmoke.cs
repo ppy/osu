@@ -58,15 +58,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 return color;
             }
 
-            protected override float PointScale(SmokePoint point)
-            {
-                throw new NotImplementedException();
-            }
+            protected override float PointScale(SmokePoint point) => 1f;
 
-            protected override Vector2 PointDirection(SmokePoint point)
-            {
-                throw new NotImplementedException();
-            }
+            protected override Vector2 PointDirection(SmokePoint point) => point.Direction;
         }
     }
 }
