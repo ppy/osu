@@ -67,7 +67,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "You are running the latest release ({0})"
         /// </summary>
-        public static LocalisableString RunningLatestRelease(string arg0) => new TranslatableString(getKey(@"running_latest_release"), @"You are running the latest release ({0})", arg0);
+        public static LocalisableString RunningLatestRelease(string version) => new TranslatableString(getKey(@"running_latest_release"), @"You are running the latest release ({0})", version);
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }
