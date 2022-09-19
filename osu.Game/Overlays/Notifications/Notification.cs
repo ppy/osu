@@ -26,7 +26,8 @@ namespace osu.Game.Overlays.Notifications
     public abstract class Notification : Container
     {
         /// <summary>
-        /// User requested close.
+        /// Notification was closed, either by user or otherwise.
+        /// Importantly, this event may be fired from a non-update thread.
         /// </summary>
         public event Action? Closed;
 
@@ -54,6 +55,8 @@ namespace osu.Game.Overlays.Notifications
         protected NotificationLight Light;
 
         protected Container IconContent;
+
+        public bool WasClosed { get; private set; }
 
         private readonly Container content;
 
@@ -245,21 +248,23 @@ namespace osu.Game.Overlays.Notifications
             initialFlash.FadeOutFromOne(2000, Easing.OutQuart);
         }
 
-        public bool WasClosed;
-
         public virtual void Close(bool runFlingAnimation)
         {
             if (WasClosed) return;
 
             WasClosed = true;
 
-            if (runFlingAnimation && dragContainer.FlingLeft())
-                this.FadeOut(600, Easing.In);
-            else
-                this.FadeOut(100);
-
             Closed?.Invoke();
-            Expire();
+
+            Schedule(() =>
+            {
+                if (runFlingAnimation && dragContainer.FlingLeft())
+                    this.FadeOut(600, Easing.In);
+                else
+                    this.FadeOut(100);
+
+                Expire();
+            });
         }
 
         private class DragContainer : Container
