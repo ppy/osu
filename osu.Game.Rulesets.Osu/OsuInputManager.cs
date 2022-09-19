@@ -57,20 +57,6 @@ namespace osu.Game.Rulesets.Osu
             return base.HandleMouseTouchStateChange(e);
         }
 
-        public override void Attach(KeyCounterDisplay keyCounter)
-        {
-            var receptor = new ActionReceptor(keyCounter);
-
-            KeyBindingContainer.Add(receptor);
-
-            keyCounter.SetReceptor(receptor);
-            keyCounter.AddRange(new[]
-            {
-                new KeyCounterAction<OsuAction>(OsuAction.LeftButton),
-                new KeyCounterAction<OsuAction>(OsuAction.RightButton),
-            });
-        }
-
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
         {
             public bool AllowUserPresses = true;
