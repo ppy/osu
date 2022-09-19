@@ -11,15 +11,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
     {
         protected override void LoadComplete()
         {
+            const float path_radius = ArgonMainCirclePiece.OUTER_GRADIENT_SIZE / 2;
+
             base.LoadComplete();
 
-            AccentColourBindable.BindValueChanged(accent =>
-            {
-                BorderColour = accent.NewValue;
-            }, true);
-            ScaleBindable.BindValueChanged(scale => PathRadius = ArgonMainCirclePiece.OUTER_GRADIENT_SIZE / 2 * scale.NewValue, true);
+            AccentColourBindable.BindValueChanged(accent => BorderColour = accent.NewValue, true);
+            ScaleBindable.BindValueChanged(scale => PathRadius = path_radius * scale.NewValue, true);
 
-            BorderSize = ArgonMainCirclePiece.BORDER_THICKNESS / 4;
+            // This border size thing is kind of weird, hey.
+            const float intended_thickness = ArgonMainCirclePiece.GRADIENT_THICKNESS / path_radius;
+
+            BorderSize = intended_thickness / Default.DrawableSliderPath.BORDER_PORTION;
         }
 
         protected override Default.DrawableSliderPath CreateSliderPath() => new DrawableSliderPath();
