@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
@@ -70,10 +71,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            var hitCircles = playfield.HitObjectContainer.Objects.Select(drawable => drawable.HitObject).OfType<HitCircle>();
-            var hitTimes = hitCircles.Select(ho => ho.StartTime);
-
-            NotesPerSecond = hitTimes.Count(time => time >= playfield.Clock.CurrentTime && time <= playfield.Clock.CurrentTime + 1e3);
+            NotesPerSecond = playfield.HitObjectContainer.Objects.OfType<DrawableHitCircle>().Count(drawable =>
+            {
+                double time = drawable.HitObject.StartTime;
+                return time >= playfield.Clock.CurrentTime && time <= playfield.Clock.CurrentTime + 1e3;
+            });
         }
 
         protected abstract bool CheckValidNewAction(OsuAction action);
