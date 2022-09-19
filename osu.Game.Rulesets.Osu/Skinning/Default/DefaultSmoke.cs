@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
@@ -40,12 +41,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 fadeOutTime = SmokeStartTime + fade_out_speed * (CurrentTime - (SmokeEndTime + fade_out_delay));
             }
 
-            protected override Color4 ColorAtTime(double pointTime)
+            protected override Color4 PointColor(SmokePoint point)
             {
                 var color = Color4.White;
                 color.A = alpha;
 
-                double timeDoingFadeOut = fadeOutTime - pointTime;
+                double timeDoingFadeOut = fadeOutTime - point.Time;
 
                 if (timeDoingFadeOut > 0)
                 {
@@ -55,6 +56,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 }
 
                 return color;
+            }
+
+            protected override float PointScale(SmokePoint point)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override Vector2 PointDirection(SmokePoint point)
+            {
+                throw new NotImplementedException();
             }
         }
     }
