@@ -197,7 +197,7 @@ namespace osu.Game.Screens.Play
             // LINQ cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
             foreach (var element in mainComponents.Components.Cast<Drawable>())
             {
-                // for now align top-right components with the bottom-edge of the lowest top-anchored hud element.
+                // for now align some top components with the bottom-edge of the lowest top-anchored hud element.
                 if (element.Anchor.HasFlagFast(Anchor.y0))
                 {
                     // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
