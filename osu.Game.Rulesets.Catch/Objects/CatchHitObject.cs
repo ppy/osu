@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         [JsonIgnore]
         public float X
         {
-            set => originalX.Value = Math.Clamp(value, 0, CatchPlayfield.WIDTH);
+            set => originalX.Value = value;
         }
 
         private HitObjectProperty<float> xOffset;
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// This value is the original <see cref="X"/> value plus the offset applied by the beatmap processing.
         /// Use <see cref="OriginalX"/> if a value not affected by the offset is desired.
         /// </remarks>
-        public float EffectiveX => OriginalX + XOffset;
+        public float EffectiveX => Math.Clamp(OriginalX + XOffset, 0, CatchPlayfield.WIDTH);
 
         public double TimePreempt { get; set; } = 1000;
 
