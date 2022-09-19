@@ -33,6 +33,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                         case OsuSkinComponents.SliderBody:
                             return new ArgonSliderBody();
+
+                        case OsuSkinComponents.SliderBall:
+                            return new ArgonSliderBall();
+
+                        case OsuSkinComponents.SliderScorePoint:
+                            return new ArgonSliderScorePoint();
                     }
 
                     break;
