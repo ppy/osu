@@ -259,7 +259,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void removeFacade()
         {
-            trackingContainer.Remove(logoFacade);
+            trackingContainer.Remove(logoFacade, false);
             visualBox.Colour = Color4.White;
             moveLogoFacade();
         }

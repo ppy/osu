@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.Containers
             drawable.StateChanged += state => selectionChanged(drawable, state);
         }
 
-        public override bool Remove(T drawable)
+        public override bool Remove(T drawable, bool disposeImmediately)
             => throw new NotSupportedException($"Cannot remove drawables from {nameof(SelectionCycleFillFlowContainer<T>)}");
 
         private void setSelected(int? value)

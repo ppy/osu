@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.Chat
             {
                 Trace.Assert(updated.Id.HasValue, "An updated message was returned with no ID.");
 
-                ChatLineFlow.Remove(found);
+                ChatLineFlow.Remove(found, false);
                 found.Message = updated;
                 ChatLineFlow.Add(found);
             }

@@ -8,11 +8,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -151,32 +149,27 @@ namespace osu.Game.Screens.Ranking
 
             var score = trackingContainer.Panel.Score;
 
-            // Calculating score can take a while in extreme scenarios, so only display scores after the process completes.
-            scoreManager.GetTotalScoreAsync(score)
-                        .ContinueWith(task => Schedule(() =>
-                        {
-                            flow.SetLayoutPosition(trackingContainer, task.GetResultSafely());
+            flow.SetLayoutPosition(trackingContainer, scoreManager.GetTotalScore(score));
 
-                            trackingContainer.Show();
+            trackingContainer.Show();
 
-                            if (SelectedScore.Value?.Equals(score) == true)
-                            {
-                                SelectedScore.TriggerChange();
-                            }
-                            else
-                            {
-                                // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
-                                // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
-                                if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
-                                {
-                                    // A somewhat hacky property is used here because we need to:
-                                    // 1) Scroll after the scroll container's visible range is updated.
-                                    // 2) Scroll before the scroll container's scroll position is updated.
-                                    // Without this, we would have a 1-frame positioning error which looks very jarring.
-                                    scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
-                                }
-                            }
-                        }), TaskContinuationOptions.OnlyOnRanToCompletion);
+            if (SelectedScore.Value?.Equals(score) == true)
+            {
+                SelectedScore.TriggerChange();
+            }
+            else
+            {
+                // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
+                // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
+                if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
+                {
+                    // A somewhat hacky property is used here because we need to:
+                    // 1) Scroll after the scroll container's visible range is updated.
+                    // 2) Scroll before the scroll container's scroll position is updated.
+                    // Without this, we would have a 1-frame positioning error which looks very jarring.
+                    scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
+                }
+            }
         }
 
         /// <summary>

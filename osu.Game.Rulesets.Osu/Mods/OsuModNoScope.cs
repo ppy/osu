@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModNoScope : ModNoScope, IUpdatableByPlayfield, IApplicableToBeatmap
     {
-        public override string Description => "Where's the cursor?";
+        public override LocalisableString Description => "Where's the cursor?";
 
         private PeriodTracker spinnerPeriods = null!;
 

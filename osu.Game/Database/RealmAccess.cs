@@ -24,6 +24,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -44,8 +45,6 @@ namespace osu.Game.Database
         /// The filename of this realm.
         /// </summary>
         public readonly string Filename;
-
-        private readonly IDatabaseContextFactory? efContextFactory;
 
         private readonly SynchronizationContext? updateThreadSyncContext;
 
@@ -68,8 +67,10 @@ namespace osu.Game.Database
         /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo, changed default value of BeatmapInfo.StarRating to -1.
         /// 21   2022-07-27    Migrate collections to realm (BeatmapCollection).
         /// 22   2022-07-31    Added ModPreset.
+        /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
+        /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
         /// </summary>
-        private const int schema_version = 22;
+        private const int schema_version = 24;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -160,11 +161,9 @@ namespace osu.Game.Database
         /// <param name="storage">The game storage which will be used to create the realm backing file.</param>
         /// <param name="filename">The filename to use for the realm backing file. A ".realm" extension will be added automatically if not specified.</param>
         /// <param name="updateThread">The game update thread, used to post realm operations into a thread-safe context.</param>
-        /// <param name="efContextFactory">An EF factory used only for migration purposes.</param>
-        public RealmAccess(Storage storage, string filename, GameThread? updateThread = null, IDatabaseContextFactory? efContextFactory = null)
+        public RealmAccess(Storage storage, string filename, GameThread? updateThread = null)
         {
             this.storage = storage;
-            this.efContextFactory = efContextFactory;
 
             updateThreadSyncContext = updateThread?.SynchronizationContext ?? SynchronizationContext.Current;
 
@@ -172,6 +171,11 @@ namespace osu.Game.Database
 
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
+
+#if DEBUG
+            if (!DebugUtils.IsNUnitRunning)
+                applyFilenameSchemaSuffix(ref Filename);
+#endif
 
             string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
 
@@ -210,6 +214,51 @@ namespace osu.Game.Database
 
                 cleanupPendingDeletions();
             }
+        }
+
+        /// <summary>
+        /// Some developers may be annoyed if a newer version migration (ie. caused by testing a pull request)
+        /// cause their test database to be unusable with previous versions.
+        /// To get around this, store development databases against their realm version.
+        /// Note that this means changes made on newer realm versions will disappear.
+        /// </summary>
+        private void applyFilenameSchemaSuffix(ref string filename)
+        {
+            string originalFilename = filename;
+
+            filename = getVersionedFilename(schema_version);
+
+            // First check if the current realm version already exists...
+            if (storage.Exists(filename))
+                return;
+
+            // Check for a previous version we can use as a base database to migrate from...
+            for (int i = schema_version - 1; i >= 0; i--)
+            {
+                string previousFilename = getVersionedFilename(i);
+
+                if (storage.Exists(previousFilename))
+                {
+                    copyPreviousVersion(previousFilename, filename);
+                    return;
+                }
+            }
+
+            // Finally, check for  a non-versioned file exists (aka before this method was added)...
+            if (storage.Exists(originalFilename))
+                copyPreviousVersion(originalFilename, filename);
+
+            void copyPreviousVersion(string previousFilename, string newFilename)
+            {
+                using (var previous = storage.GetStream(previousFilename))
+                using (var current = storage.CreateFileSafely(newFilename))
+                {
+                    Logger.Log(@$"Copying previous realm database {previousFilename} to {newFilename} for migration to schema version {schema_version}");
+                    previous.CopyTo(current);
+                }
+            }
+
+            string getVersionedFilename(int version) => originalFilename.Replace(realm_extension, $"_{version}{realm_extension}");
         }
 
         private void attemptRecoverFromFile(string recoveryFilename)
@@ -824,8 +873,17 @@ namespace osu.Game.Database
             }
         }
 
-        private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
-            efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
+        private string? getRulesetShortNameFromLegacyID(long rulesetId)
+        {
+            try
+            {
+                return new APIBeatmap.APIRuleset { OnlineID = (int)rulesetId }.ShortName;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         /// <summary>
         /// Create a full realm backup.
@@ -850,8 +908,15 @@ namespace osu.Game.Database
                 try
                 {
                     using (var source = storage.GetStream(Filename, mode: FileMode.Open))
-                    using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
-                        source.CopyTo(destination);
+                    {
+                        // source may not exist.
+                        if (source == null)
+                            return;
+
+                        using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                            source.CopyTo(destination);
+                    }
+
                     return;
                 }
                 catch (IOException)

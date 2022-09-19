@@ -37,6 +37,23 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [Test]
+        public void TestAudioEqualityCaseSensitivity()
+        {
+            var beatmapSetA = TestResources.CreateTestBeatmapSetInfo(1);
+            var beatmapSetB = TestResources.CreateTestBeatmapSetInfo(1);
+
+            // empty by default so let's set it..
+            beatmapSetA.Beatmaps.First().Metadata.AudioFile = "audio.mp3";
+            beatmapSetB.Beatmaps.First().Metadata.AudioFile = "audio.mp3";
+
+            addAudioFile(beatmapSetA, "abc", "AuDiO.mP3");
+            addAudioFile(beatmapSetB, "abc", "audio.mp3");
+
+            Assert.AreNotEqual(beatmapSetA, beatmapSetB);
+            Assert.IsTrue(beatmapSetA.Beatmaps.Single().AudioEquals(beatmapSetB.Beatmaps.Single()));
+        }
+
+        [Test]
         public void TestAudioEqualitySameHash()
         {
             var beatmapSetA = TestResources.CreateTestBeatmapSetInfo(1);
