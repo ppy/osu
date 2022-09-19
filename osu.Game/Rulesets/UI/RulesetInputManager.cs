@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.UI
 
         #region Key Counter Attachment
 
-        public void Attach(KeyCounterDisplay keyCounter)
+        public virtual void Attach(KeyCounterDisplay keyCounter)
         {
             var receptor = new ActionReceptor(keyCounter);
 
