@@ -23,7 +23,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
     public class ArgonMainCirclePiece : CompositeDrawable
     {
-        private readonly Circle outerFill;
+        public const float BORDER_THICKNESS = 7;
+
+        public const float OUTER_GRADIENT_SIZE = OsuHitObject.OBJECT_RADIUS * 2 - BORDER_THICKNESS * 3;
+
         private readonly Circle outerGradient;
         private readonly Circle innerGradient;
         private readonly Circle innerFill;
@@ -45,33 +48,27 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            const float border_thickness = 7;
             const float fill_thickness = 24;
 
             InternalChildren = new Drawable[]
             {
-                outerFill = new Circle // renders white outer border and dark fill
-                {
-                    Size = Size,
-                    Alpha = 1,
-                },
                 outerGradient = new Circle // renders the outer bright gradient
                 {
-                    Size = outerFill.Size - new Vector2(border_thickness * 3),
+                    Size = new Vector2(OUTER_GRADIENT_SIZE),
                     Alpha = 1,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
                 innerGradient = new Circle // renders the inner bright gradient
                 {
-                    Size = outerGradient.Size - new Vector2(fill_thickness),
+                    Size = new Vector2(OUTER_GRADIENT_SIZE - fill_thickness),
                     Alpha = 1,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
                 innerFill = new Circle // renders the inner dark fill
                 {
-                    Size = innerGradient.Size - new Vector2(fill_thickness),
+                    Size = new Vector2(OUTER_GRADIENT_SIZE - 2 * fill_thickness),
                     Alpha = 1,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -85,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     Text = @"1",
                 },
                 flash = new FlashPiece(),
-                border = new RingPiece(border_thickness),
+                border = new RingPiece(BORDER_THICKNESS),
             };
         }
 
@@ -104,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             accentColour.BindValueChanged(colour =>
             {
-                outerFill.Colour = innerFill.Colour = colour.NewValue.Darken(4);
+                innerFill.Colour = colour.NewValue.Darken(4);
                 outerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.1f));
                 innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
                 flash.Colour = colour.NewValue;
@@ -137,7 +134,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                         // The fill layers add too much noise during the explosion animation.
                         // They will be hidden by the additive effects anyway.
-                        outerFill.FadeOut(flash_in_duration, Easing.OutQuint);
                         innerFill.FadeOut(flash_in_duration, Easing.OutQuint);
 
                         // The inner-most gradient should actually be resizing, but is only visible for

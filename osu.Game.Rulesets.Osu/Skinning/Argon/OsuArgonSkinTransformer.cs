@@ -30,6 +30,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         case OsuSkinComponents.HitCircle:
                         case OsuSkinComponents.SliderHeadHitCircle:
                             return new ArgonMainCirclePiece();
+
+                        case OsuSkinComponents.SliderBody:
+                            return new ArgonSliderBody();
                     }
 
                     break;
