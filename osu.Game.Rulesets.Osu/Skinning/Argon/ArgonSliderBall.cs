@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             Masking = true;
 
-            BorderThickness = ArgonMainCirclePiece.BORDER_THICKNESS * 2;
+            BorderThickness = ArgonMainCirclePiece.GRADIENT_THICKNESS;
             BorderColour = Color4.White;
 
             InternalChildren = new Drawable[]

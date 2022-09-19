@@ -23,9 +23,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
     public class ArgonMainCirclePiece : CompositeDrawable
     {
-        public const float BORDER_THICKNESS = 7;
+        public const float BORDER_THICKNESS = (OsuHitObject.OBJECT_RADIUS * 2) * (2f / 58);
 
-        public const float OUTER_GRADIENT_SIZE = OsuHitObject.OBJECT_RADIUS * 2 - BORDER_THICKNESS * 3;
+        public const float GRADIENT_THICKNESS = BORDER_THICKNESS * 2.5f;
+
+        public const float OUTER_GRADIENT_SIZE = (OsuHitObject.OBJECT_RADIUS * 2) - BORDER_THICKNESS * 4;
+
+        public const float INNER_GRADIENT_SIZE = OUTER_GRADIENT_SIZE - GRADIENT_THICKNESS * 2;
+        public const float INNER_FILL_SIZE = INNER_GRADIENT_SIZE - GRADIENT_THICKNESS * 2;
 
         private readonly Circle outerFill;
         private readonly Circle outerGradient;
@@ -49,8 +54,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            const float fill_thickness = 24;
-
             InternalChildren = new Drawable[]
             {
                 outerFill = new Circle // renders white outer border and dark fill
@@ -67,14 +70,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 },
                 innerGradient = new Circle // renders the inner bright gradient
                 {
-                    Size = new Vector2(OUTER_GRADIENT_SIZE - fill_thickness),
+                    Size = new Vector2(INNER_GRADIENT_SIZE),
                     Alpha = 1,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
                 innerFill = new Circle // renders the inner dark fill
                 {
-                    Size = new Vector2(OUTER_GRADIENT_SIZE - 2 * fill_thickness),
+                    Size = new Vector2(INNER_FILL_SIZE),
                     Alpha = 1,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
