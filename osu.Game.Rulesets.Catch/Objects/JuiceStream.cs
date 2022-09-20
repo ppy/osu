@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                             AddNested(new TinyDroplet
                             {
                                 StartTime = t + lastEvent.Value.Time,
-                                X = EffectiveX + ClampToPlayField(Path.PositionAt(
+                                X = ClampToPlayField(EffectiveX + Path.PositionAt(
                                     lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X),
                             });
                         }
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = dropletSamples,
                             StartTime = e.Time,
-                            X = EffectiveX + ClampToPlayField(Path.PositionAt(e.PathProgress).X),
+                            X = ClampToPlayField(EffectiveX + Path.PositionAt(e.PathProgress).X),
                         });
                         break;
 
@@ -114,14 +114,14 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = this.GetNodeSamples(nodeIndex++),
                             StartTime = e.Time,
-                            X = EffectiveX + ClampToPlayField(Path.PositionAt(e.PathProgress).X),
+                            X = ClampToPlayField(EffectiveX + Path.PositionAt(e.PathProgress).X),
                         });
                         break;
                 }
             }
         }
 
-        public float EndX => EffectiveX + this.CurvePositionAt(1).X;
+        public float EndX => ClampToPlayField(EffectiveX + this.CurvePositionAt(1).X);
 
         public float ClampToPlayField(float value) => Math.Clamp(value, 0, CatchPlayfield.WIDTH);
 
