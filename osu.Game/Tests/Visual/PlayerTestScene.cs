@@ -7,7 +7,6 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -57,7 +56,9 @@ namespace osu.Game.Tests.Visual
 
         protected virtual bool Autoplay => false;
 
-        protected void LoadPlayer()
+        protected void LoadPlayer() => LoadPlayer(Array.Empty<Mod>());
+
+        protected void LoadPlayer(Mod[] mods)
         {
             var ruleset = CreatePlayerRuleset();
             Ruleset.Value = ruleset.RulesetInfo;
@@ -65,20 +66,21 @@ namespace osu.Game.Tests.Visual
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
-            SelectedMods.Value = Array.Empty<Mod>();
+
+            SelectedMods.Value = mods;
 
             if (!AllowFail)
             {
                 var noFailMod = ruleset.CreateMod<ModNoFail>();
                 if (noFailMod != null)
-                    SelectedMods.Value = new[] { noFailMod };
+                    SelectedMods.Value = SelectedMods.Value.Append(noFailMod).ToArray();
             }
 
             if (Autoplay)
             {
                 var mod = ruleset.GetAutoplayMod();
                 if (mod != null)
-                    SelectedMods.Value = SelectedMods.Value.Concat(mod.Yield()).ToArray();
+                    SelectedMods.Value = SelectedMods.Value.Append(mod).ToArray();
             }
 
             Player = CreatePlayer(ruleset);
