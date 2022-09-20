@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             SetContents(skin =>
             {
-                var implementation = skin is not TrianglesSkin
+                var implementation = skin is LegacySkin
                     ? CreateLegacyImplementation()
                     : CreateDefaultImplementation();
 
