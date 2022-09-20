@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
@@ -41,57 +40,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
             }
         }
 
-        private Texture? texture;
+        protected Texture? Texture { get; set; }
 
-        protected Texture? Texture
-        {
-            get => texture;
-            set
-            {
-                texture = value;
-                Invalidate(Invalidation.DrawNode);
-            }
-        }
+        protected double SmokeStartTime { get; private set; } = double.MinValue;
 
-        private double smokeTimeStart = double.MinValue;
-
-        protected double SmokeStartTime
-        {
-            get => smokeTimeStart;
-            private set
-            {
-                if (smokeTimeStart == value)
-                    return;
-
-                smokeTimeStart = value;
-                Invalidate(Invalidation.DrawNode);
-            }
-        }
-
-        private double smokeTimeEnd = double.MaxValue;
-
-        protected double SmokeEndTime
-        {
-            get => smokeTimeEnd;
-            private set
-            {
-                if (smokeTimeEnd == value)
-                    return;
-
-                smokeTimeEnd = value;
-                Invalidate(Invalidation.DrawNode);
-            }
-        }
-
-        public override IFrameBasedClock Clock
-        {
-            get => base.Clock;
-            set
-            {
-                base.Clock = value;
-                Invalidate(Invalidation.DrawNode);
-            }
-        }
+        protected double SmokeEndTime { get; private set; } = double.MaxValue;
 
         private Vector2 topLeft;
 
@@ -104,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     return;
 
                 topLeft = value;
-                Invalidate();
+                Invalidate(Invalidation.Layout);
             }
         }
 
@@ -277,6 +230,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
             base.Update();
 
             Position = TopLeft;
+
+            Invalidate(Invalidation.DrawNode);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -314,21 +269,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             protected new Smoke Source => (Smoke)base.Source;
 
-            protected IVertexBatch<TexturedVertex2D>? QuadBatch { get; private set; }
-            protected readonly List<SmokePoint> Points = new List<SmokePoint>();
-
-            protected float Radius { get; private set; }
-            protected Vector2 DrawSize { get; private set; }
-            protected Vector2 PositionOffset { get; private set; }
-            protected Texture? Texture { get; private set; }
-
             protected double SmokeStartTime { get; private set; }
             protected double SmokeEndTime { get; private set; }
             protected double CurrentTime { get; private set; }
 
-            protected RectangleF TextureRect { get; private set; }
-
-            private IFrameBasedClock? clock;
+            private readonly List<SmokePoint> points = new List<SmokePoint>();
+            private IVertexBatch<TexturedVertex2D>? quadBatch;
+            private float radius;
+            private Vector2 drawSize;
+            private Vector2 positionOffset;
+            private Texture? texture;
 
             protected SmokeDrawNode(ITexturedShaderDrawable source)
                 : base(source)
@@ -339,28 +289,29 @@ namespace osu.Game.Rulesets.Osu.Skinning
             {
                 base.ApplyState();
 
-                Points.Clear();
-                Points.AddRange(Source.SmokePoints);
+                points.Clear();
+                points.AddRange(Source.SmokePoints);
 
-                Radius = Source.Radius;
-                DrawSize = Source.DrawSize;
-                PositionOffset = Source.TopLeft;
-                Texture = Source.Texture;
-                clock = Source.Clock;
+                radius = Source.Radius;
+                drawSize = Source.DrawSize;
+                positionOffset = Source.TopLeft;
+                texture = Source.Texture;
 
                 SmokeStartTime = Source.SmokeStartTime;
                 SmokeEndTime = Source.SmokeEndTime;
+                CurrentTime = Source.Clock.CurrentTime;
             }
 
             public sealed override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 
-                if (Points.Count == 0)
+                if (points.Count == 0)
                     return;
 
-                QuadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(max_point_count / 10, 10);
-                Texture ??= renderer.WhitePixel;
+                quadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(max_point_count / 10, 10);
+                texture ??= renderer.WhitePixel;
+                RectangleF textureRect = texture.GetTextureRect();
 
                 var shader = GetAppropriateShader(renderer);
 
@@ -368,10 +319,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 renderer.PushLocalMatrix(DrawInfo.Matrix);
 
                 shader.Bind();
-                Texture.Bind();
+                texture.Bind();
 
-                UpdateDrawVariables(renderer);
-                UpdateVertexBuffer(renderer);
+                foreach (var point in points)
+                    drawPointQuad(point, textureRect);
 
                 shader.Unbind();
                 renderer.PopLocalMatrix();
@@ -379,7 +330,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             protected Color4 ColourAtPosition(Vector2 localPos) => DrawColourInfo.Colour.HasSingleColour
                 ? ((SRGBColour)DrawColourInfo.Colour).Linear
-                : DrawColourInfo.Colour.Interpolate(Vector2.Divide(localPos, DrawSize)).Linear;
+                : DrawColourInfo.Colour.Interpolate(Vector2.Divide(localPos, drawSize)).Linear;
 
             protected abstract Color4 PointColour(SmokePoint point);
 
@@ -387,24 +338,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             protected abstract Vector2 PointDirection(SmokePoint point);
 
-            protected virtual void UpdateDrawVariables(IRenderer renderer)
+            private void drawPointQuad(SmokePoint point, RectangleF textureRect)
             {
-                Debug.Assert(clock != null);
-                Debug.Assert(Texture != null);
-
-                CurrentTime = clock.CurrentTime;
-                TextureRect = Texture.GetTextureRect();
-            }
-
-            protected virtual void UpdateVertexBuffer(IRenderer renderer)
-            {
-                foreach (var point in Points)
-                    drawPointQuad(point);
-            }
-
-            private void drawPointQuad(SmokePoint point)
-            {
-                Debug.Assert(QuadBatch != null);
+                Debug.Assert(quadBatch != null);
 
                 var colour = PointColour(point);
                 float scale = PointScale(point);
@@ -414,33 +350,33 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 if (colour.A == 0 || scale == 0)
                     return;
 
-                var localTopLeft = point.Position + (Radius * scale * (-ortho - dir)) - PositionOffset;
-                var localTopRight = point.Position + (Radius * scale * (-ortho + dir)) - PositionOffset;
-                var localBotLeft = point.Position + (Radius * scale * (ortho - dir)) - PositionOffset;
-                var localBotRight = point.Position + (Radius * scale * (ortho + dir)) - PositionOffset;
+                var localTopLeft = point.Position + (radius * scale * (-ortho - dir)) - positionOffset;
+                var localTopRight = point.Position + (radius * scale * (-ortho + dir)) - positionOffset;
+                var localBotLeft = point.Position + (radius * scale * (ortho - dir)) - positionOffset;
+                var localBotRight = point.Position + (radius * scale * (ortho + dir)) - positionOffset;
 
-                QuadBatch.Add(new TexturedVertex2D
+                quadBatch.Add(new TexturedVertex2D
                 {
                     Position = localTopLeft,
-                    TexturePosition = TextureRect.TopLeft,
+                    TexturePosition = textureRect.TopLeft,
                     Colour = Color4Extensions.Multiply(ColourAtPosition(localTopLeft), colour),
                 });
-                QuadBatch.Add(new TexturedVertex2D
+                quadBatch.Add(new TexturedVertex2D
                 {
                     Position = localTopRight,
-                    TexturePosition = TextureRect.TopRight,
+                    TexturePosition = textureRect.TopRight,
                     Colour = Color4Extensions.Multiply(ColourAtPosition(localTopRight), colour),
                 });
-                QuadBatch.Add(new TexturedVertex2D
+                quadBatch.Add(new TexturedVertex2D
                 {
                     Position = localBotRight,
-                    TexturePosition = TextureRect.BottomRight,
+                    TexturePosition = textureRect.BottomRight,
                     Colour = Color4Extensions.Multiply(ColourAtPosition(localBotRight), colour),
                 });
-                QuadBatch.Add(new TexturedVertex2D
+                quadBatch.Add(new TexturedVertex2D
                 {
                     Position = localBotLeft,
-                    TexturePosition = TextureRect.BottomLeft,
+                    TexturePosition = textureRect.BottomLeft,
                     Colour = Color4Extensions.Multiply(ColourAtPosition(localBotLeft), colour),
                 });
             }
@@ -448,7 +384,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
-                QuadBatch?.Dispose();
+                quadBatch?.Dispose();
             }
         }
     }
