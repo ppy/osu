@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private float totalDistance;
         private Vector2? lastPosition;
 
-        private const double max_duration = 60_000;
+        private const int max_point_count = 72_000;
 
         public override float Height
         {
@@ -235,7 +235,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             lastPosition = position;
 
-            if (time - SmokeStartTime > max_duration)
+            if (SmokePoints.Count >= max_point_count)
                 onSmokeEnded(time);
         }
 
@@ -360,7 +360,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 if (Points.Count == 0)
                     return;
 
-                QuadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(7200, 10);
+                QuadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(max_point_count / 10, 10);
                 Texture ??= renderer.WhitePixel;
 
                 var shader = GetAppropriateShader(renderer);
@@ -409,6 +409,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 float scale = PointScale(point);
                 var dir = PointDirection(point);
                 var ortho = dir.PerpendicularLeft;
+
+                if (color.A == 0 || scale == 0)
+                    return;
 
                 var localTopLeft = point.Position + (Radius * scale * (-ortho - dir)) - PositionOffset;
                 var localTopRight = point.Position + (Radius * scale * (-ortho + dir)) - PositionOffset;
