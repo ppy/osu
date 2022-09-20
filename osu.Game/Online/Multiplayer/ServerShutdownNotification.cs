@@ -44,6 +44,6 @@ namespace osu.Game.Online.Multiplayer
             Scheduler.AddDelayed(updateTimeWithReschedule, timeToNextSecond);
         }
 
-        private void updateTime() => Text = $"The multiplayer server is restarting in {HumanizerUtils.Humanize(endDate.Subtract(DateTimeOffset.Now), precision: 2, minUnit: TimeUnit.Second)}.";
+        private void updateTime() => Text = $"The multiplayer server is restarting in {HumanizerUtils.Humanize(endDate.Subtract(DateTimeOffset.Now), precision: 3, minUnit: TimeUnit.Second)}.";
     }
 }
