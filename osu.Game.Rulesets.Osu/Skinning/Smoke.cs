@@ -39,36 +39,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         protected double SmokeEndTime { get; private set; } = double.MaxValue;
 
-        private Vector2 topLeft;
-
-        protected Vector2 TopLeft
-        {
-            get => topLeft;
-            set
-            {
-                if (topLeft == value)
-                    return;
-
-                topLeft = value;
-                Invalidate(Invalidation.Layout);
-            }
-        }
-
-        private Vector2 bottomRight;
-
-        protected Vector2 BottomRight
-        {
-            get => bottomRight;
-            set
-            {
-                if (bottomRight == value)
-                    return;
-
-                bottomRight = value;
-                Invalidate(Invalidation.Layout);
-            }
-        }
-
         protected virtual float PointInterval => Radius * 7f / 8;
         protected bool IsActive { get; private set; }
 
@@ -78,24 +48,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private Vector2? lastPosition;
 
         private const int max_point_count = 18_000;
-
-        public override float Height
-        {
-            get => base.Height = BottomRight.Y - TopLeft.Y;
-            set => throw new InvalidOperationException($"Cannot manually set {nameof(Height)} of {nameof(Smoke)}.");
-        }
-
-        public override float Width
-        {
-            get => base.Width = BottomRight.X - TopLeft.X;
-            set => throw new InvalidOperationException($"Cannot manually set {nameof(Width)} of {nameof(Smoke)}.");
-        }
-
-        public override Vector2 Size
-        {
-            get => base.Size = BottomRight - TopLeft;
-            set => throw new InvalidOperationException($"Cannot manually set {nameof(Size)} of {nameof(Smoke)}.");
-        }
 
         [Resolved(CanBeNull = true)]
         private SmokeContainer? smokeContainer { get; set; }
@@ -111,8 +63,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             base.LoadComplete();
 
-            Anchor = Anchor.TopLeft;
-            Origin = Anchor.TopLeft;
+            RelativeSizeAxes = Axes.Both;
 
             SmokeStartTime = Time.Current;
 
@@ -157,7 +108,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 {
                     int index = ~SmokePoints.BinarySearch(new SmokePoint { Time = time }, new SmokePoint.UpperBoundComparer());
                     SmokePoints.RemoveRange(index, SmokePoints.Count - index);
-                    recalculateBounds();
                 }
 
                 totalDistance %= PointInterval;
@@ -175,34 +125,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 }
 
                 Invalidate(Invalidation.DrawNode);
-                adaptBounds(position);
             }
 
             lastPosition = position;
 
             if (SmokePoints.Count >= max_point_count)
                 onSmokeEnded(time);
-        }
-
-        private void recalculateBounds()
-        {
-            TopLeft = BottomRight = Vector2.Zero;
-
-            foreach (var point in SmokePoints)
-                adaptBounds(point.Position);
-        }
-
-        private void adaptBounds(Vector2 position)
-        {
-            if (position.X < TopLeft.X)
-                TopLeft = new Vector2(position.X, TopLeft.Y);
-            else if (position.X > BottomRight.X)
-                BottomRight = new Vector2(position.X, BottomRight.Y);
-
-            if (position.Y < TopLeft.Y)
-                TopLeft = new Vector2(TopLeft.X, position.Y);
-            else if (position.Y > BottomRight.Y)
-                BottomRight = new Vector2(BottomRight.X, position.Y);
         }
 
         public abstract override double LifetimeEnd { get; }
@@ -221,8 +149,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         protected override void Update()
         {
             base.Update();
-
-            Position = TopLeft;
 
             Invalidate(Invalidation.DrawNode);
         }
@@ -270,7 +196,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
             private IVertexBatch<TexturedVertex2D>? quadBatch;
             private float radius;
             private Vector2 drawSize;
-            private Vector2 positionOffset;
             private Texture? texture;
 
             protected SmokeDrawNode(ITexturedShaderDrawable source)
@@ -287,7 +212,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 radius = Source.Radius;
                 drawSize = Source.DrawSize;
-                positionOffset = Source.TopLeft;
                 texture = Source.Texture;
 
                 SmokeStartTime = Source.SmokeStartTime;
@@ -343,10 +267,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 if (colour.A == 0 || scale == 0)
                     return;
 
-                var localTopLeft = point.Position + (radius * scale * (-ortho - dir)) - positionOffset;
-                var localTopRight = point.Position + (radius * scale * (-ortho + dir)) - positionOffset;
-                var localBotLeft = point.Position + (radius * scale * (ortho - dir)) - positionOffset;
-                var localBotRight = point.Position + (radius * scale * (ortho + dir)) - positionOffset;
+                var localTopLeft = point.Position + (radius * scale * (-ortho - dir));
+                var localTopRight = point.Position + (radius * scale * (-ortho + dir));
+                var localBotLeft = point.Position + (radius * scale * (ortho - dir));
+                var localBotRight = point.Position + (radius * scale * (ortho + dir));
 
                 quadBatch.Add(new TexturedVertex2D
                 {
