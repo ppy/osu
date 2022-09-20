@@ -38,16 +38,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 0.1f
         };
 
-        [SettingSource("Angle variety", "The amount of variety in how sharp angles are", SettingControlType = typeof(SettingsSlider<float>))]
-        public BindableFloat AngleVariety { get; } = new BindableFloat
-        {
-            Default = 3,
-            Value = 3,
-            MinValue = 0,
-            MaxValue = 10,
-            Precision = 0.1f
-        };
-
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
         private Random random = null!;
@@ -111,7 +101,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private float getRandomOffset(float stdDev)
         {
-            float customMultiplier = AngleVariety.Value / AngleVariety.Default;
+            // Range: [0.5;2]
+            float customMultiplier = (1.5f * AngleSharpness.MaxValue - AngleSharpness.Value) / (1.5f * AngleSharpness.MaxValue - AngleSharpness.Default);
+
             return OsuHitObjectGenerationUtils.RandomGaussian(random, 0, stdDev * customMultiplier);
         }
 
