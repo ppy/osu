@@ -135,36 +135,6 @@ namespace osu.Game.Localisation
         public static LocalisableString RestoredAllDeletedModPresets => new TranslatableString(getKey(@"restored_all_deleted_mod_presets"), @"Restored all deleted mod presets!");
 
         /// <summary>
-        /// "Everything?"
-        /// </summary>
-        public static LocalisableString MassDeleteConfirmation => new TranslatableString(getKey(@"mass_delete_confirmation"), @"Everything?");
-
-        /// <summary>
-        /// "All beatmap videos? This cannot be undone!"
-        /// </summary>
-        public static LocalisableString MassVideoDeleteConfirmation => new TranslatableString(getKey(@"mass_video_delete_confirmation"), @"All beatmap videos? This cannot be undone!");
-
-        /// <summary>
-        /// "Failed to automatically locate an osu!stable installation."
-        /// </summary>
-        public static LocalisableString StableDirectoryLocationHeader => new TranslatableString(getKey(@"stable_directory_location_header"), @"Failed to automatically locate an osu!stable installation.");
-
-        /// <summary>
-        /// "An existing install could not be located. If you know where it is, you can help locate it."
-        /// </summary>
-        public static LocalisableString StableDirectoryLocationBody => new TranslatableString(getKey(@"stable_directory_location_body"), @"An existing install could not be located. If you know where it is, you can help locate it.");
-
-        /// <summary>
-        /// "Sure! I know where it is located!"
-        /// </summary>
-        public static LocalisableString StableDirectoryLocationOk => new TranslatableString(getKey(@"stable_directory_location_ok"), @"Sure! I know where it is located!");
-
-        /// <summary>
-        /// "Actually I don't have osu!stable installed."
-        /// </summary>
-        public static LocalisableString StableDirectoryLocationCancel => new TranslatableString(getKey(@"stable_directory_location_cancel"), @"Actually I don't have osu!stable installed.");
-
-        /// <summary>
         /// "Please select your osu!stable install location"
         /// </summary>
         public static LocalisableString StableDirectorySelectHeader => new TranslatableString(getKey(@"stable_directory_select_header"), @"Please select your osu!stable install location");

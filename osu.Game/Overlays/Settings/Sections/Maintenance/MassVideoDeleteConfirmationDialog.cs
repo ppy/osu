@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -11,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         public MassVideoDeleteConfirmationDialog(Action deleteAction)
             : base(deleteAction)
         {
-            BodyText = MaintenanceSettingsStrings.MassVideoDeleteConfirmation;
+            BodyText = "All beatmap videos? This cannot be undone!";
         }
     }
 }
