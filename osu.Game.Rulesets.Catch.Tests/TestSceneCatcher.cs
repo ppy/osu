@@ -106,18 +106,23 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void TestCatcherCatchWidth()
         {
             float halfWidth = Catcher.CalculateCatchWidth(new BeatmapDifficulty { CircleSize = 0 }) / 2;
-            const float center_x = CatchPlayfield.CENTER_X;
-            AddStep("move catcher to center", () => catcher.X = center_x);
+
+            AddStep("move catcher to center", () => catcher.X = CatchPlayfield.CENTER_X);
+
+            float leftPlateBounds = CatchPlayfield.CENTER_X - halfWidth;
+            float rightPlateBounds = CatchPlayfield.CENTER_X + halfWidth;
+
             AddStep("catch fruit", () =>
             {
-                attemptCatch(new Fruit { X = center_x + -halfWidth + 1 });
-                attemptCatch(new Fruit { X = center_x + halfWidth - 1 });
+                attemptCatch(new Fruit { X = leftPlateBounds + 1 });
+                attemptCatch(new Fruit { X = rightPlateBounds - 1 });
             });
             checkPlate(2);
+
             AddStep("miss fruit", () =>
             {
-                attemptCatch(new Fruit { X = center_x + -halfWidth - 1 });
-                attemptCatch(new Fruit { X = center_x + halfWidth + 1 });
+                attemptCatch(new Fruit { X = leftPlateBounds - 1 });
+                attemptCatch(new Fruit { X = rightPlateBounds + 1 });
             });
             checkPlate(2);
         }
