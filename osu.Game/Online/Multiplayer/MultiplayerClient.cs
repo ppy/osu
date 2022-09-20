@@ -589,12 +589,7 @@ namespace osu.Game.Online.Multiplayer
             if (countdown == null)
                 return;
 
-            PostNotification?.Invoke(new SimpleNotification
-            {
-                Text = countdown.FinalNotification
-                    ? $"The multiplayer server is restarting in {countdown.TimeRemaining:hh\\:mm\\:ss}. This multiplayer room will be closed shortly."
-                    : $"The multiplayer server is restarting in {countdown.TimeRemaining:hh\\:mm\\:ss}."
-            });
+            PostNotification?.Invoke(new ServerShutdownNotification(countdown.TimeRemaining));
         }
 
         Task IMultiplayerClient.UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability)
