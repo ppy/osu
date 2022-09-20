@@ -445,6 +445,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Colour = Color4Extensions.Multiply(ColorAtPosition(localBotLeft), color),
                 });
             }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                QuadBatch?.Dispose();
+            }
         }
     }
 }
