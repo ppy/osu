@@ -502,7 +502,7 @@ namespace osu.Game.Screens.Play
 
         private int restartCount;
 
-        private const double volume_requirement = 0.05;
+        private const double volume_requirement = 0.01;
 
         private void showMuteWarningIfNeeded()
         {
