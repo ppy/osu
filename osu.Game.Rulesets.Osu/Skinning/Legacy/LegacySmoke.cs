@@ -37,12 +37,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected int RotationSeed { get; set; } = RNG.Next();
 
-        protected override double LifetimeAfterSmokeEnd
+        public override double LifetimeEnd
         {
             get
             {
                 double initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
-                return final_fade_out_duration + initialFadeOutDurationTrunc / re_fade_in_speed + initialFadeOutDurationTrunc / final_fade_out_speed;
+                return SmokeEndTime + final_fade_out_duration + initialFadeOutDurationTrunc / re_fade_in_speed + initialFadeOutDurationTrunc / final_fade_out_speed;
             }
         }
 
