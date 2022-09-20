@@ -303,16 +303,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
             {
+                var result = snapProvider?.FindSnappedPositionAndTime(ToScreenSpace(e.MousePosition));
+
+                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - slider.Position;
+
                 for (int i = 0; i < controlPoints.Count; ++i)
                 {
                     var controlPoint = controlPoints[i];
                     if (selectedControlPoints.Contains(controlPoint))
                     {
-                        Vector2 newPosition = Parent.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
-                        var result = snapProvider?.FindSnappedPositionAndTime(newPosition);
-
-                        Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? newPosition) - slider.Position;
-
                         controlPoint.Position = dragStartPositions[i] + movementDelta;
                     }
                 }
