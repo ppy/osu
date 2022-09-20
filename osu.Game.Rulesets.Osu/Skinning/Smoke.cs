@@ -30,14 +30,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         protected float Radius
         {
             get => radius ?? Texture?.DisplayWidth * 0.165f ?? 3;
-            set
-            {
-                if (radius == value)
-                    return;
-
-                radius = value;
-                Invalidate(Invalidation.DrawNode);
-            }
+            set => radius = value;
         }
 
         protected Texture? Texture { get; set; }
