@@ -314,19 +314,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             protected new Smoke Source => (Smoke)base.Source;
 
-            protected IVertexBatch<TexturedVertex2D>? QuadBatch;
+            protected IVertexBatch<TexturedVertex2D>? QuadBatch { get; private set; }
             protected readonly List<SmokePoint> Points = new List<SmokePoint>();
 
-            protected float Radius;
-            protected Vector2 DrawSize;
-            protected Vector2 PositionOffset;
-            protected Texture? Texture;
+            protected float Radius { get; private set; }
+            protected Vector2 DrawSize { get; private set; }
+            protected Vector2 PositionOffset { get; private set; }
+            protected Texture? Texture { get; private set; }
 
-            protected double SmokeStartTime;
-            protected double SmokeEndTime;
-            protected double CurrentTime;
+            protected double SmokeStartTime { get; private set; }
+            protected double SmokeEndTime { get; private set; }
+            protected double CurrentTime { get; private set; }
 
-            protected RectangleF TextureRect;
+            protected RectangleF TextureRect { get; private set; }
 
             private IFrameBasedClock? clock;
 
