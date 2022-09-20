@@ -4,6 +4,7 @@
 using System;
 using Humanizer.Localisation;
 using osu.Framework.Allocation;
+using osu.Framework.Threading;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
 
@@ -12,6 +13,7 @@ namespace osu.Game.Online.Multiplayer
     public class ServerShutdownNotification : SimpleNotification
     {
         private readonly DateTimeOffset endDate;
+        private ScheduledDelegate? updateDelegate;
 
         public ServerShutdownNotification(TimeSpan duration)
         {
@@ -27,7 +29,7 @@ namespace osu.Game.Online.Multiplayer
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Scheduler.Add(updateTimeWithReschedule);
+            updateDelegate = Scheduler.Add(updateTimeWithReschedule);
         }
 
         private void updateTimeWithReschedule()
@@ -41,9 +43,20 @@ namespace osu.Game.Online.Multiplayer
             // the next invocation will be roughly correct.
             double timeToNextSecond = endDate.Subtract(DateTimeOffset.UtcNow).TotalMilliseconds % 1000;
 
-            Scheduler.AddDelayed(updateTimeWithReschedule, timeToNextSecond);
+            updateDelegate = Scheduler.AddDelayed(updateTimeWithReschedule, timeToNextSecond);
         }
 
-        private void updateTime() => Text = $"The multiplayer server is restarting in {HumanizerUtils.Humanize(endDate.Subtract(DateTimeOffset.Now), precision: 3, minUnit: TimeUnit.Second)}.";
+        private void updateTime()
+        {
+            TimeSpan remaining = endDate.Subtract(DateTimeOffset.Now);
+
+            if (remaining.TotalSeconds <= 5)
+            {
+                updateDelegate?.Cancel();
+                Text = "The multiplayer server will be right back...";
+            }
+            else
+                Text = $"The multiplayer server is restarting in {HumanizerUtils.Humanize(remaining, precision: 3, minUnit: TimeUnit.Second)}.";
+        }
     }
 }
