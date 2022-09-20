@@ -231,6 +231,31 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestProgressClick()
+        {
+            ProgressNotification notification = null!;
+
+            AddStep("add progress notification", () =>
+            {
+                notification = new ProgressNotification
+                {
+                    Text = @"Uploading to BSS...",
+                    CompletionText = "Uploaded to BSS!",
+                };
+                notificationOverlay.Post(notification);
+                progressingNotifications.Add(notification);
+            });
+
+            AddStep("hover over notification", () => InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<ProgressNotification>().Single()));
+
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("not cancelled", () => notification.State == ProgressNotificationState.Active);
+
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+            AddAssert("cancelled", () => notification.State == ProgressNotificationState.Cancelled);
+        }
+
+        [Test]
         public void TestCompleteProgress()
         {
             ProgressNotification notification = null!;
