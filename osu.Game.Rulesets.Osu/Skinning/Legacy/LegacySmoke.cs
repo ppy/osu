@@ -35,20 +35,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private const float max_rotation = 0.25f;
 
-        private int rotationSeed = RNG.Next();
-
-        protected int RotationSeed
-        {
-            get => rotationSeed;
-            set
-            {
-                if (rotationSeed == value)
-                    return;
-
-                rotationSeed = value;
-                Invalidate(Invalidation.DrawNode);
-            }
-        }
+        protected int RotationSeed { get; set; } = RNG.Next();
 
         protected override double LifetimeAfterSmokeEnd
         {
