@@ -315,7 +315,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
             protected new Smoke Source => (Smoke)base.Source;
 
             protected IVertexBatch<TexturedVertex2D>? QuadBatch;
-
             protected readonly List<SmokePoint> Points = new List<SmokePoint>();
 
             protected float Radius;
@@ -378,11 +377,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 renderer.PopLocalMatrix();
             }
 
-            protected Color4 ColorAtPosition(Vector2 localPos) => DrawColourInfo.Colour.HasSingleColour
+            protected Color4 ColourAtPosition(Vector2 localPos) => DrawColourInfo.Colour.HasSingleColour
                 ? ((SRGBColour)DrawColourInfo.Colour).Linear
                 : DrawColourInfo.Colour.Interpolate(Vector2.Divide(localPos, DrawSize)).Linear;
 
-            protected abstract Color4 PointColor(SmokePoint point);
+            protected abstract Color4 PointColour(SmokePoint point);
 
             protected abstract float PointScale(SmokePoint point);
 
@@ -407,12 +406,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
             {
                 Debug.Assert(QuadBatch != null);
 
-                var color = PointColor(point);
+                var colour = PointColour(point);
                 float scale = PointScale(point);
                 var dir = PointDirection(point);
                 var ortho = dir.PerpendicularLeft;
 
-                if (color.A == 0 || scale == 0)
+                if (colour.A == 0 || scale == 0)
                     return;
 
                 var localTopLeft = point.Position + (Radius * scale * (-ortho - dir)) - PositionOffset;
@@ -424,25 +423,25 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 {
                     Position = localTopLeft,
                     TexturePosition = TextureRect.TopLeft,
-                    Colour = Color4Extensions.Multiply(ColorAtPosition(localTopLeft), color),
+                    Colour = Color4Extensions.Multiply(ColourAtPosition(localTopLeft), colour),
                 });
                 QuadBatch.Add(new TexturedVertex2D
                 {
                     Position = localTopRight,
                     TexturePosition = TextureRect.TopRight,
-                    Colour = Color4Extensions.Multiply(ColorAtPosition(localTopRight), color),
+                    Colour = Color4Extensions.Multiply(ColourAtPosition(localTopRight), colour),
                 });
                 QuadBatch.Add(new TexturedVertex2D
                 {
                     Position = localBotRight,
                     TexturePosition = TextureRect.BottomRight,
-                    Colour = Color4Extensions.Multiply(ColorAtPosition(localBotRight), color),
+                    Colour = Color4Extensions.Multiply(ColourAtPosition(localBotRight), colour),
                 });
                 QuadBatch.Add(new TexturedVertex2D
                 {
                     Position = localBotLeft,
                     TexturePosition = TextureRect.BottomLeft,
-                    Colour = Color4Extensions.Multiply(ColorAtPosition(localBotLeft), color),
+                    Colour = Color4Extensions.Multiply(ColourAtPosition(localBotLeft), colour),
                 });
             }
 

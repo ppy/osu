@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 finalFadeOutTime = final_fade_out_speed * (CurrentTime - SmokeEndTime) + SmokeEndTime - initialFadeOutDurationTrunc * (1 + 1 / re_fade_in_speed);
             }
 
-            protected override Color4 PointColor(SmokePoint point)
+            protected override Color4 PointColour(SmokePoint point)
             {
                 var color = Color4.White;
 
