@@ -311,9 +311,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 {
                     var controlPoint = controlPoints[i];
                     if (selectedControlPoints.Contains(controlPoint))
-                    {
                         controlPoint.Position = dragStartPositions[i] + movementDelta;
-                    }
                 }
             }
 
