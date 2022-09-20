@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Updater;
@@ -420,6 +422,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             setState(Visibility.Visible);
             AddRepeatStep("send barrage", sendBarrage, 10);
+        }
+
+        [Test]
+        public void TestServerShuttingDownNotification()
+        {
+            AddStep("post with 5 seconds", () => notificationOverlay.Post(new ServerShutdownNotification(TimeSpan.FromSeconds(5))));
+            AddStep("post with 30 seconds", () => notificationOverlay.Post(new ServerShutdownNotification(TimeSpan.FromSeconds(30))));
+            AddStep("post with 6 hours", () => notificationOverlay.Post(new ServerShutdownNotification(TimeSpan.FromHours(6))));
         }
 
         protected override void Update()
