@@ -137,6 +137,11 @@ namespace osu.Game.Scoring
 
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
             clone.MaximumStatistics = new Dictionary<HitResult, int>(clone.MaximumStatistics);
+
+            // Ensure we have fresh mods to avoid any references (ie. after gameplay).
+            clone.clearAllMods();
+            clone.ModsJson = ModsJson;
+
             clone.RealmUser = new RealmUser
             {
                 OnlineID = RealmUser.OnlineID,
