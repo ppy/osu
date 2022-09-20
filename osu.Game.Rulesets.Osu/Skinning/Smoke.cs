@@ -366,14 +366,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 var shader = GetAppropriateShader(renderer);
 
                 renderer.SetBlend(BlendingParameters.Additive);
+                renderer.PushLocalMatrix(DrawInfo.Matrix);
 
                 shader.Bind();
                 Texture.Bind();
 
                 UpdateDrawVariables(renderer);
-                UpdateVertexBuffer();
+                UpdateVertexBuffer(renderer);
 
                 shader.Unbind();
+                renderer.PopLocalMatrix();
             }
 
             protected Color4 ColorAtPosition(Vector2 localPos) => DrawColourInfo.Colour.HasSingleColour
@@ -395,7 +397,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 TextureRect = Texture.GetTextureRect();
             }
 
-            protected virtual void UpdateVertexBuffer()
+            protected virtual void UpdateVertexBuffer(IRenderer renderer)
             {
                 foreach (var point in Points)
                     drawPointQuad(point);
@@ -420,25 +422,25 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 QuadBatch.Add(new TexturedVertex2D
                 {
-                    Position = Vector2Extensions.Transform(localTopLeft, DrawInfo.Matrix),
+                    Position = localTopLeft,
                     TexturePosition = TextureRect.TopLeft,
                     Colour = Color4Extensions.Multiply(ColorAtPosition(localTopLeft), color),
                 });
                 QuadBatch.Add(new TexturedVertex2D
                 {
-                    Position = Vector2Extensions.Transform(localTopRight, DrawInfo.Matrix),
+                    Position = localTopRight,
                     TexturePosition = TextureRect.TopRight,
                     Colour = Color4Extensions.Multiply(ColorAtPosition(localTopRight), color),
                 });
                 QuadBatch.Add(new TexturedVertex2D
                 {
-                    Position = Vector2Extensions.Transform(localBotRight, DrawInfo.Matrix),
+                    Position = localBotRight,
                     TexturePosition = TextureRect.BottomRight,
                     Colour = Color4Extensions.Multiply(ColorAtPosition(localBotRight), color),
                 });
                 QuadBatch.Add(new TexturedVertex2D
                 {
-                    Position = Vector2Extensions.Transform(localBotLeft, DrawInfo.Matrix),
+                    Position = localBotLeft,
                     TexturePosition = TextureRect.BottomLeft,
                     Colour = Color4Extensions.Multiply(ColorAtPosition(localBotLeft), color),
                 });
