@@ -11,10 +11,5 @@ namespace osu.Game.Online.Multiplayer
     [MessagePackObject]
     public class ServerShuttingDownCountdown : MultiplayerCountdown
     {
-        /// <summary>
-        /// If this is the final notification, no more <see cref="ServerShuttingDownCountdown"/> events will be sent after this.
-        /// </summary>
-        [Key(2)]
-        public bool FinalNotification { get; set; }
     }
 }
