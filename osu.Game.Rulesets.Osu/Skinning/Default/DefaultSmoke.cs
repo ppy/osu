@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 fadeOutTime = SmokeStartTime + fade_out_speed * (CurrentTime - (SmokeEndTime + fade_out_delay));
             }
 
-            protected override Color4 PointColor(SmokePoint point)
+            protected override Color4 PointColour(SmokePoint point)
             {
                 var color = Color4.White;
                 color.A = alpha;
