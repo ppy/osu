@@ -69,7 +69,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
             }
         }
 
-        protected abstract double LifetimeAfterSmokeEnd { get; }
         protected virtual float PointInterval => Radius * 7f / 8;
         protected bool IsActive { get; private set; }
 
@@ -206,6 +205,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 BottomRight = new Vector2(BottomRight.X, position.Y);
         }
 
+        public abstract override double LifetimeEnd { get; }
+
         private void onSmokeEnded(double time)
         {
             if (!IsActive)
@@ -213,7 +214,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             IsActive = false;
             SmokeEndTime = time;
-            LifetimeEnd = time + LifetimeAfterSmokeEnd + 100;
         }
 
         protected abstract override DrawNode CreateDrawNode();

@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         private const double fade_out_duration = 50;
         private const float alpha = 0.5f;
 
-        protected override double LifetimeAfterSmokeEnd => fade_out_delay + fade_out_duration + (SmokeEndTime - SmokeStartTime) / fade_out_speed;
+        public override double LifetimeEnd => SmokeEndTime + fade_out_delay + fade_out_duration + (SmokeEndTime - SmokeStartTime) / fade_out_speed;
 
         public DefaultSmoke()
         {
