@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private float totalDistance;
         private Vector2? lastPosition;
 
-        private const int max_point_count = 72_000;
+        private const int max_point_count = 18_000;
 
         public override float Height
         {
