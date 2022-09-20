@@ -185,14 +185,22 @@ namespace osu.Game.Online.Leaderboards
             if (scores != null)
                 this.scores.AddRange(scores);
 
-            userScoreContainer.Score.Value = userScore;
+            // Schedule needs to be non-delayed here for the weird logic in refetchScores to work.
+            // If it is removed, the placeholder will be incorrectly updated to "no scores" rather than "retrieving".
+            // This whole flow should be refactored in the future.
+            Scheduler.Add(applyNewScores, false);
 
-            if (userScore == null)
-                userScoreContainer.Hide();
-            else
-                userScoreContainer.Show();
+            void applyNewScores()
+            {
+                userScoreContainer.Score.Value = userScore;
 
-            Scheduler.Add(updateScoresDrawables, false);
+                if (userScore == null)
+                    userScoreContainer.Hide();
+                else
+                    userScoreContainer.Show();
+
+                updateScoresDrawables();
+            }
         }
 
         /// <summary>
@@ -212,8 +220,8 @@ namespace osu.Game.Online.Leaderboards
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
             cancelPendingWork();
-            SetScores(null);
 
+            SetScores(null);
             setState(LeaderboardState.Retrieving);
 
             currentFetchCancellationSource = new CancellationTokenSource();
