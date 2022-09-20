@@ -539,10 +539,11 @@ namespace osu.Game.Screens.Play
                     volumeOverlay.IsMuted.Value = false;
 
                     // Check values before resetting, as the user may have only had mute enabled, in which case we might not need to adjust volumes.
+                    // Note that we only restore halfway to ensure the user isn't suddenly overloaded by unexpectedly high volume.
                     if (audioManager.Volume.Value <= volume_requirement)
-                        audioManager.Volume.SetDefault();
+                        audioManager.Volume.Value = 0.5f;
                     if (audioManager.VolumeTrack.Value <= volume_requirement)
-                        audioManager.VolumeTrack.SetDefault();
+                        audioManager.VolumeTrack.Value = 0.5f;
 
                     return true;
                 };
