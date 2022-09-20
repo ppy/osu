@@ -229,8 +229,8 @@ namespace osu.Game.Overlays.Notifications
         protected override bool OnClick(ClickEvent e)
         {
             // Clicking with anything but left button should dismiss but not perform the activation action.
-            if (e.Button == MouseButton.Left)
-                Activated?.Invoke();
+            if (e.Button == MouseButton.Left && Activated?.Invoke() == false)
+                return true;
 
             Close(false);
             return true;
