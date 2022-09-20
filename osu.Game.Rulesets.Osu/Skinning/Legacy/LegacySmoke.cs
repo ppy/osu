@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Rendering;
 using osu.Framework.Utils;
 using osu.Game.Skinning;
 using osuTK;
@@ -99,11 +98,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                 initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
                 rotationSeed = Source.RotationSeed;
-            }
-
-            protected override void UpdateDrawVariables(IRenderer renderer)
-            {
-                base.UpdateDrawVariables(renderer);
 
                 rotationRNG = new Random(rotationSeed);
                 initialFadeOutTime = Math.Min(CurrentTime, SmokeEndTime);

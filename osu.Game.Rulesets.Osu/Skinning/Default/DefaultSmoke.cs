@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Rendering;
 using osuTK;
 using osuTK.Graphics;
 
@@ -34,9 +33,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             {
             }
 
-            protected override void UpdateDrawVariables(IRenderer renderer)
+            public override void ApplyState()
             {
-                base.UpdateDrawVariables(renderer);
+                base.ApplyState();
 
                 fadeOutTime = SmokeStartTime + fade_out_speed * (CurrentTime - (SmokeEndTime + fade_out_delay));
             }
