@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
@@ -18,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override double ScoreMultiplier => 0.9;
 
-        public override string Description => "No more tricky speed changes!";
+        public override LocalisableString Description => "No more tricky speed changes!";
 
         public override IconUsage? Icon => FontAwesome.Solid.Equals;
 

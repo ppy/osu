@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.Online
                             {
                                 if (selected.Text == mod.Acronym)
                                 {
-                                    selectedMods.Remove(selected);
+                                    selectedMods.Remove(selected, true);
                                     break;
                                 }
                             }

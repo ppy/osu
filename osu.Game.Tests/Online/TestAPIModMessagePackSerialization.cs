@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using MessagePack;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
@@ -102,7 +103,7 @@ namespace osu.Game.Tests.Online
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TM";
-            public override string Description => "This is a test mod.";
+            public override LocalisableString Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Test")]
@@ -119,7 +120,7 @@ namespace osu.Game.Tests.Online
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TMTR";
-            public override string Description => "This is a test mod.";
+            public override LocalisableString Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Initial rate", "The starting speed of the track")]
@@ -154,7 +155,7 @@ namespace osu.Game.Tests.Online
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TM";
-            public override string Description => "This is a test mod.";
+            public override LocalisableString Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Test")]

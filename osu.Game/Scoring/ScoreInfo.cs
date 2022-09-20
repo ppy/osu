@@ -63,6 +63,9 @@ namespace osu.Game.Scoring
         [MapTo("Statistics")]
         public string StatisticsJson { get; set; } = string.Empty;
 
+        [MapTo("MaximumStatistics")]
+        public string MaximumStatisticsJson { get; set; } = string.Empty;
+
         public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
         {
             Ruleset = ruleset ?? new RulesetInfo();
@@ -133,6 +136,12 @@ namespace osu.Game.Scoring
             var clone = (ScoreInfo)this.Detach().MemberwiseClone();
 
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
+            clone.MaximumStatistics = new Dictionary<HitResult, int>(clone.MaximumStatistics);
+
+            // Ensure we have fresh mods to avoid any references (ie. after gameplay).
+            clone.clearAllMods();
+            clone.ModsJson = ModsJson;
+
             clone.RealmUser = new RealmUser
             {
                 OnlineID = RealmUser.OnlineID,
@@ -179,6 +188,24 @@ namespace osu.Game.Scoring
                 return statistics ??= new Dictionary<HitResult, int>();
             }
             set => statistics = value;
+        }
+
+        private Dictionary<HitResult, int>? maximumStatistics;
+
+        [Ignored]
+        public Dictionary<HitResult, int> MaximumStatistics
+        {
+            get
+            {
+                if (maximumStatistics != null)
+                    return maximumStatistics;
+
+                if (!string.IsNullOrEmpty(MaximumStatisticsJson))
+                    maximumStatistics = JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(MaximumStatisticsJson);
+
+                return maximumStatistics ??= new Dictionary<HitResult, int>();
+            }
+            set => maximumStatistics = value;
         }
 
         private Mod[]? mods;

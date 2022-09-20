@@ -10,6 +10,9 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
+    /// <summary>
+    /// Represents an aggregate score for a user based off all beatmaps that have been played in the playlist.
+    /// </summary>
     public class APIUserScoreAggregate
     {
         [JsonProperty("attempts")]

@@ -363,7 +363,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             CurrentPlayer = createPlayer();
-            CurrentPlayer.Configuration.AutomaticallySkipIntro = quickRestart;
+            CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
 
@@ -502,7 +502,7 @@ namespace osu.Game.Screens.Play
 
         private int restartCount;
 
-        private const double volume_requirement = 0.05;
+        private const double volume_requirement = 0.01;
 
         private void showMuteWarningIfNeeded()
         {
@@ -530,7 +530,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, AudioManager audioManager, INotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
             {
                 Icon = FontAwesome.Solid.VolumeMute;
-                IconBackground.Colour = colours.RedDark;
+                IconContent.Colour = colours.RedDark;
 
                 Activated = delegate
                 {
@@ -539,10 +539,11 @@ namespace osu.Game.Screens.Play
                     volumeOverlay.IsMuted.Value = false;
 
                     // Check values before resetting, as the user may have only had mute enabled, in which case we might not need to adjust volumes.
+                    // Note that we only restore halfway to ensure the user isn't suddenly overloaded by unexpectedly high volume.
                     if (audioManager.Volume.Value <= volume_requirement)
-                        audioManager.Volume.SetDefault();
+                        audioManager.Volume.Value = 0.5f;
                     if (audioManager.VolumeTrack.Value <= volume_requirement)
-                        audioManager.VolumeTrack.SetDefault();
+                        audioManager.VolumeTrack.Value = 0.5f;
 
                     return true;
                 };
@@ -584,7 +585,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, INotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.BatteryQuarter;
-                IconBackground.Colour = colours.RedDark;
+                IconContent.Colour = colours.RedDark;
 
                 Activated = delegate
                 {

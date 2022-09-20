@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Utils;
@@ -320,7 +321,7 @@ namespace osu.Game.Tests.Mods
         public class InvalidMultiplayerMod : Mod
         {
             public override string Name => string.Empty;
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override string Acronym => string.Empty;
             public override double ScoreMultiplier => 1;
             public override bool HasImplementation => true;
@@ -331,7 +332,7 @@ namespace osu.Game.Tests.Mods
         private class InvalidMultiplayerFreeMod : Mod
         {
             public override string Name => string.Empty;
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override string Acronym => string.Empty;
             public override double ScoreMultiplier => 1;
             public override bool HasImplementation => true;

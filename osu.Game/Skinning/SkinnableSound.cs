@@ -151,7 +151,7 @@ namespace osu.Game.Skinning
             bool wasPlaying = IsPlaying;
 
             // Remove all pooled samples (return them to the pool), and dispose the rest.
-            samplesContainer.RemoveAll(s => s.IsInPool);
+            samplesContainer.RemoveAll(s => s.IsInPool, false);
             samplesContainer.Clear();
 
             foreach (var s in samples)
