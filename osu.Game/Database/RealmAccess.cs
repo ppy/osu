@@ -69,8 +69,9 @@ namespace osu.Game.Database
         /// 22   2022-07-31    Added ModPreset.
         /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
         /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
+        /// 25   2022-09-18    Remove skins to add with new naming.
         /// </summary>
-        private const int schema_version = 24;
+        private const int schema_version = 25;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -869,6 +870,11 @@ namespace osu.Game.Database
                         });
                     }
 
+                    break;
+
+                case 25:
+                    // Remove the default skins so they can be added back by SkinManager with updated naming.
+                    migration.NewRealm.RemoveRange(migration.NewRealm.All<SkinInfo>().Where(s => s.Protected));
                     break;
             }
         }

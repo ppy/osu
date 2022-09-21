@@ -29,8 +29,9 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class SkinnableTestScene : OsuGridTestScene, IStorageResourceProvider
     {
+        private TrianglesSkin trianglesSkin;
         private Skin metricsSkin;
-        private Skin defaultSkin;
+        private Skin legacySkin;
         private Skin specialSkin;
         private Skin oldSkin;
 
@@ -47,8 +48,9 @@ namespace osu.Game.Tests.Visual
         {
             var dllStore = new DllResourceStore(GetType().Assembly);
 
+            trianglesSkin = new TrianglesSkin(this);
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), this, true);
-            defaultSkin = new DefaultLegacySkin(this);
+            legacySkin = new DefaultLegacySkin(this);
             specialSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), this, true);
             oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), this, true);
         }
@@ -61,9 +63,9 @@ namespace osu.Game.Tests.Visual
 
             var beatmap = CreateBeatmapForSkinProvider();
 
-            Cell(0).Child = createProvider(null, creationFunction, beatmap);
+            Cell(0).Child = createProvider(trianglesSkin, creationFunction, beatmap);
             Cell(1).Child = createProvider(metricsSkin, creationFunction, beatmap);
-            Cell(2).Child = createProvider(defaultSkin, creationFunction, beatmap);
+            Cell(2).Child = createProvider(legacySkin, creationFunction, beatmap);
             Cell(3).Child = createProvider(specialSkin, creationFunction, beatmap);
             Cell(4).Child = createProvider(oldSkin, creationFunction, beatmap);
         }
