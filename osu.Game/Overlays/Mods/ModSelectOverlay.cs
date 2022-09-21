@@ -112,6 +112,7 @@ namespace osu.Game.Overlays.Mods
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
 
         private ModsEffectsFlow? effectsContainer;
+        private ModsEffectsFlow? customisationAreaEffectsContainer;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
@@ -172,7 +173,7 @@ namespace osu.Game.Overlays.Mods
                                             Height = ModsEffectDisplay.HEIGHT - 14,
                                             Colour = ColourProvider.Background5
                                         },
-                                        new ModsEffectsFlow()
+                                        customisationAreaEffectsContainer = new ModsEffectsFlow()
                                     }
                                 }
                             },
@@ -423,6 +424,8 @@ namespace osu.Game.Overlays.Mods
             TopLevelContent.MoveToY(-modAreaHeight, transition_duration, Easing.InOutCubic);
             effectsContainer?.MoveToX(customisationVisible.Value ? distance : 0f, transition_duration, Easing.InOutCubic);
             effectsContainer?.FadeTo(customisationVisible.Value ? 0f : 1f, transition_duration, Easing.InOutCubic);
+            customisationAreaEffectsContainer?.MoveToX(customisationVisible.Value ? 0f : distance, transition_duration, Easing.InOutCubic);
+            customisationAreaEffectsContainer?.FadeTo(customisationVisible.Value ? 1f : 0f, transition_duration, Easing.InOutCubic);
         }
 
         /// <summary>
