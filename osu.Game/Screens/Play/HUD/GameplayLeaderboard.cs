@@ -92,6 +92,7 @@ namespace osu.Game.Screens.Play.HUD
 
             int displayCount = Math.Min(Flow.Count, max_panels);
             Height = displayCount * (GameplayLeaderboardScore.PANEL_HEIGHT + Flow.Spacing.Y);
+            Flow.Margin = new MarginPadding { Bottom = Height };
             requiresScroll = displayCount != Flow.Count;
 
             return drawable;
@@ -114,7 +115,7 @@ namespace osu.Game.Screens.Play.HUD
             if (requiresScroll && trackedScore != null)
             {
                 float scrollTarget = scroll.GetChildPosInContent(trackedScore) + trackedScore.DrawHeight / 2 - scroll.DrawHeight / 2;
-                scroll.ScrollTo(scrollTarget, false);
+                scroll.ScrollTo(scrollTarget);
             }
 
             const float panel_height = GameplayLeaderboardScore.PANEL_HEIGHT;

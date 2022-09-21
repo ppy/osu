@@ -49,9 +49,9 @@ namespace osu.Game.Skinning
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
 
-        public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged())
+        public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(TrianglesSkin.CreateInfo().ToLiveUnmanaged())
         {
-            Default = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged()
+            Default = TrianglesSkin.CreateInfo().ToLiveUnmanaged()
         };
 
         private readonly SkinImporter skinImporter;
@@ -59,14 +59,14 @@ namespace osu.Game.Skinning
         private readonly IResourceStore<byte[]> userFiles;
 
         /// <summary>
-        /// The default skin.
+        /// The default "triangles" skin.
         /// </summary>
-        public Skin DefaultSkin { get; }
+        public Skin DefaultSkinTriangles { get; }
 
         /// <summary>
-        /// The default legacy skin.
+        /// The default "classic" skin.
         /// </summary>
-        public Skin DefaultLegacySkin { get; }
+        public Skin DefaultClassicSkin { get; }
 
         public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
             : base(storage, realm)
@@ -85,8 +85,8 @@ namespace osu.Game.Skinning
 
             var defaultSkins = new[]
             {
-                DefaultLegacySkin = new DefaultLegacySkin(this),
-                DefaultSkin = new DefaultSkin(this),
+                DefaultClassicSkin = new DefaultLegacySkin(this),
+                DefaultSkinTriangles = new TrianglesSkin(this),
             };
 
             // Ensure the default entries are present.
@@ -104,7 +104,7 @@ namespace osu.Game.Skinning
                 CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
             };
 
-            CurrentSkin.Value = DefaultSkin;
+            CurrentSkin.Value = DefaultSkinTriangles;
             CurrentSkin.ValueChanged += skin =>
             {
                 if (!skin.NewValue.SkinInfo.Equals(CurrentSkinInfo.Value))
@@ -119,11 +119,13 @@ namespace osu.Game.Skinning
             Realm.Run(r =>
             {
                 // choose from only user skins, removing the current selection to ensure a new one is chosen.
-                var randomChoices = r.All<SkinInfo>().Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
+                var randomChoices = r.All<SkinInfo>()
+                                     .Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID)
+                                     .ToArray();
 
                 if (randomChoices.Length == 0)
                 {
-                    CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged();
+                    CurrentSkinInfo.Value = TrianglesSkin.CreateInfo().ToLiveUnmanaged();
                     return;
                 }
 
@@ -227,11 +229,11 @@ namespace osu.Game.Skinning
             {
                 yield return CurrentSkin.Value;
 
-                if (CurrentSkin.Value is LegacySkin && CurrentSkin.Value != DefaultLegacySkin)
-                    yield return DefaultLegacySkin;
+                if (CurrentSkin.Value is LegacySkin && CurrentSkin.Value != DefaultClassicSkin)
+                    yield return DefaultClassicSkin;
 
-                if (CurrentSkin.Value != DefaultSkin)
-                    yield return DefaultSkin;
+                if (CurrentSkin.Value != DefaultSkinTriangles)
+                    yield return DefaultSkinTriangles;
             }
         }
 
@@ -292,10 +294,26 @@ namespace osu.Game.Skinning
                 Guid currentUserSkin = CurrentSkinInfo.Value.ID;
 
                 if (items.Any(s => s.ID == currentUserSkin))
-                    scheduler.Add(() => CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged());
+                    scheduler.Add(() => CurrentSkinInfo.Value = TrianglesSkin.CreateInfo().ToLiveUnmanaged());
 
                 Delete(items.ToList(), silent);
             });
+        }
+
+        public void SetSkinFromConfiguration(string guidString)
+        {
+            Live<SkinInfo> skinInfo = null;
+
+            if (Guid.TryParse(guidString, out var guid))
+                skinInfo = Query(s => s.ID == guid);
+
+            if (skinInfo == null)
+            {
+                if (guid == SkinInfo.CLASSIC_SKIN)
+                    skinInfo = DefaultClassicSkin.SkinInfo;
+            }
+
+            CurrentSkinInfo.Value = skinInfo ?? DefaultSkinTriangles.SkinInfo;
         }
     }
 }

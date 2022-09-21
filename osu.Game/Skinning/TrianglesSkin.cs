@@ -22,26 +22,26 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public class DefaultSkin : Skin
+    public class TrianglesSkin : Skin
     {
         public static SkinInfo CreateInfo() => new SkinInfo
         {
-            ID = osu.Game.Skinning.SkinInfo.DEFAULT_SKIN,
-            Name = "osu! (triangles)",
+            ID = osu.Game.Skinning.SkinInfo.TRIANGLES_SKIN,
+            Name = "osu! \"triangles\" (2017)",
             Creator = "team osu!",
             Protected = true,
-            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
+            InstantiationInfo = typeof(TrianglesSkin).GetInvariantInstantiationInfo()
         };
 
         private readonly IStorageResourceProvider resources;
 
-        public DefaultSkin(IStorageResourceProvider resources)
+        public TrianglesSkin(IStorageResourceProvider resources)
             : this(CreateInfo(), resources)
         {
         }
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
-        public DefaultSkin(SkinInfo skin, IStorageResourceProvider resources)
+        public TrianglesSkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(skin, resources)
         {
             this.resources = resources;
