@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Play.HUD
             if (requiresScroll && trackedScore != null)
             {
                 float scrollTarget = scroll.GetChildPosInContent(trackedScore) + trackedScore.DrawHeight / 2 - scroll.DrawHeight / 2;
-                scroll.ScrollTo(scrollTarget, false);
+                scroll.ScrollTo(scrollTarget);
             }
 
             const float panel_height = GameplayLeaderboardScore.PANEL_HEIGHT;
