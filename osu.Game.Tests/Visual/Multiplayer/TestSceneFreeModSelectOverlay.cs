@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("select difficulty adjust", () => freeModSelectOverlay.SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
             AddWaitStep("wait some", 3);
-            AddAssert("customisation area not expanded", () => this.ChildrenOfType<ModSettingsArea>().Single().Height == 0);
+            AddAssert("customisation area not available", () => !this.ChildrenOfType<ModSettingsArea>().Any());
         }
 
         [Test]
