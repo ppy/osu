@@ -34,6 +34,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            InputManager.MoveMouseTo(Vector2.Zero);
+
             TimeToCompleteProgress = 2000;
             progressingNotifications.Clear();
 
@@ -326,7 +328,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             SimpleNotification notification = null!;
             AddStep(@"post", () => notificationOverlay.Post(notification = new BackgroundNotification { Text = @"Welcome to osu!. Enjoy your stay!" }));
-            AddUntilStep("check is toast", () => !notification.IsInToastTray);
+            AddUntilStep("check is toast", () => notification.IsInToastTray);
             AddAssert("light is not visible", () => notification.ChildrenOfType<Notification.NotificationLight>().Single().Alpha == 0);
 
             AddUntilStep("wait for forward to overlay", () => !notification.IsInToastTray);
