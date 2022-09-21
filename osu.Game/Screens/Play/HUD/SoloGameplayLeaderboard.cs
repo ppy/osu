@@ -45,15 +45,6 @@ namespace osu.Game.Screens.Play.HUD
             if (!Scores.Any())
                 return;
 
-            ILeaderboardScore local = Add(trackingUser, true);
-
-            local.TotalScore.BindTarget = scoreProcessor.TotalScore;
-            local.Accuracy.BindTarget = scoreProcessor.Accuracy;
-            local.Combo.BindTarget = scoreProcessor.Combo;
-
-            // Local score should always show lower than any existing scores in cases of ties.
-            local.DisplayOrder.Value = long.MaxValue;
-
             foreach (var s in Scores)
             {
                 var score = Add(s.User, false);
@@ -68,6 +59,15 @@ namespace osu.Game.Screens.Play.HUD
                 score.Combo.Value = s.MaxCombo;
                 score.DisplayOrder.Value = s.OnlineID > 0 ? s.OnlineID : s.Date.ToUnixTimeSeconds();
             }
+
+            ILeaderboardScore local = Add(trackingUser, true);
+
+            local.TotalScore.BindTarget = scoreProcessor.TotalScore;
+            local.Accuracy.BindTarget = scoreProcessor.Accuracy;
+            local.Combo.BindTarget = scoreProcessor.Combo;
+
+            // Local score should always show lower than any existing scores in cases of ties.
+            local.DisplayOrder.Value = long.MaxValue;
         }
     }
 }
