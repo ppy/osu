@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.IO;
@@ -46,20 +45,18 @@ namespace osu.Game.Skinning
             var type = string.IsNullOrEmpty(InstantiationInfo)
                 // handle the case of skins imported before InstantiationInfo was added.
                 ? typeof(LegacySkin)
-                : Type.GetType(InstantiationInfo).AsNonNull();
+                : Type.GetType(InstantiationInfo);
 
-            try
+            if (type == null)
             {
-                return (Skin)Activator.CreateInstance(type, this, resources);
-            }
-            catch
-            {
-                // Since the class was renamed from "DefaultSkin" to "TrianglesSkin", the instantiation would fail
+                // Since the class was renamed from "DefaultSkin" to "TrianglesSkin", the type retrieval would fail
                 // for user modified skins. This aims to amicably handle that.
                 // If we ever add more default skins in the future this will need some kind of proper migration rather than
-                // a single catch.
+                // a single fallback.
                 return new TrianglesSkin(this, resources);
             }
+
+            return (Skin)Activator.CreateInstance(type, this, resources);
         }
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;
