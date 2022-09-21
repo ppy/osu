@@ -41,6 +41,11 @@ namespace osu.Game.Screens.Select.Leaderboards
                     return;
 
                 beatmapInfo = value;
+
+                // Refetch is scheduled, which can cause scores to be outdated if the leaderboard is not currently updating.
+                // As scores are potentially used by other components, clear them eagerly to ensure a more correct state.
+                SetScores(null);
+
                 RefetchScores();
             }
         }
