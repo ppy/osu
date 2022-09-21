@@ -13,6 +13,7 @@ namespace osu.Game.Online.Multiplayer
     [MessagePackObject]
     [Union(0, typeof(MatchStartCountdown))] // IMPORTANT: Add rules to SignalRUnionWorkaroundResolver for new derived types.
     [Union(1, typeof(ForceGameplayStartCountdown))]
+    [Union(2, typeof(ServerShuttingDownCountdown))]
     public abstract class MultiplayerCountdown
     {
         /// <summary>

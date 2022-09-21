@@ -110,6 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (Client != null)
             {
                 Client.RoomUpdated -= invokeOnRoomUpdated;
+                Client.LoadRequested -= invokeOnRoomLoadRequested;
                 Client.UserLeft -= invokeUserLeft;
                 Client.UserKicked -= invokeUserKicked;
                 Client.UserJoined -= invokeUserJoined;
