@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -51,6 +52,16 @@ namespace osu.Game.Screens.Play
             };
 
         protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
+
+        protected override Task ImportScore(Score score)
+        {
+            // Before importing a score, stop binding the leaderboard with its score source.
+            // This avoids a case where the imported score may cause a leaderboard refresh
+            // (if the leaderboard's source is local).
+            LeaderboardScores.UnbindBindings();
+
+            return base.ImportScore(score);
+        }
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
         {
