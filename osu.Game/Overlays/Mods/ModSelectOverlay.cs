@@ -421,8 +421,8 @@ namespace osu.Game.Overlays.Mods
 
             customisationArea?.ResizeHeightTo(modAreaHeight, transition_duration, Easing.InOutCubic);
             TopLevelContent.MoveToY(-modAreaHeight, transition_duration, Easing.InOutCubic);
-            effectsContainer.MoveToX(customisationVisible.Value ? distance : 0f, transition_duration, Easing.InOutCubic);
-            effectsContainer.FadeTo(customisationVisible.Value ? 0f : 1f, transition_duration, Easing.InOutCubic);
+            effectsContainer?.MoveToX(customisationVisible.Value ? distance : 0f, transition_duration, Easing.InOutCubic);
+            effectsContainer?.FadeTo(customisationVisible.Value ? 0f : 1f, transition_duration, Easing.InOutCubic);
         }
 
         /// <summary>
