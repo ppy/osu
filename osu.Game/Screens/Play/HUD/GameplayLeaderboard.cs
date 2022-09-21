@@ -96,6 +96,7 @@ namespace osu.Game.Screens.Play.HUD
 
             int displayCount = Math.Min(Flow.Count, maxPanels);
             Height = displayCount * (GameplayLeaderboardScore.PANEL_HEIGHT + Flow.Spacing.Y);
+            Flow.Margin = new MarginPadding { Bottom = Height };
             requiresScroll = displayCount != Flow.Count;
 
             return drawable;
