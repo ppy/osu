@@ -44,6 +44,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                         case OsuSkinComponents.ReverseArrow:
                             return new ArgonReverseArrow();
+
+                        case OsuSkinComponents.FollowPoint:
+                            return new ArgonFollowPoint();
                     }
 
                     break;
