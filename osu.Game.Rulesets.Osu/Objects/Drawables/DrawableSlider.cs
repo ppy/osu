@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 shakeContainer = new ShakeContainer
                 {
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both, },
                 Ball,
                 slidingSample = new PausableSkinnableSound { Looping = true }
-            };
+            });
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);

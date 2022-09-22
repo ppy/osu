@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             Origin = Anchor.Centre;
 
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 scaleContainer = new Container
                 {
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         }
                     }
                 },
-            };
+            });
 
             Size = HitArea.DrawSize;
 
