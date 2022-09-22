@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
     public class ArgonSpinnerDisc : CompositeDrawable
     {
-        private const float initial_scale = 1.3f;
+        private const float initial_scale = 1f;
         private const float idle_alpha = 0.2f;
         private const float tracking_alpha = 0.4f;
 
