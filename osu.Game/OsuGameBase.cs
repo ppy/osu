@@ -125,6 +125,8 @@ namespace osu.Game
 
         protected SessionStatics SessionStatics { get; private set; }
 
+        protected OsuColour Colours { get; private set; }
+
         protected BeatmapManager BeatmapManager { get; private set; }
 
         protected BeatmapModelDownloader BeatmapDownloader { get; private set; }
@@ -311,7 +313,7 @@ namespace osu.Game
                 dependencies.CacheAs(powerStatus);
 
             dependencies.Cache(SessionStatics = new SessionStatics());
-            dependencies.Cache(new OsuColour());
+            dependencies.Cache(Colours = new OsuColour());
 
             RegisterImportHandler(BeatmapManager);
             RegisterImportHandler(ScoreManager);
