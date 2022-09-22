@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private const int animation_duration = 200;
         private const int drawable_judgement_size = 8;
 
-        [SettingSource("Judgement count", "Number of displayed judgements")]
+        [SettingSource("Judgement count", "The number of displayed judgements")]
         public BindableNumber<int> JudgementCount { get; } = new BindableNumber<int>(20)
         {
             MinValue = 1,
@@ -28,23 +28,26 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             Precision = 1
         };
 
-        [SettingSource("Spacing", "Space between each displayed judgement")]
-        public BindableNumber<float> HitShapeSpacing { get; } = new BindableNumber<float>(2)
+        [SettingSource("Judgement spacing", "The space between each displayed judgement")]
+        public BindableNumber<float> JudgementSpacing { get; } = new BindableNumber<float>(2)
         {
             MinValue = 0,
             MaxValue = 10,
             Precision = 0.1f
         };
 
-        [SettingSource("Shape", "The shape of each displayed judgement")]
-        public Bindable<ShapeStyle> HitShape { get; } = new Bindable<ShapeStyle>();
+        [SettingSource("Judgement shape", "The shape of each displayed judgement")]
+        public Bindable<ShapeStyle> JudgementShape { get; } = new Bindable<ShapeStyle>();
 
         private readonly JudgementFlow judgementsFlow;
 
         public ColourHitErrorMeter()
         {
             AutoSizeAxes = Axes.Both;
-            InternalChild = judgementsFlow = new JudgementFlow();
+            InternalChild = judgementsFlow = new JudgementFlow
+            {
+                Shape = { BindTarget = JudgementShape }
+            };
         }
 
         protected override void OnNewJudgement(JudgementResult judgement)
@@ -58,18 +61,19 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            HitShapeSpacing.BindValueChanged(_ =>
+
+            JudgementSpacing.BindValueChanged(_ =>
             {
-                judgementsFlow.Height = JudgementCount.Value * (drawable_judgement_size + HitShapeSpacing.Value) - HitShapeSpacing.Value;
-                judgementsFlow.Spacing = new Vector2(0, HitShapeSpacing.Value);
+                judgementsFlow.Height = JudgementCount.Value * (drawable_judgement_size + JudgementSpacing.Value) - JudgementSpacing.Value;
+                judgementsFlow.Spacing = new Vector2(0, JudgementSpacing.Value);
             }, true);
+
             JudgementCount.BindValueChanged(_ =>
             {
                 //Used to clear out the overflowing judgement children when the value is lowered
                 judgementsFlow.RemoveAll(_ => true, true);
-                judgementsFlow.Height = JudgementCount.Value * (drawable_judgement_size + HitShapeSpacing.Value) - HitShapeSpacing.Value;
+                judgementsFlow.Height = JudgementCount.Value * (drawable_judgement_size + JudgementSpacing.Value) - JudgementSpacing.Value;
             }, true);
-            HitShape.BindValueChanged(_ => judgementsFlow.Shape.Value = HitShape.Value, true);
         }
 
         public override void Clear() => judgementsFlow.Clear();
