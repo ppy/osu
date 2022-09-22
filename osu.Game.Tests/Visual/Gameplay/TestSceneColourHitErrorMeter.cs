@@ -1,11 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
 using System;
 using System.Diagnostics;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
@@ -21,22 +21,27 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneColourHitErrorMeter : OsuTestScene
     {
-        private DependencyProvidingContainer dependencyContainer;
+        private DependencyProvidingContainer dependencyContainer = null!;
 
         private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
-        private ScoreProcessor scoreProcessor;
+        private ScoreProcessor scoreProcessor = null!;
+
         private int iteration;
-        private ColourHitErrorMeter colourHitErrorMeter;
+
+        private ColourHitErrorMeter colourHitErrorMeter = null!;
 
         public TestSceneColourHitErrorMeter()
         {
             AddSliderStep("Manual Opacity test", 0.01f, 1, 1, alpha =>
             {
-                if (colourHitErrorMeter != null) colourHitErrorMeter.HitShapeOpacity.Value = alpha;
+                if (colourHitErrorMeter.IsNotNull())
+                    colourHitErrorMeter.HitShapeOpacity.Value = alpha;
             });
+
             AddSliderStep("Manual spacing test", 0, 10, 2, spacing =>
             {
-                if (colourHitErrorMeter != null) colourHitErrorMeter.HitShapeSpacing.Value = spacing;
+                if (colourHitErrorMeter.IsNotNull())
+                    colourHitErrorMeter.HitShapeSpacing.Value = spacing;
             });
         }
 
