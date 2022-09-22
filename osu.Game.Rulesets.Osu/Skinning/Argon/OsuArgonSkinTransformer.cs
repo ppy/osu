@@ -47,6 +47,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                         case OsuSkinComponents.FollowPoint:
                             return new ArgonFollowPoint();
+
+                        case OsuSkinComponents.Cursor:
+                            return new ArgonCursor();
+
+                        case OsuSkinComponents.CursorTrail:
+                            return new ArgonCursorTrail();
                     }
 
                     break;
