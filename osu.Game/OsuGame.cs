@@ -1042,7 +1042,7 @@ namespace osu.Game
 
             Logger.NewEntry += entry =>
             {
-                if (entry.Level < LogLevel.Important || entry.Target != LoggingTarget.Input || !entry.Message.StartsWith(tablet_prefix, StringComparison.Ordinal))
+                if (entry.Level < LogLevel.Important || entry.Target != LoggingTarget.Input || !entry.Message.StartsWith(tablet_prefix, StringComparison.OrdinalIgnoreCase))
                     return;
 
                 string message = entry.Message.Replace(tablet_prefix, string.Empty);
