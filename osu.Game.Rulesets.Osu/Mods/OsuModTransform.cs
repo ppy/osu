@@ -81,15 +81,15 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
 
                 default:
-                    var h = (OsuHitObject)drawable.HitObject;
-                    float appearDistance = (float)(h.TimePreempt - h.TimeFadeIn);
+                    var hitObject = (OsuHitObject)drawable.HitObject;
+                    float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn);
 
                     Vector2 originalPosition = drawable.Position;
                     Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
 
                     // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
-                    double appearTime = h.StartTime - h.TimePreempt - 1;
-                    double moveDuration = h.TimePreempt / 2 + 1;
+                    double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
+                    double moveDuration = hitObject.TimePreempt / 2 + 1;
 
                     using (drawable.BeginAbsoluteSequence(appearTime))
                     {
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                             .MoveTo(originalPosition, moveDuration, Easing.Out);
                     }
 
-                    theta += (float)h.TimeFadeIn / 1000;
+                    theta += (float)hitObject.TimeFadeIn / 1000;
                     break;
             }
         }
@@ -114,12 +114,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
 
                 default:
-                    var h = (OsuHitObject)drawable.HitObject;
+                    var hitObject = (OsuHitObject)drawable.HitObject;
                     Vector2 origin = drawable.Position;
 
                     // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
-                    double appearTime = h.StartTime - h.TimePreempt - 1;
-                    double moveDuration = h.TimePreempt / 2 + 1;
+                    double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
+                    double moveDuration = hitObject.TimePreempt / 2 + 1;
                     Vector2 playfieldCenter = OsuPlayfield.BASE_SIZE / 2;
 
                     using (drawable.BeginAbsoluteSequence(appearTime))
