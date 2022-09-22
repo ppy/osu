@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("hit first hitobject", () =>
             {
                 InputManager.Click(MouseButton.Left);
-                return nextObjectEntry.Result.HasResult;
+                return nextObjectEntry.Result?.HasResult == true;
             });
 
             AddAssert("check correct object after hit", () => sampleTriggerSource.GetMostValidObject() == beatmap.HitObjects[1]);

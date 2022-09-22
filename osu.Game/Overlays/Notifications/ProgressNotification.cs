@@ -142,7 +142,6 @@ namespace osu.Game.Overlays.Notifications
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
                     attemptPostCompletion();
-                    base.Close();
                     break;
             }
         }
@@ -166,6 +165,8 @@ namespace osu.Game.Overlays.Notifications
 
             CompletionTarget.Invoke(CreateCompletionNotification());
             completionSent = true;
+
+            Close(false);
         }
 
         private ProgressNotificationState state;
@@ -226,6 +227,7 @@ namespace osu.Game.Overlays.Notifications
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
+                    Depth = float.MaxValue,
                 },
                 loadingSpinner = new LoadingSpinner
                 {
@@ -234,12 +236,13 @@ namespace osu.Game.Overlays.Notifications
             });
         }
 
-        public override void Close()
+        public override void Close(bool runFlingAnimation)
         {
             switch (State)
             {
+                case ProgressNotificationState.Completed:
                 case ProgressNotificationState.Cancelled:
-                    base.Close();
+                    base.Close(runFlingAnimation);
                     break;
 
                 case ProgressNotificationState.Active:
