@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
 
-            // Explicit non-virtual function call.
+            // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
             base.AddInternal(Samples = new PausableSkinnableSound());
 
             CurrentSkin = skinSource;
@@ -405,7 +405,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
-        protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
+        protected override void ClearInternal(bool disposeChildren = true) =>
+            // See sample addition in load method.
+            throw new InvalidOperationException(
+                $"Should never clear a {nameof(DrawableHitObject)} as the base implementation adds components. If attempting to use {nameof(InternalChild)} or {nameof(InternalChildren)}, using {nameof(AddInternal)} or {nameof(AddRangeInternal)} instead.");
 
         private void updateState(ArmedState newState, bool force = false)
         {
