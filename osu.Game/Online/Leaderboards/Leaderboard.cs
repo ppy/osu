@@ -169,7 +169,7 @@ namespace osu.Game.Online.Leaderboards
                     throw new InvalidOperationException($"State {state} cannot be set by a leaderboard implementation.");
             }
 
-            Debug.Assert(scores.Any());
+            Debug.Assert(!scores.Any());
 
             setState(state);
         }
@@ -258,7 +258,7 @@ namespace osu.Game.Online.Leaderboards
                 .Expire();
             scoreFlowContainer = null;
 
-            if (scores.Any())
+            if (!scores.Any())
             {
                 setState(LeaderboardState.NoScores);
                 return;
