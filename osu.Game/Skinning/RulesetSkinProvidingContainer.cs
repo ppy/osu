@@ -81,6 +81,7 @@ namespace osu.Game.Skinning
                 }
             }
 
+            // TODO: check
             int lastDefaultSkinIndex = sources.IndexOf(sources.OfType<TrianglesSkin>().LastOrDefault());
 
             // Ruleset resources should be given the ability to override game-wide defaults

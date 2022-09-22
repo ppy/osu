@@ -104,6 +104,7 @@ namespace osu.Game.Overlays.Settings.Sections
             // In the future we should change this to properly handle ChangeSet events.
             dropdownItems.Clear();
 
+            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.ARGON_SKIN).ToLive(realm));
             dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.TRIANGLES_SKIN).ToLive(realm));
             dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.CLASSIC_SKIN).ToLive(realm));
 
