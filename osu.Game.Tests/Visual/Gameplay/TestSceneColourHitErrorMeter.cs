@@ -32,12 +32,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public TestSceneColourHitErrorMeter()
         {
-            AddSliderStep("Manual Opacity test", 0.01f, 1, 1, alpha =>
-            {
-                if (colourHitErrorMeter.IsNotNull())
-                    colourHitErrorMeter.HitShapeOpacity.Value = alpha;
-            });
-
             AddSliderStep("Manual spacing test", 0, 10, 2, spacing =>
             {
                 if (colourHitErrorMeter.IsNotNull())
@@ -74,14 +68,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         });
 
         protected override Ruleset CreateRuleset() => new OsuRuleset();
-
-        [Test]
-        public void TestOpacityChange()
-        {
-            AddRepeatStep("Add judgement", applyOneJudgement, 5);
-            AddStep("Change opacity to 30%", () => colourHitErrorMeter.HitShapeOpacity.Value = 0.3f);
-            AddRepeatStep("Add judgement", applyOneJudgement, 5);
-        }
 
         [Test]
         public void TestSpacingChange()

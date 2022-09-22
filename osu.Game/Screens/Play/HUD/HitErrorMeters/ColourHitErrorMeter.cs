@@ -28,14 +28,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             Precision = 1
         };
 
-        [SettingSource("Opacity", "Visibility of the displayed judgements")]
-        public BindableNumber<float> HitShapeOpacity { get; } = new BindableNumber<float>(1)
-        {
-            MinValue = 0.01f,
-            MaxValue = 1,
-            Precision = 0.01f,
-        };
-
         [SettingSource("Spacing", "Space between each displayed judgement")]
         public BindableNumber<float> HitShapeSpacing { get; } = new BindableNumber<float>(2)
         {
@@ -66,7 +58,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            HitShapeOpacity.BindValueChanged(_ => judgementsFlow.Alpha = HitShapeOpacity.Value, true);
             HitShapeSpacing.BindValueChanged(_ =>
             {
                 judgementsFlow.Height = JudgementCount.Value * (drawable_judgement_size + HitShapeSpacing.Value) - HitShapeSpacing.Value;
