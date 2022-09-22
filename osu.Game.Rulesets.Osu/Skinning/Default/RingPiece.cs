@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -14,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class RingPiece : CircularContainer
     {
-        public RingPiece()
+        public RingPiece(float thickness = 9)
         {
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
@@ -22,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             Origin = Anchor.Centre;
 
             Masking = true;
-            BorderThickness = 9; // roughly matches slider borders and makes stacked circles distinctly visible from each other.
+            BorderThickness = thickness;
             BorderColour = Color4.White;
 
             Child = new Box
