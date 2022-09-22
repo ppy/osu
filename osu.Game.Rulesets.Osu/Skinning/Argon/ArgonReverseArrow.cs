@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             };
 
             accentColour = hitObject.AccentColour.GetBoundCopy();
-            accentColour.BindValueChanged(accent => icon.Colour = accent.NewValue.Darken(4));
+            accentColour.BindValueChanged(accent => icon.Colour = accent.NewValue.Darken(4), true);
         }
     }
 }
