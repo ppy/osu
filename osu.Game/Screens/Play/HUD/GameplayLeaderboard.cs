@@ -96,6 +96,13 @@ namespace osu.Game.Screens.Play.HUD
 
             int displayCount = Math.Min(Flow.Count, maxPanels);
             Height = displayCount * (GameplayLeaderboardScore.PANEL_HEIGHT + Flow.Spacing.Y);
+            // Add extra margin space to flow equal to height of leaderboard.
+            // This ensures the content is always on screen, but also accounts for the fact that scroll operations
+            // without animation were actually forcing the local score to a location it can't usually reside at.
+            //
+            // Basically, the local score was in the scroll extension region (due to always trying to scroll the
+            // local player to the middle of the display, but there being no other content below the local player
+            // to scroll up by).
             Flow.Margin = new MarginPadding { Bottom = Height };
             requiresScroll = displayCount != Flow.Count;
 
