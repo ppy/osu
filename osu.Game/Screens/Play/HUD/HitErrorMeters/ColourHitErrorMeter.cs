@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private const int drawable_judgement_size = 8;
 
         [SettingSource("Judgement count", "Number of displayed judgements")]
-        public BindableNumber<int> HitShapeCount { get; } = new BindableNumber<int>(20)
+        public BindableNumber<int> JudgementCount { get; } = new BindableNumber<int>(20)
         {
             MinValue = 1,
             MaxValue = 30,
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             if (!judgement.Type.IsScorable() || judgement.Type.IsBonus())
                 return;
 
-            judgementsFlow.Push(GetColourForHitResult(judgement.Type), HitShapeCount.Value);
+            judgementsFlow.Push(GetColourForHitResult(judgement.Type), JudgementCount.Value);
         }
 
         protected override void LoadComplete()
@@ -69,14 +69,14 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             HitShapeOpacity.BindValueChanged(_ => judgementsFlow.Alpha = HitShapeOpacity.Value, true);
             HitShapeSpacing.BindValueChanged(_ =>
             {
-                judgementsFlow.Height = HitShapeCount.Value * (drawable_judgement_size + HitShapeSpacing.Value) - HitShapeSpacing.Value;
+                judgementsFlow.Height = JudgementCount.Value * (drawable_judgement_size + HitShapeSpacing.Value) - HitShapeSpacing.Value;
                 judgementsFlow.Spacing = new Vector2(0, HitShapeSpacing.Value);
             }, true);
-            HitShapeCount.BindValueChanged(_ =>
+            JudgementCount.BindValueChanged(_ =>
             {
                 //Used to clear out the overflowing judgement children when the value is lowered
                 judgementsFlow.RemoveAll(_ => true, true);
-                judgementsFlow.Height = HitShapeCount.Value * (drawable_judgement_size + HitShapeSpacing.Value) - HitShapeSpacing.Value;
+                judgementsFlow.Height = JudgementCount.Value * (drawable_judgement_size + HitShapeSpacing.Value) - HitShapeSpacing.Value;
             }, true);
             HitShape.BindValueChanged(_ => judgementsFlow.Shape.Value = HitShape.Value, true);
         }
