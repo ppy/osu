@@ -32,10 +32,16 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public TestSceneColourHitErrorMeter()
         {
-            AddSliderStep("Manual spacing test", 0, 10, 2, spacing =>
+            AddSliderStep("Judgement spacing", 0, 10, 2, spacing =>
             {
                 if (colourHitErrorMeter.IsNotNull())
                     colourHitErrorMeter.JudgementSpacing.Value = spacing;
+            });
+
+            AddSliderStep("Judgement count", 1, 50, 5, spacing =>
+            {
+                if (colourHitErrorMeter.IsNotNull())
+                    colourHitErrorMeter.JudgementCount.Value = spacing;
             });
         }
 
@@ -91,6 +97,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("Add judgement", applyOneJudgement, 8);
             AddStep("Change shape square", () => colourHitErrorMeter.JudgementShape.Value = ColourHitErrorMeter.ShapeStyle.Square);
             AddRepeatStep("Add judgement", applyOneJudgement, 10);
+            AddStep("Change shape circle", () => colourHitErrorMeter.JudgementShape.Value = ColourHitErrorMeter.ShapeStyle.Circle);
         }
 
         private void applyOneJudgement()
