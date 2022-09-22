@@ -1,23 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Textures;
-using osu.Game.Audio;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class OsuArgonSkinTransformer : ISkin
+    public class OsuArgonSkinTransformer : SkinTransformer
     {
         public OsuArgonSkinTransformer(ISkin skin)
+            : base(skin)
         {
         }
 
-        public Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponent component)
         {
             switch (component)
             {
@@ -52,22 +49,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     break;
             }
 
-            return null;
-        }
-
-        public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
-        {
-            return null;
-        }
-
-        public ISample? GetSample(ISampleInfo sampleInfo)
-        {
-            return null;
-        }
-
-        public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup) where TLookup : notnull where TValue : notnull
-        {
-            return null;
+            return base.GetDrawableComponent(component);
         }
     }
 }

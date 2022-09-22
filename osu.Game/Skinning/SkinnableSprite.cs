@@ -100,7 +100,7 @@ namespace osu.Game.Skinning
                 {
                     foreach (var skin in skins)
                     {
-                        if (skin is LegacySkinTransformer transformer && isUserSkin(transformer.Skin))
+                        if (skin is ISkinTransformer transformer && isUserSkin(transformer.Skin))
                             return transformer.Skin;
 
                         if (isUserSkin(skin))
