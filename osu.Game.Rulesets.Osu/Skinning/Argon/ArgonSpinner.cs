@@ -55,14 +55,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.Default.With(size: 28, weight: FontWeight.Bold),
-                    Y = -120,
+                    Y = -100,
                 },
                 spmContainer = new Container
                 {
                     Alpha = 0f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Y = 100,
+                    Y = 60,
                     Children = new[]
                     {
                         spmCounter = new OsuSpriteText
