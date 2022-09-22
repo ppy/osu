@@ -188,7 +188,7 @@ namespace osu.Game
         {
             this.args = args;
 
-            forwardRuntimeLogsToNotifications();
+            forwardGeneralLogsToNotifications();
             forwardTabletLogsToNotifications();
 
             SentryLogger = new SentryLogger(this);
@@ -994,7 +994,7 @@ namespace osu.Game
                 overlay.Depth = (float)-Clock.CurrentTime;
         }
 
-        private void forwardRuntimeLogsToNotifications()
+        private void forwardGeneralLogsToNotifications()
         {
             int recentLogCount = 0;
 
@@ -1002,7 +1002,7 @@ namespace osu.Game
 
             Logger.NewEntry += entry =>
             {
-                if (entry.Level < LogLevel.Important || entry.Target == null) return;
+                if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database) return;
 
                 const int short_term_display_limit = 3;
 
