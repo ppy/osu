@@ -41,6 +41,11 @@ namespace osu.Game.Screens.Select.Leaderboards
                     return;
 
                 beatmapInfo = value;
+
+                // Refetch is scheduled, which can cause scores to be outdated if the leaderboard is not currently updating.
+                // As scores are potentially used by other components, clear them eagerly to ensure a more correct state.
+                SetScores(null);
+
                 RefetchScores();
             }
         }
@@ -148,12 +153,10 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             var req = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
 
-            req.Success += r => Schedule(() =>
-            {
-                SetScores(
-                    scoreManager.OrderByTotalScore(r.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
-                    r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo));
-            });
+            req.Success += r => SetScores(
+                scoreManager.OrderByTotalScore(r.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
+                r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
+            );
 
             return req;
         }
@@ -208,7 +211,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 scores = scoreManager.OrderByTotalScore(scores.Detach());
 
-                Schedule(() => SetScores(scores));
+                SetScores(scores);
             }
         }
 

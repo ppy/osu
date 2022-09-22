@@ -1,11 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,15 +10,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class GameplayLeaderboard : CompositeDrawable
+    public abstract class GameplayLeaderboard : CompositeDrawable
     {
-        private readonly int maxPanels;
         private readonly Cached sorting = new Cached();
 
         public Bindable<bool> Expanded = new Bindable<bool>();
@@ -31,16 +27,15 @@ namespace osu.Game.Screens.Play.HUD
         private bool requiresScroll;
         private readonly OsuScrollContainer scroll;
 
-        private GameplayLeaderboardScore trackedScore;
+        private GameplayLeaderboardScore? trackedScore;
+
+        private const int max_panels = 8;
 
         /// <summary>
         /// Create a new leaderboard.
         /// </summary>
-        /// <param name="maxPanels">The maximum panels to show at once. Defines the maximum height of this component.</param>
-        public GameplayLeaderboard(int maxPanels = 8)
+        protected GameplayLeaderboard()
         {
-            this.maxPanels = maxPanels;
-
             Width = GameplayLeaderboardScore.EXTENDED_WIDTH + GameplayLeaderboardScore.SHEAR_WIDTH;
 
             InternalChildren = new Drawable[]
@@ -77,7 +72,7 @@ namespace osu.Game.Screens.Play.HUD
         /// Whether the player should be tracked on the leaderboard.
         /// Set to <c>true</c> for the local player or a player whose replay is currently being played.
         /// </param>
-        public ILeaderboardScore Add([CanBeNull] APIUser user, bool isTracked)
+        public ILeaderboardScore Add(IUser? user, bool isTracked)
         {
             var drawable = CreateLeaderboardScoreDrawable(user, isTracked);
 
@@ -93,9 +88,18 @@ namespace osu.Game.Screens.Play.HUD
 
             Flow.Add(drawable);
             drawable.TotalScore.BindValueChanged(_ => sorting.Invalidate(), true);
+            drawable.DisplayOrder.BindValueChanged(_ => sorting.Invalidate(), true);
 
-            int displayCount = Math.Min(Flow.Count, maxPanels);
+            int displayCount = Math.Min(Flow.Count, max_panels);
             Height = displayCount * (GameplayLeaderboardScore.PANEL_HEIGHT + Flow.Spacing.Y);
+            // Add extra margin space to flow equal to height of leaderboard.
+            // This ensures the content is always on screen, but also accounts for the fact that scroll operations
+            // without animation were actually forcing the local score to a location it can't usually reside at.
+            //
+            // Basically, the local score was in the scroll extension region (due to always trying to scroll the
+            // local player to the middle of the display, but there being no other content below the local player
+            // to scroll up by).
+            Flow.Margin = new MarginPadding { Bottom = Height };
             requiresScroll = displayCount != Flow.Count;
 
             return drawable;
@@ -108,7 +112,7 @@ namespace osu.Game.Screens.Play.HUD
             scroll.ScrollToStart(false);
         }
 
-        protected virtual GameplayLeaderboardScore CreateLeaderboardScoreDrawable(APIUser user, bool isTracked) =>
+        protected virtual GameplayLeaderboardScore CreateLeaderboardScoreDrawable(IUser? user, bool isTracked) =>
             new GameplayLeaderboardScore(user, isTracked);
 
         protected override void Update()
@@ -118,7 +122,7 @@ namespace osu.Game.Screens.Play.HUD
             if (requiresScroll && trackedScore != null)
             {
                 float scrollTarget = scroll.GetChildPosInContent(trackedScore) + trackedScore.DrawHeight / 2 - scroll.DrawHeight / 2;
-                scroll.ScrollTo(scrollTarget, false);
+                scroll.ScrollTo(scrollTarget);
             }
 
             const float panel_height = GameplayLeaderboardScore.PANEL_HEIGHT;
@@ -165,7 +169,10 @@ namespace osu.Game.Screens.Play.HUD
             if (sorting.IsValid)
                 return;
 
-            var orderedByScore = Flow.OrderByDescending(i => i.TotalScore.Value).ToList();
+            var orderedByScore = Flow
+                                 .OrderByDescending(i => i.TotalScore.Value)
+                                 .ThenBy(i => i.DisplayOrder.Value)
+                                 .ToList();
 
             for (int i = 0; i < Flow.Count; i++)
             {
