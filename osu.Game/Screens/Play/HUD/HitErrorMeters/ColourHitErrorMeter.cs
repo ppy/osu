@@ -24,8 +24,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         public BindableNumber<int> JudgementCount { get; } = new BindableNumber<int>(20)
         {
             MinValue = 1,
-            MaxValue = 30,
-            Precision = 1
+            MaxValue = 50,
         };
 
         [SettingSource("Judgement spacing", "The space between each displayed judgement")]
@@ -46,7 +45,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             AutoSizeAxes = Axes.Both;
             InternalChild = judgementsFlow = new JudgementFlow
             {
-                Shape = { BindTarget = JudgementShape }
+                JudgementShape = { BindTarget = JudgementShape },
+                JudgementSpacing = { BindTarget = JudgementSpacing },
+                JudgementCount = { BindTarget = JudgementCount }
             };
         }
 
@@ -55,25 +56,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             if (!judgement.Type.IsScorable() || judgement.Type.IsBonus())
                 return;
 
-            judgementsFlow.Push(GetColourForHitResult(judgement.Type), JudgementCount.Value);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            JudgementSpacing.BindValueChanged(_ =>
-            {
-                judgementsFlow.Height = JudgementCount.Value * (drawable_judgement_size + JudgementSpacing.Value) - JudgementSpacing.Value;
-                judgementsFlow.Spacing = new Vector2(0, JudgementSpacing.Value);
-            }, true);
-
-            JudgementCount.BindValueChanged(_ =>
-            {
-                //Used to clear out the overflowing judgement children when the value is lowered
-                judgementsFlow.RemoveAll(_ => true, true);
-                judgementsFlow.Height = JudgementCount.Value * (drawable_judgement_size + JudgementSpacing.Value) - JudgementSpacing.Value;
-            }, true);
+            judgementsFlow.Push(GetColourForHitResult(judgement.Type));
         }
 
         public override void Clear() => judgementsFlow.Clear();
@@ -82,7 +65,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
 
-            public readonly Bindable<ShapeStyle> Shape = new Bindable<ShapeStyle>();
+            public readonly Bindable<ShapeStyle> JudgementShape = new Bindable<ShapeStyle>();
+
+            public readonly Bindable<float> JudgementSpacing = new Bindable<float>();
+
+            public readonly Bindable<int> JudgementCount = new Bindable<int>();
 
             public JudgementFlow()
             {
@@ -92,15 +79,41 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 LayoutEasing = Easing.OutQuint;
             }
 
-            public void Push(Color4 colour, int maxErrorShapeCount)
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                JudgementCount.BindValueChanged(count =>
+                {
+                    removeExtraJudgements();
+                    updateMetrics();
+                });
+
+                JudgementSpacing.BindValueChanged(_ => updateMetrics(), true);
+            }
+
+            public void Push(Color4 colour)
             {
                 Add(new HitErrorShape(colour, drawable_judgement_size)
                 {
-                    Shape = { BindTarget = Shape },
+                    Shape = { BindTarget = JudgementShape },
                 });
 
-                if (Children.Count > maxErrorShapeCount)
-                    Children.FirstOrDefault(c => !c.IsRemoved)?.Remove();
+                removeExtraJudgements();
+            }
+
+            private void removeExtraJudgements()
+            {
+                var remainingChildren = Children.Where(c => !c.IsRemoved);
+
+                while (remainingChildren.Count() > JudgementCount.Value)
+                    remainingChildren.First().Remove();
+            }
+
+            private void updateMetrics()
+            {
+                Height = JudgementCount.Value * (drawable_judgement_size + JudgementSpacing.Value) - JudgementSpacing.Value;
+                Spacing = new Vector2(0, JudgementSpacing.Value);
             }
         }
 
