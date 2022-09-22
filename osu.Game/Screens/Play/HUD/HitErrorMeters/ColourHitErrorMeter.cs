@@ -32,7 +32,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             MinValue = 0,
             MaxValue = 10,
-            Precision = 0.1f
         };
 
         [SettingSource("Judgement shape", "The shape of each displayed judgement")]
