@@ -112,6 +112,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             private readonly Color4 colour;
 
+            private Container content = null!;
+
             public HitErrorShape(Color4 colour, int size)
             {
                 this.colour = colour;
@@ -122,33 +124,29 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             {
                 base.LoadComplete();
 
+                Child = content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colour
+                };
+
                 Shape.BindValueChanged(shape =>
                 {
                     switch (shape.NewValue)
                     {
                         case ShapeStyle.Circle:
-                            Child = new Circle
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0,
-                                Colour = colour
-                            };
+                            content.Child = new Circle { RelativeSizeAxes = Axes.Both };
                             break;
 
                         case ShapeStyle.Square:
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0,
-                                Colour = colour
-                            };
+                            content.Child = new Box { RelativeSizeAxes = Axes.Both };
                             break;
                     }
                 }, true);
 
-                Child.FadeInFromZero(animation_duration, Easing.OutQuint);
-                Child.MoveToY(-DrawSize.Y);
-                Child.MoveToY(0, animation_duration, Easing.OutQuint);
+                content.FadeInFromZero(animation_duration, Easing.OutQuint);
+                content.MoveToY(-DrawSize.Y);
+                content.MoveToY(0, animation_duration, Easing.OutQuint);
             }
 
             public void Remove()
