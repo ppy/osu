@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             if (!objects.Any())
                 return false;
 
-            return objects.All(o => Precision.AlmostEquals(o.ChildrenOfType<ShakeContainer>().First().Children.OfType<Container>().Single().Scale.X, target));
+            return objects.All(o => Precision.AlmostEquals(o.ChildrenOfType<Container>().First().Scale.X, target));
         }
 
         private bool checkSomeHit()
