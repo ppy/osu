@@ -18,11 +18,8 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Transformer used to handle support of legacy features for individual rulesets.
     /// </summary>
-    public abstract class LegacySkinTransformer : ISkin
+    public abstract class LegacySkinTransformer : ISkinTransformer
     {
-        /// <summary>
-        /// The <see cref="ISkin"/> which is being transformed.
-        /// </summary>
         [NotNull]
         public ISkin Skin { get; }
 
