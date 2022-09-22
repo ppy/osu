@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddSliderStep("Manual spacing test", 0, 10, 2, spacing =>
             {
                 if (colourHitErrorMeter.IsNotNull())
-                    colourHitErrorMeter.HitShapeSpacing.Value = spacing;
+                    colourHitErrorMeter.JudgementSpacing.Value = spacing;
             });
         }
 
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestSpacingChange()
         {
             AddRepeatStep("Add judgement", applyOneJudgement, 5);
-            AddStep("Change spacing", () => colourHitErrorMeter.HitShapeSpacing.Value = 10);
+            AddStep("Change spacing", () => colourHitErrorMeter.JudgementSpacing.Value = 10);
             AddRepeatStep("Add judgement", applyOneJudgement, 5);
         }
 
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestHitErrorShapeChange()
         {
             AddRepeatStep("Add judgement", applyOneJudgement, 8);
-            AddStep("Change shape square", () => colourHitErrorMeter.HitShape.Value = ColourHitErrorMeter.ShapeStyle.Square);
+            AddStep("Change shape square", () => colourHitErrorMeter.JudgementShape.Value = ColourHitErrorMeter.ShapeStyle.Square);
             AddRepeatStep("Add judgement", applyOneJudgement, 10);
         }
 
