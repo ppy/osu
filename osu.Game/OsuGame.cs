@@ -1037,18 +1037,21 @@ namespace osu.Game
 
         private void forwardTabletLogsToNotifications()
         {
+            const string tablet_prefix = @"[Tablet] ";
             bool notifyOnWarning = true;
 
             Logger.NewEntry += entry =>
             {
-                if (entry.Level < LogLevel.Important || entry.Target != LoggingTarget.Input || !entry.Message.StartsWith(@"[Tablet]", StringComparison.Ordinal))
+                if (entry.Level < LogLevel.Important || entry.Target != LoggingTarget.Input || !entry.Message.StartsWith(tablet_prefix, StringComparison.Ordinal))
                     return;
+
+                string message = entry.Message.Replace(tablet_prefix, string.Empty);
 
                 if (entry.Level == LogLevel.Error)
                 {
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
-                        Text = $"Encountered tablet error: \"{entry.Message}\"",
+                        Text = $"Encountered tablet error: \"{message}\"",
                         Icon = FontAwesome.Solid.PenSquare,
                         IconColour = Colours.RedDark,
                     }));
