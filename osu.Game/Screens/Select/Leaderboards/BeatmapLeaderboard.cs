@@ -153,10 +153,11 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             var req = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
 
-            req.Success += r => SetScores(
+            // Schedule is required to avoid potential object disposed exception when LoadComponentAsync is eventually called.
+            req.Success += r => Schedule(() => SetScores(
                 scoreManager.OrderByTotalScore(r.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
                 r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
-            );
+            ));
 
             return req;
         }
