@@ -465,7 +465,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             base.Update();
 
-            progressingNotifications.RemoveAll(n => n.State == ProgressNotificationState.Completed);
+            progressingNotifications.RemoveAll(n => n.State == ProgressNotificationState.Completed && n.WasClosed);
 
             if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
             {
