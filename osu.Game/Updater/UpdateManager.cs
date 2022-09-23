@@ -156,6 +156,7 @@ namespace osu.Game.Updater
                 switch (State)
                 {
                     case ProgressNotificationState.Cancelled:
+                    case ProgressNotificationState.Completed:
                         base.Close(runFlingAnimation);
                         break;
                 }
