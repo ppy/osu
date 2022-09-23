@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
@@ -26,9 +27,15 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
+        private bool showMobileMapper = true;
+
         public DrawableCatchRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
+            // Check if mods have RelaxMod instance
+            if (mods.OfType<ModRelax>().Any())
+                showMobileMapper = false;
+
             Direction.Value = ScrollingDirection.Down;
             TimeRange.Value = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450);
         }
@@ -36,7 +43,8 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            KeyBindingInputManager.Add(new CatchTouchInputMapper());
+            if (showMobileMapper)
+                KeyBindingInputManager.Add(new CatchTouchInputMapper());
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
