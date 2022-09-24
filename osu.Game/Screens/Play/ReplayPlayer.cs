@@ -7,8 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -25,28 +24,27 @@ namespace osu.Game.Screens.Play
     {
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
+        private readonly bool replayIsFailedScore;
+
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
-        protected override bool CheckModsAllowFailure() => false;
+        protected override bool CheckModsAllowFailure()
+        {
+            if (!replayIsFailedScore)
+                return false;
+
+            return base.CheckModsAllowFailure();
+        }
 
         public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
             : this((_, _) => score, configuration)
         {
+            replayIsFailedScore = score.ScoreInfo.Rank == ScoreRank.F;
         }
 
         public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)
             : base(configuration)
         {
             this.createScore = createScore;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            LoadComponentAsync(new LLinGameplayLeaderboard(Score.ScoreInfo.User)
-            {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft
-            }, HUDOverlay.Add);
         }
 
         protected override void PrepareReplay()
@@ -57,21 +55,15 @@ namespace osu.Game.Screens.Play
         protected override Score CreateScore(IBeatmap beatmap) => createScore(beatmap, Mods.Value);
 
         // Don't re-import replay scores as they're already present in the database.
-        protected override Task ImportScore(Score score, bool bypassChesk = false)
-        {
-            //目前的DanceMod仍然需要手动导入
-            var danceMod = (ModDance)Mods.Value.FirstOrDefault(m => m is ModDance);
+        protected override Task ImportScore(Score score) => Task.CompletedTask;
 
-            if (danceMod?.SaveScore.Value ?? false)
+        public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
+
+        protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
+            new SoloGameplayLeaderboard(Score.ScoreInfo.User)
             {
-                if (!score.ScoreInfo.User.Username.EndsWith(danceMod.ENDCHAR, StringComparison.Ordinal)) return Task.CompletedTask;
-
-                score.ScoreInfo.User.Username = score.ScoreInfo.User.Username.Replace(danceMod.ENDCHAR, danceMod.ENDCHARREPLACE);
-                base.ImportScore(score, bypassChesk);
-            }
-
-            return Task.CompletedTask;
-        }
+                Scores = { BindTarget = LeaderboardScores }
+            };
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
 

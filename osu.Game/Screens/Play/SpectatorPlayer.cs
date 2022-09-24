@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -84,6 +85,7 @@ namespace osu.Game.Screens.Play
             foreach (var frame in bundle.Frames)
             {
                 IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame();
+                Debug.Assert(convertibleFrame != null);
                 convertibleFrame.FromLegacy(frame, GameplayState.Beatmap);
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;

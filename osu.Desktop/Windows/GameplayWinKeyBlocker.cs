@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,12 +12,12 @@ namespace osu.Desktop.Windows
 {
     public class GameplayWinKeyBlocker : Component
     {
-        private Bindable<bool> disableWinKey;
-        private IBindable<bool> localUserPlaying;
-        private IBindable<bool> isActive;
+        private Bindable<bool> disableWinKey = null!;
+        private IBindable<bool> localUserPlaying = null!;
+        private IBindable<bool> isActive = null!;
 
         [Resolved]
-        private GameHost host { get; set; }
+        private GameHost host { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(ILocalUserPlayInfo localUserInfo, OsuConfigManager config)

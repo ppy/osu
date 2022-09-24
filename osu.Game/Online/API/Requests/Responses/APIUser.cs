@@ -34,8 +34,19 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"previous_usernames")]
         public string[] PreviousUsernames;
 
+        private CountryCode? countryCode;
+
+        public CountryCode CountryCode
+        {
+            get => countryCode ??= (Enum.TryParse(country?.Code, out CountryCode result) ? result : default);
+            set => countryCode = value;
+        }
+
+#pragma warning disable 649
+        [CanBeNull]
         [JsonProperty(@"country")]
-        public Country Country;
+        private Country country;
+#pragma warning restore 649
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
@@ -256,5 +267,13 @@ namespace osu.Game.Online.API.Requests.Responses
         public int OnlineID => Id;
 
         public bool Equals(APIUser other) => this.MatchesOnlineID(other);
+
+#pragma warning disable 649
+        private class Country
+        {
+            [JsonProperty(@"code")]
+            public string Code;
+        }
+#pragma warning restore 649
     }
 }

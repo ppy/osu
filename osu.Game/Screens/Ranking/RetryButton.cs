@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Ranking
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(13),
-                    Icon = FontAwesome.Solid.ArrowCircleLeft,
+                    Icon = FontAwesome.Solid.Redo,
                 },
             };
 

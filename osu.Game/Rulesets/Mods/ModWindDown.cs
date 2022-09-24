@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Mods
@@ -15,9 +14,8 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "递减";
         public override string Acronym => "WD";
-        public override string Description => "越~来~~越~~~慢~~~~";
+        public override LocalisableString Description => "越~来~~越~~~慢~~~~";
         public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleDown;
-        public override double ScoreMultiplier => 1.0;
 
         [SettingSource("初始速度", "歌曲的起始速度")]
         public override BindableNumber<double> InitialRate { get; } = new BindableDouble

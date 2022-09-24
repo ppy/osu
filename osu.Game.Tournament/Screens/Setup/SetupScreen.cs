@@ -9,6 +9,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -19,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    public class SetupScreen : TournamentScreen, IProvideVideo
+    public class SetupScreen : TournamentScreen
     {
         private FillFlowContainer fillFlow;
 
@@ -48,13 +50,21 @@ namespace osu.Game.Tournament.Screens.Setup
         {
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
 
-            InternalChild = fillFlow = new FillFlowContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Padding = new MarginPadding(10),
-                Spacing = new Vector2(10),
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(0.2f),
+                },
+                fillFlow = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding(10),
+                    Spacing = new Vector2(10),
+                }
             };
 
             api.LocalUser.BindValueChanged(_ => Schedule(reload));
@@ -74,7 +84,8 @@ namespace osu.Game.Tournament.Screens.Setup
                     Action = () => sceneManager?.SetScreen(new StablePathSelectScreen()),
                     Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "未找到",
                     Failing = fileBasedIpc?.IPCStorage == null,
-                    Description = "将使用osu！stable安装目录作为IPC的数据源。 如果没找到，请确保在osu!stable的最新cutting-edge中创建了一个空的ipc.txt，并将其设置为默认的osu！安装目录。"
+                    Description =
+                        "将使用osu！stable安装目录作为IPC的数据源。 如果没找到，请确保在osu!stable的最新cutting-edge中创建了一个空的ipc.txt，并将其设置为默认的osu！安装目录。"
                 },
                 new ActionableInfo
                 {
@@ -119,6 +130,12 @@ namespace osu.Game.Tournament.Screens.Setup
                     {
                         windowSize.Value = new Size((int)(height * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
                     }
+                },
+                new LabelledSwitchButton
+                {
+                    Label = "Auto advance screens",
+                    Description = "Screens will progress automatically from gameplay -> results -> map pool",
+                    Current = LadderInfo.AutoProgressScreens,
                 },
             };
         }

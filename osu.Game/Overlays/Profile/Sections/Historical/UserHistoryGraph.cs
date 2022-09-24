@@ -34,6 +34,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             new UserGraphTooltipContent(
                 tooltipCounterName,
                 playCount.ToLocalisableString("N0"),
-                date.ToLocalisableString("yyyy MMMM"));
+                date.ToLocalisableString("MMMM yyyy"));
     }
 }

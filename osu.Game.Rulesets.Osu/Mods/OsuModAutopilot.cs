@@ -1,13 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.StateChanges;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -22,19 +21,17 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "AP";
         public override IconUsage? Icon => OsuIcon.ModAutopilot;
         public override ModType Type => ModType.Automation;
-        public override string Description => @"跟着节奏点就好,无需移动光标.";
-        public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail), typeof(ModAutoplay), typeof(OsuModMagnetised) };
+        public override LocalisableString Description => @"跟着节奏点就好，光标会自动移动";
+        public override double ScoreMultiplier => 0.1;
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail), typeof(ModAutoplay), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 
         public bool PerformFail() => false;
 
         public bool RestartOnFail => false;
 
-        private OsuInputManager inputManager;
+        private OsuInputManager inputManager = null!;
 
-        private IFrameStableClock gameplayClock;
-
-        private List<OsuReplayFrame> replayFrames;
+        private List<OsuReplayFrame> replayFrames = null!;
 
         private int currentFrame;
 
@@ -42,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (currentFrame == replayFrames.Count - 1) return;
 
-            double time = gameplayClock.CurrentTime;
+            double time = playfield.Clock.CurrentTime;
 
             // Very naive implementation of autopilot based on proximity to replay frames.
             // TODO: this needs to be based on user interactions to better match stable (pausing until judgement is registered).
@@ -57,8 +54,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            gameplayClock = drawableRuleset.FrameStableClock;
-
             // Grab the input manager to disable the user's cursor, and for future use
             inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
             inputManager.AllowUserCursorMovement = false;

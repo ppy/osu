@@ -14,7 +14,6 @@ using osu.Game.Screens.Menu;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
 using osuTK.Graphics;
@@ -77,35 +76,13 @@ namespace osu.Game.Screens
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
-        private Color4 backgroundColor;
-
-        [Resolved(canBeNull: true)]
-        private DatabaseContextFactory efContextFactory { get; set; }
-
-        private EFToRealmMigrator realmMigrator;
-
-        [Resolved(canBeNull: true)]
-        private OsuGame osuGame { get; set; }
-
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
 
             LoadComponentAsync(precompiler = CreateShaderPrecompiler(), AddInternal);
 
-            // A non-null context factory means there's still content to migrate.
-            if (efContextFactory != null)
-            {
-                osuGame?.ForceWindowFadeIn();
-
-                cursorVisible = true;
-
-                LoadComponentAsync(new PreMigrateNotifier(startMigrate, this.Exit), AddInternal);
-            }
-            else
-            {
-                LoadComponentAsync(loadableScreen = CreateLoadableScreen());
-            }
+            LoadComponentAsync(loadableScreen = CreateLoadableScreen());
 
             LoadComponentAsync(spinner = new LoadingSpinner(true, true)
             {
@@ -119,24 +96,6 @@ namespace osu.Game.Screens
             });
 
             checkIfLoaded();
-        }
-
-        private void startMigrate(bool clearData)
-        {
-            cursorVisible = false;
-            LoadComponentAsync(realmMigrator = new EFToRealmMigrator(clearData), d =>
-            {
-                d.Alpha = 0.01f;
-                d.FadeIn(300, Easing.OutQuint);
-
-                AddInternal(d);
-            });
-            realmMigrator.MigrationCompleted.ContinueWith(_ => Schedule(() =>
-            {
-                // Delay initial screen loading to ensure that the migration is in a complete and sane state
-                // before the intro screen may import the game intro beatmap.
-                LoadComponentAsync(loadableScreen = CreateLoadableScreen());
-            }));
         }
 
         private void checkIfLoaded()

@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -25,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => @"紧随";
         public override string Acronym => @"ST";
         public override ModType Type => ModType.DifficultyIncrease;
-        public override string Description => @"不要断滑条哦";
+        public override LocalisableString Description => @"不要提前松手哦";
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModClassic), typeof(OsuModTarget) };
 

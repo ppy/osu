@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -35,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         private void runSpmTest(Mod mod)
         {
-            SpinnerSpmCalculator spmCalculator = null;
+            SpinnerSpmCalculator? spmCalculator = null;
 
             CreateModTest(new ModTestData
             {
@@ -61,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 return spmCalculator != null;
             });
 
-            AddUntilStep("SPM is correct", () => Precision.AlmostEquals(spmCalculator.Result.Value, 477, 5));
+            AddUntilStep("SPM is correct", () => Precision.AlmostEquals(spmCalculator.AsNonNull().Result.Value, 477, 5));
         }
     }
 }

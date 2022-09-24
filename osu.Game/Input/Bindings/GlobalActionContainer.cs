@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -16,10 +14,11 @@ namespace osu.Game.Input.Bindings
 {
     public class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalKeyboardInput
     {
-        private readonly Drawable handler;
-        private InputManager parentInputManager;
+        private readonly Drawable? handler;
 
-        public GlobalActionContainer(OsuGameBase game)
+        private InputManager? parentInputManager;
+
+        public GlobalActionContainer(OsuGameBase? game)
             : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
         {
             if (game is IKeyBindingHandler<GlobalAction>)
@@ -33,7 +32,10 @@ namespace osu.Game.Input.Bindings
             parentInputManager = GetContainingInputManager();
         }
 
+        // IMPORTANT: Do not change the order of key bindings in this list.
+        // It is used to decide the order of precedence (see note in DatabasedKeyBindingContainer).
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings
+                                                                       .Concat(OverlayKeyBindings)
                                                                        .Concat(EditorKeyBindings)
                                                                        .Concat(InGameKeyBindings)
                                                                        .Concat(SongSelectKeyBindings)
@@ -57,24 +59,6 @@ namespace osu.Game.Input.Bindings
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
-            new KeyBinding(InputKey.F6, GlobalAction.ToggleNowPlaying),
-            new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
-            new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
-            new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
-            new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
-
-            new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
-            new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
-            new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
-            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleBeatmapListing),
-            new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.S }, GlobalAction.ToggleSkinEditor),
-
-            new KeyBinding(InputKey.Escape, GlobalAction.Back),
-            new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
-
-            new KeyBinding(new[] { InputKey.Alt, InputKey.Home }, GlobalAction.Home),
-
             new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
             new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
 
@@ -85,7 +69,32 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
 
+            new KeyBinding(InputKey.Escape, GlobalAction.Back),
+            new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
+
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Home }, GlobalAction.Home),
+
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.F }, GlobalAction.ToggleFPSDisplay),
+            new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.S }, GlobalAction.ToggleSkinEditor),
+            new KeyBinding(new[] { InputKey.Control, InputKey.P }, GlobalAction.ToggleProfile),
+
+            new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
+
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.R }, GlobalAction.RandomSkin),
+
+            new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
+            new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
+        };
+
+        public IEnumerable<KeyBinding> OverlayKeyBindings => new[]
+        {
+            new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
+            new KeyBinding(InputKey.F6, GlobalAction.ToggleNowPlaying),
+            new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
+            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleBeatmapListing),
+            new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
+            new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
         };
 
         public IEnumerable<KeyBinding> EditorKeyBindings => new[]
@@ -378,5 +387,11 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTapForBPM))]
         EditorTapForBPM,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleFPSCounter))]
+        ToggleFPSDisplay,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleProfile))]
+        ToggleProfile,
     }
 }

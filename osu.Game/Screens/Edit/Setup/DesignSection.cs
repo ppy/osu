@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -126,6 +127,8 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning.Current.Value;
             Beatmap.BeatmapInfo.LetterboxInBreaks = letterboxDuringBreaks.Current.Value;
             Beatmap.BeatmapInfo.SamplesMatchPlaybackRate = samplesMatchPlaybackRate.Current.Value;
+
+            Beatmap.SaveState();
         }
     }
 }

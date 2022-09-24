@@ -5,8 +5,8 @@
 
 using System;
 using System.Diagnostics;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
+using System.Threading.Tasks;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -55,7 +55,25 @@ namespace osu.Game.Screens.Play
             return new CreateSoloScoreRequest(Beatmap.Value.BeatmapInfo, rulesetId, Game.VersionHash);
         }
 
+        public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
+
+        protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
+            new SoloGameplayLeaderboard(Score.ScoreInfo.User)
+            {
+                Scores = { BindTarget = LeaderboardScores }
+            };
+
         protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
+
+        protected override Task ImportScore(Score score)
+        {
+            // Before importing a score, stop binding the leaderboard with its score source.
+            // This avoids a case where the imported score may cause a leaderboard refresh
+            // (if the leaderboard's source is local).
+            LeaderboardScores.UnbindBindings();
+
+            return base.ImportScore(score);
+        }
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
         {

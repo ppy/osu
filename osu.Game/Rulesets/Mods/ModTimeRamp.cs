@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Audio;
@@ -20,6 +18,8 @@ namespace osu.Game.Rulesets.Mods
         /// The point in the beatmap at which the final ramping rate should be reached.
         /// </summary>
         public const double FINAL_RATE_PROGRESS = 0.75f;
+
+        public override double ScoreMultiplier => 0.5;
 
         [SettingSource("初始速度", "歌曲的起始速度")]
         public abstract BindableNumber<double> InitialRate { get; }
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        private IAdjustableAudioComponent track;
+        private IAdjustableAudioComponent? track;
 
         protected ModTimeRamp()
         {

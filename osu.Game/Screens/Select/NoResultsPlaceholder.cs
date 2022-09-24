@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Select
                 textFlow.AddParagraph("No beatmaps found!");
                 textFlow.AddParagraph(string.Empty);
 
-                textFlow.AddParagraph("Consider using the \"");
+                textFlow.AddParagraph("- Consider running the \"");
                 textFlow.AddLink(FirstRunSetupOverlayStrings.FirstRunSetupTitle, () => firstRunSetupOverlay?.Show());
                 textFlow.AddText("\" to download or import some beatmaps!");
             }
@@ -127,10 +127,10 @@ namespace osu.Game.Screens.Select
                         config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1);
                     });
 
-                    string lowerStar = filter.UserStarDifficulty.Min == null ? "∞" : $"{filter.UserStarDifficulty.Min:N1}";
+                    string lowerStar = $"{filter.UserStarDifficulty.Min ?? 0:N1}";
                     string upperStar = filter.UserStarDifficulty.Max == null ? "∞" : $"{filter.UserStarDifficulty.Max:N1}";
 
-                    textFlow.AddText($" the {lowerStar}-{upperStar} star difficulty filter.");
+                    textFlow.AddText($" the {lowerStar} - {upperStar} star difficulty filter.");
                 }
 
                 // TODO: Add realm queries to hint at which ruleset results are available in (and allow clicking to switch).
@@ -141,15 +141,14 @@ namespace osu.Game.Screens.Select
                     textFlow.AddLink(" enabling ", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
                     textFlow.AddText("automatic conversion!");
                 }
-
-                if (!string.IsNullOrEmpty(filter?.SearchText))
-                {
-                    textFlow.AddParagraph("- Try ");
-                    textFlow.AddLink("searching online", LinkAction.SearchBeatmapSet, filter.SearchText);
-                    textFlow.AddText($" for \"{filter.SearchText}\".");
-                }
             }
 
+            if (!string.IsNullOrEmpty(filter?.SearchText))
+            {
+                textFlow.AddParagraph("- Try ");
+                textFlow.AddLink("searching online", LinkAction.SearchBeatmapSet, filter.SearchText);
+                textFlow.AddText($" for \"{filter.SearchText}\".");
+            }
             // TODO: add clickable link to reset criteria.
         }
     }

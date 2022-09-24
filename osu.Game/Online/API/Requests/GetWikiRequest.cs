@@ -11,15 +11,16 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetWikiRequest : APIRequest<APIWikiPage>
     {
-        private readonly string path;
+        public readonly string Path;
+
         private readonly Language language;
 
         public GetWikiRequest(string path, Language language = Language.en)
         {
-            this.path = path;
+            Path = path;
             this.language = language;
         }
 
-        protected override string Target => $"wiki/{language.ToCultureCode()}/{path}";
+        protected override string Target => $"wiki/{language.ToCultureCode()}/{Path}";
     }
 }

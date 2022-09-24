@@ -20,8 +20,17 @@ namespace osu.Game.Screens.Select.Filter
         [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.ArtistTracksBpm))]
         BPM,
 
+        [Description("提交日期")]
+        DateSubmitted,
+
         [Description("添加日期")]
         DateAdded,
+
+        [Description("上架日期")]
+        DateRanked,
+
+        [Description("上次游玩")]
+        LastPlayed,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingDifficulty))]
         Difficulty,

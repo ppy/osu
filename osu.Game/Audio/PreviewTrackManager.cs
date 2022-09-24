@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -22,9 +20,9 @@ namespace osu.Game.Audio
 
         private readonly BindableDouble muteBindable = new BindableDouble();
 
-        private ITrackStore trackStore;
+        private ITrackStore trackStore = null!;
 
-        protected TrackManagerPreviewTrack CurrentTrack;
+        protected TrackManagerPreviewTrack? CurrentTrack;
 
         public PreviewTrackManager(IAdjustableAudioComponent mainTrackAdjustments)
         {
@@ -91,8 +89,8 @@ namespace osu.Game.Audio
 
         public class TrackManagerPreviewTrack : PreviewTrack
         {
-            [Resolved(canBeNull: true)]
-            public IPreviewTrackOwner Owner { get; private set; }
+            [Resolved]
+            public IPreviewTrackOwner? Owner { get; private set; }
 
             private readonly IBeatmapSetInfo beatmapSetInfo;
             private readonly ITrackStore trackManager;

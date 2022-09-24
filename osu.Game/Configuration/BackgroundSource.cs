@@ -3,19 +3,20 @@
 
 #nullable disable
 
-using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Configuration
 {
     public enum BackgroundSource
     {
-        [Description("皮肤")]
+        [LocalisableDescription(typeof(SkinSettingsStrings), nameof(SkinSettingsStrings.SkinSectionHeader))]
         Skin,
 
-        [Description("谱面")]
+        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.BeatmapHeader))]
         Beatmap,
 
-        [Description("谱面 (带故事版)")]
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.BeatmapWithStoryboard))]
         BeatmapWithStoryboard,
 
         [Description("加载页纯色背景")]

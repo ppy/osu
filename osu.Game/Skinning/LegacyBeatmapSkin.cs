@@ -96,7 +96,7 @@ namespace osu.Game.Skinning
             new SkinInfo
             {
                 Name = beatmapInfo.ToString(),
-                Creator = beatmapInfo.Metadata.Author.Username ?? string.Empty
+                Creator = beatmapInfo.Metadata.Author.Username
             };
     }
 }

@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class DrawableRecentActivity : CompositeDrawable
     {
-        private const int font_size = 18;//整合时更改,原为14
+        private const int font_size = 14;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -120,7 +120,13 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     };
 
                 default:
-                    return Empty();
+                    return new RecentActivityIcon(activity)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
             }
         }
 
@@ -130,40 +136,39 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             {
                 case RecentActivityType.Achievement:
                     addUserLink();
-                    addText($"解锁了\"{activity.Achievement.Name}\" 奖章!");
+                    addText($" unlocked the \"{activity.Achievement.Name}\" medal!");
                     break;
 
                 case RecentActivityType.BeatmapPlaycount:
                     addBeatmapLink();
-                    addText($"已被游玩 {activity.Count} 次!");
+                    addText($" has been played {activity.Count} times!");
                     break;
 
                 case RecentActivityType.BeatmapsetApprove:
                     addBeatmapsetLink();
-                    addText($"已被{activity.Approval.ToString().ToLowerInvariant()}!");
+                    addText($" has been {activity.Approval.ToString().ToLowerInvariant()}!");
                     break;
 
                 case RecentActivityType.BeatmapsetDelete:
                     addBeatmapsetLink();
-                    addText("已被删除.");
+                    addText(" has been deleted.");
                     break;
 
                 case RecentActivityType.BeatmapsetRevive:
                     addBeatmapsetLink();
-                    addText("已被");
+                    addText(" has been revived from eternal slumber by ");
                     addUserLink();
-                    addText("从永恒的沉睡中唤醒");
                     break;
 
                 case RecentActivityType.BeatmapsetUpdate:
                     addUserLink();
-                    addText("更新了谱面 ");
+                    addText(" has updated the beatmap ");
                     addBeatmapsetLink();
                     break;
 
                 case RecentActivityType.BeatmapsetUpload:
                     addUserLink();
-                    addText("上传了一张新的谱面 ");
+                    addText(" has submitted a new beatmap ");
                     addBeatmapsetLink();
                     break;
 
@@ -173,35 +178,35 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
                 case RecentActivityType.Rank:
                     addUserLink();
-                    addText($"在");
+                    addText($" achieved rank #{activity.Rank} on ");
                     addBeatmapLink();
-                    addText($" ({getRulesetName()})上获得了第{activity.Rank}名!");
+                    addText($" ({getRulesetName()})");
                     break;
 
                 case RecentActivityType.RankLost:
                     addUserLink();
-                    addText("在");
+                    addText(" has lost first place on ");
                     addBeatmapLink();
-                    addText($" ({getRulesetName()})上失去了第一名");
+                    addText($" ({getRulesetName()})");
                     break;
 
                 case RecentActivityType.UserSupportAgain:
                     addUserLink();
-                    addText("再次选择支持osu! - 感谢您的慷慨!");
+                    addText(" has once again chosen to support osu! - thanks for your generosity!");
                     break;
 
                 case RecentActivityType.UserSupportFirst:
                     addUserLink();
-                    addText("成为了osu!supporter! - 感谢您的慷慨!");
+                    addText(" has become an osu!supporter - thanks for your generosity!");
                     break;
 
                 case RecentActivityType.UserSupportGift:
                     addUserLink();
-                    addText("收到了一份osu!supporter的礼物!");
+                    addText(" has received the gift of osu!supporter!");
                     break;
 
                 case RecentActivityType.UsernameChange:
-                    addText($"{activity.User?.PreviousUsername}更改了用户名");
+                    addText($"{activity.User?.PreviousUsername} has changed their username to ");
                     addUserLink();
                     break;
             }

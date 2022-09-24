@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -123,11 +123,13 @@ namespace osu.Game.Overlays.Profile.Header
                             {
                                 hiddenDetailGlobal = new OverlinedInfoContainer
                                 {
-                                    Title = UsersStrings.ShowRankGlobalSimple
+                                    Title = UsersStrings.ShowRankGlobalSimple,
+                                    LineColour = colourProvider.Highlight1
                                 },
                                 hiddenDetailCountry = new OverlinedInfoContainer
                                 {
-                                    Title = UsersStrings.ShowRankCountrySimple
+                                    Title = UsersStrings.ShowRankCountrySimple,
+                                    LineColour = colourProvider.Highlight1
                                 },
                             }
                         }

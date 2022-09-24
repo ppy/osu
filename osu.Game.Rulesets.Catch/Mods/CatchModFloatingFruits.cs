@@ -1,10 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -16,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override string Name => "悬浮";
         public override string Acronym => "FF";
-        public override string Description => "上落式音游(";
+        public override LocalisableString Description => "上落式音游(";
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => FontAwesome.Solid.Cloud;
 

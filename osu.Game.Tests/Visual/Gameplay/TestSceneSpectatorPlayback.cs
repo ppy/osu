@@ -27,7 +27,6 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Screens.Play;
 using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Mods;
 using osu.Game.Tests.Visual.Spectator;
@@ -41,16 +40,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestRulesetInputManager playbackManager;
         private TestRulesetInputManager recordingManager;
 
-        private Replay replay;
-
+        private Score recordingScore;
+        private Replay playbackReplay;
         private TestSpectatorClient spectatorClient;
-
         private ManualClock manualClock;
-
         private TestReplayRecorder recorder;
-
         private OsuSpriteText latencyDisplay;
-
         private TestFramedReplayInputHandler replayHandler;
 
         [SetUpSteps]
@@ -58,7 +53,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("Setup containers", () =>
             {
-                replay = new Replay();
+                recordingScore = new Score
+                {
+                    ScoreInfo =
+                    {
+                        BeatmapInfo = new BeatmapInfo(),
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                    }
+                };
+
+                playbackReplay = new Replay();
                 manualClock = new ManualClock();
 
                 Child = new DependencyProvidingContainer
@@ -67,7 +71,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                     CachedDependencies = new[]
                     {
                         (typeof(SpectatorClient), (object)(spectatorClient = new TestSpectatorClient())),
-                        (typeof(GameplayState), TestGameplayState.Create(new OsuRuleset()))
                     },
                     Children = new Drawable[]
                     {
@@ -81,7 +84,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 {
                                     recordingManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                                     {
-                                        Recorder = recorder = new TestReplayRecorder
+                                        Recorder = recorder = new TestReplayRecorder(recordingScore)
                                         {
                                             ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
                                         },
@@ -112,7 +115,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                     playbackManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                                     {
                                         Clock = new FramedClock(manualClock),
-                                        ReplayInputHandler = replayHandler = new TestFramedReplayInputHandler(replay)
+                                        ReplayInputHandler = replayHandler = new TestFramedReplayInputHandler(playbackReplay)
                                         {
                                             GamefieldToScreenSpace = pos => playbackManager.ToScreenSpace(pos),
                                         },
@@ -144,6 +147,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 };
 
+                spectatorClient.BeginPlaying(TestGameplayState.Create(new OsuRuleset()), recordingScore);
                 spectatorClient.OnNewFrames += onNewFrames;
             });
         }
@@ -151,15 +155,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestBasic()
         {
-            AddUntilStep("received frames", () => replay.Frames.Count > 50);
+            AddUntilStep("received frames", () => playbackReplay.Frames.Count > 50);
             AddStep("stop sending frames", () => recorder.Expire());
-            AddUntilStep("wait for all frames received", () => replay.Frames.Count == recorder.SentFrames.Count);
+            AddUntilStep("wait for all frames received", () => playbackReplay.Frames.Count == recorder.SentFrames.Count);
         }
 
         [Test]
         public void TestWithSendFailure()
         {
-            AddUntilStep("received frames", () => replay.Frames.Count > 50);
+            AddUntilStep("received frames", () => playbackReplay.Frames.Count > 50);
 
             int framesReceivedSoFar = 0;
             int frameSendAttemptsSoFar = 0;
@@ -172,21 +176,21 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for next send attempt", () =>
             {
-                framesReceivedSoFar = replay.Frames.Count;
+                framesReceivedSoFar = playbackReplay.Frames.Count;
                 return spectatorClient.FrameSendAttempts > frameSendAttemptsSoFar + 1;
             });
 
             AddUntilStep("wait for more send attempts", () => spectatorClient.FrameSendAttempts > frameSendAttemptsSoFar + 10);
-            AddAssert("frames did not increase", () => framesReceivedSoFar == replay.Frames.Count);
+            AddAssert("frames did not increase", () => framesReceivedSoFar == playbackReplay.Frames.Count);
 
             AddStep("stop failing sends", () => spectatorClient.ShouldFailSendingFrames = false);
 
-            AddUntilStep("wait for next frames", () => framesReceivedSoFar < replay.Frames.Count);
+            AddUntilStep("wait for next frames", () => framesReceivedSoFar < playbackReplay.Frames.Count);
 
             AddStep("stop sending frames", () => recorder.Expire());
 
-            AddUntilStep("wait for all frames received", () => replay.Frames.Count == recorder.SentFrames.Count);
-            AddAssert("ensure frames were received in the correct sequence", () => replay.Frames.Select(f => f.Time).SequenceEqual(recorder.SentFrames.Select(f => f.Time)));
+            AddUntilStep("wait for all frames received", () => playbackReplay.Frames.Count == recorder.SentFrames.Count);
+            AddAssert("ensure frames were received in the correct sequence", () => playbackReplay.Frames.Select(f => f.Time).SequenceEqual(recorder.SentFrames.Select(f => f.Time)));
         }
 
         private void onNewFrames(int userId, FrameDataBundle frames)
@@ -195,10 +199,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 var frame = new TestReplayFrame();
                 frame.FromLegacy(legacyFrame, null);
-                replay.Frames.Add(frame);
+                playbackReplay.Frames.Add(frame);
             }
 
-            Logger.Log($"Received {frames.Frames.Count} new frames (total {replay.Frames.Count} of {recorder.SentFrames.Count})");
+            Logger.Log($"Received {frames.Frames.Count} new frames (total {playbackReplay.Frames.Count} of {recorder.SentFrames.Count})");
         }
 
         private double latency = SpectatorClient.TIME_BETWEEN_SENDS;
@@ -219,7 +223,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             if (!replayHandler.HasFrames)
                 return;
 
-            var lastFrame = replay.Frames.LastOrDefault();
+            var lastFrame = playbackReplay.Frames.LastOrDefault();
 
             // this isn't perfect as we basically can't be aware of the rate-of-send here (the streamer is not sending data when not being moved).
             // in gameplay playback, the case where NextFrame is null would pause gameplay and handle this correctly; it's strictly a test limitation / best effort implementation.
@@ -360,15 +364,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public List<ReplayFrame> SentFrames = new List<ReplayFrame>();
 
-            public TestReplayRecorder()
-                : base(new Score
-                {
-                    ScoreInfo =
-                    {
-                        BeatmapInfo = new BeatmapInfo(),
-                        Ruleset = new OsuRuleset().RulesetInfo,
-                    }
-                })
+            public TestReplayRecorder(Score score)
+                : base(score)
             {
             }
 

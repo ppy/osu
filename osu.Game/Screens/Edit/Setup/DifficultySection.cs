@@ -11,6 +11,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -96,6 +97,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Difficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
 
             Beatmap.UpdateAllHitObjects();
+            Beatmap.SaveState();
         }
     }
 }

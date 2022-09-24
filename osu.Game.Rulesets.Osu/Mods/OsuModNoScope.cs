@@ -1,11 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -19,9 +18,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModNoScope : ModNoScope, IUpdatableByPlayfield, IApplicableToBeatmap
     {
-        public override string Description => "光标在哪里?";
+        public override LocalisableString Description => "光标在哪里?";
 
-        private PeriodTracker spinnerPeriods;
+        private PeriodTracker spinnerPeriods = null!;
 
         [SettingSource(
             "隐藏连击",

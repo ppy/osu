@@ -1,11 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -16,11 +15,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModSpunOut : Mod, IApplicableToDrawableHitObject
     {
-        public override string Name => "自动转盘";
+        public override string Name => "自旋";
         public override string Acronym => "SO";
         public override IconUsage? Icon => OsuIcon.ModSpunOut;
         public override ModType Type => ModType.Automation;
-        public override string Description => @"转盘会自动完成";
+        public override LocalisableString Description => @"转盘会自动完成";
         public override double ScoreMultiplier => 0.9;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAutopilot), typeof(OsuModTarget) };
 

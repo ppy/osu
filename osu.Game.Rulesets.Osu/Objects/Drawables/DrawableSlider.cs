@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning;
@@ -33,6 +34,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSliderBall Ball { get; private set; }
 
         public SkinnableDrawable Body { get; private set; }
+
+        private ShakeContainer shakeContainer;
 
         /// <summary>
         /// A target container which can be used to add top level elements to the slider's display.
@@ -74,17 +77,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
-                Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
-                tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
-                tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
-                repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
+                shakeContainer = new ShakeContainer
+                {
+                    ShakeDuration = 30,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
+                        tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
+                        tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
+                        repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
+                    }
+                },
+                // slider head is not included in shake as it handles hit detection, and handles its own shaking.
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
                 OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both, },
                 Ball,
                 slidingSample = new PausableSkinnableSound { Looping = true }
-            };
+            });
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
@@ -108,6 +120,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             pathVersion.Value = int.MaxValue;
             PathVersion.BindTo(HitObject.Path.Version);
         }
+
+        public override void Shake() => shakeContainer.Shake();
 
         protected override void OnFree()
         {
@@ -319,13 +333,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             const float fade_out_time = 450;
 
-            // intentionally pile on an extra FadeOut to make it happen much faster.
-            Ball.FadeOut(fade_out_time / 4, Easing.Out);
-
             switch (state)
             {
                 case ArmedState.Hit:
-                    Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
                     if (SliderBody?.SnakingOut.Value == true)
                         Body.FadeOut(40); // short fade to allow for any body colour to smoothly disappear.
                     break;

@@ -126,10 +126,10 @@ namespace osu.Game.Tests.Online
             AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
             addAvailabilityCheckStep("state downloading 0%", () => BeatmapAvailability.Downloading(0.0f));
 
-            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)).SetProgress(0.4f));
+            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet))!.SetProgress(0.4f));
             addAvailabilityCheckStep("state downloading 40%", () => BeatmapAvailability.Downloading(0.4f));
 
-            AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)).TriggerSuccess(testBeatmapFile));
+            AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet))!.TriggerSuccess(testBeatmapFile));
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
 
             AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Online
 
             public TestBeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources,
                                       GameHost host = null, WorkingBeatmap defaultBeatmap = null)
-                : base(storage, realm, rulesets, api, audioManager, resources, host, defaultBeatmap)
+                : base(storage, realm, api, audioManager, resources, host, defaultBeatmap)
             {
             }
 
@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Online
                 => new TestDownloadRequest(set);
         }
 
-        private class TestDownloadRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
+        internal class TestDownloadRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
         {
             public new void SetProgress(float progress) => base.SetProgress(progress);
             public new void TriggerSuccess(string filename) => base.TriggerSuccess(filename);

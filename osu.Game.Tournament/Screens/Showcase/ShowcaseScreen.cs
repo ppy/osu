@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Showcase
 {
-    public class ShowcaseScreen : BeatmapInfoScreen // IProvideVideo
+    public class ShowcaseScreen : BeatmapInfoScreen
     {
         [BackgroundDependencyLoader]
         private void load()

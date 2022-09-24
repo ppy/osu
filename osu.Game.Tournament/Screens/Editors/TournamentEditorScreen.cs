@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen, IProvideVideo
+    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen
         where TDrawable : Drawable, IModelBacked<TModel>
         where TModel : class, new()
     {
@@ -106,7 +106,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        args.OldItems.Cast<TModel>().ForEach(i => flow.RemoveAll(d => d.Model == i));
+                        args.OldItems.Cast<TModel>().ForEach(i => flow.RemoveAll(d => d.Model == i, true));
                         break;
                 }
             };

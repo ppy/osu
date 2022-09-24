@@ -30,14 +30,9 @@
     <ProjectReference Include="..\Mvis.Plugin.BottomBar\Mvis.Plugin.BottomBar.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="Clowd.Squirrel" Version="2.9.40" />
+    <PackageReference Include="Clowd.Squirrel" Version="2.9.42" />
     <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageReference Include="System.IO.Packaging" Version="6.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.14" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.14">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
     <PackageReference Include="Tmds.DBus" Version="0.9.1" />
   </ItemGroup>

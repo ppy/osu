@@ -26,6 +26,8 @@ namespace osu.Game.Overlays
 {
     public class OverlaySortTabControl<T> : CompositeDrawable, IHasCurrentValue<T>
     {
+        public TabControl<T> TabControl { get; }
+
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
         public Bindable<T> Current
@@ -59,7 +61,7 @@ namespace osu.Game.Overlays
                         Font = OsuFont.GetFont(size: 17, weight: FontWeight.SemiBold),
                         Text = SortStrings.Default
                     },
-                    CreateControl().With(c =>
+                    TabControl = CreateControl().With(c =>
                     {
                         c.Anchor = Anchor.CentreLeft;
                         c.Origin = Anchor.CentreLeft;

@@ -29,15 +29,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private MultiplayerQueueList playlist;
         private BeatmapManager beatmaps;
-        private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
         private BeatmapInfo importedBeatmap;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
 

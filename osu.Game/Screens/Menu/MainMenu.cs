@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Menu
                 // presume the track is the current beatmap's track. not sure how correct this assumption is but it has worked until now.
                 if (!track.IsRunning)
                 {
-                    Beatmap.Value.PrepareTrackForPreviewLooping();
+                    Beatmap.Value.PrepareTrackForPreview(false);
                     track.Restart();
                 }
             }

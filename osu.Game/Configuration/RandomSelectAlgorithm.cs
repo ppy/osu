@@ -3,16 +3,17 @@
 
 #nullable disable
 
-using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Configuration
 {
     public enum RandomSelectAlgorithm
     {
-        [Description("永不重复")]
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.NeverRepeat))]
         RandomPermutation,
 
-        [Description("随机")]
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.TrueRandom))]
         Random
     }
 }

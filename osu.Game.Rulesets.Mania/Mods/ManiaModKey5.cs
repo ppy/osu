@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override int KeyCount => 5;
         public override string Name => "五键";
         public override string Acronym => "5K";
-        public override string Description => @"5键位模式";
+        public override LocalisableString Description => @"五键位模式";
     }
 }

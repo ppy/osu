@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition, IHasAccentColour
     {
+        public const float FOLLOW_AREA = 2.4f;
+
         public Func<OsuAction?> GetInitialHitAction;
 
         public Color4 AccentColour
@@ -31,7 +33,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             set => ball.Colour = value;
         }
 
-        private Drawable followCircle;
         private Drawable followCircleReceptor;
         private DrawableSlider drawableSlider;
         private Drawable ball;
@@ -47,12 +48,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Children = new[]
             {
-                followCircle = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle())
+                new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle())
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
                 },
                 followCircleReceptor = new CircularContainer
                 {
@@ -103,10 +103,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 tracking = value;
 
-                followCircleReceptor.Scale = new Vector2(tracking ? 2.4f : 1f);
-
-                followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
-                followCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
+                followCircleReceptor.Scale = new Vector2(tracking ? FOLLOW_AREA : 1f);
             }
         }
 

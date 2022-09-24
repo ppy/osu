@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                     new MostPlayedBeatmapMetadataContainer(mostPlayed.BeatmapInfo),
                                                     new LinkFlowContainer(t =>
                                                     {
-                                                        t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular);
+                                                        t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
                                                         t.Colour = colourProvider.Foreground1;
                                                     })
                                                     {
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                         Direction = FillDirection.Horizontal,
                                                     }.With(d =>
                                                     {
-                                                        d.AddText("谱师: ");
+                                                        d.AddText("mapped by ");
                                                         d.AddUserLink(mostPlayed.BeatmapSet.Author);
                                                     }),
                                                 }

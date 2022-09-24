@@ -71,11 +71,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Id = 6602580,
                         Username = @"waaiiru",
-                        Country = new Country
-                        {
-                            FullName = @"Spain",
-                            FlagName = @"ES",
-                        },
+                        CountryCode = CountryCode.ES,
                     },
                 },
                 new ScoreInfo
@@ -90,11 +86,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Id = 4608074,
                         Username = @"Skycries",
-                        Country = new Country
-                        {
-                            FullName = @"Brazil",
-                            FlagName = @"BR",
-                        },
+                        CountryCode = CountryCode.BR,
                     },
                 },
                 new ScoreInfo
@@ -109,11 +101,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Id = 1541390,
                         Username = @"Toukai",
-                        Country = new Country
-                        {
-                            FullName = @"Canada",
-                            FlagName = @"CA",
-                        },
+                        CountryCode = CountryCode.CA,
                     },
                 }
             };

@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Music
         public Action<FilterCriteria> FilterChanged;
 
         public readonly FilterTextBox Search;
-        private readonly CollectionDropdown collectionDropdown;
+        private readonly NowPlayingCollectionDropdown collectionDropdown;
 
         public FilterControl()
         {
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Music
                             RelativeSizeAxes = Axes.X,
                             Height = 40,
                         },
-                        collectionDropdown = new CollectionDropdown { RelativeSizeAxes = Axes.X }
+                        collectionDropdown = new NowPlayingCollectionDropdown { RelativeSizeAxes = Axes.X }
                     },
                 },
             };

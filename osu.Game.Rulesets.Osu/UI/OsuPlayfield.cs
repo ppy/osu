@@ -12,9 +12,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -114,22 +116,37 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuRulesetConfigManager config)
+        private void load(OsuRulesetConfigManager config, IBeatmap beatmap)
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
             config?.BindWith(OsuRulesetSetting.NoDraw300, NoDraw300);
 
-            RegisterPool<HitCircle, DrawableHitCircle>(10, 100);
+            var osuBeatmap = (OsuBeatmap)beatmap;
 
-            RegisterPool<Slider, DrawableSlider>(10, 100);
-            RegisterPool<SliderHeadCircle, DrawableSliderHead>(10, 100);
-            RegisterPool<SliderTailCircle, DrawableSliderTail>(10, 100);
-            RegisterPool<SliderTick, DrawableSliderTick>(10, 100);
-            RegisterPool<SliderRepeat, DrawableSliderRepeat>(5, 50);
+            RegisterPool<HitCircle, DrawableHitCircle>(20, 100);
+
+            // handle edge cases where a beatmap has a slider with many repeats.
+            int maxRepeatsOnOneSlider = 0;
+            int maxTicksOnOneSlider = 0;
+
+            if (osuBeatmap != null)
+            {
+                foreach (var slider in osuBeatmap.HitObjects.OfType<Slider>())
+                {
+                    maxRepeatsOnOneSlider = Math.Max(maxRepeatsOnOneSlider, slider.RepeatCount);
+                    maxTicksOnOneSlider = Math.Max(maxTicksOnOneSlider, slider.NestedHitObjects.OfType<SliderTick>().Count());
+                }
+            }
+
+            RegisterPool<Slider, DrawableSlider>(20, 100);
+            RegisterPool<SliderHeadCircle, DrawableSliderHead>(20, 100);
+            RegisterPool<SliderTailCircle, DrawableSliderTail>(20, 100);
+            RegisterPool<SliderTick, DrawableSliderTick>(Math.Max(maxTicksOnOneSlider, 20), Math.Max(maxTicksOnOneSlider, 200));
+            RegisterPool<SliderRepeat, DrawableSliderRepeat>(Math.Max(maxRepeatsOnOneSlider, 20), Math.Max(maxRepeatsOnOneSlider, 200));
 
             RegisterPool<Spinner, DrawableSpinner>(2, 20);
-            RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 100);
-            RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 100);
+            RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 200);
+            RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 200);
         }
 
         protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
@@ -176,7 +193,7 @@ namespace osu.Game.Rulesets.Osu.UI
             private readonly Action<DrawableOsuJudgement> onLoaded;
 
             public DrawableJudgementPool(HitResult result, Action<DrawableOsuJudgement> onLoaded)
-                : base(10)
+                : base(20)
             {
                 this.result = result;
                 this.onLoaded = onLoaded;

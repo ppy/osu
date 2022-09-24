@@ -70,10 +70,17 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             [Cached]
             private readonly BindableBeatDivisor beatDivisor;
 
+            protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+
             public EditorBeatmapDependencyContainer(IBeatmap beatmap, BindableBeatDivisor beatDivisor)
             {
-                editorClock = new EditorClock(beatmap, beatDivisor);
                 this.beatDivisor = beatDivisor;
+
+                InternalChildren = new Drawable[]
+                {
+                    editorClock = new EditorClock(beatmap, beatDivisor),
+                    Content,
+                };
             }
         }
     }

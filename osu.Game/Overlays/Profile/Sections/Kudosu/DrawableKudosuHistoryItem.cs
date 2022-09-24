@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Give:
-                            return $"在讨论贴 {post} 中获得了足够的票数而获得了 {amount} kudosu";
+                            return $"Received {amount} from kudosu deny repeal of modding post {post}";
                     }
 
                     break;
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Reset:
-                            return $"拒绝了讨论帖 {post} 中的 {amount} kudosu";
+                            return $"Denied {amount} from modding post {post}";
                     }
 
                     break;
@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Reset:
-                            return $"因讨论贴 {post} 被删除而失去了 {amount} kudosu";
+                            return $"Lost {amount} from modding post deletion of {post}";
                     }
 
                     break;
@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Give:
-                            return $"因在讨论贴 {post} 中获得足够的票数而获得了 {amount} kudosu";
+                            return $"Received {amount} from modding post restoration of {post}";
                     }
 
                     break;
@@ -104,10 +104,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Give:
-                            return $"因在讨论帖 {post} 中获得足够的票数而获得了 {amount} kudosu";
+                            return $"Received {amount} from obtaining votes in modding post of {post}";
 
                         case KudosuAction.Reset:
-                            return $"因在讨论贴 {post} 中失去票数而失去了 {amount} kudosu";
+                            return $"Lost {amount} from losing votes in modding post of {post}";
                     }
 
                     break;
@@ -116,10 +116,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (item.Action)
                     {
                         case KudosuAction.Give:
-                            return $"因 {post} 的选票重新计算而获得了 {amount} kudosu";
+                            return $"Received {amount} from votes recalculation in modding post of {post}";
 
                         case KudosuAction.Reset:
-                            return $"因 {post} 的选票重新计算而失去了 {amount} kudosu";
+                            return $"Lost {amount} from votes recalculation in modding post of {post}";
                     }
 
                     break;
@@ -131,19 +131,19 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (historyItem.Action)
                     {
                         case KudosuAction.Give:
-                            return $"收到了{giver} 在 {post} 中给的 {amount} kudosu";
+                            return $"Received {amount} from {giver} for a post at {post}";
 
                         case KudosuAction.Reset:
-                            return $"被 {giver} 重置了在 {post} 中给的kudosu";
+                            return $"Kudosu reset by {giver} for the post {post}";
 
                         case KudosuAction.Revoke:
-                            return $"拒绝了 {giver} 在 {post} 中给的 kudosu";
+                            return $"Denied kudosu by {giver} for the post {post}";
                     }
 
                     break;
             }
 
-            return $"未知事件 (kudosu变动 : {amount})";
+            return $"Unknown event ({amount} change)";
         }
     }
 }

@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -60,12 +61,12 @@ namespace osu.Game.Overlays.Profile.Header
                     Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
                     {
-                        topLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 16))
+                        topLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                         },
-                        bottomLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 16))
+                        bottomLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays.Profile.Header
                 topLinkContainer.AddText(UsersStrings.ShowFirstMembers);
             else
             {
-                topLinkContainer.AddText("加入时间：");
+                topLinkContainer.AddText("Joined ");
                 topLinkContainer.AddText(new DrawableDate(user.JoinDate, italic: false), embolden);
             }
 
@@ -101,7 +102,7 @@ namespace osu.Game.Overlays.Profile.Header
             }
             else if (user.LastVisit.HasValue)
             {
-                topLinkContainer.AddText("上次在线：");
+                topLinkContainer.AddText("Last seen ");
                 topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value, italic: false), embolden);
 
                 addSpacer(topLinkContainer);
@@ -109,7 +110,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (user.PlayStyles?.Length > 0)
             {
-                topLinkContainer.AddText("常用设备：");
+                topLinkContainer.AddText("Plays with ");
 
                 LocalisableString playStylesString = user.PlayStyles[0].GetLocalisableDescription();
 
@@ -124,13 +125,13 @@ namespace osu.Game.Overlays.Profile.Header
                 addSpacer(topLinkContainer);
             }
 
-            topLinkContainer.AddText("发表了");
-            topLinkContainer.AddLink($"{user.PostCount:#,##0} 篇论坛帖子", $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
+            topLinkContainer.AddText("Contributed ");
+            topLinkContainer.AddLink("forum post".ToQuantity(user.PostCount, "#,##0"), $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
 
             addSpacer(topLinkContainer);
 
-            topLinkContainer.AddText("发表了");
-            topLinkContainer.AddLink($"{user.CommentsCount:#,##0} 条评论", $"{api.WebsiteRootUrl}/comments?user_id={user.Id}", creationParameters: embolden);
+            topLinkContainer.AddText("Posted ");
+            topLinkContainer.AddLink("comment".ToQuantity(user.CommentsCount, "#,##0"), $"{api.WebsiteRootUrl}/comments?user_id={user.Id}", creationParameters: embolden);
 
             string websiteWithoutProtocol = user.Website;
 

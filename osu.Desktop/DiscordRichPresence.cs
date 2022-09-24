@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Text;
 using DiscordRPC;
@@ -26,15 +24,15 @@ namespace osu.Desktop
     {
         private const string client_id = "367827983903490050";
 
-        private DiscordRpcClient client;
+        private DiscordRpcClient client = null!;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        private IBindable<APIUser> user;
+        private IBindable<APIUser> user = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
@@ -130,8 +128,8 @@ namespace osu.Desktop
                 presence.Assets.LargeImageText = string.Empty;
             else
             {
-                if (user.Value.RulesetsStatistics != null && user.Value.RulesetsStatistics.TryGetValue(ruleset.Value.ShortName, out UserStatistics statistics))
-                    presence.Assets.LargeImageText = $"{user.Value.Username}" + (statistics.GlobalRank > 0 ? $" (全球排名#{statistics.GlobalRank:N0})" : string.Empty);
+                if (user.Value.RulesetsStatistics != null && user.Value.RulesetsStatistics.TryGetValue(ruleset.Value.ShortName, out UserStatistics? statistics))
+                    presence.Assets.LargeImageText = $"{user.Value.Username}" + (statistics.GlobalRank > 0 ? $" (全球排名 #{statistics.GlobalRank:N0})" : string.Empty);
                 else
                     presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (全球排名 #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
             }
@@ -164,7 +162,7 @@ namespace osu.Desktop
             });
         }
 
-        private IBeatmapInfo getBeatmap(UserActivity activity)
+        private IBeatmapInfo? getBeatmap(UserActivity activity)
         {
             switch (activity)
             {
@@ -188,10 +186,10 @@ namespace osu.Desktop
                            + (llin.BeatmapInfo.Metadata.TitleUnicode ?? llin.BeatmapInfo.Metadata.Title);
 
                 case UserActivity.InGame game:
-                    return game.BeatmapInfo.ToString();
+                    return game.BeatmapInfo.ToString() ?? string.Empty;
 
                 case UserActivity.Editing edit:
-                    return edit.BeatmapInfo.ToString();
+                    return edit.BeatmapInfo.ToString() ?? string.Empty;
 
                 case UserActivity.InLobby lobby:
                     return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;

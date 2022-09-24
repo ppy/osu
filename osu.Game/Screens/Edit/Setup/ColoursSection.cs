@@ -7,12 +7,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
     internal class ColoursSection : SetupSection
     {
-        public override LocalisableString Title => "配色";
+        public override LocalisableString Title => EditorSetupStrings.ColoursHeader;
 
         private LabelledColourPalette comboColours;
 
@@ -23,9 +24,9 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 comboColours = new LabelledColourPalette
                 {
-                    Label = "物件 / 滑条连击",
+                    Label = EditorSetupStrings.HitCircleSliderCombos,
                     FixedLabelWidth = LABEL_WIDTH,
-                    ColourNamePrefix = "连击"
+                    ColourNamePrefix = EditorSetupStrings.ComboColourPrefix
                 }
             };
 

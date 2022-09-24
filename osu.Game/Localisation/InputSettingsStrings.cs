@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString GlobalKeyBindingHeader => new TranslatableString(getKey(@"global_key_binding_header"), @"Global");
 
         /// <summary>
+        /// "Overlays"
+        /// </summary>
+        public static LocalisableString OverlaysSection => new TranslatableString(getKey(@"overlays_section"), @"Overlays");
+
+        /// <summary>
         /// "Song Select"
         /// </summary>
         public static LocalisableString SongSelectSection => new TranslatableString(getKey(@"song_select_section"), @"Song Select");

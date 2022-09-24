@@ -57,23 +57,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            MultiplayerCountdown newCountdown;
-
-            switch (room?.Countdown)
-            {
-                case MatchStartCountdown:
-                    newCountdown = room.Countdown;
-                    break;
-
-                // Clear the countdown with any other (including non-null) countdown values.
-                default:
-                    newCountdown = null;
-                    break;
-            }
+            MultiplayerCountdown newCountdown = room?.ActiveCountdowns.SingleOrDefault(c => c is MatchStartCountdown);
 
             if (newCountdown != countdown)
             {
-                countdown = room?.Countdown;
+                countdown = newCountdown;
                 countdownChangeTime = Time.Current;
             }
 
@@ -134,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             if (room == null)
             {
-                Text = "准备";
+                Text = "Ready";
                 return;
             }
 
@@ -142,16 +130,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             int countReady = room.Users.Count(u => u.State == MultiplayerUserState.Ready);
             int countTotal = room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
-            string countText = $"({countReady} / {countTotal} 已准备)";
+            string countText = $"({countReady} / {countTotal} ready)";
 
             if (countdown != null)
             {
-                string countdownText = $"将在{countdownTimeRemaining:mm\\:ss}后开始";
+                string countdownText = $"Starting in {countdownTimeRemaining:mm\\:ss}";
 
                 switch (localUser?.State)
                 {
                     default:
-                        Text = $"准备 ({countdownText.ToLowerInvariant()})";
+                        Text = $"Ready ({countdownText.ToLowerInvariant()})";
                         break;
 
                     case MultiplayerUserState.Spectating:
@@ -165,14 +153,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 switch (localUser?.State)
                 {
                     default:
-                        Text = "准备";
+                        Text = "Ready";
                         break;
 
                     case MultiplayerUserState.Spectating:
                     case MultiplayerUserState.Ready:
                         Text = room.Host?.Equals(localUser) == true
-                            ? $"开始 {countText}"
-                            : $"等待房主... {countText}";
+                            ? $"Start match {countText}"
+                            : $"Waiting for host... {countText}";
 
                         break;
                 }
@@ -213,7 +201,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
-                    if (room?.Host?.Equals(localUser) == true && room.Countdown == null)
+                    if (room?.Host?.Equals(localUser) == true && !room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
                         setGreen();
                     else
                         setYellow();
@@ -248,8 +236,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             get
             {
-                if (room?.Countdown != null && multiplayerClient.IsHost && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready && !room.Settings.AutoStartEnabled)
-                    return "取消倒计时";
+                if (room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true
+                    && multiplayerClient.IsHost
+                    && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready
+                    && !room.Settings.AutoStartEnabled)
+                {
+                    return "Cancel countdown";
+                }
 
                 return base.TooltipText;
             }

@@ -6,6 +6,7 @@ using osu.Framework.Localisation;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -15,11 +16,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         private SettingsButton importCollectionsButton = null!;
 
-        [BackgroundDependencyLoader]
-        private void load(CollectionManager? collectionManager, LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
-        {
-            if (collectionManager == null) return;
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
+        [Resolved]
+        private INotificationOverlay? notificationOverlay { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
+        {
             if (legacyImportManager?.SupportsImportFromStable == true)
             {
                 Add(importCollectionsButton = new SettingsButton
@@ -38,9 +43,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = MaintenanceSettingsStrings.DeleteAllCollections,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(collectionManager.DeleteAll));
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(deleteAllCollections));
                 }
             });
+        }
+
+        private void deleteAllCollections()
+        {
+            realm.Write(r => r.RemoveAll<BeatmapCollection>());
+            notificationOverlay?.Post(new ProgressCompletionNotification { Text = "Deleted all collections!" });
         }
     }
 }

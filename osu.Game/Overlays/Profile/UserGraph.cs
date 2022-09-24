@@ -244,7 +244,7 @@ namespace osu.Game.Overlays.Profile
                                     },
                                     Counter = new OsuSpriteText
                                     {
-                                        Font = OsuFont.GetFont(size: 17, weight: FontWeight.Regular),
+                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
                                     }
@@ -252,7 +252,7 @@ namespace osu.Game.Overlays.Profile
                             },
                             BottomText = new OsuSpriteText
                             {
-                                Font = OsuFont.GetFont(size: 17, weight: FontWeight.Regular),
+                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                             }
                         }
                     }

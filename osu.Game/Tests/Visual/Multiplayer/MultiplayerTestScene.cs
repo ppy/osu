@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using NUnit.Framework;
 using osu.Game.Online.Rooms;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -34,13 +33,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             this.joinRoom = joinRoom;
         }
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
-        {
-            if (joinRoom)
-                SelectedRoom.Value = CreateRoom();
-        });
-
         protected virtual Room CreateRoom()
         {
             return new Room
@@ -63,7 +55,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             if (joinRoom)
             {
-                AddStep("join room", () => RoomManager.CreateRoom(SelectedRoom.Value));
+                AddStep("join room", () =>
+                {
+                    SelectedRoom.Value = CreateRoom();
+                    RoomManager.CreateRoom(SelectedRoom.Value);
+                });
+
                 AddUntilStep("wait for room join", () => RoomJoined);
             }
         }

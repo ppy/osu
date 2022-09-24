@@ -128,5 +128,13 @@ namespace osu.Game.Online.API
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
 
         public void FailNextLogin() => shouldFailNextLogin = true;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // Ensure (as much as we can) that any pending tasks are run.
+            Scheduler.Update();
+        }
     }
 }

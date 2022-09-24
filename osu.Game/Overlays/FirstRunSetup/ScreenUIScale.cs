@@ -161,7 +161,6 @@ namespace osu.Game.Overlays.FirstRunSetup
             private void load(AudioManager audio, TextureStore textures, RulesetStore rulesets)
             {
                 Beatmap.Value = new DummyWorkingBeatmap(audio, textures);
-                Beatmap.Value.LoadTrack();
 
                 Ruleset.Value = rulesets.AvailableRulesets.First();
 

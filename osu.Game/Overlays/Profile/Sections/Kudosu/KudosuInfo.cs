@@ -44,9 +44,9 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             public CountTotal()
                 : base(UsersStrings.ShowExtraKudosuTotal)
             {
-                DescriptionText.AddText("取决于你对制谱的贡献如何。通过访问");
-                DescriptionText.AddLink("这个页面", "https://osu.ppy.sh/wiki/Kudosu");
-                DescriptionText.AddText("来获得更多信息。");//同样来自官网qwq
+                DescriptionText.AddText("Based on how much of a contribution the user has made to beatmap moderation. See ");
+                DescriptionText.AddLink("this page", "https://osu.ppy.sh/wiki/Kudosu");
+                DescriptionText.AddText(" for more information.");
             }
         }
 
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         new OsuSpriteText
                         {
                             Text = header,
-                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
                         },
                         valueText = new OsuSpriteText
                         {
@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             Font = OsuFont.GetFont(size: 40, weight: FontWeight.Light),
                             UseFullGlyphHeight = false,
                         },
-                        DescriptionText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 18))
+                        DescriptionText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 14))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

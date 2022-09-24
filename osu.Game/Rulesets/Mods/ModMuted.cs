@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -24,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "静音";
         public override string Acronym => "MU";
         public override IconUsage? Icon => FontAwesome.Solid.VolumeMute;
-        public override string Description => "你还能感受到歌曲的节奏吗？";
+        public override LocalisableString Description => "你还能感受到歌曲的节奏吗？";
         public override ModType Type => ModType.Fun;
         public override double ScoreMultiplier => 1;
     }
@@ -35,7 +33,7 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<double> mainVolumeAdjust = new BindableDouble(0.5);
         private readonly BindableNumber<double> metronomeVolumeAdjust = new BindableDouble(0.5);
 
-        private BindableNumber<int> currentCombo;
+        private readonly BindableNumber<int> currentCombo = new BindableInt();
 
         [SettingSource("启用节拍器", "添加节拍器来帮助你跟住歌曲的节奏。")]
         public BindableBool EnableMetronome { get; } = new BindableBool
@@ -94,7 +92,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            currentCombo = scoreProcessor.Combo.GetBoundCopy();
+            currentCombo.BindTo(scoreProcessor.Combo);
             currentCombo.BindValueChanged(combo =>
             {
                 double dimFactor = MuteComboCount.Value == 0 ? 1 : (double)combo.NewValue / MuteComboCount.Value;

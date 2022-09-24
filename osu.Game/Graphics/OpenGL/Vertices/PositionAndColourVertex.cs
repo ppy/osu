@@ -5,7 +5,7 @@
 
 using System;
 using System.Runtime.InteropServices;
-using osu.Framework.Graphics.OpenGL.Vertices;
+using osu.Framework.Graphics.Rendering.Vertices;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Graphics.ES30;

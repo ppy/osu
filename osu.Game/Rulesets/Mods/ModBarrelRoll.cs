@@ -1,12 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
@@ -36,7 +35,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Name => "滚筒";
         public override string Acronym => "BR";
-        public override string Description => "或许你需要旋转屏幕";
+        public override LocalisableString Description => "天旋地转！";
         public override double ScoreMultiplier => 1;
 
         public override string SettingDescription => $"{SpinSpeed.Value:N2} rpm {Direction.Value.GetDescription().ToLowerInvariant()}";

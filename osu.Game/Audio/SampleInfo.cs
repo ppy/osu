@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,7 +32,7 @@ namespace osu.Game.Audio
                 Volume);
         }
 
-        public bool Equals(SampleInfo other)
+        public bool Equals(SampleInfo? other)
             => other != null && sampleNames.SequenceEqual(other.sampleNames);
 
         public override bool Equals(object obj)

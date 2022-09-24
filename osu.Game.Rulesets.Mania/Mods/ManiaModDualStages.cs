@@ -1,8 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -13,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Name => "翻倍";
         public override string Acronym => "DS";
-        public override string Description => @"双倍键位,双倍快乐!";
+        public override LocalisableString Description => @"双倍键位,双倍快乐!";
         public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1;
 

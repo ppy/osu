@@ -328,7 +328,7 @@ namespace osu.Game.Screens.Select
             (new FooterButtonOptions(), BeatmapOptions)
         };
 
-        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay();
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
         {
@@ -421,20 +421,21 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate selectionChangedDebounce;
 
-        private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
+        private void updateCarouselSelection(ValueChangedEvent<WorkingBeatmap> e = null)
         {
-            if (e.NewValue is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
+            var beatmap = e?.NewValue ?? Beatmap.Value;
+            if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
-            Logger.Log($"Song select working beatmap updated to {e.NewValue}");
+            Logger.Log($"Song select working beatmap updated to {beatmap}");
 
-            if (!Carousel.SelectBeatmap(e.NewValue.BeatmapInfo, false))
+            if (!Carousel.SelectBeatmap(beatmap.BeatmapInfo, false))
             {
                 // A selection may not have been possible with filters applied.
 
                 // There was possibly a ruleset mismatch. This is a case we can help things along by updating the game-wide ruleset to match.
-                if (!e.NewValue.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
+                if (!beatmap.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
                 {
-                    Ruleset.Value = e.NewValue.BeatmapInfo.Ruleset;
+                    Ruleset.Value = beatmap.BeatmapInfo.Ruleset;
                     transferRulesetValue();
                 }
 
@@ -442,10 +443,10 @@ namespace osu.Game.Screens.Select
                 // we still want to temporarily show the new beatmap, bypassing filters.
                 // This will be undone the next time the user changes the filter.
                 var criteria = FilterControl.CreateCriteria();
-                criteria.SelectedBeatmapSet = e.NewValue.BeatmapInfo.BeatmapSet;
+                criteria.SelectedBeatmapSet = beatmap.BeatmapInfo.BeatmapSet;
                 Carousel.Filter(criteria);
 
-                Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
+                Carousel.SelectBeatmap(beatmap.BeatmapInfo);
             }
         }
 
@@ -613,6 +614,8 @@ namespace osu.Game.Screens.Select
 
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
+                updateCarouselSelection();
+
                 updateComponentFromBeatmap(Beatmap.Value);
 
                 if (ControlGlobalMusic)
@@ -696,7 +699,7 @@ namespace osu.Game.Screens.Select
         }
 
         private void ensureTrackLooping(IWorkingBeatmap beatmap, TrackChangeDirection changeDirection)
-            => beatmap.PrepareTrackForPreviewLooping();
+            => beatmap.PrepareTrackForPreview(true);
 
         public override bool OnBackButton()
         {
@@ -841,7 +844,7 @@ namespace osu.Game.Screens.Select
             };
             decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
-            Beatmap.BindValueChanged(workingBeatmapChanged);
+            Beatmap.BindValueChanged(updateCarouselSelection);
 
             boundLocalBindables = true;
         }
@@ -959,6 +962,11 @@ namespace osu.Game.Screens.Select
                 onHoverAction?.Invoke();
                 return base.OnHover(e);
             }
+        }
+
+        internal class SoloModSelectOverlay : UserModSelectOverlay
+        {
+            protected override bool ShowPresets => true;
         }
     }
 }

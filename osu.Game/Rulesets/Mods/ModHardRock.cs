@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
@@ -16,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "HR";
         public override IconUsage? Icon => OsuIcon.ModHardRock;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override string Description => "在各方面都难一点...";
+        public override LocalisableString Description => "在各方面都难一点...";
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModDifficultyAdjust) };
 
         public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)

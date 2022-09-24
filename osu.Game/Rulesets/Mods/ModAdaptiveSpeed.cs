@@ -1,13 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -25,16 +24,16 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Acronym => "AS";
 
-        public override string Description => "让歌曲主动适应你的节奏";
+        public override LocalisableString Description => "让歌曲主动适应你的节奏";
 
         public override ModType Type => ModType.Fun;
 
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier => 0.5;
 
         public override bool ValidForMultiplayer => false;
         public override bool ValidForMultiplayerAsFreeMod => false;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp), typeof(ModAutoplay) };
 
         [SettingSource("初始速度", "歌曲的初始速度")]
         public BindableNumber<double> InitialRate { get; } = new BindableDouble
@@ -79,7 +78,7 @@ namespace osu.Game.Rulesets.Mods
         // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
         private const double rate_change_on_miss = 0.95d;
 
-        private IAdjustableAudioComponent track;
+        private IAdjustableAudioComponent? track;
         private double targetRate = 1d;
 
         /// <summary>

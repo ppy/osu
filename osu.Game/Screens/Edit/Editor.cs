@@ -5,11 +5,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,10 +18,12 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -31,10 +33,11 @@ using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Resources.Localisation.Web;
+using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -50,6 +53,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK.Graphics;
 using osuTK.Input;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.Edit
 {
@@ -169,6 +173,9 @@ namespace osu.Game.Screens.Edit
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
+        [Resolved(canBeNull: true)]
+        private OnScreenDisplay onScreenDisplay { get; set; }
+
         public Editor(EditorLoader loader = null)
         {
             this.loader = loader;
@@ -186,7 +193,7 @@ namespace osu.Game.Screens.Edit
                 loadableBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
 
                 // required so we can get the track length in EditorClock.
-                // this is safe as nothing has yet got a reference to this new beatmap.
+                // this is ONLY safe because the track being provided is a `TrackVirtual` which we don't really care about disposing.
                 loadableBeatmap.LoadTrack();
 
                 // this is a bit haphazard, but guards against setting the lease Beatmap bindable if
@@ -212,7 +219,7 @@ namespace osu.Game.Screens.Edit
             }
 
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
-            clock = new EditorClock(playableBeatmap, beatDivisor) { IsCoupled = false };
+            clock = new EditorClock(playableBeatmap, beatDivisor);
             clock.ChangeSource(loadableBeatmap.Track);
 
             dependencies.CacheAs(clock);
@@ -225,6 +232,8 @@ namespace osu.Game.Screens.Edit
 
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo));
             dependencies.CacheAs(editorBeatmap);
+
+            editorBeatmap.UpdateInProgress.BindValueChanged(updateInProgress);
 
             canSave = editorBeatmap.BeatmapInfo.Ruleset.CreateInstance() is ILegacyRuleset;
 
@@ -297,7 +306,7 @@ namespace osu.Game.Screens.Edit
                                             pasteMenuItem = new EditorMenuItem("粘贴", MenuItemType.Standard, Paste),
                                         }
                                     },
-                                    new MenuItem("视图")
+                                    new MenuItem("View")
                                     {
                                         Items = new MenuItem[]
                                         {
@@ -323,6 +332,9 @@ namespace osu.Game.Screens.Edit
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
         }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -330,12 +342,18 @@ namespace osu.Game.Screens.Edit
 
             Mode.Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose;
             Mode.BindValueChanged(onModeChanged, true);
+
+            musicController.TrackChanged += onTrackChanged;
         }
 
-        /// <summary>
-        /// If the beatmap's track has changed, this method must be called to keep the editor in a valid state.
-        /// </summary>
-        public void UpdateClockSource() => clock.ChangeSource(Beatmap.Value.Track);
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            musicController.TrackChanged -= onTrackChanged;
+        }
+
+        private void onTrackChanged(WorkingBeatmap working, TrackChangeDirection direction) => clock.ChangeSource(working.Track);
 
         /// <summary>
         /// Creates an <see cref="EditorState"/> instance representing the current state of the editor.
@@ -386,7 +404,7 @@ namespace osu.Game.Screens.Edit
         {
             if (!canSave)
             {
-                notifications?.Post(new SimpleErrorNotification { Text = "Saving is not supported for this ruleset yet, sorry!" });
+                notifications?.Post(new SimpleErrorNotification { Text = "此游戏模式不支持保存，非常抱歉！" });
                 return false;
             }
 
@@ -405,6 +423,7 @@ namespace osu.Game.Screens.Edit
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
             updateLastSavedHash();
+            onScreenDisplay?.Display(new BeatmapEditorToast(ToastStrings.BeatmapSaved, editorBeatmap.BeatmapInfo.GetDisplayTitle()));
             return true;
         }
 
@@ -697,6 +716,27 @@ namespace osu.Game.Screens.Edit
             this.Exit();
         }
 
+        #region Mute from update application
+
+        private ScheduledDelegate temporaryMuteRestorationDelegate;
+        private bool temporaryMuteFromUpdateInProgress;
+
+        private void updateInProgress(ValueChangedEvent<bool> obj)
+        {
+            temporaryMuteFromUpdateInProgress = true;
+            updateSampleDisabledState();
+
+            // Debounce is arbitrarily high enough to avoid flip-flopping the value each other frame.
+            temporaryMuteRestorationDelegate?.Cancel();
+            temporaryMuteRestorationDelegate = Scheduler.AddDelayed(() =>
+            {
+                temporaryMuteFromUpdateInProgress = false;
+                updateSampleDisabledState();
+            }, 50);
+        }
+
+        #endregion
+
         #region Clipboard support
 
         private EditorMenuItem cutMenuItem;
@@ -812,7 +852,9 @@ namespace osu.Game.Screens.Edit
 
         private void updateSampleDisabledState()
         {
-            samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value || !(currentScreen is ComposeScreen);
+            samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value
+                                           || currentScreen is not ComposeScreen
+                                           || temporaryMuteFromUpdateInProgress;
         }
 
         private void seek(UIEvent e, int direction)
@@ -836,35 +878,61 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!trackPlaying, amount);
         }
 
+        private void updateLastSavedHash()
+        {
+            lastSavedHash = changeHandler?.CurrentStateHash;
+        }
+
+        private List<MenuItem> createFileMenuItems() => new List<MenuItem>
+        {
+            new EditorMenuItem("保存", MenuItemType.Standard, () => Save()),
+            new EditorMenuItem("导出图包", MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+            new EditorMenuItemSpacer(),
+            createDifficultyCreationMenu(),
+            createDifficultySwitchMenu(),
+            new EditorMenuItemSpacer(),
+            new EditorMenuItem("删除难度", MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } },
+            new EditorMenuItemSpacer(),
+            new EditorMenuItem("退出", MenuItemType.Standard, this.Exit)
+        };
+
         private void exportBeatmap()
         {
             Save();
             new LegacyBeatmapExporter(storage).Export(Beatmap.Value.BeatmapSetInfo);
         }
 
-        private void updateLastSavedHash()
-        {
-            lastSavedHash = changeHandler?.CurrentStateHash;
-        }
+        /// <summary>
+        /// Beatmaps of the currently edited set, grouped by ruleset and ordered by difficulty.
+        /// </summary>
+        private IOrderedEnumerable<IGrouping<RulesetInfo, BeatmapInfo>> groupedOrderedBeatmaps => Beatmap.Value.BeatmapSetInfo.Beatmaps
+                                                                                                         .OrderBy(b => b.StarRating)
+                                                                                                         .GroupBy(b => b.Ruleset)
+                                                                                                         .OrderBy(group => group.Key);
 
-        private List<MenuItem> createFileMenuItems()
+        private void deleteDifficulty()
         {
-            var fileMenuItems = new List<MenuItem>
+            if (dialogOverlay == null)
+                delete();
+            else
+                dialogOverlay.Push(new DeleteDifficultyConfirmationDialog(Beatmap.Value.BeatmapInfo, delete));
+
+            void delete()
             {
-                new EditorMenuItem("保存", MenuItemType.Standard, () => Save())
-            };
+                BeatmapInfo difficultyToDelete = playableBeatmap.BeatmapInfo;
 
-            if (RuntimeInfo.IsDesktop)
-                fileMenuItems.Add(new EditorMenuItem("导出图包", MenuItemType.Standard, exportBeatmap));
+                var difficultiesBeforeDeletion = groupedOrderedBeatmaps.SelectMany(g => g).ToList();
 
-            fileMenuItems.Add(new EditorMenuItemSpacer());
+                beatmapManager.DeleteDifficultyImmediately(difficultyToDelete);
 
-            fileMenuItems.Add(createDifficultyCreationMenu());
-            fileMenuItems.Add(createDifficultySwitchMenu());
+                int deletedIndex = difficultiesBeforeDeletion.IndexOf(difficultyToDelete);
+                // of note, we're still working with the cloned version, so indices are all prior to deletion.
+                BeatmapInfo nextToShow = difficultiesBeforeDeletion[deletedIndex == 0 ? 1 : deletedIndex - 1];
 
-            fileMenuItems.Add(new EditorMenuItemSpacer());
-            fileMenuItems.Add(new EditorMenuItem("退出", MenuItemType.Standard, this.Exit));
-            return fileMenuItems;
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(nextToShow);
+
+                SwitchToDifficulty(nextToShow);
+            }
         }
 
         private EditorMenuItem createDifficultyCreationMenu()
@@ -896,18 +964,14 @@ namespace osu.Game.Screens.Edit
 
         private EditorMenuItem createDifficultySwitchMenu()
         {
-            var beatmapSet = playableBeatmap.BeatmapInfo.BeatmapSet;
-
-            Debug.Assert(beatmapSet != null);
-
             var difficultyItems = new List<MenuItem>();
 
-            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.Ruleset).OrderBy(group => group.Key))
+            foreach (var rulesetBeatmaps in groupedOrderedBeatmaps)
             {
                 if (difficultyItems.Count > 0)
                     difficultyItems.Add(new EditorMenuItemSpacer());
 
-                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarRating))
+                foreach (var beatmap in rulesetBeatmaps)
                 {
                     bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(beatmap);
                     difficultyItems.Add(new DifficultyMenuItem(beatmap, isCurrentDifficulty, SwitchToDifficulty));
@@ -921,7 +985,7 @@ namespace osu.Game.Screens.Edit
 
         private void cancelExit()
         {
-            samplePlaybackDisabled.Value = false;
+            updateSampleDisabledState();
             loader?.CancelPendingDifficultySwitch();
         }
 
@@ -933,6 +997,14 @@ namespace osu.Game.Screens.Edit
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => editorBeatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => clock;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
+        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
+
+        private class BeatmapEditorToast : Toast
+        {
+            public BeatmapEditorToast(LocalisableString value, string beatmapDisplayName)
+                : base(InputSettingsStrings.EditorSection, value, beatmapDisplayName)
+            {
+            }
+        }
     }
 }

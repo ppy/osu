@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     {
         private readonly double weight;
 
-        public DrawableProfileWeightedScore(APIScore score, double weight)
+        public DrawableProfileWeightedScore(SoloScoreInfo score, double weight)
             : base(score)
         {
             this.weight = weight;
@@ -42,19 +42,18 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         CreateDrawableAccuracy(),
                         new Container
                         {
-                            AutoSizeAxes = Axes.Y,
-                            Width = 50,
+                            Size = new Vector2(50, 14),
                             Child = new OsuSpriteText
                             {
                                 Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                                Text = $"{Score.PP * weight:0}pp",
+                                Text = Score.PP.HasValue ? $"{Score.PP * weight:0}pp" : string.Empty,
                             },
                         }
                     }
                 },
                 new OsuSpriteText
                 {
-                    Font = OsuFont.GetFont(size: 16),
+                    Font = OsuFont.GetFont(size: 12),
                     Text = UsersStrings.ShowExtraTopRanksPpWeight(weight.ToLocalisableString("0%"))
                 }
             }
