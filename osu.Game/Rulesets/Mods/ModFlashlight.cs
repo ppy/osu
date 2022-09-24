@@ -39,6 +39,12 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
         public abstract BindableBool ComboBasedSize { get; }
 
+        [SettingSource("Final change size combo", "Changes on which combo the flashlight size reaches it final combo based size.")]
+        public abstract BindableInt FinalChangeSizeCombo { get; }
+
+        [SettingSource("Final flashlight size", "The final multiplier fully applied when the final change size combo is reached.")]
+        public abstract BindableInt FinalFlashlightSize { get; }
+
         /// <summary>
         /// The default size of the flashlight in ruleset-appropriate dimensions.
         /// <see cref="SizeMultiplier"/> and <see cref="ComboBasedSize"/> will apply their adjustments on top of this size.
@@ -105,12 +111,16 @@ namespace osu.Game.Rulesets.Mods
             private readonly float defaultFlashlightSize;
             private readonly float sizeMultiplier;
             private readonly bool comboBasedSize;
+            private readonly int finalChangeSizeCombo;
+            private readonly int finalFlashlightSize;
 
             protected Flashlight(ModFlashlight modFlashlight)
             {
                 defaultFlashlightSize = modFlashlight.DefaultFlashlightSize;
                 sizeMultiplier = modFlashlight.SizeMultiplier.Value;
                 comboBasedSize = modFlashlight.ComboBasedSize.Value;
+                finalChangeSizeCombo = modFlashlight.FinalChangeSizeCombo.Value;
+                finalFlashlightSize = modFlashlight.FinalFlashlightSize.Value;
             }
 
             [BackgroundDependencyLoader]
