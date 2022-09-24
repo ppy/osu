@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModNoSliding : Mod, IApplicableAfterBeatmapConversion
     {
+        private const int deathstream_length = 16;
+
         public override string Name => "No Sliding";
 
         public override string Acronym => "NL";
@@ -36,12 +38,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 16
         };
 
-        [SettingSource("Maximum stream length in beats", "Streams with more notes than this value will be lightened.")]
-        public BindableInt MaxStreamLength { get; } = new BindableInt(16)
-        {
-            MinValue = 5,
-            MaxValue = 100,
-        };
+        [SettingSource("Slow down too long streams")]
+        public BindableBool DeathstreamsSlowingDown { get; } = new BindableBool(true);
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -69,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     double divisor = BeatDivisor.Value;
                     // dur/BL*div is always lower than actual note count by 1, so using >=, not >.
-                    if (s.Duration / point.BeatLength * divisor >= MaxStreamLength.Value)
+                    if (s.Duration / point.BeatLength * divisor >= deathstream_length && DeathstreamsSlowingDown.Value)
                         divisor /= 2d; // making stream slower twice, if it's longer than the limit.
                     newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertSliderToStream(s, point, divisor));
                 }
