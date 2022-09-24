@@ -40,13 +40,31 @@ namespace osu.Game.Rulesets.Mods
         public abstract BindableBool ComboBasedSize { get; }
 
         [SettingSource("Change size after how many combo", "Changes after how many combo does flashlight change size")]
-        public abstract BindableFloat ChangeSizeAfterHowManyCombo { get; }
+        public BindableFloat ChangeSizeAfterHowManyCombo { get; } = new BindableFloat
+        {
+            MinValue = 1,
+            Value = 100,
+            MaxValue = 300,
+            Precision = 1
+        };
 
         [SettingSource("Final change size combo", "Changes on which combo the flashlight size reaches it final combo based size.")]
-        public abstract BindableInt FinalChangeSizeCombo { get; }
+        public BindableInt FinalChangeSizeCombo { get; } = new BindableInt
+        {
+            MinValue = 100,
+            Value = 200,
+            MaxValue = 300,
+            Precision = 50
+        };
 
         [SettingSource("Final flashlight size", "The final multiplier fully applied when the final change size combo is reached.")]
-        public abstract BindableInt FinalFlashlightSize { get; }
+        public BindableFloat FinalFlashlightSize { get; } = new BindableFloat
+        {
+            MinValue = 0.1f,
+            Value = 0.8f,
+            MaxValue = 1,
+            Precision = 0.1f,
+        };
 
         /// <summary>
         /// The default size of the flashlight in ruleset-appropriate dimensions.
