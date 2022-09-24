@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public abstract BindableFloat SizeMultiplier { get; }
 
-        [SettingSource("Change size combo", "Changes after how many combo the flashlight size is decreased.")]
+        [SettingSource("Change size combo", "Changes the combo multiplier where the flashlight size is changed.")]
         public BindableFloat ChangeSizeCombo { get; } = new BindableFloat(100)
         {
             MinValue = 1,
@@ -49,14 +49,14 @@ namespace osu.Game.Rulesets.Mods
             Precision = 1
         };
 
-        [SettingSource("Change size times", "Changes how many times is combo changed before reaching the final flashlight size")]
+        [SettingSource("Change size times", "Changes how many times the flashlight size is changed before reaching the final flashlight size.")]
         public BindableInt MaxChangeSizeTimes { get; } = new BindableInt(2)
         {
             MinValue = 0,
             MaxValue = 100
         };
 
-        [SettingSource("Final flashlight size", "The final multiplier fully applied when the final change size combo is reached.")]
+        [SettingSource("Final flashlight size", "The final size multiplier that is reached when the flashlight changes size for the last time.")]
         public BindableFloat FinalFlashlightSize { get; } = new BindableFloat(0.8f)
         {
             MinValue = 0.5f,
