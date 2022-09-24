@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Mods
 
             public List<BreakPeriod> Breaks = new List<BreakPeriod>();
 
-            private readonly float appliedSize;
+            private readonly float appliedFlashlightSize;
             private readonly float changeSizeDecreaseRatio;
             private readonly bool comboBasedSize;
 
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Mods
                 changeSizeCombo = modFlashlight.ChangeSizeCombo.Value;
                 maxChangeSizeTimes = modFlashlight.MaxChangeSizeTimes.Value;
 
-                appliedSize = modFlashlight.DefaultFlashlightSize * modFlashlight.SizeMultiplier.Value;
+                appliedFlashlightSize = modFlashlight.DefaultFlashlightSize * modFlashlight.SizeMultiplier.Value;
 
                 var finalFlashlightSizeBinding = modFlashlight.FinalFlashlightSize;
                 float finalFlashlightSize = finalFlashlightSizeBinding.Value;
@@ -182,11 +182,11 @@ namespace osu.Game.Rulesets.Mods
 
             protected float GetSizeFor(int combo)
             {
-                if (!comboBasedSize) return appliedSize;
+                if (!comboBasedSize) return appliedFlashlightSize;
 
                 float changeSizeComboReachedTimesLimited = MathF.Min(maxChangeSizeTimes, MathF.Floor(combo / changeSizeCombo));
 
-                return appliedSize * (1 - changeSizeComboReachedTimesLimited * changeSizeDecreaseRatio);
+                return appliedFlashlightSize * (1 - changeSizeComboReachedTimesLimited * changeSizeDecreaseRatio);
             }
 
             private Vector2 flashlightPosition;
