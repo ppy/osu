@@ -27,13 +27,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
             Precision = 0.1f
         };
 
-        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
-        public override BindableBool ComboBasedSize { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
-
         public override float DefaultFlashlightSize => 250;
 
         protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, playfield);

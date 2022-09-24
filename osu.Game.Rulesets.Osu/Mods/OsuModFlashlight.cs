@@ -42,13 +42,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 0.1f
         };
 
-        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
-        public override BindableBool ComboBasedSize { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
-
         public override float DefaultFlashlightSize => 180;
 
         private OsuFlashlight flashlight = null!;

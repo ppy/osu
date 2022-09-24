@@ -33,41 +33,39 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => "Restricted view area.";
 
+        protected ModFlashlight()
+        {
+            MaxChangeSizeTimes.DefaultChanged += _ => MaxChangeSizeTimes.SetDefault();
+        }
+
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public abstract BindableFloat SizeMultiplier { get; }
 
-        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
-        public abstract BindableBool ComboBasedSize { get; }
-
         [SettingSource("Change size combo", "Changes after how many combo the flashlight size is decreased.")]
-        public BindableFloat ChangeSizeCombo { get; } = new BindableFloat
+        public BindableFloat ChangeSizeCombo { get; } = new BindableFloat(100)
         {
             MinValue = 1,
-            Value = 100,
             MaxValue = 300,
             Precision = 1
         };
 
         [SettingSource("Change size times", "Changes how many times is combo changed before reaching the final flashlight size")]
-        public BindableInt MaxChangeSizeTimes { get; } = new BindableInt
+        public BindableInt MaxChangeSizeTimes { get; } = new BindableInt(2)
         {
-            MinValue = 1,
-            Value = 2,
+            MinValue = 0,
             MaxValue = 100
         };
 
         [SettingSource("Final flashlight size", "The final multiplier fully applied when the final change size combo is reached.")]
-        public BindableFloat FinalFlashlightSize { get; } = new BindableFloat
+        public BindableFloat FinalFlashlightSize { get; } = new BindableFloat(0.8f)
         {
             MinValue = 0.5f,
-            Value = 0.8f,
             MaxValue = 1,
             Precision = 0.1f,
         };
 
         /// <summary>
         /// The default size of the flashlight in ruleset-appropriate dimensions.
-        /// <see cref="SizeMultiplier"/> and <see cref="ComboBasedSize"/> will apply their adjustments on top of this size.
         /// </summary>
         public abstract float DefaultFlashlightSize { get; }
     }
@@ -130,8 +128,8 @@ namespace osu.Game.Rulesets.Mods
 
             private readonly float appliedSize;
             private readonly float changeSizeDecreaseRatio;
-
             private readonly bool comboBasedSize;
+
             private readonly int maxChangeSizeTimes;
             private readonly float changeSizeCombo;
 
@@ -139,12 +137,16 @@ namespace osu.Game.Rulesets.Mods
             {
                 changeSizeCombo = modFlashlight.ChangeSizeCombo.Value;
                 maxChangeSizeTimes = modFlashlight.MaxChangeSizeTimes.Value;
-                comboBasedSize = modFlashlight.ComboBasedSize.Value;
 
                 appliedSize = modFlashlight.DefaultFlashlightSize * modFlashlight.SizeMultiplier.Value;
 
+                var finalFlashlightSizeBinding = modFlashlight.FinalFlashlightSize;
+                float finalFlashlightSize = finalFlashlightSizeBinding.Value;
+
+                comboBasedSize = maxChangeSizeTimes > 0 && finalFlashlightSize < finalFlashlightSizeBinding.MaxValue;
+
                 if (comboBasedSize)
-                    changeSizeDecreaseRatio = (1 - modFlashlight.FinalFlashlightSize.Value) / maxChangeSizeTimes;
+                    changeSizeDecreaseRatio = (1 - finalFlashlightSize) / maxChangeSizeTimes;
             }
 
             [BackgroundDependencyLoader]
