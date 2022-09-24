@@ -115,6 +115,7 @@ namespace osu.Game.Rulesets.Mods
             private readonly float finalFlashlightDecreasing;
             private readonly float maximumChangeSizeComboReachedTimes;
 
+            private readonly bool comboBasedSize;
             private readonly int finalChangeSizeCombo;
             private readonly float changeSizeAfterHowManyCombo;
 
@@ -124,6 +125,7 @@ namespace osu.Game.Rulesets.Mods
             {
                 changeSizeAfterHowManyCombo = modFlashlight.ChangeSizeAfterHowManyCombo.Value;
                 finalChangeSizeCombo = modFlashlight.FinalChangeSizeCombo.Value;
+                comboBasedSize = modFlashlight.ComboBasedSize.Value;
 
                 finalFlashlightDecreasing = 1 - modFlashlight.FinalFlashlightSize.Value;
                 appliedSize = modFlashlight.DefaultFlashlightSize * modFlashlight.SizeMultiplier.Value;
@@ -163,6 +165,8 @@ namespace osu.Game.Rulesets.Mods
 
             protected float GetSizeFor(int combo)
             {
+                if (!comboBasedSize) return appliedSize;
+
                 int comboForSize = Math.Min(finalChangeSizeCombo, combo);
 
                 float changeSizeComboReachedTimes = getChangeSizeComboReachedTimesForCombo(comboForSize);
