@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Mods
                 var finalFlashlightSizeBinding = modFlashlight.FinalFlashlightSize;
                 float finalFlashlightSize = finalFlashlightSizeBinding.Value;
 
-                comboBasedSize = maxChangeSizeTimes > 0 && finalFlashlightSize < finalFlashlightSizeBinding.MaxValue;
+                comboBasedSize = maxChangeSizeTimes > 0 || finalFlashlightSize < finalFlashlightSizeBinding.MaxValue;
 
                 if (comboBasedSize)
                     changeSizeDecreaseRatio = (1 - finalFlashlightSize) / maxChangeSizeTimes;
