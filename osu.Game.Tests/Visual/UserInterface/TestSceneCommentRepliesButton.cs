@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-<<<<<<< HEAD
-=======
 #nullable disable
 
 using osu.Game.Overlays.Comments.Buttons;
@@ -12,17 +10,9 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.Containers;
 using osuTK;
 using NUnit.Framework;
->>>>>>> upstream/master
 using System.Linq;
-using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
-using osu.Game.Overlays;
-using osu.Game.Overlays.Comments.Buttons;
-using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {

@@ -41,6 +41,8 @@ namespace osu.Game.Screens
         private LoadingSpinner spinner;
         private ScheduledDelegate spinnerShow;
 
+        private Color4 backgroundColor;
+
         protected virtual OsuScreen CreateLoadableScreen() => new Disclaimer(getIntroSequence(), showDisclaimer, backgroundColor);
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenPureColor(backgroundColor);

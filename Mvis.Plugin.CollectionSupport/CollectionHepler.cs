@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using M.DBus.Tray;
 using M.DBus.Utils.Canonical.DBusMenuFlags;
@@ -16,19 +16,23 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Overlays;
 using osu.Game.Screens.LLin.Misc;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Game.Screens.LLin.SideBar.Settings.Items;
+using Realms;
 
 namespace Mvis.Plugin.CollectionSupport
 {
     public class CollectionHelper : BindableControlledPlugin, IProvideAudioControlPlugin
     {
         [Resolved]
-        private CollectionManager collectionManager { get; set; }
+        private RealmAccess realm { get; set; } = null!;
+
+        private IDisposable realmSubscription;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -111,14 +115,14 @@ namespace Mvis.Plugin.CollectionSupport
 
             LLin.Resuming += UpdateBeatmaps;
             LLin.Exiting += onMvisExiting;
+
+            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), onCollectionChange);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             CurrentCollection.BindValueChanged(OnCollectionChanged);
-
-            collectionManager.Collections.CollectionChanged += triggerRefresh;
         }
 
         private void onMvisExiting()
@@ -172,7 +176,7 @@ namespace Mvis.Plugin.CollectionSupport
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
                 dBusObject.Position = currentPosition;
-                dBusObject.CollectionName = CurrentCollection.Value?.Name.Value ?? "-";
+                dBusObject.CollectionName = CurrentCollection.Value?.Name ?? "-";
                 PluginManager.AddDBusMenuEntry(trayEntry);
             }
 
@@ -283,9 +287,9 @@ namespace Mvis.Plugin.CollectionSupport
             beatmapList.Clear();
             trayEntry.Children.Clear();
 
-            if (collection?.BeatmapHashes == null) return;
+            if (collection?.BeatmapMD5Hashes == null) return;
 
-            foreach (string hash in collection.BeatmapHashes)
+            foreach (string hash in collection.BeatmapMD5Hashes)
             {
                 var item = hashResolver.ResolveHash(hash);
 
@@ -319,7 +323,7 @@ namespace Mvis.Plugin.CollectionSupport
             }
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-                dBusObject.CollectionName = collection.Name.Value;
+                dBusObject.CollectionName = collection.Name;
 
             updateCurrentPosition(true);
             trayEntry.Label = $"收藏夹（{collection.Name}）";
@@ -351,8 +355,14 @@ namespace Mvis.Plugin.CollectionSupport
 
         public void UpdateBeatmaps() => updateBeatmaps(CurrentCollection.Value);
 
-        private void triggerRefresh(object sender, NotifyCollectionChangedEventArgs e)
-            => updateBeatmaps(CurrentCollection.Value);
+        public List<BeatmapCollection> AvaliableCollections { get; private set; } = new List<BeatmapCollection>();
+
+        private void onCollectionChange(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes, Exception error)
+        {
+            AvaliableCollections = collections.AsEnumerable().Select(c => c).ToList();
+
+            CurrentCollection.Value = AvaliableCollections.Find(c => c.ID == CurrentCollection.Value.ID);
+        }
 
         private void OnCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
         {
@@ -361,11 +371,13 @@ namespace Mvis.Plugin.CollectionSupport
 
         protected override void Dispose(bool isDisposing)
         {
-            collectionManager.Collections.CollectionChanged -= triggerRefresh;
+            //collectionManager.Collections.CollectionChanged -= triggerRefresh;
 
             LLin.Resuming -= UpdateBeatmaps;
 
             base.Dispose(isDisposing);
+
+            realmSubscription?.Dispose();
         }
     }
 }

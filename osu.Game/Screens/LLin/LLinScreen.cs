@@ -400,7 +400,7 @@ namespace osu.Game.Screens.LLin
         {
             if (proxyLayer.Contains(d))
             {
-                proxyLayer.Remove(d);
+                proxyLayer.Remove(d, false);
                 return true;
             }
 
@@ -441,7 +441,7 @@ namespace osu.Game.Screens.LLin
                 //如果找到的侧边栏的Plugin与pl匹配
                 if (sc is PluginSidebarPage plsp && plsp.Plugin == pl)
                 {
-                    sidebar.Remove(plsp); //移除这个页面
+                    sidebar.Remove(plsp, true); //移除这个页面
 
                     //查找与plsp对应的底栏入口
                     foreach (var d in currentFunctionBar.GetAllPluginFunctionButton())
@@ -920,12 +920,12 @@ namespace osu.Game.Screens.LLin
                 //如果允许proxy显示
                 if (v.NewValue)
                 {
-                    backgroundLayer.Remove(proxyLayer);
+                    backgroundLayer.Remove(proxyLayer, false);
                     AddInternal(proxyLayer);
                 }
                 else
                 {
-                    RemoveInternal(proxyLayer);
+                    RemoveInternal(proxyLayer, false);
                     backgroundLayer.Add(proxyLayer);
                 }
             }, true);
@@ -1160,7 +1160,7 @@ namespace osu.Game.Screens.LLin
 
             //移除
             if (targetDrawable != null)
-                overlayLayer.Remove(targetDrawable);
+                overlayLayer.Remove(targetDrawable, false);
 
             //不要在此功能条禁用时再调用onFunctionBarPluginDisable
             currentFunctionBar.OnDisable -= onFunctionBarDisable;

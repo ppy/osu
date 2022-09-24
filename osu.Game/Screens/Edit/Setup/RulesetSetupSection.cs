@@ -5,7 +5,6 @@
 
 using osu.Framework.Localisation;
 using osu.Game.Rulesets;
-using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {

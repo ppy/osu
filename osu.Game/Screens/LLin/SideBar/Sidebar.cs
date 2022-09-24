@@ -147,7 +147,7 @@ namespace osu.Game.Screens.LLin.SideBar
 
             var lastDisplay = CurrentDisplay.Value;
             lastDisplay?.FadeOut(resizeDuration / 2, Easing.OutQuint)
-                       .OnComplete(_ => contentContainer.Remove(lastDisplay));
+                       .OnComplete(_ => contentContainer.Remove(lastDisplay, false));
 
             if (!contentContainer.Contains(d))
                 contentContainer.Add(d);
@@ -180,7 +180,7 @@ namespace osu.Game.Screens.LLin.SideBar
             contentContainer.Clear(disposeChildren);
         }
 
-        public override bool Remove(Drawable drawable)
+        public override bool Remove(Drawable drawable, bool disposeImmediately)
         {
             if (drawable is ISidebarContent sc)
             {
@@ -188,14 +188,14 @@ namespace osu.Game.Screens.LLin.SideBar
                 {
                     if (t.Value == sc)
                     {
-                        Header.Tabs.Remove(t);
+                        Header.Tabs.Remove(t, true);
                         drawable.Expire();
                         return true;
                     }
                 }
             }
 
-            return base.Remove(drawable);
+            return base.Remove(drawable, disposeImmediately);
         }
 
         protected override void PopOut()

@@ -1,10 +1,11 @@
 using System.Threading.Tasks;
+using M.DBus;
 using Tmds.DBus;
 
 namespace Mvis.Plugin.Example.DBus
 {
     [DBusInterface("io.matrix_feather.mvis.example")]
-    public interface IExampleDBusObject : IDBusObject
+    public interface IExampleDBusObject : IMDBusObject
     {
         Task<string> ExampleFunctionAsync();
     }
@@ -17,5 +18,7 @@ namespace Mvis.Plugin.Example.DBus
         {
             return Task.FromResult("Hello World!");
         }
+
+        public string CustomRegisterName { get; } = "exampleRegisterName";
     }
 }

@@ -9,8 +9,6 @@ using osu.Game.Overlays.Rankings.Tables;
 using osu.Framework.Graphics;
 using System.Threading;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;

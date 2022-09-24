@@ -16,7 +16,6 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.IO;
@@ -58,9 +57,6 @@ namespace osu.Game.Tournament
             });
 
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
-
-            if (MenuCursorContainer.Cursor is MenuCursor cursor)
-                cursor.UseSystemCursor.Value = true;
 
             dependencies.CacheAs<Storage>(storage = new TournamentStorage(baseStorage));
             dependencies.CacheAs(storage);

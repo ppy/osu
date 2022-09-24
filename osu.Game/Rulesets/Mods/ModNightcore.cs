@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -56,98 +57,97 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 
-        public class NightcoreBeatContainer : BeatSyncedContainer
+    public class NightcoreBeatContainer : BeatSyncedContainer
+    {
+        private PausableSkinnableSound? hatSample;
+        private PausableSkinnableSound? clapSample;
+        private PausableSkinnableSound? kickSample;
+        private PausableSkinnableSound? finishSample;
+
+        private int? firstBeat;
+
+        public NightcoreBeatContainer()
         {
-            private PausableSkinnableSound? hatSample;
-            private PausableSkinnableSound? clapSample;
-            private PausableSkinnableSound? kickSample;
-            private PausableSkinnableSound? finishSample;
+            Divisor = 2;
+        }
 
-            private int? firstBeat;
-
-            public NightcoreBeatContainer()
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            InternalChildren = new Drawable[]
             {
-                Divisor = 2;
+                hatSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")),
+                clapSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-clap")),
+                kickSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-kick")),
+                finishSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-finish")),
+            };
+        }
+
+        private const int bars_per_segment = 4;
+
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+        {
+            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+            int beatsPerBar = timingPoint.TimeSignature.Numerator;
+            int segmentLength = beatsPerBar * Divisor * bars_per_segment;
+
+            if (!IsBeatSyncedWithTrack)
+            {
+                firstBeat = null;
+                return;
             }
 
-            [BackgroundDependencyLoader]
-            private void load()
+            if (!firstBeat.HasValue || beatIndex < firstBeat)
+                // decide on a good starting beat index if once has not yet been decided.
+                firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength + 1) * segmentLength;
+
+            if (beatIndex >= firstBeat)
+                playBeatFor(beatIndex % segmentLength, timingPoint.TimeSignature);
+        }
+
+        private void playBeatFor(int beatIndex, TimeSignature signature)
+        {
+            if (beatIndex == 0)
+                finishSample?.Play();
+
+            switch (signature.Numerator)
             {
-                InternalChildren = new Drawable[]
-                {
-                    hatSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")),
-                    clapSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-clap")),
-                    kickSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-kick")),
-                    finishSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-finish")),
-                };
-            }
+                case 3:
+                    switch (beatIndex % 6)
+                    {
+                        case 0:
+                            kickSample?.Play();
+                            break;
 
-            private const int bars_per_segment = 4;
+                        case 3:
+                            clapSample?.Play();
+                            break;
 
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
-            {
-                base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+                        default:
+                            hatSample?.Play();
+                            break;
+                    }
 
-                int beatsPerBar = timingPoint.TimeSignature.Numerator;
-                int segmentLength = beatsPerBar * Divisor * bars_per_segment;
+                    break;
 
-                if (!IsBeatSyncedWithTrack)
-                {
-                    firstBeat = null;
-                    return;
-                }
+                case 4:
+                    switch (beatIndex % 4)
+                    {
+                        case 0:
+                            kickSample?.Play();
+                            break;
 
-                if (!firstBeat.HasValue || beatIndex < firstBeat)
-                    // decide on a good starting beat index if once has not yet been decided.
-                    firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength + 1) * segmentLength;
+                        case 2:
+                            clapSample?.Play();
+                            break;
 
-                if (beatIndex >= firstBeat)
-                    playBeatFor(beatIndex % segmentLength, timingPoint.TimeSignature);
-            }
+                        default:
+                            hatSample?.Play();
+                            break;
+                    }
 
-            private void playBeatFor(int beatIndex, TimeSignature signature)
-            {
-                if (beatIndex == 0)
-                    finishSample?.Play();
-
-                switch (signature.Numerator)
-                {
-                    case 3:
-                        switch (beatIndex % 6)
-                        {
-                            case 0:
-                                kickSample?.Play();
-                                break;
-
-                            case 3:
-                                clapSample?.Play();
-                                break;
-
-                            default:
-                                hatSample?.Play();
-                                break;
-                        }
-
-                        break;
-
-                    case 4:
-                        switch (beatIndex % 4)
-                        {
-                            case 0:
-                                kickSample?.Play();
-                                break;
-
-                            case 2:
-                                clapSample?.Play();
-                                break;
-
-                            default:
-                                hatSample?.Play();
-                                break;
-                        }
-
-                        break;
-                }
+                    break;
             }
         }
     }

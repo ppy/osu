@@ -5,10 +5,11 @@ using Mvis.Plugin.Sandbox.Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Batches;
-using osu.Framework.Graphics.OpenGL.Vertices;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Platform;
 using osuTK;
 
 namespace Mvis.Plugin.Sandbox.Components.Visualizers
@@ -16,7 +17,7 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers
     public abstract class MusicVisualizerDrawable : Drawable
     {
         // Total amplitude count is 256, however in most cases some of them are empty, let's not use them.
-        private const int used_amplitude_count = 200;
+        private const int used_amplitude_count = 160;
 
         public readonly Bindable<double> BarWidth = new Bindable<double>(5);
         public readonly Bindable<int> BarCount = new Bindable<int>(100);
@@ -25,20 +26,18 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers
         public readonly Bindable<bool> Reversed = new Bindable<bool>();
         public readonly Bindable<int> Smoothness = new Bindable<int>();
 
-        public Texture Texture { get; protected set; }
+        protected Texture Texture { get; private set; }
 
         private IShader shader;
 
-        public MusicVisualizerDrawable()
-        {
-            Texture = Texture.WhitePixel;
-        }
-
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders)
+        private void load(ShaderManager shaders, GameHost host, TextureStore textures)
         {
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
+            Texture = GetTexture(host.Renderer, textures);
         }
+
+        protected virtual Texture GetTexture(IRenderer renderer, TextureStore textures) => renderer.WhitePixel;
 
         protected override void LoadComplete()
         {
@@ -153,7 +152,7 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers
         {
             protected new MusicVisualizerDrawable Source => (MusicVisualizerDrawable)base.Source;
 
-            protected readonly QuadBatch<TexturedVertex2D> VertexBatch = new QuadBatch<TexturedVertex2D>(200, 5);
+            protected IVertexBatch<TexturedVertex2D> VertexBatch;
             protected readonly List<float> AudioData = new List<float>();
 
             private IShader shader;
@@ -184,12 +183,13 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers
             protected abstract float Spacing { get; }
             protected virtual Vector2 Inflation => Vector2.One;
 
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            public override void Draw(IRenderer renderer)
             {
-                base.Draw(vertexAction);
+                base.Draw(renderer);
 
                 if (AudioData.Any())
                 {
+                    VertexBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(200, 5);
                     shader.Bind();
 
                     Vector2 inflation = Inflation;
@@ -197,7 +197,7 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers
                     PreCompute();
 
                     for (int i = 0; i < AudioData.Count; i++)
-                        DrawBar(Reversed ? AudioData.Count - 1 - i : i, AudioData[i], spacing, inflation);
+                        DrawBar(Reversed ? AudioData.Count - 1 - i : i, AudioData[i], spacing, inflation, renderer);
 
                     shader.Unbind();
                 }
@@ -207,12 +207,12 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers
             {
             }
 
-            protected abstract void DrawBar(int index, float data, float spacing, Vector2 inflation);
+            protected abstract void DrawBar(int index, float data, float spacing, Vector2 inflation, IRenderer renderer);
 
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
-                VertexBatch.Dispose();
+                VertexBatch?.Dispose();
             }
         }
     }

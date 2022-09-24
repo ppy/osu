@@ -1,22 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Game.Overlays.BeatmapSet;
 using System.Collections.Specialized;
 using System.Linq;
-using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Catch;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Catch;
-using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Taiko;
 
 namespace osu.Game.Tests.Visual.Online
 {

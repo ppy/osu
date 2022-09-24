@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -12,7 +14,7 @@ namespace osu.Game.Beatmaps
         protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set, bool minimiseDownloadSize) =>
             new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
 
-        protected override ArchiveDownloadRequest<IBeatmapSetInfo>? CreateAccelDownloadRequest(IBeatmapSetInfo model, bool isMini)
+        protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateAccelDownloadRequest(IBeatmapSetInfo model, bool isMini)
         {
             try
             {

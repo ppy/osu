@@ -9,7 +9,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Screens.LLin.SideBar.Tabs;
-using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
 
 namespace osu.Game.Configuration
@@ -95,7 +94,7 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.MprisUpdateInterval, 500d, 100d, 1000d);
 
             //排行榜
-            SetDefault(MSetting.InGameLeaderboardState, LeaderboardState.Fold);
+            //SetDefault(MSetting.InGameLeaderboardState, LeaderboardState.Fold);
         }
 
         public Color4 GetCustomLoaderColor()

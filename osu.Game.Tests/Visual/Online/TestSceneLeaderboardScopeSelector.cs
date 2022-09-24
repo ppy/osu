@@ -1,21 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-<<<<<<< HEAD
-=======
 #nullable disable
 
 using osu.Game.Overlays.BeatmapSet;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Screens.Select.Leaderboards;
->>>>>>> upstream/master
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Overlays;
-using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Tests.Visual.Online
 {

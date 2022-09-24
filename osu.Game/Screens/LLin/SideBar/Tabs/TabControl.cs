@@ -129,9 +129,9 @@ namespace osu.Game.Screens.LLin.SideBar.Tabs
 
                 Tabs.Anchor = Tabs.Origin = Anchor.CentreRight;
 
-                if (!verticalScroll.ContainsNoIndex(Tabs))
+                if (!verticalScroll.Contains(Tabs))
                 {
-                    horizonalScroll.Remove(Tabs);
+                    horizonalScroll.Remove(Tabs, false);
                     verticalScroll.Add(Tabs);
                 }
 
@@ -151,9 +151,9 @@ namespace osu.Game.Screens.LLin.SideBar.Tabs
 
                 Tabs.Anchor = Tabs.Origin = Anchor.TopCentre;
 
-                if (!horizonalScroll.ContainsNoIndex(Tabs))
+                if (!horizonalScroll.Contains(Tabs))
                 {
-                    verticalScroll.Remove(Tabs);
+                    verticalScroll.Remove(Tabs, false);
                     horizonalScroll.Add(Tabs);
                 }
 

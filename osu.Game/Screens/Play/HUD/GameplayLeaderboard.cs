@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             Flow.Clear();
             trackedScore = null;
-            Scroll.ScrollToStart(false);
+            scroll.ScrollToStart(false);
         }
 
         protected virtual GameplayLeaderboardScore CreateLeaderboardScoreDrawable(IUser? user, bool isTracked) =>
@@ -127,11 +127,11 @@ namespace osu.Game.Screens.Play.HUD
 
             const float panel_height = GameplayLeaderboardScore.PANEL_HEIGHT;
 
-            float fadeBottom = Scroll.Current + Scroll.DrawHeight;
-            float fadeTop = Scroll.Current + panel_height;
+            float fadeBottom = scroll.Current + scroll.DrawHeight;
+            float fadeTop = scroll.Current + panel_height;
 
-            if (Scroll.Current <= 0) fadeTop -= panel_height;
-            if (!Scroll.IsScrolledToEnd()) fadeBottom -= panel_height;
+            if (scroll.Current <= 0) fadeTop -= panel_height;
+            if (!scroll.IsScrolledToEnd()) fadeBottom -= panel_height;
 
             // logic is mostly shared with Leaderboard, copied here for simplicity.
             foreach (var c in Flow.Children)

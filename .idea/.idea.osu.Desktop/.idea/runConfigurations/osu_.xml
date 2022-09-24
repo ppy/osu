@@ -1,9 +1,13 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="osu!" type="DotNetProject" factoryName=".NET Project" folderName="osu!" activateToolWindowBeforeRun="false">
-    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Desktop/bin/Debug/net6.0/osu!.dll" />
+    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Desktop/bin/Debug/net6.0/osu!" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Desktop/bin/Debug/net6.0" />
     <option name="PASS_PARENT_ENVS" value="1" />
+    <envs>
+      <env name="__GLX_VENDOR_LIBRARY_NAME" value="nvidia" />
+      <env name="__NV_PRIME_RENDER_OFFLOAD" value="1" />
+    </envs>
     <option name="USE_EXTERNAL_CONSOLE" value="0" />
     <option name="USE_MONO" value="0" />
     <option name="RUNTIME_ARGUMENTS" value="" />

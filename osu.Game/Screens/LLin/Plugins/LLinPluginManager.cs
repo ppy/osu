@@ -163,10 +163,7 @@ namespace osu.Game.Screens.LLin.Plugins
 
                 //直接dispose掉插件
                 if (pl.Parent is Container container)
-                {
-                    container.Remove(pl);
-                    pl.Dispose();
-                }
+                    container.Remove(pl, true);
 
                 //刷新列表
                 resolver.UpdatePluginDictionary(GetAllPlugins(false));

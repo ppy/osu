@@ -22,8 +22,6 @@ using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Localisation;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring.Drawables;

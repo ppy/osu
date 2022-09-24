@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "休闲";
         public override string Acronym => "RX";
-        public override string Description => @"你不用点击,只需移动,让你用来点击的手指放松一下";
+        public override LocalisableString Description => @"你不用点击,只需移动,让你用来点击的手指放松一下";
         public override IconUsage? Icon => OsuIcon.ModRelax;
         public override ModType Type => ModType.Automation;
         public override double ScoreMultiplier => 0.1;

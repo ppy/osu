@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "TR";
         public override IconUsage? Icon => FontAwesome.Solid.ArrowsAlt;
         public override ModType Type => ModType.Fun;
-        public override string Description => "天旋地转";
+        public override LocalisableString Description => "天旋地转";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModWiggle), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 

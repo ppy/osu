@@ -165,7 +165,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 ? ActiveState.Idle
                 : ActiveState.Disabled;
 
-            collectionName.Text = Collection.Name.Value;
+            collectionName.Text = Collection.Name;
             collectionBeatmapCount.Text = CollectionStrings.SongCount(beatmapSets.Count);
 
             State.BindValueChanged(onStateChanged, true);
@@ -228,7 +228,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private void sortBeatmapCollection()
         {
             //From CollectionHelper.cs
-            foreach (string hash in Collection.BeatmapHashes)
+            foreach (string hash in Collection.BeatmapMD5Hashes)
             {
                 var item = hashResolver.ResolveHash(hash);
 

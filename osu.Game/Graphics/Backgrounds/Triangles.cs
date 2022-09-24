@@ -119,9 +119,6 @@ namespace osu.Game.Graphics.Backgrounds
         [Resolved(CanBeNull = true)]
         private MConfigManager config { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private MConfigManager config { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(IRenderer renderer, ShaderManager shaders)
         {

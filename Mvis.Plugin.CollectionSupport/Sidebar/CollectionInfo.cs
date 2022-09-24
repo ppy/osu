@@ -133,7 +133,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             beatmapSets.Clear();
 
             //From CollectionHelper.cs
-            foreach (string hash in c.BeatmapHashes)
+            foreach (string hash in c.BeatmapMD5Hashes)
             {
                 var item = hashResolver.ResolveHash(hash);
 
@@ -147,7 +147,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                     beatmapSets.Add(currentSet);
             }
 
-            collectionName.Text = c.Name.Value;
+            collectionName.Text = c.Name;
             collectionBeatmapCount.Text = CollectionStrings.SongCount(beatmapSets.Count);
 
             refreshBeatmapSetList();

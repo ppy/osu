@@ -56,7 +56,6 @@ using File = System.IO.File;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 using M.Resources;
 using osu.Game.Configuration.AccelUtils;
-using osu.Game.Screens;
 
 namespace osu.Game
 {

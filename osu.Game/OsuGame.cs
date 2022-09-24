@@ -64,7 +64,6 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Screens.LLin.Plugins;
-using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
 using osu.Game.Users;
 using osuTK.Graphics;

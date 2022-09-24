@@ -1,4 +1,3 @@
-using System.Collections.Specialized;
 using System.Linq;
 using M.Resources.Localisation.LLin.Plugins;
 using osu.Framework.Allocation;
@@ -21,8 +20,8 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
     public class CollectionPluginPage : PluginSidebarPage
     {
-        [Resolved]
-        private CollectionManager collectionManager { get; set; }
+        //[Resolved]
+        //private CollectionManager collectionManager { get; set; }
 
         [Resolved]
         private IImplementLLin mvisScreen { get; set; }
@@ -98,7 +97,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 }
             };
 
-            collectionManager.Collections.CollectionChanged += triggerRefresh;
+            collectionHelper.CurrentCollection.ValueChanged += triggerRefresh;
         }
 
         protected override void LoadComplete()
@@ -171,11 +170,11 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             }
 
             if (selectedpanel != null
-                && collectionHelper.CurrentCollection.Value.BeatmapHashes.Count != 0)
+                && collectionHelper.CurrentCollection.Value.BeatmapMD5Hashes.Count != 0)
                 selectedpanel.State.Value = ActiveState.Active;
         }
 
-        private void triggerRefresh(object sender, NotifyCollectionChangedEventArgs e)
+        private void triggerRefresh(ValueChangedEvent<BeatmapCollection> v)
             => RefreshCollectionList();
 
         public void RefreshCollectionList()
@@ -192,18 +191,18 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             selectedCollection.Value = null;
 
             //如果收藏夹被删除，则留null
-            if (!collectionManager.Collections.Contains(oldCollection))
+            if (!collectionHelper.AvaliableCollections.Contains(oldCollection))
                 oldCollection = null;
 
             //如果收藏夹为0，则淡出sollectionScroll
             //否则，添加CollectionPanel
-            if (collectionManager.Collections.Count == 0)
+            if (collectionHelper.AvaliableCollections.Count == 0)
             {
                 collectionScroll.FadeOut(300);
             }
             else
             {
-                collectionsFillFlow.AddRange(collectionManager.Collections.Select(c => new CollectionPanel(c, makeCurrentSelected)
+                collectionsFillFlow.AddRange(collectionHelper.AvaliableCollections.Select(c => new CollectionPanel(c, makeCurrentSelected)
                 {
                     SelectedCollection = { BindTarget = selectedCollection },
                     SelectedPanel = { BindTarget = selectedPanel }
@@ -234,8 +233,8 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         protected override void Dispose(bool isDisposing)
         {
             //单线程下会有概率在这里报System.NullReferenceException
-            if (collectionManager != null)
-                collectionManager.Collections.CollectionChanged -= triggerRefresh;
+            if (collectionHelper != null)
+                collectionHelper.CurrentCollection.ValueChanged -= triggerRefresh;
 
             base.Dispose(isDisposing);
         }

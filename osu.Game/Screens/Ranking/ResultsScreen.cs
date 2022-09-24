@@ -253,16 +253,13 @@ namespace osu.Game.Screens.Ranking
             bool useOriginalAnimation = mConfig.Get<bool>(MSetting.OptUI);
 
             popInSample?.Play();
+
             switch (useOriginalAnimation)
             {
                 case true:
                     bottomPanel.MoveToY(bottomPanel.Height).Then()
                                .Delay(250).FadeTo(1, 200)
                                .MoveToY(0, 550, Easing.OutBack);
-
-                    buttons.FadeTo(0).MoveToX(200)
-                           .Then().Delay(250)
-                           .Then().MoveToX(0, 550, Easing.OutQuint).FadeIn(200);
 
                     ScorePanelList?.MoveToY(DrawHeight)
                                   .Then().Delay(250)
@@ -322,8 +319,7 @@ namespace osu.Game.Screens.Ranking
         private ScorePanel detachedPanel;
 
         [Resolved]
-        private MConfigManager mConfig;
-        private FillFlowContainer buttons;
+        private MConfigManager mConfig { get; set; }
 
         private void onStatisticsStateChanged(ValueChangedEvent<Visibility> state)
         {

@@ -19,8 +19,6 @@ namespace osu.Game.Screens.Play
 {
     public class SoloPlayer : SubmittingPlayer
     {
-        private LLinGameplayLeaderboard leaderboard;
-
         public SoloPlayer()
             : this(null)
         {
@@ -29,16 +27,6 @@ namespace osu.Game.Screens.Play
         protected SoloPlayer(PlayerConfiguration configuration = null)
             : base(configuration)
         {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            LoadComponentAsync(leaderboard = new LLinGameplayLeaderboard
-            {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft
-            }, HUDOverlay.Add);
         }
 
         protected override APIRequest<APIScoreToken> CreateTokenRequest()
@@ -65,14 +53,14 @@ namespace osu.Game.Screens.Play
 
         protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
 
-        protected override Task ImportScore(Score score)
+        protected override Task ImportScore(Score score, bool haveDanceMod = false)
         {
             // Before importing a score, stop binding the leaderboard with its score source.
             // This avoids a case where the imported score may cause a leaderboard refresh
             // (if the leaderboard's source is local).
             LeaderboardScores.UnbindBindings();
 
-            return base.ImportScore(score);
+            return base.ImportScore(score, haveDanceMod);
         }
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)

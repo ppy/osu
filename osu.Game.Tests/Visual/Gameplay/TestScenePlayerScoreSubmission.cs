@@ -357,7 +357,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AllowImportCompletion = new SemaphoreSlim(1);
             }
 
-            protected override async Task ImportScore(Score score)
+            protected override async Task ImportScore(Score score, bool allowDance = false)
             {
                 ScoreImportStarted = true;
 

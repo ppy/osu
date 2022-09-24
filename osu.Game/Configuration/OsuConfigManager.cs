@@ -29,10 +29,14 @@ namespace osu.Game.Configuration
     [ExcludeFromDynamicCompile]
     public class OsuConfigManager : IniConfigManager<OsuSetting>
     {
+        public static OsuConfigManager Instance;
+
         public OsuConfigManager(Storage storage)
             : base(storage)
         {
             Migrate();
+
+            Instance = this;
         }
 
         protected override void InitialiseDefaults()

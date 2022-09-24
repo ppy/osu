@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using Humanizer;
 using osu.Game.Database;
 using osu.Game.Overlays.Dialog;
 

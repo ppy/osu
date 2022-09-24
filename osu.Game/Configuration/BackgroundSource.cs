@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.ComponentModel;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
 
