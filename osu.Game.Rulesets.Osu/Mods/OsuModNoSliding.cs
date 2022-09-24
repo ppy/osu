@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public BindableInt BeatDivisor { get; } = new BindableInt(4)
         {
             MinValue = 1,
-            MaxValue = 16
+            MaxValue = 8
         };
 
         [SettingSource("Slow down too long streams")]
