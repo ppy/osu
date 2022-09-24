@@ -73,6 +73,17 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
             }
 
+            // guard from overlapping sliders
+
+            newObjects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
+
+            for (int i = newObjects.Count - 1; i > 0; i--)
+            {
+                // filtering out circles closer than 1ms
+                if (Precision.AlmostEquals(newObjects[i].StartTime, newObjects[i - 1].StartTime, 1d))
+                    newObjects.RemoveAt(i);
+            }
+
             osuBeatmap.HitObjects = newObjects;
         }
     }
