@@ -38,6 +38,7 @@ namespace osu.Game.Overlays
         private const float transition_length = 800;
         private const float progress_height = 10;
         private const float bottom_black_area_height = 55;
+        private const float margin = 10;
 
         private Drawable background;
         private ProgressBar progressBar;
@@ -69,7 +70,7 @@ namespace osu.Game.Overlays
         public NowPlayingOverlay()
         {
             Width = 400;
-            Margin = new MarginPadding(10);
+            Margin = new MarginPadding(margin);
         }
 
         [BackgroundDependencyLoader]
@@ -194,7 +195,7 @@ namespace osu.Game.Overlays
                 LoadComponentAsync(playlist = new PlaylistOverlay
                 {
                     RelativeSizeAxes = Axes.X,
-                    Y = player_height + 10,
+                    Y = player_height + margin,
                 }, _ =>
                 {
                     dragContainer.Add(playlist);
