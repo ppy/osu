@@ -63,8 +63,11 @@ namespace M.DBus.Tray
                 {
                     try
                     {
+                        SimpleEntry[] entriesCopy = new SimpleEntry[entry.Children.Count];
+                        entry.Children.CopyTo(entriesCopy, 0);
+
                         //遍历所有子菜单
-                        foreach (var subEntry in entry.Children)
+                        foreach (var subEntry in entriesCopy)
                         {
                             //额外产生的SimpleEntry
                             //如果某一个subEntry是SSubmenu，则其Children中的所有SimpleEntry都将加入这个词典
