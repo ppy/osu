@@ -18,31 +18,23 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleDown;
 
         [SettingSource("Initial rate", "The starting speed of the track")]
-        public override BindableNumber<double> InitialRate { get; } = new BindableDouble
+        public override BindableNumber<double> InitialRate { get; } = new BindableDouble(1)
         {
             MinValue = 0.51,
             MaxValue = 2,
-            Default = 1,
-            Value = 1,
             Precision = 0.01,
         };
 
         [SettingSource("Final rate", "The speed increase to ramp towards")]
-        public override BindableNumber<double> FinalRate { get; } = new BindableDouble
+        public override BindableNumber<double> FinalRate { get; } = new BindableDouble(0.75)
         {
             MinValue = 0.5,
             MaxValue = 1.99,
-            Default = 0.75,
-            Value = 0.75,
             Precision = 0.01,
         };
 
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
-        public override BindableBool AdjustPitch { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public override BindableBool AdjustPitch { get; } = new BindableBool(true);
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModWindUp)).ToArray();
 
