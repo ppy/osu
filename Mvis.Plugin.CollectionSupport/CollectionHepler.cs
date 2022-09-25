@@ -361,7 +361,12 @@ namespace Mvis.Plugin.CollectionSupport
         {
             AvaliableCollections = collections.AsEnumerable().Select(c => c).ToList();
 
-            CurrentCollection.Value = AvaliableCollections.Find(c => c.ID == CurrentCollection.Value.ID);
+            if (CurrentCollection.Value != null)
+            {
+                var collectionMatch = AvaliableCollections.Find(c => c.ID == CurrentCollection.Value.ID);
+
+                CurrentCollection.Value = collectionMatch ?? null;
+            }
         }
 
         private void OnCollectionChanged(ValueChangedEvent<BeatmapCollection> v)

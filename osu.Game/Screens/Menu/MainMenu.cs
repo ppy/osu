@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Menu
                 exitConfirmOverlay?.CreateProxy() ?? Empty()
             });
 
-            if (game.HashOverriden)
+            if (game?.HashOverriden ?? false)
             {
                 var hashOverridenWarning = new HashOverridenWarning
                 {

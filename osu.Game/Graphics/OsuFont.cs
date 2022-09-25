@@ -4,7 +4,6 @@
 #nullable disable
 
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Screens;
 using osu.Game.Utils;
 
 namespace osu.Game.Graphics
@@ -64,10 +63,6 @@ namespace osu.Game.Graphics
                     return @"Venera";
 
                 case Typeface.Torus:
-                case Typeface.Custom:
-                    if (CustomFontStore.CustomFontLoaded)
-                        return GetCustomTypeface();
-
                     return @"Torus";
 
                 case Typeface.TorusAlternate:
