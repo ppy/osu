@@ -38,20 +38,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         slider1 = new ExpandableSlider<float, SizeSlider<float>>
                         {
-                            Current = new BindableFloat
+                            Current = new BindableFloat(1.0f)
                             {
-                                Default = 1.0f,
-                                MinValue = 1.0f,
                                 MaxValue = 10.0f,
                                 Precision = 0.01f,
                             },
                         },
                         slider2 = new ExpandableSlider<double>
                         {
-                            Current = new BindableDouble
+                            Current = new BindableDouble(1.0)
                             {
-                                Default = 1.0,
-                                MinValue = 1.0,
                                 MaxValue = 10.0,
                                 Precision = 0.01,
                             },
