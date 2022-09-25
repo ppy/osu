@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
-        public override BindableFloat SizeMultiplier { get; } = new BindableFloat
+        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
             MaxValue = 1.5f,
