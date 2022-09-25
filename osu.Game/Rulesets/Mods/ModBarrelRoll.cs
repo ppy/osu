@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Name => "滚筒";
         public override string Acronym => "BR";
-        public override LocalisableString Description => "天旋地转！";
+        public override LocalisableString Description => "滚筒洗衣机";
         public override double ScoreMultiplier => 1;
 
         public override string SettingDescription => $"{SpinSpeed.Value:N2} rpm {Direction.Value.GetDescription().ToLowerInvariant()}";

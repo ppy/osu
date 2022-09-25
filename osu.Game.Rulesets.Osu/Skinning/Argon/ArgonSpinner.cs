@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = @"SPINS PER MINUTE",
+                            Text = @"转每分钟",
                             Font = OsuFont.Default.With(size: 16, weight: FontWeight.SemiBold),
                             Y = 30
                         }

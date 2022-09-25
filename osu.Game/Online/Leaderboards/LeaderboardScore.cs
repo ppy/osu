@@ -17,9 +17,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Game.Configuration;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
@@ -95,13 +95,11 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager, MConfigManager config)
+        private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager, MConfigManager mConfig)
         {
             var user = Score.User;
 
-            config.BindWith(MSetting.OptUI, optui);
-
-            optui.BindValueChanged(_ => updateTooltip(), true);
+            mConfig.BindWith(MSetting.OptUI, optui);
 
             statisticsLabels = GetStatistics(Score).Select(s => new ScoreComponentLabel(s)).ToList();
 
@@ -263,17 +261,6 @@ namespace osu.Game.Online.Leaderboards
             };
 
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
-        }
-
-        private void updateTooltip()
-        {
-            if (optui.Value && isOnlineScope)
-            {
-                TooltipText = $"于 {Score.Date.ToLocalTime():g} 游玩";
-                return;
-            }
-
-            TooltipText = "";
         }
 
         public override void Show()
