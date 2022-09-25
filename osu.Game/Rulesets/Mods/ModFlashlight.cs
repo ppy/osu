@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Mods
             private readonly float changeSizeDecreaseRatio;
             private readonly bool comboBasedSize;
 
-            private readonly float maxChangeSizeTimes;
+            private readonly int maxChangeSizeTimes;
             private readonly float changeSizeCombo;
 
             protected Flashlight(ModFlashlight modFlashlight)
