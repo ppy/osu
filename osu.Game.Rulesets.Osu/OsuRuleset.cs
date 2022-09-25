@@ -171,6 +171,7 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModTarget(),
                         new OsuModDifficultyAdjust(),
+                        new OsuModVisualAdjusts(),
                         new OsuModClassic(),
                         new OsuModRandom(),
                         new OsuModMirror(),
