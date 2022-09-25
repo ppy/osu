@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Current = new BindableDouble
                             {
                                 Default = 1.0,
-                                MinValue = 1.0
+                                MinValue = 1.0,
                                 MaxValue = 10.0,
                                 Precision = 0.01,
                             },
