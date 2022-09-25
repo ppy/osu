@@ -21,17 +21,11 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             MinValue = 0.5f,
             MaxValue = 1.5f,
-            Default = 1f,
-            Value = 1f,
             Precision = 0.1f
         };
 
         [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
-        public override BindableBool ComboBasedSize { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
         public override float DefaultFlashlightSize => 350;
 
