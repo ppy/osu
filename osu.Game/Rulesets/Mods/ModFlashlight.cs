@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -27,6 +28,9 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModFlashlight : Mod
     {
+        private const int min_change_size_combo = 1;
+        private const int max_change_size_combo = 300;
+
         public override string Name => "Flashlight";
         public override string Acronym => "FL";
         public override IconUsage? Icon => OsuIcon.ModFlashlight;
@@ -35,26 +39,11 @@ namespace osu.Game.Rulesets.Mods
 
         protected ModFlashlight()
         {
-            MaxChangeSizeTimes.DefaultChanged += _ => MaxChangeSizeTimes.SetDefault();
+            FinalFlashlightSize.DefaultChanged += _ => FinalFlashlightSize.SetDefault();
         }
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public abstract BindableFloat SizeMultiplier { get; }
-
-        [SettingSource("Change size combo", "Changes the combo multiplier where the flashlight size is changed.")]
-        public BindableFloat ChangeSizeCombo { get; } = new BindableFloat(100)
-        {
-            MinValue = 1,
-            MaxValue = 300,
-            Precision = 1
-        };
-
-        [SettingSource("Change size times", "Changes how many times the flashlight size is changed before reaching the final flashlight size.")]
-        public BindableInt MaxChangeSizeTimes { get; } = new BindableInt(2)
-        {
-            MinValue = 0,
-            MaxValue = 100
-        };
 
         [SettingSource("Final flashlight size", "The final size multiplier that is reached when the flashlight changes size for the last time.")]
         public BindableFloat FinalFlashlightSize { get; } = new BindableFloat(0.8f)
@@ -62,6 +51,20 @@ namespace osu.Game.Rulesets.Mods
             MinValue = 0.5f,
             MaxValue = 1,
             Precision = 0.1f,
+        };
+
+        [SettingSource("Change size combo", "Changes the combo multiplier where the flashlight size is changed.")]
+        public BindableInt ChangeSizeCombo { get; } = new BindableInt(100)
+        {
+            MinValue = min_change_size_combo,
+            MaxValue = max_change_size_combo,
+        };
+
+        [SettingSource("Change size times", "Changes how many times the flashlight size is changed before reaching the final flashlight size.")]
+        public BindableInt MaxChangeSizeTimes { get; } = new BindableInt(2)
+        {
+            MinValue = min_change_size_combo,
+            MaxValue = max_change_size_combo,
         };
 
         /// <summary>
@@ -143,7 +146,7 @@ namespace osu.Game.Rulesets.Mods
                 var finalFlashlightSizeBinding = modFlashlight.FinalFlashlightSize;
                 float finalFlashlightSize = finalFlashlightSizeBinding.Value;
 
-                comboBasedSize = maxChangeSizeTimes > 0 || finalFlashlightSize < finalFlashlightSizeBinding.MaxValue;
+                comboBasedSize = !Precision.AlmostEquals(finalFlashlightSize, 1);
 
                 if (comboBasedSize)
                     changeSizeDecreaseRatio = (1 - finalFlashlightSize) / maxChangeSizeTimes;

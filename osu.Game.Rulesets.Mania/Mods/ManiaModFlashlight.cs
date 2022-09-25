@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public ManiaModFlashlight()
         {
-            MaxChangeSizeTimes.Default = 0;
+            FinalFlashlightSize.Default = 1;
         }
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
