@@ -14,10 +14,10 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
         public LocalisableString TooltipText
         {
             get => tooltip;
-            set => tooltip = value + " (点击重置)";
+            set => tooltip = value + " (点按中键重置)";
         }
 
-        private string tooltip = "点击重置";
+        private string tooltip = "点按中键重置";
 
         public bool DisplayAsPercentage;
         public bool TransferValueOnCommit;
@@ -32,11 +32,9 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             TransferValueOnCommit = TransferValueOnCommit,
         };
 
-        protected override void OnLeftClick()
+        protected override void OnMiddleClick()
         {
             Bindable.Value = Bindable.Default;
         }
-
-        protected override void OnMiddleClick() => OnLeftClick();
     }
 }

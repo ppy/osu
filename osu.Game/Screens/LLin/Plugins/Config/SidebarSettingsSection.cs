@@ -2,6 +2,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Screens.LLin.SideBar.Settings.Sections;
 
@@ -27,6 +28,7 @@ namespace osu.Game.Screens.LLin.Plugins.Config
         }
     }
 
+    [Cached]
     public class NewPluginSettingsSection : Section
     {
         private readonly LLinPlugin plugin;
@@ -55,12 +57,23 @@ namespace osu.Game.Screens.LLin.Plugins.Config
             }
         }
 
+        public int MaxRows { get; private set; } = 1;
+        public Action<int> OnNewMaxRows;
+
         protected override void LoadComplete()
         {
             fillFlowMaxWidth.BindValueChanged(v => FadeoutThen(200, () =>
                 {
                     //bug: 直接设置FillFlow的Width可能并不会生效，灵异事件？
                     Width = v.NewValue;
+
+                    int nmr = (int)Math.Floor(DrawWidth / (150 + 10f));
+
+                    if (nmr != MaxRows)
+                    {
+                        MaxRows = nmr;
+                        OnNewMaxRows?.Invoke(MaxRows);
+                    }
 
                     FillFlow.AutoSizeDuration = 200;
                     FillFlow.AutoSizeEasing = Easing.OutQuint;

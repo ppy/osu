@@ -30,7 +30,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             Size = new Vector2(25)
         };
 
-        public LocalisableString Description
+        public virtual LocalisableString Description
         {
             get => description;
             set
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             }
         }
 
-        public IconUsage Icon
+        public virtual IconUsage Icon
         {
             get => icon;
             set
@@ -72,13 +72,17 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
         [Resolved]
         private Bindable<TabControlPosition> tabpos { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        public SettingsPieceBasePanel()
         {
             Masking = true;
             CornerRadius = 7.5f;
             AutoSizeAxes = Axes.Y;
             Width = 150;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
             InternalChildren = new Drawable[]
             {
                 BgBox = new Box
@@ -112,6 +116,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.White,
                     Alpha = 0,
+                    Depth = -1
                 },
                 new HoverSounds()
             };

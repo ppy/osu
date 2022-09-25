@@ -199,7 +199,13 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
 
         public override Drawable ToLLinSettingsItem()
         {
-            throw new NotImplementedException();
+            return new SettingsStringPiece
+            {
+                Bindable = (Bindable<string>)Bindable.GetBoundCopy(),
+                Description = Name,
+                TooltipText = Description,
+                Icon = this.Icon
+            };
         }
     }
 
