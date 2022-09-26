@@ -82,7 +82,9 @@ namespace osu.Game.Rulesets.Mods
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
 
-            flashlight.Combo.BindTo(Combo);
+            if (ComboBasedSize.Value)
+                flashlight.Combo.BindTo(Combo);
+
             drawableRuleset.KeyBindingInputManager.Add(flashlight);
 
             flashlight.Breaks = drawableRuleset.Beatmap.Breaks;
@@ -123,7 +125,8 @@ namespace osu.Game.Rulesets.Mods
             {
                 base.LoadComplete();
 
-                Combo.ValueChanged += OnComboChange;
+                if (comboBasedSize)
+                    Combo.ValueChanged += ApplyComboBasedSize;
 
                 using (BeginAbsoluteSequence(0))
                 {
@@ -140,7 +143,7 @@ namespace osu.Game.Rulesets.Mods
                 }
             }
 
-            protected abstract void OnComboChange(ValueChangedEvent<int> e);
+            protected abstract void ApplyComboBasedSize(ValueChangedEvent<int> e);
 
             protected abstract string FragmentShader { get; }
 

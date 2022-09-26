@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                 FlashlightPosition = playfield.CatcherArea.ToSpaceOfOtherDrawable(playfield.Catcher.DrawPosition, this);
             }
 
-            protected override void OnComboChange(ValueChangedEvent<int> e)
+            protected override void ApplyComboBasedSize(ValueChangedEvent<int> e)
             {
                 this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }
