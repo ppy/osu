@@ -179,7 +179,6 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
             Active.BindValueChanged(_ =>
             {
-                playStateChangeSamples();
                 UpdateState();
             });
 
@@ -187,7 +186,7 @@ namespace osu.Game.Overlays.Mods
             FinishTransforms(true);
         }
 
-        private void playStateChangeSamples()
+        protected void playStateChangeSamples()
         {
             if (samplePlaybackDisabled.Value)
                 return;

@@ -61,12 +61,14 @@ namespace osu.Game.Overlays.Mods
         {
             modState.PendingConfiguration = Mod.RequiresConfiguration;
             Active.Value = true;
+            base.playStateChangeSamples();
         }
 
         protected override void Deselect()
         {
             modState.PendingConfiguration = false;
             Active.Value = false;
+            base.playStateChangeSamples();
         }
 
         #region Filtering support
