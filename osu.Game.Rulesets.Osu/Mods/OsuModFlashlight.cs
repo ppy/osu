@@ -33,21 +33,15 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
-        public override BindableFloat SizeMultiplier { get; } = new BindableFloat
+        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
             MaxValue = 2f,
-            Default = 1f,
-            Value = 1f,
             Precision = 0.1f
         };
 
         [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
-        public override BindableBool ComboBasedSize { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
         public override float DefaultFlashlightSize => 180;
 

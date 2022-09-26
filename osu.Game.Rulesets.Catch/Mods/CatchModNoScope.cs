@@ -22,10 +22,8 @@ namespace osu.Game.Rulesets.Catch.Mods
             "The combo count at which the catcher becomes completely hidden",
             SettingControlType = typeof(SettingsSlider<int, HiddenComboSlider>)
         )]
-        public override BindableInt HiddenComboCount { get; } = new BindableInt
+        public override BindableInt HiddenComboCount { get; } = new BindableInt(10)
         {
-            Default = 10,
-            Value = 10,
             MinValue = 0,
             MaxValue = 50,
         };
