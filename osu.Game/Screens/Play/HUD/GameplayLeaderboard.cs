@@ -3,12 +3,14 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Users;
 using osuTK;
@@ -18,6 +20,10 @@ namespace osu.Game.Screens.Play.HUD
 {
     public abstract class GameplayLeaderboard : CompositeDrawable
     {
+
+        private const int duration = 100;
+
+        private readonly Bindable<bool> configVisibility = new Bindable<bool>();
         private readonly Cached sorting = new Cached();
 
         public Bindable<bool> Expanded = new Bindable<bool>();
@@ -57,11 +63,19 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             Scheduler.AddDelayed(sort, 1000, true);
+
+            configVisibility.BindValueChanged(_ => updateVisibility(), true);
         }
 
         /// <summary>
@@ -193,5 +207,8 @@ namespace osu.Game.Screens.Play.HUD
             public override bool HandlePositionalInput => false;
             public override bool HandleNonPositionalInput => false;
         }
+
+        private void updateVisibility() =>
+            Flow.FadeTo(configVisibility.Value ? 1 : 0, duration);
     }
 }
