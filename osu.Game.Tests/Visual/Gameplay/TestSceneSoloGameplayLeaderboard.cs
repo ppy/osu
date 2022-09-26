@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private readonly BindableList<ScoreInfo> scores = new BindableList<ScoreInfo>();
 
-        private Bindable<bool> configVisibility = new Bindable<bool>();
+        private readonly Bindable<bool> configVisibility = new Bindable<bool>();
 
         private TestSoloGameplayLeaderboard? testSoloGameplayLeaderboard;
 
@@ -96,9 +96,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class TestSoloGameplayLeaderboard : SoloGameplayLeaderboard
         {
             public float FlowAlpha => Flow.Alpha;
+
             public TestSoloGameplayLeaderboard(IUser trackingUser)
-            : base(trackingUser)
-            { }
+                : base(trackingUser)
+            {
+            }
         }
     }
 }
