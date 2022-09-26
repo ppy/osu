@@ -38,6 +38,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Current = config.GetBindable<bool>(OsuSetting.KeyOverlay),
                     Keywords = new[] { "counter" },
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = GameplaySettingsStrings.AlwaysShowGameplayLeaderboard,
+                    Current = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard),
+                    Keywords = new[] { "leaderboard", "score" },
+                },
             };
         }
     }
