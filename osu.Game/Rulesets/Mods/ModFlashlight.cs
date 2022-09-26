@@ -50,14 +50,21 @@ namespace osu.Game.Rulesets.Mods
         where T : HitObject
     {
         public const double FLASHLIGHT_FADE_DURATION = 800;
-        protected readonly BindableInt Combo = new BindableInt();
+
+        /// <summary>
+        /// The <see cref="Flashlight"/> handled by this <see cref="ModFlashlight"/>.
+        /// </summary>
+        private Flashlight flashlight = null!;
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            Combo.BindTo(scoreProcessor.Combo);
-
             // Default value of ScoreProcessor's Rank in Flashlight Mod should be SS+
             scoreProcessor.Rank.Value = ScoreRank.XH;
+
+            if (!ComboBasedSize.Value) return;
+
+            flashlight.Combo.BindTo(scoreProcessor.Combo);
+            flashlight.Combo.ValueChanged += flashlight.ApplyComboBasedSize;
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
@@ -77,17 +84,14 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
-            var flashlight = CreateFlashlight();
+            flashlight = CreateFlashlight();
 
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
 
-            if (ComboBasedSize.Value)
-                flashlight.Combo.BindTo(Combo);
+            flashlight.Breaks = drawableRuleset.Beatmap.Breaks;
 
             drawableRuleset.KeyBindingInputManager.Add(flashlight);
-
-            flashlight.Breaks = drawableRuleset.Beatmap.Breaks;
         }
 
         protected abstract Flashlight CreateFlashlight();
@@ -125,9 +129,6 @@ namespace osu.Game.Rulesets.Mods
             {
                 base.LoadComplete();
 
-                if (comboBasedSize)
-                    Combo.ValueChanged += ApplyComboBasedSize;
-
                 using (BeginAbsoluteSequence(0))
                 {
                     foreach (var breakPeriod in Breaks)
@@ -143,7 +144,7 @@ namespace osu.Game.Rulesets.Mods
                 }
             }
 
-            protected abstract void ApplyComboBasedSize(ValueChangedEvent<int> e);
+            public abstract void ApplyComboBasedSize(ValueChangedEvent<int> e);
 
             protected abstract string FragmentShader { get; }
 

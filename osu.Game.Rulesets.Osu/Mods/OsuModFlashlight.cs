@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return base.OnMouseMove(e);
             }
 
-            protected override void ApplyComboBasedSize(ValueChangedEvent<int> e)
+            public override void ApplyComboBasedSize(ValueChangedEvent<int> e)
             {
                 this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }

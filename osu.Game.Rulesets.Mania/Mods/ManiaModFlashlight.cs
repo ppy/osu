@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 }
             }
 
-            protected override void ApplyComboBasedSize(ValueChangedEvent<int> e)
+            public override void ApplyComboBasedSize(ValueChangedEvent<int> e)
             {
                 this.TransformTo(nameof(FlashlightSize), new Vector2(DrawWidth, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }

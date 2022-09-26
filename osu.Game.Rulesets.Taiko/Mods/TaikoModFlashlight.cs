@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 return new Vector2(0, GetSizeFor(combo) * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
             }
 
-            protected override void ApplyComboBasedSize(ValueChangedEvent<int> e)
+            public override void ApplyComboBasedSize(ValueChangedEvent<int> e)
             {
                 this.TransformTo(nameof(FlashlightSize), getSizeFor(e.NewValue), FLASHLIGHT_FADE_DURATION);
             }
