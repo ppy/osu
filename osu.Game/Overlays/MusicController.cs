@@ -249,6 +249,35 @@ namespace osu.Game.Overlays
             return false;
         }
 
+        public void RandomTrack(Action onSuccess = null) => Schedule(() =>
+        {
+            bool res = rand();
+            if (res)
+                onSuccess?.Invoke();
+        });
+
+        private bool rand()
+        {
+            if (beatmap.Disabled)
+                return false;
+
+            queuedDirection = TrackChangeDirection.Next;
+
+            var playableSet = getBeatmapSets().AsEnumerable().SkipWhile(i => i.Equals(current.BeatmapSetInfo)).OrderBy(e => Guid.NewGuid()).ElementAtOrDefault(1)
+                              ?? getBeatmapSets().FirstOrDefault();
+
+            var playableBeatmap = playableSet?.Beatmaps.FirstOrDefault();
+
+            if (playableBeatmap != null)
+            {
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playableBeatmap));
+                restartTrack();
+                return true;
+            }
+
+            return false;
+        }
+
         private void restartTrack()
         {
             // if not scheduled, the previously track will be stopped one frame later (see ScheduleAfterChildren logic in GameBase).
@@ -406,7 +435,8 @@ namespace osu.Game.Overlays
     {
         None,
         Next,
-        Prev
+        Prev,
+        Random
     }
 
     public enum PreviousTrackResult

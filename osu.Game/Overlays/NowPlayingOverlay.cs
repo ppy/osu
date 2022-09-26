@@ -45,6 +45,7 @@ namespace osu.Game.Overlays
         private IconButton prevButton;
         private IconButton playButton;
         private IconButton nextButton;
+        private IconButton randomButton;
         private IconButton playlistButton;
 
         private SpriteText title, artist;
@@ -158,6 +159,13 @@ namespace osu.Game.Overlays
                                                     Origin = Anchor.Centre,
                                                     Action = () => musicController.NextTrack(),
                                                     Icon = FontAwesome.Solid.StepForward,
+                                                },
+                                                randomButton = new MusicIconButton
+                                                {
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
+                                                    Action = () => musicController.RandomTrack(),
+                                                    Icon = FontAwesome.Solid.Question,
                                                 },
                                             }
                                         },
