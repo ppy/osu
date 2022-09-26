@@ -5,12 +5,14 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -24,6 +26,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private readonly BindableDouble playerScore = new BindableDouble();
 
+        private Bindable<bool> configVisibility = new Bindable<bool>();
+
         public TestSceneGameplayLeaderboard()
         {
             AddStep("toggle expanded", () =>
@@ -33,6 +37,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
         }
 
         [Test]
@@ -129,6 +139,21 @@ namespace osu.Game.Tests.Visual.Gameplay
                 => AddAssert($"leaderboard height is {panelCount} panels high", () => leaderboard.DrawHeight == (GameplayLeaderboardScore.PANEL_HEIGHT + leaderboard.Spacing) * panelCount);
         }
 
+        [Test]
+        public void TestVisibility()
+        {
+            createLeaderboard();
+            addLocalPlayer();
+
+            AddStep("set visible true", () => configVisibility.Value = true);
+            AddWaitStep("wait", 1);
+            AddAssert("is leaderboard fully visible", () => leaderboard.FlowAlpha == 1);
+
+            AddStep("set visible false", () => configVisibility.Value = false);
+            AddWaitStep("wait", 1);
+            AddAssert("is leaderboard fully invisible", () => leaderboard.FlowAlpha == 0);
+        }
+
         private void addLocalPlayer()
         {
             AddStep("add local player", () =>
@@ -162,6 +187,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class TestGameplayLeaderboard : GameplayLeaderboard
         {
             public float Spacing => Flow.Spacing.Y;
+
+            public float FlowAlpha => Flow.Alpha;
 
             public bool CheckPositionByUsername(string username, int? expectedPosition)
             {
