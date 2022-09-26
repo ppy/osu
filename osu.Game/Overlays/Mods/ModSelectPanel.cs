@@ -178,7 +178,6 @@ namespace osu.Game.Overlays.Mods
 
         protected override void LoadComplete()
         {
-            
             base.LoadComplete();
             ModClicked.BindValueChanged(_ =>
             {
