@@ -28,6 +28,8 @@ namespace osu.Game.Overlays.Mods
     {
         public abstract BindableBool Active { get; }
 
+        public abstract BindableBool ModClicked { get; }
+
         public Color4 AccentColour { get; set; }
 
         public LocalisableString Title
@@ -176,7 +178,12 @@ namespace osu.Game.Overlays.Mods
 
         protected override void LoadComplete()
         {
+            
             base.LoadComplete();
+            ModClicked.BindValueChanged(_ =>
+            {
+                playStateChangeSamples();
+            });
             Active.BindValueChanged(_ =>
             {
                 UpdateState();

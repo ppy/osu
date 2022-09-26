@@ -53,6 +53,7 @@ namespace osu.Game.Overlays.Mods.Input
                 return false;
 
             modState.Active.Toggle();
+            modState.ModClicked.Toggle();
             return true;
         }
     }

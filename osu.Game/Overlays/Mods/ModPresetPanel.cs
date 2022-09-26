@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.Mods
 
         public override BindableBool Active { get; } = new BindableBool();
 
+        public override BindableBool ModClicked { get; } = new BindableBool();
+
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
@@ -57,7 +59,7 @@ namespace osu.Game.Overlays.Mods
             // if the preset is not active at the point of the user click, then set the mods using the preset directly, discarding any previous selections,
             // which will also have the side effect of activating the preset (see `updateActiveState()`).
             selectedMods.Value = Preset.Value.Mods.ToArray();
-            base.playStateChangeSamples();
+            ModClicked.Toggle();
         }
 
         protected override void Deselect()
@@ -66,7 +68,7 @@ namespace osu.Game.Overlays.Mods
             // (there are no other active mods than what the preset specifies, and the mod settings match exactly).
             // therefore it's safe to just clear selected mods, since it will have the effect of toggling the preset off.
             selectedMods.Value = Array.Empty<Mod>();
-            base.playStateChangeSamples();
+            ModClicked.Toggle();
         }
 
         private void selectedModsChanged()

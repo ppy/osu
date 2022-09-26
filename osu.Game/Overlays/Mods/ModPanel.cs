@@ -15,6 +15,7 @@ namespace osu.Game.Overlays.Mods
     {
         public Mod Mod => modState.Mod;
         public override BindableBool Active => modState.Active;
+        public override BindableBool ModClicked => modState.ModClicked;
         public BindableBool Filtered => modState.Filtered;
 
         protected override float IdleSwitchWidth => 54;
@@ -61,14 +62,14 @@ namespace osu.Game.Overlays.Mods
         {
             modState.PendingConfiguration = Mod.RequiresConfiguration;
             Active.Value = true;
-            base.playStateChangeSamples();
+            modState.ModClicked.Toggle();
         }
 
         protected override void Deselect()
         {
             modState.PendingConfiguration = false;
             Active.Value = false;
-            base.playStateChangeSamples();
+            modState.ModClicked.Toggle();
         }
 
         #region Filtering support

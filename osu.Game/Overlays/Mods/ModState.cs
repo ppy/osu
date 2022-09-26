@@ -23,6 +23,10 @@ namespace osu.Game.Overlays.Mods
         /// Whether the mod is currently selected.
         /// </summary>
         public BindableBool Active { get; } = new BindableBool();
+        /// <summary>
+        /// Whether the mod was just clicked, as opposed to being selected automatically by selecting a preset.
+        /// </summary>
+        public BindableBool ModClicked { get; } = new BindableBool();
 
         /// <summary>
         /// Whether the mod requires further customisation.
