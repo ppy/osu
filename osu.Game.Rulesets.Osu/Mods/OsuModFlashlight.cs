@@ -32,8 +32,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = default_follow_delay,
         };
 
-        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
-        public override BindableFloat SizeMultiplier { get; } = new BindableFloat
+        [SettingSource("Starting flashlight size", "Multiplier applied to the default flashlight size.")]
+        public override BindableFloat StartingFlashlightSize { get; } = new BindableFloat
         {
             MinValue = 0.5f,
             MaxValue = 2f,

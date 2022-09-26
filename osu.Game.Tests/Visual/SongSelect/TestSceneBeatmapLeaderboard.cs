@@ -200,7 +200,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         new OsuModFlashlight
                         {
                             FollowDelay = { Value = 200 },
-                            SizeMultiplier = { Value = 5 },
+                            StartingFlashlightSize = { Value = 5 },
                         },
                         new OsuModDifficultyAdjust
                         {
