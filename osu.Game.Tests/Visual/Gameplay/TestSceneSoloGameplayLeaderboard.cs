@@ -9,11 +9,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -23,6 +25,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
 
         private readonly BindableList<ScoreInfo> scores = new BindableList<ScoreInfo>();
+
+        private Bindable<bool> configVisibility = new Bindable<bool>();
+
+        private TestSoloGameplayLeaderboard? testSoloGameplayLeaderboard;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
+        }
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -37,7 +49,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Id = 2,
                 };
 
-                Child = new SoloGameplayLeaderboard(trackingUser)
+                Child = testSoloGameplayLeaderboard = new TestSoloGameplayLeaderboard(trackingUser)
                 {
                     Scores = { BindTarget = scores },
                     Anchor = Anchor.Centre,
@@ -57,6 +69,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddSliderStep("combo", 0, 1000, 0, v => scoreProcessor.Combo.Value = v);
         }
 
+        [Test]
+        public void TestVisibility()
+        {
+            AddStep("set visible true", () => configVisibility.Value = true);
+            AddWaitStep("wait", 1);
+            AddAssert("is leaderboard fully visible", () => testSoloGameplayLeaderboard?.FlowAlpha == 1);
+
+            AddStep("set visible false", () => configVisibility.Value = false);
+            AddWaitStep("wait", 1);
+            AddAssert("is leaderboard fully invisible", () => testSoloGameplayLeaderboard?.FlowAlpha == 0);
+        }
+
         private static List<ScoreInfo> createSampleScores()
         {
             return new[]
@@ -67,6 +91,14 @@ namespace osu.Game.Tests.Visual.Gameplay
                 new ScoreInfo { User = new APIUser { Username = @"frenzibyte" }, TotalScore = RNG.Next(500000, 1000000) },
                 new ScoreInfo { User = new APIUser { Username = @"Susko3" }, TotalScore = RNG.Next(500000, 1000000) },
             }.Concat(Enumerable.Range(0, 50).Select(i => new ScoreInfo { User = new APIUser { Username = $"User {i + 1}" }, TotalScore = 1000000 - i * 10000 })).ToList();
+        }
+
+        private class TestSoloGameplayLeaderboard : SoloGameplayLeaderboard
+        {
+            public float FlowAlpha => Flow.Alpha;
+            public TestSoloGameplayLeaderboard(IUser trackingUser)
+            : base(trackingUser)
+            { }
         }
     }
 }
