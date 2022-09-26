@@ -14,16 +14,37 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc.Mapping
         /// <summary>
         /// 对应的谱面
         /// </summary>
-        public int[] Beatmaps { get; set; }
+        public int[] Beatmaps { get; set; } = Array.Empty<int>();
 
         /// <summary>
-        /// 偏移
+        /// 要匹配的标题
         /// </summary>
-        public int Offset { get; set; }
+        public string[] MatchingTitle { get; set; } = Array.Empty<string>();
+
+        /// <summary>
+        /// 匹配模式
+        /// </summary>
+        public MatchingMode TitleMatchMode = MatchingMode.Exactly;
+
+        /// <summary>
+        /// 要匹配的艺术家
+        /// </summary>
+        public string[] MatchingArtist { get; set; } = Array.Empty<string>();
+
+        /// <summary>
+        /// 艺术家匹配模式
+        /// </summary>
+        public MatchingMode ArtistMatchMode = MatchingMode.Exactly;
 
         public void Dispose()
         {
             GC.SuppressFinalize(this);
         }
+    }
+
+    public enum MatchingMode
+    {
+        Exactly,
+        Contains,
     }
 }

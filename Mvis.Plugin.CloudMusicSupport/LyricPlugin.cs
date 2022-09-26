@@ -36,6 +36,8 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         private SettingsEntry[] entries;
 
+        public bool IsContentLoaded => ContentLoaded;
+
         public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {
             var config = (LyricConfigManager)pluginConfigManager;
@@ -269,7 +271,9 @@ namespace Mvis.Plugin.CloudMusicSupport
             currentResponseRoot = null;
             CurrentLine = null;
 
-            if (UserDefinitionHelper.HaveDefinition(CurrentWorkingBeatmap.BeatmapSetInfo.OnlineID, out int neid))
+            if (UserDefinitionHelper.BeatmapMetaHaveDefinition(CurrentWorkingBeatmap.BeatmapInfo, out int neid))
+                GetLyricFor(neid);
+            else if (UserDefinitionHelper.OnlineIDHaveDefinition(CurrentWorkingBeatmap.BeatmapSetInfo.OnlineID, out neid))
                 GetLyricFor(neid);
             else
                 processor.StartFetchByBeatmap(CurrentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);

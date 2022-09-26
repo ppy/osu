@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using osu.Game.Screens.LLin;
 using osuTK;
 using osuTK.Graphics;
 
@@ -106,7 +107,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         }
 
         [BackgroundDependencyLoader]
-        private void load(LyricConfigManager config, LyricConfigManager lcm)
+        private void load(LyricConfigManager lcm, IImplementLLin llin)
         {
             udh ??= plugin.UserDefinitionHelper;
 
@@ -136,7 +137,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                     {
                         new IconButton
                         {
-                            Size = new Vector2(30),
+                            Height = 30,
+                            Width = 1,
+                            RelativeSizeAxes = Axes.X,
                             TooltipText = "更新定义",
                             Action = () =>
                             {
@@ -149,30 +152,16 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                         },
                         new IconButton
                         {
-                            Size = new Vector2(30),
-                            TooltipText = "复制单条信息",
+                            Height = 30,
+                            Width = 1,
+                            RelativeSizeAxes = Axes.X,
+                            TooltipText = "复制谱面参考信息",
                             Action = () =>
                             {
                                 SDL2.SDL.SDL_SetClipboardText(resolveBeatmapVerboseString(plugin.CurrentWorkingBeatmap));
+                                llin.PostNotification(plugin, FontAwesome.Regular.CheckCircle, "复制成功！");
                             },
                             Icon = FontAwesome.Solid.Clipboard
-                        },
-                        new IconButton
-                        {
-                            Size = new Vector2(30),
-                            TooltipText = "复制模板",
-                            Action = () =>
-                            {
-                                string targetString = "\n{\n"
-                                                      + "  \"Target\": 把这条中文替换成你得到的网易云ID,\n"
-                                                      + "  \"Beatmaps\":\n"
-                                                      + "  [\n"
-                                                      + $"    {resolveBeatmapVerboseString(plugin.CurrentWorkingBeatmap)}\n"
-                                                      + "  ]\n"
-                                                      + "},";
-                                SDL2.SDL.SDL_SetClipboardText(targetString);
-                            },
-                            Icon = FontAwesome.Solid.Pen
                         }
                     }
                 }

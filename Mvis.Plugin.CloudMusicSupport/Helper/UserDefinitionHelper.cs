@@ -5,10 +5,13 @@ using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Misc.Mapping;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Screens.LLin;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace Mvis.Plugin.CloudMusicSupport.Helper
@@ -33,6 +36,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             UpdateDefinition();
         }
 
+        [Resolved]
+        private IImplementLLin llin { get; set; }
+
+        [Resolved]
+        private LyricPlugin plugin { get; set; }
+
         #region 更新定义
 
         private WebRequest currentRequest;
@@ -41,6 +50,18 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
         public void UpdateDefinition(string url = null, Action onComplete = null, Action<Exception> onFail = null)
         {
+            void onRefreshComplete()
+            {
+                if (plugin.IsContentLoaded)
+                {
+                    this.Schedule(() =>
+                    {
+                        plugin.RefreshLyric();
+                        llin.PostNotification(plugin, FontAwesome.Regular.CheckCircle, "用户定义更新完成");
+                    });
+                }
+            }
+
             //检查本地
             if (storage.Exists(filePath))
             {
@@ -57,6 +78,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                     if (now - lastUpdate < 7 || deserializedObject.LastUpdate == -1)
                     {
                         mappingRoot = deserializedObject;
+                        onRefreshComplete();
                         return;
                     }
                 }
@@ -79,6 +101,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                 File.WriteAllText(storage.GetFullPath(filePath), req.GetResponseString());
 
                 onComplete?.Invoke();
+
+                onRefreshComplete();
             };
 
             req.Failed += onFail;
@@ -89,7 +113,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
         #endregion
 
-        public bool HaveDefinition(int onlineID, out int neteaseID)
+        public bool OnlineIDHaveDefinition(int onlineID, out int neteaseID)
         {
             neteaseID = -1;
 
@@ -102,18 +126,51 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             return result != null;
         }
 
+        public bool BeatmapMetaHaveDefinition(BeatmapInfo bi, out int neteaseID)
+        {
+            neteaseID = -1;
+
+            if (mappingRoot == null || mappingRoot.Data.Length == 0) return false;
+
+            var metadata = bi.Metadata;
+            var result = mappingRoot.Data.FirstOrDefault(m =>
+                (m.ArtistMatchMode == MatchingMode.Contains
+                    ? m.MatchingArtist.Any(s => metadata.Artist.Contains(s) || (metadata.ArtistUnicode?.Contains(s) ?? false))
+                    : m.MatchingArtist.Any(s => metadata.Artist.Equals(s) || (metadata.ArtistUnicode?.Equals(s) ?? false)))
+                &&
+                (m.TitleMatchMode == MatchingMode.Contains
+                    ? m.MatchingTitle.Any(s => metadata.Title.Contains(s) || (metadata.TitleUnicode?.Contains(s) ?? false))
+                    : m.MatchingTitle.Any(s => metadata.Title.Equals(s) || (metadata.TitleUnicode?.Equals(s) ?? false)))
+            );
+
+            if (result != null) neteaseID = result.TargetNeteaseID;
+
+            return result != null;
+        }
+
         internal void Debug()
         {
             foreach (var mapping in mappingRoot.Data)
             {
+                string titleString = "";
+                string artistString = "";
+
+                foreach (string t in mapping.MatchingTitle)
+                    titleString += $"\"{t}\", ";
+
+                foreach (string a in mapping.MatchingArtist)
+                    artistString += $"\"{a}\", ";
+
                 Logger.Log($"{mapping}包含的数据：");
                 Logger.Log($"|------对应网易云ID：{mapping.TargetNeteaseID}");
+                Logger.Log($"|------对应标题：{titleString}");
+                Logger.Log($"|------标题匹配模式：{mapping.TitleMatchMode}");
+                Logger.Log($"|------艺术家：{artistString}");
+                Logger.Log($"|------艺术家匹配模式：{mapping.ArtistMatchMode}");
                 Logger.Log($"|------谱面：");
 
-                foreach (var oid in mapping.Beatmaps)
-                {
+                foreach (int oid in mapping.Beatmaps)
                     Logger.Log($"|------------{oid}");
-                }
             }
         }
     }
