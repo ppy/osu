@@ -58,12 +58,11 @@ namespace osu.Game.Overlays
         [Resolved]
         private RealmAccess realm { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            // Todo: These binds really shouldn't be here, but are unlikely to cause any issues for now.
-            // They are placed here for now since some tests rely on setting the beatmap _and_ their hierarchies inside their load(), which runs before the MusicController's load().
-            beatmap.BindValueChanged(beatmapChanged, true);
+            base.LoadComplete();
+
+            beatmap.BindValueChanged(b => changeBeatmap(b.NewValue), true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
         }
 
@@ -262,8 +261,6 @@ namespace osu.Game.Overlays
         private TrackChangeDirection? queuedDirection;
 
         private IQueryable<BeatmapSetInfo> getBeatmapSets() => realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending);
-
-        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap) => changeBeatmap(beatmap.NewValue);
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {

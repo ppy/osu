@@ -89,6 +89,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private IDisposable scoreSubscription;
 
+        private GetScoresRequest scoreRetrievalRequest;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -151,14 +153,14 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            var req = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
+            scoreRetrievalRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
 
-            req.Success += r => SetScores(
-                scoreManager.OrderByTotalScore(r.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
-                r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
+            scoreRetrievalRequest.Success += response => SetScores(
+                scoreManager.OrderByTotalScore(response.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
+                response.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
             );
 
-            return req;
+            return scoreRetrievalRequest;
         }
 
         protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope)
@@ -218,7 +220,9 @@ namespace osu.Game.Screens.Select.Leaderboards
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
             scoreSubscription?.Dispose();
+            scoreRetrievalRequest?.Cancel();
         }
     }
 }
