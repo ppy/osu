@@ -18,21 +18,15 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
-        public override BindableFloat SizeMultiplier { get; } = new BindableFloat
+        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
             MaxValue = 3f,
-            Default = 1f,
-            Value = 1f,
             Precision = 0.1f
         };
 
         [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
-        public override BindableBool ComboBasedSize { get; } = new BindableBool
-        {
-            Default = false,
-            Value = false
-        };
+        public override BindableBool ComboBasedSize { get; } = new BindableBool();
 
         public override float DefaultFlashlightSize => 50;
 
