@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                         {
                             new TriangleButton
                             {
-                                Text = "Add new playlist entry",
+                                Text = "添加新课题条目",
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 Action = () => CreateNewItem?.Invoke()

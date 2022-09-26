@@ -265,8 +265,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             if (host.NewValue != null)
             {
-                hostText.AddText("hosted by ");
+                hostText.AddText("由 ");
                 hostText.AddUserLink(host.NewValue);
+                hostText.AddText(" 发起");
             }
         }
 

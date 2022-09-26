@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Select
             {
                 new OsuSpriteText
                 {
-                    Text = "Difficulty range",
+                    Text = "难度范围",
                     Font = OsuFont.GetFont(size: 14),
                 },
                 new MaximumStarsSlider
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select
             {
             }
 
-            public override LocalisableString TooltipText => Current.Value.ToString(@"0.## stars");
+            public override LocalisableString TooltipText => Current.Value.ToString(@"0.## 星");
 
             protected override void LoadComplete()
             {

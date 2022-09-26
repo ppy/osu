@@ -58,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             count.Clear();
             count.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
             count.AddText(" ");
-            count.AddText("Beatmap".ToQuantity(activeItems, ShowQuantityAs.None));
+            count.AddText("张谱面");
         }
     }
 }

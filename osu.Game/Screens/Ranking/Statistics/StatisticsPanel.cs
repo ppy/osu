@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             Origin = Anchor.TopCentre,
                             Children = new Drawable[]
                             {
-                                new MessagePlaceholder("More statistics available after watching a replay!"),
+                                new MessagePlaceholder("请先看一遍回放再来查看更多统计信息"),
                                 new ReplayDownloadButton(newScore)
                                 {
                                     Scale = new Vector2(1.5f),

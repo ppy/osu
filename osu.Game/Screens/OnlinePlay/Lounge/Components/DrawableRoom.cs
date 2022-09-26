@@ -402,7 +402,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 if (Type.Value == MatchType.Playlists)
                 {
-                    statusText.Text = "Ready to play";
+                    statusText.Text = "准备开始";
                     return;
                 }
 
@@ -419,7 +419,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                                       var retrievedBeatmap = task.GetResultSafely();
 
-                                      statusText.Text = "Currently playing ";
+                                      statusText.Text = "正在游玩 ";
 
                                       if (retrievedBeatmap != null)
                                       {
@@ -429,7 +429,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                               creationParameters: s => s.Truncate = true);
                                       }
                                       else
-                                          beatmapText.AddText("unknown beatmap");
+                                          beatmapText.AddText("未知谱面");
                                   }), cancellationSource.Token);
             }
         }

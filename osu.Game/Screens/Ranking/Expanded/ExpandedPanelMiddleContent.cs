@@ -177,6 +177,9 @@ namespace osu.Game.Screens.Ranking.Expanded
                                             t.AddText("谱师：");
                                             t.AddText(creator, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
                                         }
+
+                                        if (score.Date != default)
+                                            AddInternal(new PlayedOnText(score.Date));
                                     })
                                 }
                             },
@@ -224,9 +227,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                     }
                 }
             });
-
-            if (score.Date != default)
-                AddInternal(new PlayedOnText(score.Date));
 
             var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely();
 
@@ -291,7 +291,7 @@ namespace osu.Game.Screens.Ranking.Expanded
 
                 Anchor = Anchor.BottomCentre;
                 Origin = Anchor.BottomCentre;
-                Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold);
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold);
             }
 
             [BackgroundDependencyLoader]
@@ -309,7 +309,7 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             private void updateDisplay()
             {
-                Text = prefer24HourTime.Value ? $"Played on {time.ToLocalTime():d MMMM yyyy HH:mm}" : $"Played on {time.ToLocalTime():d MMMM yyyy h:mm tt}";
+                Text = prefer24HourTime.Value ? $"于 {time.ToLocalTime():yyyy MMMM d HH:mm} 游玩" : $"于 {time.ToLocalTime():yyyy MMMm d h:mm tt} 游玩";
             }
         }
     }

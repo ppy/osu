@@ -129,7 +129,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
+            new OsuMenuItem("创建副本", MenuItemType.Standard, () =>
             {
                 lounge?.OpenCopy(Room);
             })
@@ -224,12 +224,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                 passwordTextBox = new OsuPasswordTextBox
                                 {
                                     Width = 200,
-                                    PlaceholderText = "password",
+                                    PlaceholderText = "密码",
                                 },
                                 joinButton = new TriangleButton
                                 {
                                     Width = 80,
-                                    Text = "Join Room",
+                                    Text = "加入房间",
                                 }
                             }
                         },

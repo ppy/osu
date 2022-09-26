@@ -154,7 +154,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             Padding = new MarginPadding { Right = FIELD_PADDING / 2 },
                                                             Children = new[]
                                                             {
-                                                                new Section("Room name")
+                                                                new Section("房间名")
                                                                 {
                                                                     Child = NameField = new OsuTextBox
                                                                     {
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 //         Enabled = { Value = false }
                                                                 //     },
                                                                 // },
-                                                                new Section("Game type")
+                                                                new Section("游戏类型")
                                                                 {
                                                                     Child = new FillFlowContainer
                                                                     {
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         },
                                                                     },
                                                                 },
-                                                                new Section("Queue mode")
+                                                                new Section("队列模式")
                                                                 {
                                                                     Child = new Container
                                                                     {
@@ -205,7 +205,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         }
                                                                     }
                                                                 },
-                                                                new Section("Auto start")
+                                                                new Section("自动开始")
                                                                 {
                                                                     Child = new Container
                                                                     {
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             Padding = new MarginPadding { Left = FIELD_PADDING / 2 },
                                                             Children = new[]
                                                             {
-                                                                new Section("Max participants")
+                                                                new Section("最大人数")
                                                                 {
                                                                     Alpha = disabled_alpha,
                                                                     Child = MaxParticipantsField = new OsuNumberBox
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         ReadOnly = true,
                                                                     },
                                                                 },
-                                                                new Section("Password (optional)")
+                                                                new Section("密码 （可选）")
                                                                 {
                                                                     Child = PasswordTextBox = new OsuPasswordTextBox
                                                                     {
@@ -245,11 +245,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         LengthLimit = 255,
                                                                     },
                                                                 },
-                                                                new Section("Other")
+                                                                new Section("其他")
                                                                 {
                                                                     Child = AutoSkipCheckbox = new OsuCheckbox
                                                                     {
-                                                                        LabelText = "Automatically skip the beatmap intro"
+                                                                        LabelText = "自动跳过谱面开头"
                                                                     }
                                                                 }
                                                             }
@@ -276,7 +276,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                         {
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = 40,
-                                                            Text = "Select beatmap",
+                                                            Text = "选择谱面",
                                                             Action = SelectBeatmap
                                                         }
                                                     }
@@ -439,11 +439,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 Debug.Assert(applyingSettingsOperation != null);
 
                 // see https://github.com/ppy/osu-web/blob/2c97aaeb64fb4ed97c747d8383a35b30f57428c7/app/Models/Multiplayer/PlaylistItem.php#L48.
-                const string not_found_prefix = "beatmaps not found:";
+                const string not_found_prefix = "未找到谱面:";
 
                 if (text.StartsWith(not_found_prefix, StringComparison.Ordinal))
                 {
-                    ErrorText.Text = "The selected beatmap is not available online.";
+                    ErrorText.Text = "选择的谱面无法在线上找到";
                     CurrentPlaylistItem.Value.MarkInvalid();
                 }
                 else
@@ -466,7 +466,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                roomId.BindValueChanged(id => Text = id.NewValue == null ? "Create" : "Update", true);
+                roomId.BindValueChanged(id => Text = id.NewValue == null ? "创建" : "更新", true);
             }
 
             [BackgroundDependencyLoader]
@@ -480,19 +480,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private enum StartMode
         {
-            [Description("Off")]
+            [Description("关闭")]
             Off = 0,
 
-            [Description("30 seconds")]
+            [Description("30秒")]
             Seconds_30 = 30,
 
-            [Description("1 minute")]
+            [Description("1分钟")]
             Seconds_60 = 60,
 
-            [Description("3 minutes")]
+            [Description("3分钟")]
             Seconds_180 = 180,
 
-            [Description("5 minutes")]
+            [Description("5分钟")]
             Seconds_300 = 300
         }
     }

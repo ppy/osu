@@ -230,7 +230,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem("Give host", MenuItemType.Standard, () =>
+                    new OsuMenuItem("设为房主", MenuItemType.Standard, () =>
                     {
                         // Ensure the local user is still host.
                         if (!Client.IsHost)
@@ -238,7 +238,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
                         Client.TransferHost(targetUser).FireAndForget();
                     }),
-                    new OsuMenuItem("Kick", MenuItemType.Destructive, () =>
+                    new OsuMenuItem("踢出", MenuItemType.Destructive, () =>
                     {
                         // Ensure the local user is still host.
                         if (!Client.IsHost)
@@ -255,7 +255,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             public KickButton()
             {
                 Icon = FontAwesome.Solid.UserTimes;
-                TooltipText = "Kick";
+                TooltipText = "踢出";
             }
 
             [BackgroundDependencyLoader]

@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            Text = "Create room";
+            Text = "创建房间";
 
             isConnected = multiplayerClient.IsConnected.GetBoundCopy();
             operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();

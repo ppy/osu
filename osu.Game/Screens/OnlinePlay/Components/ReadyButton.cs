@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     return string.Empty;
 
                 if (availability.Value.State != DownloadState.LocallyAvailable)
-                    return "Beatmap not downloaded";
+                    return "谱面未下载";
 
                 return string.Empty;
             }

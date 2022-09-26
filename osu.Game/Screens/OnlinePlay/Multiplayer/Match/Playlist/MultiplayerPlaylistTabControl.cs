@@ -34,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                QueueItems.BindCollectionChanged((_, _) => Text.Text = QueueItems.Count > 0 ? $"Queue ({QueueItems.Count})" : "Queue", true);
+                QueueItems.BindCollectionChanged((_, _) => Text.Text = QueueItems.Count > 0 ? $"列表 ({QueueItems.Count})" : "列表", true);
             }
         }
     }

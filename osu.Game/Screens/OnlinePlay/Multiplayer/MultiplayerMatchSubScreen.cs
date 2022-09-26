@@ -54,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
         {
-            Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
+            Title = room.RoomID.Value == null ? "创建新房间" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
         }
 
@@ -122,14 +122,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 RelativeSizeAxes = Axes.Both,
                                 Content = new[]
                                 {
-                                    new Drawable[] { new OverlinedHeader("Beatmap") },
+                                    new Drawable[] { new OverlinedHeader("谱面") },
                                     new Drawable[]
                                     {
                                         addItemButton = new AddItemButton
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             Height = 40,
-                                            Text = "Add item",
+                                            Text = "添加谱面",
                                             Action = () => OpenSongSelection()
                                         },
                                     },
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                             Alpha = 0,
                                             Children = new Drawable[]
                                             {
-                                                new OverlinedHeader("Extra mods"),
+                                                new OverlinedHeader("额外模组"),
                                                 new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
                                                             Width = 90,
-                                                            Text = "Select",
+                                                            Text = "选择",
                                                             Action = ShowUserModSelect,
                                                         },
                                                         new ModDisplay
@@ -198,7 +198,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 RelativeSizeAxes = Axes.Both,
                                 Content = new[]
                                 {
-                                    new Drawable[] { new OverlinedHeader("Chat") },
+                                    new Drawable[] { new OverlinedHeader("聊天") },
                                     new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
                                 },
                                 RowDimensions = new[]
@@ -261,7 +261,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     confirmDialog.PerformOkAction();
                 else
                 {
-                    dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
+                    dialogOverlay.Push(new ConfirmDialog("你确定要离开多人游戏房间吗?", () =>
                     {
                         exitConfirmed = true;
                         this.Exit();

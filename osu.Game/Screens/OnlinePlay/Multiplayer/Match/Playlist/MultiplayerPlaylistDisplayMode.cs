@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System.ComponentModel;
+
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 {
     /// <summary>
@@ -11,6 +13,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     public enum MultiplayerPlaylistDisplayMode
     {
         Queue,
+
+        [Description("历史")]
         History,
     }
 }

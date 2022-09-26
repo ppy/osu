@@ -89,7 +89,7 @@ namespace osu.Game.Screens.OnlinePlay
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.TorusAlternate.With(size: 24),
-                                Text = "Lounge"
+                                Text = "大厅"
                             }
                         }
                     },

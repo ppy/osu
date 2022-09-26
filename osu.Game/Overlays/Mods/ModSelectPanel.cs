@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Mods
                                     },
                                     descriptionText = new OsuSpriteText
                                     {
-                                        Font = OsuFont.Default.With(size: 12),
+                                        Font = OsuFont.Default.With(size: 14),
                                         RelativeSizeAxes = Axes.X,
                                         Truncate = true,
                                         Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)

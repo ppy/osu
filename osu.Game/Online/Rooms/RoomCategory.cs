@@ -10,10 +10,13 @@ namespace osu.Game.Online.Rooms
     public enum RoomCategory
     {
         // used for osu-web deserialization so names shouldn't be changed.
+        [Description("正常")]
         Normal,
+
+        [Description("聚光灯")]
         Spotlight,
 
-        [Description("Featured Artist")]
+        [Description("精选艺术家")]
         FeaturedArtist,
     }
 }

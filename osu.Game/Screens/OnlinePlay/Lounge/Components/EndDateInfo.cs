@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 12),
+                Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 14),
                 EndDate = { BindTarget = EndDate }
             };
         }
@@ -52,15 +52,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 var diffToNow = Date.Subtract(DateTimeOffset.Now);
 
                 if (diffToNow.TotalSeconds < -5)
-                    return $"Closed {base.Format()}";
+                    return $"已在{base.Format()}关闭";
 
                 if (diffToNow.TotalSeconds < 0)
-                    return "Closed";
+                    return "已关闭";
 
                 if (diffToNow.TotalSeconds < 5)
-                    return "Closing soon";
+                    return "即将关闭";
 
-                return $"Closing {base.Format()}";
+                return $"将在{base.Format()}关闭";
             }
         }
     }

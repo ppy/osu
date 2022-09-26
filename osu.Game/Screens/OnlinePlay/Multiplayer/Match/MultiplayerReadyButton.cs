@@ -122,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             if (room == null)
             {
-                Text = "Ready";
+                Text = "准备";
                 return;
             }
 
@@ -130,16 +130,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             int countReady = room.Users.Count(u => u.State == MultiplayerUserState.Ready);
             int countTotal = room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
-            string countText = $"({countReady} / {countTotal} ready)";
+            string countText = $"({countReady} / {countTotal} 已准备)";
 
             if (countdown != null)
             {
-                string countdownText = $"Starting in {countdownTimeRemaining:mm\\:ss}";
+                string countdownText = $"将在 {countdownTimeRemaining:mm\\:ss} 后开始";
 
                 switch (localUser?.State)
                 {
                     default:
-                        Text = $"Ready ({countdownText.ToLowerInvariant()})";
+                        Text = $"准备 ({countdownText.ToLowerInvariant()})";
                         break;
 
                     case MultiplayerUserState.Spectating:
@@ -153,14 +153,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 switch (localUser?.State)
                 {
                     default:
-                        Text = "Ready";
+                        Text = "准备";
                         break;
 
                     case MultiplayerUserState.Spectating:
                     case MultiplayerUserState.Ready:
                         Text = room.Host?.Equals(localUser) == true
-                            ? $"Start match {countText}"
-                            : $"Waiting for host... {countText}";
+                            ? $"开始游戏 {countText}"
+                            : $"等待房主... {countText}";
 
                         break;
                 }
@@ -241,7 +241,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready
                     && !room.Settings.AutoStartEnabled)
                 {
-                    return "Cancel countdown";
+                    return "取消倒计时";
                 }
 
                 return base.TooltipText;

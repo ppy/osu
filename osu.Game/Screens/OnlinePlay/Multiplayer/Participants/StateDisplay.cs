@@ -74,7 +74,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                 Padding = new MarginPadding { Horizontal = 5f, Vertical = 1f },
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
-                                Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 12),
+                                Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 16),
                                 Colour = Color4Extensions.FromHex("#DDFFFF")
                             },
                         }
@@ -99,44 +99,44 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     break;
 
                 case MultiplayerUserState.Ready:
-                    text.Text = "ready";
+                    text.Text = "已准备";
                     icon.Icon = FontAwesome.Solid.CheckCircle;
                     icon.Colour = Color4Extensions.FromHex("#AADD00");
                     break;
 
                 case MultiplayerUserState.WaitingForLoad:
-                    text.Text = "loading";
+                    text.Text = "正在载入";
                     icon.Icon = FontAwesome.Solid.PauseCircle;
                     icon.Colour = colours.Yellow;
                     break;
 
                 case MultiplayerUserState.Loaded:
                 case MultiplayerUserState.ReadyForGameplay:
-                    text.Text = "loaded";
+                    text.Text = "已载入";
                     icon.Icon = FontAwesome.Solid.DotCircle;
                     icon.Colour = colours.YellowLight;
                     break;
 
                 case MultiplayerUserState.Playing:
-                    text.Text = "playing";
+                    text.Text = "游戏中";
                     icon.Icon = FontAwesome.Solid.PlayCircle;
                     icon.Colour = colours.BlueLight;
                     break;
 
                 case MultiplayerUserState.FinishedPlay:
-                    text.Text = "results pending";
+                    text.Text = "等待结算";
                     icon.Icon = FontAwesome.Solid.ArrowAltCircleUp;
                     icon.Colour = colours.BlueLighter;
                     break;
 
                 case MultiplayerUserState.Results:
-                    text.Text = "results";
+                    text.Text = "结算界面";
                     icon.Icon = FontAwesome.Solid.ArrowAltCircleUp;
                     icon.Colour = colours.BlueLighter;
                     break;
 
                 case MultiplayerUserState.Spectating:
-                    text.Text = "spectating";
+                    text.Text = "旁观中";
                     icon.Icon = FontAwesome.Solid.Binoculars;
                     icon.Colour = colours.BlueLight;
                     break;
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     break;
 
                 case DownloadState.NotDownloaded:
-                    text.Text = "no map";
+                    text.Text = "没有地图";
                     icon.Icon = FontAwesome.Solid.MinusCircle;
                     icon.Colour = colours.RedLight;
                     break;
@@ -164,13 +164,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     progressBar.FadeIn(fade_time);
                     progressBar.CurrentTime = availability.DownloadProgress ?? 0;
 
-                    text.Text = "downloading map";
+                    text.Text = "正在下图";
                     icon.Icon = FontAwesome.Solid.ArrowAltCircleDown;
                     icon.Colour = colours.Blue;
                     break;
 
                 case DownloadState.Importing:
-                    text.Text = "importing map";
+                    text.Text = "正在导入";
                     icon.Icon = FontAwesome.Solid.ArrowAltCircleDown;
                     icon.Colour = colours.Yellow;
                     break;

@@ -58,7 +58,7 @@ namespace osu.Game.Collections
     public class AllBeatmapsCollectionFilterMenuItem : CollectionFilterMenuItem
     {
         public AllBeatmapsCollectionFilterMenuItem()
-            : base("All beatmaps")
+            : base("所有谱面")
         {
         }
     }

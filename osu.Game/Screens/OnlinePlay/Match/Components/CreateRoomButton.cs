@@ -15,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            SpriteText.Font = SpriteText.Font.With(size: 14);
+            SpriteText.Font = SpriteText.Font.With(size: 16);
             Triangles.TriangleScale = 1.5f;
         }
 

@@ -165,7 +165,7 @@ namespace osu.Game.Graphics.UserInterface
                         break;
 
                     case Enum e:
-                        text = e.GetLocalisableDescription();
+                        text = e.GetDescription() ?? e.GetLocalisableDescription();
                         break;
 
                     case LocalisableString l:

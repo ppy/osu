@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Select
                                                 new OsuSpriteText
                                                 {
                                                     Text = SortStrings.Default,
-                                                    Font = OsuFont.GetFont(size: 14),
+                                                    Font = OsuFont.GetFont(size: 16),
                                                     Margin = new MarginPadding(5),
                                                     Anchor = Anchor.BottomRight,
                                                     Origin = Anchor.BottomRight,

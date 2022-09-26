@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             base.Action = this.ShowPopover;
 
-            TooltipText = "Countdown settings";
+            TooltipText = "倒计时设置";
         }
 
         [BackgroundDependencyLoader]
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 flow.Add(new OsuButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = $"Start match in {duration.Humanize()}",
+                    Text = $"在 {duration.Humanize()} 后开始",
                     BackgroundColour = colours.Green,
                     Action = () =>
                     {
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 flow.Add(new OsuButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = "Stop countdown",
+                    Text = "停止倒计时",
                     BackgroundColour = colours.Red,
                     Action = () =>
                     {
