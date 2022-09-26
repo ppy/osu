@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -13,6 +15,9 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class SoloGameplayLeaderboard : GameplayLeaderboard
     {
+        private const int duration = 100;
+
+        private readonly Bindable<bool> configVisibility = new Bindable<bool>();
         private readonly IUser trackingUser;
 
         public readonly IBindableList<ScoreInfo> Scores = new BindableList<ScoreInfo>();
@@ -31,10 +36,18 @@ namespace osu.Game.Screens.Play.HUD
             this.trackingUser = trackingUser;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
             Scores.BindCollectionChanged((_, _) => Scheduler.AddOnce(showScores), true);
+
+            configVisibility.BindValueChanged(_ => updateVisibility(), true);
         }
 
         private void showScores()
@@ -69,5 +82,8 @@ namespace osu.Game.Screens.Play.HUD
             // Local score should always show lower than any existing scores in cases of ties.
             local.DisplayOrder.Value = long.MaxValue;
         }
+
+        private void updateVisibility() =>
+            Flow.FadeTo(configVisibility.Value ? 1 : 0, duration);
     }
 }
