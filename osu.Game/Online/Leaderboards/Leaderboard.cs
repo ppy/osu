@@ -185,10 +185,15 @@ namespace osu.Game.Online.Leaderboards
             if (scores != null)
                 this.scores.AddRange(scores);
 
-            // Schedule needs to be non-delayed here for the weird logic in refetchScores to work.
-            // If it is removed, the placeholder will be incorrectly updated to "no scores" rather than "retrieving".
-            // This whole flow should be refactored in the future.
-            Scheduler.Add(applyNewScores, false);
+            // Non-delayed schedule may potentially run inline (due to IsMainThread check passing) after leaderboard  is disposed.
+            // This is guarded against in BeatmapLeaderboard via web request cancellation, but let's be extra safe.
+            if (!IsDisposed)
+            {
+                // Schedule needs to be non-delayed here for the weird logic in refetchScores to work.
+                // If it is removed, the placeholder will be incorrectly updated to "no scores" rather than "retrieving".
+                // This whole flow should be refactored in the future.
+                Scheduler.Add(applyNewScores, false);
+            }
 
             void applyNewScores()
             {
