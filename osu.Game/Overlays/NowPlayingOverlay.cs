@@ -5,6 +5,7 @@
 
 using System;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -34,6 +35,11 @@ namespace osu.Game.Overlays
         public LocalisableString Title => NowPlayingStrings.HeaderTitle;
         public LocalisableString Description => NowPlayingStrings.HeaderDescription;
 
+        public string CurrentMinutes;
+        public string FinalMinutes;
+        public string CurrentSeconds;
+        public string FinalSeconds;
+
         private const float player_height = 130;
         private const float transition_length = 800;
         private const float progress_height = 10;
@@ -55,6 +61,7 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
         private Container playlistContainer;
+        private OsuSpriteText timeText;
 
         protected override string PopInSampleName => "UI/now-playing-pop-in";
         protected override string PopOutSampleName => "UI/now-playing-pop-out";
@@ -103,21 +110,21 @@ namespace osu.Game.Overlays
                                 background = new Background(),
                                 title = new OsuSpriteText
                                 {
-                                    Origin = Anchor.BottomCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Position = new Vector2(0, 40),
+                                    Origin = Anchor.BottomLeft, // Originally BottomCentre
+                                    Anchor = Anchor.TopLeft, // Originally TopCentre
+                                    Position = new Vector2(20, 40),
                                     Font = OsuFont.GetFont(size: 25, italics: true),
                                     Colour = Color4.White,
                                     Text = @"Nothing to play",
                                 },
                                 artist = new OsuSpriteText
                                 {
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Position = new Vector2(0, 45),
+                                    Origin = Anchor.TopLeft, //Originally TopCentre
+                                    Anchor = Anchor.TopLeft, //Originally TopCentre
+                                    Position = new Vector2(20, 45),
                                     Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold, italics: true),
                                     Colour = Color4.White,
-                                    Text = @"Nothing to play",
+                                    Text = @"Nothing to play"
                                 },
                                 new Container
                                 {
@@ -133,8 +140,9 @@ namespace osu.Game.Overlays
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(5),
-                                            Origin = Anchor.Centre,
-                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.CentreLeft, // Changed from Centre to CentreLeft
+                                            Anchor = Anchor.CentreLeft, // Changed from Centre to CentreLeft
+                                            Position = new Vector2(20, 0),
                                             Children = new[]
                                             {
                                                 prevButton = new MusicIconButton
@@ -161,6 +169,14 @@ namespace osu.Game.Overlays
                                                     Icon = FontAwesome.Solid.StepForward,
                                                 },
                                             }
+                                        },
+                                        timeText = new OsuSpriteText
+                                        {
+                                            Origin = Anchor.Centre,
+                                            Anchor = Anchor.Centre,
+                                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold, italics: true),
+                                            Colour = Color4.White,
+                                            Text = @"0:00/0:00"
                                         },
                                         playlistButton = new MusicIconButton
                                         {
@@ -278,12 +294,34 @@ namespace osu.Game.Overlays
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
 
+                // Process the Current Minute and Second
+                CurrentMinutes = Math.Floor((track.CurrentTime / 1000) / 60).ToString();
+                CurrentSeconds = Math.Floor((track.CurrentTime / 1000) % 60).ToString();
+
+                // Process the Total Minute and Second
+                FinalMinutes = Math.Floor((track.Length / 1000) / 60).ToString();
+                FinalSeconds = Math.Floor((track.Length / 1000) % 60).ToString();
+
+                // If the second variables is only 1 Character long, it will be made 2
+                if (CurrentSeconds.Length < 2)
+                {
+                    CurrentSeconds = "0" + CurrentSeconds;
+                };
+
+                if (FinalSeconds.Length < 2)
+                {
+                    FinalSeconds = "0" + FinalSeconds;
+                };
+
+                timeText.Text = CurrentMinutes + ":" + CurrentSeconds + "/" + FinalMinutes + ":" + FinalSeconds;
                 playButton.Icon = track.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
             }
             else
             {
                 progressBar.CurrentTime = 0;
                 progressBar.EndTime = 1;
+
+                timeText.Text = "0:00/0:00";
                 playButton.Icon = FontAwesome.Regular.PlayCircle;
             }
         }
@@ -308,6 +346,10 @@ namespace osu.Game.Overlays
                         BeatmapMetadata metadata = beatmap.Metadata;
                         title.Text = new RomanisableString(metadata.TitleUnicode, metadata.Title);
                         artist.Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
+                        if (title.Text.ToString().Length > 30)
+                        {
+                            title.Text = title.Text.ToString().Substring(0, 27) + "...";
+                        }
                     }
                 });
 
