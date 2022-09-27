@@ -31,6 +31,12 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
 
+        /// <summary>
+        /// Whether the leaderboard should be visible regardless of the configuration value.
+        /// This is true by default, but can be changed.
+        /// </summary>
+        public readonly Bindable<bool> AlwaysVisible = new Bindable<bool>(true);
+
         public SoloGameplayLeaderboard(IUser trackingUser)
         {
             this.trackingUser = trackingUser;
@@ -47,6 +53,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
             Scores.BindCollectionChanged((_, _) => Scheduler.AddOnce(showScores), true);
 
+            AlwaysVisible.BindValueChanged(_ => updateVisibility());
             configVisibility.BindValueChanged(_ => updateVisibility(), true);
         }
 
@@ -84,6 +91,6 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private void updateVisibility() =>
-            Flow.FadeTo(configVisibility.Value ? 1 : 0, duration);
+            this.FadeTo(AlwaysVisible.Value || configVisibility.Value ? 1 : 0, duration);
     }
 }
