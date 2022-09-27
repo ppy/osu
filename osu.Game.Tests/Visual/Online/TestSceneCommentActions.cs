@@ -34,9 +34,9 @@ namespace osu.Game.Tests.Visual.Online
         [SetUpSteps]
         public void SetUp()
         {
-            API.Login("test", "test");
             Schedule(() =>
             {
+                API.Login("test", "test");
                 if (dialogOverlay.Parent != null) Remove(dialogOverlay, false);
                 Children = new Container<Drawable>[]
                 {
@@ -55,11 +55,11 @@ namespace osu.Game.Tests.Visual.Online
         {
             addTestComments();
 
-            AddAssert("First comment has button", () =>
+            AddUntilStep("First comment has button", () =>
             {
                 var comments = this.ChildrenOfType<DrawableComment>();
-                var ourComment = comments.Single(x => x.Comment.Id == 1);
-                return ourComment.ChildrenOfType<OsuSpriteText>().Any(x => x.Text == "Delete");
+                var ourComment = comments.SingleOrDefault(x => x.Comment.Id == 1);
+                return ourComment != null && ourComment.ChildrenOfType<OsuSpriteText>().Any(x => x.Text == "Delete");
             });
 
             AddAssert("Second doesn't", () =>
@@ -73,14 +73,15 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestDeletion()
         {
-            DrawableComment ourComment = null!;
+            DrawableComment? ourComment = null;
             bool delete = false;
 
             addTestComments();
-            AddStep("Comment exists", () =>
+            AddUntilStep("Comment exists", () =>
             {
                 var comments = this.ChildrenOfType<DrawableComment>();
-                ourComment = comments.Single(x => x.Comment.Id == 1);
+                ourComment = comments.SingleOrDefault(x => x.Comment.Id == 1);
+                return ourComment != null;
             });
             AddStep("It has delete button", () =>
             {

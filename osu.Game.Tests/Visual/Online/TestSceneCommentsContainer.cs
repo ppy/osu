@@ -25,17 +25,27 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
+        [Cached]
+        private readonly DialogOverlay dialogOverlay = new DialogOverlay();
+
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         private CommentsContainer commentsContainer;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
-            Child = new BasicScrollContainer
+        {
+            if (dialogOverlay.Parent != null) Remove(dialogOverlay, false);
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = commentsContainer = new CommentsContainer()
-            });
+                new BasicScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = commentsContainer = new CommentsContainer()
+                },
+                dialogOverlay
+            };
+        });
 
         [Test]
         public void TestIdleState()
@@ -139,7 +149,7 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-        private CommentBundle getExampleComments(bool withPinned = false)
+        private static CommentBundle getExampleComments(bool withPinned = false)
         {
             var bundle = new CommentBundle
             {
