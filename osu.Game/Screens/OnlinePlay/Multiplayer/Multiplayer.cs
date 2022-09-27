@@ -85,7 +85,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.ChangeState(MultiplayerUserState.Idle);
         }
 
-        protected override string ScreenTitle => "Multiplayer";
+        protected override string ScreenTitle => "多人游戏";
 
         protected override RoomManager CreateRoomManager() => new MultiplayerRoomManager();
 

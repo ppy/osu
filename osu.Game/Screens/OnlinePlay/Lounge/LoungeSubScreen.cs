@@ -37,7 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     [Cached]
     public abstract class LoungeSubScreen : OnlinePlaySubScreen
     {
-        public override string Title => "Lounge";
+        public override string Title => "大厅";
 
         protected override bool PlayExitSound => false;
 

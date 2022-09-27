@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [BackgroundDependencyLoader]
         private void load()
         {
-            Text = "Create playlist";
+            Text = "创建课题";
         }
     }
 }

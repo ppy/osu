@@ -48,8 +48,8 @@ namespace osu.Game.Online.Leaderboards
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = @"your personal best".ToUpperInvariant(),
-                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
+                            Text = @"个人最佳记录".ToUpperInvariant(),
+                            Font = OsuFont.GetFont(size: 19, weight: FontWeight.Bold),
                         },
                         scoreContainer = new Container
                         {

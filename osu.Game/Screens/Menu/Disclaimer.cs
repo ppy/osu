@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Menu
                 });
             }
 
-            game.SetWindowIcon(mConfig.Get<string>(MSetting.CustomWindowIconPath));
+            game?.SetWindowIcon(mConfig.Get<string>(MSetting.CustomWindowIconPath));
 
             textFlow.AddText("这就是 osu!", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular));
 

@@ -78,11 +78,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private enum PlaylistsCategory
         {
+            [Description("所有")]
             Any,
+
+            [Description("正常")]
             Normal,
+
+            [Description("聚光灯")]
             Spotlight,
 
-            [Description("Featured Artist")]
+            [Description("精选艺术家")]
             FeaturedArtist,
         }
     }

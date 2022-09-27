@@ -385,7 +385,7 @@ namespace osu.Game.Rulesets.Mania
             {
                 Columns = new[]
                 {
-                    new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                    new StatisticItem("表现分析", () => new PerformanceBreakdownChart(score, playableBeatmap)
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y

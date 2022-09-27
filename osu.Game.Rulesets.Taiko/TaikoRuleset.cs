@@ -225,12 +225,12 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     Columns = new[]
                     {
-                        new StatisticItem("Timing分布", () => new HitEventTimingDistributionGraph(timedHitEvents)),
-                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                        new StatisticItem("表现分析", () => new PerformanceBreakdownChart(score, playableBeatmap)
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y
                         }),
+                        new StatisticItem("Timing分布", () => new HitEventTimingDistributionGraph(timedHitEvents)),
                     }
                 },
                 new StatisticRow

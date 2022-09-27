@@ -73,6 +73,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private OsuColour colours { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
+
         public NowPlayingOverlay()
         {
             Width = 400;
@@ -80,7 +83,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config, OsuGame game)
+        private void load(MConfigManager config)
         {
             optUI = config.GetBindable<bool>(MSetting.OptUI);
             Children = new Drawable[]
@@ -142,7 +145,7 @@ namespace osu.Game.Overlays
                                             Position = new Vector2(bottom_black_area_height / 2, 0),
                                             Icon = FontAwesome.Solid.Play,
                                             TooltipText = "打开LLin",
-                                            Action = () => game.PerformFromScreen(s =>
+                                            Action = () => game?.PerformFromScreen(s =>
                                             {
                                                 s.Push(new LLinScreen());
                                             }, new[] { typeof(PlaySongSelect), typeof(MainMenu) })

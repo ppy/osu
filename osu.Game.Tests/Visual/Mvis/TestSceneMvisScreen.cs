@@ -30,6 +30,7 @@ namespace osu.Game.Tests.Visual.Mvis
         private DialogOverlay dialog = new DialogOverlay();
 
         private DependencyContainer dependencies;
+        private NotificationOverlay notifiaction;
 
         [Test]
         public void CreateMvisScreen()
@@ -55,12 +56,14 @@ namespace osu.Game.Tests.Visual.Mvis
 
             dependencies.Cache(mvisPluginManager = new LLinPluginManager());
             dependencies.Cache(GetContainingInputManager() ?? new LocalInputManager());
+            dependencies.CacheAs<INotificationOverlay>(notifiaction = new NotificationOverlay());
             mvisPluginManager.AddPlugin(new MvisTestsPlugin());
 
             Add(mvisPluginManager);
             Add(idle);
             Add(musicController);
             Add(dialog);
+            Add(notifiaction);
 
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
         }

@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         public override string Title { get; }
 
-        public override string ShortTitle => "playlist";
+        public override string ShortTitle => "课题模式";
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public PlaylistsRoomSubScreen(Room room)
             : base(room, false) // Editing is temporarily not allowed.
         {
-            Title = room.RoomID.Value == null ? "New playlist" : room.Name.Value;
+            Title = room.RoomID.Value == null ? "创建课题" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
         }
 
@@ -147,7 +147,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                             Margin = new MarginPadding { Bottom = 10 },
                                             Children = new Drawable[]
                                             {
-                                                new OverlinedHeader("Extra mods"),
+                                                new OverlinedHeader("额外模组"),
                                                 new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
@@ -160,7 +160,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
                                                             Width = 90,
-                                                            Text = "Select",
+                                                            Text = "选择",
                                                             Action = ShowUserModSelect,
                                                         },
                                                         new ModDisplay
@@ -186,14 +186,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                             Direction = FillDirection.Vertical,
                                             Children = new Drawable[]
                                             {
-                                                new OverlinedHeader("Progress"),
+                                                new OverlinedHeader("进度"),
                                                 new RoomLocalUserInfo(),
                                             }
                                         },
                                     },
                                     new Drawable[]
                                     {
-                                        new OverlinedHeader("Leaderboard")
+                                        new OverlinedHeader("排行榜")
                                     },
                                     new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
                                 },
@@ -213,7 +213,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                 RelativeSizeAxes = Axes.Both,
                                 Content = new[]
                                 {
-                                    new Drawable[] { new OverlinedHeader("Chat") },
+                                    new Drawable[] { new OverlinedHeader("聊天") },
                                     new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
                                 },
                                 RowDimensions = new[]

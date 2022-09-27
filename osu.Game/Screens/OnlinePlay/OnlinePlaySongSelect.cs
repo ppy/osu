@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay
 {
     public abstract class OnlinePlaySongSelect : SongSelect, IOnlinePlaySubScreen
     {
-        public string ShortTitle => "song selection";
+        public string ShortTitle => "歌曲选择";
 
         public override string Title => ShortTitle.Humanize();
 

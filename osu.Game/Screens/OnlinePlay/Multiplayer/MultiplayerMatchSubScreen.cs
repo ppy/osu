@@ -42,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     {
         public override string Title { get; }
 
-        public override string ShortTitle => "room";
+        public override string ShortTitle => "房间";
 
         protected override bool PlayExitSound => !exitConfirmed;
 
