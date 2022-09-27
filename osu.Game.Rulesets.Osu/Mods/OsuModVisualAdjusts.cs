@@ -12,7 +12,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModVisualAdjusts : Mod, IApplicableToDrawableRuleset<OsuHitObject>
+    internal class OsuModVisualAdjusts : Mod, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Visual Adjusts";
         public override LocalisableString Description => "Override some gameplay elements that can bring some challenge for other mods.";
@@ -21,27 +21,38 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Conversion;
 
         [SettingSource("Disable follow points", "No more hints for where to follow...")]
-        public VisualAdjustSetting DisableFollowPoints { get; } = new VisualAdjustSetting(ruleset => ruleset.Playfield.FollowPoints.Hide());
+        public DrawableRulesetVisualAdjustSetting DisableFollowPoints { get; } = new DrawableRulesetVisualAdjustSetting(ruleset => ruleset.Playfield.FollowPoints.Hide());
 
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        private void triggerAdjustsForType<B, T>(T args) where B : VisualAdjustSetting<T>
         {
-            var drawableOsuRuleset = (DrawableOsuRuleset)drawableRuleset;
-
             foreach (var (_, property) in this.GetOrderedSettingsSourceProperties())
             {
-                if (property.GetValue(this) is not VisualAdjustSetting bindable || !bindable.Value) continue;
-
-                bindable.ApplyAdjusts(drawableOsuRuleset);
+                if (property.GetValue(this) is B bindable && bindable.Value)
+                    bindable.ApplyAdjusts(args);
             }
         }
 
-        public class VisualAdjustSetting : Bindable<bool>
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            public readonly Action<DrawableOsuRuleset> ApplyAdjusts;
+            triggerAdjustsForType<DrawableRulesetVisualAdjustSetting, DrawableOsuRuleset>((DrawableOsuRuleset)drawableRuleset);
+        }
 
-            public VisualAdjustSetting(Action<DrawableOsuRuleset> applyAdjusts)
+        public abstract class VisualAdjustSetting<T> : Bindable<bool>
+        {
+            public readonly Action<T> ApplyAdjusts;
+
+            protected VisualAdjustSetting(Action<T> applyAdjusts, bool defaultValue = false)
+                : base(defaultValue)
             {
                 ApplyAdjusts = applyAdjusts;
+            }
+        }
+
+        public class DrawableRulesetVisualAdjustSetting : VisualAdjustSetting<DrawableOsuRuleset>
+        {
+            public DrawableRulesetVisualAdjustSetting(Action<DrawableOsuRuleset> applyAdjusts, bool defaultValue = false)
+                : base(applyAdjusts, defaultValue)
+            {
             }
         }
     }
