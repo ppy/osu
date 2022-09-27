@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 case ManiaSkinComponent maniaComponent:
                     switch (maniaComponent.Component)
                     {
+                        case ManiaSkinComponents.HitTarget:
+                            return new ArgonHitTarget();
+
                         case ManiaSkinComponents.KeyArea:
                             return new ArgonKeyArea();
 

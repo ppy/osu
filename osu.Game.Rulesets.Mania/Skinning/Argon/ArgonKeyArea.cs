@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -25,6 +26,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private Container directionContainer = null!;
         private Container keyIcon = null!;
         private Drawable background = null!;
+
+        private Circle hitTargetLine = null!;
 
         [Resolved]
         private Column column { get; set; } = null!;
@@ -61,6 +64,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         Origin = Anchor.TopCentre,
                         Children = new[]
                         {
+                            hitTargetLine = new Circle()
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.Centre,
+                                Colour = OsuColour.Gray(196 / 255f),
+                                Height = 4,
+                                Masking = true,
+                            },
                             new Circle
                             {
                                 Y = icon_vertical_offset,
@@ -149,13 +161,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                 foreach (var circle in keyIcon.Children.OfType<CompositeDrawable>())
                 {
-                    circle.ScaleTo(0.9f, 50, Easing.OutQuint);
+                    if (circle != hitTargetLine)
+                        circle.ScaleTo(0.9f, 50, Easing.OutQuint);
 
                     circle.FadeColour(Color4.White, 50, Easing.OutQuint);
+
+                    // TODO: VERY TMPOERAOIRY.
+                    float f = circle == hitTargetLine ? 0.2f : (circle is Circle ? 0.05f : 0.2f);
+
                     circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = Color4.White.Opacity(circle is Circle ? 0.05f : 0.2f),
+                        Colour = Color4.White.Opacity(f),
                         Radius = 40,
                     }, 50, Easing.OutQuint);
                 }
@@ -175,7 +192,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     circle.ScaleTo(1f, 200, Easing.OutQuint);
 
                     // TODO: temp lol
-                    if (circle is Circle)
+                    if (circle == hitTargetLine)
+                    {
+                        circle.FadeColour(OsuColour.Gray(196 / 255f), 800, Easing.OutQuint);
+                    }
+                    else if (circle is Circle)
                         circle.FadeColour(column.AccentColour, 800, Easing.OutQuint);
 
                     circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
