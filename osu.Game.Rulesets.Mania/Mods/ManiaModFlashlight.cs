@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             public ManiaFlashlight(ManiaModFlashlight modFlashlight)
                 : base(modFlashlight)
             {
-                FlashlightSize = new Vector2(DrawWidth, appliedFlashlightSize);
+                FlashlightSize = new Vector2(DrawWidth, AppliedFlashlightSize);
 
                 AddLayout(flashlightProperties);
             }

@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                 : base(modFlashlight)
             {
                 this.playfield = playfield;
-                FlashlightSize = new Vector2(0, appliedFlashlightSize);
+                FlashlightSize = new Vector2(0, AppliedFlashlightSize);
             }
 
             protected override void Update()

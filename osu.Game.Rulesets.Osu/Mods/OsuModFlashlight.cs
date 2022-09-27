@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 followDelay = modFlashlight.FollowDelay.Value;
 
-                FlashlightSize = new Vector2(0, appliedFlashlightSize);
+                FlashlightSize = new Vector2(0, AppliedFlashlightSize);
             }
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)

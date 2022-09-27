@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 : base(modFlashlight)
             {
                 this.taikoPlayfield = taikoPlayfield;
-                FlashlightSize = getSizeVector(appliedFlashlightSize);
+                FlashlightSize = getSizeVector(AppliedFlashlightSize);
 
                 AddLayout(flashlightProperties);
             }
