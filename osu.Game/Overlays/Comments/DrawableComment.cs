@@ -266,7 +266,7 @@ namespace osu.Game.Overlays.Comments
             else
                 username.AddText(Comment.LegacyName);
 
-            if (Comment.EditedAt.HasValue)
+            if (Comment.EditedAt.HasValue && Comment.EditedUser != null)
             {
                 var font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
                 var colour = colourProvider.Foreground1;
