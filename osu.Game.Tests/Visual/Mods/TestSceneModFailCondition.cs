@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Mods
         {
             Autoplay = false,
             Mods = new Mod[] { new OsuModSuddenDeath(), new OsuModEasy() },
-            PassCondition = () => Player.GameplayState.HasFailed == true && Player.Results.Count(m => m.Type == HitResult.Miss) == 1
+            PassCondition = () => Player.GameplayState.HasFailed && Player.Results.Count(m => m.Type == HitResult.Miss) == 1
         });
     }
 }
