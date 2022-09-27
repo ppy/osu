@@ -1,11 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
@@ -20,13 +20,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     public class ArgonKeyArea : CompositeDrawable, IKeyBindingHandler<ManiaAction>
     {
-        private const float key_icon_size = 10;
-
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private Container directionContainer = null!;
-        private Container<Circle> keyIcon = null!;
-        private Drawable gradient = null!;
+        private Container keyIcon = null!;
+        private Drawable background = null!;
 
         [Resolved]
         private Column column { get; set; } = null!;
@@ -40,8 +38,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private void load(IScrollingInfo scrollingInfo)
         {
             const float icon_circle_size = 8;
-            const float icon_spacing = 8;
-            const float icon_vertical_offset = 20;
+            const float icon_spacing = 7;
+            const float icon_vertical_offset = -30;
 
             InternalChild = directionContainer = new Container
             {
@@ -49,13 +47,13 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 Height = Stage.HIT_TARGET_POSITION,
                 Children = new[]
                 {
-                    gradient = new Box
+                    background = new Box
                     {
                         Name = "Key gradient",
                         RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.5f
+                        Colour = column.AccentColour.Darken(0.6f),
                     },
-                    keyIcon = new Container<Circle>
+                    keyIcon = new Container
                     {
                         Name = "Icons",
                         RelativeSizeAxes = Axes.Both,
@@ -67,8 +65,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                             {
                                 Y = icon_vertical_offset,
                                 Size = new Vector2(icon_circle_size),
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.Centre,
                                 Blending = BlendingParameters.Additive,
                                 Colour = column.AccentColour,
                                 Masking = true,
@@ -78,8 +76,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                 X = -icon_spacing,
                                 Y = icon_vertical_offset + icon_spacing * 1.2f,
                                 Size = new Vector2(icon_circle_size),
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.Centre,
                                 Blending = BlendingParameters.Additive,
                                 Colour = column.AccentColour,
                                 Masking = true,
@@ -89,11 +87,30 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                 X = icon_spacing,
                                 Y = icon_vertical_offset + icon_spacing * 1.2f,
                                 Size = new Vector2(icon_circle_size),
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.Centre,
                                 Blending = BlendingParameters.Additive,
                                 Colour = column.AccentColour,
                                 Masking = true,
+                            },
+                            new CircularContainer
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.Centre,
+                                Y = -icon_vertical_offset,
+                                Size = new Vector2(22, 14),
+                                Masking = true,
+                                BorderThickness = 4,
+                                BorderColour = Color4.White,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0,
+                                        AlwaysPresent = true,
+                                    },
+                                },
                             }
                         }
                     },
@@ -112,14 +129,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     directionContainer.Scale = new Vector2(1, -1);
                     directionContainer.Anchor = Anchor.TopLeft;
                     directionContainer.Origin = Anchor.BottomLeft;
-                    gradient.Colour = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0));
                     break;
 
                 case ScrollingDirection.Down:
                     directionContainer.Scale = new Vector2(1, 1);
                     directionContainer.Anchor = Anchor.BottomLeft;
                     directionContainer.Origin = Anchor.BottomLeft;
-                    gradient.Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Color4.Black);
                     break;
             }
         }
@@ -128,7 +143,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         {
             if (e.Action == column.Action.Value)
             {
-                foreach (var circle in keyIcon.Children)
+                foreach (var circle in keyIcon.Children.OfType<CompositeDrawable>())
                 {
                     circle.ScaleTo(1.1f, 50, Easing.OutQuint);
 
@@ -136,8 +151,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = Color4.White.Opacity(0.05f),
-                        Radius = 10,
+                        Colour = Color4.White.Opacity(circle is Circle ? 0.05f : 0.2f),
+                        Radius = 40,
                     }, 50, Easing.OutQuint);
                 }
             }
@@ -149,16 +164,19 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         {
             if (e.Action == column.Action.Value)
             {
-                foreach (var circle in keyIcon.Children)
+                foreach (var circle in keyIcon.Children.OfType<CompositeDrawable>())
                 {
                     circle.ScaleTo(1f, 125, Easing.OutQuint);
 
-                    circle.FadeColour(column.AccentColour, 200, Easing.OutQuint);
+                    // TODO: temp lol
+                    if (circle is Circle)
+                        circle.FadeColour(column.AccentColour, 200, Easing.OutQuint);
+
                     circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Colour = Color4.White.Opacity(0),
-                        Radius = 10,
+                        Radius = 30,
                     }, 200, Easing.OutQuint);
                 }
             }
