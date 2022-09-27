@@ -53,6 +53,9 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
             Scores.BindCollectionChanged((_, _) => Scheduler.AddOnce(showScores), true);
 
+            // Alpha will be updated via `updateVisibility` below.
+            Alpha = 0;
+
             AlwaysVisible.BindValueChanged(_ => updateVisibility());
             configVisibility.BindValueChanged(_ => updateVisibility(), true);
         }
