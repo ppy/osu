@@ -9,11 +9,11 @@ namespace osu.Game.Online.API.Requests
 {
     public class CommentDeleteRequest : APIRequest<CommentBundle>
     {
-        private readonly long id;
+        public readonly long ID;
 
         public CommentDeleteRequest(long id)
         {
-            this.id = id;
+            this.ID = id;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -23,6 +23,6 @@ namespace osu.Game.Online.API.Requests
             return req;
         }
 
-        protected override string Target => $@"comments/{id}";
+        protected override string Target => $@"comments/{ID}";
     }
 }
