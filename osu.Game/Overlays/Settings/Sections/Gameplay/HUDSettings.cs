@@ -42,7 +42,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = GameplaySettingsStrings.AlwaysShowGameplayLeaderboard,
                     Current = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard),
-                    Keywords = new[] { "leaderboard", "score" },
                 },
             };
         }
