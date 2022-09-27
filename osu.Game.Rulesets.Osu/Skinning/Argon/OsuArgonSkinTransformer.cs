@@ -56,6 +56,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                         case OsuSkinComponents.CursorTrail:
                             return new ArgonCursorTrail();
+
+                        // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     }
 
                     break;
