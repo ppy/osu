@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -41,11 +43,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Slow down too long streams")]
         public BindableBool DeathstreamsSlowingDown { get; } = new BindableBool(true);
 
+        [SettingSource("Slow down too fast parts")]
+        public BindableBool FastPartsSlowingDown { get; } = new BindableBool(true);
+
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var osuBeatmap = (OsuBeatmap)beatmap;
-
             var newObjects = new List<OsuHitObject>();
+            double minAllowedBeatLength = (beatmap.ControlPointInfo.TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength / 1.5d;
 
             foreach (var hitObject in osuBeatmap.HitObjects)
             {
@@ -58,8 +63,22 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var point = beatmap.ControlPointInfo.TimingPointAt(s.StartTime);
                 s.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
 
-                // SpanDuration <= beat/(divisor/2) && has repeats - likely a kickslider, using another method.
-                if (!Precision.DefinitelyBigger(s.SpanDuration, point.BeatLength * 2d / BeatDivisor.Value) && s.RepeatCount > 0)
+                if (FastPartsSlowingDown.Value && point.BeatLength < minAllowedBeatLength)
+                {
+                    double beatLength = point.BeatLength;
+                    while (beatLength < minAllowedBeatLength)
+                        beatLength *= 2;
+
+                    point = (TimingControlPoint)point.DeepClone();
+                    point.BeatLength = beatLength;
+                }
+
+                // this will be true if span is going to be converted into 1, 2, or 3 circles.
+                bool spanTooShort = s.SpanDuration <= point.BeatLength * 2d / BeatDivisor.Value;
+                // an attempt to fix too fast turns. I chose 250ms by eye, but if it is still going to be a problem this can be calculated based on AR.
+                bool spanTooFast = s.SpanDuration <= 250d;
+
+                if ((spanTooShort || spanTooFast) && s.RepeatCount > 0)
                 {
                     newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertKickSliderToBurst(s, point, BeatDivisor.Value));
                 }
