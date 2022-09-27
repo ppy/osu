@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -16,6 +17,16 @@ namespace osu.Game.Rulesets.Taiko.Edit
         public TaikoHitObjectComposer(TaikoRuleset ruleset)
             : base(ruleset)
         {
+        }
+
+        public override void EndPlacement(HitObject hitObject, bool commit)
+        {
+            EditorBeatmap.PlacementObject.Value = null;
+
+            if (commit)
+            {
+                EditorBeatmap.Add(hitObject);
+            }
         }
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
