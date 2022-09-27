@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
 
-        private TestSoloGameplayLeaderboard? testSoloGameplayLeaderboard;
+        private SoloGameplayLeaderboard leaderboard = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -49,11 +49,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Id = 2,
                 };
 
-                Child = testSoloGameplayLeaderboard = new TestSoloGameplayLeaderboard(trackingUser)
+                Child = leaderboard = new SoloGameplayLeaderboard(trackingUser)
                 {
                     Scores = { BindTarget = scores },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    AlwaysVisible = { Value = false },
                     Expanded = { Value = true },
                 };
             });
@@ -72,13 +73,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestVisibility()
         {
-            AddStep("set visible true", () => configVisibility.Value = true);
-            AddWaitStep("wait", 1);
-            AddAssert("is leaderboard fully visible", () => testSoloGameplayLeaderboard?.FlowAlpha == 1);
+            AddStep("set config visible true", () => configVisibility.Value = true);
+            AddUntilStep("leaderboard visible", () => leaderboard.Alpha == 1);
 
-            AddStep("set visible false", () => configVisibility.Value = false);
-            AddWaitStep("wait", 1);
-            AddAssert("is leaderboard fully invisible", () => testSoloGameplayLeaderboard?.FlowAlpha == 0);
+            AddStep("set config visible false", () => configVisibility.Value = false);
+            AddUntilStep("leaderboard not visible", () => leaderboard.Alpha == 0);
+
+            AddStep("set always visible", () => leaderboard.AlwaysVisible.Value = true);
+            AddUntilStep("leaderboard visible", () => leaderboard.Alpha == 1);
+
+            AddStep("set config visible true", () => configVisibility.Value = true);
+            AddAssert("leaderboard still visible", () => leaderboard.Alpha == 1);
         }
 
         private static List<ScoreInfo> createSampleScores()
@@ -91,16 +96,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 new ScoreInfo { User = new APIUser { Username = @"frenzibyte" }, TotalScore = RNG.Next(500000, 1000000) },
                 new ScoreInfo { User = new APIUser { Username = @"Susko3" }, TotalScore = RNG.Next(500000, 1000000) },
             }.Concat(Enumerable.Range(0, 50).Select(i => new ScoreInfo { User = new APIUser { Username = $"User {i + 1}" }, TotalScore = 1000000 - i * 10000 })).ToList();
-        }
-
-        private class TestSoloGameplayLeaderboard : SoloGameplayLeaderboard
-        {
-            public float FlowAlpha => Flow.Alpha;
-
-            public TestSoloGameplayLeaderboard(IUser trackingUser)
-                : base(trackingUser)
-            {
-            }
         }
     }
 }
