@@ -43,10 +43,9 @@ namespace osu.Game.Rulesets.Mods
             ChangeSizeComboDivisor.BindValueChanged(e =>
             {
                 int newChangeSizeComboDivisor = e.NewValue;
-                float floatNewChangeSizeComboDivisor = newChangeSizeComboDivisor;
 
                 FinalChangeSizeCombo.MinValue = newChangeSizeComboDivisor;
-                FinalChangeSizeCombo.MaxValue = findClosestMultipleFrom(ChangeSizeComboDivisor.MaxValue, floatNewChangeSizeComboDivisor);
+                FinalChangeSizeCombo.MaxValue = findClosestMultipleFrom(ChangeSizeComboDivisor.MaxValue, newChangeSizeComboDivisor);
                 FinalChangeSizeCombo.Precision = newChangeSizeComboDivisor;
             }, true);
         }
