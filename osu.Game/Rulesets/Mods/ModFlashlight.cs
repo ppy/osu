@@ -108,6 +108,8 @@ namespace osu.Game.Rulesets.Mods
 
             public List<BreakPeriod> Breaks = new List<BreakPeriod>();
 
+            protected readonly float appliedFlashlightSize;
+
             private readonly float defaultFlashlightSize;
             private readonly float sizeMultiplier;
             private readonly bool comboBasedSize;
@@ -117,6 +119,8 @@ namespace osu.Game.Rulesets.Mods
                 defaultFlashlightSize = modFlashlight.DefaultFlashlightSize;
                 sizeMultiplier = modFlashlight.SizeMultiplier.Value;
                 comboBasedSize = modFlashlight.ComboBasedSize.Value;
+
+                appliedFlashlightSize = defaultFlashlightSize * sizeMultiplier;
             }
 
             [BackgroundDependencyLoader]
@@ -148,17 +152,14 @@ namespace osu.Game.Rulesets.Mods
 
             protected abstract string FragmentShader { get; }
 
-            protected float GetSizeFor(int combo)
+            protected float GetComboBasedSize(int combo)
             {
-                float size = defaultFlashlightSize * sizeMultiplier;
+                float size = appliedFlashlightSize;
 
-                if (comboBasedSize)
-                {
-                    if (combo >= 200)
-                        size *= 0.8f;
-                    else if (combo >= 100)
-                        size *= 0.9f;
-                }
+                if (combo >= 200)
+                    size *= 0.8f;
+                else if (combo >= 100)
+                    size *= 0.9f;
 
                 return size;
             }

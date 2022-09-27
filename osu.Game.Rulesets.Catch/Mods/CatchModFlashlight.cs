@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                 : base(modFlashlight)
             {
                 this.playfield = playfield;
-                FlashlightSize = new Vector2(0, GetSizeFor(0));
+                FlashlightSize = new Vector2(0, appliedFlashlightSize);
             }
 
             protected override void Update()
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             public override void ApplyComboBasedSize(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetComboBasedSize(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";

@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 followDelay = modFlashlight.FollowDelay.Value;
 
-                FlashlightSize = new Vector2(0, GetSizeFor(0));
+                FlashlightSize = new Vector2(0, appliedFlashlightSize);
             }
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public override void ApplyComboBasedSize(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetComboBasedSize(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";

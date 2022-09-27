@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             public ManiaFlashlight(ManiaModFlashlight modFlashlight)
                 : base(modFlashlight)
             {
-                FlashlightSize = new Vector2(DrawWidth, GetSizeFor(0));
+                FlashlightSize = new Vector2(DrawWidth, appliedFlashlightSize);
 
                 AddLayout(flashlightProperties);
             }
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
             public override void ApplyComboBasedSize(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(DrawWidth, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(DrawWidth, GetComboBasedSize(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "RectangularFlashlight";

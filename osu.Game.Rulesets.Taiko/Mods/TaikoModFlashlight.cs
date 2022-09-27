@@ -49,20 +49,22 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 : base(modFlashlight)
             {
                 this.taikoPlayfield = taikoPlayfield;
-                FlashlightSize = getSizeFor(0);
+                FlashlightSize = getSizeVector(appliedFlashlightSize);
 
                 AddLayout(flashlightProperties);
             }
 
-            private Vector2 getSizeFor(int combo)
+            private Vector2 getSizeVector(float size)
             {
                 // Preserve flashlight size through the playfield's aspect adjustment.
-                return new Vector2(0, GetSizeFor(combo) * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
+                return new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
             }
+
+            private Vector2 getSizeVectorForCombo(int combo) => getSizeVector(GetComboBasedSize(combo));
 
             public override void ApplyComboBasedSize(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), getSizeFor(e.NewValue), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), getSizeVectorForCombo(e.NewValue), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
@@ -76,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
 
                     ClearTransforms(targetMember: nameof(FlashlightSize));
-                    FlashlightSize = getSizeFor(Combo.Value);
+                    FlashlightSize = getSizeVectorForCombo(Combo.Value);
 
                     flashlightProperties.Validate();
                 }
