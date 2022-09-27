@@ -10,7 +10,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModVisualAdjusts<T, R> : Mod, IApplicableToDrawableRuleset<T> where T : HitObject where R : DrawableRuleset<T>
+    public abstract class ModVisualAdjusts<TObject, TDrawableRuleset> : Mod, IApplicableToDrawableRuleset<TObject> where TObject : HitObject where TDrawableRuleset : DrawableRuleset<TObject>
     {
         public override string Name => "Visual Adjusts";
         public override LocalisableString Description => "Adjust some gameplay elements that can bring some visual challenge.";
@@ -18,33 +18,33 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "VA";
         public override ModType Type => ModType.Conversion;
 
-        private void triggerAdjustsForType<B, A>(A args) where B : VisualAdjustSetting<A>
+        private void triggerAdjustsForType<TBindable, TArgs>(TArgs args) where TBindable : VisualAdjustSetting<TArgs>
         {
             foreach (var (_, property) in this.GetOrderedSettingsSourceProperties())
             {
-                if (property.GetValue(this) is B bindable && bindable.Value)
+                if (property.GetValue(this) is TBindable bindable && bindable.Value)
                     bindable.ApplyAdjusts(args);
             }
         }
 
-        public void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
+        public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            triggerAdjustsForType<DrawableRulesetVisualAdjustSetting, R>((R)drawableRuleset);
+            triggerAdjustsForType<DrawableRulesetVisualAdjustSetting, TDrawableRuleset>((TDrawableRuleset)drawableRuleset);
         }
 
-        public abstract class VisualAdjustSetting<A> : BindableBool
+        public abstract class VisualAdjustSetting<TArgs> : BindableBool
         {
-            public readonly Action<A> ApplyAdjusts;
+            public readonly Action<TArgs> ApplyAdjusts;
 
-            protected VisualAdjustSetting(Action<A> applyAdjusts)
+            protected VisualAdjustSetting(Action<TArgs> applyAdjusts)
             {
                 ApplyAdjusts = applyAdjusts;
             }
         }
 
-        public class DrawableRulesetVisualAdjustSetting : VisualAdjustSetting<R>
+        public class DrawableRulesetVisualAdjustSetting : VisualAdjustSetting<TDrawableRuleset>
         {
-            public DrawableRulesetVisualAdjustSetting(Action<R> applyAdjusts)
+            public DrawableRulesetVisualAdjustSetting(Action<TDrawableRuleset> applyAdjusts)
                 : base(applyAdjusts)
             {
             }
