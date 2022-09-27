@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.Update();
 
-            if (timeline == null || !(DrawWidth > 0)) return;
+            if (timeline == null || DrawWidth <= 0) return;
 
             (float, float) newRange = (
                 (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X - PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X,
