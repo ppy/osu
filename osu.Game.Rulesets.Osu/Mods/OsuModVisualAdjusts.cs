@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Disable follow points", "No more hints for where to follow...")]
         public DrawableRulesetVisualAdjustSetting DisableFollowPoints { get; } = new DrawableRulesetVisualAdjustSetting(ruleset => ruleset.Playfield.FollowPoints.Hide());
 
-        [SettingSource("White combo colours", "All combos will now be white!")]
-        public DrawableHitObjectVisualAdjustSetting WhiteComboColours { get; } = new DrawableHitObjectVisualAdjustSetting(dho => dho.AccentColour.Value = Colour4.White);
+        [SettingSource("No combo colours", "The combo colours won't tell you anything now...")]
+        public DrawableHitObjectVisualAdjustSetting NoComboColours { get; } = new DrawableHitObjectVisualAdjustSetting(dho => dho.AccentColour.Value = Colour4.White);
     }
 }
