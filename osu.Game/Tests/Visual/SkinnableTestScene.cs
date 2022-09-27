@@ -140,6 +140,7 @@ namespace osu.Game.Tests.Visual
                 {
                     c.RelativeSizeAxes = Axes.None;
                     c.AutoSizeAxes = Axes.None;
+                    c.Size = Vector2.Zero;
 
                     c.RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None;
                     c.AutoSizeAxes = autoSize ? Axes.Both : Axes.None;
