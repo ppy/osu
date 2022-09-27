@@ -4,10 +4,12 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
@@ -145,6 +147,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     beat++;
                 }
+            }
+
+            if (Children.Count > 512)
+            {
+                // There should always be a sanely small number of ticks rendered.
+                // If this assertion triggers, either the zoom logic is broken or a beatmap is
+                // probably doing weird things...
+                //
+                // Let's hope the latter never happens.
+                // If it does, we can choose to either fix it or ignore it as an outlier.
+                string message = $"Timeline is rendering many ticks ({Children.Count})";
+
+                Logger.Log(message);
+                Debug.Fail(message);
             }
 
             int usedDrawables = drawableIndex;
