@@ -8,9 +8,11 @@ using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Play;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Tests.Visual.Mods
 {
@@ -52,6 +54,14 @@ namespace osu.Game.Tests.Visual.Mods
                 Restart = { Value = true }
             },
             PassCondition = () => restartRequested && Player.ChildrenOfType<FailOverlay>().Single().State.Value == Visibility.Hidden
+        });
+
+        [Test]
+        public void TestFailedOnEasyEnabled() => CreateModTest(new ModTestData
+        {
+            Autoplay = false,
+            Mods = new Mod[] { new OsuModSuddenDeath(), new OsuModEasy() },
+            PassCondition = () => Player.GameplayState.HasFailed == true && Player.Results.Count(m => m.Type == HitResult.Miss) == 1
         });
     }
 }
