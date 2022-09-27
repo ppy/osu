@@ -77,20 +77,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.Update();
 
-            if (timeline != null)
+            if (timeline == null || !(DrawWidth > 0)) return;
+
+            (float, float) newRange = (
+                (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X - PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X,
+                (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X + PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X);
+
+            if (visibleRange != newRange)
             {
-                var newRange = (
-                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X - PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X,
-                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X + PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X);
+                visibleRange = newRange;
 
-                if (visibleRange != newRange)
-                {
-                    visibleRange = newRange;
-
-                    // actual regeneration only needs to occur if we've passed one of the known next min/max tick boundaries.
-                    if (nextMinTick == null || nextMaxTick == null || (visibleRange.min < nextMinTick || visibleRange.max > nextMaxTick))
-                        tickCache.Invalidate();
-                }
+                // actual regeneration only needs to occur if we've passed one of the known next min/max tick boundaries.
+                if (nextMinTick == null || nextMaxTick == null || (visibleRange.min < nextMinTick || visibleRange.max > nextMaxTick))
+                    tickCache.Invalidate();
             }
 
             if (!tickCache.IsValid)
