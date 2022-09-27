@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Select
                                 {
                                     TextContainer = new Container
                                     {
-                                        Margin = new MarginPadding { Top = 40 },
+                                        Padding = new MarginPadding { Top = 40 },
                                         Colour = Colour4.White,
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,

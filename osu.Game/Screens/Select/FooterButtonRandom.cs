@@ -45,16 +45,16 @@ namespace osu.Game.Screens.Select
                     {
                         Font = OsuFont.TorusAlternate.With(size: 16),
                         AlwaysPresent = true,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
                         Text = "Random",
                     },
                     rewindSpriteText = new OsuSpriteText
                     {
                         Font = OsuFont.TorusAlternate.With(size: 16),
                         AlwaysPresent = true,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
                         Text = "Rewind",
                         Alpha = 0f,
                     }
@@ -74,8 +74,8 @@ namespace osu.Game.Screens.Select
                         Alpha = 0,
                         Text = rewindSpriteText.Text,
                         AlwaysPresent = true, // make sure the button is sized large enough to always show this
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre
                     });
 
                     fallingRewind.FadeOutFromOne(fade_time, Easing.In);
