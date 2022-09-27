@@ -26,6 +26,11 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
                 Size = new Vector2(TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.DEFAULT_HEIGHT)
             };
         }
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            BeginPlacement();
+        }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
