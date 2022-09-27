@@ -22,6 +22,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Comments.Buttons;
 using osu.Game.Resources.Localisation.Web;
 
@@ -59,10 +61,11 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, IAPIProvider api)
         {
             LinkFlowContainer username;
             FillFlowContainer info;
+            LinkFlowContainer actions;
             CommentMarkdownContainer message;
             GridContainer content;
             VotePill votePill;
@@ -163,16 +166,30 @@ namespace osu.Game.Overlays.Comments
                                                     DocumentMargin = new MarginPadding(0),
                                                     DocumentPadding = new MarginPadding(0),
                                                 },
-                                                info = new FillFlowContainer
+                                                new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10, 0),
-                                                    Children = new Drawable[]
+                                                    Children = new[]
                                                     {
-                                                        new DrawableDate(Comment.CreatedAt, 12, false)
+                                                        info = new FillFlowContainer
                                                         {
-                                                            Colour = colourProvider.Foreground1
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Direction = FillDirection.Horizontal,
+                                                            Spacing = new Vector2(10, 0),
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new DrawableDate(Comment.CreatedAt, 12, false)
+                                                                {
+                                                                    Colour = colourProvider.Foreground1
+                                                                }
+                                                            }
+                                                        },
+                                                        actions = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold))
+                                                        {
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Spacing = new Vector2(10, 0)
                                                         }
                                                     }
                                                 },
@@ -286,6 +303,11 @@ namespace osu.Game.Overlays.Comments
             {
                 content.FadeColour(OsuColour.Gray(0.5f));
                 votePill.Hide();
+            }
+
+            if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
+            {
+                actions.AddLink("Delete", () => Logger.Log("Attempt to delete a comment", level: LogLevel.Important));
             }
 
             if (Comment.IsTopLevel)
