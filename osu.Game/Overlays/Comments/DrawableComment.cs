@@ -56,13 +56,19 @@ namespace osu.Game.Overlays.Comments
         private ChevronButton chevronButton;
         private DeletedCommentsCounter deletedCommentsCounter;
 
+        [Resolved]
+        private DialogOverlay dialogOverlay { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         public DrawableComment(Comment comment)
         {
             Comment = comment;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, IAPIProvider api, DialogOverlay dialogOverlay)
+        private void load(OverlayColourProvider colourProvider)
         {
             LinkFlowContainer username;
             FillFlowContainer info;
