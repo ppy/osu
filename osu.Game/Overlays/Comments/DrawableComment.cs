@@ -22,9 +22,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
@@ -61,7 +62,7 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, IAPIProvider api)
+        private void load(OverlayColourProvider colourProvider, IAPIProvider api, DialogOverlay dialogOverlay)
         {
             LinkFlowContainer username;
             FillFlowContainer info;
@@ -307,7 +308,20 @@ namespace osu.Game.Overlays.Comments
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
             {
-                actions.AddLink("Delete", () => Logger.Log("Attempt to delete a comment", level: LogLevel.Important));
+                actions.AddLink("Delete", () =>
+                {
+                    dialogOverlay.Push(new ConfirmDialog("Do you really want to delete your comment?", () =>
+                    {
+                        var request = new CommentDeleteRequest(Comment.Id);
+                        request.Success += _ =>
+                        {
+                            //TODO this is temporary just for testing
+                            content.FadeColour(OsuColour.Gray(0.5f));
+                            votePill.Hide();
+                        };
+                        api.Queue(request);
+                    }));
+                });
             }
 
             if (Comment.IsTopLevel)
