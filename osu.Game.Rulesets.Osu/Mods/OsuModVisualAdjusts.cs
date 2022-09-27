@@ -37,12 +37,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             triggerAdjustsForType<DrawableRulesetVisualAdjustSetting, DrawableOsuRuleset>((DrawableOsuRuleset)drawableRuleset);
         }
 
-        public abstract class VisualAdjustSetting<T> : Bindable<bool>
+        public abstract class VisualAdjustSetting<T> : BindableBool
         {
             public readonly Action<T> ApplyAdjusts;
 
-            protected VisualAdjustSetting(Action<T> applyAdjusts, bool defaultValue = false)
-                : base(defaultValue)
+            protected VisualAdjustSetting(Action<T> applyAdjusts)
             {
                 ApplyAdjusts = applyAdjusts;
             }
@@ -50,8 +49,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public class DrawableRulesetVisualAdjustSetting : VisualAdjustSetting<DrawableOsuRuleset>
         {
-            public DrawableRulesetVisualAdjustSetting(Action<DrawableOsuRuleset> applyAdjusts, bool defaultValue = false)
-                : base(applyAdjusts, defaultValue)
+            public DrawableRulesetVisualAdjustSetting(Action<DrawableOsuRuleset> applyAdjusts)
+                : base(applyAdjusts)
             {
             }
         }
