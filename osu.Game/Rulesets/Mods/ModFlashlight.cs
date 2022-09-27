@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.1f,
         };
 
-        [SettingSource("Change size combo divisor", "Changes the combo multiplier where the flashlight size is changed.")]
+        [SettingSource("Change size combo divisor", "Changes the combo divisor where the flashlight size is changed.")]
         public BindableInt ChangeSizeComboDivisor { get; } = new BindableInt(100)
         {
             MinValue = 1,
