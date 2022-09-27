@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -33,8 +32,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         [Resolved]
         private OsuColour colours { get; set; }
-
-        private static readonly int highest_divisor = BindableBeatDivisor.PREDEFINED_DIVISORS.Last();
 
         public TimelineTickDisplay()
         {
