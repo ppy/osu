@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModVisualAdjusts<T, R> : Mod, IApplicableToDrawableRuleset<T> where T : HitObject where R : DrawableRuleset<T>
     {
         public override string Name => "Visual Adjusts";
-        public override LocalisableString Description => "Override some gameplay elements that can bring some challenge for other mods.";
+        public override LocalisableString Description => "Adjust some gameplay elements that can bring some visual challenge.";
         public override double ScoreMultiplier => 1;
         public override string Acronym => "VA";
         public override ModType Type => ModType.Conversion;
