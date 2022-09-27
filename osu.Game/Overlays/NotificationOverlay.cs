@@ -113,7 +113,7 @@ namespace osu.Game.Overlays
 
             if (enabled)
                 // we want a slight delay before toggling notifications on to avoid the user becoming overwhelmed.
-                notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, State.Value == Visibility.Visible ? 0 : 100);
+                notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, State.Value == Visibility.Visible ? 0 : 250);
             else
                 processingPosts = false;
         }
