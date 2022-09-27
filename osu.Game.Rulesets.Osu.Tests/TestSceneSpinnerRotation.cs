@@ -7,7 +7,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -43,7 +42,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             => new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
 
         private DrawableSpinner drawableSpinner = null!;
-        private SpriteIcon spinnerSymbol => drawableSpinner.ChildrenOfType<SpriteIcon>().Single();
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -77,18 +75,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             double finalCumulativeTrackerRotation = 0;
             double finalTrackerRotation = 0, trackerRotationTolerance = 0;
-            double finalSpinnerSymbolRotation = 0, spinnerSymbolRotationTolerance = 0;
 
             addSeekStep(spinner_start_time + 5000);
             AddStep("retrieve disc rotation", () =>
             {
                 finalTrackerRotation = drawableSpinner.RotationTracker.Rotation;
                 trackerRotationTolerance = Math.Abs(finalTrackerRotation * 0.05f);
-            });
-            AddStep("retrieve spinner symbol rotation", () =>
-            {
-                finalSpinnerSymbolRotation = spinnerSymbol.Rotation;
-                spinnerSymbolRotationTolerance = Math.Abs(finalSpinnerSymbolRotation * 0.05f);
             });
             AddStep("retrieve cumulative disc rotation", () => finalCumulativeTrackerRotation = drawableSpinner.Result.RateAdjustedRotation);
 
@@ -98,8 +90,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 // due to the exponential damping applied we're allowing a larger margin of error of about 10%
                 // (5% relative to the final rotation value, but we're half-way through the spin).
                 () => drawableSpinner.RotationTracker.Rotation, () => Is.EqualTo(finalTrackerRotation / 2).Within(trackerRotationTolerance));
-            AddAssert("symbol rotation rewound",
-                () => spinnerSymbol.Rotation, () => Is.EqualTo(finalSpinnerSymbolRotation / 2).Within(spinnerSymbolRotationTolerance));
             AddAssert("is cumulative rotation rewound",
                 // cumulative rotation is not damped, so we're treating it as the "ground truth" and allowing a comparatively smaller margin of error.
                 () => drawableSpinner.Result.RateAdjustedRotation, () => Is.EqualTo(finalCumulativeTrackerRotation / 2).Within(100));
@@ -107,8 +97,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSeekStep(spinner_start_time + 5000);
             AddAssert("is disc rotation almost same",
                 () => drawableSpinner.RotationTracker.Rotation, () => Is.EqualTo(finalTrackerRotation).Within(trackerRotationTolerance));
-            AddAssert("is symbol rotation almost same",
-                () => spinnerSymbol.Rotation, () => Is.EqualTo(finalSpinnerSymbolRotation).Within(spinnerSymbolRotationTolerance));
             AddAssert("is cumulative rotation almost same",
                 () => drawableSpinner.Result.RateAdjustedRotation, () => Is.EqualTo(finalCumulativeTrackerRotation).Within(100));
         }
@@ -122,7 +110,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSeekStep(5000);
 
             AddAssert("disc spin direction correct", () => clockwise ? drawableSpinner.RotationTracker.Rotation > 0 : drawableSpinner.RotationTracker.Rotation < 0);
-            AddAssert("spinner symbol direction correct", () => clockwise ? spinnerSymbol.Rotation > 0 : spinnerSymbol.Rotation < 0);
         }
 
         private Replay flip(Replay scoreReplay) => new Replay

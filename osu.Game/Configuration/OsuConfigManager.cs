@@ -39,7 +39,7 @@ namespace osu.Game.Configuration
         {
             // UI/selection defaults
             SetDefault(OsuSetting.Ruleset, string.Empty);
-            SetDefault(OsuSetting.Skin, SkinInfo.DEFAULT_SKIN.ToString());
+            SetDefault(OsuSetting.Skin, SkinInfo.TRIANGLES_SKIN.ToString());
 
             SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
@@ -131,6 +131,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
+            SetDefault(OsuSetting.GameplayLeaderboard, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
             SetDefault(OsuSetting.FloatingComments, false);
@@ -294,6 +295,7 @@ namespace osu.Game.Configuration
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
+        GameplayLeaderboard,
         PositionalHitsounds,
         PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,

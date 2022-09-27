@@ -19,12 +19,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => "Hit them at the right size!";
 
         [SettingSource("Starting Size", "The initial size multiplier applied to all objects.")]
-        public override BindableNumber<float> StartScale { get; } = new BindableFloat
+        public override BindableNumber<float> StartScale { get; } = new BindableFloat(2)
         {
             MinValue = 1f,
             MaxValue = 25f,
-            Default = 2f,
-            Value = 2f,
             Precision = 0.1f,
         };
     }

@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Play
 {
@@ -33,7 +34,6 @@ namespace osu.Game.Screens.Play
 
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
-            Default = 1,
             MinValue = 0.5,
             MaxValue = 2,
             Precision = 0.1,
@@ -41,9 +41,9 @@ namespace osu.Game.Screens.Play
 
         private readonly WorkingBeatmap beatmap;
 
-        private readonly double skipTargetTime;
+        private readonly Track track;
 
-        private readonly List<Bindable<double>> nonGameplayAdjustments = new List<Bindable<double>>();
+        private readonly double skipTargetTime;
 
         /// <summary>
         /// Stores the time at which the last <see cref="StopGameplayClock"/> call was triggered.
@@ -56,7 +56,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private double? actualStopTime;
 
-        public override IEnumerable<double> NonGameplayAdjustments => nonGameplayAdjustments.Select(b => b.Value);
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
 
         /// <summary>
         /// Create a new master gameplay clock container.
@@ -68,6 +69,8 @@ namespace osu.Game.Screens.Play
         {
             this.beatmap = beatmap;
             this.skipTargetTime = skipTargetTime;
+
+            track = beatmap.Track;
 
             StartTime = findEarliestStartTime();
         }
@@ -195,14 +198,11 @@ namespace osu.Game.Screens.Play
             if (speedAdjustmentsApplied)
                 return;
 
-            if (SourceClock is not Track track)
-                return;
+            musicController.ResetTrackAdjustments();
 
+            track.BindAdjustments(AdjustmentsFromMods);
             track.AddAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
-
-            nonGameplayAdjustments.Add(GameplayClock.ExternalPauseFrequencyAdjust);
-            nonGameplayAdjustments.Add(UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
         }
@@ -212,14 +212,9 @@ namespace osu.Game.Screens.Play
             if (!speedAdjustmentsApplied)
                 return;
 
-            if (SourceClock is not Track track)
-                return;
-
+            track.UnbindAdjustments(AdjustmentsFromMods);
             track.RemoveAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
             track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
-
-            nonGameplayAdjustments.Remove(GameplayClock.ExternalPauseFrequencyAdjust);
-            nonGameplayAdjustments.Remove(UserPlaybackRate);
 
             speedAdjustmentsApplied = false;
         }

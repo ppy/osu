@@ -79,7 +79,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (section)
             {
                 case Section.Colours:
-                    HandleColours(output, line);
+                    HandleColours(output, line, false);
                     return;
             }
         }
@@ -93,7 +93,7 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        protected void HandleColours<TModel>(TModel output, string line)
+        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
         {
             var pair = SplitKeyVal(line);
 
@@ -108,7 +108,7 @@ namespace osu.Game.Beatmaps.Formats
 
             try
             {
-                byte alpha = split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
+                byte alpha = allowAlpha && split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
                 colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), alpha);
             }
             catch

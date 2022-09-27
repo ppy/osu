@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -34,6 +35,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -375,6 +377,8 @@ namespace osu.Game.Screens.Play
 
             if (Configuration.AutomaticallySkipIntro)
                 skipIntroOverlay.SkipWhenReady();
+
+            loadLeaderboard();
         }
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
@@ -417,7 +421,7 @@ namespace osu.Game.Screens.Play
                     // display the cursor above some HUD elements.
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                     DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
-                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods)
+                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration.AlwaysShowLeaderboard)
                     {
                         HoldToQuit =
                         {
@@ -820,6 +824,41 @@ namespace osu.Game.Screens.Play
             return mouseWheelDisabled.Value && !e.AltPressed;
         }
 
+        #region Gameplay leaderboard
+
+        protected readonly Bindable<bool> LeaderboardExpandedState = new BindableBool();
+
+        private void loadLeaderboard()
+        {
+            HUDOverlay.HoldingForHUD.BindValueChanged(_ => updateLeaderboardExpandedState());
+            LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
+
+            var gameplayLeaderboard = CreateGameplayLeaderboard();
+
+            if (gameplayLeaderboard != null)
+            {
+                LoadComponentAsync(gameplayLeaderboard, leaderboard =>
+                {
+                    if (!LoadedBeatmapSuccessfully)
+                        return;
+
+                    leaderboard.Expanded.BindTo(LeaderboardExpandedState);
+
+                    AddLeaderboardToHUD(leaderboard);
+                });
+            }
+        }
+
+        [CanBeNull]
+        protected virtual GameplayLeaderboard CreateGameplayLeaderboard() => null;
+
+        protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.LeaderboardFlow.Add(leaderboard);
+
+        private void updateLeaderboardExpandedState() =>
+            LeaderboardExpandedState.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
+
+        #endregion
+
         #region Fail Logic
 
         protected FailOverlay FailOverlay { get; private set; }
@@ -996,12 +1035,8 @@ namespace osu.Game.Screens.Play
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);
 
-            // Our mods are local copies of the global mods so they need to be re-applied to the track.
-            // This is done through the music controller (for now), because resetting speed adjustments on the beatmap track also removes adjustments provided by DrawableTrack.
-            // Todo: In the future, player will receive in a track and will probably not have to worry about this...
-            musicController.ResetTrackAdjustments();
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrack>())
-                mod.ApplyToTrack(musicController.CurrentTrack);
+                mod.ApplyToTrack(GameplayClockContainer.AdjustmentsFromMods);
 
             updateGameplayState();
 
@@ -1053,6 +1088,7 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
 
             fadeOut();
+
             return base.OnExiting(e);
         }
 

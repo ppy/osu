@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -23,6 +24,10 @@ namespace osu.Game.Overlays
     /// </summary>
     public class NotificationOverlayToastTray : CompositeDrawable
     {
+        public override bool IsPresent => toastContentBackground.Height > 0 || toastFlow.Count > 0;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => toastFlow.ReceivePositionalInputAt(screenSpacePos);
+
         public bool IsDisplayingToasts => toastFlow.Count > 0;
 
         private FillFlowContainer<Notification> toastFlow = null!;
@@ -33,8 +38,12 @@ namespace osu.Game.Overlays
 
         public Action<Notification>? ForwardNotificationToPermanentStore { get; set; }
 
-        public int UnreadCount => toastFlow.Count(n => !n.WasClosed && !n.Read)
-                                  + InternalChildren.OfType<Notification>().Count(n => !n.WasClosed && !n.Read);
+        public int UnreadCount => allDisplayedNotifications.Count(n => !n.WasClosed && !n.Read);
+
+        /// <summary>
+        /// Notifications contained in the toast flow, or in a detached state while they animate during forwarding to the main overlay.
+        /// </summary>
+        private IEnumerable<Notification> allDisplayedNotifications => toastFlow.Concat(InternalChildren.OfType<Notification>());
 
         private int runningDepth;
 
@@ -55,6 +64,7 @@ namespace osu.Game.Overlays
                         colourProvider.Background6.Opacity(0.7f),
                         colourProvider.Background6.Opacity(0.5f)),
                     RelativeSizeAxes = Axes.Both,
+                    Height = 0,
                 }.WithEffect(new BlurEffect
                 {
                     PadExtent = true,
@@ -66,11 +76,10 @@ namespace osu.Game.Overlays
                     postEffectDrawable.AutoSizeAxes = Axes.None;
                     postEffectDrawable.RelativeSizeAxes = Axes.X;
                 })),
-                toastFlow = new AlwaysUpdateFillFlowContainer<Notification>
+                toastFlow = new FillFlowContainer<Notification>
                 {
                     LayoutDuration = 150,
                     LayoutEasing = Easing.OutQuart,
-                    Spacing = new Vector2(3),
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },
@@ -93,6 +102,8 @@ namespace osu.Game.Overlays
         {
             ++runningDepth;
 
+            notification.ForwardToOverlay = () => forwardNotification(notification);
+
             int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
 
             toastFlow.Insert(depth, notification);
@@ -110,7 +121,7 @@ namespace osu.Game.Overlays
                     return;
 
                 // Notification hovered; delay dismissal.
-                if (notification.IsHovered)
+                if (notification.IsHovered || notification.IsDragged)
                 {
                     scheduleDismissal();
                     return;
@@ -123,6 +134,9 @@ namespace osu.Game.Overlays
 
         private void forwardNotification(Notification notification)
         {
+            if (!notification.IsInToastTray)
+                return;
+
             Debug.Assert(notification.Parent == toastFlow);
 
             // Temporarily remove from flow so we can animate the position off to the right.
@@ -143,8 +157,8 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            float height = toastFlow.DrawHeight + 120;
-            float alpha = IsDisplayingToasts ? MathHelper.Clamp(toastFlow.DrawHeight / 40, 0, 1) * toastFlow.Children.Max(n => n.Alpha) : 0;
+            float height = toastFlow.Count > 0 ? toastFlow.DrawHeight + 120 : 0;
+            float alpha = toastFlow.Count > 0 ? MathHelper.Clamp(toastFlow.DrawHeight / 41, 0, 1) * toastFlow.Children.Max(n => n.Alpha) : 0;
 
             toastContentBackground.Height = (float)Interpolation.DampContinuously(toastContentBackground.Height, height, 10, Clock.ElapsedFrameTime);
             toastContentBackground.Alpha = (float)Interpolation.DampContinuously(toastContentBackground.Alpha, alpha, 10, Clock.ElapsedFrameTime);

@@ -4,11 +4,13 @@
 #nullable disable
 
 using System.ComponentModel;
+using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch
 {
+    [Cached]
     public class CatchInputManager : RulesetInputManager<CatchAction>
     {
         public CatchInputManager(RulesetInfo ruleset)

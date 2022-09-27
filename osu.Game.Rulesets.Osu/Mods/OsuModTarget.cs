@@ -53,11 +53,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         }).ToArray();
 
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SettingsNumberBox))]
-        public Bindable<int?> Seed { get; } = new Bindable<int?>
-        {
-            Default = null,
-            Value = null
-        };
+        public Bindable<int?> Seed { get; } = new Bindable<int?>();
 
         [SettingSource("Metronome ticks", "Whether a metronome beat should play in the background")]
         public Bindable<bool> Metronome { get; } = new BindableBool(true);
@@ -362,10 +358,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             return breaks.Any(breakPeriod =>
             {
-                var firstObjAfterBreak = originalHitObjects.First(obj => almostBigger(obj.StartTime, breakPeriod.EndTime));
+                OsuHitObject? firstObjAfterBreak = originalHitObjects.FirstOrDefault(obj => almostBigger(obj.StartTime, breakPeriod.EndTime));
 
                 return almostBigger(time, breakPeriod.StartTime)
-                       && definitelyBigger(firstObjAfterBreak.StartTime, time);
+                       // There should never really be a break section with no objects after it, but we've seen crashes from users with malformed beatmaps,
+                       // so it's best to guard against this.
+                       && (firstObjAfterBreak == null || definitelyBigger(firstObjAfterBreak.StartTime, time));
             });
         }
 

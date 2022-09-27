@@ -112,7 +112,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Fail);
-            assertStateAfterResult(new JudgementResult(new DrumRoll(), new TaikoDrumRollJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Ok }, TaikoMascotAnimationState.Idle);
         }
 
