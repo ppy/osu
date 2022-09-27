@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private TestParticleSpewer createSpewer() =>
-            new TestParticleSpewer(skinManager.DefaultLegacySkin.GetTexture("star2"))
+            new TestParticleSpewer(skinManager.DefaultClassicSkin.GetTexture("star2"))
             {
                 Origin = Anchor.Centre,
                 RelativePositionAxes = Axes.Both,

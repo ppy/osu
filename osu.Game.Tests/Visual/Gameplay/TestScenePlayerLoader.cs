@@ -264,13 +264,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestMutedNotificationMasterVolume()
         {
-            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, () => audioManager.Volume.IsDefault);
+            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, () => audioManager.Volume.Value == 0.5);
         }
 
         [Test]
         public void TestMutedNotificationTrackVolume()
         {
-            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, () => audioManager.VolumeTrack.IsDefault);
+            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, () => audioManager.VolumeTrack.Value == 0.5);
         }
 
         [Test]
@@ -301,7 +301,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(1));
 
-            clickNotificationIfAny();
+            clickNotification();
 
             AddAssert("check " + volumeName, assert);
 
@@ -370,8 +370,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 batteryInfo.SetChargeLevel(chargeLevel);
             }));
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
-            AddAssert($"notification {(shouldWarn ? "triggered" : "not triggered")}", () => notificationOverlay.UnreadCount.Value == (shouldWarn ? 1 : 0));
-            clickNotificationIfAny();
+
+            if (shouldWarn)
+                clickNotification();
+            else
+                AddAssert("notification not triggered", () => notificationOverlay.UnreadCount.Value == 0);
+
             AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
@@ -436,9 +440,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("skip button not visible", () => !checkSkipButtonVisible());
         }
 
-        private void clickNotificationIfAny()
+        private void clickNotification()
         {
-            AddStep("click notification", () => notificationOverlay.ChildrenOfType<Notification>().FirstOrDefault()?.TriggerClick());
+            Notification notification = null;
+
+            AddUntilStep("wait for notification", () => (notification = notificationOverlay.ChildrenOfType<Notification>().FirstOrDefault()) != null);
+            AddStep("open notification overlay", () => notificationOverlay.Show());
+            AddStep("click notification", () => notification.TriggerClick());
         }
 
         private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault();

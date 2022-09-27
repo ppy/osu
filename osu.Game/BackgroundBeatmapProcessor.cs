@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,6 +15,7 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game
@@ -22,6 +24,9 @@ namespace osu.Game
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
+
+        [Resolved]
+        private ScoreManager scoreManager { get; set; } = null!;
 
         [Resolved]
         private RealmAccess realmAccess { get; set; } = null!;
@@ -46,6 +51,7 @@ namespace osu.Game
                 Logger.Log("Beginning background beatmap processing..");
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
+                processScoresWithMissingStatistics();
             }).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -138,6 +144,53 @@ namespace osu.Game
                         }
                     }
                 });
+            }
+        }
+
+        private void processScoresWithMissingStatistics()
+        {
+            HashSet<Guid> scoreIds = new HashSet<Guid>();
+
+            Logger.Log("Querying for scores to reprocess...");
+
+            realmAccess.Run(r =>
+            {
+                foreach (var score in r.All<ScoreInfo>())
+                {
+                    if (score.Statistics.Sum(kvp => kvp.Value) > 0 && score.MaximumStatistics.Sum(kvp => kvp.Value) == 0)
+                        scoreIds.Add(score.ID);
+                }
+            });
+
+            Logger.Log($"Found {scoreIds.Count} scores which require reprocessing.");
+
+            foreach (var id in scoreIds)
+            {
+                while (localUserPlayInfo?.IsPlaying.Value == true)
+                {
+                    Logger.Log("Background processing sleeping due to active gameplay...");
+                    Thread.Sleep(TimeToSleepDuringGameplay);
+                }
+
+                try
+                {
+                    var score = scoreManager.Query(s => s.ID == id);
+
+                    scoreManager.PopulateMaximumStatistics(score);
+
+                    // Can't use async overload because we're not on the update thread.
+                    // ReSharper disable once MethodHasAsyncOverload
+                    realmAccess.Write(r =>
+                    {
+                        r.Find<ScoreInfo>(id).MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
+                    });
+
+                    Logger.Log($"Populated maximum statistics for score {id}");
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
+                }
             }
         }
     }

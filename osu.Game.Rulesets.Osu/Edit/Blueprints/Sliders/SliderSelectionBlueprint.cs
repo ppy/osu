@@ -163,7 +163,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override void OnDrag(DragEvent e)
         {
             if (placementControlPoint != null)
-                placementControlPoint.Position = e.MousePosition - HitObject.Position;
+            {
+                var result = snapProvider?.FindSnappedPositionAndTime(ToScreenSpace(e.MousePosition));
+                placementControlPoint.Position = ToLocalSpace(result?.ScreenSpacePosition ?? ToScreenSpace(e.MousePosition)) - HitObject.Position;
+            }
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
