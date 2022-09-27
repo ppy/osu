@@ -6,11 +6,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModVisualAdjusts<TObject, TDrawableRuleset> : Mod, IApplicableToDrawableRuleset<TObject> where TObject : HitObject where TDrawableRuleset : DrawableRuleset<TObject>
+    public abstract class ModVisualAdjusts<TObject, TDrawableRuleset> : Mod, IApplicableToDrawableRuleset<TObject>, IApplicableToDrawableHitObject where TObject : HitObject where TDrawableRuleset : DrawableRuleset<TObject>
     {
         public override string Name => "Visual Adjusts";
         public override LocalisableString Description => "Adjust some gameplay elements that can bring some visual challenge.";
@@ -32,6 +33,11 @@ namespace osu.Game.Rulesets.Mods
             triggerAdjustsForType<DrawableRulesetVisualAdjustSetting, TDrawableRuleset>((TDrawableRuleset)drawableRuleset);
         }
 
+        public void ApplyToDrawableHitObject(DrawableHitObject drawable)
+        {
+            triggerAdjustsForType<DrawableHitObjectVisualAdjustSetting, DrawableHitObject<TObject>>((DrawableHitObject<TObject>)drawable);
+        }
+
         public abstract class VisualAdjustSetting<TArgs> : BindableBool
         {
             public readonly Action<TArgs> ApplyAdjusts;
@@ -45,6 +51,14 @@ namespace osu.Game.Rulesets.Mods
         public class DrawableRulesetVisualAdjustSetting : VisualAdjustSetting<TDrawableRuleset>
         {
             public DrawableRulesetVisualAdjustSetting(Action<TDrawableRuleset> applyAdjusts)
+                : base(applyAdjusts)
+            {
+            }
+        }
+
+        public class DrawableHitObjectVisualAdjustSetting : VisualAdjustSetting<DrawableHitObject<TObject>>
+        {
+            public DrawableHitObjectVisualAdjustSetting(Action<DrawableHitObject<TObject>> applyAdjusts)
                 : base(applyAdjusts)
             {
             }
