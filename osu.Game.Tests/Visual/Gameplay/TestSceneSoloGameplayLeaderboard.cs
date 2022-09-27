@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -24,6 +25,16 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private readonly BindableList<ScoreInfo> scores = new BindableList<ScoreInfo>();
 
+        private readonly Bindable<bool> configVisibility = new Bindable<bool>();
+
+        private SoloGameplayLeaderboard leaderboard = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
+        }
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -37,11 +48,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Id = 2,
                 };
 
-                Child = new SoloGameplayLeaderboard(trackingUser)
+                Child = leaderboard = new SoloGameplayLeaderboard(trackingUser)
                 {
                     Scores = { BindTarget = scores },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    AlwaysVisible = { Value = false },
                     Expanded = { Value = true },
                 };
             });
@@ -55,6 +67,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddSliderStep("score", 0, 1000000, 500000, v => scoreProcessor.TotalScore.Value = v);
             AddSliderStep("accuracy", 0f, 1f, 0.5f, v => scoreProcessor.Accuracy.Value = v);
             AddSliderStep("combo", 0, 1000, 0, v => scoreProcessor.Combo.Value = v);
+        }
+
+        [Test]
+        public void TestVisibility()
+        {
+            AddStep("set config visible true", () => configVisibility.Value = true);
+            AddUntilStep("leaderboard visible", () => leaderboard.Alpha == 1);
+
+            AddStep("set config visible false", () => configVisibility.Value = false);
+            AddUntilStep("leaderboard not visible", () => leaderboard.Alpha == 0);
+
+            AddStep("set always visible", () => leaderboard.AlwaysVisible.Value = true);
+            AddUntilStep("leaderboard visible", () => leaderboard.Alpha == 1);
+
+            AddStep("set config visible true", () => configVisibility.Value = true);
+            AddAssert("leaderboard still visible", () => leaderboard.Alpha == 1);
         }
 
         private static List<ScoreInfo> createSampleScores()
