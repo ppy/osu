@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
