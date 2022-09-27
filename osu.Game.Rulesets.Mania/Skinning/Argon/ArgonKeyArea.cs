@@ -143,9 +143,13 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         {
             if (e.Action == column.Action.Value)
             {
+                background
+                    .FadeColour(column.AccentColour.Lighten(0.3f), 50, Easing.OutQuint).Then()
+                    .FadeColour(column.AccentColour, 100, Easing.OutQuint);
+
                 foreach (var circle in keyIcon.Children.OfType<CompositeDrawable>())
                 {
-                    circle.ScaleTo(1.1f, 50, Easing.OutQuint);
+                    circle.ScaleTo(0.9f, 50, Easing.OutQuint);
 
                     circle.FadeColour(Color4.White, 50, Easing.OutQuint);
                     circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
@@ -164,20 +168,22 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         {
             if (e.Action == column.Action.Value)
             {
+                background.FadeColour(column.AccentColour.Darken(0.6f), 800, Easing.OutQuint);
+
                 foreach (var circle in keyIcon.Children.OfType<CompositeDrawable>())
                 {
-                    circle.ScaleTo(1f, 125, Easing.OutQuint);
+                    circle.ScaleTo(1f, 200, Easing.OutQuint);
 
                     // TODO: temp lol
                     if (circle is Circle)
-                        circle.FadeColour(column.AccentColour, 200, Easing.OutQuint);
+                        circle.FadeColour(column.AccentColour, 800, Easing.OutQuint);
 
                     circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Colour = Color4.White.Opacity(0),
                         Radius = 30,
-                    }, 200, Easing.OutQuint);
+                    }, 800, Easing.OutQuint);
                 }
             }
         }
