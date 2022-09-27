@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Online
                     if (!(request is CommentDeleteRequest req))
                         return false;
 
-                    if (req.ID != 1)
+                    if (req.CommentId != 1)
                         return false;
 
                     CommentBundle cb = new CommentBundle
