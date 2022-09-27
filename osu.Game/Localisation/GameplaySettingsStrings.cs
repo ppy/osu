@@ -80,6 +80,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");
 
         /// <summary>
+        /// "Always show gameplay leaderboard"
+        /// </summary>
+        public static LocalisableString AlwaysShowGameplayLeaderboard => new TranslatableString(getKey(@"gameplay_leaderboard"), @"Always show gameplay leaderboard");
+
+        /// <summary>
         /// "Always play first combo break sound"
         /// </summary>
         public static LocalisableString AlwaysPlayFirstComboBreak => new TranslatableString(getKey(@"always_play_first_combo_break"), @"Always play first combo break sound");
