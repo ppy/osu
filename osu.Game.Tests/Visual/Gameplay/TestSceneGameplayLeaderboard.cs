@@ -58,6 +58,16 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for some scores not masked away",
                 () => leaderboard.ChildrenOfType<GameplayLeaderboardScore>().Any(s => leaderboard.ScreenSpaceDrawQuad.Contains(s.ScreenSpaceDrawQuad.Centre)));
+
+            AddUntilStep("wait for tracked score fully visible", () => leaderboard.ScreenSpaceDrawQuad.Intersects(leaderboard.TrackedScore!.ScreenSpaceDrawQuad));
+
+            AddStep("change score to middle", () => playerScore.Value = 1000000);
+            AddWaitStep("wait for movement", 5);
+            AddUntilStep("wait for tracked score fully visible", () => leaderboard.ScreenSpaceDrawQuad.Intersects(leaderboard.TrackedScore!.ScreenSpaceDrawQuad));
+
+            AddStep("change score to first", () => playerScore.Value = 5000000);
+            AddWaitStep("wait for movement", 5);
+            AddUntilStep("wait for tracked score fully visible", () => leaderboard.ScreenSpaceDrawQuad.Intersects(leaderboard.TrackedScore!.ScreenSpaceDrawQuad));
         }
 
         [Test]
