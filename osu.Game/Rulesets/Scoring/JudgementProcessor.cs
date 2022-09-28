@@ -66,12 +66,16 @@ namespace osu.Game.Rulesets.Scoring
                 throw new ArgumentException(@$"A {nameof(HitResult.LegacyComboIncrease)} hit result cannot be applied.");
 #pragma warning restore CS0618
 
-            JudgedHits++;
-            lastAppliedResult = result;
+            if (result.Score)
+            {
+                JudgedHits++;
+                lastAppliedResult = result;
 
-            ApplyResultInternal(result);
+                ApplyResultInternal(result);
+            }
 
-            NewJudgement?.Invoke(result);
+            if (result.Display)
+                NewJudgement?.Invoke(result);
         }
 
         /// <summary>
@@ -80,11 +84,15 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The judgement scoring result.</param>
         public void RevertResult(JudgementResult result)
         {
-            JudgedHits--;
+            if (result.Score)
+            {
+                JudgedHits--;
 
-            RevertResultInternal(result);
+                RevertResultInternal(result);
+            }
 
-            JudgementReverted?.Invoke(result);
+            if (result.Display)
+                JudgementReverted?.Invoke(result);
         }
 
         /// <summary>

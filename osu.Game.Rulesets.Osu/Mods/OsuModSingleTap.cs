@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Localisation;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => @"Single Tap";
         public override string Acronym => @"SG";
         public override LocalisableString Description => @"You must only use one key!";
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAlternate) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModRelax), typeof(ModRelaxDisplay), typeof(OsuModAlternate) }).ToArray();
 
         protected override bool CheckValidNewAction(OsuAction action) => LastAcceptedAction == null || LastAcceptedAction == action;
     }

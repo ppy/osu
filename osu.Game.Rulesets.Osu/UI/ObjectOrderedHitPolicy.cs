@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public bool IsHittable(DrawableHitObject hitObject, double time) => enumerateHitObjectsUpTo(hitObject.HitObject.StartTime).All(obj => obj.AllJudged);
 
-        public void HandleHit(DrawableHitObject hitObject)
+        public void HandleHit(DrawableHitObject hitObject, JudgementResult result)
         {
         }
 

@@ -75,6 +75,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public virtual void Shake() { }
 
         /// <summary>
+        /// Causes this <see cref="DrawableOsuHitObject"/> to display a miss, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
+        /// </summary>
+        public void DisplayMissForcefully() => ApplyUnscoredResult(r => r.Type = r.Judgement.MinResult);
+
+        /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
         public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);

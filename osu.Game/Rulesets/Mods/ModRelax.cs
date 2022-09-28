@@ -16,4 +16,14 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 0.1;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModNoFail), typeof(ModFailCondition) };
     }
+
+    public abstract class ModRelaxDisplay : Mod
+    {
+        public override string Name => "Relax Display";
+        public override string Acronym => "RD";
+        public override IconUsage? Icon => OsuIcon.ModRelax;
+        public override ModType Type => ModType.DifficultyIncrease;
+        public override double ScoreMultiplier => 1;
+        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
+    }
 }

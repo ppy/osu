@@ -74,6 +74,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 UpdateResult(true);
                                 return true;
                             },
+                            UnscoredHit = () =>
+                            {
+                                if (AllResultsDisplayed)
+                                    return false;
+
+                                UpdateUnscoredResult(true);
+                                return true;
+                            },
                         },
                         shakeContainer = new ShakeContainer
                         {
@@ -232,6 +240,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             public override bool HandlePositionalInput => true;
 
             public Func<bool> Hit;
+            public Func<bool> UnscoredHit;
 
             public OsuAction? HitAction;
 
@@ -253,6 +262,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     case OsuAction.LeftButton:
                     case OsuAction.RightButton:
                         if (IsHovered && (Hit?.Invoke() ?? false))
+                        {
+                            HitAction = e.Action;
+                            return true;
+                        }
+
+                        break;
+
+                    case OsuAction.UnscoredLeftButton:
+                    case OsuAction.UnscoredRightButton:
+                        if (IsHovered && (UnscoredHit?.Invoke() ?? false))
                         {
                             HitAction = e.Action;
                             return true;

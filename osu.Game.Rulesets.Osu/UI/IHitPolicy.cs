@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -28,6 +29,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// Handles a <see cref="HitObject"/> being hit.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> that was hit.</param>
-        void HandleHit(DrawableHitObject hitObject);
+        /// <param name="result">The <see cref="JudgementResult"/> of the HitObject's hit.</param>
+        void HandleHit(DrawableHitObject hitObject, JudgementResult result);
     }
 }

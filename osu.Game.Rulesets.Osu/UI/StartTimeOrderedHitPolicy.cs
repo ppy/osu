@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -45,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.UI
             return blockingObject.Judged || time >= blockingObject.HitObject.StartTime;
         }
 
-        public void HandleHit(DrawableHitObject hitObject)
+        public void HandleHit(DrawableHitObject hitObject, JudgementResult result)
         {
             // Hitobjects which themselves don't block future hitobjects don't cause misses (e.g. slider ticks, spinners).
             if (!hitObjectCanBlockFutureHits(hitObject))
@@ -57,11 +58,16 @@ namespace osu.Game.Rulesets.Osu.UI
             // Miss all hitobjects prior to the hit one.
             foreach (var obj in enumerateHitObjectsUpTo(hitObject.HitObject.StartTime))
             {
-                if (obj.Judged)
+                if ((result.Score && obj.Judged) || (result.Display && obj.ResultDisplayed))
                     continue;
 
                 if (hitObjectCanBlockFutureHits(obj))
-                    ((DrawableOsuHitObject)obj).MissForcefully();
+                {
+                    if (result.Score)
+                        ((DrawableOsuHitObject)obj).MissForcefully();
+                    else
+                        ((DrawableOsuHitObject)obj).DisplayMissForcefully();
+                }
             }
         }
 

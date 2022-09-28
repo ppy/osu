@@ -93,9 +93,22 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public virtual bool DisplayResult => true;
 
         /// <summary>
+        /// Whether a visual indicator should be automatically displayed when a scoring result occurs.
+        /// </summary>
+        /// <remarks>
+        /// If this is false and DisplayResult is true, ApplyUnscoredResult should also be called for each hitobject.
+        /// </remarks>
+        public bool DisplayScoredResult { get; set; } = true;
+
+        /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
         public bool AllJudged => Judged && NestedHitObjects.All(h => h.AllJudged);
+
+        /// <summary>
+        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have had a judgement displayed.
+        /// </summary>
+        public bool AllResultsDisplayed => ResultDisplayed && NestedHitObjects.All(h => h.AllResultsDisplayed);
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result"/> is hit.
@@ -110,9 +123,21 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public bool Judged => Result?.HasResult ?? true;
 
         /// <summary>
+        /// Whether this <see cref="DrawableHitObject"/> has had a judgement displayed.
+        /// Note: This does NOT include nested hitobjects.
+        /// </summary>
+        public bool ResultDisplayed => DisplayScoredResult ? Judged : (DisplayedResult?.HasResult ?? true);
+
+        /// <summary>
         /// The scoring result of this <see cref="DrawableHitObject"/>.
         /// </summary>
         public JudgementResult Result => Entry?.Result;
+
+        /// <summary>
+        /// The displayed result of this <see cref="DrawableHitObject"/>.
+        /// This exists and is used when <see cref="DisplayScoredResult"/> is false.
+        /// </summary>
+        public JudgementResult DisplayedResult => Entry?.DisplayedResult;
 
         /// <summary>
         /// The relative X position of this hit object for sample playback balance adjustment.
@@ -164,7 +189,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (initialHitObject == null) return;
 
             Entry = new SyntheticHitObjectEntry(initialHitObject);
-            ensureEntryHasResult();
+            ensureEntryHasResults();
         }
 
         [BackgroundDependencyLoader]
@@ -227,7 +252,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (entry is SyntheticHitObjectEntry)
                 LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
 
-            ensureEntryHasResult();
+            ensureEntryHasResults();
 
             foreach (var h in HitObject.NestedHitObjects)
             {
@@ -595,6 +620,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             base.UpdateAfterChildren();
 
             UpdateResult(false);
+            UpdateUnscoredResult(false);
         }
 
         /// <summary>
@@ -676,10 +702,47 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             Result.TimeOffset = Math.Min(MaximumJudgementOffset, Time.Current - HitObject.GetEndTime());
 
-            if (Result.HasResult)
+            if (Result.HasResult && Result.Display)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
 
             OnNewResult?.Invoke(this, Result);
+        }
+
+        /// <summary>
+        /// Applies the <see cref="DisplayedResult"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
+        /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <remarks>
+        /// This should only be called when <see cref="DisplayScoredResult"/> is false.
+        /// </remarks>
+        /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
+        protected void ApplyUnscoredResult(Action<JudgementResult> application)
+        {
+            Debug.Assert(DisplayedResult != null);
+
+            if (DisplayScoredResult)
+                return;
+
+            if (DisplayedResult.HasResult)
+                throw new InvalidOperationException("Cannot apply result on a hitobject that already has a result.");
+
+            application?.Invoke(DisplayedResult);
+
+            if (!DisplayedResult.HasResult)
+                throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
+
+            if (!DisplayedResult.Type.IsValidHitResult(DisplayedResult.Judgement.MinResult, DisplayedResult.Judgement.MaxResult))
+            {
+                throw new InvalidOperationException(
+                    $"{GetType().ReadableName()} applied an invalid hit result (was: {DisplayedResult.Type}, expected: [{DisplayedResult.Judgement.MinResult} ... {DisplayedResult.Judgement.MaxResult}]).");
+            }
+
+            DisplayedResult.TimeOffset = Math.Min(MaximumJudgementOffset, Time.Current - HitObject.GetEndTime());
+
+            if (DisplayedResult.HasResult && DisplayedResult.Display)
+                updateState(DisplayedResult.IsHit ? ArmedState.Hit : ArmedState.Miss);
+
+            OnNewResult?.Invoke(this, DisplayedResult);
         }
 
         /// <summary>
@@ -696,16 +759,42 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Judged)
                 return false;
 
-            CheckForResult(userTriggered, Time.Current - HitObject.GetEndTime());
+            CheckForResult(userTriggered, Time.Current - HitObject.GetEndTime(), ApplyResult);
 
             return Judged;
+        }
+
+        /// <summary>
+        /// Processes this <see cref="DrawableHitObject"/>, checking if a scoring result has occurred. The result is not saved for scoring.
+        /// </summary>
+        /// <remarks>
+        /// This should only be called when <see cref="DisplayScoredResult"/> is false.
+        /// </remarks>
+        /// <param name="userTriggered">Whether the user triggered this process.</param>
+        /// <returns>Whether a scoring result has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>.</returns>
+        protected bool UpdateUnscoredResult(bool userTriggered)
+        {
+            if (DisplayScoredResult)
+                return false;
+
+            // It's possible for input to get into a bad state when rewinding gameplay, so results should not be processed
+            if (Time.Elapsed < 0)
+                return false;
+
+            if (ResultDisplayed)
+                return false;
+
+            CheckForResult(userTriggered, Time.Current - HitObject.GetEndTime(), ApplyUnscoredResult);
+
+            return ResultDisplayed;
         }
 
         /// <summary>
         /// Checks if a scoring result has occurred for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <remarks>
-        /// If a scoring result has occurred, this method must invoke <see cref="ApplyResult"/> to update the result and notify responders.
+        /// If a scoring result has occurred, this method must invoke OnAction to update the result and notify responders as necessary.
+        /// OnAction will be either <see cref="ApplyResult"/> or <see cref="ApplyUnscoredResult"/>
         /// </remarks>
         /// <param name="userTriggered">Whether the user triggered this check.</param>
         /// <param name="timeOffset">The offset from the end time of the <see cref="HitObject"/> at which this check occurred.
@@ -721,11 +810,19 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
         protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(HitObject, judgement);
 
-        private void ensureEntryHasResult()
+        private void ensureEntryHasResults()
         {
             Debug.Assert(Entry != null);
             Entry.Result ??= CreateResult(HitObject.CreateJudgement())
                              ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+
+            if (!DisplayScoredResult)
+            {
+                Entry.Result.Display = false;
+                Entry.DisplayedResult ??= CreateResult(HitObject.CreateJudgement())
+                                          ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+                Entry.DisplayedResult.Score = false;
+            }
         }
 
         protected override void Dispose(bool isDisposing)

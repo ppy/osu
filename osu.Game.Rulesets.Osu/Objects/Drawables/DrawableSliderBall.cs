@@ -181,6 +181,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (headCircleHit && (!timeToAcceptAnyKeyAfter.HasValue || Time.Current <= timeToAcceptAnyKeyAfter.Value))
                 return action == GetInitialHitAction();
 
+            // Cannot use Unscored OsuActions
             return action == OsuAction.LeftButton || action == OsuAction.RightButton;
         }
 

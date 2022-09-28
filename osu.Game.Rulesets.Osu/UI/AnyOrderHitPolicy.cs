@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public bool IsHittable(DrawableHitObject hitObject, double time) => true;
 
-        public void HandleHit(DrawableHitObject hitObject)
+        public void HandleHit(DrawableHitObject hitObject, JudgementResult result)
         {
         }
     }

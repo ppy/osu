@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -17,46 +18,49 @@ using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
+    public interface IOsuModRelaxExtensions : IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
-        public override LocalisableString Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModMagnetised), typeof(OsuModAlternate), typeof(OsuModSingleTap) }).ToArray();
+        bool IsDownState { get; set; }
+        bool WasLeft { get; set; }
+        OsuAction LeftAction { get; }
+        OsuAction RightAction { get; }
 
+        OsuInputManager InputManager { get; set; }
+
+        ReplayState<OsuAction> State { get; set; }
+        double LastStateChangeTime { get; set; }
+
+        bool HasReplay { get; set; }
+    }
+
+    public static class OsuModRelaxExtensions
+    {
         /// <summary>
         /// How early before a hitobject's start time to trigger a hit.
         /// </summary>
         private const float relax_leniency = 3;
 
-        private bool isDownState;
-        private bool wasLeft;
-
-        private OsuInputManager osuInputManager = null!;
-
-        private ReplayState<OsuAction> state = null!;
-        private double lastStateChangeTime;
-
-        private bool hasReplay;
-
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        public static void ApplyToDrawableRuleset(this IOsuModRelaxExtensions mod, DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
-            osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+            mod.InputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
         }
 
-        public void ApplyToPlayer(Player player)
+        public static void ApplyToPlayer(this IOsuModRelaxExtensions mod, Player player)
         {
-            if (osuInputManager.ReplayInputHandler != null)
+            if (mod.InputManager.ReplayInputHandler != null)
             {
-                hasReplay = true;
+                mod.HasReplay = true;
                 return;
             }
 
-            osuInputManager.AllowUserPresses = false;
+            if (mod is ModRelax)
+                mod.InputManager.AllowUserPresses = false;
         }
 
-        public void Update(Playfield playfield)
+        public static void Update(this IOsuModRelaxExtensions mod, Playfield playfield)
         {
-            if (hasReplay)
+            if (mod.HasReplay)
                 return;
 
             bool requiresHold = false;
@@ -71,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
 
                 // already hit or beyond the hittable end time.
-                if (h.IsHit || (h.HitObject is IHasDuration hasEnd && time > hasEnd.EndTime))
+                if ((mod is ModRelax ? h.IsHit : h.ResultDisplayed) || (h.HitObject is IHasDuration hasEnd && time > hasEnd.EndTime))
                     continue;
 
                 switch (h)
@@ -102,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (requiresHold)
                 changeState(true);
-            else if (isDownState && time - lastStateChangeTime > AutoGenerator.KEY_UP_DELAY)
+            else if (mod.IsDownState && time - mod.LastStateChangeTime > AutoGenerator.KEY_UP_DELAY)
                 changeState(false);
 
             void handleHitCircle(DrawableHitCircle circle)
@@ -116,25 +120,73 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             void changeState(bool down)
             {
-                if (isDownState == down)
+                if (mod.IsDownState == down)
                     return;
 
-                isDownState = down;
-                lastStateChangeTime = time;
+                mod.IsDownState = down;
+                mod.LastStateChangeTime = time;
 
-                state = new ReplayState<OsuAction>
+                mod.State = new ReplayState<OsuAction>
                 {
                     PressedActions = new List<OsuAction>()
                 };
 
                 if (down)
                 {
-                    state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
-                    wasLeft = !wasLeft;
+                    mod.State.PressedActions.Add(mod.WasLeft ? mod.LeftAction : mod.RightAction);
+                    mod.WasLeft = !mod.WasLeft;
                 }
 
-                state.Apply(osuInputManager.CurrentState, osuInputManager);
+                mod.State.Apply(mod.InputManager.CurrentState, mod.InputManager);
             }
+        }
+    }
+
+    public class OsuModRelax : ModRelax, IOsuModRelaxExtensions
+    {
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModMagnetised), typeof(OsuModAlternate), typeof(OsuModSingleTap) }).ToArray();
+        public override LocalisableString Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
+
+        public bool IsDownState { get; set; }
+        public bool WasLeft { get; set; }
+        public OsuInputManager InputManager { get; set; } = null!;
+        public ReplayState<OsuAction> State { get; set; } = null!;
+        public double LastStateChangeTime { get; set; }
+        public bool HasReplay { get; set; }
+
+        // These are required because these methods fulfill other interfaces.
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset) => OsuModRelaxExtensions.ApplyToDrawableRuleset(this, drawableRuleset);
+        public void ApplyToPlayer(Player player) => OsuModRelaxExtensions.ApplyToPlayer(this, player);
+        public void Update(Playfield playfield) => OsuModRelaxExtensions.Update(this, playfield);
+
+        public OsuAction LeftAction => OsuAction.LeftButton;
+        public OsuAction RightAction => OsuAction.RightButton;
+    }
+
+    public class OsuModRelaxDisplay : ModRelaxDisplay, IOsuModRelaxExtensions, IApplicableToDrawableHitObject
+    {
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModMagnetised), typeof(OsuModAlternate), typeof(OsuModSingleTap) }).ToArray();
+        public override LocalisableString Description => @"It looks like you have relax on, but your clicks are still scored. Just focus on your aim - and make sure to tap perfectly.";
+
+        public bool IsDownState { get; set; }
+        public bool WasLeft { get; set; }
+        public OsuInputManager InputManager { get; set; } = null!;
+        public ReplayState<OsuAction> State { get; set; } = null!;
+        public double LastStateChangeTime { get; set; }
+        public bool HasReplay { get; set; }
+
+        // These are required because these methods fulfill other interfaces.
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset) => OsuModRelaxExtensions.ApplyToDrawableRuleset(this, drawableRuleset);
+        public void ApplyToPlayer(Player player) => OsuModRelaxExtensions.ApplyToPlayer(this, player);
+        public void Update(Playfield playfield) => OsuModRelaxExtensions.Update(this, playfield);
+
+        public OsuAction LeftAction => OsuAction.UnscoredLeftButton;
+        public OsuAction RightAction => OsuAction.UnscoredRightButton;
+
+        public void ApplyToDrawableHitObject(DrawableHitObject drawable)
+        {
+            if (!HasReplay)
+                drawable.DisplayScoredResult = false;
         }
     }
 }

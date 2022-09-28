@@ -33,6 +33,16 @@ namespace osu.Game.Rulesets.Judgements
         public readonly Judgement Judgement;
 
         /// <summary>
+        /// Whether this <see cref="JudgementResult"/> should be displayed.
+        /// </summary>
+        public bool Display { get; set; } = true;
+
+        /// <summary>
+        /// Whether this <see cref="JudgementResult"/> should be scored.
+        /// </summary>
+        public bool Score { get; set; } = true;
+
+        /// <summary>
         /// The offset from a perfect hit at which this <see cref="JudgementResult"/> occurred.
         /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult"/>.
         /// </summary>

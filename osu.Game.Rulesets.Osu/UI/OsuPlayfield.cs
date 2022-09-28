@@ -163,9 +163,9 @@ namespace osu.Game.Rulesets.Osu.UI
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             // Hitobjects that block future hits should miss previous hitobjects if they're hit out-of-order.
-            hitPolicy.HandleHit(judgedObject);
+            hitPolicy.HandleHit(judgedObject, result);
 
-            if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
+            if (!judgedObject.DisplayResult || !result.Display || !DisplayJudgements.Value)
                 return;
 
             DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj => doj.Apply(result, judgedObject));

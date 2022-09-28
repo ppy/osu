@@ -19,6 +19,12 @@ namespace osu.Game.Rulesets.Objects
         public readonly HitObject HitObject;
 
         /// <summary>
+        /// The result that <see cref="HitObject"/> displayed.
+        /// This is set by the accompanying <see cref="DrawableHitObject"/>, and reused when required for rewinding.
+        /// </summary>
+        internal JudgementResult? DisplayedResult;
+
+        /// <summary>
         /// The result that <see cref="HitObject"/> was judged with.
         /// This is set by the accompanying <see cref="DrawableHitObject"/>, and reused when required for rewinding.
         /// </summary>
