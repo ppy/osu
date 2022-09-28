@@ -22,6 +22,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
@@ -54,6 +55,8 @@ namespace osu.Game.Overlays.Comments
         private ShowMoreRepliesButton showMoreButton;
         private ShowRepliesButton showRepliesButton;
         private ChevronButton chevronButton;
+        private LinkFlowContainer actionsContainer;
+        private LoadingSpinner actionsLoading;
         private DeletedCommentsCounter deletedCommentsCounter;
 
         [Resolved]
@@ -72,7 +75,6 @@ namespace osu.Game.Overlays.Comments
         {
             LinkFlowContainer username;
             FillFlowContainer info;
-            LinkFlowContainer actions;
             CommentMarkdownContainer message;
             GridContainer content;
             VotePill votePill;
@@ -178,7 +180,7 @@ namespace osu.Game.Overlays.Comments
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10, 0),
-                                                    Children = new[]
+                                                    Children = new Drawable[]
                                                     {
                                                         info = new FillFlowContainer
                                                         {
@@ -193,10 +195,16 @@ namespace osu.Game.Overlays.Comments
                                                                 }
                                                             }
                                                         },
-                                                        actions = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold))
+                                                        actionsContainer = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold))
                                                         {
                                                             AutoSizeAxes = Axes.Both,
                                                             Spacing = new Vector2(10, 0)
+                                                        },
+                                                        actionsLoading = new LoadingSpinner
+                                                        {
+                                                            Size = new Vector2(12f),
+                                                            Anchor = Anchor.TopLeft,
+                                                            Origin = Anchor.TopLeft
                                                         }
                                                     }
                                                 },
@@ -314,20 +322,7 @@ namespace osu.Game.Overlays.Comments
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
             {
-                actions.AddLink("Delete", () =>
-                {
-                    dialogOverlay.Push(new ConfirmDialog("Do you really want to delete your comment?", () =>
-                    {
-                        var request = new CommentDeleteRequest(Comment.Id);
-                        request.Success += _ =>
-                        {
-                            //TODO this is temporary just for testing
-                            content.FadeColour(OsuColour.Gray(0.5f));
-                            votePill.Hide();
-                        };
-                        api.Queue(request);
-                    }));
-                });
+                actionsContainer.AddLink("Delete", deleteComment);
             }
 
             if (Comment.IsTopLevel)
@@ -357,6 +352,30 @@ namespace osu.Game.Overlays.Comments
                         throw new NotSupportedException(@"You can only add replies to this list. Other actions are not supported.");
                 }
             };
+        }
+
+        private void deleteComment()
+        {
+            dialogOverlay.Push(new ConfirmDialog("Do you really want to delete your comment?", () =>
+            {
+                actionsContainer.Hide();
+                actionsLoading.Show();
+                var request = new CommentDeleteRequest(Comment.Id);
+                request.Success += _ =>
+                {
+                    actionsLoading.Hide();
+                    AutoSizeAxes = Axes.None;
+                    Masking = true;
+                    this.ResizeHeightTo(0, 1000, Easing.Out);
+                    this.FadeOut(1000, Easing.Out).Expire();
+                };
+                request.Failure += _ =>
+                {
+                    actionsLoading.Hide();
+                    actionsContainer.Show();
+                };
+                api.Queue(request);
+            }));
         }
 
         protected override void LoadComplete()
