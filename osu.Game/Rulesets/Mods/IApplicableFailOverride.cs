@@ -11,12 +11,19 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Whether we should allow failing at the current point in time.
         /// </summary>
-        /// <returns>Whether the fail should be allowed to proceed. Return false to block.</returns>
-        bool PerformFail();
+        /// <returns>Whether the fail need to proceed. Return <see cref="FailType"/> to decide whether to fail.</returns>
+        FailType PerformFail();
 
         /// <summary>
-        /// Whether we want to restart on fail. Only used if <see cref="PerformFail"/> returns true.
+        /// Whether we want to restart on fail. Only used if occur fail.
         /// </summary>
         bool RestartOnFail { get; }
+    }
+
+    public enum FailType
+    {
+        ForceFail,
+        BlockFail,
+        AllowFail
     }
 }

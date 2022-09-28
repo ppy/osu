@@ -137,9 +137,23 @@ namespace osu.Game.Screens.Play
 
         /// <summary>
         /// Whether failing should be allowed.
-        /// By default, this checks one of all selected mods allow failing.
+        /// If one of mod block failed, return false.
+        /// If one of mod force fail or all mod allow fail, return true.
         /// </summary>
-        protected virtual bool CheckModsAllowFailure() => !GameplayState.Mods.OfType<IApplicableFailOverride>().Any() || GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.PerformFail());
+        protected virtual bool CheckModsAllowFailure()
+        {
+            if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.PerformFail() == FailType.BlockFail))
+            {
+                return false;
+            }
+
+            if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.PerformFail() == FailType.ForceFail) || GameplayState.Mods.OfType<IApplicableFailOverride>().All(m => m.PerformFail() == FailType.AllowFail))
+            {
+                return true;
+            }
+
+            return false;
+        }
 
         public readonly PlayerConfiguration Configuration;
 

@@ -11,10 +11,12 @@ namespace osu.Game.Rulesets.Mods
     {
         private readonly Bindable<bool> showHealthBar = new Bindable<bool>();
 
+        public bool AllowFail { get; } = false;
+
         /// <summary>
         /// We never fail, 'yo.
         /// </summary>
-        public bool PerformFail() => false;
+        public FailType PerformFail() => FailType.BlockFail;
 
         public bool RestartOnFail => false;
 

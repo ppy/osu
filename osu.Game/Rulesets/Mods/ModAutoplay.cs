@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "Watch a perfect automated play through the song.";
         public override double ScoreMultiplier => 1;
 
-        public bool PerformFail() => false;
+        public FailType PerformFail() => FailType.BlockFail;
 
         public bool RestartOnFail => false;
 

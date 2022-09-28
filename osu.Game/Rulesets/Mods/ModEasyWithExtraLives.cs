@@ -30,14 +30,16 @@ namespace osu.Game.Rulesets.Mods
             retries = Retries.Value;
         }
 
-        public bool PerformFail()
+        public bool AllowFail { get; } = true;
+
+        public FailType PerformFail()
         {
-            if (retries == 0) return true;
+            if (retries == 0) return FailType.AllowFail;
 
             health.Value = health.MaxValue;
             retries--;
 
-            return false;
+            return FailType.BlockFail;
         }
 
         public bool RestartOnFail => false;

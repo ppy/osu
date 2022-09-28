@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Restart on fail", "Automatically restarts when failed.")]
         public BindableBool Restart { get; } = new BindableBool();
 
-        public virtual bool PerformFail() => true;
+        public virtual FailType PerformFail() => FailType.ForceFail;
 
         public virtual bool RestartOnFail => Restart.Value;
 

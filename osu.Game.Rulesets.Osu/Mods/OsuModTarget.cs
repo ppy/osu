@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         #region Sudden Death (IApplicableFailOverride)
 
-        public bool PerformFail() => true;
+        public FailType PerformFail() => FailType.ForceFail;
 
         public bool RestartOnFail => false;
 
