@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuSpinnerJudgementResult(HitObject, judgement);
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
         {
             if (Time.Current < HitObject.StartTime) return;
 
@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var tick in ticks.Where(t => !t.Result.HasResult))
                 tick.TriggerResult(false);
 
-            ApplyResult(r =>
+            onAction?.Invoke(r =>
             {
                 if (Progress >= 1)
                     r.Type = HitResult.Great;

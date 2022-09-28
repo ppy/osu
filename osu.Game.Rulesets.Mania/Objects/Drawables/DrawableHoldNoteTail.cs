@@ -3,9 +3,11 @@
 
 #nullable disable
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
@@ -42,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override double MaximumJudgementOffset => base.MaximumJudgementOffset * release_window_lenience;
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
         {
             Debug.Assert(HitObject.HitWindows != null);
 
@@ -52,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    onAction?.Invoke(r => r.Type = r.Judgement.MinResult);
 
                 return;
             }
@@ -61,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
-            ApplyResult(r =>
+            onAction?.Invoke(r =>
             {
                 // If the head wasn't hit or the hold note was broken, cap the max score to Meh.
                 if (result > HitResult.Meh && (!HoldNote.Head.IsHit || HoldNote.HoldBrokenTime != null))

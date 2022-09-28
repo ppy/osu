@@ -7,6 +7,7 @@ using System;
 using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
@@ -40,19 +41,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override double MaximumJudgementOffset => HitObject.HitWindow;
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
         {
             if (!userTriggered)
             {
                 if (timeOffset > HitObject.HitWindow)
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    onAction?.Invoke(r => r.Type = r.Judgement.MinResult);
                 return;
             }
 
             if (Math.Abs(timeOffset) > HitObject.HitWindow)
                 return;
 
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            onAction?.Invoke(r => r.Type = r.Judgement.MaxResult);
         }
 
         public override void OnKilled()
@@ -95,12 +96,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
             }
 
-            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
             {
                 if (!ParentHitObject.Judged)
                     return;
 
-                ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                onAction?.Invoke(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
             }
 
             public override void OnKilled()

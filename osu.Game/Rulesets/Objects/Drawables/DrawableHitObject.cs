@@ -710,7 +710,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="userTriggered">Whether the user triggered this check.</param>
         /// <param name="timeOffset">The offset from the end time of the <see cref="HitObject"/> at which this check occurred.
         /// A <paramref name="timeOffset"/> &gt; 0 implies that this check occurred after the end time of the <see cref="HitObject"/>. </param>
-        protected virtual void CheckForResult(bool userTriggered, double timeOffset)
+        /// <param name="onAction">The callback that updates the result and notifies responders as necessary.</param>
+        protected virtual void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
         {
         }
 

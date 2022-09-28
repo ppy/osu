@@ -3,11 +3,13 @@
 
 #nullable disable
 
+using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Skinning.Default;
@@ -118,10 +120,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
         {
             if (!userTriggered && timeOffset >= 0)
-                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                onAction?.Invoke(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         protected override void OnApply()

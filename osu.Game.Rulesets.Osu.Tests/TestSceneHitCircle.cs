@@ -3,11 +3,13 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -119,15 +121,15 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public void TriggerJudgement() => Schedule(() => UpdateResult(true));
 
-            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
             {
                 if (auto && !userTriggered && timeOffset > hitOffset && CheckHittable?.Invoke(this, Time.Current) != false)
                 {
                     // force success
-                    ApplyResult(r => r.Type = HitResult.Great);
+                    onAction?.Invoke(r => r.Type = HitResult.Great);
                 }
                 else
-                    base.CheckForResult(userTriggered, timeOffset);
+                    base.CheckForResult(userTriggered, timeOffset, ApplyResult);
             }
         }
 

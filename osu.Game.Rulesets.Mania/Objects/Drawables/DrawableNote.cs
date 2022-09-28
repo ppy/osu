@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,6 +12,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
@@ -82,14 +84,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             headPiece.Anchor = headPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
         {
             Debug.Assert(HitObject.HitWindows != null);
 
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    onAction?.Invoke(r => r.Type = r.Judgement.MinResult);
                 return;
             }
 
@@ -97,7 +99,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
-            ApplyResult(r => r.Type = result);
+            onAction?.Invoke(r => r.Type = result);
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<ManiaAction> e)

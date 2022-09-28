@@ -311,10 +311,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Position = new Vector2(RNG.Next(-200, 200), RNG.Next(-200, 200));
             }
 
-            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
             {
                 if (timeOffset > HitObject.Duration)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    onAction?.Invoke(r => r.Type = r.Judgement.MaxResult);
             }
 
             protected override void UpdateHitStateTransforms(ArmedState state)

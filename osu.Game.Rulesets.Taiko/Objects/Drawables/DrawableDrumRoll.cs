@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             updateColour(100);
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
         {
             if (userTriggered)
                 return;
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (timeOffset < 0)
                 return;
 
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            onAction?.Invoke(r => r.Type = r.Judgement.MaxResult);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -187,12 +187,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
             }
 
-            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
             {
                 if (!ParentHitObject.Judged)
                     return;
 
-                ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                onAction?.Invoke(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
             }
 
             public override void OnKilled()

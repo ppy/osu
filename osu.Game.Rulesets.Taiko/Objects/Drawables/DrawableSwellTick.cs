@@ -3,9 +3,11 @@
 
 #nullable disable
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
@@ -33,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
         {
         }
 

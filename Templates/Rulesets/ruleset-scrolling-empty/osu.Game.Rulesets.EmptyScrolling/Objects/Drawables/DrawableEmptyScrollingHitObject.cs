@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -20,11 +22,11 @@ namespace osu.Game.Rulesets.EmptyScrolling.Objects.Drawables
             // todo: add visuals.
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
         {
             if (timeOffset >= 0)
                 // todo: implement judgement logic
-                ApplyResult(r => r.Type = HitResult.Perfect);
+                onAction?.Invoke(r => r.Type = HitResult.Perfect);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)

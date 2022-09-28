@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -238,7 +239,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
         {
             if (Tail.AllJudged)
             {
@@ -248,7 +249,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         tick.MissForcefully();
                 }
 
-                ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                onAction?.Invoke(r => r.Type = r.Judgement.MaxResult);
                 endHold();
             }
 

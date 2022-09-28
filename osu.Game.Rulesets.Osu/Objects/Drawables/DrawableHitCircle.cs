@@ -136,14 +136,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override void Shake() => shakeContainer.Shake();
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset, Action<Action<JudgementResult>> onAction)
         {
             Debug.Assert(HitObject.HitWindows != null);
 
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    onAction?.Invoke(r => r.Type = r.Judgement.MinResult);
 
                 return;
             }
@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return;
             }
 
-            ApplyResult(r =>
+            onAction?.Invoke(r =>
             {
                 var circleResult = (OsuHitCircleJudgementResult)r;
 
