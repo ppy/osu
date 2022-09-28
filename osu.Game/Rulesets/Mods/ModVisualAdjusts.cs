@@ -48,8 +48,15 @@ namespace osu.Game.Rulesets.Mods
                 normalVisibilityVisualAdjustSetting.ApplyAdjusts(hitObject);
         }
 
+        /// <summary>
+        /// Represents an <see cref="BindableBool"/> which is used as a Visual Setting for <see cref="ModVisualAdjusts{TObject,TDrawableRuleset}"/>.
+        /// </summary>
+        /// <typeparam name="TArgs">The arguments used to call <see cref="ApplyAdjusts"/> and apply the visual adjusts of this setting.</typeparam>
         public abstract class VisualAdjustSetting<TArgs> : BindableBool
         {
+            /// <summary>
+            /// Applies the visual adjusts for this <see cref="VisualAdjustSetting{TArgs}"/>.
+            /// </summary>
             public readonly Action<TArgs> ApplyAdjusts;
 
             protected VisualAdjustSetting(Action<TArgs> applyAdjusts)
@@ -58,6 +65,10 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
+        /// <inheritdoc />
+        /// <summary>
+        /// Represents an <see cref="VisualAdjustSetting{TArgs}" /> which is triggered when <see cref="ModVisualAdjusts{TObject,TDrawableRuleset}.ApplyToDrawableRuleset" /> is called.
+        /// </summary>
         public class DrawableRulesetVisualAdjustSetting : VisualAdjustSetting<TDrawableRuleset>
         {
             public DrawableRulesetVisualAdjustSetting(Action<TDrawableRuleset> applyAdjusts)
@@ -66,8 +77,16 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
+        /// <inheritdoc />
+        /// <summary>
+        /// Represents an <see cref="VisualAdjustSetting{TArgs}" /> which is triggered when either <see cref="ModVisualAdjusts{TObject,TDrawableRuleset}.ApplyNormalVisibilityState" />
+        /// or <see cref="ApplyIncreasedVisibilityAdjusts" /> is called, passing down the given <see cref="DrawableHitObject" /> to apply adjusted visibility into.
+        /// </summary>
         public class HitObjectVisibilityVisualAdjustSetting : VisualAdjustSetting<DrawableHitObject>
         {
+            /// <summary>
+            /// Applies the increased visibility state for the current <see cref="DrawableHitObject"/>.
+            /// </summary>
             public readonly Action<DrawableHitObject> ApplyIncreasedVisibilityAdjusts;
 
             public HitObjectVisibilityVisualAdjustSetting(Action<DrawableHitObject> applyNormalVisibilityAdjusts, Action<DrawableHitObject> applyIncreasedVisibilityAdjusts)
