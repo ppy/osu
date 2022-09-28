@@ -22,29 +22,39 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "VA";
         public override ModType Type => ModType.Conversion;
 
-        private readonly IList<HitObjectVisibilityVisualAdjustSetting> hitObjectVisibilityVisualAdjustSettings = new List<HitObjectVisibilityVisualAdjustSetting>();
+        private readonly IList<BindableBool> activeVisualAdjustSettings = new List<BindableBool>();
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            var activeVisualAdjustSettings = this.GetOrderedSettingsSourceProperties().Select(entry => entry.Item2.GetValue(this)).OfType<BindableBool>().Where(bindable => bindable.Value).ToArray();
-
             var tDrawableRuleset = (TDrawableRuleset)drawableRuleset;
-            foreach (var drawableRulesetVisualAdjustSetting in activeVisualAdjustSettings.OfType<DrawableRulesetVisualAdjustSetting>())
-                drawableRulesetVisualAdjustSetting.ApplyAdjusts(tDrawableRuleset);
 
-            foreach (var hitObjectVisibilityVisualAdjustSetting in activeVisualAdjustSettings.OfType<HitObjectVisibilityVisualAdjustSetting>())
-                hitObjectVisibilityVisualAdjustSettings.Add(hitObjectVisibilityVisualAdjustSetting);
+            foreach (var (_, property) in this.GetOrderedSettingsSourceProperties())
+            {
+                if (property.GetValue(this) is BindableBool bindableBool && bindableBool.Value)
+                {
+                    switch (bindableBool)
+                    {
+                        case DrawableRulesetVisualAdjustSetting drawableRulesetVisualAdjustSetting:
+                            drawableRulesetVisualAdjustSetting.ApplyAdjusts(tDrawableRuleset);
+                            break;
+
+                        default:
+                            activeVisualAdjustSettings.Add(bindableBool);
+                            break;
+                    }
+                }
+            }
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            foreach (var hitObjectVisibilityVisualAdjustSetting in hitObjectVisibilityVisualAdjustSettings)
+            foreach (var hitObjectVisibilityVisualAdjustSetting in activeVisualAdjustSettings.OfType<HitObjectVisibilityVisualAdjustSetting>())
                 hitObjectVisibilityVisualAdjustSetting.ApplyIncreasedVisibilityAdjusts(hitObject);
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            foreach (var normalVisibilityVisualAdjustSetting in hitObjectVisibilityVisualAdjustSettings)
+            foreach (var normalVisibilityVisualAdjustSetting in activeVisualAdjustSettings.OfType<HitObjectVisibilityVisualAdjustSetting>())
                 normalVisibilityVisualAdjustSetting.ApplyAdjusts(hitObject);
         }
 
