@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
         private bool requiresScroll;
         private readonly OsuScrollContainer scroll;
 
-        private GameplayLeaderboardScore? trackedScore;
+        public GameplayLeaderboardScore? TrackedScore { get; private set; }
 
         private const int max_panels = 8;
 
@@ -78,10 +78,10 @@ namespace osu.Game.Screens.Play.HUD
 
             if (isTracked)
             {
-                if (trackedScore != null)
+                if (TrackedScore != null)
                     throw new InvalidOperationException("Cannot track more than one score.");
 
-                trackedScore = drawable;
+                TrackedScore = drawable;
             }
 
             drawable.Expanded.BindTo(Expanded);
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Play.HUD
         public void Clear()
         {
             Flow.Clear();
-            trackedScore = null;
+            TrackedScore = null;
             scroll.ScrollToStart(false);
         }
 
@@ -119,9 +119,10 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
-            if (requiresScroll && trackedScore != null)
+            if (requiresScroll && TrackedScore != null)
             {
-                float scrollTarget = scroll.GetChildPosInContent(trackedScore) + trackedScore.DrawHeight / 2 - scroll.DrawHeight / 2;
+                float scrollTarget = scroll.GetChildPosInContent(TrackedScore) + TrackedScore.DrawHeight / 2 - scroll.DrawHeight / 2;
+
                 scroll.ScrollTo(scrollTarget);
             }
 
