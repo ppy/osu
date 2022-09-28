@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mods
             health.Value = health.MaxValue;
             retries--;
 
-            return FailType.BlockFail;
+            return FailType.AvoidFail;
         }
 
         public bool RestartOnFail => false;

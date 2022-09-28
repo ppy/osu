@@ -22,8 +22,9 @@ namespace osu.Game.Rulesets.Mods
 
     public enum FailType
     {
-        ForceFail,
         BlockFail,
+        ForceFail,
+        AvoidFail,
         AllowFail
     }
 }
