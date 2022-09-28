@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 using osuTK;
@@ -17,7 +16,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
 
-        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
@@ -25,7 +23,6 @@ namespace osu.Game.Rulesets.Mania.Mods
             Precision = 0.1f
         };
 
-        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
         public override BindableBool ComboBasedSize { get; } = new BindableBool();
 
         public override float DefaultFlashlightSize => 50;
