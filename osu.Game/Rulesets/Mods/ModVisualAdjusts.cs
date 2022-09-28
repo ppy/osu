@@ -11,7 +11,8 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModVisualAdjusts<TObject, TDrawableRuleset> : Mod, IApplicableToDrawableRuleset<TObject>, IApplicableToDrawableHitObject where TObject : HitObject where TDrawableRuleset : DrawableRuleset<TObject>
+    public abstract class ModVisualAdjusts<TObject, TDrawableRuleset> : Mod, IApplicableToDrawableRuleset<TObject>, IApplicableToDrawableHitObject
+        where TObject : HitObject where TDrawableRuleset : DrawableRuleset<TObject>
     {
         public override string Name => "Visual Adjusts";
         public override LocalisableString Description => "Adjust some gameplay elements that can bring some visual challenge.";
@@ -19,23 +20,23 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "VA";
         public override ModType Type => ModType.Conversion;
 
-        private void triggerAdjustsForType<TBindable, TArgs>(TArgs args) where TBindable : VisualAdjustSetting<TArgs>
+        private void triggerAdjustsForType<TArgs>(TArgs args)
         {
             foreach (var (_, property) in this.GetOrderedSettingsSourceProperties())
             {
-                if (property.GetValue(this) is TBindable bindable && bindable.Value)
+                if (property.GetValue(this) is VisualAdjustSetting<TArgs> bindable && bindable.Value)
                     bindable.ApplyAdjusts(args);
             }
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            triggerAdjustsForType<DrawableRulesetVisualAdjustSetting, TDrawableRuleset>((TDrawableRuleset)drawableRuleset);
+            triggerAdjustsForType((TDrawableRuleset)drawableRuleset);
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            triggerAdjustsForType<DrawableHitObjectVisualAdjustSetting, DrawableHitObject<TObject>>((DrawableHitObject<TObject>)drawable);
+            triggerAdjustsForType((DrawableHitObject<TObject>)drawable);
         }
 
         public abstract class VisualAdjustSetting<TArgs> : BindableBool
