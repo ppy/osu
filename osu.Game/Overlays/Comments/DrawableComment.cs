@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Comments
         private DeletedCommentsCounter deletedCommentsCounter;
 
         [Resolved]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }

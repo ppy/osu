@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-        [Cached]
+        [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay = new DialogOverlay();
 
         [Cached]
@@ -137,49 +137,52 @@ namespace osu.Game.Tests.Visual.Online
 
         private void addTestComments()
         {
-            CommentBundle cb = new CommentBundle
+            AddStep("set up response", () =>
             {
-                Comments = new List<Comment>
+                CommentBundle cb = new CommentBundle
                 {
-                    new Comment
+                    Comments = new List<Comment>
                     {
-                        Id = 1,
-                        Message = "This is our comment",
-                        UserId = API.LocalUser.Value.Id,
-                        CreatedAt = DateTimeOffset.Now,
-                        User = API.LocalUser.Value,
-                    },
-                    new Comment
-                    {
-                        Id = 2,
-                        Message = "This is a comment by another user",
-                        UserId = API.LocalUser.Value.Id + 1,
-                        CreatedAt = DateTimeOffset.Now,
-                        User = new APIUser
+                        new Comment
                         {
-                            Id = API.LocalUser.Value.Id + 1,
-                            Username = "Another user"
-                        }
+                            Id = 1,
+                            Message = "This is our comment",
+                            UserId = API.LocalUser.Value.Id,
+                            CreatedAt = DateTimeOffset.Now,
+                            User = API.LocalUser.Value,
+                        },
+                        new Comment
+                        {
+                            Id = 2,
+                            Message = "This is a comment by another user",
+                            UserId = API.LocalUser.Value.Id + 1,
+                            CreatedAt = DateTimeOffset.Now,
+                            User = new APIUser
+                            {
+                                Id = API.LocalUser.Value.Id + 1,
+                                Username = "Another user"
+                            }
+                        },
                     },
-                },
-                IncludedComments = new List<Comment>(),
-                PinnedComments = new List<Comment>(),
-            };
-            setUpCommentsResponse(cb);
+                    IncludedComments = new List<Comment>(),
+                    PinnedComments = new List<Comment>(),
+                };
+                setUpCommentsResponse(cb);
+            });
+
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
         }
 
         private void setUpCommentsResponse(CommentBundle commentBundle)
-            => AddStep("set up response", () =>
+        {
+            dummyAPI.HandleRequest = request =>
             {
-                dummyAPI.HandleRequest = request =>
-                {
-                    if (!(request is GetCommentsRequest getCommentsRequest))
-                        return false;
+                if (!(request is GetCommentsRequest getCommentsRequest))
+                    return false;
 
-                    getCommentsRequest.TriggerSuccess(commentBundle);
-                    return true;
-                };
-            });
+                getCommentsRequest.TriggerSuccess(commentBundle);
+                return true;
+            };
+        }
     }
 }
