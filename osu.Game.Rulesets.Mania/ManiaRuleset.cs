@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +46,7 @@ namespace osu.Game.Rulesets.Mania
         /// </summary>
         public const int MAX_STAGE_KEYS = 10;
 
-        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableManiaRuleset(this, beatmap, mods);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableManiaRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
 
@@ -64,7 +62,16 @@ namespace osu.Game.Rulesets.Mania
 
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new ManiaLegacySkinTransformer(skin, beatmap);
+        public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)
+        {
+            switch (skin)
+            {
+                case LegacySkin:
+                    return new ManiaLegacySkinTransformer(skin, beatmap);
+            }
+
+            return null;
+        }
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
@@ -285,7 +292,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 
-        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new ManiaRulesetConfigManager(settings, RulesetInfo);
+        public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new ManiaRulesetConfigManager(settings, RulesetInfo);
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 

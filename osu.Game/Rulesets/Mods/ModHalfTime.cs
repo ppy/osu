@@ -18,12 +18,10 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "Less zoom...";
 
         [SettingSource("Speed decrease", "The actual decrease to apply")]
-        public override BindableNumber<double> SpeedChange { get; } = new BindableDouble
+        public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(0.75)
         {
             MinValue = 0.5,
             MaxValue = 0.99,
-            Default = 0.75,
-            Value = 0.75,
             Precision = 0.01,
         };
     }

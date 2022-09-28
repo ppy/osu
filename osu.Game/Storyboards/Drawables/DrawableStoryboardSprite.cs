@@ -55,11 +55,6 @@ namespace osu.Game.Storyboards.Drawables
             get => vectorScale;
             set
             {
-                if (Math.Abs(value.X) < Precision.FLOAT_EPSILON)
-                    value.X = Precision.FLOAT_EPSILON;
-                if (Math.Abs(value.Y) < Precision.FLOAT_EPSILON)
-                    value.Y = Precision.FLOAT_EPSILON;
-
                 if (vectorScale == value)
                     return;
 

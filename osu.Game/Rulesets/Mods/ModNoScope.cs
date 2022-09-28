@@ -6,7 +6,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -36,6 +38,11 @@ namespace osu.Game.Rulesets.Mods
 
         public BindableBool IsDisabled { get; } = new BindableBool();
 
+        [SettingSource(
+            "Hidden at combo",
+            "The combo count at which the cursor becomes completely hidden",
+            SettingControlType = typeof(SettingsSlider<int, HiddenComboSlider>)
+        )]
         public abstract BindableInt HiddenComboCount { get; }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;

@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Play
             {
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
+                Alpha = 0,
             };
         }
 

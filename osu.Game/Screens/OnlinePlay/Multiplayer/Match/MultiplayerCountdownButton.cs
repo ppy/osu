@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -79,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            bool countdownActive = multiplayerClient.Room?.Countdown is MatchStartCountdown;
+            bool countdownActive = multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true;
 
             if (countdownActive)
             {
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 });
             }
 
-            if (multiplayerClient.Room?.Countdown != null && multiplayerClient.IsHost)
+            if (multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true && multiplayerClient.IsHost)
             {
                 flow.Add(new OsuButton
                 {
