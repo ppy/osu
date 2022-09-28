@@ -129,6 +129,10 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Confirm dialog", () => InputManager.Key(Key.Number1));
             AddUntilStep("Deletion requested", () => delete);
+            AddUntilStep("Comment is deleted locally", () =>
+            {
+                return this.ChildrenOfType<DrawableComment>().SingleOrDefault(x => x.Comment.Id == 1) == null;
+            });
         }
 
         private void addTestComments()
