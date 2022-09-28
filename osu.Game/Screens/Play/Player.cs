@@ -142,17 +142,22 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual bool CheckModsAllowFailure()
         {
-            if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.PerformFail() == FailType.BlockFail))
+            // PerformFail only run once.
+            var modStatus = GameplayState.Mods.OfType<IApplicableFailOverride>().Select(mod => mod.PerformFail()).ToArray();
+
+            // do not fail if fail was blocked
+            if (modStatus.Any(m => m == FailType.BlockFail))
             {
                 return false;
             }
 
-            if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.PerformFail() == FailType.ForceFail) || GameplayState.Mods.OfType<IApplicableFailOverride>().All(m => m.PerformFail() == FailType.AllowFail))
+            // perform fail if force fail and all mod allow fail
+            if (modStatus.Any(m => m == FailType.ForceFail) || modStatus.All(m => m != FailType.AvoidFail))
             {
                 return true;
             }
 
-            return false;
+            return true;
         }
 
         public readonly PlayerConfiguration Configuration;
