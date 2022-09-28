@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
@@ -11,7 +13,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModVisualAdjusts<TObject, TDrawableRuleset> : Mod, IApplicableToDrawableRuleset<TObject>, IApplicableToDrawableHitObject
+    public abstract class ModVisualAdjusts<TObject, TDrawableRuleset> : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<TObject>
         where TObject : HitObject where TDrawableRuleset : DrawableRuleset<TObject>
     {
         public override string Name => "Visual Adjusts";
@@ -20,23 +22,30 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "VA";
         public override ModType Type => ModType.Conversion;
 
-        private void triggerAdjustsForType<TArgs>(TArgs args)
-        {
-            foreach (var (_, property) in this.GetOrderedSettingsSourceProperties())
-            {
-                if (property.GetValue(this) is VisualAdjustSetting<TArgs> bindable && bindable.Value)
-                    bindable.ApplyAdjusts(args);
-            }
-        }
+        private readonly IList<HitObjectVisibilityVisualAdjustSetting> hitObjectVisibilityVisualAdjustSettings = new List<HitObjectVisibilityVisualAdjustSetting>();
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            triggerAdjustsForType((TDrawableRuleset)drawableRuleset);
+            var activeVisualAdjustSettings = this.GetOrderedSettingsSourceProperties().Select(entry => entry.Item2.GetValue(this)).OfType<BindableBool>().Where(bindable => bindable.Value).ToArray();
+
+            var tDrawableRuleset = (TDrawableRuleset)drawableRuleset;
+            foreach (var drawableRulesetVisualAdjustSetting in activeVisualAdjustSettings.OfType<DrawableRulesetVisualAdjustSetting>())
+                drawableRulesetVisualAdjustSetting.ApplyAdjusts(tDrawableRuleset);
+
+            foreach (var hitObjectVisibilityVisualAdjustSetting in activeVisualAdjustSettings.OfType<HitObjectVisibilityVisualAdjustSetting>())
+                hitObjectVisibilityVisualAdjustSettings.Add(hitObjectVisibilityVisualAdjustSetting);
         }
 
-        public void ApplyToDrawableHitObject(DrawableHitObject drawable)
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            triggerAdjustsForType(drawable);
+            foreach (var hitObjectVisibilityVisualAdjustSetting in hitObjectVisibilityVisualAdjustSettings)
+                hitObjectVisibilityVisualAdjustSetting.ApplyIncreasedVisibilityAdjusts(hitObject);
+        }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+            foreach (var normalVisibilityVisualAdjustSetting in hitObjectVisibilityVisualAdjustSettings)
+                normalVisibilityVisualAdjustSetting.ApplyAdjusts(hitObject);
         }
 
         public abstract class VisualAdjustSetting<TArgs> : BindableBool
@@ -57,11 +66,14 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public class DrawableHitObjectVisualAdjustSetting : VisualAdjustSetting<DrawableHitObject>
+        public class HitObjectVisibilityVisualAdjustSetting : VisualAdjustSetting<DrawableHitObject>
         {
-            public DrawableHitObjectVisualAdjustSetting(Action<DrawableHitObject> applyAdjusts)
-                : base(applyAdjusts)
+            public readonly Action<DrawableHitObject> ApplyIncreasedVisibilityAdjusts;
+
+            public HitObjectVisibilityVisualAdjustSetting(Action<DrawableHitObject> applyNormalVisibilityAdjusts, Action<DrawableHitObject> applyIncreasedVisibilityAdjusts)
+                : base(applyNormalVisibilityAdjusts)
             {
+                ApplyIncreasedVisibilityAdjusts = applyIncreasedVisibilityAdjusts;
             }
         }
     }
