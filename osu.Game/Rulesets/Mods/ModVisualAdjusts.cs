@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            triggerAdjustsForType((DrawableHitObject<TObject>)drawable);
+            triggerAdjustsForType(drawable);
         }
 
         public abstract class VisualAdjustSetting<TArgs> : BindableBool
@@ -57,9 +57,9 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public class DrawableHitObjectVisualAdjustSetting : VisualAdjustSetting<DrawableHitObject<TObject>>
+        public class DrawableHitObjectVisualAdjustSetting : VisualAdjustSetting<DrawableHitObject>
         {
-            public DrawableHitObjectVisualAdjustSetting(Action<DrawableHitObject<TObject>> applyAdjusts)
+            public DrawableHitObjectVisualAdjustSetting(Action<DrawableHitObject> applyAdjusts)
                 : base(applyAdjusts)
             {
             }
