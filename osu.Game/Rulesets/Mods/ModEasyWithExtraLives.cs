@@ -30,8 +30,6 @@ namespace osu.Game.Rulesets.Mods
             retries = Retries.Value;
         }
 
-        public bool AllowFail { get; } = true;
-
         public FailType PerformFail()
         {
             if (retries == 0) return FailType.AllowFail;
