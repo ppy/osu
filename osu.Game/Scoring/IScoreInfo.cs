@@ -15,7 +15,7 @@ namespace osu.Game.Scoring
     {
         IUser User { get; }
 
-        long TotalScore { get; }
+        double TotalScore { get; }
 
         int MaxCombo { get; }
 

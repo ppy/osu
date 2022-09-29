@@ -31,7 +31,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool Passed { get; set; }
 
         [JsonProperty("total_score")]
-        public int TotalScore { get; set; }
+        public double TotalScore { get; set; }
 
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }

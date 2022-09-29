@@ -39,7 +39,7 @@ namespace osu.Game.Scoring
 
         public bool DeletePending { get; set; }
 
-        public long TotalScore { get; set; }
+        public double TotalScore { get; set; }
 
         public int MaxCombo { get; set; }
 

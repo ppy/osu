@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD
         public readonly IBindableList<ScoreInfo> Scores = new BindableList<ScoreInfo>();
 
         // hold references to ensure bindables are updated.
-        private readonly List<Bindable<long>> scoreBindables = new List<Bindable<long>>();
+        private readonly List<Bindable<double>> scoreBindables = new List<Bindable<double>>();
 
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;

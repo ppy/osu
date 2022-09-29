@@ -71,7 +71,7 @@ namespace osu.Game.Scoring
         /// </remarks>
         /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
         /// <returns>The bindable containing the total score.</returns>
-        public Bindable<long> GetBindableTotalScore([NotNull] ScoreInfo score) => new TotalScoreBindable(score, this, configManager);
+        public Bindable<double> GetBindableTotalScore([NotNull] ScoreInfo score) => new TotalScoreBindable(score, this, configManager);
 
         /// <summary>
         /// Retrieves a bindable that represents the formatted total score string of a <see cref="ScoreInfo"/>.
@@ -89,7 +89,7 @@ namespace osu.Game.Scoring
         /// <param name="score">The <see cref="ScoreInfo"/> to calculate the total score of.</param>
         /// <param name="mode">The <see cref="ScoringMode"/> to return the total score as.</param>
         /// <returns>The total score.</returns>
-        public long GetTotalScore([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised)
+        public double GetTotalScore([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised)
         {
             // TODO: This is required for playlist aggregate scores. They should likely not be getting here in the first place.
             if (string.IsNullOrEmpty(score.BeatmapInfo.MD5Hash))
@@ -112,7 +112,7 @@ namespace osu.Game.Scoring
         /// <summary>
         /// Provides the total score of a <see cref="ScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
         /// </summary>
-        private class TotalScoreBindable : Bindable<long>
+        private class TotalScoreBindable : Bindable<double>
         {
             private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
 
@@ -135,9 +135,9 @@ namespace osu.Game.Scoring
         private class TotalScoreStringBindable : Bindable<string>
         {
             // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (need to hold a reference)
-            private readonly IBindable<long> totalScore;
+            private readonly IBindable<double> totalScore;
 
-            public TotalScoreStringBindable(IBindable<long> totalScore)
+            public TotalScoreStringBindable(IBindable<double> totalScore)
             {
                 this.totalScore = totalScore;
                 this.totalScore.BindValueChanged(v => Value = v.NewValue.ToString("N0"), true);

@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Ranking
 
             var score = trackingContainer.Panel.Score;
 
-            flow.SetLayoutPosition(trackingContainer, scoreManager.GetTotalScore(score));
+            flow.SetLayoutPosition(trackingContainer, (float)scoreManager.GetTotalScore(score));
 
             trackingContainer.Show();
 

@@ -262,7 +262,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                 using (BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DELAY))
                 {
                     scoreCounter.FadeIn();
-                    scoreCounter.Current = scoreManager.GetBindableTotalScore(score);
+                    scoreCounter.Current.Value = (long)Math.Round(scoreManager.GetBindableTotalScore(score).Value);
 
                     double delay = 0;
 
