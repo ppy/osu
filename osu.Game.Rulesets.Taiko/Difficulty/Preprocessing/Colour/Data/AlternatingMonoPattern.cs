@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
 {
@@ -30,6 +31,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// The first <see cref="TaikoDifficultyHitObject"/> in this <see cref="AlternatingMonoPattern"/>.
         /// </summary>
         public TaikoDifficultyHitObject FirstHitObject => MonoStreaks[0].FirstHitObject;
+
+        /// <summary>
+        /// All <see cref="TaikoDifficultyHitObject"/>s in this <see cref="AlternatingMonoPattern"/>.
+        /// </summary>
+        public IEnumerable<TaikoDifficultyHitObject> AllHitObjects => MonoStreaks.SelectMany(streak => streak.HitObjects);
 
         /// <summary>
         /// Determine if this <see cref="AlternatingMonoPattern"/> is a repetition of another <see cref="AlternatingMonoPattern"/>. This

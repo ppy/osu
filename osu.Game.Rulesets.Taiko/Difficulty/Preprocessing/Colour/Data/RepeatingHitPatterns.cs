@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
@@ -23,9 +24,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         public readonly List<AlternatingMonoPattern> AlternatingMonoPatterns = new List<AlternatingMonoPattern>();
 
         /// <summary>
-        /// The parent <see cref="TaikoDifficultyHitObject"/> in this <see cref="RepeatingHitPatterns"/>
+        /// The first <see cref="TaikoDifficultyHitObject"/> in this <see cref="RepeatingHitPatterns"/>
         /// </summary>
         public TaikoDifficultyHitObject FirstHitObject => AlternatingMonoPatterns[0].FirstHitObject;
+
+        /// <summary>
+        /// All <see cref="TaikoDifficultyHitObject"/>s in this <see cref="RepeatingHitPatterns"/>.
+        /// </summary>
+        public IEnumerable<TaikoDifficultyHitObject> AllHitObjects => AlternatingMonoPatterns.SelectMany(pattern => pattern.AllHitObjects);
 
         /// <summary>
         /// The previous <see cref="RepeatingHitPatterns"/>. This is used to determine the repetition interval.
