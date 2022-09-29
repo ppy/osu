@@ -24,8 +24,10 @@ namespace osu.Game.Tests.Visual.Mods
 
         protected override TestPlayer CreateModPlayer(Ruleset ruleset)
         {
-            var player = base.CreateModPlayer(ruleset);
-            player.RestartRequested = _ => restartRequested = true;
+            var player = new TestPlayer
+            {
+                RestartRequested = _ => restartRequested = true
+            };
             return player;
         }
 
@@ -63,5 +65,22 @@ namespace osu.Game.Tests.Visual.Mods
             Mods = new Mod[] { new OsuModSuddenDeath(), new OsuModEasy() },
             PassCondition = () => Player.GameplayState.HasFailed && Player.Results.Count(m => m.Type == HitResult.Miss) == 1
         });
+
+        [Test]
+        public void TestFailedOnEZNFenabled()
+        {
+            CreateModTest(new ModTestData
+            {
+                Autoplay = false,
+                Mods = new Mod[]
+                {
+                    new OsuModNoFail(), new OsuModEasy
+                    {
+                        Retries = { Value = 0 }
+                    }
+                },
+                PassCondition = () => !Player.GameplayState.HasFailed && Player.Results.Count(m => m.Type == HitResult.Miss) == 10
+            });
+        }
     }
 }
