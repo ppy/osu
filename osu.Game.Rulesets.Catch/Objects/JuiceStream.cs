@@ -70,7 +70,8 @@ namespace osu.Game.Rulesets.Catch.Objects
                 // generate tiny droplets since the last point
                 if (lastEvent != null)
                 {
-                    double sinceLastTick = e.Time - lastEvent.Value.Time;
+                    // int truncation is used here intentionally to match stable's generation logic generation.
+                    int sinceLastTick = (int)(e.Time - lastEvent.Value.Time);
 
                     if (sinceLastTick > 80)
                     {
