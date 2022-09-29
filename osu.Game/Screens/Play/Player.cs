@@ -157,7 +157,7 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            return true;
+            return false;
         }
 
         public readonly PlayerConfiguration Configuration;
