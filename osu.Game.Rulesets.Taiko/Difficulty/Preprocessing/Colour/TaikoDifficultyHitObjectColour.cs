@@ -24,5 +24,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// The <see cref="RepeatingHitPattern"/> that encodes this note.
         /// </summary>
         public RepeatingHitPatterns? RepeatingHitPattern;
+
+        /// <summary>
+        /// The closest past <see cref="TaikoDifficultyHitObject"/> that's not the same colour.
+        /// </summary>
+        public TaikoDifficultyHitObject? PreviousColourChange => MonoStreak?.FirstHitObject.PreviousNote(0);
+
+        /// <summary>
+        /// The closest future <see cref="TaikoDifficultyHitObject"/> that's not the same colour.
+        /// </summary>
+        public TaikoDifficultyHitObject? NextColourChange => MonoStreak?.LastHitObject.NextNote(0);
     }
 }
