@@ -25,6 +25,29 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         /// <summary>
+        /// Determines the number of fingers available to hit the current <see cref="TaikoDifficultyHitObject"/>.
+        /// Any mono notes that is more than 0.5s apart from note of the other colour will be considered to have more
+        /// than 2 fingers available, since players can move their hand over to hit the same key with multiple fingers.
+        /// </summary>
+        private static int availableFingersFor(TaikoDifficultyHitObject hitObject)
+        {
+            DifficultyHitObject? previousColourChange = hitObject.Colour.MonoStreak?.FirstHitObject.Previous(0);
+            DifficultyHitObject? nextColourChange = hitObject.Colour.MonoStreak?.LastHitObject.Next(0);
+
+            if (previousColourChange != null && hitObject.StartTime - previousColourChange.StartTime < 300)
+            {
+                return 2;
+            }
+
+            if (nextColourChange != null && nextColourChange.StartTime - hitObject.StartTime < 300)
+            {
+                return 2;
+            }
+
+            return 5;
+        }
+
+        /// <summary>
         /// Evaluates the minimum mechanical stamina required to play the current object. This is calculated using the
         /// maximum possible interval between two hits using the same key, by alternating 2 keys for each colour.
         /// </summary>
@@ -37,7 +60,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             // Find the previous hit object hit by the current key, which is two notes of the same colour prior.
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
-            TaikoDifficultyHitObject? keyPrevious = taikoCurrent.PreviousMono(1);
+            TaikoDifficultyHitObject? keyPrevious = taikoCurrent.PreviousMono(availableFingersFor(taikoCurrent) - 1);
 
             if (keyPrevious == null)
             {
