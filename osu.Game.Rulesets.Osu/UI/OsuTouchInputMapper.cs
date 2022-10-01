@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </remarks>
         /// </summary>
         /// <param name="source">The <see cref="TouchSource"/> to check.</param>
-        /// <returns>Whether the given <see cref="source"/> is a tap touch.</returns>
+        /// <returns>Whether the given source is a tap touch.</returns>
         public bool IsTapTouch(TouchSource source) => source != DEFAULT_CURSOR_TOUCH || !osuInputManager.AllowUserCursorMovement;
 
         /// <summary>
