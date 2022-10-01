@@ -47,6 +47,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
+            if (mods.Any(m => m is OsuModTouchDevice))
+            {
+                aimRating = Math.Pow(aimRating, 0.8);
+                flashlightRating = Math.Pow(flashlightRating, 0.8);
+            }
+
             if (mods.Any(h => h is OsuModRelax))
             {
                 aimRating *= 0.9;
@@ -81,6 +87,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
+
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+
+            double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
 
             return new OsuDifficultyAttributes
             {
