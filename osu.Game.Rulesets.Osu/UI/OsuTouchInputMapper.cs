@@ -97,24 +97,20 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             var source = e.Touch.Source;
 
-            if (!AcceptingTouchInputs)
-                return base.OnTouchDown(e);
+            if (!AcceptingTouchInputs || IsCursorTouch(source)) return base.OnTouchDown(e);
 
-            if (IsTapTouch(source))
+            if (BlockCursorActionOnNextTap)
             {
-                if (BlockCursorActionOnNextTap)
-                {
-                    if (!JustBlockedCursorActions)
-                        JustBlockedCursorActions = osuInputManager.BlockTouchCursorAction();
-                }
-                else
-                {
-                    JustBlockedCursorActions = false;
-                }
-
-                activeTapTouches.Add(source);
-                keyBindingContainer.TriggerPressed(tapActionsMap[source]);
+                if (!JustBlockedCursorActions)
+                    JustBlockedCursorActions = osuInputManager.BlockTouchCursorAction();
             }
+            else
+            {
+                JustBlockedCursorActions = false;
+            }
+
+            activeTapTouches.Add(source);
+            keyBindingContainer.TriggerPressed(tapActionsMap[source]);
 
             return base.OnTouchDown(e);
         }
