@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModHardRock))
                 difficultyValue *= 1.050;
 
-            if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && readingBonusEnabled)
+            if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= 1.050 * lengthBonus;
 
             return difficultyValue * Math.Pow(score.Accuracy, 2.0);
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
             accuracyValue *= lengthBonus;
 
-            // Slight HDFL Bonus for accuracy. A clamp is used to prevent against negative values. 
+            // Slight HDFL Bonus for accuracy. A clamp is used to prevent against negative values.
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden) && readingBonusEnabled)
                 accuracyValue *= Math.Max(1.050, 1.075 * lengthBonus);
 
