@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void expectTapTouchesAmount(int expect) => AddAssert($"Has {expect} tap touches active", () => touchInputMapper.ActiveTapTouchesCount == expect);
 
-        private void assertAllowingTouchInput() => AddAssert("Allowing other touch input", () => touchInputMapper.AllowingOtherTouch);
+        private void assertAllowingTouchInput() => AddAssert("Allowing other touch input", () => touchInputMapper.AcceptingTouchInputs);
 
         private void addTouchWithFingerStep(TouchSource source) => AddStep($"Touch with {getTouchString(source)} finger", () => touch(source));
 
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             assertAcceptedOnlyThreeSequentialInputs();
             AddAssert("Tap only key mapping", () => touchInputMapper.BlockCursorAction && touchInputMapper.JustBlockedCursorActions);
-            AddAssert("Touch input is blocked", () => !touchInputMapper.AllowingOtherTouch);
+            AddAssert("Touch input is blocked", () => !touchInputMapper.AcceptingTouchInputs);
         }
 
         [Test]
