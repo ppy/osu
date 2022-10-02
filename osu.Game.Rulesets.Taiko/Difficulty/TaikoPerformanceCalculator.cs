@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 effectiveMissCount = Math.Max(1.0, 1000.0 / totalSuccessfulHits) * countMiss;
 
             // We are disabling some HD and/or FL Bonus for converts for now due to them having low pattern difficulty, and thus being easy to memorize.
-            bool readingBonusEnabled = score.BeatmapInfo.Ruleset.OnlineID == 1;
+            bool rulesetTaiko = score.BeatmapInfo.Ruleset.OnlineID == 1;
 
             double multiplier = 1.13;
 
@@ -52,8 +52,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModEasy))
                 multiplier *= 0.975;
 
-            double difficultyValue = computeDifficultyValue(score, taikoAttributes, readingBonusEnabled);
-            double accuracyValue = computeAccuracyValue(score, taikoAttributes, readingBonusEnabled);
+            double difficultyValue = computeDifficultyValue(score, taikoAttributes, rulesetTaiko);
+            double accuracyValue = computeAccuracyValue(score, taikoAttributes, rulesetTaiko);
             double totalValue =
                 Math.Pow(
                     Math.Pow(difficultyValue, 1.1) +
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             };
         }
 
-        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool readingBonusEnabled)
+        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool rulesetTaiko)
         {
             double difficultyValue = Math.Pow(5 * Math.Max(1.0, attributes.StarRating / 0.115) - 4.0, 2.25) / 1150.0;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModEasy))
                 difficultyValue *= 0.985;
 
-            if (score.Mods.Any(m => m is ModHidden) && readingBonusEnabled)
+            if (score.Mods.Any(m => m is ModHidden) && rulesetTaiko)
                 difficultyValue *= 1.025;
 
             if (score.Mods.Any(m => m is ModHardRock))
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return difficultyValue * Math.Pow(score.Accuracy, 2.0);
         }
 
-        private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool readingBonusEnabled)
+        private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool rulesetTaiko)
         {
             if (attributes.GreatHitWindow <= 0)
                 return 0;
@@ -104,8 +104,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             accuracyValue *= lengthBonus;
 
             // Slight HDFL Bonus for accuracy. A clamp is used to prevent against negative values.
-            if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden) && readingBonusEnabled)
-                accuracyValue *= Math.Max(1.050, 1.075 * lengthBonus);
+            if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden) && rulesetTaiko)
+                accuracyValue *= Math.Max(1.0, 1.1 * lengthBonus);
 
             return accuracyValue;
         }
