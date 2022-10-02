@@ -88,7 +88,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
-            HitWindows hitWindows = new OsuHitWindows();
+            HitWindows hitWindows;
+
+            if (mods.Any(m => m is OsuModPrecise))
+                hitWindows = new OsuPreciseHitWindows();
+            else
+                hitWindows = new OsuHitWindows();
+
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
