@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public Tap(Mod[] mods, double hitWindowGreat)
             : base(mods)
         {
+            greatWindow = hitWindowGreat;
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -44,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
             currentStrain += TapEvaluator.EvaluateDifficultyOf(current, greatWindow) * skillMultiplier;
 
-            currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+            currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current, greatWindow);
 
             double totalStrain = currentStrain * currentRhythm;
 

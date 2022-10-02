@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>and how easily they can be cheesed.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, double greatWindow)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.IsOverlapping(false))
                 return 0;
 
+            double greatWindowFull = greatWindow * 2;
             double strainTime = osuCurrObj.StrainTime;
             double doubletapness = 1;
 
