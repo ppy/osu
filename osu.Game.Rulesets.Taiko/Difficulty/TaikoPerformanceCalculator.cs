@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (totalSuccessfulHits > 0)
                 effectiveMissCount = Math.Max(1.0, 1000.0 / totalSuccessfulHits) * countMiss;
 
-            // We are disabling some HD and/or FL Bonus for converts for now due to them having low pattern difficulty, and thus being easy to memorize.
+            // TODO: The detection of rulesets is temporary until the leftover old skills have been reworked.
             bool rulesetTaiko = score.BeatmapInfo.Ruleset.OnlineID == 1;
 
             double multiplier = 1.13;
