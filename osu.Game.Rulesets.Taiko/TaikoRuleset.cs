@@ -162,6 +162,7 @@ namespace osu.Game.Rulesets.Taiko
                     return new Mod[]
                     {
                         new MultiMod(new ModWindUp(), new ModWindDown()),
+                        new ModPitchShift(),
                         new TaikoModMuted(),
                         new ModAdaptiveSpeed()
                     };
