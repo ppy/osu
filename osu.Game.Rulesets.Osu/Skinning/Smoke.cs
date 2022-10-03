@@ -40,7 +40,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         protected double SmokeEndTime { get; private set; } = double.MaxValue;
 
         protected virtual float PointInterval => Radius * 7f / 8;
-        protected bool IsActive { get; private set; }
 
         protected readonly List<SmokePoint> SmokePoints = new List<SmokePoint>();
 
@@ -73,7 +72,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
             {
                 smokeContainer.SmokeMoved += onSmokeMoved;
                 smokeContainer.SmokeEnded += onSmokeEnded;
-                IsActive = true;
 
                 onSmokeMoved(smokeContainer.LastMousePosition, Time.Current);
             }
@@ -87,9 +85,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void onSmokeMoved(Vector2 position, double time)
         {
-            if (!IsActive)
-                return;
-
             lastPosition ??= position;
 
             float delta = (position - (Vector2)lastPosition).LengthFast;
@@ -137,10 +132,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void onSmokeEnded(double time)
         {
-            if (!IsActive)
-                return;
+            if (smokeContainer != null)
+            {
+                smokeContainer.SmokeMoved -= onSmokeMoved;
+                smokeContainer.SmokeEnded -= onSmokeEnded;
+            }
 
-            IsActive = false;
             SmokeEndTime = time;
         }
 
