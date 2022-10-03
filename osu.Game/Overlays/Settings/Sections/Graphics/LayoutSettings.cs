@@ -202,19 +202,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             // initial update bypasses transforms
             updateScalingModeVisibility();
 
-            void updateDisplayModeDropdowns()
-            {
-                if (resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen)
-                    resolutionDropdown.Show();
-                else
-                    resolutionDropdown.Hide();
-
-                if (displayDropdown.Items.Count() > 1)
-                    displayDropdown.Show();
-                else
-                    displayDropdown.Hide();
-            }
-
             void updateScalingModeVisibility()
             {
                 if (scalingMode.Value == ScalingMode.Off)
@@ -223,6 +210,19 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
                 scalingSettings.ForEach(s => s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything);
             }
+        }
+
+        private void updateDisplayModeDropdowns()
+        {
+            if (resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen)
+                resolutionDropdown.Show();
+            else
+                resolutionDropdown.Hide();
+
+            if (displayDropdown.Items.Count() > 1)
+                displayDropdown.Show();
+            else
+                displayDropdown.Hide();
         }
 
         private void updateScreenModeWarning()
