@@ -11,9 +11,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
     public class StaminaEvaluator
     {
         /// <summary>
-        /// Applies a speed bonus dependent on the time since the last hit performed using this key.
+        /// Applies a speed bonus dependent on the time since the last hit performed using this finger.
         /// </summary>
-        /// <param name="interval">The interval between the current and previous note hit using the same key.</param>
+        /// <param name="interval">The interval between the current and previous note hit using the same finger.</param>
         private static double speedBonus(double interval)
         {
             // Interval is capped at a very small value to prevent infinite values.
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
         /// <summary>
         /// Evaluates the minimum mechanical stamina required to play the current object. This is calculated using the
-        /// maximum possible interval between two hits using the same key, by alternating 2 keys for each colour.
+        /// maximum possible interval between two hits using the same key, by alternating available fingers for each colour.
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
@@ -56,13 +56,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 return 0.0;
             }
 
-            // Find the previous hit object hit by the current key, which is two notes of the same colour prior.
+            // Find the previous hit object hit by the current finger, which is n notes prior, n being the number of
+            // available fingers.
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
             TaikoDifficultyHitObject? keyPrevious = taikoCurrent.PreviousMono(availableFingersFor(taikoCurrent) - 1);
 
             if (keyPrevious == null)
             {
-                // There is no previous hit object hit by the current key
+                // There is no previous hit object hit by the current finger
                 return 0.0;
             }
 
