@@ -151,9 +151,9 @@ namespace osu.Game.Rulesets.Mods
                 if (comboBasedSize)
                 {
                     if (combo >= 200)
-                        size *= 0.8f;
+                        size *= 0.625f;
                     else if (combo >= 100)
-                        size *= 0.9f;
+                        size *= 0.8125f;
                 }
 
                 return size;
