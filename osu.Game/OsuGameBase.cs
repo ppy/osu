@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -124,6 +125,8 @@ namespace osu.Game
 
         protected SessionStatics SessionStatics { get; private set; }
 
+        protected OsuColour Colours { get; private set; }
+
         protected BeatmapManager BeatmapManager { get; private set; }
 
         protected BeatmapModelDownloader BeatmapDownloader { get; private set; }
@@ -179,7 +182,7 @@ namespace osu.Game
 
         private SpectatorClient spectatorClient;
 
-        private MultiplayerClient multiplayerClient;
+        protected MultiplayerClient MultiplayerClient { get; private set; }
 
         private MetadataClient metadataClient;
 
@@ -255,6 +258,8 @@ namespace osu.Game
 
             InitialiseFonts();
 
+            addFilesWarning();
+
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
             dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
@@ -284,7 +289,7 @@ namespace osu.Game
             // TODO: OsuGame or OsuGameBase?
             dependencies.CacheAs(beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage));
             dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
-            dependencies.CacheAs(multiplayerClient = new OnlineMultiplayerClient(endpoints));
+            dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
 
             AddInternal(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
@@ -308,7 +313,7 @@ namespace osu.Game
                 dependencies.CacheAs(powerStatus);
 
             dependencies.Cache(SessionStatics = new SessionStatics());
-            dependencies.Cache(new OsuColour());
+            dependencies.Cache(Colours = new OsuColour());
 
             RegisterImportHandler(BeatmapManager);
             RegisterImportHandler(ScoreManager);
@@ -329,7 +334,7 @@ namespace osu.Game
                 AddInternal(apiAccess);
 
             AddInternal(spectatorClient);
-            AddInternal(multiplayerClient);
+            AddInternal(MultiplayerClient);
             AddInternal(metadataClient);
 
             AddInternal(rulesetConfigCache);
@@ -371,6 +376,29 @@ namespace osu.Game
 
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
+        }
+
+        private void addFilesWarning()
+        {
+            var realmStore = new RealmFileStore(realm, Storage);
+
+            const string filename = "IMPORTANT READ ME.txt";
+
+            if (!realmStore.Storage.Exists(filename))
+            {
+                using (var stream = realmStore.Storage.CreateFileSafely(filename))
+                using (var textWriter = new StreamWriter(stream))
+                {
+                    textWriter.WriteLine(@"This folder contains all your user files (beatmaps, skins, replays etc.)");
+                    textWriter.WriteLine(@"Please do not touch or delete this folder!!");
+                    textWriter.WriteLine();
+                    textWriter.WriteLine(@"If you are really looking to completely delete user data, please delete");
+                    textWriter.WriteLine(@"the parent folder including all other files and directories");
+                    textWriter.WriteLine();
+                    textWriter.WriteLine(@"For more information on how these files are organised,");
+                    textWriter.WriteLine(@"see https://github.com/ppy/osu/wiki/User-file-storage");
+                }
+            }
         }
 
         private void onTrackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction)

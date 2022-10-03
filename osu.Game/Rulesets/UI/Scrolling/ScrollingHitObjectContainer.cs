@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -214,7 +215,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     break;
             }
 
-            return scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, originAdjustment, timeRange.Value, scrollLength);
+            double computedStartTime = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, originAdjustment, timeRange.Value, scrollLength);
+
+            // always load the hitobject before its first judgement offset
+            return Math.Min(hitObject.HitObject.StartTime - hitObject.MaximumJudgementOffset, computedStartTime);
         }
 
         private void updateLayoutRecursive(DrawableHitObject hitObject)

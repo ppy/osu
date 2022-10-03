@@ -39,10 +39,8 @@ namespace osu.Game.Rulesets.Mods
         private double finalRateTime;
         private double beginRampTime;
 
-        public BindableNumber<double> SpeedChange { get; } = new BindableDouble
+        public BindableNumber<double> SpeedChange { get; } = new BindableDouble(1)
         {
-            Default = 1,
-            Value = 1,
             Precision = 0.01,
         };
 

@@ -6,8 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Utils;
-using osu.Game.Configuration;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.UI;
 
@@ -17,15 +15,8 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override LocalisableString Description => "Where's the catcher?";
 
-        [SettingSource(
-            "Hidden at combo",
-            "The combo count at which the catcher becomes completely hidden",
-            SettingControlType = typeof(SettingsSlider<int, HiddenComboSlider>)
-        )]
-        public override BindableInt HiddenComboCount { get; } = new BindableInt
+        public override BindableInt HiddenComboCount { get; } = new BindableInt(10)
         {
-            Default = 10,
-            Value = 10,
             MinValue = 0,
             MaxValue = 50,
         };
