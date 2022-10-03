@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddSliderStep("score", 0, 1000000, 500000, v => scoreProcessor.TotalScore.Value = v);
             AddSliderStep("accuracy", 0f, 1f, 0.5f, v => scoreProcessor.Accuracy.Value = v);
-            AddSliderStep("combo", 0, 1000, 0, v => scoreProcessor.Combo.Value = v);
+            AddSliderStep("combo", 0, 1000, 0, v => scoreProcessor.HighestCombo.Value = v);
         }
 
         [Test]
