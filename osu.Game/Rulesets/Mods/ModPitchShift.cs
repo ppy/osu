@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "Adjust the pitch of the song!";
         public override double ScoreMultiplier => 1;
 
+        public override bool RequiresConfiguration => true;
+
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
