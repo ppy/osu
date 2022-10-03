@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -38,8 +39,6 @@ namespace osu.Game.Screens.Play.HUD
         private const float panel_shear = 0.15f;
 
         private const float rank_text_width = 35f;
-
-        private const float score_components_width = 85f;
 
         private const float avatar_size = 25f;
 
@@ -161,7 +160,7 @@ namespace osu.Game.Screens.Play.HUD
                             {
                                 new Dimension(GridSizeMode.Absolute, rank_text_width),
                                 new Dimension(),
-                                new Dimension(GridSizeMode.AutoSize, maxSize: score_components_width),
+                                new Dimension(GridSizeMode.AutoSize),
                             },
                             Content = new[]
                             {
@@ -286,8 +285,19 @@ namespace osu.Game.Screens.Play.HUD
             LoadComponentAsync(new DrawableAvatar(User), avatarContainer.Add);
 
             TotalScore.BindValueChanged(v => scoreText.Text = v.NewValue.ToString("N0"), true);
-            Accuracy.BindValueChanged(v => accuracyText.Text = v.NewValue.FormatAccuracy(), true);
-            Combo.BindValueChanged(v => comboText.Text = $"{v.NewValue}x", true);
+
+            Accuracy.BindValueChanged(v =>
+            {
+                accuracyText.Text = v.NewValue.FormatAccuracy();
+                updateDetailsWidth();
+            }, true);
+
+            Combo.BindValueChanged(v =>
+            {
+                comboText.Text = $"{v.NewValue}x";
+                updateDetailsWidth();
+            }, true);
+
             HasQuit.BindValueChanged(_ => updateState());
         }
 
@@ -303,13 +313,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private void changeExpandedState(ValueChangedEvent<bool> expanded)
         {
-            scoreComponents.ClearTransforms();
-
             if (expanded.NewValue)
             {
                 gridContainer.ResizeWidthTo(regular_width, panel_transition_duration, Easing.OutQuint);
 
-                scoreComponents.ResizeWidthTo(score_components_width, panel_transition_duration, Easing.OutQuint);
                 scoreComponents.FadeIn(panel_transition_duration, Easing.OutQuint);
 
                 usernameText.FadeIn(panel_transition_duration, Easing.OutQuint);
@@ -318,12 +325,31 @@ namespace osu.Game.Screens.Play.HUD
             {
                 gridContainer.ResizeWidthTo(compact_width, panel_transition_duration, Easing.OutQuint);
 
-                scoreComponents.ResizeWidthTo(0, panel_transition_duration, Easing.OutQuint);
                 scoreComponents.FadeOut(text_transition_duration, Easing.OutQuint);
 
                 usernameText.FadeOut(text_transition_duration, Easing.OutQuint);
             }
+
+            updateDetailsWidth();
         }
+
+        private float? scoreComponentsTargetWidth;
+
+        // Schedule required to get correct DrawWidth from text after updates.
+        private void updateDetailsWidth() => SchedulerAfterChildren.AddOnce(() =>
+        {
+            const float score_components_min_width = 88f;
+
+            float newWidth = Expanded.Value
+                ? Math.Max(score_components_min_width, comboText.DrawWidth + accuracyText.DrawWidth + 25)
+                : 0;
+
+            if (scoreComponentsTargetWidth == newWidth)
+                return;
+
+            scoreComponentsTargetWidth = newWidth;
+            scoreComponents.ResizeWidthTo(newWidth, panel_transition_duration, Easing.OutQuint);
+        });
 
         private void updateState()
         {
