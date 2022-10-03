@@ -76,6 +76,7 @@ namespace osu.Game.Screens.Play
 
             req.Success += r =>
             {
+                Logger.Log($"Score submission token retrieved ({r.ID})");
                 token = r.ID;
                 tcs.SetResult(true);
             };
@@ -103,6 +104,12 @@ namespace osu.Game.Screens.Play
                         ValidForResume = false;
                         this.Exit();
                     });
+                }
+                else
+                {
+                    // Gameplay is allowed to continue, but we still should keep track of the error.
+                    // In the future, this should be visible to the user in some way.
+                    Logger.Log($"Score submission token retrieval failed ({exception.Message})");
                 }
 
                 tcs.SetResult(false);
