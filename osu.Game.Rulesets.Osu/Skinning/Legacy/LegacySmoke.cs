@@ -67,6 +67,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             protected new LegacySmoke Source => (LegacySmoke)base.Source;
 
             private double initialFadeOutDurationTrunc;
+            private double firstVisiblePointTime;
+
             private double initialFadeOutTime;
             private double reFadeInTime;
             private double finalFadeOutTime;
@@ -83,20 +85,22 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
                 base.ApplyState();
 
-                initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
                 rotationSeed = Source.RotationSeed;
-
                 rotationRNG = new Random(rotationSeed);
-                initialFadeOutTime = Math.Min(CurrentTime, SmokeEndTime);
-                reFadeInTime = re_fade_in_speed * (CurrentTime - SmokeEndTime) + SmokeEndTime - initialFadeOutDurationTrunc;
-                finalFadeOutTime = final_fade_out_speed * (CurrentTime - SmokeEndTime) + SmokeEndTime - initialFadeOutDurationTrunc * (1 + 1 / re_fade_in_speed);
+
+                initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
+                firstVisiblePointTime = SmokeEndTime - initialFadeOutDurationTrunc;
+
+                initialFadeOutTime = CurrentTime;
+                reFadeInTime = CurrentTime - initialFadeOutDurationTrunc - firstVisiblePointTime * (1 - 1 / re_fade_in_speed);
+                finalFadeOutTime = CurrentTime - initialFadeOutDurationTrunc - firstVisiblePointTime * (1 - 1 / final_fade_out_speed);
             }
 
             protected override Color4 PointColour(SmokePoint point)
             {
                 var color = Color4.White;
 
-                double timeDoingInitialFadeOut = initialFadeOutTime - point.Time;
+                double timeDoingInitialFadeOut = Math.Min(initialFadeOutTime, SmokeEndTime) - point.Time;
 
                 if (timeDoingInitialFadeOut > 0)
                 {
@@ -106,8 +110,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                 if (color.A > 0)
                 {
-                    double timeDoingReFadeIn = reFadeInTime - point.Time;
-                    double timeDoingFinalFadeOut = finalFadeOutTime - point.Time;
+                    double timeDoingReFadeIn = reFadeInTime - point.Time / re_fade_in_speed;
+                    double timeDoingFinalFadeOut = finalFadeOutTime - point.Time / final_fade_out_speed;
 
                     if (timeDoingFinalFadeOut > 0)
                     {
