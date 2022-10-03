@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool ValidForMultiplayerAsFreeMod => false;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed), typeof(ModPitchShift) };
 
         public override string SettingDescription => $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x";
 
