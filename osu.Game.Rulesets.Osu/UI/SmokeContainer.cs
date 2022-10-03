@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
@@ -44,6 +45,9 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 isSmoking = false;
                 SmokeEnded?.Invoke(Time.Current);
+
+                foreach (SkinnableDrawable skinnable in Children)
+                    skinnable.LifetimeEnd = skinnable.Drawable.LifetimeEnd;
             }
         }
 
