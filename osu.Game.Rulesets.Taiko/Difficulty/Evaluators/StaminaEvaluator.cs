@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
         /// <summary>
         /// Determines the number of fingers available to hit the current <see cref="TaikoDifficultyHitObject"/>.
-        /// Any mono notes that is more than 300ms apart from a colour change will be considered to have more than 2 
+        /// Any mono notes that is more than 300ms apart from a colour change will be considered to have more than 2
         /// fingers available, since players can hit the same key with multiple fingers.
         /// </summary>
         private static int availableFingersFor(TaikoDifficultyHitObject hitObject)
