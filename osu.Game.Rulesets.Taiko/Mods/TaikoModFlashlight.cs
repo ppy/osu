@@ -4,7 +4,6 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
@@ -17,22 +16,14 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
-        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
-        public override BindableFloat SizeMultiplier { get; } = new BindableFloat
+        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
             MaxValue = 1.5f,
-            Default = 1f,
-            Value = 1f,
             Precision = 0.1f
         };
 
-        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
-        public override BindableBool ComboBasedSize { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
         public override float DefaultFlashlightSize => 250;
 
