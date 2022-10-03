@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mods
         private const double semitone_multiplier = 1.059463;
 
         [SettingSource("Pitch change", "The change to the pitch, in semitones")]
-        public BindableNumber<int> PitchChange { get; } = new BindableInt()
+        public BindableNumber<int> PitchChange { get; } = new BindableInt
         {
             MinValue = -12,
             MaxValue = 12,
