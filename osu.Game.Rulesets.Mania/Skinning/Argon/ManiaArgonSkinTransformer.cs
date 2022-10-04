@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             switch (component)
             {
                 case ManiaSkinComponent maniaComponent:
+                    // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (maniaComponent.Component)
                     {
                         case ManiaSkinComponents.HitTarget:
@@ -25,8 +26,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case ManiaSkinComponents.KeyArea:
                             return new ArgonKeyArea();
-
-                        // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     }
 
                     break;
