@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                         case ManiaSkinComponents.StageBackground:
                             Debug.Assert(maniaComponent.StageDefinition != null);
-                            return new LegacyStageBackground(maniaComponent.StageDefinition.Value);
+                            return new LegacyStageBackground(maniaComponent.StageDefinition);
 
                         case ManiaSkinComponents.StageForeground:
                             return new LegacyStageForeground();

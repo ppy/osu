@@ -6,7 +6,6 @@
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -18,7 +17,6 @@ using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
-using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -26,7 +24,7 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Rulesets.Mania.UI
 {
     [Cached]
-    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
+    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>
     {
         public const float COLUMN_WIDTH = 80;
         public const float SPECIAL_COLUMN_WIDTH = 70;
@@ -46,14 +44,17 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly GameplaySampleTriggerSource sampleTriggerSource;
 
-        public readonly ColumnType ColumnType;
+        /// <summary>
+        /// Whether this is a special (ie. scratch) column.
+        /// </summary>
+        public readonly bool IsSpecial;
 
         public Color4 AccentColour { get; set; }
 
-        public Column(int index, ColumnType columnType)
+        public Column(int index, bool isSpecial)
         {
             Index = index;
-            ColumnType = columnType;
+            IsSpecial = isSpecial;
 
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
