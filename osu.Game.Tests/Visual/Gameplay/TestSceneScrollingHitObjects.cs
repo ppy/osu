@@ -340,8 +340,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             protected override RectangleF GetConservativeBoundingBox(HitObjectLifetimeEntry entry)
             {
-                var hitObject = (TestHitObject)entry.HitObject;
-                return new RectangleF().Inflate(hitObject.Size / 2);
+                if (entry.HitObject is TestHitObject testObject)
+                    return new RectangleF().Inflate(testObject.Size / 2);
+
+                return base.GetConservativeBoundingBox(entry);
             }
         }
     }
