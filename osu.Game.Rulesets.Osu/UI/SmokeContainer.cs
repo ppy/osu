@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
@@ -31,8 +30,6 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             if (e.Action == OsuAction.Smoke)
             {
-                Logger.Log("holy moly");
-
                 isSmoking = true;
                 AddInternal(new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.Smoke), _ => new DefaultSmoke()));
 
