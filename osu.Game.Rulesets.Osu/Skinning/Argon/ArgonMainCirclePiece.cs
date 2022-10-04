@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         const double fade_out_time = 800;
 
                         const double flash_in_duration = 150;
-                        const double resize_duration = 300;
+                        const double resize_duration = 400;
 
                         const float shrink_size = 0.8f;
 
@@ -165,13 +165,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         // The outer gradient is resize with a slight delay from the border.
                         // This is to give it a bomb-like effect, with the border "triggering" its animation when getting close.
                         using (BeginDelayedSequence(flash_in_duration / 12))
+                        {
                             outerGradient.ResizeTo(outerGradient.Size * shrink_size, resize_duration, Easing.OutElasticHalf);
+                            outerGradient
+                                .FadeColour(Color4.White, 80)
+                                .Then()
+                                .FadeOut(flash_in_duration);
+                        }
 
                         // The flash layer starts white to give the wanted brightness, but is almost immediately
                         // recoloured to the accent colour. This would more correctly be done with two layers (one for the initial flash)
                         // but works well enough with the colour fade.
                         flash.FadeTo(1, flash_in_duration, Easing.OutQuint);
-                        flash.FlashColour(Color4.White, flash_in_duration, Easing.OutQuint);
+                        flash.FlashColour(accentColour.Value, fade_out_time, Easing.OutQuint);
 
                         this.FadeOut(fade_out_time, Easing.OutQuad);
                         break;

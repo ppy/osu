@@ -42,8 +42,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         case OsuSkinComponents.SliderScorePoint:
                             return new ArgonSliderScorePoint();
 
+                        case OsuSkinComponents.SpinnerBody:
+                            return new ArgonSpinner();
+
                         case OsuSkinComponents.ReverseArrow:
                             return new ArgonReverseArrow();
+
+                        case OsuSkinComponents.FollowPoint:
+                            return new ArgonFollowPoint();
+
+                        case OsuSkinComponents.Cursor:
+                            return new ArgonCursor();
+
+                        case OsuSkinComponents.CursorTrail:
+                            return new ArgonCursorTrail();
                     }
 
                     break;
