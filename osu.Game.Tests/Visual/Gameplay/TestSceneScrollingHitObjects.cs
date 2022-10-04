@@ -11,8 +11,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
+using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -167,14 +169,39 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("add control points", () => addControlPoints(testControlPoints, Time.Current));
         }
 
-        private void addHitObject(double time)
+        [Test]
+        public void TestVeryFlowScroll()
+        {
+            const double long_time_range = 100000;
+            var manualClock = new ManualClock();
+
+            AddStep("set manual clock", () =>
+            {
+                manualClock.CurrentTime = 0;
+                scrollContainers.ForEach(c => c.Clock = new FramedClock(manualClock));
+
+                setScrollAlgorithm(ScrollVisualisationMethod.Constant);
+                scrollContainers.ForEach(c => c.TimeRange = long_time_range);
+            });
+
+            AddStep("add hit objects", () =>
+            {
+                addHitObject(long_time_range);
+                addHitObject(long_time_range + 100, 250);
+            });
+
+            AddAssert("hit objects are alive", () => playfields.All(p => p.HitObjectContainer.AliveObjects.Count() == 2));
+        }
+
+        private void addHitObject(double time, float size = 75)
         {
             playfields.ForEach(p =>
             {
-                var hitObject = new TestDrawableHitObject(time);
-                setAnchor(hitObject, p);
+                var hitObject = new TestHitObject(size) { StartTime = time };
+                var drawable = new TestDrawableHitObject(hitObject);
 
-                p.Add(hitObject);
+                setAnchor(drawable, p);
+                p.Add(drawable);
             });
         }
 
@@ -248,6 +275,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 };
             }
+
+            protected override ScrollingHitObjectContainer CreateScrollingHitObjectContainer() => new TestScrollingHitObjectContainer();
         }
 
         private class TestDrawableControlPoint : DrawableHitObject<HitObject>
@@ -281,21 +310,38 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class TestDrawableHitObject : DrawableHitObject<HitObject>
+        private class TestHitObject : HitObject
         {
-            public TestDrawableHitObject(double time)
-                : base(new HitObject { StartTime = time, HitWindows = HitWindows.Empty })
-            {
-                Origin = Anchor.Custom;
-                OriginPosition = new Vector2(75 / 4.0f);
+            public readonly float Size;
 
-                AutoSizeAxes = Axes.Both;
+            public TestHitObject(float size)
+            {
+                Size = size;
+            }
+        }
+
+        private class TestDrawableHitObject : DrawableHitObject<TestHitObject>
+        {
+            public TestDrawableHitObject(TestHitObject hitObject)
+                : base(hitObject)
+            {
+                Origin = Anchor.Centre;
+                Size = new Vector2(hitObject.Size);
 
                 AddInternal(new Box
                 {
-                    Size = new Vector2(75),
+                    RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1)
                 });
+            }
+        }
+
+        private class TestScrollingHitObjectContainer : ScrollingHitObjectContainer
+        {
+            protected override RectangleF GetConservativeBoundingBox(HitObjectLifetimeEntry entry)
+            {
+                var hitObject = (TestHitObject)entry.HitObject;
+                return new RectangleF().Inflate(hitObject.Size / 2);
             }
         }
     }
