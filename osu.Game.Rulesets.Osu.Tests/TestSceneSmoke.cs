@@ -19,14 +19,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Create smoke", () =>
             {
-                SetContents(_ =>
+                SetContents(_ => new SmokingInputManager
                 {
-                    return new SmokingInputManager
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.95f),
-                        Child = new TestSmokeContainer { RelativeSizeAxes = Axes.Both },
-                    };
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.95f),
+                    Child = new TestSmokeContainer { RelativeSizeAxes = Axes.Both },
                 });
             });
         }

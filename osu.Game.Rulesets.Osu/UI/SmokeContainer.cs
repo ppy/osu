@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -48,8 +49,11 @@ namespace osu.Game.Rulesets.Osu.UI
                 isSmoking = false;
                 SmokeEnded?.Invoke(Time.Current);
 
-                foreach (SkinnableDrawable skinnable in Children)
+                foreach (Drawable child in Children)
+                {
+                    var skinnable = (SkinnableDrawable)child;
                     skinnable.LifetimeEnd = skinnable.Drawable.LifetimeEnd;
+                }
             }
         }
 
