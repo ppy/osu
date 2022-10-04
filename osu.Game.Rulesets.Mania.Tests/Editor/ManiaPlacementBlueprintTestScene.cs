@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             scrollingInfo = ((ScrollingTestContainer)HitObjectContainer).ScrollingInfo;
 
-            Add(column = new Column(0)
+            Add(column = new Column(0, ColumnType.Even)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

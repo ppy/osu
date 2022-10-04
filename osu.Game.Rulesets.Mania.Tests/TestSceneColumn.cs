@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
@@ -84,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private Drawable createColumn(ScrollingDirection direction, ManiaAction action, int index)
         {
-            var column = new Column(index)
+            var column = new Column(index, ColumnType.Even)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

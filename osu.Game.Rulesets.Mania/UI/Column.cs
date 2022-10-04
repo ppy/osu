@@ -46,9 +46,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly GameplaySampleTriggerSource sampleTriggerSource;
 
-        public Column(int index)
+        public readonly ColumnType ColumnType;
+
+        public Color4 AccentColour { get; set; }
+
+        public Column(int index, ColumnType columnType)
         {
             Index = index;
+            ColumnType = columnType;
 
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
@@ -91,12 +96,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
             NewResult += OnNewResult;
         }
-
-        public ColumnType ColumnType { get; set; }
-
-        public bool IsSpecial => ColumnType == ColumnType.Special;
-
-        public Color4 AccentColour { get; set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {

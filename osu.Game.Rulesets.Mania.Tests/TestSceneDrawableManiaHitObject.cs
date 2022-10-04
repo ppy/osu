@@ -9,6 +9,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 RelativeSizeAxes = Axes.Y,
                 TimeRange = 2000,
                 Clock = new FramedClock(clock),
-                Child = column = new Column(0)
+                Child = column = new Column(0, ColumnType.Even)
                 {
                     Action = { Value = ManiaAction.Key1 },
                     Height = 0.85f,

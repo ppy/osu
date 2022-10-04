@@ -28,11 +28,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         {
             InternalChildren = new[]
             {
-                this.column = new Column(column)
+                this.column = new Column(column, column % 2 == 0 ? ColumnType.Even : ColumnType.Odd)
                 {
                     Action = { Value = action },
                     AccentColour = Color4.Orange,
-                    ColumnType = column % 2 == 0 ? ColumnType.Even : ColumnType.Odd,
                     Alpha = showColumn ? 1 : 0
                 },
                 content = new ManiaInputManager(new ManiaRuleset().RulesetInfo, 4)
