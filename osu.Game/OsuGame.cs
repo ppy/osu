@@ -565,7 +565,7 @@ namespace osu.Game
             // due to the weird decoupled ruleset logic (which can cause a crash in certain filter scenarios).
             PerformFromScreen(screen =>
             {
-                Logger.Log($"{nameof(PresentScore)} updating beatmap ({databasedBeatmap}) and ruleset ({databasedScore.ScoreInfo.Ruleset} to match score)");
+                Logger.Log($"{nameof(PresentScore)} updating beatmap ({databasedBeatmap}) and ruleset ({databasedScore.ScoreInfo.Ruleset}) to match score");
 
                 Ruleset.Value = databasedScore.ScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
