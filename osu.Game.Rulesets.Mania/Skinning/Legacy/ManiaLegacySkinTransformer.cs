@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -113,8 +112,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             return new LegacyHitExplosion();
 
                         case ManiaSkinComponents.StageBackground:
-                            Debug.Assert(maniaComponent.StageDefinition != null);
-                            return new LegacyStageBackground(maniaComponent.StageDefinition);
+                            return new LegacyStageBackground();
 
                         case ManiaSkinComponents.StageForeground:
                             return new LegacyStageForeground();
