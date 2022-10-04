@@ -10,43 +10,43 @@ using NUnit.Framework;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    public class ManiaColumnTypeTest
+    public class ManiaSpecialColumnTest
     {
         [TestCase(new[]
         {
-            ColumnType.Special
+            true
         }, 1)]
         [TestCase(new[]
         {
-            ColumnType.Odd,
-            ColumnType.Even,
-            ColumnType.Even,
-            ColumnType.Odd
+            false,
+            false,
+            false,
+            false
         }, 4)]
         [TestCase(new[]
         {
-            ColumnType.Odd,
-            ColumnType.Even,
-            ColumnType.Odd,
-            ColumnType.Special,
-            ColumnType.Odd,
-            ColumnType.Even,
-            ColumnType.Odd
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
         }, 7)]
-        public void Test(IEnumerable<ColumnType> expected, int columns)
+        public void Test(IEnumerable<bool> special, int columns)
         {
             var definition = new StageDefinition
             {
                 Columns = columns
             };
             var results = getResults(definition);
-            Assert.AreEqual(expected, results);
+            Assert.AreEqual(special, results);
         }
 
-        private IEnumerable<ColumnType> getResults(StageDefinition definition)
+        private IEnumerable<bool> getResults(StageDefinition definition)
         {
             for (int i = 0; i < definition.Columns; i++)
-                yield return definition.GetTypeOfColumn(i);
+                yield return definition.IsSpecialColumn(i);
         }
     }
 }

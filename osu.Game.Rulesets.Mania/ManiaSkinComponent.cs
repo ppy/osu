@@ -15,14 +15,14 @@ namespace osu.Game.Rulesets.Mania
         /// The intended <see cref="StageDefinition"/> for this component.
         /// May be null if the component is not a direct member of a <see cref="Stage"/>.
         /// </summary>
-        public readonly StageDefinition? StageDefinition;
+        public readonly StageDefinition StageDefinition;
 
         /// <summary>
         /// Creates a new <see cref="ManiaSkinComponent"/>.
         /// </summary>
         /// <param name="component">The component.</param>
         /// <param name="stageDefinition">The intended <see cref="StageDefinition"/> for this component. May be null if the component is not a direct member of a <see cref="Stage"/>.</param>
-        public ManiaSkinComponent(ManiaSkinComponents component, StageDefinition? stageDefinition = null)
+        public ManiaSkinComponent(ManiaSkinComponents component, StageDefinition stageDefinition = null)
             : base(component)
         {
             StageDefinition = stageDefinition;
