@@ -251,8 +251,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             {
                 updateLayoutRecursive(obj);
 
-                // Nested hitobjects don't need to scroll, but they do need accurate positions
+                // Nested hitobjects don't need to scroll, but they do need accurate positions and start lifetime
                 updatePosition(obj, hitObject.HitObject.StartTime);
+                setComputedLifetimeStart(obj.Entry);
             }
         }
 
