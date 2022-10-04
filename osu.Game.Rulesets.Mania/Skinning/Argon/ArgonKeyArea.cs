@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -24,10 +23,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private Container directionContainer = null!;
-        private Container keyIcon = null!;
         private Drawable background = null!;
 
         private Circle hitTargetLine = null!;
+
+        private Container<Circle> bottomIcon = null!;
+        private CircularContainer topIcon = null!;
 
         [Resolved]
         private Column column { get; set; } = null!;
@@ -56,56 +57,58 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         RelativeSizeAxes = Axes.Both,
                         Colour = column.AccentColour.Darken(0.6f),
                     },
-                    keyIcon = new Container
+                    hitTargetLine = new Circle
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Colour = OsuColour.Gray(196 / 255f),
+                        Height = 4,
+                        Masking = true,
+                    },
+                    new Container
                     {
                         Name = "Icons",
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Children = new[]
+                        Children = new Drawable[]
                         {
-                            hitTargetLine = new Circle()
+                            bottomIcon = new Container<Circle>
                             {
-                                RelativeSizeAxes = Axes.X,
-                                Anchor = Anchor.TopCentre,
+                                AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.Centre,
-                                Colour = OsuColour.Gray(196 / 255f),
-                                Height = 4,
-                                Masking = true,
-                            },
-                            new Circle
-                            {
+                                Blending = BlendingParameters.Additive,
+                                Colour = column.AccentColour,
                                 Y = icon_vertical_offset,
-                                Size = new Vector2(icon_circle_size),
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.Centre,
-                                Blending = BlendingParameters.Additive,
-                                Colour = column.AccentColour,
-                                Masking = true,
+                                Children = new[]
+                                {
+                                    new Circle
+                                    {
+                                        Size = new Vector2(icon_circle_size),
+                                        Anchor = Anchor.BottomCentre,
+                                        Origin = Anchor.Centre,
+                                    },
+                                    new Circle
+                                    {
+                                        X = -icon_spacing,
+                                        Y = icon_spacing * 1.2f,
+                                        Size = new Vector2(icon_circle_size),
+                                        Anchor = Anchor.BottomCentre,
+                                        Origin = Anchor.Centre,
+                                    },
+                                    new Circle
+                                    {
+                                        X = icon_spacing,
+                                        Y = icon_spacing * 1.2f,
+                                        Size = new Vector2(icon_circle_size),
+                                        Anchor = Anchor.BottomCentre,
+                                        Origin = Anchor.Centre,
+                                    },
+                                }
                             },
-                            new Circle
-                            {
-                                X = -icon_spacing,
-                                Y = icon_vertical_offset + icon_spacing * 1.2f,
-                                Size = new Vector2(icon_circle_size),
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.Centre,
-                                Blending = BlendingParameters.Additive,
-                                Colour = column.AccentColour,
-                                Masking = true,
-                            },
-                            new Circle
-                            {
-                                X = icon_spacing,
-                                Y = icon_vertical_offset + icon_spacing * 1.2f,
-                                Size = new Vector2(icon_circle_size),
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.Centre,
-                                Blending = BlendingParameters.Additive,
-                                Colour = column.AccentColour,
-                                Masking = true,
-                            },
-                            new CircularContainer
+                            topIcon = new CircularContainer
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.Centre,
@@ -153,29 +156,41 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (e.Action == column.Action.Value)
+            if (e.Action != column.Action.Value) return false;
+
+            const double lighting_fade_in_duration = 50;
+            Color4 lightingColour = column.AccentColour.Lighten(0.9f);
+
+            background
+                .FadeColour(column.AccentColour.Lighten(0.4f), 40).Then()
+                .FadeColour(column.AccentColour, 150, Easing.OutQuint);
+
+            hitTargetLine.FadeColour(Color4.White, lighting_fade_in_duration, Easing.OutQuint);
+            hitTargetLine.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
             {
-                background
-                    .FadeColour(column.AccentColour.Lighten(0.3f), 50, Easing.OutQuint).Then()
-                    .FadeColour(column.AccentColour, 100, Easing.OutQuint);
+                Type = EdgeEffectType.Glow,
+                Colour = lightingColour.Opacity(0.7f),
+                Radius = 20,
+            }, lighting_fade_in_duration, Easing.OutQuint);
 
-                foreach (var circle in keyIcon.Children.OfType<CompositeDrawable>())
+            topIcon.ScaleTo(0.9f, lighting_fade_in_duration, Easing.OutQuint);
+            topIcon.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = lightingColour.Opacity(0.1f),
+                Radius = 20,
+            }, lighting_fade_in_duration, Easing.OutQuint);
+
+            bottomIcon.FadeColour(Color4.White, lighting_fade_in_duration, Easing.OutQuint);
+
+            foreach (var circle in bottomIcon)
+            {
+                circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
                 {
-                    if (circle != hitTargetLine)
-                        circle.ScaleTo(0.9f, 50, Easing.OutQuint);
-
-                    circle.FadeColour(Color4.White, 50, Easing.OutQuint);
-
-                    // TODO: VERY TMPOERAOIRY.
-                    float f = circle == hitTargetLine ? 0.2f : (circle is Circle ? 0.05f : 0.2f);
-
-                    circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Colour = Color4.White.Opacity(f),
-                        Radius = 40,
-                    }, 50, Easing.OutQuint);
-                }
+                    Type = EdgeEffectType.Glow,
+                    Colour = lightingColour.Opacity(0.3f),
+                    Radius = 60,
+                }, lighting_fade_in_duration, Easing.OutQuint);
             }
 
             return false;
@@ -183,29 +198,39 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         public void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
-            if (e.Action == column.Action.Value)
+            if (e.Action != column.Action.Value) return;
+
+            const double lighting_fade_out_duration = 300;
+            Color4 lightingColour = column.AccentColour.Lighten(0.9f).Opacity(0);
+
+            background.FadeColour(column.AccentColour.Darken(0.6f), lighting_fade_out_duration, Easing.OutQuint);
+
+            topIcon.ScaleTo(1f, 200, Easing.OutQuint);
+            topIcon.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
             {
-                background.FadeColour(column.AccentColour.Darken(0.6f), 800, Easing.OutQuint);
+                Type = EdgeEffectType.Glow,
+                Colour = lightingColour,
+                Radius = 20,
+            }, lighting_fade_out_duration, Easing.OutQuint);
 
-                foreach (var circle in keyIcon.Children.OfType<CompositeDrawable>())
+            hitTargetLine.FadeColour(OsuColour.Gray(196 / 255f), lighting_fade_out_duration, Easing.OutQuint);
+            hitTargetLine.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = lightingColour,
+                Radius = 30,
+            }, lighting_fade_out_duration, Easing.OutQuint);
+
+            bottomIcon.FadeColour(column.AccentColour, lighting_fade_out_duration, Easing.OutQuint);
+
+            foreach (var circle in bottomIcon)
+            {
+                circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
                 {
-                    circle.ScaleTo(1f, 200, Easing.OutQuint);
-
-                    // TODO: temp lol
-                    if (circle == hitTargetLine)
-                    {
-                        circle.FadeColour(OsuColour.Gray(196 / 255f), 800, Easing.OutQuint);
-                    }
-                    else if (circle is Circle)
-                        circle.FadeColour(column.AccentColour, 800, Easing.OutQuint);
-
-                    circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Colour = Color4.White.Opacity(0),
-                        Radius = 30,
-                    }, 800, Easing.OutQuint);
-                }
+                    Type = EdgeEffectType.Glow,
+                    Colour = lightingColour,
+                    Radius = 30,
+                }, lighting_fade_out_duration, Easing.OutQuint);
             }
         }
     }
