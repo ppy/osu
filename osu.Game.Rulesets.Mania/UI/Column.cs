@@ -3,23 +3,24 @@
 
 #nullable disable
 
-using osuTK.Graphics;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI.Components;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.UI;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -37,12 +38,12 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         public readonly ColumnHitObjectArea HitObjectArea;
-        internal readonly Container TopLevelContainer;
-        private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
+        internal readonly Container TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both };
+        private DrawablePool<PoolableHitExplosion> hitExplosionPool;
         private readonly OrderedHitPolicy hitPolicy;
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
-        private readonly GameplaySampleTriggerSource sampleTriggerSource;
+        private GameplaySampleTriggerSource sampleTriggerSource;
 
         /// <summary>
         /// Whether this is a special (ie. scratch) column.
@@ -59,6 +60,21 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
 
+            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+            HitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource skin)
+        {
+            // TODO: reimplement this somewhere.
+            AccentColour = skin.GetConfig<ManiaSkinColour, Color4>()
+            var ballColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
+
+            //AccentColour = columnColours[isSpecial],
+            foreach (var obj in HitObjectContainer.Objects)
+                obj.AccentColour.Value = AccentColour;
+
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
                 RelativeSizeAxes = Axes.Both
@@ -70,17 +86,15 @@ namespace osu.Game.Rulesets.Mania.UI
                 sampleTriggerSource = new GameplaySampleTriggerSource(HitObjectContainer),
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                HitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both },
+                HitObjectArea,
                 new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both
                 },
                 background,
-                TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both },
+                TopLevelContainer,
                 new ColumnTouchInputArea(this)
             };
-
-            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
 
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
 
