@@ -50,9 +50,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         // TODO: Add actual colours.
                         return SkinUtils.As<TValue>(new Bindable<Color4>(new Color4(RNG.NextSingle() * 0.5f, RNG.NextSingle() * 0.5f, RNG.NextSingle() * 0.5f, 1)));
                 }
-
-                return base.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(maniaLookup.StageDefinition.Columns, maniaLookup.Lookup,
-                    maniaLookup.ColumnIndex));
             }
 
             return base.GetConfig<TLookup, TValue>(lookup);
