@@ -120,13 +120,12 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 var columnType = definition.GetTypeOfColumn(i);
 
-                var column = new Column(firstColumnIndex + i)
+                var column = new Column(firstColumnIndex + i, columnType)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Width = 1,
-                    ColumnType = columnType,
                     AccentColour = columnColours[columnType],
                     Action = { Value = columnType == ColumnType.Special ? specialColumnStartAction++ : normalColumnStartAction++ }
+                    Width = 1,
                 };
 
                 topLevelContainer.Add(column.TopLevelContainer.CreateProxy());
