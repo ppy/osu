@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             isLegacySkin = new Lazy<bool>(() => GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version) != null);
             hasKeyTexture = new Lazy<bool>(() =>
             {
-                string keyImage = this.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.KeyImage, 0)?.Value ?? "mania-key1";
+                string keyImage = this.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.KeyImage, new StageDefinition(), 0)?.Value ?? "mania-key1";
                 return this.GetAnimation(keyImage, true, true) != null;
             });
         }
@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             if (!hit_result_mapping.ContainsKey(result))
                 return null;
 
-            string filename = this.GetManiaSkinConfig<string>(hit_result_mapping[result])?.Value
+            string filename = this.GetManiaSkinConfig<string>(hit_result_mapping[result], new StageDefinition())?.Value
                               ?? default_hit_result_skin_filenames[result];
 
             var animation = this.GetAnimation(filename, true, true);
@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
             if (lookup is ManiaSkinConfigurationLookup maniaLookup)
-                return base.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.TargetColumn));
+                return base.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.ColumnIndex));
 
             return base.GetConfig<TLookup, TValue>(lookup);
         }

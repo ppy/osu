@@ -65,14 +65,14 @@ namespace osu.Game.Rulesets.Mania.UI
                 if (i > 0)
                 {
                     float spacing = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
-                                                   new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnSpacing, i - 1))
+                                                   new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnSpacing, stageDefinition, i - 1))
                                                ?.Value ?? Stage.COLUMN_SPACING;
 
                     columns[i].Margin = new MarginPadding { Left = spacing };
                 }
 
                 float? width = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
-                                              new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnWidth, i))
+                                              new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnWidth, stageDefinition, i))
                                           ?.Value;
 
                 if (width == null)
