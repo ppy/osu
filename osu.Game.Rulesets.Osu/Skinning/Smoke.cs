@@ -25,6 +25,15 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public IShader? TextureShader { get; private set; }
         public IShader? RoundedTextureShader { get; private set; }
 
+        public override double LifetimeEnd
+        {
+            get
+            {
+                double initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
+                return SmokeEndTime + final_fade_out_duration + initialFadeOutDurationTrunc / re_fade_in_speed + initialFadeOutDurationTrunc / final_fade_out_speed;
+            }
+        }
+
         private float? radius;
 
         protected float Radius
@@ -39,21 +48,45 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         protected double SmokeEndTime { get; private set; } = double.MaxValue;
 
-        protected virtual float PointInterval => Radius * 7f / 8;
-
         protected readonly List<SmokePoint> SmokePoints = new List<SmokePoint>();
+
+        protected virtual float PointInterval => Radius * 7f / 8;
 
         private float totalDistance;
         private Vector2? lastPosition;
+        private SmokeContainer? smokeContainer;
 
         private const int max_point_count = 18_000;
 
-        [Resolved(CanBeNull = true)]
-        private SmokeContainer? smokeContainer { get; set; }
+        // fade anim values
+        private const double initial_fade_out_duration = 4000;
+
+        private const double re_fade_in_speed = 3;
+        private const double re_fade_in_duration = 50;
+
+        private const double final_fade_out_speed = 2;
+        private const double final_fade_out_duration = 8000;
+
+        private const float initial_alpha = 0.6f;
+        private const float re_fade_in_alpha = 1f;
+
+        private readonly int rotationSeed = RNG.Next();
+
+        // scale anim values
+        private const double scale_duration = 1200;
+
+        private const float initial_scale = 0.65f;
+        private const float final_scale = 1f;
+
+        // rotation anim values
+        private const double rotation_duration = 500;
+
+        private const float max_rotation = 0.25f;
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders)
+        private void load(SmokeContainer container, ShaderManager shaders)
         {
+            smokeContainer = container;
             RoundedTextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
         }
@@ -128,8 +161,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 onSmokeEnded(time);
         }
 
-        public abstract override double LifetimeEnd { get; }
-
         private void onSmokeEnded(double time)
         {
             if (smokeContainer != null)
@@ -141,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             SmokeEndTime = time;
         }
 
-        protected abstract override DrawNode CreateDrawNode();
+        protected override DrawNode CreateDrawNode() => new SmokeDrawNode(this);
 
         protected override void Update()
         {
@@ -181,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             }
         }
 
-        protected abstract class SmokeDrawNode : TexturedShaderDrawNode
+        protected class SmokeDrawNode : TexturedShaderDrawNode
         {
             protected new Smoke Source => (Smoke)base.Source;
 
@@ -195,7 +226,17 @@ namespace osu.Game.Rulesets.Osu.Skinning
             private Vector2 drawSize;
             private Texture? texture;
 
-            protected SmokeDrawNode(ITexturedShaderDrawable source)
+            // anim calculation vars (color, scale, direction)
+            private double initialFadeOutDurationTrunc;
+            private double firstVisiblePointTime;
+
+            private double initialFadeOutTime;
+            private double reFadeInTime;
+            private double finalFadeOutTime;
+
+            private Random rotationRNG = new Random();
+
+            public SmokeDrawNode(ITexturedShaderDrawable source)
                 : base(source)
             {
             }
@@ -214,6 +255,15 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 SmokeStartTime = Source.SmokeStartTime;
                 SmokeEndTime = Source.SmokeEndTime;
                 CurrentTime = Source.Clock.CurrentTime;
+
+                rotationRNG = new Random(Source.rotationSeed);
+
+                initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
+                firstVisiblePointTime = SmokeEndTime - initialFadeOutDurationTrunc;
+
+                initialFadeOutTime = CurrentTime;
+                reFadeInTime = CurrentTime - initialFadeOutDurationTrunc - firstVisiblePointTime * (1 - 1 / re_fade_in_speed);
+                finalFadeOutTime = CurrentTime - initialFadeOutDurationTrunc - firstVisiblePointTime * (1 - 1 / final_fade_out_speed);
             }
 
             public sealed override void Draw(IRenderer renderer)
@@ -246,11 +296,62 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 ? ((SRGBColour)DrawColourInfo.Colour).Linear
                 : DrawColourInfo.Colour.Interpolate(Vector2.Divide(localPos, drawSize)).Linear;
 
-            protected abstract Color4 PointColour(SmokePoint point);
+            protected virtual Color4 PointColour(SmokePoint point)
+            {
+                var color = Color4.White;
 
-            protected abstract float PointScale(SmokePoint point);
+                double timeDoingInitialFadeOut = Math.Min(initialFadeOutTime, SmokeEndTime) - point.Time;
 
-            protected abstract Vector2 PointDirection(SmokePoint point);
+                if (timeDoingInitialFadeOut > 0)
+                {
+                    float fraction = Math.Clamp((float)(timeDoingInitialFadeOut / initial_fade_out_duration), 0, 1);
+                    color.A = (1 - fraction) * initial_alpha;
+                }
+
+                if (color.A > 0)
+                {
+                    double timeDoingReFadeIn = reFadeInTime - point.Time / re_fade_in_speed;
+                    double timeDoingFinalFadeOut = finalFadeOutTime - point.Time / final_fade_out_speed;
+
+                    if (timeDoingFinalFadeOut > 0)
+                    {
+                        float fraction = Math.Clamp((float)(timeDoingFinalFadeOut / final_fade_out_duration), 0, 1);
+                        fraction = MathF.Pow(fraction, 5);
+                        color.A = (1 - fraction) * re_fade_in_alpha;
+                    }
+                    else if (timeDoingReFadeIn > 0)
+                    {
+                        float fraction = Math.Clamp((float)(timeDoingReFadeIn / re_fade_in_duration), 0, 1);
+                        fraction = 1 - MathF.Pow(1 - fraction, 5);
+                        color.A = fraction * (re_fade_in_alpha - color.A) + color.A;
+                    }
+                }
+
+                return color;
+            }
+
+            protected virtual float PointScale(SmokePoint point)
+            {
+                double timeDoingScale = CurrentTime - point.Time;
+                float fraction = Math.Clamp((float)(timeDoingScale / scale_duration), 0, 1);
+                fraction = 1 - MathF.Pow(1 - fraction, 5);
+                return fraction * (final_scale - initial_scale) + initial_scale;
+            }
+
+            protected virtual Vector2 PointDirection(SmokePoint point)
+            {
+                float initialAngle = MathF.Atan2(point.Direction.Y, point.Direction.X);
+                float finalAngle = initialAngle + nextRotation();
+
+                double timeDoingRotation = CurrentTime - point.Time;
+                float fraction = Math.Clamp((float)(timeDoingRotation / rotation_duration), 0, 1);
+                fraction = 1 - MathF.Pow(1 - fraction, 5);
+                float angle = fraction * (finalAngle - initialAngle) + initialAngle;
+
+                return new Vector2(MathF.Sin(angle), -MathF.Cos(angle));
+            }
+
+            private float nextRotation() => max_rotation * ((float)rotationRNG.NextDouble() * 2 - 1);
 
             private void drawPointQuad(SmokePoint point, RectangleF textureRect)
             {
