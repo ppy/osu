@@ -21,7 +21,6 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 using osuTK;
 
@@ -250,11 +249,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestHitLightingColour()
         {
-            var fruitColour = SkinConfiguration.DefaultComboColours[1];
             AddStep("enable hit lighting", () => config.SetValue(OsuSetting.HitLighting, true));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
-            AddAssert("correct hit lighting colour", () =>
-                catcher.ChildrenOfType<HitExplosion>().First()?.Entry?.ObjectColour == fruitColour);
+            AddAssert("correct hit lighting colour", () => catcher.ChildrenOfType<HitExplosion>().First()?.Entry?.ObjectColour == this.ChildrenOfType<DrawableCatchHitObject>().First().AccentColour.Value);
         }
 
         [Test]
