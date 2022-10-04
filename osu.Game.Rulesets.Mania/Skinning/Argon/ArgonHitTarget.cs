@@ -2,18 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Mania.Skinning.Default;
+using osu.Game.Rulesets.UI.Scrolling;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     public class ArgonHitTarget : CompositeDrawable
     {
+        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IScrollingInfo scrollingInfo)
         {
             RelativeSizeAxes = Axes.X;
             Height = DefaultNotePiece.NOTE_HEIGHT;
@@ -28,6 +32,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     Colour = Color4.White
                 },
             };
+
+            direction.BindTo(scrollingInfo.Direction);
+            direction.BindValueChanged(onDirectionChanged, true);
+        }
+
+        private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
+        {
+            Anchor = Origin = direction.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
         }
     }
 }
