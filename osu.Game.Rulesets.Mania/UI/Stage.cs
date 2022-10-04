@@ -128,8 +128,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 1,
-                    // TODO: reimplement this somewhere.
-                    //AccentColour = columnColours[isSpecial],
                     Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
                 };
 
