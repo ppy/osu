@@ -9,7 +9,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Scoring;
@@ -19,8 +18,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public class ManiaLegacySkinTransformer : LegacySkinTransformer
     {
-        private readonly ManiaBeatmap beatmap;
-
         /// <summary>
         /// Mapping of <see cref="HitResult"/> to their corresponding
         /// <see cref="LegacyManiaSkinConfigurationLookups"/> value.
@@ -59,15 +56,13 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         /// </summary>
         private readonly Lazy<bool> hasKeyTexture;
 
-        public ManiaLegacySkinTransformer(ISkin skin, IBeatmap beatmap)
+        public ManiaLegacySkinTransformer(ISkin skin)
             : base(skin)
         {
-            this.beatmap = (ManiaBeatmap)beatmap;
-
             isLegacySkin = new Lazy<bool>(() => GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version) != null);
             hasKeyTexture = new Lazy<bool>(() =>
             {
-                string keyImage = this.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.KeyImage, new StageDefinition(), 0)?.Value ?? "mania-key1";
+                string keyImage = this.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.KeyImage, new StageDefinition { Columns = 1 }, 0)?.Value ?? "mania-key1";
                 return this.GetAnimation(keyImage, true, true) != null;
             });
         }
@@ -149,7 +144,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
             if (lookup is ManiaSkinConfigurationLookup maniaLookup)
-                return base.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.ColumnIndex));
+                return base.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(maniaLookup.StageDefinition.Columns, maniaLookup.Lookup, maniaLookup.ColumnIndex));
 
             return base.GetConfig<TLookup, TValue>(lookup);
         }

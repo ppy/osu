@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Mania
             switch (skin)
             {
                 case LegacySkin:
-                    return new ManiaLegacySkinTransformer(skin, beatmap);
+                    return new ManiaLegacySkinTransformer(skin);
 
                 case ArgonSkin:
                     return new ManiaArgonSkinTransformer(skin);
