@@ -71,11 +71,11 @@ namespace osu.Game.Rulesets.Mania
                 case TrianglesSkin:
                     return new ManiaTrianglesSkinTransformer(skin);
 
-                case LegacySkin:
-                    return new ManiaLegacySkinTransformer(skin);
-
                 case ArgonSkin:
                     return new ManiaArgonSkinTransformer(skin);
+
+                case LegacySkin:
+                    return new ManiaLegacySkinTransformer(skin, beatmap);
             }
 
             return null;
