@@ -14,6 +14,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
+    /// <summary>
+    /// Manages smoke trails generated from user input.
+    /// </summary>
     [Cached]
     public class SmokeContainer : Container, IRequireHighFrequencyMousePosition, IKeyBindingHandler<OsuAction>
     {
@@ -31,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.UI
             if (e.Action == OsuAction.Smoke)
             {
                 isSmoking = true;
-                AddInternal(new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.Smoke), _ => new DefaultSmoke()));
+                AddInternal(new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SmokeTrail), _ => new DefaultSmokeSegment()));
 
                 return true;
             }

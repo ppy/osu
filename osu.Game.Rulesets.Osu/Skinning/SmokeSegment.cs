@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
-    public abstract class Smoke : Drawable, ITexturedShaderDrawable
+    public abstract class SmokeSegment : Drawable, ITexturedShaderDrawable
     {
         public IShader? TextureShader { get; private set; }
         public IShader? RoundedTextureShader { get; private set; }
@@ -214,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         protected class SmokeDrawNode : TexturedShaderDrawNode
         {
-            protected new Smoke Source => (Smoke)base.Source;
+            protected new SmokeSegment Source => (SmokeSegment)base.Source;
 
             protected double SmokeStartTime { get; private set; }
             protected double SmokeEndTime { get; private set; }
