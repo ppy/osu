@@ -175,6 +175,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
+            SetDefault(OsuSetting.ComboColourBrightness, 0.7f, 0f, 1f);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -370,6 +371,7 @@ namespace osu.Game.Configuration
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
-        LastProcessedMetadataId
+        LastProcessedMetadataId,
+        ComboColourBrightness
     }
 }

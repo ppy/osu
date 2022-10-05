@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Objects.Types;
@@ -128,6 +129,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
 
         private readonly Bindable<float> positionalHitsoundsLevel = new Bindable<float>();
+        private readonly Bindable<float> comboColourBrightness = new Bindable<float>();
         private readonly Bindable<int> comboIndexWithOffsetsBindable = new Bindable<int>();
 
         protected override bool RequiresChildrenUpdate => true;
@@ -171,6 +173,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load(OsuConfigManager config, ISkinSource skinSource)
         {
             config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
+            config.BindWith(OsuSetting.ComboColourBrightness, comboColourBrightness);
 
             // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
             base.AddInternal(Samples = new PausableSkinnableSound());
@@ -191,6 +194,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             comboIndexBindable.BindValueChanged(_ => UpdateComboColour());
             comboIndexWithOffsetsBindable.BindValueChanged(_ => UpdateComboColour(), true);
+
+            comboColourBrightness.BindValueChanged(_ => UpdateComboColour());
 
             // Apply transforms
             updateState(State.Value, true);
@@ -519,7 +524,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (!(HitObject is IHasComboInformation combo)) return;
 
-            AccentColour.Value = combo.GetComboColour(CurrentSkin);
+            Color4 colour = combo.GetComboColour(CurrentSkin);
+
+            // Normalise the combo colour to the given brightness level.
+            colour = OsuColour.ToHSPA(colour);
+            colour.B = comboColourBrightness.Value;
+            colour = OsuColour.FromHSPA(colour);
+
+            AccentColour.Value = colour;
         }
 
         /// <summary>
