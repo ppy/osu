@@ -40,6 +40,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GraphicsSettingsStrings.StoryboardVideo,
                     Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
                 },
+                new SettingsSlider<float>
+                {
+                    LabelText = "Combo colour brightness",
+                    Current = config.GetBindable<float>(OsuSetting.ComboColourBrightness),
+                    DisplayAsPercentage = true
+                }
             };
         }
     }
