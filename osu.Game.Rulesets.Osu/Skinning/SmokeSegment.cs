@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 using osuTK.Graphics;
 
@@ -54,7 +53,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private float totalDistance;
         private Vector2? lastPosition;
-        private SmokeContainer? smokeContainer;
 
         private const int max_point_count = 18_000;
 
@@ -84,9 +82,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private const float max_rotation = 0.25f;
 
         [BackgroundDependencyLoader]
-        private void load(SmokeContainer container, ShaderManager shaders)
+        private void load(ShaderManager shaders)
         {
-            smokeContainer = container;
             RoundedTextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
         }
@@ -100,14 +97,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
             SmokeStartTime = Time.Current;
 
             totalDistance = PointInterval;
-
-            if (smokeContainer != null)
-            {
-                smokeContainer.SmokeMoved += onSmokeMoved;
-                smokeContainer.SmokeEnded += onSmokeEnded;
-
-                onSmokeMoved(smokeContainer.LastMousePosition, Time.Current);
-            }
         }
 
         private Vector2 nextPointDirection()
@@ -116,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             return new Vector2(MathF.Sin(angle), -MathF.Cos(angle));
         }
 
-        private void onSmokeMoved(Vector2 position, double time)
+        public void AddPosition(Vector2 position, double time)
         {
             lastPosition ??= position;
 
@@ -158,17 +147,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
             lastPosition = position;
 
             if (SmokePoints.Count >= max_point_count)
-                onSmokeEnded(time);
+                FinishDrawing(time);
         }
 
-        private void onSmokeEnded(double time)
+        public void FinishDrawing(double time)
         {
-            if (smokeContainer != null)
-            {
-                smokeContainer.SmokeMoved -= onSmokeMoved;
-                smokeContainer.SmokeEnded -= onSmokeEnded;
-            }
-
             SmokeEndTime = time;
         }
 
@@ -179,17 +162,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
             base.Update();
 
             Invalidate(Invalidation.DrawNode);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (smokeContainer != null)
-            {
-                smokeContainer.SmokeMoved -= onSmokeMoved;
-                smokeContainer.SmokeEnded -= onSmokeEnded;
-            }
         }
 
         protected struct SmokePoint
