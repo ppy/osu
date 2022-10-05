@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -184,7 +183,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             double maxTime = dragBox.MaxTime;
 
             SelectedItems.RemoveAll(hitObject => !shouldBeSelected(hitObject));
-            SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).Where(hitObject => shouldBeSelected(hitObject)));
+            SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).Where(shouldBeSelected));
 
             bool shouldBeSelected(HitObject hitObject) => minTime <= hitObject.StartTime && hitObject.StartTime <= maxTime;
         }
