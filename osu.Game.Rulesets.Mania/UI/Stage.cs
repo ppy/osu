@@ -100,10 +100,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 RelativeSizeAxes = Axes.Y,
                             }
                         },
-                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageForeground, stageDefinition: definition), _ => null)
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        },
+                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageForeground, stageDefinition: definition), _ => null),
                         judgements = new JudgementContainer<DrawableManiaJudgement>
                         {
                             Anchor = Anchor.TopCentre,
@@ -111,7 +108,8 @@ namespace osu.Game.Rulesets.Mania.UI
                             RelativeSizeAxes = Axes.Both,
                             Y = HIT_TARGET_POSITION + 150
                         },
-                        topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
+                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ComboCounter), _ => Empty()),
+                        topLevelContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 }
             };

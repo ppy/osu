@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -77,6 +78,25 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             switch (component)
             {
+                case SkinnableTargetComponent targetComponent:
+                    switch (targetComponent.Target)
+                    {
+                        case SkinnableTarget.MainHUDComponents:
+                            var components = base.GetDrawableComponent(component) as SkinnableTargetComponentsContainer;
+
+                            if (components != null)
+                            {
+                                // catch may provide its own combo counter; hide the default.
+                                // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
+                                foreach (var legacyComboCounter in components.OfType<LegacyOsuComboCounter>())
+                                    legacyComboCounter.HiddenByRulesetImplementation = false;
+                            }
+
+                            return components;
+                    }
+
+                    break;
+
                 case GameplaySkinComponent<HitResult> resultComponent:
                     return getResult(resultComponent.Component);
 

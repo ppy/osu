@@ -5,14 +5,21 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
     public class TestScenePlayfield : ManiaSkinnableTestScene
     {
+        [Cached]
+        private ScoreProcessor scoreProcessor = new ScoreProcessor(new ManiaRuleset());
+
         private List<StageDefinition> stageDefinitions = new List<StageDefinition>();
 
         [Test]
@@ -27,6 +34,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 
                 SetContents(_ => new ManiaPlayfield(stageDefinitions));
             });
+
+            AddRepeatStep("perform hit", () => scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Perfect }), 20);
+            AddStep("perform miss", () => scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Miss }));
         }
 
         [Test]
@@ -42,6 +52,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 
                 SetContents(_ => new ManiaPlayfield(stageDefinitions));
             });
+
+            AddRepeatStep("perform hit", () => scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Perfect }), 20);
+            AddStep("perform miss", () => scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Miss }));
         }
 
         protected override IBeatmap CreateBeatmapForSkinProvider()
