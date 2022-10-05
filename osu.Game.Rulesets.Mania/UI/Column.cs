@@ -65,14 +65,17 @@ namespace osu.Game.Rulesets.Mania.UI
             HitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, StageDefinition stageDefinition)
-        {
-            AccentColour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour, stageDefinition, Index)?.Value ?? Color4.Black;
+        [Resolved]
+        private ISkinSource skin { get; set; }
 
-            //AccentColour = columnColours[isSpecial],
-            foreach (var obj in HitObjectContainer.Objects)
-                obj.AccentColour.Value = AccentColour;
+        [Resolved]
+        private StageDefinition stageDefinition { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            skin.SourceChanged += onSourceChanged;
+            onSourceChanged();
 
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
@@ -104,11 +107,23 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 250);
         }
 
+        private void onSourceChanged()
+        {
+            AccentColour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour, stageDefinition, Index)?.Value ?? Color4.Black;
+            foreach (var obj in HitObjectContainer.Objects)
+                obj.AccentColour.Value = AccentColour;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             NewResult += OnNewResult;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            skin.SourceChanged += onSourceChanged;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
