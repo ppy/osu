@@ -185,7 +185,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             SelectedItems.RemoveAll(hitObject => !shouldBeSelected(hitObject));
             SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).Where(shouldBeSelected));
 
-            bool shouldBeSelected(HitObject hitObject) => minTime <= hitObject.StartTime && hitObject.StartTime <= maxTime;
+            bool shouldBeSelected(HitObject hitObject)
+            {
+                double midTime = (hitObject.StartTime + hitObject.GetEndTime()) / 2;
+                return minTime <= midTime && midTime <= maxTime;
+            }
         }
 
         private void handleScrollViaDrag(DragEvent e)
