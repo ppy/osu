@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -13,11 +12,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 using osuTK.Input;
@@ -79,7 +76,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             AddRangeInternal(new[]
             {
-                DragBox = CreateDragBox(selectBlueprintsFromDragRectangle),
+                DragBox = CreateDragBox(),
                 SelectionHandler,
                 SelectionBlueprints = CreateSelectionBlueprintContainer(),
                 SelectionHandler.CreateProxy(),
@@ -101,7 +98,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [CanBeNull]
         protected virtual SelectionBlueprint<T> CreateBlueprintFor(T item) => null;
 
-        protected virtual DragBox CreateDragBox(Action<RectangleF> performSelect) => new DragBox(performSelect);
+        protected virtual DragBox CreateDragBox() => new DragBox();
 
         /// <summary>
         /// Whether this component is in a state where items outside a drag selection should be deselected. If false, selection will only be added to.
@@ -183,13 +180,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return true;
             }
 
-            if (DragBox.HandleDrag(e))
-            {
-                DragBox.Show();
-                return true;
-            }
-
-            return false;
+            DragBox.HandleDrag(e);
+            DragBox.Show();
+            return true;
         }
 
         protected override void OnDrag(DragEvent e)
@@ -198,7 +191,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return;
 
             if (DragBox.State == Visibility.Visible)
+            {
                 DragBox.HandleDrag(e);
+                UpdateSelectionFromDragBox();
+            }
 
             moveCurrentSelection(e);
         }
@@ -214,8 +210,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 changeHandler?.EndChange();
             }
 
-            if (DragBox.State == Visibility.Visible)
-                DragBox.Hide();
+            DragBox.Hide();
         }
 
         /// <summary>
@@ -380,28 +375,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         /// <summary>
-        /// Select all masks in a given rectangle selection area.
+        /// Select all blueprints in a selection area specified by <see cref="DragBox"/>.
         /// </summary>
-        /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
-        private void selectBlueprintsFromDragRectangle(RectangleF rect)
+        protected virtual void UpdateSelectionFromDragBox()
         {
+            var quad = DragBox.Box.ScreenSpaceDrawQuad;
+
             foreach (var blueprint in SelectionBlueprints)
             {
-                // only run when utmost necessary to avoid unnecessary rect computations.
-                bool isValidForSelection() => blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.ScreenSpaceSelectionPoint);
+                if (blueprint.IsSelected && !AllowDeselectionDuringDrag)
+                    continue;
 
-                switch (blueprint.State)
-                {
-                    case SelectionState.NotSelected:
-                        if (isValidForSelection())
-                            blueprint.Select();
-                        break;
-
-                    case SelectionState.Selected:
-                        if (AllowDeselectionDuringDrag && !isValidForSelection())
-                            blueprint.Deselect();
-                        break;
-                }
+                bool shouldBeSelected = blueprint.IsAlive && blueprint.IsPresent && quad.Contains(blueprint.ScreenSpaceSelectionPoint);
+                if (blueprint.IsSelected != shouldBeSelected)
+                    blueprint.ToggleSelection();
             }
         }
 

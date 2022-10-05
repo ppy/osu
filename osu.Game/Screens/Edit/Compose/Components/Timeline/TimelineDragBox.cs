@@ -6,7 +6,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
@@ -24,24 +23,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private Timeline timeline { get; set; }
 
-        public TimelineDragBox(Action<RectangleF> performSelect)
-            : base(performSelect)
-        {
-        }
-
         protected override Drawable CreateBox() => new Box
         {
             RelativeSizeAxes = Axes.Y,
             Alpha = 0.3f
         };
 
-        public override bool HandleDrag(MouseButtonEvent e)
+        public override void HandleDrag(MouseButtonEvent e)
         {
-            // The dragbox should only be active if the mouseDownPosition.Y is within this drawable's bounds.
-            float localY = ToLocalSpace(e.ScreenSpaceMouseDownPosition).Y;
-            if (DrawRectangle.Top > localY || DrawRectangle.Bottom < localY)
-                return false;
-
             selectionStart ??= e.MouseDownPosition.X / timeline.CurrentZoom;
 
             // only calculate end when a transition is not in progress to avoid bouncing.
@@ -49,7 +38,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 selectionEnd = e.MousePosition.X / timeline.CurrentZoom;
 
             updateDragBoxPosition();
-            return true;
         }
 
         private void updateDragBoxPosition()
@@ -68,8 +56,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // we don't care about where the hitobjects are vertically. in cases like stacking display, they may be outside the box without this adjustment.
             boxScreenRect.Y -= boxScreenRect.Height;
             boxScreenRect.Height *= 2;
-
-            PerformSelection?.Invoke(boxScreenRect);
         }
 
         public override void Hide()

@@ -13,7 +13,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
@@ -65,7 +64,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            DragBox.Alpha = 0;
 
             placement = Beatmap.PlacementObject.GetBoundCopy();
             placement.ValueChanged += placementChanged;
@@ -92,6 +90,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (!base.ReceivePositionalInputAt(e.ScreenSpaceMouseDownPosition))
+                return false;
+
+            return base.OnDragStart(e);
+        }
 
         protected override void OnDrag(DragEvent e)
         {
@@ -169,7 +175,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             };
         }
 
-        protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new TimelineDragBox(performSelect);
+        protected override DragBox CreateDragBox() => new TimelineDragBox();
 
         private void handleScrollViaDrag(DragEvent e)
         {
