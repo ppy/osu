@@ -49,14 +49,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
-                // Objects that are arranged in a mostly-linear fashion should be easy to read (such as circles in a stream).
-                if (prevLoopObj != null && loopObj.Angle.IsNotNull() && prevLoopObj.Angle.IsNotNull())
-                    loopDifficulty *= 1 - Math.Pow(Math.Sin(0.5 * loopObj.Angle.Value), 5);
-
                 pastObjectDifficultyInfluence += loopDifficulty;
             }
 
             noteDensityDifficulty = Math.Pow(3 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence - 1)), 2.3);
+
+            // Objects that are arranged in a mostly-linear fashion should be easy to read (such as circles in a stream).
+            if (currObj.Angle.IsNotNull() && prevObj.IsNotNull())
+            {
+                double prevVelocity = prevObj.LazyJumpDistance / prevObj.StrainTime;
+                double velocityDifference = Math.Clamp(Math.Abs(currVelocity - prevVelocity), 0, 1);
+                noteDensityDifficulty *= 1 - velocityDifference * Math.Pow(Math.Sin(0.5 * currObj.Angle.Value), 5);
+            }
 
             double hiddenDifficulty = 0;
 
