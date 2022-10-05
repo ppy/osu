@@ -35,10 +35,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         }, 7)]
         public void Test(IEnumerable<bool> special, int columns)
         {
-            var definition = new StageDefinition
-            {
-                Columns = columns
-            };
+            var definition = new StageDefinition(columns);
             var results = getResults(definition);
             Assert.AreEqual(special, results);
         }
