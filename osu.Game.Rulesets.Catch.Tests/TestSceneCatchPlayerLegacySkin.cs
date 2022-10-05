@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
 
         [Test]
-        public void TestLegacyHUDComboCounterHidden([Values] bool withModifiedSkin)
+        public void TestLegacyOsuComboCounterHidden([Values] bool withModifiedSkin)
         {
             if (withModifiedSkin)
             {
@@ -31,9 +31,9 @@ namespace osu.Game.Rulesets.Catch.Tests
                 CreateTest();
             }
 
-            AddAssert("legacy HUD combo counter hidden", () =>
+            AddAssert("legacy osu combo counter hidden", () =>
             {
-                return Player.ChildrenOfType<LegacyComboCounter>().All(c => c.ChildrenOfType<Container>().Single().Alpha == 0f);
+                return Player.ChildrenOfType<LegacyOsuComboCounter>().All(c => c.ChildrenOfType<Container>().Single().Alpha == 0f);
             });
         }
     }
