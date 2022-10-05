@@ -8,12 +8,14 @@ using System.Collections.Generic;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
@@ -149,7 +151,20 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
             if (lookup is ManiaSkinConfigurationLookup maniaLookup)
-                return base.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.ColumnIndex));
+            {
+                var legacyLookup =
+                    base.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.ColumnIndex));
+
+                if (legacyLookup != null)
+                    return legacyLookup;
+
+                // default legacy fallback.
+                switch (maniaLookup.Lookup)
+                {
+                    case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(Color4.Black));
+                }
+            }
 
             return base.GetConfig<TLookup, TValue>(lookup);
         }
