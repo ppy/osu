@@ -17,10 +17,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             Anchor = Anchor.TopCentre;
             Origin = Anchor.Centre;
 
+            Y = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ComboPosition)?.Value ?? 0;
+
             DisplayedCountText.Anchor = Anchor.Centre;
             DisplayedCountText.Origin = Anchor.Centre;
+
             PopOutCountText.Anchor = Anchor.Centre;
             PopOutCountText.Origin = Anchor.Centre;
+            PopOutCountText.Colour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ComboBreakColour)?.Value ?? Color4.Red;
         }
 
         protected override void OnCountIncrement()
