@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -18,9 +17,9 @@ namespace osu.Game.Rulesets.Osu.UI
     /// </summary>
     public class SmokeContainer : Container, IRequireHighFrequencyMousePosition, IKeyBindingHandler<OsuAction>
     {
-        public Vector2 LastMousePosition;
+        private SkinnableDrawable? currentSegmentSkinnable;
 
-        private SkinnableDrawable? currentSegment;
+        private Vector2 lastMousePosition;
 
         public override bool ReceivePositionalInputAt(Vector2 _) => true;
 
@@ -28,38 +27,38 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             if (e.Action == OsuAction.Smoke)
             {
-                AddInternal(currentSegment = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SmokeTrail), _ => new DefaultSmokeSegment()));
-                addPosition(LastMousePosition, Time.Current);
+                AddInternal(currentSegmentSkinnable = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SmokeTrail), _ => new DefaultSmokeSegment()));
+
+                // Add initial position immediately.
+                addPosition();
                 return true;
             }
 
             return false;
         }
 
-        private void addPosition(Vector2 position, double timeCurrent) => (currentSegment?.Drawable as SmokeSegment)?.AddPosition(position, timeCurrent);
-
         public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
         {
             if (e.Action == OsuAction.Smoke)
             {
-                (currentSegment?.Drawable as SmokeSegment)?.FinishDrawing(Time.Current);
-                currentSegment = null;
-
-                foreach (Drawable child in Children)
+                if (currentSegmentSkinnable?.Drawable is SmokeSegment segment)
                 {
-                    var skinnable = (SkinnableDrawable)child;
-                    skinnable.LifetimeEnd = skinnable.Drawable.LifetimeEnd;
+                    segment.FinishDrawing(Time.Current);
+
+                    currentSegmentSkinnable.LifetimeEnd = segment.LifetimeEnd;
+                    currentSegmentSkinnable = null;
                 }
             }
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (currentSegment != null)
-                addPosition(e.MousePosition, Time.Current);
+            lastMousePosition = e.MousePosition;
+            addPosition();
 
-            LastMousePosition = e.MousePosition;
             return base.OnMouseMove(e);
         }
+
+        private void addPosition() => (currentSegmentSkinnable?.Drawable as SmokeSegment)?.AddPosition(lastMousePosition, Time.Current);
     }
 }
