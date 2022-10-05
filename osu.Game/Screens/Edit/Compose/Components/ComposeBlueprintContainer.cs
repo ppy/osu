@@ -83,6 +83,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
+        protected override bool AllowDeselectionDuringDrag => !EditorClock.IsRunning;
+
         protected override void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
         {
             base.TransferBlueprintFor(hitObject, drawableObject);
