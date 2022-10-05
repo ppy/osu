@@ -24,15 +24,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public IShader? TextureShader { get; private set; }
         public IShader? RoundedTextureShader { get; private set; }
 
-        public override double LifetimeEnd
-        {
-            get
-            {
-                double initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
-                return SmokeEndTime + final_fade_out_duration + initialFadeOutDurationTrunc / re_fade_in_speed + initialFadeOutDurationTrunc / final_fade_out_speed;
-            }
-        }
-
         private float? radius;
 
         protected float Radius
@@ -153,6 +144,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public void FinishDrawing(double time)
         {
             SmokeEndTime = time;
+
+            double initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
+            LifetimeEnd = SmokeEndTime + final_fade_out_duration + initialFadeOutDurationTrunc / re_fade_in_speed + initialFadeOutDurationTrunc / final_fade_out_speed;
         }
 
         protected override DrawNode CreateDrawNode() => new SmokeDrawNode(this);
