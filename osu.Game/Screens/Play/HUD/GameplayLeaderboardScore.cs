@@ -335,8 +335,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private float? scoreComponentsTargetWidth;
 
-        // Schedule required to get correct DrawWidth from text after updates.
-        private void updateDetailsWidth() => SchedulerAfterChildren.AddOnce(() =>
+        private void updateDetailsWidth()
         {
             const float score_components_min_width = 88f;
 
@@ -349,7 +348,7 @@ namespace osu.Game.Screens.Play.HUD
 
             scoreComponentsTargetWidth = newWidth;
             scoreComponents.ResizeWidthTo(newWidth, panel_transition_duration, Easing.OutQuint);
-        });
+        }
 
         private void updateState()
         {
