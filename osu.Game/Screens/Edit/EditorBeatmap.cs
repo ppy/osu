@@ -352,6 +352,8 @@ namespace osu.Game.Screens.Edit
             var updates = batchPendingUpdates.ToArray();
             batchPendingUpdates.Clear();
 
+            foreach (var h in deletes) SelectedHitObjects.Remove(h);
+
             foreach (var h in deletes) HitObjectRemoved?.Invoke(h);
             foreach (var h in inserts) HitObjectAdded?.Invoke(h);
             foreach (var h in updates) HitObjectUpdated?.Invoke(h);
