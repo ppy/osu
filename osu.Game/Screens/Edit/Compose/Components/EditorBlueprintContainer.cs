@@ -66,8 +66,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override IEnumerable<SelectionBlueprint<HitObject>> SortForMovement(IReadOnlyList<SelectionBlueprint<HitObject>> blueprints)
             => blueprints.OrderBy(b => b.Item.StartTime);
 
-        protected override bool AllowDeselectionDuringDrag => !EditorClock.IsRunning;
-
         protected override bool ApplySnapResult(SelectionBlueprint<HitObject>[] blueprints, SnapResult result)
         {
             if (!base.ApplySnapResult(blueprints, result))
