@@ -109,6 +109,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         case ManiaSkinComponents.ColumnBackground:
                             return new LegacyColumnBackground();
 
+                        case ManiaSkinComponents.ComboCounter:
+                            return new LegacyManiaComboCounter();
+
                         case ManiaSkinComponents.HitTarget:
                             // Legacy skins sandwich the hit target between the column background and the column light.
                             // To preserve this ordering, it's created manually inside LegacyStageBackground.
