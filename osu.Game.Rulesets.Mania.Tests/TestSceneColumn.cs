@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
@@ -27,6 +28,9 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
+
+        [Cached]
+        private readonly StageDefinition stage = new StageDefinition(1);
 
         private readonly List<Column> columns = new List<Column>();
 

@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
@@ -15,7 +16,15 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <summary>
         /// The number of <see cref="Column"/>s which this stage contains.
         /// </summary>
-        public int Columns;
+        public readonly int Columns;
+
+        public StageDefinition(int columns)
+        {
+            if (columns < 1)
+                throw new ArgumentException("Column count must be above zero.", nameof(columns));
+
+            Columns = columns;
+        }
 
         /// <summary>
         /// Whether the column index is a special column for this stage.

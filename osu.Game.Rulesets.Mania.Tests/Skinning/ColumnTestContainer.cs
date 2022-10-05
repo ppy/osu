@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         private readonly Column column;
 
         [Cached]
-        private readonly StageDefinition stageDefinition = new StageDefinition { Columns = 2 };
+        private readonly StageDefinition stageDefinition = new StageDefinition(5);
 
         public ColumnTestContainer(int column, ManiaAction action, bool showColumn = false)
         {

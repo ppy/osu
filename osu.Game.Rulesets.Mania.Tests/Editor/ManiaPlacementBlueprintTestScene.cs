@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -29,6 +30,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
         [Cached(typeof(IScrollingInfo))]
         private IScrollingInfo scrollingInfo;
+
+        [Cached]
+        private readonly StageDefinition stage = new StageDefinition(5);
 
         protected ManiaPlacementBlueprintTestScene()
         {
