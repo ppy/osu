@@ -21,24 +21,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 {
     public abstract class SmokeSegment : Drawable, ITexturedShaderDrawable
     {
-        public IShader? TextureShader { get; private set; }
-        public IShader? RoundedTextureShader { get; private set; }
-
-        protected float Radius => Texture?.DisplayWidth * 0.165f ?? 3;
-
-        protected Texture? Texture { get; set; }
-
-        protected double SmokeStartTime { get; private set; } = double.MinValue;
-
-        protected double SmokeEndTime { get; private set; } = double.MaxValue;
-
-        protected readonly List<SmokePoint> SmokePoints = new List<SmokePoint>();
-
-        protected virtual float PointInterval => Radius * 7f / 8;
-
-        private float totalDistance;
-        private Vector2? lastPosition;
-
         private const int max_point_count = 18_000;
 
         // fade anim values
@@ -66,6 +48,24 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private const float max_rotation = 0.25f;
 
+        public IShader? TextureShader { get; private set; }
+        public IShader? RoundedTextureShader { get; private set; }
+
+        protected Texture? Texture { get; set; }
+
+        private float radius => Texture?.DisplayWidth * 0.165f ?? 3;
+
+        protected readonly List<SmokePoint> SmokePoints = new List<SmokePoint>();
+
+        private float pointInterval => radius * 7f / 8;
+
+        private double smokeStartTime { get; set; } = double.MinValue;
+
+        private double smokeEndTime { get; set; } = double.MaxValue;
+
+        private float totalDistance;
+        private Vector2? lastPosition;
+
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
@@ -79,9 +79,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             RelativeSizeAxes = Axes.Both;
 
-            SmokeStartTime = Time.Current;
+            smokeStartTime = Time.Current;
 
-            totalDistance = PointInterval;
+            totalDistance = pointInterval;
         }
 
         private Vector2 nextPointDirection()
@@ -96,15 +96,15 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             float delta = (position - (Vector2)lastPosition).LengthFast;
             totalDistance += delta;
-            int count = (int)(totalDistance / PointInterval);
+            int count = (int)(totalDistance / pointInterval);
 
             if (count > 0)
             {
                 Vector2 increment = position - (Vector2)lastPosition;
                 increment.NormalizeFast();
 
-                Vector2 pointPos = (PointInterval - (totalDistance - delta)) * increment + (Vector2)lastPosition;
-                increment *= PointInterval;
+                Vector2 pointPos = (pointInterval - (totalDistance - delta)) * increment + (Vector2)lastPosition;
+                increment *= pointInterval;
 
                 if (SmokePoints.Count > 0 && SmokePoints[^1].Time > time)
                 {
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     SmokePoints.RemoveRange(index, SmokePoints.Count - index);
                 }
 
-                totalDistance %= PointInterval;
+                totalDistance %= pointInterval;
 
                 for (int i = 0; i < count; i++)
                 {
@@ -137,10 +137,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         public void FinishDrawing(double time)
         {
-            SmokeEndTime = time;
+            smokeEndTime = time;
 
-            double initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
-            LifetimeEnd = SmokeEndTime + final_fade_out_duration + initialFadeOutDurationTrunc / re_fade_in_speed + initialFadeOutDurationTrunc / final_fade_out_speed;
+            double initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, smokeEndTime - smokeStartTime);
+            LifetimeEnd = smokeEndTime + final_fade_out_duration + initialFadeOutDurationTrunc / re_fade_in_speed + initialFadeOutDurationTrunc / final_fade_out_speed;
         }
 
         protected override DrawNode CreateDrawNode() => new SmokeDrawNode(this);
@@ -208,12 +208,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 points.Clear();
                 points.AddRange(Source.SmokePoints);
 
-                radius = Source.Radius;
+                radius = Source.radius;
                 drawSize = Source.DrawSize;
                 texture = Source.Texture;
 
-                SmokeStartTime = Source.SmokeStartTime;
-                SmokeEndTime = Source.SmokeEndTime;
+                SmokeStartTime = Source.smokeStartTime;
+                SmokeEndTime = Source.smokeEndTime;
                 CurrentTime = Source.Clock.CurrentTime;
 
                 rotationRNG = new Random(Source.rotationSeed);
