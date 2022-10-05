@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => stages.Any(s => s.ReceivePositionalInputAt(screenSpacePos));
 
-        public ManiaPlayfield(List<StageDefinition> stageDefinitions)
+        public ManiaPlayfield(List<StageDefinition> stageDefinitions, bool displayComboCounter = false)
         {
             if (stageDefinitions == null)
                 throw new ArgumentNullException(nameof(stageDefinitions));
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new Stage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                var newStage = new Stage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction, displayComboCounter);
 
                 playfieldGrid.Content[0][i] = newStage;
 

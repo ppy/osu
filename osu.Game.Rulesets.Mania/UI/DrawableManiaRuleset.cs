@@ -42,6 +42,13 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public const double MAX_TIME_RANGE = 11485;
 
+        /// <summary>
+        /// Whether an osu!mania-specific combo counter should be displayed on the playfield.
+        /// Used to hide combo counter on editor screen.
+        /// </summary>
+        // todo: this is very ugly, but works for now until ruleset-specific combo counters become part of HUDOverlay.
+        protected virtual bool DisplayComboCounter => true;
+
         protected new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
 
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
@@ -131,7 +138,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
 
-        protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages);
+        protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages, DisplayComboCounter);
 
         public override int Variant => (int)(Beatmap.Stages.Count == 1 ? PlayfieldType.Single : PlayfieldType.Dual) + Beatmap.TotalColumns;
 

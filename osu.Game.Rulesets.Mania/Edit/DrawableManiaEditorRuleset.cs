@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public class DrawableManiaEditorRuleset : DrawableManiaRuleset
     {
+        protected override bool DisplayComboCounter => false;
+
         public new IScrollingInfo ScrollingInfo => base.ScrollingInfo;
 
         public DrawableManiaEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)

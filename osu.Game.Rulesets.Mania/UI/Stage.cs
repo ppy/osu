@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly int firstColumnIndex;
 
-        public Stage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
+        public Stage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction, bool showComboCounter = false)
         {
             this.firstColumnIndex = firstColumnIndex;
 
@@ -108,7 +108,6 @@ namespace osu.Game.Rulesets.Mania.UI
                             RelativeSizeAxes = Axes.Both,
                             Y = HIT_TARGET_POSITION + 150
                         },
-                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ComboCounter), _ => Empty()),
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 }
@@ -131,6 +130,9 @@ namespace osu.Game.Rulesets.Mania.UI
                 columnFlow.SetContentForColumn(i, column);
                 AddNested(column);
             }
+
+            if (showComboCounter)
+                AddInternal(new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ComboCounter), _ => Empty()));
         }
 
         protected override void LoadComplete()
