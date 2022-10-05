@@ -182,21 +182,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             var dragBox = (TimelineDragBox)DragBox;
             double minTime = dragBox.MinTime;
             double maxTime = dragBox.MaxTime;
-            Console.WriteLine($"{minTime}, {maxTime}");
 
-            // TODO: performance
-            foreach (var hitObject in Beatmap.HitObjects)
-            {
-                bool shouldBeSelected = minTime <= hitObject.StartTime && hitObject.StartTime <= maxTime;
-                bool isSelected = SelectedItems.Contains(hitObject);
-                if (isSelected != shouldBeSelected)
-                {
-                    if (!isSelected)
-                        SelectedItems.Add(hitObject);
-                    else
-                        SelectedItems.Remove(hitObject);
-                }
-            }
+            SelectedItems.RemoveAll(hitObject => !shouldBeSelected(hitObject));
+            SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).Where(hitObject => shouldBeSelected(hitObject)));
+
+            bool shouldBeSelected(HitObject hitObject) => minTime <= hitObject.StartTime && hitObject.StartTime <= maxTime;
         }
 
         private void handleScrollViaDrag(DragEvent e)

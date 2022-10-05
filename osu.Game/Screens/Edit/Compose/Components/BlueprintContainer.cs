@@ -58,13 +58,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     case NotifyCollectionChangedAction.Add:
                         foreach (object o in args.NewItems)
-                            SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Select();
+                        {
+                            if (blueprintMap.TryGetValue((T)o, out var blueprint))
+                                blueprint.Select();
+                        }
 
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
                         foreach (object o in args.OldItems)
-                            SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Deselect();
+                        {
+                            if (blueprintMap.TryGetValue((T)o, out var blueprint))
+                                blueprint.Deselect();
+                        }
 
                         break;
                 }
