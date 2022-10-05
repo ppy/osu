@@ -175,7 +175,29 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             };
         }
 
-        protected override DragBox CreateDragBox() => new TimelineDragBox();
+        protected sealed override DragBox CreateDragBox() => new TimelineDragBox();
+
+        protected override void UpdateSelectionFromDragBox()
+        {
+            var dragBox = (TimelineDragBox)DragBox;
+            double minTime = dragBox.MinTime;
+            double maxTime = dragBox.MaxTime;
+            Console.WriteLine($"{minTime}, {maxTime}");
+
+            // TODO: performance
+            foreach (var hitObject in Beatmap.HitObjects)
+            {
+                bool shouldBeSelected = minTime <= hitObject.StartTime && hitObject.StartTime <= maxTime;
+                bool isSelected = SelectedItems.Contains(hitObject);
+                if (isSelected != shouldBeSelected)
+                {
+                    if (!isSelected)
+                        SelectedItems.Add(hitObject);
+                    else
+                        SelectedItems.Remove(hitObject);
+                }
+            }
+        }
 
         private void handleScrollViaDrag(DragEvent e)
         {

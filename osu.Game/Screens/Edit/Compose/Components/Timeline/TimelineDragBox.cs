@@ -14,11 +14,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class TimelineDragBox : DragBox
     {
-        // the following values hold the start and end X positions of the drag box in the timeline's local space,
-        // but with zoom unapplied in order to be able to compensate for positional changes
-        // while the timeline is being zoomed in/out.
-        private float? selectionStart;
-        private float selectionEnd;
+        public double MinTime => Math.Min(startTime.Value, endTime);
+
+        public double MaxTime => Math.Max(startTime.Value, endTime);
+
+        private double? startTime;
+
+        private double endTime;
 
         [Resolved]
         private Timeline timeline { get; set; }
@@ -31,37 +33,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public override void HandleDrag(MouseButtonEvent e)
         {
-            selectionStart ??= e.MouseDownPosition.X / timeline.CurrentZoom;
+            startTime ??= timeline.TimeAtPosition(e.MouseDownPosition.X);
+            endTime = timeline.TimeAtPosition(e.MousePosition.X);
 
-            // only calculate end when a transition is not in progress to avoid bouncing.
-            if (Precision.AlmostEquals(timeline.CurrentZoom, timeline.Zoom))
-                selectionEnd = e.MousePosition.X / timeline.CurrentZoom;
-
-            updateDragBoxPosition();
-        }
-
-        private void updateDragBoxPosition()
-        {
-            if (selectionStart == null)
-                return;
-
-            float rescaledStart = selectionStart.Value * timeline.CurrentZoom;
-            float rescaledEnd = selectionEnd * timeline.CurrentZoom;
-
-            Box.X = Math.Min(rescaledStart, rescaledEnd);
-            Box.Width = Math.Abs(rescaledStart - rescaledEnd);
-
-            var boxScreenRect = Box.ScreenSpaceDrawQuad.AABBFloat;
-
-            // we don't care about where the hitobjects are vertically. in cases like stacking display, they may be outside the box without this adjustment.
-            boxScreenRect.Y -= boxScreenRect.Height;
-            boxScreenRect.Height *= 2;
+            Box.X = timeline.PositionAtTime(MinTime);
+            Box.Width = timeline.PositionAtTime(MaxTime) - Box.X;
         }
 
         public override void Hide()
         {
             base.Hide();
-            selectionStart = null;
+            startTime = null;
         }
     }
 }
