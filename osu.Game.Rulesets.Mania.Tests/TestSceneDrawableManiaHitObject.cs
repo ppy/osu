@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 {
                     Action = { Value = ManiaAction.Key1 },
                     Height = 0.85f,
-                    AccentColour = Color4.Gray
+                    AccentColour = { Value = Color4.Gray },
                 },
             };
         });

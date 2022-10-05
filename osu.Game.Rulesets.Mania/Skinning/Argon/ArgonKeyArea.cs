@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private Container<Circle> bottomIcon = null!;
         private CircularContainer topIcon = null!;
 
+        private Bindable<Color4> accentColour = null!;
+
         [Resolved]
         private Column column { get; set; } = null!;
 
@@ -55,7 +57,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     {
                         Name = "Key gradient",
                         RelativeSizeAxes = Axes.Both,
-                        Colour = column.AccentColour.Darken(0.6f),
                     },
                     hitTargetLine = new Circle
                     {
@@ -80,7 +81,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.Centre,
                                 Blending = BlendingParameters.Additive,
-                                Colour = column.AccentColour,
                                 Y = icon_vertical_offset,
                                 Children = new[]
                                 {
@@ -134,6 +134,13 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
+
+            accentColour = column.AccentColour.GetBoundCopy();
+            accentColour.BindValueChanged(colour =>
+            {
+                background.Colour = colour.NewValue.Darken(0.6f);
+                bottomIcon.Colour = colour.NewValue;
+            }, true);
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
@@ -159,11 +166,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             if (e.Action != column.Action.Value) return false;
 
             const double lighting_fade_in_duration = 50;
-            Color4 lightingColour = column.AccentColour.Lighten(0.9f);
+            Color4 lightingColour = accentColour.Value.Lighten(0.9f);
 
             background
-                .FadeColour(column.AccentColour.Lighten(0.4f), 40).Then()
-                .FadeColour(column.AccentColour, 150, Easing.OutQuint);
+                .FadeColour(accentColour.Value.Lighten(0.4f), 40).Then()
+                .FadeColour(accentColour.Value, 150, Easing.OutQuint);
 
             hitTargetLine.FadeColour(Color4.White, lighting_fade_in_duration, Easing.OutQuint);
             hitTargetLine.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
@@ -201,9 +208,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             if (e.Action != column.Action.Value) return;
 
             const double lighting_fade_out_duration = 300;
-            Color4 lightingColour = column.AccentColour.Lighten(0.9f).Opacity(0);
+            Color4 lightingColour = accentColour.Value.Lighten(0.9f).Opacity(0);
 
-            background.FadeColour(column.AccentColour.Darken(0.6f), lighting_fade_out_duration, Easing.OutQuint);
+            background.FadeColour(accentColour.Value.Darken(0.6f), lighting_fade_out_duration, Easing.OutQuint);
 
             topIcon.ScaleTo(1f, 200, Easing.OutQuint);
             topIcon.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
@@ -221,7 +228,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 Radius = 30,
             }, lighting_fade_out_duration, Easing.OutQuint);
 
-            bottomIcon.FadeColour(column.AccentColour, lighting_fade_out_duration, Easing.OutQuint);
+            bottomIcon.FadeColour(accentColour.Value, lighting_fade_out_duration, Easing.OutQuint);
 
             foreach (var circle in bottomIcon)
             {
