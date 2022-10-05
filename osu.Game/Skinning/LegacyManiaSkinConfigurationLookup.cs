@@ -1,19 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 namespace osu.Game.Skinning
 {
     public class LegacyManiaSkinConfigurationLookup
     {
-        public readonly int Keys;
+        /// <summary>
+        /// Total columns across all stages.
+        /// </summary>
+        public readonly int TotalColumns;
+
         public readonly LegacyManiaSkinConfigurationLookups Lookup;
         public readonly int? TargetColumn;
 
-        public LegacyManiaSkinConfigurationLookup(int keys, LegacyManiaSkinConfigurationLookups lookup, int? targetColumn = null)
+        public LegacyManiaSkinConfigurationLookup(int totalColumns, LegacyManiaSkinConfigurationLookups lookup, int? targetColumn = null)
         {
-            Keys = keys;
+            TotalColumns = totalColumns;
             Lookup = lookup;
             TargetColumn = targetColumn;
         }

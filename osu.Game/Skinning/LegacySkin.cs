@@ -128,8 +128,8 @@ namespace osu.Game.Skinning
 
         private IBindable<TValue>? lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
         {
-            if (!maniaConfigurations.TryGetValue(maniaLookup.Keys, out var existing))
-                maniaConfigurations[maniaLookup.Keys] = existing = new LegacyManiaSkinConfiguration(maniaLookup.Keys);
+            if (!maniaConfigurations.TryGetValue(maniaLookup.TotalColumns, out var existing))
+                maniaConfigurations[maniaLookup.TotalColumns] = existing = new LegacyManiaSkinConfiguration(maniaLookup.TotalColumns);
 
             switch (maniaLookup.Lookup)
             {
