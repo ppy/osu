@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                 this.column = new Column(column, false)
                 {
                     Action = { Value = action },
-                    AccentColour = Color4.Orange,
+                    AccentColour = { Value = Color4.Orange },
                     Alpha = showColumn ? 1 : 0
                 },
                 content = new ManiaInputManager(new ManiaRuleset().RulesetInfo, 4)

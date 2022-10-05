@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public readonly bool IsSpecial;
 
-        public Color4 AccentColour { get; set; }
+        public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Black);
 
         public Column(int index, bool isSpecial)
         {
@@ -76,6 +76,13 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             skin.SourceChanged += onSourceChanged;
             onSourceChanged();
+
+            AccentColour.BindValueChanged(colour =>
+            {
+                // Manual transfer as hit objects may be moved between column and unbinding is non-trivial.
+                foreach (var obj in HitObjectContainer.Objects)
+                    obj.AccentColour.Value = colour.NewValue;
+            }, true);
 
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
@@ -109,9 +116,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private void onSourceChanged()
         {
-            AccentColour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour, stageDefinition, Index)?.Value ?? Color4.Black;
-            foreach (var obj in HitObjectContainer.Objects)
-                obj.AccentColour.Value = AccentColour;
+            AccentColour.Value = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour, stageDefinition, Index)?.Value ?? Color4.Black;
         }
 
         protected override void LoadComplete()
@@ -139,7 +144,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)drawableHitObject;
 
-            maniaObject.AccentColour.Value = AccentColour;
+            maniaObject.AccentColour.Value = AccentColour.Value;
             maniaObject.CheckHittable = hitPolicy.IsHittable;
         }
 
