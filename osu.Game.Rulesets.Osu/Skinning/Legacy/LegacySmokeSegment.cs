@@ -6,7 +6,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacySmoke : Smoke
+    public class LegacySmokeSegment : SmokeSegment
     {
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
