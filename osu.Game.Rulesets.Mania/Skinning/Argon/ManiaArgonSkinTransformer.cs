@@ -3,7 +3,6 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Skinning;
@@ -56,11 +55,49 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         int column = maniaLookup.ColumnIndex ?? 0;
                         var stage = beatmap.GetStageForColumnIndex(column);
 
-                        if (stage.IsSpecialColumn(column))
-                            return SkinUtils.As<TValue>(new Bindable<Color4>(Color4.Yellow));
+                        Color4 colour;
 
-                        // TODO: Add actual colours.
-                        return SkinUtils.As<TValue>(new Bindable<Color4>(new Color4(RNG.NextSingle() * 0.5f, RNG.NextSingle() * 0.5f, RNG.NextSingle() * 0.5f, 1)));
+                        if (stage.IsSpecialColumn(column))
+                            colour = new Color4(159, 101, 255, 255);
+                        else
+                        {
+                            switch (column % 8)
+                            {
+                                default:
+                                    colour = new Color4(240, 216, 0, 255);
+                                    break;
+
+                                case 1:
+                                    colour = new Color4(240, 101, 0, 255);
+                                    break;
+
+                                case 2:
+                                    colour = new Color4(240, 0, 130, 255);
+                                    break;
+
+                                case 3:
+                                    colour = new Color4(192, 0, 240, 255);
+                                    break;
+
+                                case 4:
+                                    colour = new Color4(178, 0, 240, 255);
+                                    break;
+
+                                case 5:
+                                    colour = new Color4(0, 96, 240, 255);
+                                    break;
+
+                                case 6:
+                                    colour = new Color4(0, 226, 240, 255);
+                                    break;
+
+                                case 7:
+                                    colour = new Color4(0, 240, 96, 255);
+                                    break;
+                            }
+                        }
+
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(colour));
                 }
             }
 
