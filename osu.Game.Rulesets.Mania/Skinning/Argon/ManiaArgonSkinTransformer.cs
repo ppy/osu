@@ -4,6 +4,8 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -11,9 +13,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     public class ManiaArgonSkinTransformer : SkinTransformer
     {
-        public ManiaArgonSkinTransformer(ISkin skin)
+        private readonly ManiaBeatmap beatmap;
+
+        public ManiaArgonSkinTransformer(ISkin skin, IBeatmap beatmap)
             : base(skin)
         {
+            this.beatmap = (ManiaBeatmap)beatmap;
         }
 
         public override Drawable? GetDrawableComponent(ISkinComponent component)
@@ -44,7 +49,10 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 switch (maniaLookup.Lookup)
                 {
                     case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
-                        if (maniaLookup.StageDefinition.IsSpecialColumn(maniaLookup.ColumnIndex ?? 0))
+                        int column = maniaLookup.ColumnIndex ?? 0;
+                        var stage = beatmap.GetStageForColumnIndex(column);
+
+                        if (stage.IsSpecialColumn(column))
                             return SkinUtils.As<TValue>(new Bindable<Color4>(Color4.Yellow));
 
                         // TODO: Add actual colours.
