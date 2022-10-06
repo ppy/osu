@@ -3,6 +3,11 @@
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// This class exists for the explicit purpose of ferrying information from ManiaBeatmap in a way LegacySkin can use it.
+    /// This is because half of the mania legacy skin implementation is in LegacySkin (osu.Game project) which doesn't have visibility
+    /// over ManiaBeatmap / StageDefinition.
+    /// </summary>
     public class LegacyManiaSkinConfigurationLookup
     {
         /// <summary>
@@ -10,8 +15,9 @@ namespace osu.Game.Skinning
         /// </summary>
         public readonly int TotalColumns;
 
-        public readonly LegacyManiaSkinConfigurationLookups Lookup;
         public readonly int? TargetColumn;
+
+        public readonly LegacyManiaSkinConfigurationLookups Lookup;
 
         public LegacyManiaSkinConfigurationLookup(int totalColumns, LegacyManiaSkinConfigurationLookups lookup, int? targetColumn = null)
         {
