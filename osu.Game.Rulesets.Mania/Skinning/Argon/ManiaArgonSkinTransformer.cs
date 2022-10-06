@@ -55,11 +55,17 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         {
             if (lookup is ManiaSkinConfigurationLookup maniaLookup)
             {
+                int column = maniaLookup.ColumnIndex ?? 0;
+                var stage = beatmap.GetStageForColumnIndex(column);
+
                 switch (maniaLookup.Lookup)
                 {
+                    case LegacyManiaSkinConfigurationLookups.ColumnWidth:
+                        return SkinUtils.As<TValue>(new Bindable<float>(
+                            stage.IsSpecialColumn(column) ? 80 : 60
+                        ));
+
                     case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
-                        int column = maniaLookup.ColumnIndex ?? 0;
-                        var stage = beatmap.GetStageForColumnIndex(column);
 
                         Color4 colour;
 
