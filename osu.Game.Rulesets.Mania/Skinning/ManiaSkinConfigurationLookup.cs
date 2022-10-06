@@ -16,8 +16,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
         public readonly LegacyManiaSkinConfigurationLookups Lookup;
 
         /// <summary>
-        /// The intended <see cref="Column"/> index for the configuration.
+        /// The column which is being looked up.
         /// May be null if the configuration does not apply to a <see cref="Column"/>.
+        /// Note that this is the absolute index across all stages.
         /// </summary>
         public readonly int? ColumnIndex;
 
