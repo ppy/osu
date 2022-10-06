@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -17,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.UI
     /// </summary>
     public class SmokeContainer : Container, IRequireHighFrequencyMousePosition, IKeyBindingHandler<OsuAction>
     {
-        private SkinnableDrawable? currentSegmentSkinnable;
+        private SmokeSkinnableDrawable? currentSegmentSkinnable;
 
         private Vector2 lastMousePosition;
 
@@ -27,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             if (e.Action == OsuAction.Smoke)
             {
-                AddInternal(currentSegmentSkinnable = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorSmoke), _ => new DefaultSmokeSegment()));
+                AddInternal(currentSegmentSkinnable = new SmokeSkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorSmoke), _ => new DefaultSmokeSegment()));
 
                 // Add initial position immediately.
                 addPosition();
@@ -44,8 +46,6 @@ namespace osu.Game.Rulesets.Osu.UI
                 if (currentSegmentSkinnable?.Drawable is SmokeSegment segment)
                 {
                     segment.FinishDrawing(Time.Current);
-
-                    currentSegmentSkinnable.LifetimeEnd = segment.LifetimeEnd;
                     currentSegmentSkinnable = null;
                 }
             }
@@ -60,5 +60,18 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         private void addPosition() => (currentSegmentSkinnable?.Drawable as SmokeSegment)?.AddPosition(lastMousePosition, Time.Current);
+
+        private class SmokeSkinnableDrawable : SkinnableDrawable
+        {
+            public override bool RemoveWhenNotAlive => true;
+
+            public override double LifetimeStart => Drawable.LifetimeStart;
+            public override double LifetimeEnd => Drawable.LifetimeEnd;
+
+            public SmokeSkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable>? defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
+                : base(component, defaultImplementation, confineMode)
+            {
+            }
+        }
     }
 }
