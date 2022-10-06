@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.UI
             : base(ruleset, beatmap, mods)
         {
             // Check if mods have RelaxMod instance
-            if (mods.OfType<ModRelax>().Any())
+            if (mods != null && mods.OfType<ModRelax>().Any())
                 showMobileMapper = false;
 
             Direction.Value = ScrollingDirection.Down;
