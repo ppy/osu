@@ -12,6 +12,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
@@ -53,18 +54,24 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 Height = Stage.HIT_TARGET_POSITION,
                 Children = new[]
                 {
-                    background = new Box
+                    new Container
                     {
-                        Name = "Key gradient",
+                        Masking = true,
                         RelativeSizeAxes = Axes.Both,
+                        CornerRadius = ArgonNotePiece.CORNER_RADIUS,
+                        Child = background = new Box
+                        {
+                            Name = "Key gradient",
+                            RelativeSizeAxes = Axes.Both,
+                        },
                     },
                     hitTargetLine = new Circle
                     {
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.TopCentre,
-                        Origin = Anchor.Centre,
+                        Origin = Anchor.BottomCentre,
                         Colour = OsuColour.Gray(196 / 255f),
-                        Height = 4,
+                        Height = ArgonNotePiece.CORNER_RADIUS * 2,
                         Masking = true,
                     },
                     new Container
@@ -137,10 +144,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
             accentColour = column.AccentColour.GetBoundCopy();
             accentColour.BindValueChanged(colour =>
-            {
-                background.Colour = colour.NewValue.Darken(0.6f);
-                bottomIcon.Colour = colour.NewValue;
-            }, true);
+                {
+                    background.Colour = colour.NewValue.Darken(1f);
+                    bottomIcon.Colour = colour.NewValue;
+                },
+                true);
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
@@ -169,8 +177,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             Color4 lightingColour = accentColour.Value.Lighten(0.9f);
 
             background
-                .FadeColour(accentColour.Value.Lighten(0.4f), 40).Then()
-                .FadeColour(accentColour.Value, 150, Easing.OutQuint);
+                .FadeColour(accentColour.Value, 40).Then()
+                .FadeColour(accentColour.Value.Darken(0.4f), 150, Easing.OutQuint);
 
             hitTargetLine.FadeColour(Color4.White, lighting_fade_in_duration, Easing.OutQuint);
             hitTargetLine.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
@@ -225,7 +233,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             {
                 Type = EdgeEffectType.Glow,
                 Colour = lightingColour,
-                Radius = 30,
+                Radius = 25,
             }, lighting_fade_out_duration, Easing.OutQuint);
 
             bottomIcon.FadeColour(accentColour.Value, lighting_fade_out_duration, Easing.OutQuint);
