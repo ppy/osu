@@ -311,6 +311,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("jump editor clock", () => EditorClock.Seek(60000));
             AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
             assertSelectionIs(addedObjects.Skip(1));
+            AddAssert("all blueprints are present", () => blueprintContainer.SelectionBlueprints.Count == EditorBeatmap.SelectedHitObjects.Count);
         }
 
         private void assertSelectionIs(IEnumerable<HitObject> hitObjects)
