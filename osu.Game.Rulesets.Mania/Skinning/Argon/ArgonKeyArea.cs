@@ -12,7 +12,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.UI;
-using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
@@ -62,6 +61,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         Child = background = new Box
                         {
                             Name = "Key gradient",
+                            Alpha = 0,
+                            Blending = BlendingParameters.Additive,
                             RelativeSizeAxes = Axes.Both,
                         },
                     },
@@ -177,8 +178,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             Color4 lightingColour = accentColour.Value.Lighten(0.9f);
 
             background
-                .FadeColour(accentColour.Value, 40).Then()
-                .FadeColour(accentColour.Value.Darken(0.4f), 150, Easing.OutQuint);
+                .FadeTo(1, 40).Then()
+                .FadeTo(0.8f, 150, Easing.OutQuint);
 
             hitTargetLine.FadeColour(Color4.White, lighting_fade_in_duration, Easing.OutQuint);
             hitTargetLine.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
@@ -218,7 +219,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             const double lighting_fade_out_duration = 300;
             Color4 lightingColour = accentColour.Value.Lighten(0.9f).Opacity(0);
 
-            background.FadeColour(accentColour.Value.Darken(0.6f), lighting_fade_out_duration, Easing.OutQuint);
+            background.FadeTo(0, lighting_fade_out_duration, Easing.OutQuint);
 
             topIcon.ScaleTo(1f, 200, Easing.OutQuint);
             topIcon.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
