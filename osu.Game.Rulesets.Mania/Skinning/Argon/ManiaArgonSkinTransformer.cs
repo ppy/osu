@@ -60,6 +60,10 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                 switch (maniaLookup.Lookup)
                 {
+                    case LegacyManiaSkinConfigurationLookups.StagePaddingBottom:
+                    case LegacyManiaSkinConfigurationLookups.StagePaddingTop:
+                        return SkinUtils.As<TValue>(new Bindable<float>(30));
+
                     case LegacyManiaSkinConfigurationLookups.ColumnWidth:
                         return SkinUtils.As<TValue>(new Bindable<float>(
                             stage.IsSpecialColumn(column) ? 80 : 60
