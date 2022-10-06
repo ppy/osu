@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             if (e.Action == OsuAction.Smoke)
             {
-                AddInternal(currentSegmentSkinnable = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SmokeTrail), _ => new DefaultSmokeSegment()));
+                AddInternal(currentSegmentSkinnable = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorSmoke), _ => new DefaultSmokeSegment()));
 
                 // Add initial position immediately.
                 addPosition();

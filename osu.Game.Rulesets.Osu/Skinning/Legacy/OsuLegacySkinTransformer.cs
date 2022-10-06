@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                         return null;
 
-                    case OsuSkinComponents.SmokeTrail:
+                    case OsuSkinComponents.CursorSmoke:
                         if (GetTexture("cursor-smoke") != null)
                             return new LegacySmokeSegment();
 
