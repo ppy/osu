@@ -30,10 +30,10 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, StageDefinition stageDefinition)
         {
-            string leftImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.LeftStageImage, stageDefinition)?.Value
+            string leftImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.LeftStageImage)?.Value
                                ?? "mania-stage-left";
 
-            string rightImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.RightStageImage, stageDefinition)?.Value
+            string rightImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.RightStageImage)?.Value
                                 ?? "mania-stage-right";
 
             InternalChildren = new[]
@@ -91,16 +91,16 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             }
 
             [BackgroundDependencyLoader]
-            private void load(ISkinSource skin, StageDefinition stageDefinition)
+            private void load(ISkinSource skin)
             {
-                float leftLineWidth = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.LeftLineWidth, stageDefinition, columnIndex)?.Value ?? 1;
-                float rightLineWidth = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.RightLineWidth, stageDefinition, columnIndex)?.Value ?? 1;
+                float leftLineWidth = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.LeftLineWidth, columnIndex)?.Value ?? 1;
+                float rightLineWidth = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.RightLineWidth, columnIndex)?.Value ?? 1;
 
                 bool hasLeftLine = leftLineWidth > 0;
                 bool hasRightLine = (rightLineWidth > 0 && skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value >= 2.4m) || isLastColumn;
 
-                Color4 lineColour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnLineColour, stageDefinition, columnIndex)?.Value ?? Color4.White;
-                Color4 backgroundColour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour, stageDefinition, columnIndex)?.Value ?? Color4.Black;
+                Color4 lineColour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnLineColour, columnIndex)?.Value ?? Color4.White;
+                Color4 backgroundColour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour, columnIndex)?.Value ?? Color4.Black;
 
                 InternalChildren = new Drawable[]
                 {

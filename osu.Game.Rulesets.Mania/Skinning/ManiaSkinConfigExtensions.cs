@@ -4,7 +4,6 @@
 #nullable disable
 
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Skinning
@@ -16,10 +15,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
         /// </summary>
         /// <param name="skin">The skin from which configuration is retrieved.</param>
         /// <param name="lookup">The value to retrieve.</param>
-        /// <param name="stageDefinition">The stage definition.</param>
         /// <param name="columnIndex">If not null, denotes the index of the column to which the entry applies.</param>
-        public static IBindable<T> GetManiaSkinConfig<T>(this ISkin skin, LegacyManiaSkinConfigurationLookups lookup, StageDefinition stageDefinition, int? columnIndex = null)
+        public static IBindable<T> GetManiaSkinConfig<T>(this ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? columnIndex = null)
             => skin.GetConfig<ManiaSkinConfigurationLookup, T>(
-                new ManiaSkinConfigurationLookup(lookup, stageDefinition, columnIndex));
+                new ManiaSkinConfigurationLookup(lookup, columnIndex));
     }
 }
