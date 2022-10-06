@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK.Graphics;
 
@@ -20,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private void load(IScrollingInfo scrollingInfo)
         {
             RelativeSizeAxes = Axes.X;
-            Height = DefaultNotePiece.NOTE_HEIGHT;
+            Height = ArgonNotePiece.NOTE_HEIGHT;
 
             InternalChildren = new[]
             {
