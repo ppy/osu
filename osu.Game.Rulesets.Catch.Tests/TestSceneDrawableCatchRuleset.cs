@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Mods;
@@ -15,45 +14,28 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneDrawableCatchRulesetWithRelax : OsuTestScene
+    public class TestSceneDrawableCatchRuleset : OsuTestScene
     {
-        [SetUpSteps]
-        public void SetUpSteps()
-        {
-            AddStep("create drawable ruleset with relax mod", () =>
-            {
-                Child = new DrawableCatchRuleset(new CatchRuleset(), new CatchBeatmap(), new List<Mod>() {
-                    new CatchModRelax()
-                });
-            });
-            AddUntilStep("wait for load", () => Child.IsLoaded);
-        }
-
         [Test]
-        public void TestBasic()
-        {
-            AddAssert("check if touch catcher is showing", () => this.ChildrenOfType<CatchTouchInputMapper>().Any() == false);
-        }
-    }
-
-    [TestFixture]
-    public class TestSceneDrawableCatchRulesetWithoutRelax : OsuTestScene
-    {
-        [SetUpSteps]
-        public void SetUpSteps()
+        public void TestWithoutRelax()
         {
             AddStep("create drawable ruleset without relax mod", () =>
             {
                 Child = new DrawableCatchRuleset(new CatchRuleset(), new CatchBeatmap(), new List<Mod>());
             });
             AddUntilStep("wait for load", () => Child.IsLoaded);
-            Logger.Log("Ready");
+            AddAssert("check if touch catcher is showing", () => this.ChildrenOfType<CatchTouchInputMapper>().Any());
         }
 
         [Test]
-        public void TestBasic()
+        public void TestWithRelax()
         {
-            AddAssert("check if touch catcher is showing", () => this.ChildrenOfType<CatchTouchInputMapper>().Any());
+            AddStep("create drawable ruleset with relax mod", () =>
+            {
+                Child = new DrawableCatchRuleset(new CatchRuleset(), new CatchBeatmap(), new List<Mod> { new CatchModRelax() });
+            });
+            AddUntilStep("wait for load", () => Child.IsLoaded);
+            AddAssert("check if touch catcher is showing", () => this.ChildrenOfType<CatchTouchInputMapper>().Any() == false);
         }
     }
 }
