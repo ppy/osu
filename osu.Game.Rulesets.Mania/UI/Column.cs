@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -68,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private ISkinSource skin { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(GameHost host)
         {
             skin.SourceChanged += onSourceChanged;
             onSourceChanged();
@@ -82,7 +83,10 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
+                // This is pretty dodgy (and will cause weirdness when pausing gameplay) but is better than completely broken rewind.
+                Clock = host.UpdateThread.Clock,
+                ProcessCustomClock = false,
             };
 
             InternalChildren = new[]
@@ -94,7 +98,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 HitObjectArea,
                 new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    // This is pretty dodgy (and will cause weirdness when pausing gameplay) but is better than completely broken rewind.
+                    Clock = host.UpdateThread.Clock,
+                    ProcessCustomClock = false,
                 },
                 background,
                 TopLevelContainer,
