@@ -107,9 +107,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("start drag", () =>
             {
-                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single());
+                InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<Notification>().Single());
                 InputManager.PressButton(MouseButton.Left);
-                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single().ScreenSpaceDrawQuad.Centre + new Vector2(-500, 0));
+                InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<Notification>().Single().ScreenSpaceDrawQuad.Centre + new Vector2(-500, 0));
             });
 
             AddStep("fling away", () =>
@@ -121,6 +121,45 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("was not activated", () => !activated);
             AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
             AddAssert("unread count zero", () => notificationOverlay.UnreadCount.Value == 0);
+        }
+
+        [Test]
+        public void TestProgressNotificationCantBeFlung()
+        {
+            bool activated = false;
+            ProgressNotification notification = null!;
+
+            AddStep("post", () =>
+            {
+                activated = false;
+                notificationOverlay.Post(notification = new ProgressNotification
+                {
+                    Text = @"Uploading to BSS...",
+                    CompletionText = "Uploaded to BSS!",
+                    Activated = () => activated = true,
+                });
+
+                progressingNotifications.Add(notification);
+            });
+
+            AddStep("start drag", () =>
+            {
+                InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<Notification>().Single());
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<Notification>().Single().ScreenSpaceDrawQuad.Centre + new Vector2(-500, 0));
+            });
+
+            AddStep("attempt fling", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddUntilStep("was not closed", () => !notification.WasClosed);
+            AddUntilStep("was not cancelled", () => notification.State == ProgressNotificationState.Active);
+            AddAssert("was not activated", () => !activated);
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+
+            AddUntilStep("was completed", () => notification.State == ProgressNotificationState.Completed);
         }
 
         [Test]
@@ -465,7 +504,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             base.Update();
 
-            progressingNotifications.RemoveAll(n => n.State == ProgressNotificationState.Completed);
+            progressingNotifications.RemoveAll(n => n.State == ProgressNotificationState.Completed && n.WasClosed);
 
             if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
             {

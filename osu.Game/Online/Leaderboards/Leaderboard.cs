@@ -1,14 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
@@ -54,23 +51,23 @@ namespace osu.Game.Online.Leaderboards
         private readonly Container placeholderContainer;
         private readonly UserTopScoreContainer<TScoreInfo> userScoreContainer;
 
-        private FillFlowContainer<LeaderboardScore> scoreFlowContainer;
+        private FillFlowContainer<LeaderboardScore>? scoreFlowContainer;
 
         private readonly LoadingSpinner loading;
 
-        private CancellationTokenSource currentFetchCancellationSource;
-        private CancellationTokenSource currentScoresAsyncLoadCancellationSource;
+        private CancellationTokenSource? currentFetchCancellationSource;
+        private CancellationTokenSource? currentScoresAsyncLoadCancellationSource;
 
-        private APIRequest fetchScoresRequest;
+        private APIRequest? fetchScoresRequest;
 
         private LeaderboardState state;
 
         [Resolved(CanBeNull = true)]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider? api { get; set; }
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
-        private TScope scope;
+        private TScope scope = default!;
 
         public TScope Scope
         {
@@ -179,16 +176,21 @@ namespace osu.Game.Online.Leaderboards
         /// </summary>
         /// <param name="scores">The scores to display.</param>
         /// <param name="userScore">The user top score, if any.</param>
-        protected void SetScores(IEnumerable<TScoreInfo> scores, TScoreInfo userScore = default)
+        protected void SetScores(IEnumerable<TScoreInfo>? scores, TScoreInfo? userScore = default)
         {
             this.scores.Clear();
             if (scores != null)
                 this.scores.AddRange(scores);
 
-            // Schedule needs to be non-delayed here for the weird logic in refetchScores to work.
-            // If it is removed, the placeholder will be incorrectly updated to "no scores" rather than "retrieving".
-            // This whole flow should be refactored in the future.
-            Scheduler.Add(applyNewScores, false);
+            // Non-delayed schedule may potentially run inline (due to IsMainThread check passing) after leaderboard  is disposed.
+            // This is guarded against in BeatmapLeaderboard via web request cancellation, but let's be extra safe.
+            if (!IsDisposed)
+            {
+                // Schedule needs to be non-delayed here for the weird logic in refetchScores to work.
+                // If it is removed, the placeholder will be incorrectly updated to "no scores" rather than "retrieving".
+                // This whole flow should be refactored in the future.
+                Scheduler.Add(applyNewScores, false);
+            }
 
             void applyNewScores()
             {
@@ -208,8 +210,7 @@ namespace osu.Game.Online.Leaderboards
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        [CanBeNull]
-        protected abstract APIRequest FetchScores(CancellationToken cancellationToken);
+        protected abstract APIRequest? FetchScores(CancellationToken cancellationToken);
 
         protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
 
@@ -293,7 +294,7 @@ namespace osu.Game.Online.Leaderboards
 
         #region Placeholder handling
 
-        private Placeholder placeholder;
+        private Placeholder? placeholder;
 
         private void setState(LeaderboardState state)
         {
@@ -320,7 +321,7 @@ namespace osu.Game.Online.Leaderboards
             placeholder.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 
-        private Placeholder getPlaceholderFor(LeaderboardState state)
+        private Placeholder? getPlaceholderFor(LeaderboardState state)
         {
             switch (state)
             {
