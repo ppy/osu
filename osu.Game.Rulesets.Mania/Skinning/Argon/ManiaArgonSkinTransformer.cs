@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                     case LegacyManiaSkinConfigurationLookups.ColumnWidth:
                         return SkinUtils.As<TValue>(new Bindable<float>(
-                            stage.IsSpecialColumn(column) ? 80 : 60
+                            stage.IsSpecialColumn(column) ? 120 : 60
                         ));
 
                     case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
