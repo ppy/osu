@@ -27,15 +27,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        private readonly bool showMobileMapper = true;
-
         public DrawableCatchRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
-            // Check if mods have RelaxMod instance
-            if (mods != null && mods.OfType<ModRelax>().Any())
-                showMobileMapper = false;
-
             Direction.Value = ScrollingDirection.Down;
             TimeRange.Value = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450);
         }
@@ -43,7 +37,8 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (showMobileMapper)
+            // With relax mod, input maps directly to x position and left/right buttons are not used.
+            if (!Mods.Any(m => m is ModRelax))
                 KeyBindingInputManager.Add(new CatchTouchInputMapper());
         }
 
