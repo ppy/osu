@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.Notifications
 
         public Func<bool>? CancelRequested { get; set; }
 
+        protected override bool AllowFlingDismiss => false;
+
         /// <summary>
         /// The function to post completion notifications back to.
         /// </summary>

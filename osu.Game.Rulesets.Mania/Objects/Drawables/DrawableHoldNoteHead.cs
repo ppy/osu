@@ -30,14 +30,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public bool UpdateResult() => base.UpdateResult(true);
 
-        protected override void UpdateInitialTransforms()
-        {
-            base.UpdateInitialTransforms();
-
-            // This hitobject should never expire, so this is just a safe maximum.
-            LifetimeEnd = LifetimeStart + 30000;
-        }
-
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             // suppress the base call explicitly.

@@ -47,10 +47,7 @@ namespace osu.Game.Screens.Play.HUD
             if (clock != null)
                 gameplayClock = clock;
 
-            // Lock height so changes in text autosize (if character height changes)
-            // don't cause parent invalidation.
-            Height = 14;
-
+            AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
                 new Container
