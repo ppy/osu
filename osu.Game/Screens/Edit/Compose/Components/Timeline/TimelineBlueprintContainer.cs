@@ -183,7 +183,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             double maxTime = dragBox.MaxTime;
 
             SelectedItems.RemoveAll(hitObject => !shouldBeSelected(hitObject));
-            SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).Where(shouldBeSelected));
+
+            foreach (var hitObject in Beatmap.HitObjects.Except(SelectedItems).Where(shouldBeSelected))
+            {
+                Composer.Playfield.SetKeepAlive(hitObject, true);
+                SelectedItems.Add(hitObject);
+            }
 
             bool shouldBeSelected(HitObject hitObject)
             {
