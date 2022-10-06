@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.UI
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Down;
-            TimeRange.Value = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450);
+            TimeRange.Value = GetTimeRange(beatmap.Difficulty.ApproachRate);
         }
 
         [BackgroundDependencyLoader]
@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             KeyBindingInputManager.Add(new CatchTouchInputMapper());
         }
+
+        protected double GetTimeRange(float approachRate) => IBeatmapDifficultyInfo.DifficultyRange(approachRate, 1800, 1200, 450);
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
