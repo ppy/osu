@@ -124,7 +124,9 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            skin.SourceChanged += onSourceChanged;
+
+            if (skin != null)
+                skin.SourceChanged -= onSourceChanged;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
