@@ -21,6 +21,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             RelativeSizeAxes = Axes.X;
             Height = ArgonNotePiece.NOTE_HEIGHT;
 
+            Masking = true;
+            CornerRadius = ArgonNotePiece.CORNER_RADIUS;
+
             InternalChildren = new[]
             {
                 new Box
