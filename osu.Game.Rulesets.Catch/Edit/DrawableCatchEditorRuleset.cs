@@ -18,6 +18,16 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            double gamePlayTimeRange = GetTimeRange(Beatmap.Difficulty.ApproachRate);
+            TimeRange.Value = gamePlayTimeRange * (Playfield.DrawHeight / CatchPlayfield.HEIGHT);
+        }
+
         protected override Playfield CreatePlayfield() => new CatchEditorPlayfield(Beatmap.Difficulty);
+
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new CatchEditorPlayfieldAdjustmentContainer();
     }
 }
