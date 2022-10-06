@@ -12,8 +12,10 @@ using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Edit;
@@ -36,6 +38,12 @@ namespace osu.Game.Rulesets.Catch.Edit
         private readonly Bindable<TernaryState> distanceSnapToggle = new Bindable<TernaryState>();
 
         private InputManager inputManager;
+
+        private readonly BindableDouble timeRangeMultiplier = new BindableDouble(1)
+        {
+            MinValue = 1,
+            MaxValue = 10,
+        };
 
         public CatchHitObjectComposer(CatchRuleset ruleset)
             : base(ruleset)
@@ -80,8 +88,27 @@ namespace osu.Game.Rulesets.Catch.Edit
             updateDistanceSnapGrid();
         }
 
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.IncreaseScrollSpeed:
+                    this.TransformBindableTo(timeRangeMultiplier, timeRangeMultiplier.Value - 1, 200, Easing.OutQuint);
+                    break;
+
+                case GlobalAction.DecreaseScrollSpeed:
+                    this.TransformBindableTo(timeRangeMultiplier, timeRangeMultiplier.Value + 1, 200, Easing.OutQuint);
+                    break;
+            }
+
+            return base.OnPressed(e);
+        }
+
         protected override DrawableRuleset<CatchHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null) =>
-            new DrawableCatchEditorRuleset(ruleset, beatmap, mods);
+            new DrawableCatchEditorRuleset(ruleset, beatmap, mods)
+            {
+                TimeRangeMultiplier = { BindTarget = timeRangeMultiplier, }
+            };
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
