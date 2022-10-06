@@ -42,6 +42,8 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             base.PrepareForUse();
 
+            LifetimeStart = Time.Current;
+
             (skinnableExplosion?.Drawable as IHitExplosion)?.Animate(Result);
 
             this.Delay(DURATION).Then().Expire();
