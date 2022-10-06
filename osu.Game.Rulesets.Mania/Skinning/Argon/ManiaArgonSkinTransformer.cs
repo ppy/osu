@@ -28,6 +28,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (maniaComponent.Component)
                     {
+                        case ManiaSkinComponents.StageBackground:
+                            return new ArgonStageBackground();
+
+                        case ManiaSkinComponents.ColumnBackground:
+                            return new ArgonColumnBackground();
+
                         case ManiaSkinComponents.HoldNoteBody:
                             return new ArgonHoldBodyPiece();
 
