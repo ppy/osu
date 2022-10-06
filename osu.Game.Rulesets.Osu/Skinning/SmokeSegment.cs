@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             RelativeSizeAxes = Axes.Both;
 
-            smokeStartTime = Time.Current;
+            LifetimeStart = smokeStartTime = Time.Current;
 
             totalDistance = pointInterval;
         }
