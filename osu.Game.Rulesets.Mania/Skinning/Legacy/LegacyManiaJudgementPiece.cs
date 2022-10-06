@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -33,9 +32,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, StageDefinition stageDefinition)
+        private void load(ISkinSource skin)
         {
-            float? scorePosition = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ScorePosition, stageDefinition)?.Value;
+            float? scorePosition = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ScorePosition)?.Value;
 
             if (scorePosition != null)
                 scorePosition -= Stage.HIT_TARGET_POSITION + 150;

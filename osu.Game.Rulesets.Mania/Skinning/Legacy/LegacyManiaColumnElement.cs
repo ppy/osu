@@ -42,6 +42,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         }
 
         protected IBindable<T> GetColumnSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup)
-            => skin.GetManiaSkinConfig<T>(lookup, stage, Column.Index);
+            => skin.GetManiaSkinConfig<T>(lookup, Column.Index);
     }
 }

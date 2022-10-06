@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
@@ -36,9 +35,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, IScrollingInfo scrollingInfo, StageDefinition stageDefinition)
+        private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            minimumColumnWidth = skin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.MinimumColumnWidth, stageDefinition))?.Value;
+            minimumColumnWidth = skin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.MinimumColumnWidth))?.Value;
 
             InternalChild = directionContainer = new Container
             {

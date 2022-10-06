@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             isLegacySkin = new Lazy<bool>(() => GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version) != null);
             hasKeyTexture = new Lazy<bool>(() =>
             {
-                string keyImage = this.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.KeyImage, new StageDefinition(1), 0)?.Value ?? "mania-key1";
+                string keyImage = this.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.KeyImage, 0)?.Value ?? "mania-key1";
                 return this.GetAnimation(keyImage, true, true) != null;
             });
         }
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             if (!hit_result_mapping.ContainsKey(result))
                 return null;
 
-            string filename = this.GetManiaSkinConfig<string>(hit_result_mapping[result], new StageDefinition(1))?.Value
+            string filename = this.GetManiaSkinConfig<string>(hit_result_mapping[result])?.Value
                               ?? default_hit_result_skin_filenames[result];
 
             var animation = this.GetAnimation(filename, true, true);
