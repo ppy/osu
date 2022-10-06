@@ -15,15 +15,20 @@ namespace osu.Game.Skinning
         /// </summary>
         public readonly int TotalColumns;
 
-        public readonly int? TargetColumn;
+        /// <summary>
+        /// The column which is being looked up.
+        /// May be null if the configuration does not apply to a specific column.
+        /// Note that this is the absolute index across all stages.
+        /// </summary>
+        public readonly int? ColumnIndex;
 
         public readonly LegacyManiaSkinConfigurationLookups Lookup;
 
-        public LegacyManiaSkinConfigurationLookup(int totalColumns, LegacyManiaSkinConfigurationLookups lookup, int? targetColumn = null)
+        public LegacyManiaSkinConfigurationLookup(int totalColumns, LegacyManiaSkinConfigurationLookups lookup, int? columnIndex = null)
         {
             TotalColumns = totalColumns;
             Lookup = lookup;
-            TargetColumn = targetColumn;
+            ColumnIndex = columnIndex;
         }
     }
 
