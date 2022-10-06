@@ -5,6 +5,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -24,6 +25,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         {
             switch (component)
             {
+                case GameplaySkinComponent<HitResult> resultComponent:
+                    return new ArgonJudgementPiece(resultComponent.Component);
+
                 case ManiaSkinComponent maniaComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (maniaComponent.Component)
