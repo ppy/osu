@@ -54,10 +54,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        protected override void UpdateInitialTransforms()
-        {
-        }
-
         protected override void UpdateStartTimeStateTransforms() => this.FadeOut(150);
     }
 }

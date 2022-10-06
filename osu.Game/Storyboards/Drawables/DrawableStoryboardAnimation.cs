@@ -10,7 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
-using osu.Game.Screens.Play;
+using osu.Game.Beatmaps;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -91,6 +91,9 @@ namespace osu.Game.Storyboards.Drawables
         [Resolved]
         private ISkinSource skin { get; set; }
 
+        [Resolved]
+        private IBeatSyncProvider beatSyncProvider { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textureStore, Storyboard storyboard)
         {
@@ -116,9 +119,6 @@ namespace osu.Game.Storyboards.Drawables
             Animation.ApplyTransforms(this);
         }
 
-        [Resolved]
-        private IGameplayClock gameplayClock { get; set; }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -128,7 +128,7 @@ namespace osu.Game.Storyboards.Drawables
             //
             // In the case of storyboard animations, we want to synchronise with game time perfectly
             // so let's get a correct time based on gameplay clock and earliest transform.
-            PlaybackPosition = gameplayClock.CurrentTime - Animation.EarliestTransformTime;
+            PlaybackPosition = (beatSyncProvider.Clock?.CurrentTime ?? Clock.CurrentTime) - Animation.EarliestTransformTime;
         }
 
         private void skinSourceChanged()
