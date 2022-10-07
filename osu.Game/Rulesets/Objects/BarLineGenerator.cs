@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +31,7 @@ namespace osu.Game.Rulesets.Objects
             double lastHitTime = 1 + lastObject.GetEndTime();
 
             var timingPoints = beatmap.ControlPointInfo.TimingPoints;
+            var effectPoints = beatmap.ControlPointInfo.EffectPoints;
 
             if (timingPoints.Count == 0)
                 return;
@@ -40,14 +39,22 @@ namespace osu.Game.Rulesets.Objects
             for (int i = 0; i < timingPoints.Count; i++)
             {
                 TimingControlPoint currentTimingPoint = timingPoints[i];
+                EffectControlPoint? currentEffectPoint = effectPoints.FirstOrDefault(p => p.Time == currentTimingPoint.Time);
                 int currentBeat = 0;
 
                 // Stop on the beat before the next timing point, or if there is no next timing point stop slightly past the last object
                 double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastHitTime + currentTimingPoint.BeatLength * currentTimingPoint.TimeSignature.Numerator;
 
+                double startTime = currentTimingPoint.Time;
+
                 double barLength = currentTimingPoint.BeatLength * currentTimingPoint.TimeSignature.Numerator;
 
-                for (double t = currentTimingPoint.Time; Precision.DefinitelyBigger(endTime, t); t += barLength, currentBeat++)
+                if (currentEffectPoint != null && currentEffectPoint.OmitFirstBarLine)
+                {
+                    startTime += barLength;
+                }
+
+                for (double t = startTime; Precision.DefinitelyBigger(endTime, t); t += barLength, currentBeat++)
                 {
                     double roundedTime = Math.Round(t, MidpointRounding.AwayFromZero);
 
