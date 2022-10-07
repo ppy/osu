@@ -42,6 +42,8 @@ namespace osu.Game.Skinning
         HitPosition,
         ScorePosition,
         LightPosition,
+        StagePaddingTop,
+        StagePaddingBottom,
         HitTargetImage,
         ShowJudgementLine,
         KeyImage,
