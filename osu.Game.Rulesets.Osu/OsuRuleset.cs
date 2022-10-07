@@ -27,6 +27,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.Skinning.Argon;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Rulesets.Osu.UI;
@@ -58,6 +59,7 @@ namespace osu.Game.Rulesets.Osu
         {
             new KeyBinding(InputKey.Z, OsuAction.LeftButton),
             new KeyBinding(InputKey.X, OsuAction.RightButton),
+            new KeyBinding(InputKey.C, OsuAction.Smoke),
             new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
@@ -238,6 +240,9 @@ namespace osu.Game.Rulesets.Osu
             {
                 case LegacySkin:
                     return new OsuLegacySkinTransformer(skin);
+
+                case ArgonSkin:
+                    return new OsuArgonSkinTransformer(skin);
             }
 
             return null;
