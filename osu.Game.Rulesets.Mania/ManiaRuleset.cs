@@ -27,6 +27,7 @@ using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mania.Skinning.Argon;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Mania.Skinning.Legacy;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -67,11 +68,17 @@ namespace osu.Game.Rulesets.Mania
         {
             switch (skin)
             {
-                case LegacySkin:
-                    return new ManiaLegacySkinTransformer(skin, beatmap);
+                case TrianglesSkin:
+                    return new ManiaTrianglesSkinTransformer(skin, beatmap);
 
                 case ArgonSkin:
-                    return new ManiaArgonSkinTransformer(skin);
+                    return new ManiaArgonSkinTransformer(skin, beatmap);
+
+                case DefaultLegacySkin:
+                    return new ManiaClassicSkinTransformer(skin, beatmap);
+
+                case LegacySkin:
+                    return new ManiaLegacySkinTransformer(skin, beatmap);
             }
 
             return null;

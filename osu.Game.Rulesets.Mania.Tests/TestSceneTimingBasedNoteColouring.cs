@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             const double beat_length = 500;
 
-            var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 1 })
+            var beatmap = new ManiaBeatmap(new StageDefinition(1))
             {
                 HitObjects =
                 {
