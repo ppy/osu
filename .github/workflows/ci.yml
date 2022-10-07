@@ -88,7 +88,7 @@ jobs:
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
 
       - name: Test
-        run: dotnet test $pwd/**/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
+        run: dotnet test $pwd/**/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx" -- NUnit.ConsoleOut=0
         shell: pwsh
 
       # Attempt to upload results even if test fails.
