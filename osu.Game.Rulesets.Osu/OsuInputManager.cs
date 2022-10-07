@@ -80,6 +80,9 @@ namespace osu.Game.Rulesets.Osu
         LeftButton,
 
         [Description("Right button")]
-        RightButton
+        RightButton,
+
+        [Description("Smoke")]
+        Smoke,
     }
 }

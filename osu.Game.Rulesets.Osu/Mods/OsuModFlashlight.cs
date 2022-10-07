@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        public override float DefaultFlashlightSize => 180;
+        public override float DefaultFlashlightSize => 200;
 
         private OsuFlashlight flashlight = null!;
 
@@ -63,6 +63,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 followDelay = modFlashlight.FollowDelay.Value;
 
                 FlashlightSize = new Vector2(0, GetSizeFor(0));
+                FlashlightSmoothness = 1.4f;
             }
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
