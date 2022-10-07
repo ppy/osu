@@ -32,6 +32,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             // Without this, the width of the body will be slightly larger than the head/tail.
             Masking = true;
             CornerRadius = ArgonNotePiece.CORNER_RADIUS;
+            Blending = BlendingParameters.Additive;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -58,7 +59,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
             AccentColour.BindValueChanged(colour =>
             {
-                background.Colour = colour.NewValue.Darken(1.5f);
+                background.Colour = colour.NewValue.Darken(1.2f);
                 foreground.Colour = colour.NewValue.Opacity(0.2f);
             }, true);
 
