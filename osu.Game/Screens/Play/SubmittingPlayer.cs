@@ -76,6 +76,7 @@ namespace osu.Game.Screens.Play
 
             req.Success += r =>
             {
+                Logger.Log($"Score submission token retrieved ({r.ID})");
                 token = r.ID;
                 tcs.SetResult(true);
             };
@@ -91,6 +92,11 @@ namespace osu.Game.Screens.Play
 
             void handleTokenFailure(Exception exception)
             {
+                // This method may be invoked multiple times due to the Task.Wait call above.
+                // We only really care about the first error.
+                if (!tcs.TrySetResult(false))
+                    return;
+
                 if (HandleTokenRetrievalFailure(exception))
                 {
                     if (string.IsNullOrEmpty(exception.Message))
@@ -104,8 +110,12 @@ namespace osu.Game.Screens.Play
                         this.Exit();
                     });
                 }
-
-                tcs.SetResult(false);
+                else
+                {
+                    // Gameplay is allowed to continue, but we still should keep track of the error.
+                    // In the future, this should be visible to the user in some way.
+                    Logger.Log($"Score submission token retrieval failed ({exception.Message})");
+                }
             }
         }
 

@@ -74,13 +74,6 @@ namespace osu.Game.Rulesets.Mania.UI
             skin.SourceChanged += onSourceChanged;
             onSourceChanged();
 
-            AccentColour.BindValueChanged(colour =>
-            {
-                // Manual transfer as hit objects may be moved between column and unbinding is non-trivial.
-                foreach (var obj in HitObjectContainer.Objects)
-                    obj.AccentColour.Value = colour.NewValue;
-            }, true);
-
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
                 RelativeSizeAxes = Axes.Both,
@@ -149,7 +142,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)drawableHitObject;
 
-            maniaObject.AccentColour.Value = AccentColour.Value;
+            maniaObject.AccentColour.BindTo(AccentColour);
             maniaObject.CheckHittable = hitPolicy.IsHittable;
         }
 
