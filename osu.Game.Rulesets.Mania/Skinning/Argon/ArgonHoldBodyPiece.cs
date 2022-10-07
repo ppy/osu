@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK.Graphics;
 
@@ -16,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
     /// <summary>
     /// Represents length-wise portion of a hold note.
     /// </summary>
-    public class ArgonHoldBodyPiece : CompositeDrawable
+    public class ArgonHoldBodyPiece : CompositeDrawable, IHoldNoteBody
     {
         protected readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
         protected readonly IBindable<bool> IsHitting = new Bindable<bool>();
@@ -26,7 +27,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         public ArgonHoldBodyPiece()
         {
-            Blending = BlendingParameters.Additive;
             RelativeSizeAxes = Axes.Both;
 
             // Without this, the width of the body will be slightly larger than the head/tail.
@@ -52,14 +52,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             {
                 var holdNote = (DrawableHoldNote)drawableObject;
 
-                AccentColour.BindTo(drawableObject.AccentColour);
+                AccentColour.BindTo(holdNote.AccentColour);
                 IsHitting.BindTo(holdNote.IsHitting);
             }
 
             AccentColour.BindValueChanged(colour =>
             {
                 background.Colour = colour.NewValue.Darken(1.5f);
-                foreground.Colour = colour.NewValue.Opacity(0.1f);
+                foreground.Colour = colour.NewValue.Opacity(0.2f);
             }, true);
 
             IsHitting.BindValueChanged(hitting =>
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     using (foreground.BeginDelayedSequence(synchronisedOffset))
                     {
                         foreground.FadeTo(1, animation_length).Then()
-                                  .FadeTo(0, animation_length)
+                                  .FadeTo(0.5f, animation_length)
                                   .Loop();
                     }
                 }
@@ -85,6 +85,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     foreground.FadeOut(animation_length);
                 }
             });
+        }
+
+        public void Recycle()
+        {
+            foreground.ClearTransforms();
+            foreground.Alpha = 0;
         }
     }
 }
