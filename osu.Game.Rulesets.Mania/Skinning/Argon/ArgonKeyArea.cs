@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         Colour = OsuColour.Gray(196 / 255f),
                         Height = ArgonNotePiece.CORNER_RADIUS * 2,
                         Masking = true,
+                        EdgeEffect = new EdgeEffectParameters { Type = EdgeEffectType.Glow },
                     },
                     new Container
                     {
@@ -100,6 +101,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                         Size = new Vector2(icon_circle_size),
                                         Anchor = Anchor.BottomCentre,
                                         Origin = Anchor.Centre,
+                                        EdgeEffect = new EdgeEffectParameters { Type = EdgeEffectType.Glow },
                                     },
                                     new Circle
                                     {
@@ -108,6 +110,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                         Size = new Vector2(icon_circle_size),
                                         Anchor = Anchor.BottomCentre,
                                         Origin = Anchor.Centre,
+                                        EdgeEffect = new EdgeEffectParameters { Type = EdgeEffectType.Glow },
                                     },
                                     new Circle
                                     {
@@ -116,6 +119,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                         Size = new Vector2(icon_circle_size),
                                         Anchor = Anchor.BottomCentre,
                                         Origin = Anchor.Centre,
+                                        EdgeEffect = new EdgeEffectParameters { Type = EdgeEffectType.Glow },
                                     },
                                 }
                             },
@@ -128,6 +132,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                 Masking = true,
                                 BorderThickness = 4,
                                 BorderColour = Color4.White,
+                                EdgeEffect = new EdgeEffectParameters { Type = EdgeEffectType.Glow },
                                 Children = new Drawable[]
                                 {
                                     new Box
