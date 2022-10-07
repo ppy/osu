@@ -44,9 +44,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
             };
 
-            if (!LanguageExtensions.TryParseCultureCode(frameworkLocale.Value, out var locale))
-                locale = Language.en;
-            languageSelection.Current.Value = locale;
+            frameworkLocale.BindValueChanged(locale =>
+            {
+                if (!LanguageExtensions.TryParseCultureCode(locale.NewValue, out var language))
+                    language = Language.en;
+                languageSelection.Current.Value = language;
+            }, true);
 
             languageSelection.Current.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
         }
