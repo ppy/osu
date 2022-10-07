@@ -149,14 +149,19 @@ namespace osu.Game.Rulesets.Mods
                 float size = defaultFlashlightSize * sizeMultiplier;
 
                 if (comboBasedSize)
-                {
-                    if (combo >= 200)
-                        size *= 0.8f;
-                    else if (combo >= 100)
-                        size *= 0.9f;
-                }
+                    size *= GetComboScaleFor(combo);
 
                 return size;
+            }
+
+            protected virtual float GetComboScaleFor(int combo)
+            {
+                if (combo >= 200)
+                    return 0.625f;
+                if (combo >= 100)
+                    return 0.8125f;
+
+                return 1.0f;
             }
 
             private Vector2 flashlightPosition;
@@ -201,6 +206,20 @@ namespace osu.Game.Rulesets.Mods
                 }
             }
 
+            private float flashlightSmoothness = 1.1f;
+
+            public float FlashlightSmoothness
+            {
+                get => flashlightSmoothness;
+                set
+                {
+                    if (flashlightSmoothness == value) return;
+
+                    flashlightSmoothness = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
+
             private class FlashlightDrawNode : DrawNode
             {
                 protected new Flashlight Source => (Flashlight)base.Source;
@@ -210,6 +229,7 @@ namespace osu.Game.Rulesets.Mods
                 private Vector2 flashlightPosition;
                 private Vector2 flashlightSize;
                 private float flashlightDim;
+                private float flashlightSmoothness;
 
                 private IVertexBatch<PositionAndColourVertex>? quadBatch;
                 private Action<TexturedVertex2D>? addAction;
@@ -228,6 +248,7 @@ namespace osu.Game.Rulesets.Mods
                     flashlightPosition = Vector2Extensions.Transform(Source.FlashlightPosition, DrawInfo.Matrix);
                     flashlightSize = Source.FlashlightSize * DrawInfo.Matrix.ExtractScale().Xy;
                     flashlightDim = Source.FlashlightDim;
+                    flashlightSmoothness = Source.flashlightSmoothness;
                 }
 
                 public override void Draw(IRenderer renderer)
@@ -249,6 +270,7 @@ namespace osu.Game.Rulesets.Mods
                     shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref flashlightPosition);
                     shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
                     shader.GetUniform<float>("flashlightDim").UpdateValue(ref flashlightDim);
+                    shader.GetUniform<float>("flashlightSmoothness").UpdateValue(ref flashlightSmoothness);
 
                     renderer.DrawQuad(renderer.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: addAction);
 

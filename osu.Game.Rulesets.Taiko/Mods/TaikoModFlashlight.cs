@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        public override float DefaultFlashlightSize => 250;
+        public override float DefaultFlashlightSize => 200;
 
         protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, playfield);
 
@@ -46,7 +46,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 : base(modFlashlight)
             {
                 this.taikoPlayfield = taikoPlayfield;
+
                 FlashlightSize = getSizeFor(0);
+                FlashlightSmoothness = 1.4f;
 
                 AddLayout(flashlightProperties);
             }

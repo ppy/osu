@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
             addSeekStep(3000);
             AddAssert("all judged", () => Player.DrawableRuleset.Playfield.AllHitObjects.All(h => h.Judged));
-            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses >= 7));
+            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.Select(kc => kc.CountPresses).Sum() == 15);
             AddStep("clear results", () => Player.Results.Clear());
             addSeekStep(0);
             AddAssert("none judged", () => Player.DrawableRuleset.Playfield.AllHitObjects.All(h => !h.Judged));
