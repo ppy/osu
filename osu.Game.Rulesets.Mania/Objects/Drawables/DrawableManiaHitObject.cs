@@ -65,22 +65,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Direction.BindValueChanged(OnDirectionChanged, true);
         }
 
-        protected override void OnApply()
-        {
-            base.OnApply();
-
-            if (ParentHitObject != null)
-                AccentColour.BindTo(ParentHitObject.AccentColour);
-        }
-
-        protected override void OnFree()
-        {
-            base.OnFree();
-
-            if (ParentHitObject != null)
-                AccentColour.UnbindFrom(ParentHitObject.AccentColour);
-        }
-
         protected virtual void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
         {
             Anchor = Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
