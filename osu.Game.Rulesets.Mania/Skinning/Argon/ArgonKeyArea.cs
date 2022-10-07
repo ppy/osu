@@ -50,7 +50,10 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             InternalChild = directionContainer = new Container
             {
                 RelativeSizeAxes = Axes.X,
-                Height = Stage.HIT_TARGET_POSITION,
+                // Ensure the area is tall enough to put the target line in the correct location.
+                // This is to also allow the main background component to overlap the target line
+                // and avoid an inner corner radius being shown below the target line.
+                Height = Stage.HIT_TARGET_POSITION + ArgonNotePiece.CORNER_RADIUS * 2,
                 Children = new[]
                 {
                     new Container
@@ -70,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     {
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.TopCentre,
-                        Origin = Anchor.BottomCentre,
+                        Origin = Anchor.TopCentre,
                         Colour = OsuColour.Gray(196 / 255f),
                         Height = ArgonNotePiece.CORNER_RADIUS * 2,
                         Masking = true,
