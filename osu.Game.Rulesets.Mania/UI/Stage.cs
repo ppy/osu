@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -128,6 +129,37 @@ namespace osu.Game.Rulesets.Mania.UI
                 columnFlow.SetContentForColumn(i, column);
                 AddNested(column);
             }
+        }
+
+        private ISkinSource currentSkin;
+
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource skin)
+        {
+            currentSkin = skin;
+
+            skin.SourceChanged += onSkinChanged;
+            onSkinChanged();
+        }
+
+        private void onSkinChanged()
+        {
+            float paddingTop = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.StagePaddingTop))?.Value ?? 0;
+            float paddingBottom = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.StagePaddingBottom))?.Value ?? 0;
+
+            Padding = new MarginPadding
+            {
+                Top = paddingTop,
+                Bottom = paddingBottom,
+            };
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (currentSkin != null)
+                currentSkin.SourceChanged -= onSkinChanged;
         }
 
         protected override void LoadComplete()
