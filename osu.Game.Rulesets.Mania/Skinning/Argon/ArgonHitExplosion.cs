@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     public class ArgonHitExplosion : CompositeDrawable, IHitExplosion
     {
-        private const float default_large_faint_size = 0.8f;
-
         public override bool RemoveWhenNotAlive => true;
 
         [Resolved]
