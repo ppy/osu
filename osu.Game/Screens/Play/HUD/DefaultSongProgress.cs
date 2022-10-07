@@ -16,7 +16,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class DefaultSongProgress : SongProgress
     {
-        private const float info_height = 20;
         private const float bottom_bar_height = 5;
         private const float graph_height = SquareGraph.Column.WIDTH * 6;
         private const float handle_height = 18;
@@ -65,7 +64,6 @@ namespace osu.Game.Screens.Play.HUD
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
-                    Height = info_height,
                 },
                 graph = new SongProgressGraph
                 {
@@ -178,7 +176,7 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
-            Height = bottom_bar_height + graph_height + handle_size.Y + info_height - graph.Y;
+            Height = bottom_bar_height + graph_height + handle_size.Y + info.Height - graph.Y;
         }
 
         private void updateBarVisibility()

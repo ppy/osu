@@ -18,6 +18,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
@@ -26,6 +27,8 @@ namespace osu.Game.Online.Multiplayer
 {
     public abstract class MultiplayerClient : Component, IMultiplayerClient, IMultiplayerRoomServer
     {
+        public Action<Notification>? PostNotification { protected get; set; }
+
         /// <summary>
         /// Invoked when any change occurs to the multiplayer room.
         /// </summary>
@@ -206,6 +209,8 @@ namespace osu.Game.Online.Multiplayer
                         updateUserPlayingState(user.UserID, user.State);
 
                     updateLocalRoomSettings(joinedRoom.Settings);
+
+                    postServerShuttingDownNotification();
 
                     OnRoomJoined();
                 }, cancellationSource.Token).ConfigureAwait(false);
@@ -552,8 +557,22 @@ namespace osu.Game.Online.Multiplayer
 
                 switch (e)
                 {
-                    case CountdownChangedEvent countdownChangedEvent:
-                        Room.Countdown = countdownChangedEvent.Countdown;
+                    case CountdownStartedEvent countdownStartedEvent:
+                        Room.ActiveCountdowns.Add(countdownStartedEvent.Countdown);
+
+                        switch (countdownStartedEvent.Countdown)
+                        {
+                            case ServerShuttingDownCountdown:
+                                postServerShuttingDownNotification();
+                                break;
+                        }
+
+                        break;
+
+                    case CountdownStoppedEvent countdownStoppedEvent:
+                        MultiplayerCountdown? countdown = Room.ActiveCountdowns.FirstOrDefault(countdown => countdown.ID == countdownStoppedEvent.ID);
+                        if (countdown != null)
+                            Room.ActiveCountdowns.Remove(countdown);
                         break;
                 }
 
@@ -561,6 +580,16 @@ namespace osu.Game.Online.Multiplayer
             }, false);
 
             return Task.CompletedTask;
+        }
+
+        private void postServerShuttingDownNotification()
+        {
+            ServerShuttingDownCountdown? countdown = room?.ActiveCountdowns.OfType<ServerShuttingDownCountdown>().FirstOrDefault();
+
+            if (countdown == null)
+                return;
+
+            PostNotification?.Invoke(new ServerShutdownNotification(countdown.TimeRemaining));
         }
 
         Task IMultiplayerClient.UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability)

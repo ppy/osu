@@ -8,11 +8,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 
@@ -27,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private OngoingOperationTracker operationTracker { get; set; } = null!;
 
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
-        private readonly long? itemToEdit;
+        private readonly PlaylistItem? itemToEdit;
 
         private LoadingLayer loadingLayer = null!;
         private IDisposable? selectionOperation;
@@ -37,21 +35,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         /// <param name="room">The room.</param>
         /// <param name="itemToEdit">The item to be edited. May be null, in which case a new item will be added to the playlist.</param>
-        /// <param name="beatmap">An optional initial beatmap selection to perform.</param>
-        /// <param name="ruleset">An optional initial ruleset selection to perform.</param>
-        public MultiplayerMatchSongSelect(Room room, long? itemToEdit = null, WorkingBeatmap? beatmap = null, RulesetInfo? ruleset = null)
-            : base(room)
+        public MultiplayerMatchSongSelect(Room room, PlaylistItem? itemToEdit = null)
+            : base(room, itemToEdit)
         {
             this.itemToEdit = itemToEdit;
-
-            if (beatmap != null || ruleset != null)
-            {
-                Schedule(() =>
-                {
-                    if (beatmap != null) Beatmap.Value = beatmap;
-                    if (ruleset != null) Ruleset.Value = ruleset;
-                });
-            }
         }
 
         [BackgroundDependencyLoader]
@@ -80,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             if (operationInProgress.Value)
             {
-                Logger.Log($"{nameof(SelectedItem)} aborted due to {nameof(operationInProgress)}");
+                Logger.Log($"{nameof(SelectItem)} aborted due to {nameof(operationInProgress)}");
                 return false;
             }
 
@@ -92,7 +79,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 var multiplayerItem = new MultiplayerPlaylistItem
                 {
-                    ID = itemToEdit ?? 0,
+                    ID = itemToEdit?.ID ?? 0,
                     BeatmapID = item.Beatmap.OnlineID,
                     BeatmapChecksum = item.Beatmap.MD5Hash,
                     RulesetID = item.RulesetID,

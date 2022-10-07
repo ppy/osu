@@ -60,7 +60,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         protected readonly BindableDouble TimeRange = new BindableDouble(time_span_default)
         {
-            Default = time_span_default,
             MinValue = time_span_min,
             MaxValue = time_span_max
         };

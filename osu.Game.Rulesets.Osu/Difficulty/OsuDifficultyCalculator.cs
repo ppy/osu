@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
         private const double difficulty_multiplier = 0.0675;
-        private double hitWindowGreat;
 
         public override int Version => 20220902;
 
@@ -45,6 +44,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double cognitionRating = Math.Sqrt(skills[4].DifficultyValue()) * difficulty_multiplier;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
+
+            if (mods.Any(m => m is OsuModTouchDevice))
+            {
+                aimRating = Math.Pow(aimRating, 0.8);
+                flashlightRating = Math.Pow(flashlightRating, 0.8);
+            }
 
             if (mods.Any(h => h is OsuModRelax))
             {
@@ -79,6 +84,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
+
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+
+            double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
 
             return new OsuDifficultyAttributes
             {
@@ -117,23 +127,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            HitWindows hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
-
-            hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
-
             return new Skill[]
             {
                 new Aim(mods, true),
                 new Aim(mods, false),
-                new Speed(mods, hitWindowGreat),
+                new Speed(mods),
                 new Flashlight(mods),
-                new Cognition(mods)
+                new Cognition(mods),
             };
         }
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
+            new OsuModTouchDevice(),
             new OsuModDoubleTime(),
             new OsuModHalfTime(),
             new OsuModEasy(),
