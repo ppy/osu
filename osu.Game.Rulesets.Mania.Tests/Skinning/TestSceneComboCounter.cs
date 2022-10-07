@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
@@ -21,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("setup", () => SetContents(_ => new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ComboCounter, stageDefinition: new StageDefinition { Columns = 4 }),
+            AddStep("setup", () => SetContents(_ => new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ComboCounter),
                 _ => new DefaultComboCounter())
             {
                 Anchor = Anchor.Centre,
