@@ -119,8 +119,7 @@ namespace osu.Game.Skinning.Editor
 
         protected override void SelectAll()
         {
-            SelectedItems.Clear();
-            SelectedItems.AddRange(targetComponents.SelectMany(list => list));
+            SelectedItems.AddRange(targetComponents.SelectMany(list => list).Except(SelectedItems).ToArray());
         }
 
         /// <summary>

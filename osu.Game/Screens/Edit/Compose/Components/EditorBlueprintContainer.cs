@@ -131,8 +131,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void SelectAll()
         {
             Composer.Playfield.KeepAllAlive();
-            SelectedItems.Clear();
-            SelectedItems.AddRange(Beatmap.HitObjects);
+            SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).ToArray());
         }
 
         protected override void OnBlueprintSelected(SelectionBlueprint<HitObject> blueprint)
