@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 preemptDifficulty *= 1 + 0.6 * currVelocity;
 
                 // Buff rhythm.
-                preemptDifficulty *= Math.Max(1, RhythmEvaluator.EvaluateDifficultyOf(current, 30) - 0.1);
+                preemptDifficulty *= Math.Max(1, RhythmEvaluator.EvaluateDifficultyOf(current) - 0.1);
 
                 // Buff small circles.
                 // Very arbitrary, but lets assume CS5 is when AR11 becomes more uncomfortable.
