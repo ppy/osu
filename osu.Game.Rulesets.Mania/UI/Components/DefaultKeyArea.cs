@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     Radius = 5,
                     Colour = colour.NewValue.Opacity(0.5f),
                 };
-            });
+            }, true);
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
