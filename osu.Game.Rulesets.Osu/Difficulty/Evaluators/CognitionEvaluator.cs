@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 preemptDifficulty += Math.Pow(400 - currObj.preempt, 1.5) / (10 + (currObj.StrainTime * 0.05));
 
                 // Buff spacing.
-                preemptDifficulty *= 1 + 0.4 * currVelocity;
+                preemptDifficulty *= 1 + 0.6 * currVelocity;
 
                 // Buff rhythm.
                 preemptDifficulty *= Math.Max(1, RhythmEvaluator.EvaluateDifficultyOf(current, 30) - 0.1);
@@ -99,17 +99,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Nerf repeated angles.
                 if (current.Index > 1)
                 {
-                    var prevPrevObj = (OsuDifficultyHitObject)current.Previous(1);
-
-                    if (currObj.Angle != null && prevObj.Angle != null)
-                    {
-                        preemptDifficulty *= getAngleDifferenceNerfFactor(Math.Abs(currObj.Angle.Value - prevObj.Angle.Value));
-                    }
-
-                    if (currObj.Angle != null && prevPrevObj.Angle != null)
-                    {
-                        preemptDifficulty *= getAngleDifferenceNerfFactor(Math.Abs(currObj.Angle.Value - prevPrevObj.Angle.Value));
-                    }
+                    preemptDifficulty *= getConstantAngleNerfFactor(currObj);
+                    preemptDifficulty *= getConstantAngleNerfFactor(prevObj);
                 }
 
                 // Nerf constant rhythm.
@@ -213,12 +204,45 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return difficulty;
         }
 
+        private static double getConstantAngleNerfFactor(OsuDifficultyHitObject current)
+        {
+            const double time_limit = 2000;
+            const double time_limit_low = 300;
+
+            double constantAngleCount = 0;
+
+            int index = 0;
+            double currentTimeGap = 0;
+
+            while (currentTimeGap < time_limit)
+            {
+                var loopObj = (OsuDifficultyHitObject)current.Previous(index);
+
+                if (loopObj.IsNull())
+                    break;
+
+                double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - time_limit_low) / (time_limit - time_limit_low), 0, 1);
+
+                if (loopObj.Angle.IsNotNull() && current.Angle.IsNotNull())
+                {
+                    double angleDifference = Math.Abs(current.Angle.Value - loopObj.Angle.Value);
+
+                    constantAngleCount += Math.Cos(2 * Math.Min(Math.PI / 4, angleDifference)) * longIntervalFactor;
+                }
+
+                currentTimeGap = current.StartTime - loopObj.StartTime;
+                index++;
+            }
+
+            double difficulty = Math.Pow(Math.Min(1, 2 / constantAngleCount), 2);
+
+            return difficulty;
+        }
+
         private static double getTimeNerfFactor(double deltaTime)
         {
             return Math.Clamp(2 - (deltaTime / 1500), 0, 1);
         }
-
-        private static double getAngleDifferenceNerfFactor(double angleDifference) => 1 - 0.5 * Math.Cos(1 * Math.Min(Math.PI / 2, angleDifference));
 
         private static double logistic(double x) => 1 / (1 + Math.Pow(Math.E, -x));
     }
