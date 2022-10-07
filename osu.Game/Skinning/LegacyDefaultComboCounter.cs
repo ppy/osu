@@ -11,8 +11,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Uses the 'x' symbol and has a pop-out effect while rolling over.
     /// </summary>
-    // todo: this shouldn't be here, hmm...
-    public class LegacyOsuComboCounter : LegacyComboCounter
+    public class LegacyDefaultComboCounter : LegacyComboCounter
     {
         private const double big_pop_out_duration = 300;
         private const double small_pop_out_duration = 100;
@@ -31,7 +30,7 @@ namespace osu.Game.Skinning
             set => CounterContainer.Alpha = value ? 1 : 0;
         }
 
-        public LegacyOsuComboCounter()
+        public LegacyDefaultComboCounter()
         {
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;

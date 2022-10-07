@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
 
         protected override Drawable CreateDefaultImplementation() => new DefaultComboCounter();
-        protected override Drawable CreateLegacyImplementation() => new LegacyOsuComboCounter();
+        protected override Drawable CreateLegacyImplementation() => new LegacyDefaultComboCounter();
 
         [Test]
         public void TestComboCounterIncrementing()
@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddToggleStep("toggle legacy hidden by ruleset", visible =>
             {
-                foreach (var legacyCounter in this.ChildrenOfType<LegacyOsuComboCounter>())
+                foreach (var legacyCounter in this.ChildrenOfType<LegacyDefaultComboCounter>())
                     legacyCounter.HiddenByRulesetImplementation = visible;
             });
 

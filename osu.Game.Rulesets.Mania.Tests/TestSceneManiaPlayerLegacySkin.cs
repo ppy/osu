@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddAssert("legacy osu combo counter hidden", () =>
             {
-                return Player.ChildrenOfType<LegacyOsuComboCounter>().All(c => c.ChildrenOfType<Container>().Single().Alpha == 0f);
+                return Player.ChildrenOfType<LegacyDefaultComboCounter>().All(c => c.ChildrenOfType<Container>().Single().Alpha == 0f);
             });
         }
     }
