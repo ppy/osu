@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
     {
         public const float NOTE_HEIGHT = 42;
 
-        public const float CORNER_RADIUS = 3;
+        public const float CORNER_RADIUS = 3.4f;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
