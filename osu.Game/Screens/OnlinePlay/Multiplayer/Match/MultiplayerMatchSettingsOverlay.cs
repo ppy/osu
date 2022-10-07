@@ -54,6 +54,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             private const float disabled_alpha = 0.2f;
 
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
             public Action? SettingsApplied;
 
             public OsuTextBox NameField = null!;
@@ -424,7 +426,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             private void hideError() => ErrorText.FadeOut(50);
 
-            private void onSuccess(Room room)
+            private void onSuccess(Room room) => Schedule(() =>
             {
                 Debug.Assert(applyingSettingsOperation != null);
 
@@ -432,9 +434,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 applyingSettingsOperation.Dispose();
                 applyingSettingsOperation = null;
-            }
+            });
 
-            private void onError(string text)
+            private void onError(string text) => Schedule(() =>
             {
                 Debug.Assert(applyingSettingsOperation != null);
 
@@ -455,7 +457,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 applyingSettingsOperation.Dispose();
                 applyingSettingsOperation = null;
-            }
+            });
         }
 
         public class CreateOrUpdateButton : TriangleButton

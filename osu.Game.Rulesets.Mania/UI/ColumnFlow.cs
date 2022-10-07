@@ -36,6 +36,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             AutoSizeAxes = Axes.X;
 
+            Masking = true;
+
             InternalChild = columns = new FillFlowContainer<Container>
             {
                 RelativeSizeAxes = Axes.Y,

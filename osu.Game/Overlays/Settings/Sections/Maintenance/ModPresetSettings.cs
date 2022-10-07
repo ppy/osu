@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class ModPresetSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Mod presets";
+        protected override LocalisableString Header => CommonStrings.ModPresets;
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             deleteAllButton.Enabled.Value = true;
 
             if (deletionTask.IsCompletedSuccessfully)
-                notificationOverlay?.Post(new ProgressCompletionNotification { Text = "Deleted all mod presets!" });
+                notificationOverlay?.Post(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.DeletedAllModPresets });
             else if (deletionTask.IsFaulted)
                 Logger.Error(deletionTask.Exception, "Failed to delete all mod presets");
         }
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             undeleteButton.Enabled.Value = true;
 
             if (undeletionTask.IsCompletedSuccessfully)
-                notificationOverlay?.Post(new ProgressCompletionNotification { Text = "Restored all deleted mod presets!" });
+                notificationOverlay?.Post(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.RestoredAllDeletedModPresets });
             else if (undeletionTask.IsFaulted)
                 Logger.Error(undeletionTask.Exception, "Failed to restore mod presets");
         }

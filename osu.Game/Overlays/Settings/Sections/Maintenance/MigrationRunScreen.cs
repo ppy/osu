@@ -15,6 +15,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osuTK;
@@ -71,14 +72,14 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "Migration in progress",
+                            Text = MaintenanceSettingsStrings.MigrationInProgress,
                             Font = OsuFont.Default.With(size: 40)
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "This could take a few minutes depending on the speed of your disk(s).",
+                            Text = MaintenanceSettingsStrings.MigrationDescription,
                             Font = OsuFont.Default.With(size: 30)
                         },
                         new LoadingSpinner(true)
@@ -89,7 +90,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "Please avoid interacting with the game!",
+                            Text = MaintenanceSettingsStrings.ProhibitedInteractDuringMigration,
                             Font = OsuFont.Default.With(size: 30)
                         },
                     }
@@ -111,7 +112,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     {
                                         notifications.Post(new SimpleNotification
                                         {
-                                            Text = "Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up.",
+                                            Text = MaintenanceSettingsStrings.FailedCleanupNotification,
                                             Activated = () =>
                                             {
                                                 originalStorage.PresentExternally();
