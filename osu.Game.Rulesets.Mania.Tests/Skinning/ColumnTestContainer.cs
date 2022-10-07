@@ -24,15 +24,17 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [Cached]
         private readonly Column column;
 
+        [Cached]
+        private readonly StageDefinition stageDefinition = new StageDefinition(5);
+
         public ColumnTestContainer(int column, ManiaAction action, bool showColumn = false)
         {
             InternalChildren = new[]
             {
-                this.column = new Column(column)
+                this.column = new Column(column, false)
                 {
                     Action = { Value = action },
-                    AccentColour = Color4.Orange,
-                    ColumnType = column % 2 == 0 ? ColumnType.Even : ColumnType.Odd,
+                    AccentColour = { Value = Color4.Orange },
                     Alpha = showColumn ? 1 : 0
                 },
                 content = new ManiaInputManager(new ManiaRuleset().RulesetInfo, 4)
