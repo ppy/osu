@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        public override float DefaultFlashlightSize => 350;
+        public override float DefaultFlashlightSize => 325;
 
         protected override Flashlight CreateFlashlight() => new CatchFlashlight(this, playfield);
 
@@ -44,7 +44,19 @@ namespace osu.Game.Rulesets.Catch.Mods
                 : base(modFlashlight)
             {
                 this.playfield = playfield;
+
                 FlashlightSize = new Vector2(0, GetSizeFor(0));
+                FlashlightSmoothness = 1.4f;
+            }
+
+            protected override float GetComboScaleFor(int combo)
+            {
+                if (combo >= 200)
+                    return 0.770f;
+                if (combo >= 100)
+                    return 0.885f;
+
+                return 1.0f;
             }
 
             protected override void Update()
