@@ -71,15 +71,14 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
+            SkinnableDrawable keyArea;
+
             skin.SourceChanged += onSourceChanged;
             onSourceChanged();
 
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
                 RelativeSizeAxes = Axes.Both,
-                // This is pretty dodgy (and will cause weirdness when pausing gameplay) but is better than completely broken rewind.
-                Clock = host.UpdateThread.Clock,
-                ProcessCustomClock = false,
             };
 
             InternalChildren = new[]
@@ -89,17 +88,17 @@ namespace osu.Game.Rulesets.Mania.UI
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
                 HitObjectArea,
-                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
+                keyArea = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both,
-                    // This is pretty dodgy (and will cause weirdness when pausing gameplay) but is better than completely broken rewind.
-                    Clock = host.UpdateThread.Clock,
-                    ProcessCustomClock = false,
                 },
                 background,
                 TopLevelContainer,
                 new ColumnTouchInputArea(this)
             };
+
+            applyGameWideClock(background);
+            applyGameWideClock(keyArea);
 
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
 
@@ -108,6 +107,18 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
             RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
             RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 250);
+
+            // Some elements don't handle rewind correctly and fixing them is non-trivial.
+            // In the future we need a better solution to this, but as a temporary work-around, give these components the game-wide
+            // clock so they don't need to worry about rewind.
+            // This only works because they handle OnPressed/OnReleased which results in a correct state while rewinding.
+            //
+            // This is kinda dodgy (and will cause weirdness when pausing gameplay) but is better than completely broken rewind.
+            void applyGameWideClock(Drawable drawable)
+            {
+                drawable.Clock = host.UpdateThread.Clock;
+                drawable.ProcessCustomClock = false;
+            }
         }
 
         private void onSourceChanged()
