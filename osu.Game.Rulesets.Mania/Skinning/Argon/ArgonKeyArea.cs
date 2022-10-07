@@ -150,6 +150,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     bottomIcon.Colour = colour.NewValue;
                 },
                 true);
+
+            // Yes, proxy everything.
+            column.TopLevelContainer.Add(CreateProxy());
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
