@@ -189,9 +189,10 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             Color4 lightingColour = getLightingColour();
 
             background
+                .FlashColour(accentColour.Value.Lighten(0.8f), 200, Easing.OutQuint)
                 .FadeTo(1, lighting_fade_in_duration, Easing.OutQuint)
                 .Then()
-                .FadeTo(0.6f, 500, Easing.In);
+                .FadeTo(0.8f, 500);
 
             hitTargetLine.FadeColour(Color4.White, lighting_fade_in_duration, Easing.OutQuint);
             hitTargetLine.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
