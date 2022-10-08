@@ -24,22 +24,18 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        [Cached(typeof(IDialogOverlay))]
-        private readonly DialogOverlay dialogOverlay = new DialogOverlay();
 
         private TestCommentsContainer comments;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            if (dialogOverlay.Parent != null) Remove(dialogOverlay, false);
             Clear();
             Add(new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = comments = new TestCommentsContainer()
             });
-            Add(dialogOverlay);
         });
 
         [Test]

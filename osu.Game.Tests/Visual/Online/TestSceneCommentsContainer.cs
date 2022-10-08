@@ -25,9 +25,6 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        [Cached(typeof(IDialogOverlay))]
-        private readonly DialogOverlay dialogOverlay = new DialogOverlay();
-
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         private CommentsContainer commentsContainer;
@@ -35,15 +32,10 @@ namespace osu.Game.Tests.Visual.Online
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            if (dialogOverlay.Parent != null) Remove(dialogOverlay, false);
-            Children = new Drawable[]
+            Child = new BasicScrollContainer
             {
-                new BasicScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = commentsContainer = new CommentsContainer()
-                },
-                dialogOverlay
+                RelativeSizeAxes = Axes.Both,
+                Child = commentsContainer = new CommentsContainer()
             };
         });
 
