@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -136,6 +137,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Confirm dialog", () => InputManager.Key(Key.Number1));
             AddUntilStep("Deletion requested", () => delete);
+            AddAssert("Loading spinner shown", () => commentsContainer.ChildrenOfType<LoadingSpinner>().Any(d => d.IsPresent));
             AddUntilStep("Comment is deleted locally", () =>
             {
                 return this.ChildrenOfType<DrawableComment>().SingleOrDefault(x => x.Comment.Id == 1) == null;
