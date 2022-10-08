@@ -17,6 +17,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
@@ -311,6 +312,8 @@ namespace osu.Game.Beatmaps
                 if (existingFileInfo != null)
                     DeleteFile(setInfo, existingFileInfo);
 
+                string? oldMd5Hash = beatmapInfo.MD5Hash;
+
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
@@ -326,6 +329,12 @@ namespace osu.Game.Beatmaps
                     var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
+
+                    foreach (var collection in r.All<BeatmapCollection>())
+                    {
+                        if (collection.BeatmapMD5Hashes.Remove(oldMd5Hash))
+                            collection.BeatmapMD5Hashes.Add(beatmapInfo.MD5Hash);
+                    }
 
                     ProcessBeatmap?.Invoke((liveBeatmapSet, false));
                 });
