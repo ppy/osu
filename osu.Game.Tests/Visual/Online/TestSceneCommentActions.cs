@@ -140,7 +140,57 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Loading spinner shown", () => commentsContainer.ChildrenOfType<LoadingSpinner>().Any(d => d.IsPresent));
             AddUntilStep("Comment is deleted locally", () =>
             {
-                return this.ChildrenOfType<DrawableComment>().SingleOrDefault(x => x.Comment.Id == 1) == null;
+                return this.ChildrenOfType<DrawableComment>().Single(x => x.Comment.Id == 1).WasDeleted;
+            });
+        }
+
+        [Test]
+        public void TestDeletionFail()
+        {
+            DrawableComment? ourComment = null;
+            bool delete = false;
+
+            addTestComments();
+            AddUntilStep("Comment exists", () =>
+            {
+                var comments = this.ChildrenOfType<DrawableComment>();
+                ourComment = comments.SingleOrDefault(x => x.Comment.Id == 1);
+                return ourComment != null;
+            });
+            AddStep("It has delete button", () =>
+            {
+                var btn = ourComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "Delete");
+                InputManager.MoveMouseTo(btn);
+            });
+            AddStep("Click delete button", () =>
+            {
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("Setup request handling", () =>
+            {
+                dummyAPI.HandleRequest = request =>
+                {
+                    if (request is not CommentDeleteRequest req)
+                        return false;
+
+                    req.TriggerFailure(new Exception());
+                    delete = true;
+                    return false;
+                };
+            });
+            AddStep("Confirm dialog", () => InputManager.Key(Key.Number1));
+            AddUntilStep("Deletion requested", () => delete);
+            AddUntilStep("Comment is available", () =>
+            {
+                return !this.ChildrenOfType<DrawableComment>().Single(x => x.Comment.Id == 1).WasDeleted;
+            });
+            AddAssert("Loading spinner hidden", () =>
+            {
+                return ourComment.ChildrenOfType<LoadingSpinner>().All(d => !d.IsPresent);
+            });
+            AddAssert("Actions available", () =>
+            {
+                return ourComment.ChildrenOfType<LinkFlowContainer>().Single(x => x.Name == @"Actions buttons").IsPresent;
             });
         }
 
