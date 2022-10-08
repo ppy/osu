@@ -201,6 +201,7 @@ namespace osu.Game.Overlays.Comments
                                                         },
                                                         actionsContainer = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold))
                                                         {
+                                                            Name = @"Actions buttons",
                                                             AutoSizeAxes = Axes.Both,
                                                             Spacing = new Vector2(10, 0)
                                                         },
