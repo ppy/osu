@@ -47,6 +47,11 @@ namespace osu.Game.Overlays.Comments
 
         private int currentPage;
 
+        /// <summary>
+        /// Local field for tracking comment state. Initialized from Comment.IsDeleted, may change when deleting was requested by user.
+        /// </summary>
+        public bool WasDeleted { get; protected set; }
+
         private FillFlowContainer childCommentsVisibilityContainer = null!;
         private FillFlowContainer childCommentsContainer = null!;
         private LoadRepliesButton loadRepliesButton = null!;
@@ -56,6 +61,9 @@ namespace osu.Game.Overlays.Comments
         private LinkFlowContainer actionsContainer = null!;
         private LoadingSpinner actionsLoading = null!;
         private DeletedCommentsCounter deletedCommentsCounter = null!;
+        private OsuSpriteText deletedLabel = null!;
+        private GridContainer content = null!;
+        private VotePill votePill = null!;
 
         [Resolved(canBeNull: true)]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -74,8 +82,6 @@ namespace osu.Game.Overlays.Comments
             LinkFlowContainer username;
             FillFlowContainer info;
             CommentMarkdownContainer message;
-            GridContainer content;
-            VotePill votePill;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -158,9 +164,9 @@ namespace osu.Game.Overlays.Comments
                                                         },
                                                         Comment.Pinned ? new PinnedCommentNotice() : Empty(),
                                                         new ParentUsername(Comment),
-                                                        new OsuSpriteText
+                                                        deletedLabel = new OsuSpriteText
                                                         {
-                                                            Alpha = Comment.IsDeleted ? 1 : 0,
+                                                            Alpha = 0f,
                                                             Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                                                             Text = CommentsStrings.Deleted
                                                         }
@@ -312,11 +318,9 @@ namespace osu.Game.Overlays.Comments
             if (Comment.HasMessage)
                 message.Text = Comment.Message;
 
-            if (Comment.IsDeleted)
-            {
-                content.FadeColour(OsuColour.Gray(0.5f));
-                votePill.Hide();
-            }
+            WasDeleted = Comment.IsDeleted;
+            if (WasDeleted)
+                makeDeleted();
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
             {
@@ -353,6 +357,17 @@ namespace osu.Game.Overlays.Comments
         }
 
         /// <summary>
+        /// Transforms some comment's components to show it as deleted. Invoked both from loading and deleting.
+        /// </summary>
+        private void makeDeleted()
+        {
+            deletedLabel.Alpha = 1f;
+            content.FadeColour(OsuColour.Gray(0.5f));
+            votePill.Hide();
+            actionsContainer.Expire();
+        }
+
+        /// <summary>
         /// Invokes comment deletion with confirmation.
         /// </summary>
         private void deleteComment()
@@ -374,10 +389,10 @@ namespace osu.Game.Overlays.Comments
             request.Success += _ => Schedule(() =>
             {
                 actionsLoading.Hide();
-                AutoSizeAxes = Axes.None;
-                Masking = true;
-                this.ResizeHeightTo(0, 1000, Easing.Out);
-                this.FadeOut(1000, Easing.Out).Expire();
+                makeDeleted();
+                WasDeleted = true;
+                if (!ShowDeleted.Value)
+                    Hide();
             });
             request.Failure += _ => Schedule(() =>
             {
@@ -391,7 +406,7 @@ namespace osu.Game.Overlays.Comments
         {
             ShowDeleted.BindValueChanged(show =>
             {
-                if (Comment.IsDeleted)
+                if (WasDeleted)
                     this.FadeTo(show.NewValue ? 1 : 0);
             }, true);
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
