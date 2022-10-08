@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -21,6 +22,8 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneCommentActions : OsuManualInputManagerTestScene
     {
+        private Container<Drawable> content = null!;
+        protected override Container<Drawable> Content => content;
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         [Cached(typeof(IDialogOverlay))]
@@ -31,22 +34,26 @@ namespace osu.Game.Tests.Visual.Online
 
         private CommentsContainer commentsContainer = null!;
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            base.Content.AddRange(new Drawable[]
+            {
+                content = new OsuScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                dialogOverlay
+            });
+        }
+
         [SetUpSteps]
         public void SetUp()
         {
             Schedule(() =>
             {
                 API.Login("test", "test");
-                if (dialogOverlay.Parent != null) Remove(dialogOverlay, false);
-                Children = new Container<Drawable>[]
-                {
-                    new BasicScrollContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = commentsContainer = new CommentsContainer()
-                    },
-                    dialogOverlay
-                };
+                Child = commentsContainer = new CommentsContainer();
             });
         }
 
