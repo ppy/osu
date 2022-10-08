@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModPerfect;
         public override ModType Type => ModType.DifficultyIncrease;
         public override double ScoreMultiplier => 1;
-        public override string Description => "不SS，便重试";
+        public override LocalisableString Description => "不SS，便重试";
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModSuddenDeath)).ToArray();
 

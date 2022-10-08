@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -76,11 +78,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private enum PlaylistsCategory
         {
+            [Description("所有")]
             Any,
+
+            [Description("正常")]
             Normal,
+
+            [Description("聚光灯")]
             Spotlight,
 
-            [Description("Featured Artist")]
+            [Description("精选艺术家")]
             FeaturedArtist,
         }
     }

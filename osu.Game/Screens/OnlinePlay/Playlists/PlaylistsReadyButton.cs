@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -29,7 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         public PlaylistsReadyButton()
         {
-            Text = "Start";
+            Text = "开始";
         }
 
         [BackgroundDependencyLoader]
@@ -72,10 +74,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     return string.Empty;
 
                 if (!enoughTimeLeft)
-                    return "No time left!";
+                    return "时间已用完!";
 
                 if (!hasRemainingAttempts)
-                    return "Attempts exhausted!";
+                    return "尝试次数已用尽!";
 
                 return base.TooltipText;
             }

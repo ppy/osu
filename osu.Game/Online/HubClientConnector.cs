@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -66,26 +64,26 @@ namespace osu.Game.Online
             this.preferMessagePack = preferMessagePack;
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(state => connectIfPossible(), true);
+            apiState.BindValueChanged(_ => Task.Run(connectIfPossible), true);
         }
 
-        public void Reconnect()
+        public Task Reconnect()
         {
             Logger.Log($"{clientName} reconnecting...", LoggingTarget.Network);
-            Task.Run(connectIfPossible);
+            return Task.Run(connectIfPossible);
         }
 
-        private void connectIfPossible()
+        private async Task connectIfPossible()
         {
             switch (apiState.Value)
             {
                 case APIState.Failing:
                 case APIState.Offline:
-                    Task.Run(() => disconnect(true));
+                    await disconnect(true);
                     break;
 
                 case APIState.Online:
-                    Task.Run(connect);
+                    await connect();
                     break;
             }
         }
@@ -146,7 +144,7 @@ namespace osu.Game.Online
         /// </summary>
         private async Task handleErrorAndDelay(Exception exception, CancellationToken cancellationToken)
         {
-            Logger.Log($"{clientName} connection error: {exception}", LoggingTarget.Network);
+            Logger.Log($"{clientName} connect attempt failed: {exception.Message}", LoggingTarget.Network);
             await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
         }
 

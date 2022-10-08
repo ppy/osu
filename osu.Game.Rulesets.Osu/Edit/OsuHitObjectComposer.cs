@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,8 +49,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override IEnumerable<TernaryButton> CreateTernaryButtons() => base.CreateTernaryButtons().Concat(new[]
         {
-            new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler }),
-            new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Th })
+            new TernaryButton(distanceSnapToggle, "距离吸附", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler }),
+            new TernaryButton(rectangularGridSnapToggle, "格线吸附", () => new SpriteIcon { Icon = FontAwesome.Solid.Th })
         });
 
         private BindableList<HitObject> selectedHitObjects;
@@ -71,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             });
 
             selectedHitObjects = EditorBeatmap.SelectedHitObjects.GetBoundCopy();
-            selectedHitObjects.CollectionChanged += (_, __) => updateDistanceSnapGrid();
+            selectedHitObjects.CollectionChanged += (_, _) => updateDistanceSnapGrid();
 
             placementObject = EditorBeatmap.PlacementObject.GetBoundCopy();
             placementObject.ValueChanged += _ => updateDistanceSnapGrid();
@@ -202,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             switch (BlueprintContainer.CurrentTool)
             {
-                case SelectTool _:
+                case SelectTool:
                     if (!EditorBeatmap.SelectedHitObjects.Any())
                         return;
 

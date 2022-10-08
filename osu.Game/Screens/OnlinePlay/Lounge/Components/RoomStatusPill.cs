@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -38,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 12),
+                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 14),
                     Colour = Color4.Black
                 }
             };

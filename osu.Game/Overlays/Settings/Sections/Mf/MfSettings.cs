@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 new SettingsCheckbox
                 {
                     LabelText = "使用自定义开屏页背景",
-                    TooltipText = "请将要显示在开屏页的图片放在custom下, 并更名为avatarlogo",
+                    TooltipText = "请将要显示在开屏页的图片放在custom下, 并更名为startup或avatarlogo",
                     Current = config.GetBindable<bool>(MSetting.UseCustomGreetingPicture)
                 },
                 new SettingsCheckbox

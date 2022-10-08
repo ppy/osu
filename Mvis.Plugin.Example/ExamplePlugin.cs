@@ -1,7 +1,6 @@
 using Mvis.Plugin.Example.Config;
 using Mvis.Plugin.Example.DBus;
 using Mvis.Plugin.Example.Sidebar;
-using Mvis.Plugin.Example.UI;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 using osuTK.Graphics;
 
 namespace Mvis.Plugin.Example
@@ -40,9 +40,10 @@ namespace Mvis.Plugin.Example
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new ExamplePluginConfigManager(storage);
 
-        //指定插件的设置界面
-        public override PluginSettingsSubSection CreateSettingsSubSection()
-            => new ExampleSettings(this);
+        public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
+        {
+            return base.GetSettingEntries(pluginConfigManager);
+        }
 
         //指定插件的侧边栏页面
         public override PluginSidebarPage CreateSidebarPage()

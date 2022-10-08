@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
-using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,8 +15,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Online.API;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
@@ -32,13 +32,6 @@ namespace osu.Game.Screens.Menu
 
         private ISample pianoReverb;
         protected override string SeeyaSampleName => "Intro/Welcome/seeya";
-
-        protected override BackgroundScreen CreateBackground() => background = new BackgroundScreenDefault(false)
-        {
-            Alpha = 0,
-        };
-
-        private BackgroundScreenDefault background;
 
         public IntroWelcome([CanBeNull] Func<MainMenu> createNextScreen = null)
             : base(createNextScreen)
@@ -98,18 +91,12 @@ namespace osu.Game.Screens.Menu
                         logo.ScaleTo(1);
                         logo.FadeIn(fade_in_time);
 
-                        background.FadeIn(fade_in_time);
+                        FadeInBackground(fade_in_time);
 
                         LoadMenu();
                     }, delay_step_two);
                 });
             }
-        }
-
-        public override void OnResuming(ScreenTransitionEvent e)
-        {
-            base.OnResuming(e);
-            background.FadeOut(100);
         }
 
         private class WelcomeIntroSequence : Container

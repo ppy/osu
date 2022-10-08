@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Game.Overlays;
 using System.Collections.Generic;
@@ -9,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
-using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay
             IsValidMod = _ => true;
         }
 
-        protected override ModColumn CreateModColumn(ModType modType, Key[] toggleKeys = null) => new ModColumn(modType, true, toggleKeys);
+        protected override ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, true);
 
         protected override IEnumerable<ShearedButton> CreateFooterButtons() => base.CreateFooterButtons().Prepend(
             new SelectAllModsButton(this)

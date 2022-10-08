@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -53,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             base.Action = this.ShowPopover;
 
-            TooltipText = "Countdown settings";
+            TooltipText = "倒计时设置";
         }
 
         [BackgroundDependencyLoader]
@@ -77,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            bool countdownActive = multiplayerClient.Room?.Countdown is MatchStartCountdown;
+            bool countdownActive = multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true;
 
             if (countdownActive)
             {
@@ -109,7 +112,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 flow.Add(new OsuButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = $"Start match in {duration.Humanize()}",
+                    Text = $"在 {duration.Humanize()} 后开始",
                     BackgroundColour = colours.Green,
                     Action = () =>
                     {
@@ -119,12 +122,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 });
             }
 
-            if (multiplayerClient.Room?.Countdown != null && multiplayerClient.IsHost)
+            if (multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true && multiplayerClient.IsHost)
             {
                 flow.Add(new OsuButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = "Stop countdown",
+                    Text = "停止倒计时",
                     BackgroundColour = colours.Red,
                     Action = () =>
                     {

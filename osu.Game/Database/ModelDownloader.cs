@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Logging;
@@ -17,18 +18,18 @@ namespace osu.Game.Database
         where TModel : class, IHasGuidPrimaryKey, ISoftDelete, IEquatable<TModel>, T
         where T : class
     {
-        public Action<Notification> PostNotification { protected get; set; }
+        public Action<Notification>? PostNotification { protected get; set; }
 
-        public event Action<ArchiveDownloadRequest<T>> DownloadBegan;
+        public event Action<ArchiveDownloadRequest<T>>? DownloadBegan;
 
-        public event Action<ArchiveDownloadRequest<T>> DownloadFailed;
+        public event Action<ArchiveDownloadRequest<T>>? DownloadFailed;
 
         private readonly IModelImporter<TModel> importer;
-        private readonly IAPIProvider api;
+        private readonly IAPIProvider? api;
 
         protected readonly List<ArchiveDownloadRequest<T>> CurrentDownloads = new List<ArchiveDownloadRequest<T>>();
 
-        protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider api)
+        protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider? api)
         {
             this.importer = importer;
             this.api = api;
@@ -46,13 +47,11 @@ namespace osu.Game.Database
 
         private bool accel;
 
-        /// <summary>
-        /// Begin a download for the requested <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="model">The <typeparamref name="T"/> to be downloaded.</param>
-        /// <param name="minimiseDownloadSize">Upstream arg</param>
-        /// <returns>Whether the download was started.</returns>
-        public bool Download(T model, bool minimiseDownloadSize = false)
+        public bool Download(T model, bool minimiseDownloadSize = false) => Download(model, minimiseDownloadSize, null);
+
+        public void DownloadAsUpdate(TModel originalModel) => Download(originalModel, false, originalModel);
+
+        protected bool Download(T model, bool minimiseDownloadSize, TModel? originalModel)
         {
             if (!canDownload(model)) return false;
 
@@ -75,11 +74,15 @@ namespace osu.Game.Database
             {
                 Task.Factory.StartNew(async () =>
                 {
-                    // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    var imported = await importer.Import(notification, new ImportTask(filename)).ConfigureAwait(false);
+                    bool importSuccessful;
+
+                    if (originalModel != null)
+                        importSuccessful = (await importer.ImportAsUpdate(notification, new ImportTask(filename), originalModel)) != null;
+                    else
+                        importSuccessful = (await importer.Import(notification, new ImportTask(filename))).Any();
 
                     // for now a failed import will be marked as a failed download for simplicity.
-                    if (!imported.Any())
+                    if (!importSuccessful)
                         DownloadFailed?.Invoke(request);
 
                     CurrentDownloads.Remove(request);
@@ -102,7 +105,7 @@ namespace osu.Game.Database
             CurrentDownloads.Add(request);
             PostNotification?.Invoke(notification);
 
-            api.PerformAsync(request);
+            api?.PerformAsync(request);
 
             DownloadBegan?.Invoke(request);
             return true;
@@ -116,7 +119,15 @@ namespace osu.Game.Database
                 notification.State = ProgressNotificationState.Cancelled;
 
                 if (!(error is OperationCanceledException))
-                    Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} 下载失败!");
+                {
+                    if (error is WebException webException && webException.Message == @"TooManyRequests")
+                    {
+                        notification.Close(false);
+                        PostNotification?.Invoke(new TooManyDownloadsNotification());
+                    }
+                    else
+                        Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} download failed!");
+                }
             }
 
             void onAccelFail(Exception _)
@@ -132,7 +143,7 @@ namespace osu.Game.Database
             return Download(model, minimiseDownloadSize);
         }
 
-        public abstract ArchiveDownloadRequest<T> GetExistingDownload(T model);
+        public abstract ArchiveDownloadRequest<T>? GetExistingDownload(T model);
 
         private bool canDownload(T model) => GetExistingDownload(model) == null && api != null;
 

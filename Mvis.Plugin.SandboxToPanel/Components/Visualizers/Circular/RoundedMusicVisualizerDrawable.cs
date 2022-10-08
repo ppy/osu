@@ -2,6 +2,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osuTK;
 
@@ -45,7 +46,7 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers.Circular
                 dotSize = new Vector2((float)BarWidth);
             }
 
-            protected override void DrawBar(int index, float data, float spacing, Vector2 inflation)
+            protected override void DrawBar(int index, float data, float spacing, Vector2 inflation, IRenderer renderer)
             {
                 float rotation = MathHelper.DegreesToRadians(index * spacing - 90);
                 float rotationCos = MathF.Cos(rotation);
@@ -64,7 +65,7 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers.Circular
                         Vector2Extensions.Transform(bottomDotPosition + dotBottomOffset + dotAmplitudeOffset, DrawInfo.Matrix)
                     );
 
-                DrawQuad(
+                renderer.DrawQuad(
                     circleTexture,
                     bottomDotQuad,
                     DrawColourInfo.Colour,
@@ -90,7 +91,7 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers.Circular
                         Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                     );
 
-                DrawQuad(
+                renderer.DrawQuad(
                     Texture,
                     rectangle,
                     DrawColourInfo.Colour,
@@ -112,7 +113,7 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers.Circular
                         Vector2Extensions.Transform(topDotPosition + dotBottomOffset + dotAmplitudeOffset, DrawInfo.Matrix)
                     );
 
-                DrawQuad(
+                renderer.DrawQuad(
                     circleTexture,
                     topDotQuad,
                     DrawColourInfo.Colour,

@@ -39,73 +39,79 @@ namespace M.DBus.Tray
             int order, int maxOrder,
             out IDictionary<int, SimpleEntry> additionalEntries)
         {
-            var result = new Dictionary<string, object>
+            lock (entry)
             {
-                ["type"] = entry.Type,
-                ["label"] = entry.Label,
-                ["enabled"] = entry.Enabled,
-                ["visible"] = entry.Visible,
-                ["icon-name"] = entry.IconName,
-                ["icon-data"] = entry.IconData,
-                ["shortcuts"] = entry.Shortcuts,
-                ["toggle-type"] = entry.ToggleType,
-                ["toggle-state"] = entry.ToggleState,
-                ["children-display"] = entry.ChildrenDisplay
-            };
-
-            IList<object> subMenus = new List<object>();
-
-            additionalEntries = new Dictionary<int, SimpleEntry>();
-
-            if (entry.ChildrenDisplay == ChildrenDisplayType.SSubmenu)
-            {
-                try
+                var result = new Dictionary<string, object>
                 {
-                    //遍历所有子菜单
-                    foreach (var subEntry in entry.Children)
+                    ["type"] = entry.Type,
+                    ["label"] = entry.Label,
+                    ["enabled"] = entry.Enabled,
+                    ["visible"] = entry.Visible,
+                    ["icon-name"] = entry.IconName,
+                    ["icon-data"] = entry.IconData,
+                    ["shortcuts"] = entry.Shortcuts,
+                    ["toggle-type"] = entry.ToggleType,
+                    ["toggle-state"] = entry.ToggleState,
+                    ["children-display"] = entry.ChildrenDisplay
+                };
+
+                IList<object> subMenus = new List<object>();
+
+                additionalEntries = new Dictionary<int, SimpleEntry>();
+
+                if (entry.ChildrenDisplay == ChildrenDisplayType.SSubmenu)
+                {
+                    try
                     {
-                        //额外产生的SimpleEntry
-                        //如果某一个subEntry是SSubmenu，则其Children中的所有SimpleEntry都将加入这个词典
-                        IDictionary<int, SimpleEntry> additDict;
+                        SimpleEntry[] entriesCopy = new SimpleEntry[entry.Children.Count];
+                        entry.Children.CopyTo(entriesCopy, 0);
 
-                        //如果subEntry没有被指定ChildID
-                        if (subEntry.ChildId == -2)
+                        //遍历所有子菜单
+                        foreach (var subEntry in entriesCopy)
                         {
-                            //最大id+1
-                            maxOrder++;
+                            //额外产生的SimpleEntry
+                            //如果某一个subEntry是SSubmenu，则其Children中的所有SimpleEntry都将加入这个词典
+                            IDictionary<int, SimpleEntry> additDict;
 
-                            //设置subEntry的ChildID
-                            subEntry.ChildId = maxOrder;
+                            //如果subEntry没有被指定ChildID
+                            if (subEntry.ChildId == -2)
+                            {
+                                //最大id+1
+                                maxOrder++;
 
-                            //加入要返回的词典中
-                            additionalEntries[subEntry.ChildId] = subEntry;
+                                //设置subEntry的ChildID
+                                subEntry.ChildId = maxOrder;
 
-                            //记录
-                            //Logger.Log($"{subEntry} 获取了新的ChildId: {subEntry.ChildId}");
+                                //加入要返回的词典中
+                                additionalEntries[subEntry.ChildId] = subEntry;
+
+                                //记录
+                                //Logger.Log($"{subEntry} 获取了新的ChildId: {subEntry.ChildId}");
+                            }
+
+                            //添加目录
+                            //不需要处理additonalOrders，因为已经有additDict可以用作计数了
+                            subMenus.Add(subEntry.ToDbusObject(subEntry.ChildId, maxOrder, out additDict));
+
+                            //将循环调用返回的 额外词典 加进要返回的 词典 中
+
+                            foreach (var entryData in additDict)
+                            {
+                                additionalEntries.Add(entryData);
+                            }
+
+                            //当前的最大id += 多出的目录数量 + 额外目录的数量
+                            maxOrder += additDict.Count;
                         }
-
-                        //添加目录
-                        //不需要处理additonalOrders，因为已经有additDict可以用作计数了
-                        subMenus.Add(subEntry.ToDbusObject(subEntry.ChildId, maxOrder, out additDict));
-
-                        //将循环调用返回的 额外词典 加进要返回的 词典 中
-
-                        foreach (var entryData in additDict)
-                        {
-                            additionalEntries.Add(entryData);
-                        }
-
-                        //当前的最大id += 多出的目录数量 + 额外目录的数量
-                        maxOrder += additDict.Count;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $"尝试转换{entry}时出现了错误");
                     }
                 }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $"尝试转换{entry}时出现了错误");
-                }
-            }
 
-            return (order, result, subMenus.ToArray());
+                return (order, result, subMenus.ToArray());
+            }
         }
 
         public static (int, IDictionary<string, object>) ToDbusObject(this SimpleEntry entry)

@@ -133,20 +133,21 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             beatmapSets.Clear();
 
             //From CollectionHelper.cs
-            foreach (string hash in c.BeatmapHashes)
+            foreach (string hash in c.BeatmapMD5Hashes)
             {
                 var item = hashResolver.ResolveHash(hash);
-                if (item == null) continue;
 
                 //获取当前BeatmapSet
                 var currentSet = item.BeatmapSet;
+
+                if (currentSet == null) continue;
 
                 //进行比对，如果beatmapList中不存在，则添加。
                 if (!beatmapSets.Contains(currentSet))
                     beatmapSets.Add(currentSet);
             }
 
-            collectionName.Text = c.Name.Value;
+            collectionName.Text = c.Name;
             collectionBeatmapCount.Text = CollectionStrings.SongCount(beatmapSets.Count);
 
             refreshBeatmapSetList();

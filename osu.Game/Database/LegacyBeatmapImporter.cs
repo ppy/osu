@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.IO.Stores;
@@ -18,6 +20,10 @@ namespace osu.Game.Database
 
         protected override IEnumerable<string> GetStableImportPaths(Storage storage)
         {
+            // make sure the directory exists
+            if (!storage.ExistsDirectory(string.Empty))
+                yield break;
+
             foreach (string directory in storage.GetDirectories(string.Empty))
             {
                 var directoryStorage = storage.GetStorageForDirectory(directory);

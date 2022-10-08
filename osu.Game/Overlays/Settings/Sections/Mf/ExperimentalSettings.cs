@@ -8,10 +8,8 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Mf;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens;
 using osuTK;
 using osuTK.Graphics;
 
@@ -32,14 +30,11 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             FamilyName = "Torus"
         };
 
-        private FillFlowContainer<FontInfoLabel> textFlow;
-        private SettingsDropdown<Font> dropDown;
-
         [Resolved]
         private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager mConfig, OsuGame game, CustomFontStore customStorage)
+        private void load(MConfigManager mConfig, OsuGame game)
         {
             Children = new Drawable[]
             {
@@ -54,27 +49,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                         RelativeSizeAxes = Axes.X,
                         Colour = Color4.Gold
                     }
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Margin = new MarginPadding { Top = 8 },
-                    Padding = new MarginPadding { Horizontal = 15 },
-                    Children = new Drawable[]
-                    {
-                        textFlow = new FillFlowContainer<FontInfoLabel>
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Masking = true,
-                            CornerRadius = 5
-                        }
-                    }
-                },
-                dropDown = new PreferredFontSettingsDropDown
-                {
-                    LabelText = "首选字体"
                 }
             };
 
@@ -90,18 +64,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     TooltipText = "可能在Wayland上没有效果",
                     Current = mConfig.GetBindable<bool>(MSetting.AllowWindowFadeEffect)
                 });
-            }
-
-            var fonts = customStorage.ActiveFonts;
-
-            dropDown.Items = fonts;
-            currentFont.Value = fonts.Find(f => f.FamilyName == mConfig.Get<string>(MSetting.PreferredFont));
-            currentFont.BindValueChanged(v => mConfig.SetValue(MSetting.PreferredFont, v.NewValue.FamilyName));
-            dropDown.Current = currentFont;
-
-            foreach (var font in customStorage.ActiveFonts)
-            {
-                textFlow.Add(new FontInfoLabel(font));
             }
 
             mConfig.BindWith(MSetting.CustomWindowIconPath, customWindowIconPath);

@@ -165,7 +165,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 ? ActiveState.Idle
                 : ActiveState.Disabled;
 
-            collectionName.Text = Collection.Name.Value;
+            collectionName.Text = Collection.Name;
             collectionBeatmapCount.Text = CollectionStrings.SongCount(beatmapSets.Count);
 
             State.BindValueChanged(onStateChanged, true);
@@ -228,14 +228,14 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private void sortBeatmapCollection()
         {
             //From CollectionHelper.cs
-            foreach (string hash in Collection.BeatmapHashes)
+            foreach (string hash in Collection.BeatmapMD5Hashes)
             {
                 var item = hashResolver.ResolveHash(hash);
 
-                if (item == null) continue;
-
                 //获取当前BeatmapSet
                 var currentSet = item.BeatmapSet;
+
+                if (currentSet == null) continue;
 
                 //进行比对，如果beatmapList中不存在，则添加。
                 if (!beatmapSets.Contains(currentSet))
@@ -267,7 +267,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             //如果已经被选中了，则触发双击
             if (State.Value == ActiveState.Selected)
             {
-                doubleClick?.Invoke();
+                doubleClick.Invoke();
                 State.Value = ActiveState.Active;
 
                 return base.OnClick(e);
@@ -295,7 +295,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             }
         }
 
-        private class BeatmapThumbnailFlow : FillFlowContainer
+        private class BeatmapThumbnailFlow : FillFlowContainer<TooltipContainer>
         {
             [Resolved]
             private BeatmapManager beatmaps { get; set; }

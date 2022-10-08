@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -17,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Ladder
 {
-    public class LadderScreen : TournamentScreen, IProvideVideo
+    public class LadderScreen : TournamentScreen
     {
         protected Container<DrawableTournamentMatch> MatchesContainer;
         private Container<Path> paths;
@@ -73,7 +75,7 @@ namespace osu.Game.Tournament.Screens.Ladder
             foreach (var match in LadderInfo.Matches)
                 addMatch(match);
 
-            LadderInfo.Rounds.CollectionChanged += (_, __) => layout.Invalidate();
+            LadderInfo.Rounds.CollectionChanged += (_, _) => layout.Invalidate();
             LadderInfo.Matches.CollectionChanged += (_, args) =>
             {
                 switch (args.Action)

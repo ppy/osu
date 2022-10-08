@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Objects
         /// The result that <see cref="HitObject"/> was judged with.
         /// This is set by the accompanying <see cref="DrawableHitObject"/>, and reused when required for rewinding.
         /// </summary>
-        internal JudgementResult Result;
+        internal JudgementResult? Result;
 
         private readonly IBindable<double> startTimeBindable = new BindableDouble();
 

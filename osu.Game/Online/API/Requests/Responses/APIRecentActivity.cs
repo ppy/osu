@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using Humanizer;
 using Newtonsoft.Json;
+using osu.Game.Extensions;
 using osu.Game.Scoring;
 
 namespace osu.Game.Online.API.Requests.Responses
@@ -19,7 +21,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty]
         private string type
         {
-            set => Type = (RecentActivityType)Enum.Parse(typeof(RecentActivityType), value.Pascalize());
+            set => Type = (RecentActivityType)Enum.Parse(typeof(RecentActivityType), value.ToPascalCase());
         }
 
         public RecentActivityType Type;

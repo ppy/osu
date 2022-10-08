@@ -4,6 +4,7 @@
 using System;
 using System.ComponentModel;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -14,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModMirror : ModMirror, IApplicableToHitObject
     {
-        public override string Description => "在所选方向上旋转物件。";
+        public override LocalisableString Description => "在所选方向上旋转物件。";
         public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
 
         [SettingSource("旋转方向", "选择物件要旋转的方向。")]

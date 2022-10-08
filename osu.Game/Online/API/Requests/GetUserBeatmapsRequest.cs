@@ -1,8 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Humanizer;
+#nullable disable
+
 using System.Collections.Generic;
+using osu.Game.Extensions;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
@@ -20,7 +22,7 @@ namespace osu.Game.Online.API.Requests
             this.type = type;
         }
 
-        protected override string Target => $@"users/{userId}/beatmapsets/{type.ToString().Underscore()}";
+        protected override string Target => $@"users/{userId}/beatmapsets/{type.ToString().ToSnakeCase()}";
     }
 
     public enum BeatmapSetType

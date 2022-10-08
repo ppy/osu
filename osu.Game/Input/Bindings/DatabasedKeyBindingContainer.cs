@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,7 +51,7 @@ namespace osu.Game.Input.Bindings
 
         protected override void LoadComplete()
         {
-            realmSubscription = realm.RegisterForNotifications(queryRealmKeyBindings, (sender, changes, error) =>
+            realmSubscription = realm.RegisterForNotifications(queryRealmKeyBindings, (sender, _, _) =>
             {
                 // The first fire of this is a bit redundant as this is being called in base.LoadComplete,
                 // but this is safest in case the subscription is restored after a context recycle.

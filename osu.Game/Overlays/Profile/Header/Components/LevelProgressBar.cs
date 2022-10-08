@@ -1,15 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -20,6 +26,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         public LocalisableString TooltipText { get; }
 
         private Bar levelProgressBar;
+        private OsuSpriteText levelProgressText;
 
         public LevelProgressBar()
         {
@@ -31,13 +38,24 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             InternalChildren = new Drawable[]
             {
-                levelProgressBar = new Bar
+                new CircularContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    BackgroundColour = colourProvider.Background6,
-                    Direction = BarDirection.LeftToRight,
-                    AccentColour = colourProvider.Highlight1
+                    Masking = true,
+                    Child = levelProgressBar = new Bar
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        BackgroundColour = Color4.Black,
+                        Direction = BarDirection.LeftToRight,
+                        AccentColour = colourProvider.Highlight1
+                    }
                 },
+                levelProgressText = new OsuSpriteText
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.TopRight,
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
+                }
             };
 
             User.BindValueChanged(user => updateProgress(user.NewValue));
@@ -46,7 +64,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void updateProgress(APIUser user)
         {
             levelProgressBar.Length = user?.Statistics?.Level.Progress / 100f ?? 0;
-            //levelProgressText.Text = user?.Statistics?.Level.Progress.ToLocalisableString("0'%'") ?? default;
+            levelProgressText.Text = user?.Statistics?.Level.Progress.ToLocalisableString("0'%'") ?? default;
         }
     }
 }

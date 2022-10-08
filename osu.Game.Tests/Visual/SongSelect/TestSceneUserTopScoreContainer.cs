@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,9 +15,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Scoring;
 using osu.Game.Users;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
@@ -69,11 +69,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Id = 6602580,
                         Username = @"waaiiru",
-                        Country = new Country
-                        {
-                            FullName = @"Spain",
-                            FlagName = @"ES",
-                        },
+                        CountryCode = CountryCode.ES,
                     },
                 },
                 new ScoreInfo
@@ -88,11 +84,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Id = 4608074,
                         Username = @"Skycries",
-                        Country = new Country
-                        {
-                            FullName = @"Brazil",
-                            FlagName = @"BR",
-                        },
+                        CountryCode = CountryCode.BR,
                     },
                 },
                 new ScoreInfo
@@ -107,11 +99,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Id = 1541390,
                         Username = @"Toukai",
-                        Country = new Country
-                        {
-                            FullName = @"Canada",
-                            FlagName = @"CA",
-                        },
+                        CountryCode = CountryCode.CA,
                     },
                 }
             };

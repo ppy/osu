@@ -1,16 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+#nullable disable
+
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -21,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneRankingsCountryFilter()
         {
-            var countryBindable = new Bindable<Country>();
+            var countryBindable = new Bindable<CountryCode>();
 
             AddRange(new Drawable[]
             {
@@ -54,20 +56,12 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            var country = new Country
-            {
-                FlagName = "BY",
-                FullName = "Belarus"
-            };
-            var unknownCountry = new Country
-            {
-                FlagName = "CK",
-                FullName = "Cook Islands"
-            };
+            const CountryCode country = CountryCode.BY;
+            const CountryCode unknown_country = CountryCode.CK;
 
             AddStep("Set country", () => countryBindable.Value = country);
-            AddStep("Set null country", () => countryBindable.Value = null);
-            AddStep("Set country with no flag", () => countryBindable.Value = unknownCountry);
+            AddStep("Set default country", () => countryBindable.Value = default);
+            AddStep("Set country with no flag", () => countryBindable.Value = unknown_country);
         }
     }
 }

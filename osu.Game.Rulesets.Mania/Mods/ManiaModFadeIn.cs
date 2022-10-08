@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Name => "渐入";
         public override string Acronym => "FI";
-        public override string Description => @"上隐模式!";
+        public override LocalisableString Description => @"上隐模式!";
         public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ManiaModHidden)).ToArray();

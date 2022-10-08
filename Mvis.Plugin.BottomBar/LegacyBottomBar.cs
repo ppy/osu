@@ -9,6 +9,7 @@ using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Game.Screens.LLin.SideBar.Settings.Items;
 using osuTK;
+using osuTK.Graphics;
 
 namespace Mvis.Plugin.BottomBar
 {
@@ -28,7 +29,7 @@ namespace Mvis.Plugin.BottomBar
         private readonly SongProgressBar progressBar;
         private readonly Container contentContainer;
 
-        public override int Version => 9;
+        public override int Version => 10;
 
         public override TargetLayer Target => TargetLayer.FunctionBar;
 
@@ -111,7 +112,10 @@ namespace Mvis.Plugin.BottomBar
             LLin.OnIdle += Hide;
             LLin.OnActive += Show;
 
-            progressBar.OnSeek = LLin.SeekTo;
+            progressBar.OnSeek = target =>
+            {
+                if (!LLin.SeekTo(target)) progressBar.FlashColour(Color4.Red, 1000, Easing.OutQuint);
+            };
         }
 
         protected override void Update()
@@ -177,6 +181,12 @@ namespace Mvis.Plugin.BottomBar
                 default:
                     throw new InvalidOperationException("???");
             }
+
+            provider.OnActive = success =>
+            {
+                if (!success) button.FlashColour(Color4.Red, 1000, Easing.OutQuint);
+                else button.DoFlash();
+            };
 
             return true;
         }

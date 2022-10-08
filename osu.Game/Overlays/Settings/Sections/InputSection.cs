@@ -1,14 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Handlers;
-using osu.Framework.Input.Handlers.Joystick;
-using osu.Framework.Input.Handlers.Midi;
-using osu.Framework.Input.Handlers.Mouse;
-using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Localisation;
@@ -22,8 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override LocalisableString Header => InputSettingsStrings.InputSectionHeader;
 
-        [Resolved]
-        private GameHost host { get; set; }
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "keybindings" });
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
@@ -36,54 +36,24 @@ namespace osu.Game.Overlays.Settings.Sections
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(GameHost host, OsuGameBase game)
         {
             Children = new Drawable[]
             {
                 new BindingSettings(keyConfig),
+                new FrameworkActionManagerSetings()
             };
 
             foreach (var handler in host.AvailableInputHandlers)
             {
-                var handlerSection = createSectionFor(handler);
+                var handlerSection = game.CreateSettingsSubsectionFor(handler);
 
                 if (handlerSection != null)
                     Add(handlerSection);
             }
         }
 
-        private SettingsSubsection createSectionFor(InputHandler handler)
-        {
-            SettingsSubsection section;
-
-            switch (handler)
-            {
-                // ReSharper disable once SuspiciousTypeConversion.Global (net standard fuckery)
-                case ITabletHandler th:
-                    section = new TabletSettings(th);
-                    break;
-
-                case MouseHandler mh:
-                    section = new MouseSettings(mh);
-                    break;
-
-                // whitelist the handlers which should be displayed to avoid any weird cases of users touching settings they shouldn't.
-                case JoystickHandler jh:
-                    section = new JoystickSettings(jh);
-                    break;
-
-                case MidiHandler _:
-                    section = new HandlerSection(handler);
-                    break;
-
-                default:
-                    return null;
-            }
-
-            return section;
-        }
-
-        private class HandlerSection : SettingsSubsection
+        public class HandlerSection : SettingsSubsection
         {
             private readonly InputHandler handler;
 
@@ -106,6 +76,24 @@ namespace osu.Game.Overlays.Settings.Sections
             }
 
             protected override LocalisableString Header => handler.Description;
+        }
+    }
+
+    internal class FrameworkActionManagerSetings : SettingsSubsection
+    {
+        protected override LocalisableString Header => "框架";
+
+        [BackgroundDependencyLoader]
+        private void load(FrameworkConfigManager fcm)
+        {
+            Children = new[]
+            {
+                new SettingsCheckbox
+                {
+                    LabelText = "忽略框架KeyBind",
+                    Current = fcm.GetBindable<bool>(FrameworkSetting.ActionContainerIgnoreKeyBind)
+                }
+            };
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -104,12 +106,12 @@ namespace osu.Game.Overlays.Toolbar
                                         AutoSizeAxes = Axes.X,
                                         Children = new Drawable[]
                                         {
-                                            ToolbarMfButton = new ToolbarMfButton(),
                                             new ToolbarSettingsButton(),
                                             new ToolbarHomeButton
                                             {
                                                 Action = () => OnHome?.Invoke()
                                             },
+                                            ToolbarMfButton = new ToolbarMfButton(),
                                         },
                                     },
                                 }

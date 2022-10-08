@@ -5,8 +5,8 @@ using Mvis.Plugin.Sandbox.Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -118,36 +118,36 @@ namespace Mvis.Plugin.Sandbox.Components
                 sourceSize = source.DrawSize;
             }
 
-            protected override void Blit(Action<TexturedVertex2D> vertexAction)
+            protected override void Blit(IRenderer renderer)
             {
                 foreach (var p in parts)
                 {
                     var rect = getPartRectangle(p.CurrentPosition, p.CurrentSize);
                     var quad = getQuad(rect);
 
-                    drawPart(quad, p.CurrentAlpha, vertexAction);
+                    drawPart(quad, p.CurrentAlpha, renderer);
                 }
             }
 
-            private void drawPart(Quad quad, float alpha, Action<TexturedVertex2D> vertexAction)
+            private void drawPart(Quad quad, float alpha, IRenderer renderer)
             {
-                DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null, vertexAction,
-                        new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
-                        null, TextureCoords);
+                renderer.DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null,
+                    inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
+                    textureCoords: TextureCoords);
             }
 
             private Quad getQuad(RectangleF rect) => new Quad(
-                        Vector2Extensions.Transform(rect.TopLeft, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(rect.TopRight, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(rect.BottomLeft, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
-                    );
+                Vector2Extensions.Transform(rect.TopLeft, DrawInfo.Matrix),
+                Vector2Extensions.Transform(rect.TopRight, DrawInfo.Matrix),
+                Vector2Extensions.Transform(rect.BottomLeft, DrawInfo.Matrix),
+                Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
+            );
 
             private RectangleF getPartRectangle(Vector2 pos, float size) => new RectangleF(
-                        pos.X * sourceSize.X + sourceSize.X / 2 - size / 2,
-                        pos.Y * sourceSize.Y + sourceSize.Y / 2 - size / 2,
-                        size,
-                        size);
+                pos.X * sourceSize.X + sourceSize.X / 2 - size / 2,
+                pos.Y * sourceSize.Y + sourceSize.Y / 2 - size / 2,
+                size,
+                size);
         }
 
         private class Particle

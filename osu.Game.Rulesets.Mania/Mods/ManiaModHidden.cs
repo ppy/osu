@@ -3,13 +3,14 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModHidden : ManiaModPlayfieldCover
     {
-        public override string Description => @"下隐模式!";
+        public override LocalisableString Description => @"下隐模式!";
         public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ManiaModFadeIn)).ToArray();

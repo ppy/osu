@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -304,7 +306,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(128, 255, 128, 255),
                     new Color4(255, 187, 255, 255),
                     new Color4(255, 177, 140, 255),
-                    new Color4(100, 100, 100, 100),
+                    new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
                 };
                 Assert.AreEqual(expectedColors.Length, comboColors.Count);
                 for (int i = 0; i < expectedColors.Length; i++)
@@ -915,6 +917,31 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints[0].Position, Is.EqualTo(Vector2.Zero));
                 Assert.That(controlPoints[1].Type, Is.Null);
                 Assert.That(controlPoints[1].Position, Is.Not.EqualTo(Vector2.Zero));
+            }
+        }
+
+        [Test]
+        public void TestNaNControlPoints()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("nan-control-points.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.TimingPoints.Count, Is.EqualTo(1));
+                Assert.That(controlPoints.DifficultyPoints.Count, Is.EqualTo(2));
+
+                Assert.That(controlPoints.TimingPointAt(1000).BeatLength, Is.EqualTo(500));
+
+                Assert.That(controlPoints.DifficultyPointAt(2000).SliderVelocity, Is.EqualTo(1));
+                Assert.That(controlPoints.DifficultyPointAt(3000).SliderVelocity, Is.EqualTo(1));
+
+#pragma warning disable 618
+                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(2000)).GenerateTicks, Is.False);
+                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(3000)).GenerateTicks, Is.True);
+#pragma warning restore 618
             }
         }
     }

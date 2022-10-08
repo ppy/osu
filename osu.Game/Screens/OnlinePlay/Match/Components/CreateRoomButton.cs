@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -13,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            SpriteText.Font = SpriteText.Font.With(size: 14);
+            SpriteText.Font = SpriteText.Font.With(size: 16);
             Triangles.TriangleScale = 1.5f;
         }
 

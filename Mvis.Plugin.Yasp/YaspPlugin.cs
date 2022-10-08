@@ -36,32 +36,26 @@ namespace Mvis.Plugin.Yasp
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new YaspConfigManager(storage);
 
-        private SettingsEntry[] entries;
-
-        public override SettingsEntry[] GetSettingEntries()
+        public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {
-            var config = (YaspConfigManager)PluginManager.GetConfigManager(this);
-
-            entries ??= new SettingsEntry[]
+            return new SettingsEntry[]
             {
                 new NumberSettingsEntry<float>
                 {
                     Icon = FontAwesome.Solid.ExpandArrowsAlt,
                     Name = YaspStrings.Scale,
-                    Bindable = config.GetBindable<float>(YaspSettings.Scale),
+                    Bindable = ((YaspConfigManager)pluginConfigManager).GetBindable<float>(YaspSettings.Scale),
                     DisplayAsPercentage = true,
                 },
                 new BooleanSettingsEntry
                 {
                     Name = LLinGenericStrings.EnablePlugin,
-                    Bindable = config.GetBindable<bool>(YaspSettings.EnablePlugin)
+                    Bindable = ((YaspConfigManager)pluginConfigManager).GetBindable<bool>(YaspSettings.EnablePlugin)
                 }
             };
-
-            return entries;
         }
 
-        public override int Version => 9;
+        public override int Version => 10;
 
         public YaspPlugin()
         {

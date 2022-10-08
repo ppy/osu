@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
+#nullable disable
+
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Configuration
 {
@@ -10,19 +13,19 @@ namespace osu.Game.Configuration
         /// <summary>
         /// Seasonal backgrounds are shown regardless of season, if at all available.
         /// </summary>
-        [Description("总是显示")]
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.AlwaysSeasonalBackground))]
         Always,
 
         /// <summary>
         /// Seasonal backgrounds are shown only during their corresponding season.
         /// </summary>
-        [Description("只在对应季节显示")]
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.SometimesSeasonalBackground))]
         Sometimes,
 
         /// <summary>
         /// Seasonal backgrounds are never shown.
         /// </summary>
-        [Description("永不显示")]
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.NeverSeasonalBackground))]
         Never
     }
 }

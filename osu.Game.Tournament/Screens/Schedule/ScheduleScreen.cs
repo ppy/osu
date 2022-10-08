@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -17,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Schedule
 {
-    public class ScheduleScreen : TournamentScreen // IProvidesVideo
+    public class ScheduleScreen : TournamentScreen
     {
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Container mainContainer;
@@ -255,8 +257,8 @@ namespace osu.Game.Tournament.Screens.Schedule
             }
 
             protected override string Format() => Date < DateTimeOffset.Now
-                ? $"已在 {base.Format()}"
-                : $"将在 {base.Format()}";
+                ? $"已在 {base.Format()} 开始"
+                : $"将在 {base.Format()} 开始";
         }
 
         public class ScheduleContainer : Container

@@ -7,23 +7,27 @@ namespace osu.Game.Screens.LLin.Plugins.Types
         /// <summary>
         /// 下一首
         /// </summary>
-        public void NextTrack();
+        /// <returns>操作是否被允许</returns>
+        public bool NextTrack();
 
         /// <summary>
         /// 上一首
         /// </summary>
-        public void PrevTrack();
+        /// <returns>操作是否被允许</returns>
+        public bool PrevTrack();
 
         /// <summary>
         /// 切换暂停
         /// </summary>
-        public void TogglePause();
+        /// <returns>操作是否被允许</returns>
+        public bool TogglePause();
 
         /// <summary>
         /// 调整歌曲进度到某一时间节点
         /// </summary>
         /// <param name="position">目标时间(毫秒)</param>
-        public void Seek(double position);
+        /// <returns>操作是否被允许</returns>
+        public bool Seek(double position);
 
         /// <summary>
         /// 获取当前音轨

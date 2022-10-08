@@ -130,6 +130,12 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
                     break;
             }
 
+            provider.OnActive = b =>
+            {
+                if (!b) button.FlashColour(Color4.Red, 1000, Easing.OutQuint);
+                else button.DoFlash();
+            };
+
             return true;
         }
 

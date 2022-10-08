@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
@@ -37,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     return string.Empty;
 
                 if (availability.Value.State != DownloadState.LocallyAvailable)
-                    return "Beatmap not downloaded";
+                    return "谱面未下载";
 
                 return string.Empty;
             }

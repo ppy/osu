@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,6 +11,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -76,7 +79,7 @@ namespace osu.Game.Screens.Edit.Setup
             public SetupScreenTitle()
             {
                 Title = "谱面设置";
-                Description = "change general settings of your beatmap";
+                Description = EditorSetupStrings.BeatmapSetupDescription;
                 IconTexture = "Icons/Hexacons/social";
             }
         }

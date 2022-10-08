@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.LLin;
+using osuTK;
 using osuTK.Graphics;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
@@ -58,8 +59,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         [Resolved]
         private IImplementLLin mvisScreen { get; set; }
 
+        [Resolved]
+        private CustomColourProvider colourProvider { get; set; }
+
+        private Box bgBox;
+
         [BackgroundDependencyLoader]
-        private void load(CustomColourProvider colourProvider)
+        private void load()
         {
             CornerRadius = 5f;
             Masking = true;
@@ -67,53 +73,82 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Box fgBox;
             InternalChildren = new Drawable[]
             {
+                bgBox = new Box
+                {
+                    Colour = colourProvider.Highlight1,
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(5),
+                    Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
                     {
                         new Container
                         {
+                            Name = "时间显示",
                             Masking = true,
                             CornerRadius = 5,
-                            AutoSizeAxes = Axes.Both,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Margin = new MarginPadding(5),
+                            AutoSizeAxes = Axes.Y,
+                            Width = 80,
+                            Margin = new MarginPadding { Vertical = 5, Left = 5, Right = -1 },
                             Children = new Drawable[]
                             {
-                                fgBox = new Box
-                                {
-                                    Colour = colourProvider.Highlight1,
-                                    RelativeSizeAxes = Axes.Both,
-                                },
                                 timeText = new OsuSpriteText
                                 {
                                     Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
-                                    Colour = Color4.Black,
-                                    Margin = new MarginPadding { Horizontal = 5, Vertical = 3 }
-                                },
+                                    Margin = new MarginPadding { Horizontal = 5, Vertical = 3 },
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre
+                                }
                             }
                         },
-                        contentText = new OsuSpriteText
+                        new Circle
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Truncate = true,
-                            Margin = new MarginPadding { Left = 5, Bottom = 5 }
+                            Name = "分隔",
+                            Height = 3,
+                            Colour = Color4.Gray.Opacity(0.6f),
+                            Width = 20,
+                            Margin = new MarginPadding { Top = 16 }
                         },
-                        translateText = new OsuSpriteText
+                        new Container
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Truncate = true,
-                            Margin = new MarginPadding { Left = 5, Bottom = 5 }
+                            Name = "歌词内容",
+                            Width = 380,
+                            AutoSizeAxes = Axes.Y,
+                            Margin = new MarginPadding { Top = 6 },
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    Height = 18,
+                                    Colour = Color4.White.Opacity(0)
+                                },
+                                textFillFlow = new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
+                                    {
+                                        contentText = new OsuSpriteText
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Truncate = true,
+                                            Margin = new MarginPadding { Left = 5, Bottom = 5 }
+                                        },
+                                        translateText = new OsuSpriteText
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Truncate = true,
+                                            Margin = new MarginPadding { Left = 5, Bottom = 5 }
+                                        },
+                                    }
+                                },
+                            }
                         },
                     }
                 },
@@ -128,9 +163,34 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                fgBox.Colour = colourProvider.Highlight1;
+                bgBox.Colour = colourProvider.Highlight1.Opacity(isCurrent ? 1 : 0);
             }, true);
         }
+
+        private bool isCurrent_real;
+
+        private bool isCurrent
+        {
+            get => isCurrent_real;
+            set
+            {
+                bgBox.FadeColour(colourProvider.Highlight1.Opacity(value ? 1 : 0), 300, Easing.OutQuint);
+                textFillFlow.FadeColour(value ? Color4.Black : Color4.White, 300, Easing.OutQuint);
+                timeText.FadeColour(value ? Color4.Black : Color4.White, 300, Easing.OutQuint);
+
+                isCurrent_real = value;
+            }
+        }
+
+        protected override void Update()
+        {
+            isCurrent = plugin.CurrentLine.Equals(Value);
+
+            base.Update();
+        }
+
+        private bool haveLyric;
+        private FillFlowContainer textFillFlow;
 
         protected override void UpdateValue(Lyric lyric)
         {
@@ -138,9 +198,18 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             translateText.Text = lyric.TranslatedString;
 
             var timeSpan = TimeSpan.FromMilliseconds(lyric.Time);
-            timeText.Text = TooltipText = $"{timeSpan:mm\\:ss\\.fff}";
+            timeText.Text = $"{timeSpan:mm\\:ss\\.fff}";
+            TooltipText = $"{timeText.Text}"
+                          + (string.IsNullOrEmpty(lyric.Content)
+                              ? ""
+                              : $"－ {lyric.Content}")
+                          + (string.IsNullOrEmpty(lyric.TranslatedString)
+                              ? ""
+                              : $"－ {lyric.TranslatedString}");
 
-            Colour = string.IsNullOrEmpty(lyric.Content)
+            haveLyric = string.IsNullOrEmpty(lyric.Content);
+
+            Colour = haveLyric
                 ? Color4Extensions.FromHex(@"555")
                 : Color4.White;
         }
@@ -163,14 +232,25 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             base.OnHoverLost(e);
         }
 
-        //时间显示的高度(23) + 时间显示的Margin(10) + 2 * (文本高度 + 文本Margin(5))
-        public override int FinalHeight() => 23 + 10
-                                                + (int)(string.IsNullOrEmpty(Value.TranslatedString)
-                                                    ? 0
-                                                    : (contentText?.Height ?? 18 + 5))
-                                                + (int)(string.IsNullOrEmpty(Value.Content)
-                                                    ? 0
-                                                    : (translateText?.Height ?? 18 + 5))
-                                                + 10; //向下Margin
+        //时间显示的高度(23) + 2 * (文本高度 + 文本Margin(5))
+        public override int FinalHeight()
+        {
+            int val = 23; //时间显示大小
+
+            val += 10; //时间显示Margin
+
+            if (!string.IsNullOrEmpty(Value.Content) && !string.IsNullOrEmpty(Value.TranslatedString))
+            {
+                val += (int)(string.IsNullOrEmpty(Value.TranslatedString)
+                    ? (string.IsNullOrEmpty(Value.Content)
+                        ? 0
+                        : (translateText?.Height ?? 18 + 5))
+                    : (contentText?.Height ?? 18 + 5));
+            }
+
+            val += 5; //向下Margin
+
+            return val;
+        }
     }
 }

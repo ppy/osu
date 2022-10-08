@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -53,7 +55,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            SelectedItems.CollectionChanged += (selectedObjects, args) =>
+            SelectedItems.CollectionChanged += (_, args) =>
             {
                 switch (args.Action)
                 {
@@ -105,13 +107,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Whether this component is in a state where items outside a drag selection should be deselected. If false, selection will only be added to.
         /// </summary>
         protected virtual bool AllowDeselectionDuringDrag => true;
-
-        /// <remarks>
-        /// Positional input must be received outside the container's bounds,
-        /// in order to handle blueprints which are partially offscreen.
-        /// </remarks>
-        /// <seealso cref="SelectionHandler{T}.ReceivePositionalInputAt"/>
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
@@ -297,7 +292,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Selected -= OnBlueprintSelected;
             blueprint.Deselected -= OnBlueprintDeselected;
 
-            SelectionBlueprints.Remove(blueprint);
+            SelectionBlueprints.Remove(blueprint, true);
 
             if (movementBlueprints?.Contains(blueprint) == true)
                 finishSelectionMovement();

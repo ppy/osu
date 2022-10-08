@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -54,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(SkinManager skins)
         {
-            var defaultLegacySkin = skins.DefaultLegacySkin;
+            var defaultLegacySkin = skins.DefaultClassicSkin;
 
             // sprite names intentionally swapped to match stable member naming / ease of cross-referencing
             explosion1.Texture = defaultLegacySkin.GetTexture("scoreboard-explosion-2");

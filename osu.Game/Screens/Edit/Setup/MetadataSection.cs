@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
@@ -85,7 +87,7 @@ namespace osu.Game.Screens.Edit.Setup
                 target.Current.Value = value;
 
             updateReadOnlyState();
-            updateMetadata();
+            Scheduler.AddOnce(updateMetadata);
         }
 
         private void updateReadOnlyState()
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // for now, update on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
-            updateMetadata();
+            Scheduler.AddOnce(updateMetadata);
         }
 
         private void updateMetadata()
@@ -115,6 +117,8 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.BeatmapInfo.DifficultyName = difficultyTextBox.Current.Value;
             Beatmap.Metadata.Source = sourceTextBox.Current.Value;
             Beatmap.Metadata.Tags = tagsTextBox.Current.Value;
+
+            Beatmap.SaveState();
         }
     }
 }

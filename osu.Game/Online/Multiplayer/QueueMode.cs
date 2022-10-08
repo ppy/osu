@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.ComponentModel;
 
 namespace osu.Game.Online.Multiplayer
@@ -9,13 +11,13 @@ namespace osu.Game.Online.Multiplayer
     {
         // used for osu-web deserialization so names shouldn't be changed.
 
-        [Description("Host only")]
+        [Description("仅房主")]
         HostOnly,
 
-        [Description("All players")]
+        [Description("所有玩家")]
         AllPlayers,
 
-        [Description("All players (round robin)")]
+        [Description("所有玩家 (轮换)")]
         AllPlayersRoundRobin
     }
 }

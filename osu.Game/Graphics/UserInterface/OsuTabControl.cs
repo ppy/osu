@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osuTK;
@@ -163,7 +165,7 @@ namespace osu.Game.Graphics.UserInterface
                         break;
 
                     case Enum e:
-                        text = e.GetLocalisableDescription();
+                        text = e.GetDescription() ?? e.GetLocalisableDescription();
                         break;
 
                     case LocalisableString l:

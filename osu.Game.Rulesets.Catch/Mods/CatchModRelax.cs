@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
@@ -16,9 +17,9 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
     {
-        public override string Description => @"用鼠标来控制小人";
+        public override LocalisableString Description => @"用鼠标来控制小人";
 
-        private DrawableRuleset<CatchHitObject> drawableRuleset;
+        private DrawableRuleset<CatchHitObject> drawableRuleset = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {

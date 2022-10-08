@@ -1,4 +1,3 @@
-using System.Collections.Specialized;
 using System.Linq;
 using M.Resources.Localisation.LLin.Plugins;
 using osu.Framework.Allocation;
@@ -8,10 +7,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.LLin;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Types;
+using osu.Game.Screens.LLin.SideBar.Tabs;
 using osuTK;
 using osuTK.Input;
 
@@ -19,8 +20,8 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
     public class CollectionPluginPage : PluginSidebarPage
     {
-        [Resolved]
-        private CollectionManager collectionManager { get; set; }
+        //[Resolved]
+        //private CollectionManager collectionManager { get; set; }
 
         [Resolved]
         private IImplementLLin mvisScreen { get; set; }
@@ -34,6 +35,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private CollectionPanel selectedpanel;
         private CollectionPanel prevPanel;
         private OsuScrollContainer collectionScroll;
+        private Container scrollContainer;
         private CollectionInfo info;
 
         public CollectionPluginPage(LLinPlugin plugin)
@@ -52,14 +54,18 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         public override IPluginFunctionProvider GetFunctionEntry() => new CollectionFunctionProvider(this);
         public override Key ShortcutKey => Key.Period;
 
+        private Bindable<TabControlPosition> tabControlPos;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(MConfigManager config)
         {
             dependencies.Cache(collectionHelper);
 
+            tabControlPos = config.GetBindable<TabControlPosition>(MSetting.MvisTabControlPosition);
+
             Children = new Drawable[]
             {
-                new Container
+                scrollContainer = new Container
                 {
                     Name = "收藏夹选择界面",
                     RelativeSizeAxes = Axes.Both,
@@ -91,7 +97,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 }
             };
 
-            collectionManager.Collections.CollectionChanged += triggerRefresh;
+            collectionHelper.CurrentCollection.ValueChanged += triggerRefresh;
         }
 
         protected override void LoadComplete()
@@ -101,6 +107,22 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             collectionHelper.CurrentCollection.BindValueChanged(OnCurrentCollectionChanged);
             selectedCollection.BindValueChanged(updateSelection);
             selectedPanel.BindValueChanged(updateSelectedPanel);
+
+            tabControlPos.BindValueChanged(v =>
+            {
+                switch (v.NewValue)
+                {
+                    case TabControlPosition.Left:
+                        scrollContainer.Anchor = scrollContainer.Origin = Anchor.TopRight;
+                        info.Anchor = info.Origin = Anchor.TopLeft;
+                        break;
+
+                    default:
+                        scrollContainer.Anchor = scrollContainer.Origin = Anchor.TopLeft;
+                        info.Anchor = info.Origin = Anchor.TopRight;
+                        break;
+                }
+            });
 
             RefreshCollectionList();
             mvisScreen.Resuming += RefreshCollectionList;
@@ -148,11 +170,11 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             }
 
             if (selectedpanel != null
-                && collectionHelper.CurrentCollection.Value.BeatmapHashes.Count != 0)
+                && collectionHelper.CurrentCollection.Value.BeatmapMD5Hashes.Count != 0)
                 selectedpanel.State.Value = ActiveState.Active;
         }
 
-        private void triggerRefresh(object sender, NotifyCollectionChangedEventArgs e)
+        private void triggerRefresh(ValueChangedEvent<BeatmapCollection> v)
             => RefreshCollectionList();
 
         public void RefreshCollectionList()
@@ -169,18 +191,18 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             selectedCollection.Value = null;
 
             //如果收藏夹被删除，则留null
-            if (!collectionManager.Collections.Contains(oldCollection))
+            if (!collectionHelper.AvaliableCollections.Contains(oldCollection))
                 oldCollection = null;
 
             //如果收藏夹为0，则淡出sollectionScroll
             //否则，添加CollectionPanel
-            if (collectionManager.Collections.Count == 0)
+            if (collectionHelper.AvaliableCollections.Count == 0)
             {
                 collectionScroll.FadeOut(300);
             }
             else
             {
-                collectionsFillFlow.AddRange(collectionManager.Collections.Select(c => new CollectionPanel(c, makeCurrentSelected)
+                collectionsFillFlow.AddRange(collectionHelper.AvaliableCollections.Select(c => new CollectionPanel(c, makeCurrentSelected)
                 {
                     SelectedCollection = { BindTarget = selectedCollection },
                     SelectedPanel = { BindTarget = selectedPanel }
@@ -211,8 +233,8 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         protected override void Dispose(bool isDisposing)
         {
             //单线程下会有概率在这里报System.NullReferenceException
-            if (collectionManager != null)
-                collectionManager.Collections.CollectionChanged -= triggerRefresh;
+            if (collectionHelper != null)
+                collectionHelper.CurrentCollection.ValueChanged -= triggerRefresh;
 
             base.Dispose(isDisposing);
         }

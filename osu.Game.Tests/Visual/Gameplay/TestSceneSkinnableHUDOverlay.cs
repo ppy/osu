@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,8 +36,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
-        [Cached]
-        private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
+        [Cached(typeof(IGameplayClock))]
+        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
 
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 

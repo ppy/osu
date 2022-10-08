@@ -12,13 +12,33 @@ namespace osu.Game.Screens.LLin.Plugins
         [Resolved]
         private MusicController controller { get; set; }
 
-        public void NextTrack() => controller.NextTrack();
+        public bool NextTrack()
+        {
+            controller.NextTrack();
 
-        public void PrevTrack() => controller.PreviousTrack();
+            return true;
+        }
 
-        public void TogglePause() => controller.TogglePause();
+        public bool PrevTrack()
+        {
+            controller.PreviousTrack();
 
-        public void Seek(double position) => controller.SeekTo(position);
+            return true;
+        }
+
+        public bool TogglePause()
+        {
+            controller.TogglePause();
+
+            return true;
+        }
+
+        public bool Seek(double position)
+        {
+            controller.SeekTo(position);
+
+            return true;
+        }
 
         public DrawableTrack GetCurrentTrack() => controller.CurrentTrack;
 

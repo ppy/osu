@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
@@ -61,7 +63,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             pathVersion.BindTo(DrawableSlider.PathVersion);
 
-            OnShake = DrawableSlider.Shake;
             CheckHittable = (d, t) => DrawableSlider.CheckHittable?.Invoke(d, t) ?? true;
         }
 
@@ -94,9 +95,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             return result.IsHit() ? HitResult.LargeTickHit : HitResult.LargeTickMiss;
         }
 
-        public Action<double> OnShake;
-
-        public override void Shake(double maximumLength) => OnShake?.Invoke(maximumLength);
+        public override void Shake()
+        {
+            base.Shake();
+            DrawableSlider.Shake();
+        }
 
         private void updatePosition()
         {

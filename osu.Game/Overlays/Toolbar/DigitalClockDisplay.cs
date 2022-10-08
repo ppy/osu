@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -73,7 +75,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private void updateMetrics()
         {
-            Width = showRuntime || !use24HourDisplay ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
+            Width = showRuntime || !use24HourDisplay ? 66 : 55; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
 
             gameTime.FadeTo(showRuntime ? 1 : 0);
         }

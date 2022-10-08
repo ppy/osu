@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -52,7 +50,7 @@ namespace osu.Game.Screens.Select
             Masking = true;
             CornerRadius = 10;
 
-            Width = 300;
+            Width = 400;
             AutoSizeAxes = Axes.Y;
 
             Anchor = Anchor.Centre;
@@ -108,37 +106,49 @@ namespace osu.Game.Screens.Select
 
             if (beatmaps.QueryBeatmapSet(s => !s.Protected && !s.DeletePending) == null)
             {
-                textFlow.AddParagraph("No beatmaps found!");
+                textFlow.AddParagraph("没有找到任何谱面!");
                 textFlow.AddParagraph(string.Empty);
 
-                textFlow.AddParagraph("Consider using the \"");
+                textFlow.AddParagraph("- 试试看运行 \"");
                 textFlow.AddLink(FirstRunSetupOverlayStrings.FirstRunSetupTitle, () => firstRunSetupOverlay?.Show());
-                textFlow.AddText("\" to download or import some beatmaps!");
+                textFlow.AddText("\" 来下载或者导入一些图!");
             }
             else
             {
-                textFlow.AddParagraph("No beatmaps match your filter criteria!");
+                textFlow.AddParagraph("没有找到符合条件的谱面!");
                 textFlow.AddParagraph(string.Empty);
 
-                if (string.IsNullOrEmpty(filter?.SearchText))
+                if (filter?.UserStarDifficulty.HasFilter == true)
                 {
-                    // TODO: Add realm queries to hint at which ruleset results are available in (and allow clicking to switch).
-                    // TODO: Make this message more certain by ensuring the osu! beatmaps exist before suggesting.
-                    if (filter?.Ruleset.OnlineID > 0 && !filter.AllowConvertedBeatmaps)
+                    textFlow.AddParagraph("- 试试看");
+                    textFlow.AddLink("移除", () =>
                     {
-                        textFlow.AddParagraph("Beatmaps may be available by ");
-                        textFlow.AddLink("enabling automatic conversion", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
-                        textFlow.AddText("!");
-                    }
+                        config.SetValue(OsuSetting.DisplayStarsMinimum, 0.0);
+                        config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1);
+                    });
+
+                    string lowerStar = $"{filter.UserStarDifficulty.Min ?? 0:N1}";
+                    string upperStar = filter.UserStarDifficulty.Max == null ? "∞" : $"{filter.UserStarDifficulty.Max:N1}";
+
+                    textFlow.AddText($" {lowerStar} - {upperStar} 的星级过滤");
                 }
-                else
+
+                // TODO: Add realm queries to hint at which ruleset results are available in (and allow clicking to switch).
+                // TODO: Make this message more certain by ensuring the osu! beatmaps exist before suggesting.
+                if (filter?.Ruleset?.OnlineID != 0 && filter?.AllowConvertedBeatmaps == false)
                 {
-                    textFlow.AddParagraph("You can try ");
-                    textFlow.AddLink("searching online", LinkAction.SearchBeatmapSet, filter.SearchText);
-                    textFlow.AddText(" for this query.");
+                    textFlow.AddParagraph("- 试试看");
+                    textFlow.AddLink(" 启用", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
+                    textFlow.AddText("自动转谱!");
                 }
             }
 
+            if (!string.IsNullOrEmpty(filter?.SearchText))
+            {
+                textFlow.AddParagraph("- 试试看");
+                textFlow.AddLink("在线查找", LinkAction.SearchBeatmapSet, filter.SearchText);
+                textFlow.AddText($"和 \"{filter.SearchText}\" 有关的谱面。");
+            }
             // TODO: add clickable link to reset criteria.
         }
     }

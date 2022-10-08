@@ -10,8 +10,6 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
-#nullable enable
-
 namespace osu.Game.Overlays.BeatmapSet
 {
     public abstract class BeatmapBadge : CompositeDrawable

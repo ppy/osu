@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -183,6 +186,40 @@ namespace osu.Game.Rulesets.Osu.Utils
                 length * MathF.Cos(angle),
                 length * MathF.Sin(angle)
             );
+        }
+
+        /// <param name="beatmap">The beatmap hitObject is a part of.</param>
+        /// <param name="hitObject">The <see cref="OsuHitObject"/> that should be checked.</param>
+        /// <param name="downbeatsOnly">If true, this method only returns true if hitObject is on a downbeat.
+        /// If false, it returns true if hitObject is on any beat.</param>
+        /// <returns>true if hitObject is on a (down-)beat, false otherwise.</returns>
+        public static bool IsHitObjectOnBeat(OsuBeatmap beatmap, OsuHitObject hitObject, bool downbeatsOnly = false)
+        {
+            var timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
+
+            double timeSinceTimingPoint = hitObject.StartTime - timingPoint.Time;
+
+            double beatLength = timingPoint.BeatLength;
+
+            if (downbeatsOnly)
+                beatLength *= timingPoint.TimeSignature.Numerator;
+
+            // Ensure within 1ms of expected location.
+            return Math.Abs(timeSinceTimingPoint + 1) % beatLength < 2;
+        }
+
+        /// <summary>
+        /// Generates a random number from a normal distribution using the Box-Muller transform.
+        /// </summary>
+        public static float RandomGaussian(Random rng, float mean = 0, float stdDev = 1)
+        {
+            // Generate 2 random numbers in the interval (0,1].
+            // x1 must not be 0 since log(0) = undefined.
+            double x1 = 1 - rng.NextDouble();
+            double x2 = 1 - rng.NextDouble();
+
+            double stdNormal = Math.Sqrt(-2 * Math.Log(x1)) * Math.Sin(2 * Math.PI * x2);
+            return mean + stdDev * (float)stdNormal;
         }
     }
 }

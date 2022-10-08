@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +11,9 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
@@ -100,28 +98,16 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 OsuLogo logo = new OsuLogo { Scale = new Vector2(0.15f) };
 
-                Remove(testDifficultyCache);
+                Remove(testDifficultyCache, false);
 
                 Children = new Drawable[]
                 {
                     testDifficultyCache,
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#333"), Color4Extensions.FromHex("#777"))
-                    },
                     display = new BeatmapMetadataDisplay(getBeatmap(), new Bindable<IReadOnlyList<Mod>>(randomMods), logo)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Alpha = 0f,
-                        Optui = { BindTarget = bindableBool }
-                    },
-                    new TriangleButton
-                    {
-                        Action = () => bindableBool.Toggle(),
-                        Width = 40,
-                        Text = "切换optui"
                     }
                 };
 

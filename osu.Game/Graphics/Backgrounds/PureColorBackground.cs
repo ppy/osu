@@ -1,7 +1,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Rendering;
 using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.Backgrounds
@@ -21,9 +21,9 @@ namespace osu.Game.Graphics.Backgrounds
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IRenderer renderer)
         {
-            Sprite.Texture = Texture.WhitePixel;
+            Sprite.Texture = renderer.WhitePixel;
             Sprite.Colour = config.GetCustomLoaderColor();
 
             colorHex = config.GetBindable<string>(MSetting.LoaderBackgroundColor);

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Globalization;
 using System.Linq;
@@ -98,7 +100,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             EnableCountdown.Current.BindValueChanged(_ => updateBeatmap());
             CountdownSpeed.Current.BindValueChanged(_ => updateBeatmap());
-            CountdownOffset.OnCommit += (_, __) => onOffsetCommitted();
+            CountdownOffset.OnCommit += (_, _) => onOffsetCommitted();
 
             widescreenSupport.Current.BindValueChanged(_ => updateBeatmap());
             epilepsyWarning.Current.BindValueChanged(_ => updateBeatmap());
@@ -124,6 +126,8 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning.Current.Value;
             Beatmap.BeatmapInfo.LetterboxInBreaks = letterboxDuringBreaks.Current.Value;
             Beatmap.BeatmapInfo.SamplesMatchPlaybackRate = samplesMatchPlaybackRate.Current.Value;
+
+            Beatmap.SaveState();
         }
     }
 }

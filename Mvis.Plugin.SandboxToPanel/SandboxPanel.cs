@@ -20,7 +20,7 @@ namespace Mvis.Plugin.Sandbox
     public class SandboxPanel : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
-        public override int Version => 9;
+        public override int Version => 10;
         public Bindable<WorkingBeatmap> CurrentBeatmap = new Bindable<WorkingBeatmap>();
 
         public SandboxPanel()
@@ -81,9 +81,9 @@ namespace Mvis.Plugin.Sandbox
 
         private SettingsEntry[] entries;
 
-        public override SettingsEntry[] GetSettingEntries()
+        public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {
-            var config = (SandboxConfigManager)PluginManager.GetConfigManager(this);
+            var config = (SandboxConfigManager)pluginConfigManager;
 
             entries ??= new SettingsEntry[]
             {

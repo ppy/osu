@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -33,7 +35,7 @@ namespace osu.Game.Graphics.Containers
                 if (value == expandableHeader) return;
 
                 if (expandableHeader != null)
-                    RemoveInternal(expandableHeader);
+                    RemoveInternal(expandableHeader, false);
 
                 expandableHeader = value;
 
@@ -53,6 +55,7 @@ namespace osu.Game.Graphics.Containers
 
                 fixedHeader?.Expire();
                 fixedHeader = value;
+
                 if (value == null) return;
 
                 AddInternal(fixedHeader);
@@ -68,8 +71,10 @@ namespace osu.Game.Graphics.Containers
                 if (value == footer) return;
 
                 if (footer != null)
-                    scrollContainer.Remove(footer);
+                    scrollContainer.Remove(footer, false);
+
                 footer = value;
+
                 if (value == null) return;
 
                 footer.Anchor |= Anchor.y2;

@@ -1,9 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -18,15 +22,12 @@ using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users.Drawables;
 using osuTK;
-using osu.Game.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Profile.Header
 {
     public class TopHeaderContainer : CompositeDrawable
     {
-        private const float avatar_size = 150;
+        private const float avatar_size = 110;
 
         public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 
@@ -37,23 +38,15 @@ namespace osu.Game.Overlays.Profile.Header
         private UpdateableAvatar avatar;
         private OsuSpriteText usernameText;
         private ExternalLinkButton openUserExternally;
+        private OsuSpriteText titleText;
         private UpdateableFlag userFlag;
-        private ComponentContainer userStats;
-        private readonly Dictionary<ScoreRank, DetailHeaderContainer.ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, DetailHeaderContainer.ScoreRankInfo>();
-
-        private PlayerStatBox medalInfo;
-        private PlayerStatBox ppInfo;
-        private PlayerStatBox levelInfo;
-        private OsuScrollContainer scoreRankInfoScroll;
-        private OsuScrollContainer userNameScroll;
-
-        [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuSpriteText userCountryText;
+        private FillFlowContainer userStats;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            Height = 350;
+            Height = 150;
 
             InternalChildren = new Drawable[]
             {
@@ -62,248 +55,123 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
                 },
-                new Container
+                new FillFlowContainer
                 {
-                    Padding = new MarginPadding { Vertical = Height * 0.1f, Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new GridContainer
+                    Direction = FillDirection.Horizontal,
+                    Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
+                    Height = avatar_size,
+                    AutoSizeAxes = Axes.X,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Content = new[]
+                        avatar = new UpdateableAvatar(isInteractive: false, showGuestOnNull: false)
                         {
-                            new Drawable[]
+                            Size = new Vector2(avatar_size),
+                            Masking = true,
+                            CornerRadius = avatar_size * 0.25f,
+                        },
+                        new OsuContextMenuContainer
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Child = new Container
                             {
-                                new Container
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X,
+                                Padding = new MarginPadding { Left = 10 },
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Children = new Drawable[]
+                                    new FillFlowContainer
                                     {
-                                        new Container
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Vertical,
+                                        Children = new Drawable[]
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Height = 0.65f,
-                                            Anchor = Anchor.TopCentre,
-                                            Origin = Anchor.TopCentre,
-                                            Masking = true,
-                                            CornerRadius = 25f,
-                                            Children = new Drawable[]
+                                            new FillFlowContainer
                                             {
-                                                new Container
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Children = new Drawable[]
                                                 {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Padding = new MarginPadding { Bottom = 4.5f },
-                                                    Child = new GridContainer
+                                                    usernameText = new OsuSpriteText
                                                     {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        ColumnDimensions = new[]
-                                                        {
-                                                            new Dimension(),
-                                                            new Dimension(),
-                                                        },
-                                                        Content = new[]
-                                                        {
-                                                            new Drawable[]
-                                                            {
-                                                                new OverlinedTotalPlayTime
-                                                                {
-                                                                    User = { BindTarget = User }
-                                                                },
-                                                                medalInfo = new PlayerStatBox
-                                                                {
-                                                                    Icon = FontAwesome.Solid.Medal,
-                                                                    Title = "奖章数"
-                                                                },
-                                                            },
-                                                            new Drawable[]
-                                                            {
-                                                                ppInfo = new PlayerStatBox(0)
-                                                                {
-                                                                    IconDescription = "PP",
-                                                                    Title = "pp"
-                                                                },
-                                                                new Container
-                                                                {
-                                                                    Name = "Level Bar Area",
-                                                                    RelativeSizeAxes = Axes.Both,
-                                                                    Children = new Drawable[]
-                                                                    {
-                                                                        levelInfo = new PlayerStatBox(0)
-                                                                        {
-                                                                            IconDescription = "EXP",
-                                                                            Title = "经验"
-                                                                        },
-                                                                    }
-                                                                },
-                                                            },
-                                                        }
+                                                        Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
                                                     },
-                                                },
-                                                new LevelProgressBar
-                                                {
-                                                    Anchor = Anchor.BottomCentre,
-                                                    Origin = Anchor.BottomCentre,
-                                                    RelativeSizeAxes = Axes.X,
-                                                    Height = 4.5f,
-                                                    User = { BindTarget = User }
-                                                }
-                                            }
-                                        },
-                                        new ComponentContainer
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Height = 0.3f,
-                                            Anchor = Anchor.BottomCentre,
-                                            Origin = Anchor.BottomCentre,
-                                            Child = scoreRankInfoScroll = new OsuScrollContainer(Direction.Horizontal)
-                                            {
-                                                ScrollbarVisible = false,
-                                                RelativeSizeAxes = Axes.Both,
-                                                Child = new FillFlowContainer
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    Spacing = new Vector2(5),
-                                                    Children = new[]
+                                                    openUserExternally = new ExternalLinkButton
                                                     {
-                                                        scoreRankInfos[ScoreRank.XH] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.XH),
-                                                        scoreRankInfos[ScoreRank.X] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.X),
-                                                        scoreRankInfos[ScoreRank.SH] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.SH),
-                                                        scoreRankInfos[ScoreRank.S] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.S),
-                                                        scoreRankInfos[ScoreRank.A] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.A),
-                                                    }
+                                                        Margin = new MarginPadding { Left = 5 },
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft,
+                                                    },
                                                 }
-                                            }
-                                        },
-                                    }
-                                },
-                                new ComponentContainer
-                                {
-                                    Masking = true,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Width = 0.9f,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Children = new Drawable[]
+                                            },
+                                            titleText = new OsuSpriteText
+                                            {
+                                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular)
+                                            },
+                                        }
+                                    },
+                                    new FillFlowContainer
                                     {
-                                        new FillFlowContainer
+                                        Origin = Anchor.BottomLeft,
+                                        Anchor = Anchor.BottomLeft,
+                                        Direction = FillDirection.Vertical,
+                                        AutoSizeAxes = Axes.Both,
+                                        Children = new Drawable[]
                                         {
-                                            Direction = FillDirection.Vertical,
-                                            Padding = new MarginPadding { Horizontal = 20, Top = 60 }, //将Top设为60以临时对付对齐问题, 需要修复
-                                            Spacing = new Vector2(10),
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Children = new Drawable[]
+                                            supporterTag = new SupporterIcon
                                             {
-                                                new Container
+                                                Height = 20,
+                                                Margin = new MarginPadding { Top = 5 }
+                                            },
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 1.5f,
+                                                Margin = new MarginPadding { Top = 10 },
+                                                Colour = colourProvider.Light1,
+                                            },
+                                            new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Margin = new MarginPadding { Top = 5 },
+                                                Direction = FillDirection.Horizontal,
+                                                Children = new Drawable[]
                                                 {
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    Name = "Avatar Container",
-                                                    Size = new Vector2(avatar_size),
-                                                    Masking = true,
-                                                    CornerRadius = avatar_size * 0.25f,
-                                                    Children = new Drawable[]
+                                                    userFlag = new UpdateableFlag
                                                     {
-                                                        avatar = new UpdateableAvatar(isInteractive: false, showGuestOnNull: false)
-                                                        {
-                                                            Anchor = Anchor.Centre,
-                                                            Origin = Anchor.Centre,
-                                                            RelativeSizeAxes = Axes.Both
-                                                        },
-                                                        supporterTag = new SupporterIcon
-                                                        {
-                                                            Height = 20,
-                                                            Anchor = Anchor.BottomRight,
-                                                            Origin = Anchor.BottomRight,
-                                                        },
-                                                    }
-                                                },
-                                                userNameScroll = new OsuScrollContainer(Direction.Horizontal)
-                                                {
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    ScrollbarVisible = false,
-                                                    RelativeSizeAxes = Axes.X,
-                                                    Height = 35,
-                                                    Child = new FillFlowContainer
-                                                    {
-                                                        Name = "User Name FillFlow",
-                                                        Spacing = new Vector2(7.5f),
-                                                        Direction = FillDirection.Horizontal,
-                                                        AutoSizeAxes = Axes.Both,
-                                                        Anchor = Anchor.Centre,
-                                                        Origin = Anchor.Centre,
-                                                        Children = new Drawable[]
-                                                        {
-                                                            userFlag = new UpdateableFlag
-                                                            {
-                                                                Anchor = Anchor.Centre,
-                                                                Origin = Anchor.Centre,
-                                                                Size = new Vector2(30, 20),
-                                                                ShowPlaceholderOnNull = false,
-                                                            },
-                                                            usernameText = new OsuSpriteText
-                                                            {
-                                                                Anchor = Anchor.Centre,
-                                                                Origin = Anchor.Centre,
-                                                                Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
-                                                            },
-                                                            openUserExternally = new ExternalLinkButton
-                                                            {
-                                                                Anchor = Anchor.Centre,
-                                                                Origin = Anchor.Centre,
-                                                            },
-                                                        }
+                                                        Size = new Vector2(28, 20),
+                                                        ShowPlaceholderOnUnknown = false,
                                                     },
-                                                },
-                                                new FillFlowContainer
-                                                {
-                                                    Name = "Buttons FillFlow",
-                                                    Spacing = new Vector2(10f),
-                                                    Direction = FillDirection.Horizontal,
-                                                    AutoSizeAxes = Axes.X,
-                                                    Height = 40,
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    Children = new Drawable[]
+                                                    userCountryText = new OsuSpriteText
                                                     {
-                                                        new FollowersButton
-                                                        {
-                                                            User = { BindTarget = User }
-                                                        },
-                                                        new MessageUserButton
-                                                        {
-                                                            User = { BindTarget = User }
-                                                        },
+                                                        Font = OsuFont.GetFont(size: 17.5f, weight: FontWeight.Regular),
+                                                        Margin = new MarginPadding { Left = 10 },
+                                                        Origin = Anchor.CentreLeft,
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Colour = colourProvider.Light1,
                                                     }
                                                 }
-                                            }
+                                            },
                                         }
                                     }
-                                },
-                                userStats = new ComponentContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
                                 }
                             }
                         }
-                    },
+                    }
+                },
+                userStats = new FillFlowContainer
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.Y,
+                    Width = 300,
+                    Margin = new MarginPadding { Right = UserProfileOverlay.CONTENT_X_MARGIN },
+                    Padding = new MarginPadding { Vertical = 15 },
+                    Spacing = new Vector2(0, 2)
                 }
             };
-
-            userNameScroll.ScrollContent.Anchor = Anchor.Centre;
-            userNameScroll.ScrollContent.Origin = Anchor.Centre;
-
-            scoreRankInfoScroll.ScrollContent.Anchor = Anchor.Centre;
-            scoreRankInfoScroll.ScrollContent.Origin = Anchor.Centre;
 
             User.BindValueChanged(user => updateUser(user.NewValue));
         }
@@ -313,137 +181,47 @@ namespace osu.Game.Overlays.Profile.Header
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
             openUserExternally.Link = $@"{api.WebsiteRootUrl}/users/{user?.Id ?? 0}";
-            userFlag.Country = user?.Country;
+            userFlag.CountryCode = user?.CountryCode ?? default;
+            userCountryText.Text = (user?.CountryCode ?? default).GetDescription();
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
+            titleText.Text = user?.Title ?? string.Empty;
+            titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
 
             userStats.Clear();
 
             if (user?.Statistics != null)
             {
-                userStats.Add(new GridContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            new UserStatsLine(UsersStrings.ShowStatsRankedScore, user.Statistics.RankedScore.ToLocalisableString("#,##0"))
-                            {
-                                Icon = FontAwesome.Regular.Map
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            new UserStatsLine(UsersStrings.ShowStatsHitAccuracy, user.Statistics.DisplayAccuracy)
-                            {
-                                Icon = FontAwesome.Regular.CheckCircle
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            new UserStatsLine(UsersStrings.ShowStatsPlayCount, user.Statistics.PlayCount.ToLocalisableString("#,##0"))
-                            {
-                                Icon = FontAwesome.Solid.PlayCircle
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            new UserStatsLine(UsersStrings.ShowStatsReplaysWatchedByOthers, user.Statistics.ReplaysWatched.ToLocalisableString("#,##0"))
-                            {
-                                Icon = FontAwesome.Regular.FileVideo
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            new UserStatsLine(UsersStrings.ShowStatsTotalHits, user.Statistics.TotalHits.ToLocalisableString("#,##0"))
-                            {
-                                Icon = FontAwesome.Regular.Compass
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            new UserStatsLine(UsersStrings.ShowStatsMaximumCombo, user.Statistics.MaxCombo.ToLocalisableString("#,##0"))
-                            {
-                                Icon = FontAwesome.Regular.WindowMaximize
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            new UserStatsLine(UsersStrings.ShowStatsTotalScore, user.Statistics.TotalScore.ToLocalisableString("#,##0"))
-                            {
-                                Icon = FontAwesome.Regular.Calendar
-                            }
-                        }
-                    }
-                });
-
-                medalInfo.ContentText = user?.Achievements?.Length.ToString() ?? "0";
-                ppInfo.ContentText = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
-
-                foreach (var scoreRankInfo in scoreRankInfos)
-                    scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
-
-                var levelProgress = user?.Statistics?.Level.Progress.ToLocalisableString("0'%'");
-                levelInfo.ContentText = $"等级{user?.Statistics?.Level.Current.ToString() ?? "0"}, 进度{levelProgress}";
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsRankedScore, user.Statistics.RankedScore.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsHitAccuracy, user.Statistics.DisplayAccuracy));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsPlayCount, user.Statistics.PlayCount.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalScore, user.Statistics.TotalScore.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalHits, user.Statistics.TotalHits.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsMaximumCombo, user.Statistics.MaxCombo.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsReplaysWatchedByOthers, user.Statistics.ReplaysWatched.ToLocalisableString("#,##0")));
             }
         }
 
         private class UserStatsLine : Container
         {
-            private SpriteIcon icon;
-            public IconUsage Icon { get; set; }
-
             public UserStatsLine(LocalisableString left, LocalisableString right)
             {
-                RelativeSizeAxes = Axes.Both;
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer
+                    new OsuSpriteText
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.Both,
-                        Spacing = new Vector2(10),
-                        Margin = new MarginPadding { Left = 10 },
-                        Children = new Drawable[]
-                        {
-                            icon = new SpriteIcon
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Size = new Vector2(16)
-                            },
-                            new OsuSpriteText
-                            {
-                                Font = OsuFont.GetFont(size: 20),
-                                Text = left,
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft
-                            },
-                        }
+                        Font = OsuFont.GetFont(size: 15),
+                        Text = left,
                     },
                     new OsuSpriteText
                     {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
                         Text = right,
-                        Margin = new MarginPadding { Right = 10 }
-                    }
+                    },
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                Add(new Box
-                {
-                    Depth = float.MaxValue,
-                    Colour = colourProvider.Background4,
-                    RelativeSizeAxes = Axes.Both
-                });
-
-                icon.Icon = Icon;
             }
         }
     }

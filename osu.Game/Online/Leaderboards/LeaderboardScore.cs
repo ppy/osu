@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +17,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Game.Configuration;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
@@ -93,13 +95,11 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager, MConfigManager config)
+        private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager, MConfigManager mConfig)
         {
             var user = Score.User;
 
-            config.BindWith(MSetting.OptUI, optui);
-
-            optui.BindValueChanged(_ => updateTooltip(), true);
+            mConfig.BindWith(MSetting.OptUI, optui);
 
             statisticsLabels = GetStatistics(Score).Select(s => new ScoreComponentLabel(s)).ToList();
 
@@ -189,7 +189,7 @@ namespace osu.Game.Online.Leaderboards
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        new UpdateableFlag(user.Country)
+                                                        new UpdateableFlag(user.CountryCode)
                                                         {
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
@@ -261,17 +261,6 @@ namespace osu.Game.Online.Leaderboards
             };
 
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
-        }
-
-        private void updateTooltip()
-        {
-            if (optui.Value && isOnlineScope)
-            {
-                TooltipText = $"于 {Score.Date.ToLocalTime():g} 游玩";
-                return;
-            }
-
-            TooltipText = "";
         }
 
         public override void Show()
@@ -445,10 +434,10 @@ namespace osu.Game.Online.Leaderboards
                     items.Add(new OsuMenuItem("使用这些mod游玩", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
 
                 if (Score.Files.Count > 0)
+                {
                     items.Add(new OsuMenuItem("导出", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
-
-                if (!isOnlineScope)
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                }
 
                 return items.ToArray();
             }

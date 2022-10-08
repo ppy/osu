@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -51,6 +53,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             editorInfo.Selected.ValueChanged += selection =>
             {
+                // ensure any ongoing edits are committed out to the *current* selection before changing to a new one.
+                GetContainingInputManager().TriggerFocusContention(null);
+
                 roundDropdown.Current = selection.NewValue?.Round;
                 losersCheckbox.Current = selection.NewValue?.Losers;
                 dateTimeBox.Current = selection.NewValue?.Date;

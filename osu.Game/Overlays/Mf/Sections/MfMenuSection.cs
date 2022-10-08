@@ -4,7 +4,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.Profile;
 using osuTK;
 
 namespace osu.Game.Overlays.Mf.Sections
@@ -36,13 +35,6 @@ namespace osu.Game.Overlays.Mf.Sections
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
-                },
-                new SectionTriangles
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Height = 0.3f,
-                    RelativeSizeAxes = Axes.Both
                 },
                 new FillFlowContainer
                 {

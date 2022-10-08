@@ -1,9 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -47,11 +48,10 @@ namespace osu.Game.Screens.Menu
 
         private readonly List<ITextPart> expendableText = new List<ITextPart>();
 
-        [CanBeNull]
         private Texture avatarTexture;
 
         private bool showDisclaimer;
-        private Color4 backgroundColor;
+        private readonly Color4 backgroundColor;
 
         public Disclaimer(OsuScreen nextScreen = null, bool showDisclaimer = true, Color4 backgroundColor = new Color4())
         {
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, LargeTextureStore largeTextureStore, MConfigManager mConfig)
         {
-            var enableAvatarSprite = mConfig.Get<bool>(MSetting.UseCustomGreetingPicture);
+            bool enableAvatarSprite = mConfig.Get<bool>(MSetting.UseCustomGreetingPicture);
 
             showDisclaimer = !mConfig.Get<bool>(MSetting.DoNotShowDisclaimer) && showDisclaimer;
 
@@ -120,7 +120,10 @@ namespace osu.Game.Screens.Menu
 
             if (enableAvatarSprite)
             {
-                avatarTexture = largeTextureStore.Get("avatarlogo");
+                avatarTexture = largeTextureStore.Get("startup");
+
+                if (!avatarTexture.Available)
+                    avatarTexture = largeTextureStore.Get("avatarlogo");
 
                 AddInternal(new Sprite
                 {
@@ -146,7 +149,7 @@ namespace osu.Game.Screens.Menu
                 });
             }
 
-            game.SetWindowIcon(mConfig.Get<string>(MSetting.CustomWindowIconPath));
+            game?.SetWindowIcon(mConfig.Get<string>(MSetting.CustomWindowIconPath));
 
             textFlow.AddText("这就是 osu!", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular));
 
@@ -199,16 +202,17 @@ namespace osu.Game.Screens.Menu
                     supportFlow.AddText("来支持游戏的开发", formatSemiBold);
                 }
 
-                heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
+                supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
                 {
+                    heart = t;
+
                     t.Padding = new MarginPadding { Left = 5, Top = 3 };
                     t.Font = t.Font.With(size: 20);
                     t.Origin = Anchor.Centre;
                     t.Colour = colours.Pink;
-                }).Drawables.First();
 
-                if (IsLoaded)
-                    animateHeart();
+                    Schedule(() => heart?.FlashColour(Color4.White, 750, Easing.OutQuint).Loop());
+                });
 
                 if (supportFlow.IsPresent)
                     supportFlow.FadeInFromZero(500);
@@ -224,6 +228,14 @@ namespace osu.Game.Screens.Menu
             ((IBindable<APIUser>)currentUser).BindTo(api.LocalUser);
         }
 
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            base.OnSuspending(e);
+
+            // Once this screen has finished being displayed, we don't want to unnecessarily handle user change events.
+            currentUser.UnbindAll();
+        }
+
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
@@ -237,8 +249,7 @@ namespace osu.Game.Screens.Menu
             if (showDisclaimer)
             {
                 //显示Disclaimer
-
-                using (BeginDelayedSequence(3000, true))
+                using (BeginDelayedSequence(3000))
                 {
                     icon.FadeColour(iconColour, 200, Easing.OutQuint);
                     icon.MoveToY(icon_y * 1.3f, 500, Easing.OutCirc)
@@ -263,8 +274,6 @@ namespace osu.Game.Screens.Menu
                 foreach (var c in textFlow.Children)
                     c.FadeTo(0.001f).Delay(delay += 20).FadeIn(500);
 
-                animateHeart();
-
                 this
                     .FadeInFromZero(500)
                     .Then(5500)
@@ -279,19 +288,14 @@ namespace osu.Game.Screens.Menu
             else
             {
                 //不显示Disclaimer
-
-                var instantPush = avatarTexture == null;
+                bool instantPush = avatarTexture == null;
 
                 icon.FadeOut();
                 textFlow.FadeOut();
                 supportFlow.FadeOut();
 
                 if (!instantPush)
-                {
                     supportFlow.FadeIn(500);
-
-                    animateHeart();
-                }
 
                 this
                     .FadeInFromZero(instantPush ? 0 : 500)
@@ -330,16 +334,10 @@ namespace osu.Game.Screens.Menu
                 "使用linux游玩以获得更好的体验 ——翎",
                 "原来，你也玩osu",
                 "选择ppy，选择成功！",
-                "I use Arch btw.",
                 "owo"
             };
 
             return tips[RNG.Next(0, tips.Length)];
-        }
-
-        private void animateHeart()
-        {
-            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
     }
 }

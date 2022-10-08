@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -55,23 +57,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            MultiplayerCountdown newCountdown;
-
-            switch (room?.Countdown)
-            {
-                case MatchStartCountdown _:
-                    newCountdown = room.Countdown;
-                    break;
-
-                // Clear the countdown with any other (including non-null) countdown values.
-                default:
-                    newCountdown = null;
-                    break;
-            }
+            MultiplayerCountdown newCountdown = room?.ActiveCountdowns.SingleOrDefault(c => c is MatchStartCountdown);
 
             if (newCountdown != countdown)
             {
-                countdown = room?.Countdown;
+                countdown = newCountdown;
                 countdownChangeTime = Time.Current;
             }
 
@@ -144,7 +134,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             if (countdown != null)
             {
-                string countdownText = $"将在{countdownTimeRemaining:mm\\:ss}后开始";
+                string countdownText = $"将在 {countdownTimeRemaining:mm\\:ss} 后开始";
 
                 switch (localUser?.State)
                 {
@@ -169,7 +159,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     case MultiplayerUserState.Spectating:
                     case MultiplayerUserState.Ready:
                         Text = room.Host?.Equals(localUser) == true
-                            ? $"开始 {countText}"
+                            ? $"开始游戏 {countText}"
                             : $"等待房主... {countText}";
 
                         break;
@@ -211,7 +201,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
-                    if (room?.Host?.Equals(localUser) == true && room.Countdown == null)
+                    if (room?.Host?.Equals(localUser) == true && !room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
                         setGreen();
                     else
                         setYellow();
@@ -246,8 +236,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             get
             {
-                if (room?.Countdown != null && multiplayerClient.IsHost && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready && !room.Settings.AutoStartEnabled)
+                if (room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true
+                    && multiplayerClient.IsHost
+                    && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready
+                    && !room.Settings.AutoStartEnabled)
+                {
                     return "取消倒计时";
+                }
 
                 return base.TooltipText;
             }

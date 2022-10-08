@@ -24,7 +24,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 
         protected override Drawable CreateSideDrawable() => valueText;
 
-        protected virtual string GetValueText(T newValue) => newValue.ToString();
+        protected virtual string GetValueText(T newValue) => newValue?.ToString() ?? "无值";
 
         [BackgroundDependencyLoader]
         private void load()

@@ -161,6 +161,7 @@ dotnet_style_prefer_conditional_expression_over_return = true:silent
 dotnet_style_prefer_compound_assignment = true:warning
 
 #Style - null/type checks
+
 dotnet_style_coalesce_expression = true:warning
 dotnet_style_null_propagation = true:warning
 csharp_style_pattern_matching_over_is_with_cast_check = true:warning
@@ -190,6 +191,12 @@ csharp_prefer_simple_using_statement = true:silent
 csharp_style_prefer_index_operator = false:silent
 csharp_style_prefer_range_operator = false:silent
 csharp_style_prefer_switch_expression = false:none
+
+#mfosu: pain
+dotnet_diagnostic.CS8618.severity = none
+dotnet_diagnostic.CS8625.severity = none
+dotnet_diagnostic.CS8603.severity = none
+dotnet_diagnostic.CS8601.severity = none
 
 [*.{yaml,yml}]
 insert_final_newline = true

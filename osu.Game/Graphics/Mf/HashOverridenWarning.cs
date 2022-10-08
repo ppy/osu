@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.Mf
                         },
                         new OsuSpriteText
                         {
-                            Text = $"当前版本哈希值已覆盖为 {gameBase.VersionHash}, 我们无法保证mfosu可以与osu-web以及相关功能100%兼容, 请自行承担相关风险",
+                            Text = $"当前版本哈希值已覆盖为一个自定义的值, 我们无法保证mfosu可以与osu-web以及相关功能100%兼容, 请自行承担相关风险",
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         }

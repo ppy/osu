@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -23,18 +22,31 @@ using osu.Desktop.Windows;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Handlers;
+using osu.Framework.Input.Handlers.Joystick;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.Screens.Menu;
+using osu.Game.IPC;
+using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections;
+using osu.Game.Overlays.Settings.Sections.Input;
+using osu.Game.Utils;
+using SDL2;
 
 namespace osu.Desktop
 {
     internal class OsuGameDesktop : OsuGame
     {
+        private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
+
         private DBusManagerContainer dBusManagerContainer;
 
-        public OsuGameDesktop(string[] args = null, string hashOverride = null)
+        public OsuGameDesktop(string[]? args = null, string hashOverride = null)
             : base(args)
         {
             if (!string.IsNullOrEmpty(hashOverride))
@@ -44,13 +56,13 @@ namespace osu.Desktop
             }
         }
 
-        public override StableStorage GetStorageForStableInstall()
+        public override StableStorage? GetStorageForStableInstall()
         {
             try
             {
                 if (Host is DesktopGameHost desktopHost)
                 {
-                    string stablePath = getStableInstallPath();
+                    string? stablePath = getStableInstallPath();
                     if (!string.IsNullOrEmpty(stablePath))
                         return new StableStorage(stablePath, desktopHost);
                 }
@@ -63,11 +75,11 @@ namespace osu.Desktop
             return null;
         }
 
-        private string getStableInstallPath()
+        private string? getStableInstallPath()
         {
             static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs")) || File.Exists(Path.Combine(p, "osu!.cfg"));
 
-            string stableInstallPath;
+            string? stableInstallPath;
 
             if (OperatingSystem.IsWindows())
             {
@@ -95,15 +107,15 @@ namespace osu.Desktop
         }
 
         [SupportedOSPlatform("windows")]
-        private string getStableInstallPathFromRegistry()
+        private string? getStableInstallPathFromRegistry()
         {
-            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
+            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu"))
                 return key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
 
         protected override UpdateManager CreateUpdateManager()
         {
-            string packageManaged = Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER");
+            string? packageManaged = Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER");
 
             if (!string.IsNullOrEmpty(packageManaged))
                 return new NoActionUpdateManager();
@@ -146,6 +158,8 @@ namespace osu.Desktop
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
+            osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
+
             MConfig.BindWith(MSetting.AllowWindowFadeEffect, allowWindowFade);
 
             windowOpacity = new BindableFloat
@@ -187,18 +201,42 @@ namespace osu.Desktop
         {
             base.SetHost(host);
 
-            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
-
             var desktopWindow = (SDL2DesktopWindow)host.Window;
 
+            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
+            if (iconStream != null)
+                desktopWindow.SetIconFromStream(iconStream);
+
             desktopWindow.CursorState |= CursorState.Hidden;
-            desktopWindow.SetIconFromStream(iconStream);
             desktopWindow.Title = Name;
             desktopWindow.DragDrop += f => fileDrop(new[] { f });
         }
 
+        public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
+        {
+            switch (handler)
+            {
+                case ITabletHandler th:
+                    return new TabletSettings(th);
+
+                case MouseHandler mh:
+                    return new MouseSettings(mh);
+
+                case JoystickHandler jh:
+                    return new JoystickSettings(jh);
+
+                case TouchHandler th:
+                    return new InputSection.HandlerSection(th);
+
+                default:
+                    return base.CreateSettingsSubsectionFor(handler);
+            }
+        }
+
+        protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
+
         private readonly List<string> importableFiles = new List<string>();
-        private ScheduledDelegate importSchedule;
+        private ScheduledDelegate? importSchedule;
 
         private void fileDrop(string[] filePaths)
         {
@@ -236,5 +274,29 @@ namespace osu.Desktop
             this.TransformBindableTo(windowOpacity, final, duration, easing);
 
         public void SetWindowOpacity(float value) => ((SDL2DesktopWindow)Window).Opacity = value;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            osuSchemeLinkIPCChannel?.Dispose();
+        }
+
+        private class SDL2BatteryInfo : BatteryInfo
+        {
+            public override double? ChargeLevel
+            {
+                get
+                {
+                    SDL.SDL_GetPowerInfo(out _, out int percentage);
+
+                    if (percentage == -1)
+                        return null;
+
+                    return percentage / 100.0;
+                }
+            }
+
+            public override bool OnBattery => SDL.SDL_GetPowerInfo(out _, out _) == SDL.SDL_PowerState.SDL_POWERSTATE_ON_BATTERY;
+        }
     }
 }

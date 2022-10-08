@@ -1,10 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -59,6 +63,8 @@ namespace osu.Game.Screens.Ranking
         private readonly bool allowRetry;
         private readonly bool allowWatchingReplay;
 
+        private Sample popInSample;
+
         protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
         {
             Score = score;
@@ -69,9 +75,11 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager mConfig)
+        private void load(AudioManager audio)
         {
-            this.mConfig = mConfig;
+            FillFlowContainer buttons;
+
+            popInSample = audio.Samples.Get(@"UI/overlay-pop-in");
 
             InternalChild = new GridContainer
             {
@@ -170,7 +178,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        player?.Restart();
+                        player?.Restart(true);
                     },
                 });
             }
@@ -244,16 +252,14 @@ namespace osu.Game.Screens.Ranking
 
             bool useOriginalAnimation = mConfig.Get<bool>(MSetting.OptUI);
 
+            popInSample?.Play();
+
             switch (useOriginalAnimation)
             {
                 case true:
                     bottomPanel.MoveToY(bottomPanel.Height).Then()
                                .Delay(250).FadeTo(1, 200)
                                .MoveToY(0, 550, Easing.OutBack);
-
-                    buttons.FadeTo(0).MoveToX(200)
-                           .Then().Delay(250)
-                           .Then().MoveToX(0, 550, Easing.OutQuint).FadeIn(200);
 
                     ScorePanelList?.MoveToY(DrawHeight)
                                   .Then().Delay(250)
@@ -311,8 +317,9 @@ namespace osu.Game.Screens.Ranking
         }
 
         private ScorePanel detachedPanel;
-        private MConfigManager mConfig;
-        private FillFlowContainer buttons;
+
+        [Resolved]
+        private MConfigManager mConfig { get; set; }
 
         private void onStatisticsStateChanged(ValueChangedEvent<Visibility> state)
         {
@@ -347,7 +354,7 @@ namespace osu.Game.Screens.Ranking
                 var screenSpacePos = detachedPanel.ScreenSpaceDrawQuad.TopLeft;
 
                 // Remove from the local container and re-attach.
-                detachedPanelContainer.Remove(detachedPanel);
+                detachedPanelContainer.Remove(detachedPanel, false);
                 ScorePanelList.Attach(detachedPanel);
 
                 // Move into its original location in the attached container first, then to the final location.

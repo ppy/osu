@@ -23,14 +23,16 @@ namespace osu.Game.Screens.Select
 {
     public class PlaySongSelect : SongSelect
     {
-        private OsuScreen playerLoader;
+        private OsuScreen? playerLoader;
 
         [Resolved(CanBeNull = true)]
-        private INotificationOverlay notifications { get; set; }
+        private INotificationOverlay? notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;
 
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
+
+        private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -38,8 +40,6 @@ namespace osu.Game.Screens.Select
             BeatmapOptions.AddButton(@"编辑", @"该谱面", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
             Footer.AddButton(new FooterButtonOpenInMvis { Action = openInMvis }, null);
-
-            ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }
 
         private void openInMvis() =>
@@ -48,7 +48,18 @@ namespace osu.Game.Screens.Select
         protected void PresentScore(ScoreInfo score) =>
             FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
 
-        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
+        protected override BeatmapDetailArea CreateBeatmapDetailArea()
+        {
+            playBeatmapDetailArea = new PlayBeatmapDetailArea
+            {
+                Leaderboard =
+                {
+                    ScoreSelected = PresentScore
+                }
+            };
+
+            return playBeatmapDetailArea;
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -65,9 +76,9 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(e);
         }
 
-        private IReadOnlyList<Mod> modsAtGameplayStart;
+        private IReadOnlyList<Mod>? modsAtGameplayStart;
 
-        private ModAutoplay getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
+        private ModAutoplay? getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
 
         protected override bool OnStart()
         {
@@ -105,14 +116,26 @@ namespace osu.Game.Screens.Select
 
             Player createPlayer()
             {
+                Player player;
+
                 var replayGeneratingMod = Mods.Value.OfType<ICreateReplayData>().FirstOrDefault();
 
                 if (replayGeneratingMod != null)
                 {
-                    return new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods));
+                    player = new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))
+                    {
+                        LeaderboardScores = { BindTarget = playBeatmapDetailArea.Leaderboard.Scores }
+                    };
+                }
+                else
+                {
+                    player = new SoloPlayer
+                    {
+                        LeaderboardScores = { BindTarget = playBeatmapDetailArea.Leaderboard.Scores }
+                    };
                 }
 
-                return new SoloPlayer();
+                return player;
             }
         }
 

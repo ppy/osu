@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -58,7 +56,7 @@ namespace osu.Game.Database
         /// </summary>
         private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
-        public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
+        public abstract IEnumerable<string> HandledExtensions { get; }
 
         protected readonly RealmFileStore Files;
 
@@ -67,12 +65,12 @@ namespace osu.Game.Database
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<Live<TModel>>>? PostImport { get; set; }
+        public Action<IEnumerable<Live<TModel>>>? PresentImport { get; set; }
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
-        public Action<Notification>? PostNotification { protected get; set; }
+        public Action<Notification>? PostNotification { get; set; }
 
         protected RealmArchiveModelImporter(Storage storage, RealmAccess realm)
         {
@@ -110,47 +108,42 @@ namespace osu.Game.Database
 
             bool isBatchImport = tasks.Length >= minimum_items_considered_batch_import;
 
-            try
+            await Task.WhenAll(tasks.Select(async task =>
             {
-                await Task.WhenAll(tasks.Select(async task =>
+                if (notification.CancellationToken.IsCancellationRequested)
+                    return;
+
+                try
                 {
-                    notification.CancellationToken.ThrowIfCancellationRequested();
+                    var model = await Import(task, isBatchImport, notification.CancellationToken).ConfigureAwait(false);
 
-                    try
+                    lock (imported)
                     {
-                        var model = await Import(task, isBatchImport, notification.CancellationToken).ConfigureAwait(false);
+                        if (model != null)
+                            imported.Add(model);
+                        current++;
 
-                        lock (imported)
-                        {
-                            if (model != null)
-                                imported.Add(model);
-                            current++;
+                        notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
+                        notification.Progress = (float)current / tasks.Length;
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
+                }
+            })).ConfigureAwait(false);
 
-                            notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
-                            notification.Progress = (float)current / tasks.Length;
-                        }
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
-                    }
-                })).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
+            if (imported.Count == 0)
             {
-                if (imported.Count == 0)
+                if (notification.CancellationToken.IsCancellationRequested)
                 {
                     notification.State = ProgressNotificationState.Cancelled;
                     return imported;
                 }
-            }
 
-            if (imported.Count == 0)
-            {
                 notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed!";
                 notification.State = ProgressNotificationState.Cancelled;
             }
@@ -160,12 +153,12 @@ namespace osu.Game.Database
                     ? $"Imported {imported.First().GetDisplayString()}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
-                if (imported.Count > 0 && PostImport != null)
+                if (imported.Count > 0 && PresentImport != null)
                 {
                     notification.CompletionText += " Click to view.";
                     notification.CompletionClickAction = () =>
                     {
-                        PostImport?.Invoke(imported);
+                        PresentImport?.Invoke(imported);
                         return true;
                     };
                 }
@@ -175,6 +168,8 @@ namespace osu.Game.Database
 
             return imported;
         }
+
+        public virtual Task<Live<TModel>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, TModel original) => throw new NotImplementedException();
 
         /// <summary>
         /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
@@ -190,7 +185,7 @@ namespace osu.Game.Database
 
             Live<TModel>? import;
             using (ArchiveReader reader = task.GetReader())
-                import = await Import(reader, batchImport, cancellationToken).ConfigureAwait(false);
+                import = await importFromArchive(reader, batchImport, cancellationToken).ConfigureAwait(false);
 
             // We may or may not want to delete the file depending on where it is stored.
             //  e.g. reconstructing/repairing database with items from default storage.
@@ -210,12 +205,15 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Silently import an item from an <see cref="ArchiveReader"/>.
+        /// Create and import a model based off the provided <see cref="ArchiveReader"/>.
         /// </summary>
+        /// <remarks>
+        /// This method also handled queueing the import task on a relevant import thread pool.
+        /// </remarks>
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="batchImport">Whether this import is part of a larger batch.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<Live<TModel>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
+        private async Task<Live<TModel>?> importFromArchive(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -238,7 +236,7 @@ namespace osu.Game.Database
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, batchImport, cancellationToken),
+            var scheduledImport = Task.Factory.StartNew(() => ImportModel(model, archive, batchImport, cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler,
                 batchImport ? import_scheduler_batch : import_scheduler);
@@ -253,19 +251,17 @@ namespace osu.Game.Database
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="batchImport">If <c>true</c>, imports will be skipped before they begin, given an existing model matches on hash and filenames. Should generally only be used for large batch imports, as it may defy user expectations when updating an existing model.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
+        public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            bool checkedExisting = false;
-            TModel? existing = null;
+            TModel? existing;
 
             if (batchImport && archive != null)
             {
                 // this is a fast bail condition to improve large import performance.
                 item.Hash = computeHashFast(archive);
 
-                checkedExisting = true;
                 existing = CheckForExisting(item, realm);
 
                 if (existing != null)
@@ -295,7 +291,8 @@ namespace osu.Game.Database
 
             try
             {
-                LogForModel(item, @"Beginning import...");
+                // Log output here will be missing a valid hash in non-batch imports.
+                LogForModel(item, $@"Beginning import from {archive?.Name ?? "unknown"}...");
 
                 // TODO: do we want to make the transaction this local? not 100% sure, will need further investigation.
                 using (var transaction = realm.BeginWrite())
@@ -309,8 +306,12 @@ namespace osu.Game.Database
                     // TODO: we may want to run this outside of the transaction.
                     Populate(item, archive, realm, cancellationToken);
 
-                    if (!checkedExisting)
-                        existing = CheckForExisting(item, realm);
+                    // Populate() may have adjusted file content (see SkinImporter.updateSkinIniMetadata), so regardless of whether a fast check was done earlier, let's
+                    // check for existing items a second time.
+                    //
+                    // If this is ever a performance issue, the fast-check hash can be compared and trigger a skip of this second check if it still matches.
+                    // I don't think it is a huge deal doing a second indexed check, though.
+                    existing = CheckForExisting(item, realm);
 
                     if (existing != null)
                     {
@@ -333,6 +334,8 @@ namespace osu.Game.Database
 
                     // import to store
                     realm.Add(item);
+
+                    PostImport(item, realm, batchImport);
 
                     transaction.Commit();
                 }
@@ -382,7 +385,7 @@ namespace osu.Game.Database
         /// <remarks>
         ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
         /// </remarks>
-        protected string ComputeHash(TModel item)
+        public string ComputeHash(TModel item)
         {
             // for now, concatenate all hashable files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
@@ -473,6 +476,16 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Perform any final actions before the import has been committed to the database.
+        /// </summary>
+        /// <param name="model">The model prepared for import.</param>
+        /// <param name="realm">The current realm context.</param>
+        /// <param name="batchImport">Whether the import was part of a batch.</param>
+        protected virtual void PostImport(TModel model, Realm realm, bool batchImport)
+        {
+        }
+
+        /// <summary>
         /// Check whether an existing model already exists for a new import item.
         /// </summary>
         /// <param name="model">The new model proposed for import.</param>
@@ -537,6 +550,6 @@ namespace osu.Game.Database
                 yield return f.Filename;
         }
 
-        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
+        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLowerInvariant()}";
     }
 }

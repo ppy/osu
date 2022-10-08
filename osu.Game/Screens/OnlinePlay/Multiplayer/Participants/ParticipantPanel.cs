@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -20,6 +21,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
@@ -33,18 +35,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         public readonly MultiplayerRoomUser User;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private IRulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; } = null!;
 
-        private SpriteIcon crown;
+        private SpriteIcon crown = null!;
 
-        private OsuSpriteText userRankText;
-        private ModDisplay userModsDisplay;
-        private StateDisplay userStateDisplay;
+        private OsuSpriteText userRankText = null!;
+        private ModDisplay userModsDisplay = null!;
+        private StateDisplay userStateDisplay = null!;
 
-        private IconButton kickButton;
+        private IconButton kickButton = null!;
 
         public ParticipantPanel(MultiplayerRoomUser user)
         {
@@ -126,14 +128,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Size = new Vector2(28, 20),
-                                            Country = user?.Country
+                                            CountryCode = user?.CountryCode ?? default
                                         },
                                         new OsuSpriteText
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
-                                            Text = user?.Username
+                                            Text = user?.Username ?? string.Empty
                                         },
                                         userRankText = new OsuSpriteText
                                         {
@@ -186,7 +188,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             const double fade_time = 50;
 
             var currentItem = Playlist.GetCurrentItem();
-            var ruleset = currentItem != null ? rulesets.GetRuleset(currentItem.RulesetID)?.CreateInstance() : null;
+            Ruleset? ruleset = currentItem != null ? rulesets.GetRuleset(currentItem.RulesetID)?.CreateInstance() : null;
 
             int? currentModeRank = ruleset != null ? User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank : null;
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
@@ -203,10 +205,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
             // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
-            Schedule(() => userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(ruleset)).ToList());
+            Schedule(() =>
+            {
+                userModsDisplay.Current.Value = ruleset != null ? User.Mods.Select(m => m.ToMod(ruleset)).ToList() : Array.Empty<Mod>();
+            });
         }
 
-        public MenuItem[] ContextMenuItems
+        public MenuItem[]? ContextMenuItems
         {
             get
             {
@@ -225,7 +230,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem("Give host", MenuItemType.Standard, () =>
+                    new OsuMenuItem("设为房主", MenuItemType.Standard, () =>
                     {
                         // Ensure the local user is still host.
                         if (!Client.IsHost)
@@ -233,7 +238,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
                         Client.TransferHost(targetUser).FireAndForget();
                     }),
-                    new OsuMenuItem("Kick", MenuItemType.Destructive, () =>
+                    new OsuMenuItem("踢出", MenuItemType.Destructive, () =>
                     {
                         // Ensure the local user is still host.
                         if (!Client.IsHost)
@@ -250,7 +255,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             public KickButton()
             {
                 Icon = FontAwesome.Solid.UserTimes;
-                TooltipText = "Kick";
+                TooltipText = "踢出";
             }
 
             [BackgroundDependencyLoader]

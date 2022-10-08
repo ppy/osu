@@ -21,6 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         public GlobalKeyBindingsSection(GlobalActionContainer manager)
         {
             Add(new DefaultBindingsSubsection(manager));
+            Add(new OverlayBindingsSubsection(manager));
             Add(new AudioControlKeyBindingsSubsection(manager));
             Add(new MvisBindingsSection(manager));
             Add(new SongSelectKeyBindingSubsection(manager));
@@ -47,6 +48,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 : base(null)
             {
                 Defaults = manager.GlobalKeyBindings;
+            }
+        }
+
+        private class OverlayBindingsSubsection : KeyBindingsSubsection
+        {
+            protected override LocalisableString Header => InputSettingsStrings.OverlaysSection;
+
+            public OverlayBindingsSubsection(GlobalActionContainer manager)
+                : base(null)
+            {
+                Defaults = manager.OverlayKeyBindings;
             }
         }
 

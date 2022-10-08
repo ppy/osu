@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -51,7 +53,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             Spacing = new Vector2(10, 0),
             Children = new[]
             {
-                base.CreateContent().With(d =>
+                base.CreateContent().With(_ =>
                 {
                     Anchor = Anchor.CentreLeft;
                     Origin = Anchor.CentreLeft;

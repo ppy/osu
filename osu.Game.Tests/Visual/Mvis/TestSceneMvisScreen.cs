@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Platform;
-using osu.Game.Collections;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
 using osu.Game.Overlays;
@@ -31,6 +30,7 @@ namespace osu.Game.Tests.Visual.Mvis
         private DialogOverlay dialog = new DialogOverlay();
 
         private DependencyContainer dependencies;
+        private NotificationOverlay notifiaction;
 
         [Test]
         public void CreateMvisScreen()
@@ -50,30 +50,22 @@ namespace osu.Game.Tests.Visual.Mvis
         [BackgroundDependencyLoader]
         private void load(Storage storage, OsuGameBase gameBase)
         {
-            CollectionManager collectionManager;
             LLinPluginManager mvisPluginManager;
             CustomFontStore customStore = dependencies.Get<CustomFontStore>() ?? new CustomFontStore(storage, gameBase);
             dependencies.Cache(customStore);
 
-            dependencies.Cache(collectionManager = new CollectionManager(LocalStorage));
             dependencies.Cache(mvisPluginManager = new LLinPluginManager());
             dependencies.Cache(GetContainingInputManager() ?? new LocalInputManager());
+            dependencies.CacheAs<INotificationOverlay>(notifiaction = new NotificationOverlay());
             mvisPluginManager.AddPlugin(new MvisTestsPlugin());
 
             Add(mvisPluginManager);
             Add(idle);
             Add(musicController);
             Add(dialog);
+            Add(notifiaction);
 
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-
-            AddStep("Add Collection", () =>
-            {
-                collectionManager.Collections.Add(new BeatmapCollection
-                {
-                    Name = { Value = "Collection" },
-                });
-            });
         }
 
         private class MvisTestsPlugin : LLinPlugin

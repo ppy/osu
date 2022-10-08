@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -98,7 +97,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 backgroundLayer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Y,
                     CornerRadius = corner_radius,
                     Masking = true,
                     BorderThickness = 2,
@@ -129,10 +128,12 @@ namespace osu.Game.Graphics.UserInterface
             if (width != null)
             {
                 Width = width.Value;
+                backgroundLayer.RelativeSizeAxes = Axes.Both;
             }
             else
             {
                 AutoSizeAxes = Axes.X;
+                backgroundLayer.AutoSizeAxes = Axes.X;
                 text.Margin = new MarginPadding { Horizontal = 15 };
             }
         }

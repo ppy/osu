@@ -3,6 +3,7 @@
 
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "消隐";
         public override string Acronym => "HD";
-        public override string Description => @"没有缩圈,圆圈渐隐,分数略微提高";
+        public override LocalisableString Description => @"没有缩圈,圆圈渐隐,分数略微提高";
         public override IconUsage? Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;
 

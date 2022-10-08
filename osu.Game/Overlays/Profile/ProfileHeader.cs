@@ -1,6 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -21,9 +24,8 @@ namespace osu.Game.Overlays.Profile
 
         public Bindable<APIUser> User = new Bindable<APIUser>();
 
-        //private CentreHeaderContainer centreHeaderContainer;
+        private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
-        private TopHeaderContainer topheaderContainer;
 
         public ProfileHeader()
         {
@@ -36,7 +38,11 @@ namespace osu.Game.Overlays.Profile
             // todo: pending implementation.
             // TabControl.AddItem(LayoutStrings.HeaderUsersModding);
 
-            //topheaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
+            // Haphazardly guaranteed by OverlayHeader constructor (see CreateBackground / CreateContent).
+            Debug.Assert(centreHeaderContainer != null);
+            Debug.Assert(detailHeaderContainer != null);
+
+            centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
 
         protected override Drawable CreateBackground() =>
@@ -66,7 +72,12 @@ namespace osu.Game.Overlays.Profile
             Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                topheaderContainer = new TopHeaderContainer
+                new TopHeaderContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    User = { BindTarget = User },
+                },
+                centreHeaderContainer = new CentreHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },

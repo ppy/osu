@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -25,7 +27,11 @@ namespace osu.Game.Screens.Edit.GameplayTest
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-            => new MasterGameplayClockContainer(beatmap, gameplayStart) { StartTime = editorState.Time };
+        {
+            var masterGameplayClockContainer = new MasterGameplayClockContainer(beatmap, gameplayStart);
+            masterGameplayClockContainer.Reset(editorState.Time);
+            return masterGameplayClockContainer;
+        }
 
         protected override void LoadComplete()
         {
@@ -33,7 +39,13 @@ namespace osu.Game.Screens.Edit.GameplayTest
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
             {
                 if (completed.NewValue)
-                    Scheduler.AddDelayed(this.Exit, RESULTS_DISPLAY_DELAY);
+                {
+                    Scheduler.AddDelayed(() =>
+                    {
+                        if (this.IsCurrentScreen())
+                            this.Exit();
+                    }, RESULTS_DISPLAY_DELAY);
+                }
             });
         }
 

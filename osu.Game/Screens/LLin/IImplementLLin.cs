@@ -68,7 +68,8 @@ namespace osu.Game.Screens.LLin
         /// 调整歌曲进度
         /// </summary>
         /// <param name="position">目标进度（毫秒）</param>
-        public void SeekTo(double position);
+        /// <returns>操作是否被允许</returns>
+        public bool SeekTo(double position);
 
         #endregion
 

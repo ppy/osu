@@ -1,14 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
-using osuTK;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -96,6 +98,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestCorrectAnimationStartTime()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("animation-starts-before-alpha.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                Assert.AreEqual(1, background.Elements.Count);
+
+                Assert.AreEqual(2000, background.Elements[0].StartTime);
+                // This property should be used in DrawableStoryboardAnimation as a starting point for animation playback.
+                Assert.AreEqual(1000, (background.Elements[0] as StoryboardAnimation)?.EarliestTransformTime);
+            }
+        }
+
+        [Test]
         public void TestOutOfOrderStartTimes()
         {
             var decoder = new LegacyStoryboardDecoder();
@@ -109,6 +130,26 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(2, background.Elements.Count);
 
                 Assert.AreEqual(1500, background.Elements[0].StartTime);
+                Assert.AreEqual(1000, background.Elements[1].StartTime);
+
+                Assert.AreEqual(1000, storyboard.EarliestEventTime);
+            }
+        }
+
+        [Test]
+        public void TestEarliestStartTimeWithLoopAlphas()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("loop-containing-earlier-non-zero-fade.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                Assert.AreEqual(2, background.Elements.Count);
+
+                Assert.AreEqual(1000, background.Elements[0].StartTime);
                 Assert.AreEqual(1000, background.Elements[1].StartTime);
 
                 Assert.AreEqual(1000, storyboard.EarliestEventTime);

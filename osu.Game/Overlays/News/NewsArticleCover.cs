@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.News
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Font = OsuFont.GetFont(Typeface.Torus, 12, FontWeight.Bold, false, false),
-                        Text = date.ToString("d MMM yyy").ToUpper(),
+                        Text = date.ToString("d MMM yyy").ToUpperInvariant(),
                         Margin = new MarginPadding
                         {
                             Vertical = 4,
@@ -160,7 +160,7 @@ namespace osu.Game.Overlays.News
                 };
             }
 
-            public LocalisableString TooltipText => date.ToString("dddd dd MMMM yyyy hh:mm:ss UTCz").ToUpper();
+            public LocalisableString TooltipText => date.ToString("dddd dd MMMM yyyy hh:mm:ss UTCz").ToUpperInvariant();
         }
 
         // fake API data struct to use for now as a skeleton for data, as there is no API struct for news article info for now

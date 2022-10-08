@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -74,7 +72,7 @@ namespace osu.Game.Online.Rooms
         /// In many cases, this will *not* contain any usable information apart from OnlineID.
         /// </summary>
         [JsonIgnore]
-        public IBeatmapInfo Beatmap { get; set; } = null!;
+        public IBeatmapInfo Beatmap { get; private set; }
 
         [JsonIgnore]
         public IBindable<bool> Valid => valid;
@@ -83,6 +81,7 @@ namespace osu.Game.Online.Rooms
 
         [JsonConstructor]
         private PlaylistItem()
+            : this(new APIBeatmap())
         {
         }
 

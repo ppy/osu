@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -54,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             isProxied = true;
 
-            nonProxiedContent.Remove(Content);
+            nonProxiedContent.Remove(Content, false);
             proxiedContent.Add(Content);
         }
 
@@ -68,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             isProxied = false;
 
-            proxiedContent.Remove(Content);
+            proxiedContent.Remove(Content, false);
             nonProxiedContent.Add(Content);
         }
 
@@ -139,7 +141,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Size = BaseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
 
             if (MainPiece != null)
-                Content.Remove(MainPiece);
+                Content.Remove(MainPiece, true);
 
             Content.Add(MainPiece = CreateMainPiece());
         }

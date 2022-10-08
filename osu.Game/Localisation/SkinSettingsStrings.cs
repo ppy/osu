@@ -35,6 +35,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AutoCursorSize => new TranslatableString(getKey(@"auto_cursor_size"), @"根据谱面物件大小调整光标大小");
 
         /// <summary>
+        /// "Show gameplay cursor during touch input"
+        /// </summary>
+        public static LocalisableString GameplayCursorDuringTouch => new TranslatableString(getKey(@"gameplay_cursor_during_touch"), @"Show gameplay cursor during touch input");
+
+        /// <summary>
         /// "谱面皮肤"
         /// </summary>
         public static LocalisableString BeatmapSkins => new TranslatableString(getKey(@"beatmap_skins"), @"谱面皮肤");
@@ -55,9 +60,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ExportSkinButton => new TranslatableString(getKey(@"export_skin_button"), @"Export selected skin");
 
         /// <summary>
-        /// "Delete selected skin"
+        /// "删除选中的皮肤"
         /// </summary>
-        public static LocalisableString DeleteSkinButton => new TranslatableString(getKey(@"delete_skin_button"), @"Delete selected skin");
+        public static LocalisableString DeleteSkinButton => new TranslatableString(getKey(@"llin_delete_skin_button"), @"删除选中的皮肤");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

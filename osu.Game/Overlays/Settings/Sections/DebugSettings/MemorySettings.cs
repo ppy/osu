@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,11 +35,11 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 },
                 new SettingsButton
                 {
-                    Text = DebugSettingsStrings.CompactRealm,
+                    Text = "Compact realm",
                     Action = () =>
                     {
                         // Blocking operations implicitly causes a Compact().
-                        using (realm.BlockAllOperations())
+                        using (realm.BlockAllOperations("compact"))
                         {
                         }
                     }
@@ -56,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
             {
                 try
                 {
-                    var token = realm.BlockAllOperations();
+                    var token = realm.BlockAllOperations("maintenance");
 
                     blockAction.Enabled.Value = false;
 

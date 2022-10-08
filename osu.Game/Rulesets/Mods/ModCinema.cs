@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "剧院";
         public override string Acronym => "CN";
         public override IconUsage? Icon => OsuIcon.ModCinema;
-        public override string Description => "剧院模式";
+        public override LocalisableString Description => "Watch the video without visual distractions.";
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModAutoplay)).ToArray();
 

@@ -3,9 +3,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -15,18 +17,37 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
     public class ColourHitErrorMeter : HitErrorMeter
     {
-        internal const int MAX_DISPLAYED_JUDGEMENTS = 20;
-
         private const int animation_duration = 200;
         private const int drawable_judgement_size = 8;
-        private const int spacing = 2;
+
+        [SettingSource("Judgement count", "The number of displayed judgements")]
+        public BindableNumber<int> JudgementCount { get; } = new BindableNumber<int>(20)
+        {
+            MinValue = 1,
+            MaxValue = 50,
+        };
+
+        [SettingSource("Judgement spacing", "The space between each displayed judgement")]
+        public BindableNumber<float> JudgementSpacing { get; } = new BindableNumber<float>(2)
+        {
+            MinValue = 0,
+            MaxValue = 10,
+        };
+
+        [SettingSource("Judgement shape", "The shape of each displayed judgement")]
+        public Bindable<ShapeStyle> JudgementShape { get; } = new Bindable<ShapeStyle>();
 
         private readonly JudgementFlow judgementsFlow;
 
         public ColourHitErrorMeter()
         {
             AutoSizeAxes = Axes.Both;
-            InternalChild = judgementsFlow = new JudgementFlow();
+            InternalChild = judgementsFlow = new JudgementFlow
+            {
+                JudgementShape = { BindTarget = JudgementShape },
+                JudgementSpacing = { BindTarget = JudgementSpacing },
+                JudgementCount = { BindTarget = JudgementCount }
+            };
         }
 
         protected override void OnNewJudgement(JudgementResult judgement)
@@ -39,53 +60,105 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         public override void Clear() => judgementsFlow.Clear();
 
-        private class JudgementFlow : FillFlowContainer<HitErrorCircle>
+        private class JudgementFlow : FillFlowContainer<HitErrorShape>
         {
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
 
+            public readonly Bindable<ShapeStyle> JudgementShape = new Bindable<ShapeStyle>();
+
+            public readonly Bindable<float> JudgementSpacing = new Bindable<float>();
+
+            public readonly Bindable<int> JudgementCount = new Bindable<int>();
+
             public JudgementFlow()
             {
-                AutoSizeAxes = Axes.X;
-                Height = MAX_DISPLAYED_JUDGEMENTS * (drawable_judgement_size + spacing) - spacing;
-                Spacing = new Vector2(0, spacing);
+                Width = drawable_judgement_size;
                 Direction = FillDirection.Vertical;
                 LayoutDuration = animation_duration;
                 LayoutEasing = Easing.OutQuint;
-            }
-
-            public void Push(Color4 colour)
-            {
-                Add(new HitErrorCircle(colour, drawable_judgement_size));
-
-                if (Children.Count > MAX_DISPLAYED_JUDGEMENTS)
-                    Children.FirstOrDefault(c => !c.IsRemoved)?.Remove();
-            }
-        }
-
-        internal class HitErrorCircle : Container
-        {
-            public bool IsRemoved { get; private set; }
-
-            private readonly Circle circle;
-
-            public HitErrorCircle(Color4 colour, int size)
-            {
-                Size = new Vector2(size);
-                Child = circle = new Circle
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    Colour = colour
-                };
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                circle.FadeInFromZero(animation_duration, Easing.OutQuint);
-                circle.MoveToY(-DrawSize.Y);
-                circle.MoveToY(0, animation_duration, Easing.OutQuint);
+                JudgementCount.BindValueChanged(count =>
+                {
+                    removeExtraJudgements();
+                    updateMetrics();
+                });
+
+                JudgementSpacing.BindValueChanged(_ => updateMetrics(), true);
+            }
+
+            public void Push(Color4 colour)
+            {
+                Add(new HitErrorShape(colour, drawable_judgement_size)
+                {
+                    Shape = { BindTarget = JudgementShape },
+                });
+
+                removeExtraJudgements();
+            }
+
+            private void removeExtraJudgements()
+            {
+                var remainingChildren = Children.Where(c => !c.IsRemoved);
+
+                while (remainingChildren.Count() > JudgementCount.Value)
+                    remainingChildren.First().Remove();
+            }
+
+            private void updateMetrics()
+            {
+                Height = JudgementCount.Value * (drawable_judgement_size + JudgementSpacing.Value) - JudgementSpacing.Value;
+                Spacing = new Vector2(0, JudgementSpacing.Value);
+            }
+        }
+
+        public class HitErrorShape : Container
+        {
+            public bool IsRemoved { get; private set; }
+
+            public readonly Bindable<ShapeStyle> Shape = new Bindable<ShapeStyle>();
+
+            private readonly Color4 colour;
+
+            private Container content = null!;
+
+            public HitErrorShape(Color4 colour, int size)
+            {
+                this.colour = colour;
+                Size = new Vector2(size);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Child = content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colour
+                };
+
+                Shape.BindValueChanged(shape =>
+                {
+                    switch (shape.NewValue)
+                    {
+                        case ShapeStyle.Circle:
+                            content.Child = new Circle { RelativeSizeAxes = Axes.Both };
+                            break;
+
+                        case ShapeStyle.Square:
+                            content.Child = new Box { RelativeSizeAxes = Axes.Both };
+                            break;
+                    }
+                }, true);
+
+                content.FadeInFromZero(animation_duration, Easing.OutQuint);
+                content.MoveToY(-DrawSize.Y);
+                content.MoveToY(0, animation_duration, Easing.OutQuint);
             }
 
             public void Remove()
@@ -94,6 +167,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
                 this.FadeOut(animation_duration, Easing.OutQuint).Expire();
             }
+        }
+
+        public enum ShapeStyle
+        {
+            Circle,
+            Square
         }
     }
 }

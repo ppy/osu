@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -35,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Margin = new MarginPadding { Horizontal = 10, Bottom = 1 },
-                    Font = OsuFont.GetFont(size: 16f, weight: FontWeight.Bold),
+                    Font = OsuFont.GetFont(size: 11.2f, weight: FontWeight.Bold),
                     Colour = colourProvider.Foreground1
                 }
             };

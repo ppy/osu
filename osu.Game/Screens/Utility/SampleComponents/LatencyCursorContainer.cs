@@ -1,56 +1,50 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
-using osu.Game.Overlays;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Utility.SampleComponents
 {
-    public class LatencyCursorContainer : LatencySampleComponent
+    public class LatencyCursorContainer : CursorContainer
     {
-        private Circle cursor = null!;
+        protected override Drawable CreateCursor() => new LatencyCursor();
 
-        [Resolved]
-        private OverlayColourProvider overlayColourProvider { get; set; } = null!;
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
         public LatencyCursorContainer()
         {
-            Masking = true;
+            State.Value = Visibility.Hidden;
         }
 
-        protected override void LoadComplete()
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            base.LoadComplete();
-
-            InternalChild = cursor = new Circle
-            {
-                Size = new Vector2(40),
-                Origin = Anchor.Centre,
-                Colour = overlayColourProvider.Colour2,
-            };
+            // Scheduling is required to ensure updating of cursor position happens in limited rate.
+            // We can alternatively solve this by a PassThroughInputManager layer inside LatencyArea,
+            // but that would mean including input lag to this test, which may not be desired.
+            Schedule(() => base.OnMouseMove(e));
+            return false;
         }
 
-        protected override bool OnHover(HoverEvent e) => false;
-
-        protected override void UpdateAtLimitedRate(InputState inputState)
+        private class LatencyCursor : LatencySampleComponent
         {
-            cursor.Colour = inputState.Mouse.IsPressed(MouseButton.Left) ? overlayColourProvider.Content1 : overlayColourProvider.Colour2;
-
-            if (IsActive.Value)
+            public LatencyCursor()
             {
-                cursor.Position = ToLocalSpace(inputState.Mouse.Position);
-                cursor.Alpha = 1;
+                AutoSizeAxes = Axes.Both;
+                Origin = Anchor.Centre;
+
+                InternalChild = new Circle { Size = new Vector2(40) };
             }
-            else
+
+            protected override void UpdateAtLimitedRate(InputState inputState)
             {
-                cursor.Alpha = 0;
+                Colour = inputState.Mouse.IsPressed(MouseButton.Left) ? OverlayColourProvider.Content1 : OverlayColourProvider.Colour2;
             }
         }
     }

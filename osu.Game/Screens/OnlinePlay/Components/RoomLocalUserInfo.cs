@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -51,12 +53,12 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             if (MaxAttempts.Value != null)
             {
-                attemptDisplay.Text = $"最大尝试次数: {MaxAttempts.Value:N0}";
+                attemptDisplay.Text = $"Maximum attempts: {MaxAttempts.Value:N0}";
 
                 if (UserScore.Value != null)
                 {
                     int remaining = MaxAttempts.Value.Value - UserScore.Value.PlaylistItemAttempts.Sum(a => a.Attempts);
-                    attemptDisplay.Text += $" ({remaining} 剩余)";
+                    attemptDisplay.Text += $" ({remaining} remaining)";
 
                     if (remaining == 0)
                         attemptDisplay.Colour = colours.RedLight;

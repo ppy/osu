@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
@@ -17,6 +16,10 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
+using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.Select.Details;
 using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
@@ -34,6 +37,9 @@ namespace osu.Game.Tests.Visual.Online
 
         [Resolved]
         private IRulesetStore rulesets { get; set; }
+
+        [SetUp]
+        public void SetUp() => Schedule(() => SelectedMods.Value = Array.Empty<Mod>());
 
         [Test]
         public void TestLoading()
@@ -204,6 +210,21 @@ namespace osu.Game.Tests.Visual.Online
                 beatmapSet.TrackId = 1;
                 overlay.ShowBeatmapSet(beatmapSet);
             });
+        }
+
+        [Test]
+        public void TestSelectedModsDontAffectStatistics()
+        {
+            AddStep("show map", () => overlay.ShowBeatmapSet(getBeatmapSet()));
+            AddAssert("AR displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == BeatmapsetsStrings.ShowStatsAr).Value == (0, null));
+            AddStep("set AR10 diff adjust", () => SelectedMods.Value = new[]
+            {
+                new OsuModDifficultyAdjust
+                {
+                    ApproachRate = { Value = 10 }
+                }
+            });
+            AddAssert("AR still displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == BeatmapsetsStrings.ShowStatsAr).Value == (0, null));
         }
 
         [Test]

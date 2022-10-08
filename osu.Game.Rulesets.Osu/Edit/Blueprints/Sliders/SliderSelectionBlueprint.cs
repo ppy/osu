@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -11,6 +13,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -109,7 +112,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(HitObject, true)
             {
-                RemoveControlPointsRequested = removeControlPoints
+                RemoveControlPointsRequested = removeControlPoints,
+                SplitControlPointsRequested = splitControlPoints
             });
 
             base.OnSelected();
@@ -159,7 +163,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override void OnDrag(DragEvent e)
         {
             if (placementControlPoint != null)
-                placementControlPoint.Position = e.MousePosition - HitObject.Position;
+            {
+                var result = snapProvider?.FindSnappedPositionAndTime(ToScreenSpace(e.MousePosition));
+                placementControlPoint.Position = ToLocalSpace(result?.ScreenSpacePosition ?? ToScreenSpace(e.MousePosition)) - HitObject.Position;
+            }
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
@@ -247,15 +254,83 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             HitObject.Position += first;
         }
 
+        private void splitControlPoints(List<PathControlPoint> controlPointsToSplitAt)
+        {
+            // Arbitrary gap in milliseconds to put between split slider pieces
+            const double split_gap = 100;
+
+            // Ensure that there are any points to be split
+            if (controlPointsToSplitAt.Count == 0)
+                return;
+
+            editorBeatmap.SelectedHitObjects.Clear();
+
+            foreach (var splitPoint in controlPointsToSplitAt)
+            {
+                if (splitPoint == controlPoints[0] || splitPoint == controlPoints[^1] || splitPoint.Type is null)
+                    continue;
+
+                // Split off the section of slider before this control point so the remaining control points to split are in the latter part of the slider.
+                int index = controlPoints.IndexOf(splitPoint);
+
+                if (index <= 0)
+                    continue;
+
+                // Extract the split portion and remove from the original slider.
+                var splitControlPoints = controlPoints.Take(index + 1).ToList();
+                controlPoints.RemoveRange(0, index);
+
+                // Turn the control points which were split off into a new slider.
+                var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
+                var difficultyPoint = (DifficultyControlPoint)HitObject.DifficultyControlPoint.DeepClone();
+
+                var newSlider = new Slider
+                {
+                    StartTime = HitObject.StartTime,
+                    Position = HitObject.Position + splitControlPoints[0].Position,
+                    NewCombo = HitObject.NewCombo,
+                    SampleControlPoint = samplePoint,
+                    DifficultyControlPoint = difficultyPoint,
+                    LegacyLastTickOffset = HitObject.LegacyLastTickOffset,
+                    Samples = HitObject.Samples.Select(s => s.With()).ToList(),
+                    RepeatCount = HitObject.RepeatCount,
+                    NodeSamples = HitObject.NodeSamples.Select(n => (IList<HitSampleInfo>)n.Select(s => s.With()).ToList()).ToList(),
+                    Path = new SliderPath(splitControlPoints.Select(o => new PathControlPoint(o.Position - splitControlPoints[0].Position, o == splitControlPoints[^1] ? null : o.Type)).ToArray())
+                };
+
+                // Increase the start time of the slider before adding the new slider so the new slider is immediately inserted at the correct index and internal state remains valid.
+                HitObject.StartTime += split_gap;
+
+                editorBeatmap.Add(newSlider);
+
+                HitObject.NewCombo = false;
+                HitObject.Path.ExpectedDistance.Value -= newSlider.Path.CalculatedDistance;
+                HitObject.StartTime += newSlider.SpanDuration;
+
+                // In case the remainder of the slider has no length left over, give it length anyways so we don't get a 0 length slider.
+                if (HitObject.Path.ExpectedDistance.Value <= Precision.DOUBLE_EPSILON)
+                {
+                    HitObject.Path.ExpectedDistance.Value = null;
+                }
+            }
+
+            // Once all required pieces have been split off, the original slider has the final split.
+            // As a final step, we must reset its control points to have an origin of (0,0).
+            Vector2 first = controlPoints[0].Position;
+            foreach (var c in controlPoints)
+                c.Position -= first;
+            HitObject.Position += first;
+        }
+
         private void convertToStream()
         {
-            if (editorBeatmap == null || changeHandler == null || beatDivisor == null)
+            if (editorBeatmap == null || beatDivisor == null)
                 return;
 
             var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(HitObject.StartTime);
             double streamSpacing = timingPoint.BeatLength / beatDivisor.Value;
 
-            changeHandler.BeginChange();
+            changeHandler?.BeginChange();
 
             int i = 0;
             double time = HitObject.StartTime;
@@ -289,7 +364,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
             editorBeatmap.Remove(HitObject);
 
-            changeHandler.EndChange();
+            changeHandler?.EndChange();
         }
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]

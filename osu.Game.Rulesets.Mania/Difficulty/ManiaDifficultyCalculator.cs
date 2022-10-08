@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +31,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private readonly bool isForCurrentRuleset;
         private readonly double originalOverallDifficulty;
 
+        public override int Version => 20220902;
+
         public ManiaDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
@@ -51,7 +55,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 // In osu-stable mania, rate-adjustment mods don't affect the hit window.
                 // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
                 GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),
-                ScoreMultiplier = getScoreMultiplier(mods),
                 MaxCombo = beatmap.HitObjects.Sum(maxComboForObject)
             };
         }
@@ -144,33 +147,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
                 return value;
             }
-        }
-
-        private double getScoreMultiplier(Mod[] mods)
-        {
-            double scoreMultiplier = 1;
-
-            foreach (var m in mods)
-            {
-                switch (m)
-                {
-                    case ManiaModNoFail _:
-                    case ManiaModEasy _:
-                    case ManiaModHalfTime _:
-                        scoreMultiplier *= 0.5;
-                        break;
-                }
-            }
-
-            var maniaBeatmap = (ManiaBeatmap)Beatmap;
-            int diff = maniaBeatmap.TotalColumns - maniaBeatmap.OriginalTotalColumns;
-
-            if (diff > 0)
-                scoreMultiplier *= 0.9;
-            else if (diff < 0)
-                scoreMultiplier *= 0.9 + 0.04 * diff;
-
-            return scoreMultiplier;
         }
     }
 }

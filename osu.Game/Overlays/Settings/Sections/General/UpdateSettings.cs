@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -52,7 +54,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             {
                                 notifications?.Post(new SimpleNotification
                                 {
-                                    Text = $"已是最新版本! ({game.Version})",
+                                    Text = GeneralSettingsStrings.RunningLatestRelease(game.Version),
                                     Icon = FontAwesome.Solid.CheckCircle,
                                 });
                             }

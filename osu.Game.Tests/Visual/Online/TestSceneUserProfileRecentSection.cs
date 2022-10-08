@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -84,7 +86,28 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     User = dummyUser,
                     Type = RecentActivityType.BeatmapsetApprove,
+                    Approval = BeatmapApproval.Approved,
+                    Beatmapset = dummyBeatmap,
+                },
+                new APIRecentActivity
+                {
+                    User = dummyUser,
+                    Type = RecentActivityType.BeatmapsetApprove,
+                    Approval = BeatmapApproval.Loved,
+                    Beatmapset = dummyBeatmap,
+                },
+                new APIRecentActivity
+                {
+                    User = dummyUser,
+                    Type = RecentActivityType.BeatmapsetApprove,
                     Approval = BeatmapApproval.Qualified,
+                    Beatmapset = dummyBeatmap,
+                },
+                new APIRecentActivity
+                {
+                    User = dummyUser,
+                    Type = RecentActivityType.BeatmapsetApprove,
+                    Approval = BeatmapApproval.Ranked,
                     Beatmapset = dummyBeatmap,
                 },
                 new APIRecentActivity

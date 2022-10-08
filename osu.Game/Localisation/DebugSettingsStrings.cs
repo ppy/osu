@@ -44,11 +44,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ClearAllCaches => new TranslatableString(getKey(@"clear_all_caches"), @"Clear all caches");
 
-        /// <summary>
-        /// "压缩realm存储"
-        /// </summary>
-        public static LocalisableString CompactRealm => new TranslatableString(getKey(@"compact_realm"), @"压缩realm存储");
-
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

@@ -1,5 +1,6 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
 using osuTK;
 
 namespace Mvis.Plugin.Sandbox.Components.Visualizers.Linear
@@ -15,11 +16,11 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers.Linear
             {
             }
 
-            protected override void DrawBar(Vector2 barPosition, Vector2 barSize)
+            protected override void DrawBar(Vector2 barPosition, Vector2 barSize, IRenderer renderer)
             {
                 var adjustedSize = barSize + new Vector2(0, 2);
 
-                DrawQuad(
+                renderer.DrawQuad(
                     Texture,
                     getQuad(barPosition, adjustedSize),
                     DrawColourInfo.Colour,

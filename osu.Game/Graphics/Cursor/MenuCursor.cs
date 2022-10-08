@@ -1,22 +1,24 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
+#nullable disable
+
+using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Configuration;
-using System;
-using JetBrains.Annotations;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
+using osuTK;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -39,6 +41,7 @@ namespace osu.Game.Graphics.Cursor
         private GameHost host { get; set; }
 
         private Sample tapSample;
+        private Vector2 lastMovePosition;
 
         [BackgroundDependencyLoader(true)]
         private void load([NotNull] OsuConfigManager config, [NotNull] MConfigManager mConfig, [CanBeNull] ScreenshotManager screenshotManager, AudioManager audio)
@@ -66,16 +69,29 @@ namespace osu.Game.Graphics.Cursor
             tapSample = audio.Samples.Get(@"UI/cursor-tap");
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (dragRotationState != DragRotationState.NotDragging
+                && Vector2.Distance(positionMouseDown, lastMovePosition) > 60)
+            {
+                // make the rotation centre point floating.
+                positionMouseDown = Interpolation.ValueAt(0.04f, positionMouseDown, lastMovePosition, 0, Clock.ElapsedFrameTime);
+            }
+        }
+
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             if (dragRotationState != DragRotationState.NotDragging)
             {
-                var position = e.MousePosition;
-                float distance = Vector2Extensions.Distance(position, positionMouseDown);
+                lastMovePosition = e.MousePosition;
+
+                float distance = Vector2Extensions.Distance(lastMovePosition, positionMouseDown);
 
                 // don't start rotating until we're moved a minimum distance away from the mouse down location,
                 // else it can have an annoying effect.
-                if (dragRotationState == DragRotationState.DragStarted && distance > 30)
+                if (dragRotationState == DragRotationState.DragStarted && distance > 80)
                     dragRotationState = DragRotationState.Rotating;
 
                 // don't rotate when distance is zero to avoid NaN
@@ -90,7 +106,7 @@ namespace osu.Game.Graphics.Cursor
                     if (diff > 180) diff -= 360;
                     degrees = activeCursor.Rotation + diff;
 
-                    activeCursor.RotateTo(degrees, 600, Easing.OutQuint);
+                    activeCursor.RotateTo(degrees, 120, Easing.OutQuint);
                 }
             }
 
@@ -130,7 +146,7 @@ namespace osu.Game.Graphics.Cursor
 
                 if (dragRotationState != DragRotationState.NotDragging)
                 {
-                    activeCursor.RotateTo(0, 600 * (1 + Math.Abs(activeCursor.Rotation / 720)), Easing.OutElasticHalf);
+                    activeCursor.RotateTo(0, 400 * (0.5f + Math.Abs(activeCursor.Rotation / 960)), Easing.OutElasticQuarter);
                     dragRotationState = DragRotationState.NotDragging;
                 }
 

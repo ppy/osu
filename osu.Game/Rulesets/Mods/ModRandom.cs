@@ -18,10 +18,6 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1;
 
         [SettingSource("种子", "使用自定义种子，留空则随机生成", SettingControlType = typeof(SettingsNumberBox))]
-        public Bindable<int?> Seed { get; } = new Bindable<int?>
-        {
-            Default = null,
-            Value = null
-        };
+        public Bindable<int?> Seed { get; } = new Bindable<int?>();
     }
 }

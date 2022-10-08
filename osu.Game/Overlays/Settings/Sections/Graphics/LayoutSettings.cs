@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Drawing;
 using System.Linq;
@@ -71,8 +73,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 windowModes.BindTo(host.Window.SupportedWindowModes);
             }
 
-            if (host.Window is WindowsWindow windowsWindow)
-                fullscreenCapability.BindTo(windowsWindow.FullscreenCapability);
+            if (host.Renderer is IWindowsRenderer windowsRenderer)
+                fullscreenCapability.BindTo(windowsRenderer.FullscreenCapability);
 
             Children = new Drawable[]
             {
@@ -158,13 +160,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
-            windowModeDropdown.Current.BindValueChanged(mode =>
+            windowModeDropdown.Current.BindValueChanged(_ =>
             {
                 updateDisplayModeDropdowns();
                 updateScreenModeWarning();
             }, true);
 
-            windowModes.BindCollectionChanged((sender, args) =>
+            windowModes.BindCollectionChanged((_, _) =>
             {
                 if (windowModes.Count > 1)
                     windowModeDropdown.Show();
@@ -188,7 +190,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 updateDisplayModeDropdowns();
             }), true);
 
-            scalingMode.BindValueChanged(mode =>
+            scalingMode.BindValueChanged(_ =>
             {
                 scalingSettings.ClearTransforms();
                 scalingSettings.AutoSizeDuration = transition_duration;

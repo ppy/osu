@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -104,40 +106,40 @@ namespace osu.Game.Overlays.Profile
             background.Colour = colourProvider.Background5;
             underscore.Colour = colourProvider.Highlight1;
         }
-    }
 
-    public class SectionTriangles : Container
-    {
-        private readonly Triangles triangles;
-        private readonly Box foreground;
-
-        public SectionTriangles()
+        private class SectionTriangles : Container
         {
-            RelativeSizeAxes = Axes.X;
-            Height = 100;
-            Masking = true;
-            Children = new Drawable[]
+            private readonly Triangles triangles;
+            private readonly Box foreground;
+
+            public SectionTriangles()
             {
-                triangles = new Triangles
+                RelativeSizeAxes = Axes.X;
+                Height = 100;
+                Masking = true;
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    TriangleScale = 3,
-                },
-                foreground = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }
-            };
-        }
+                    triangles = new Triangles
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        RelativeSizeAxes = Axes.Both,
+                        TriangleScale = 3,
+                    },
+                    foreground = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                };
+            }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            triangles.ColourLight = colourProvider.Background4;
-            triangles.ColourDark = colourProvider.Background5.Darken(0.2f);
-            foreground.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Background5.Opacity(0));
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                triangles.ColourLight = colourProvider.Background4;
+                triangles.ColourDark = colourProvider.Background5.Darken(0.2f);
+                foreground.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Background5.Opacity(0));
+            }
         }
     }
 }

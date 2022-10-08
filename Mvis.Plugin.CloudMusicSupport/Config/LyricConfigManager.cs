@@ -26,6 +26,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
             SetDefault(LyricSettings.LyricDirection, Anchor.BottomCentre);
             SetDefault(LyricSettings.LyricPositionX, 0f, -1f, 1f);
             SetDefault(LyricSettings.LyricPositionY, 0f, -1f, 1f);
+            SetDefault(LyricSettings.EnableUserDefinitions, false);
+            SetDefault(LyricSettings.UserDefinitionURL, "https://raw.githubusercontent.com/MATRIX-feather/random-stuffs/master/assets/netease_to_llin.json");
+            SetDefault(LyricSettings.OutputDefinitionInLogs, false);
             base.InitialiseDefaults();
         }
 
@@ -43,6 +46,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
         AutoScrollToCurrent,
         LyricDirection,
         LyricPositionX,
-        LyricPositionY
+        LyricPositionY,
+        EnableUserDefinitions,
+        UserDefinitionURL,
+        CurrentDefinition,
+        OutputDefinitionInLogs
     }
 }

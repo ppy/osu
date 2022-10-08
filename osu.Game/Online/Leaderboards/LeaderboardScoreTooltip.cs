@@ -10,11 +10,13 @@ using osuTK;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-
-#nullable enable
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -24,6 +26,7 @@ namespace osu.Game.Online.Leaderboards
         private FillFlowContainer<HitResultCell> topScoreStatistics = null!;
         private FillFlowContainer<HitResultCell> bottomScoreStatistics = null!;
         private FillFlowContainer<ModCell> modStatistics = null!;
+        private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
 
         public LeaderboardScoreTooltip()
         {
@@ -36,8 +39,9 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager configManager)
         {
+            configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -92,6 +96,13 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            prefer24HourTime.BindValueChanged(_ => updateTimestampLabel(), true);
+        }
+
         private ScoreInfo? displayedScore;
 
         public void SetContent(ScoreInfo score)
@@ -101,7 +112,7 @@ namespace osu.Game.Online.Leaderboards
 
             displayedScore = score;
 
-            timestampLabel.Text = $"游玩于 {score.Date.ToLocalTime():yyyy MMMM d HH:mm}";
+            updateTimestampLabel();
 
             modStatistics.Clear();
             topScoreStatistics.Clear();
@@ -121,6 +132,16 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
+        private void updateTimestampLabel()
+        {
+            if (displayedScore != null)
+            {
+                timestampLabel.Text = prefer24HourTime.Value
+                    ? $"于 {displayedScore.Date.ToLocalTime():yyyy MMMM d HH:mm} 游玩"
+                    : $"于 {displayedScore.Date.ToLocalTime():yyyy MMMM d h:mm tt} 游玩";
+            }
+        }
+
         protected override void PopIn() => this.FadeIn(20, Easing.OutQuint);
         protected override void PopOut() => this.FadeOut(80, Easing.OutQuint);
 
@@ -128,7 +149,7 @@ namespace osu.Game.Online.Leaderboards
 
         private class HitResultCell : CompositeDrawable
         {
-            private readonly string displayName;
+            private readonly LocalisableString displayName;
             private readonly HitResult result;
             private readonly int count;
 
@@ -136,7 +157,7 @@ namespace osu.Game.Online.Leaderboards
             {
                 AutoSizeAxes = Axes.Both;
 
-                displayName = stat.DisplayName;
+                displayName = stat.DisplayName.ToUpper();
                 result = stat.Result;
                 count = stat.Count;
             }
@@ -155,7 +176,7 @@ namespace osu.Game.Online.Leaderboards
                         new OsuSpriteText
                         {
                             Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                            Text = displayName.ToUpperInvariant(),
+                            Text = displayName.ToUpper(),
                             Colour = colours.ForHitResult(result),
                         },
                         new OsuSpriteText

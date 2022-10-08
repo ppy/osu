@@ -30,8 +30,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         public void StartFetchByBeatmap(
             WorkingBeatmap beatmap,
             bool noLocalFile,
-            Action<APILyricResponseRoot> onFinish,
-            Action<string> onFail)
+            Action<APILyricResponseRoot>? onFinish,
+            Action<string>? onFail)
         {
             if (!noLocalFile)
             {
@@ -83,7 +83,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                 Logger.Error(e, message);
                 onFail?.Invoke(e.ToString());
             };
-            req.PerformAsync(cancellationTokenSource.Token);
+            req.PerformAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
             currentSearchRequest = req;
         }
@@ -112,20 +112,21 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             onRequestFinish(fakeResponse, onFinish, onFail);
         }
 
-        private void onRequestFinish(APISearchResponseRoot responseRoot, Action<APILyricResponseRoot> onFinish, Action<string> onFail)
+        private void onRequestFinish(APISearchResponseRoot responseRoot, Action<APILyricResponseRoot>? onFinish, Action<string>? onFail)
         {
-            if ((responseRoot.Result?.SongCount ?? 0) <= 0)
+            int id = responseRoot.Result?.Songs?.First().ID ?? -1;
+
+            if (id <= 0)
             {
                 onFail?.Invoke("未搜索到对应歌曲!");
                 return;
             }
 
-            int id = responseRoot.Result.Songs.First().ID;
             string target = $"https://music.163.com/api/song/lyric?os=pc&id={id}&lv=-1&kv=-1&tv=-1";
             var req = new OsuJsonWebRequest<APILyricResponseRoot>(target);
             req.Finished += () => onFinish?.Invoke(req.ResponseObject);
             req.Failed += e => Logger.Error(e, "获取歌词失败");
-            req.PerformAsync(cancellationTokenSource.Token);
+            req.PerformAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
             currentLyricRequest = req;
         }

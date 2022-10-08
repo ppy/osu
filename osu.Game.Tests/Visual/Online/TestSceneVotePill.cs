@@ -1,14 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Overlays.Comments;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Framework.Allocation;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Tests.Visual.Online
 {

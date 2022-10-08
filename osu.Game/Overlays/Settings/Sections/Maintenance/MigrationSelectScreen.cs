@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -10,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.IO;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
@@ -33,7 +36,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         public override bool HideOverlaysOnEnter => true;
 
-        public override LocalisableString HeaderText => "请选择一个新位置";
+        public override LocalisableString HeaderText => MaintenanceSettingsStrings.SelectNewLocation;
 
         protected override void OnSelection(DirectoryInfo directory)
         {
@@ -49,12 +52,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     // Quick test for whether there's already an osu! install at the target path.
                     if (fileInfos.Any(f => f.Name == OsuGameBase.CLIENT_DATABASE_FILENAME))
                     {
-                        dialogOverlay.Push(new ConfirmDialog("The target directory already seems to have an osu! install. Use that data instead?", () =>
+                        dialogOverlay.Push(new ConfirmDialog(MaintenanceSettingsStrings.TargetDirectoryAlreadyInstalledOsu, () =>
                             {
-                                dialogOverlay.Push(new ConfirmDialog("To complete this operation, osu! will close. Please open it again to use the new data location.", () =>
+                                dialogOverlay.Push(new ConfirmDialog(MaintenanceSettingsStrings.RestartAndReOpenRequiredForCompletion, () =>
                                 {
                                     (storage as OsuStorage)?.ChangeDataPath(target.FullName);
-                                    game.GracefullyExit();
+                                    game.Exit();
                                 }, () => { }));
                             },
                             () => { }));

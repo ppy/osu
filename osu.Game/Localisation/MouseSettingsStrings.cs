@@ -64,6 +64,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString HighPrecisionPlatformWarning => new TranslatableString(getKey(@"high_precision_platform_warning"), @"此设置在您的平台上有已知问题。如果您遇到问题，建议您在游戏外调整灵敏度，并暂时禁用此项。");
 
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString AlwaysConfine => new TranslatableString(getKey(@"always_confine"), @"Always");
+
+        /// <summary>
+        /// "During Gameplay"
+        /// </summary>
+        public static LocalisableString ConfineDuringGameplay => new TranslatableString(getKey(@"confine_during_gameplay"), @"During Gameplay");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString NeverConfine => new TranslatableString(getKey(@"never_confine"), @"Never");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

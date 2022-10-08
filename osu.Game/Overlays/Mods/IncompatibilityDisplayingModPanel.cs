@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -44,8 +46,8 @@ namespace osu.Game.Overlays.Mods
                                  && !ModUtils.CheckCompatibleSet(selectedMods.Value.Append(Mod));
         }
 
-        protected override Colour4 BackgroundColour => incompatible.Value ? (Colour4)ColourProvider.Background6 : base.BackgroundColour;
-        protected override Colour4 ForegroundColour => incompatible.Value ? (Colour4)ColourProvider.Background5 : base.ForegroundColour;
+        protected override Colour4 BackgroundColour => incompatible.Value ? ColourProvider.Background6 : base.BackgroundColour;
+        protected override Colour4 ForegroundColour => incompatible.Value ? ColourProvider.Background5 : base.ForegroundColour;
 
         protected override void UpdateState()
         {

@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "静音";
         public override string Acronym => "MU";
         public override IconUsage? Icon => FontAwesome.Solid.VolumeMute;
-        public override string Description => "你还能感受到歌曲的节奏吗？";
+        public override LocalisableString Description => "你还能感受到歌曲的节奏吗？";
         public override ModType Type => ModType.Fun;
         public override double ScoreMultiplier => 1;
     }
@@ -33,37 +33,23 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<double> mainVolumeAdjust = new BindableDouble(0.5);
         private readonly BindableNumber<double> metronomeVolumeAdjust = new BindableDouble(0.5);
 
-        private BindableNumber<int> currentCombo;
+        private readonly BindableNumber<int> currentCombo = new BindableInt();
 
         [SettingSource("启用节拍器", "添加节拍器来帮助你跟住歌曲的节奏。")]
-        public BindableBool EnableMetronome { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public BindableBool EnableMetronome { get; } = new BindableBool(true);
 
         [SettingSource("抵达最大音量的连击", "抵达最大音量时的连击数", SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
-        public BindableInt MuteComboCount { get; } = new BindableInt
+        public BindableInt MuteComboCount { get; } = new BindableInt(100)
         {
-            Default = 100,
-            Value = 100,
             MinValue = 0,
             MaxValue = 500,
         };
 
         [SettingSource("以静音开始", "随连击增加音量")]
-        public BindableBool InverseMuting { get; } = new BindableBool
-        {
-            Default = false,
-            Value = false
-        };
+        public BindableBool InverseMuting { get; } = new BindableBool();
 
         [SettingSource("静音音效", "音效也会跟着音频静音。")]
-        public BindableBool AffectsHitSounds { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public BindableBool AffectsHitSounds { get; } = new BindableBool(true);
 
         protected ModMuted()
         {
@@ -92,7 +78,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            currentCombo = scoreProcessor.Combo.GetBoundCopy();
+            currentCombo.BindTo(scoreProcessor.Combo);
             currentCombo.BindValueChanged(combo =>
             {
                 double dimFactor = MuteComboCount.Value == 0 ? 1 : (double)combo.NewValue / MuteComboCount.Value;

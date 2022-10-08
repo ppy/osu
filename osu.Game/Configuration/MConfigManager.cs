@@ -9,7 +9,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Screens.LLin.SideBar.Tabs;
-using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
 
 namespace osu.Game.Configuration
@@ -63,9 +62,11 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.MvisInterfaceRed, value: 0, 0, 255f);
             SetDefault(MSetting.MvisInterfaceGreen, value: 119f, 0, 255f);
             SetDefault(MSetting.MvisInterfaceBlue, value: 255f, 0, 255f);
-            SetDefault(MSetting.MvisCurrentAudioProvider, "a@b");
+            SetDefault(MSetting.MvisCurrentAudioProvider, "DummyAudioPlugin@osu.Game.Screens.LLin.Plugins.Internal.DummyAudio");
             SetDefault(MSetting.MvisCurrentFunctionBar, "LegacyBottomBar@Mvis.Plugin.BottomBar");
             SetDefault(MSetting.MvisTabControlPosition, TabControlPosition.Right);
+            SetDefault(MSetting.MvisAutoVSync, true);
+            SetDefault(MSetting.MvisPlayerSettingsMaxWidth, 0.6f, 0.2f, 1f);
 
             //实验性功能
             SetDefault(MSetting.CustomWindowIconPath, "");
@@ -93,7 +94,7 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.MprisUpdateInterval, 500d, 100d, 1000d);
 
             //排行榜
-            SetDefault(MSetting.InGameLeaderboardState, LeaderboardState.Fold);
+            //SetDefault(MSetting.InGameLeaderboardState, LeaderboardState.Fold);
         }
 
         public Color4 GetCustomLoaderColor()
@@ -158,6 +159,8 @@ namespace osu.Game.Configuration
         CoverAccelSource,
         TrackPreviewAccelSource,
         InGameLeaderboardState,
+        MvisAutoVSync,
+        MvisPlayerSettingsMaxWidth
     }
 
     public enum GamemodeActivateCondition

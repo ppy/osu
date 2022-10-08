@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Globalization;
 using osu.Framework.Bindables;
@@ -68,7 +70,7 @@ namespace osu.Game.Screens.Edit.Timing
                 Current.TriggerChange();
             };
 
-            Current.BindValueChanged(val =>
+            Current.BindValueChanged(_ =>
             {
                 decimal decimalValue = slider.Current.Value.ToDecimal(NumberFormatInfo.InvariantInfo);
                 textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");

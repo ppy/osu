@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -40,8 +38,6 @@ namespace osu.Game.Screens.Utility
         private readonly OsuTextFlowContainer statusText;
 
         public override bool HideOverlaysOnEnter => true;
-
-        public override bool CursorVisible => mainArea.Count == 0;
 
         public override float BackgroundParallaxAmount => 0;
 
@@ -266,8 +262,8 @@ namespace osu.Game.Screens.Utility
 
             string exclusive = "unknown";
 
-            if (host.Window is WindowsWindow windowsWindow)
-                exclusive = windowsWindow.FullscreenCapability.ToString();
+            if (host.Renderer is IWindowsRenderer windowsRenderer)
+                exclusive = windowsRenderer.FullscreenCapability.ToString();
 
             statusText.Clear();
 
@@ -453,14 +449,14 @@ namespace osu.Game.Screens.Utility
 
             mainArea.AddRange(new[]
             {
-                new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : (int?)null)
+                new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : null)
                 {
                     Width = 0.5f,
                     VisualMode = { BindTarget = VisualMode },
                     IsActiveArea = { Value = true },
                     ReportUserBest = () => recordResult(betterSide == 0),
                 },
-                new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : (int?)null)
+                new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : null)
                 {
                     Width = 0.5f,
                     VisualMode = { BindTarget = VisualMode },

@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -17,7 +20,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -96,6 +98,11 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         protected bool UsingThemedIntro { get; private set; }
 
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault(false)
+        {
+            Colour = Color4.Black
+        };
+
         protected IntroScreen([CanBeNull] Func<MainMenu> createNextScreen = null)
         {
             this.createNextScreen = createNextScreen;
@@ -145,7 +152,7 @@ namespace osu.Game.Screens.Menu
                 {
                     // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
                     // this could happen if a user has nuked their files store. for now, reimport to repair this.
-                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
+                    var import = beatmaps.Import(new ImportTask(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
 
                     import?.PerformWrite(b => b.Protected = true);
 
@@ -207,16 +214,22 @@ namespace osu.Game.Screens.Menu
 
                 PrepareMenuLoad();
                 LoadMenu();
-                notifications.Post(new SimpleErrorNotification
+
+                if (!Debugger.IsAttached)
                 {
-                    Text = "osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
-                });
+                    notifications.Post(new SimpleErrorNotification
+                    {
+                        Text = "osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
+                    });
+                }
             }, 5000);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             this.FadeIn(300);
+
+            ApplyToBackground(b => b.FadeColour(Color4.Black, 100));
 
             var track = musicController.CurrentTrack;
 
@@ -256,19 +269,39 @@ namespace osu.Game.Screens.Menu
             base.OnResuming(e);
         }
 
+        private bool backgroundFaded;
+
+        protected void FadeInBackground(float duration = 0)
+        {
+            ApplyToBackground(b => b.FadeColour(Color4.White, duration));
+            backgroundFaded = true;
+        }
+
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             base.OnSuspending(e);
             initialBeatmap = null;
+
+            if (!backgroundFaded)
+                FadeInBackground(200);
         }
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
-
-        protected virtual void StartTrack()
+        protected void StartTrack()
         {
-            // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-            if (UsingThemedIntro)
-                Track.Start();
+            var drawableTrack = musicController.CurrentTrack;
+
+            if (!UsingThemedIntro)
+            {
+                initialBeatmap?.PrepareTrackForPreview(false);
+
+                drawableTrack.VolumeTo(0);
+                drawableTrack.Restart();
+                drawableTrack.VolumeTo(1, 2200, Easing.InCubic);
+            }
+            else
+            {
+                drawableTrack.Restart();
+            }
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

@@ -16,6 +16,31 @@ cd ../osu
 dotnet run --project osu.Desktop -c Release
 ```
 
+# 歌词插件的“用户定义”使用方法
+**目前尚未完全实现在线功能，所以您需要先创建一个本地文件来体验。**
+
+以你在设置中点“打开osu!文件夹”的地方为出发点，在`custom/lyrics`文件夹中创建`definition.json`文件。
+
+里面的内容格式应该像这样：
+```
+{
+  "LastUpdate": -1,
+  "Data":
+  [
+    {
+        "Target": <某首歌的网易云ID>,
+        "Beatmaps":[<图1的在线ID>, <图2的在线ID>]
+    },
+    {
+        "Target": <另外一首歌的网易云ID>,
+        "Beatmaps":[<图3的在线ID>, <图4的在线ID>]
+    }
+  ]
+}
+```
+
+**某张图的在线ID可以打开歌词界面查看顶上面的“ID:xxxxx”来获取**
+
 <p align="center">
   <img width="500" alt="osu! logo" src="assets/lazer.png">
 </p>

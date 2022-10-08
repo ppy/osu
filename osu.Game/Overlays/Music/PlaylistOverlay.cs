@@ -1,11 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -22,11 +25,7 @@ namespace osu.Game.Overlays.Music
     public class PlaylistOverlay : VisibilityContainer
     {
         private const float transition_duration = 600;
-        public float playlist_height = 510;
-
-        public IBindableList<Live<BeatmapSetInfo>> BeatmapSets => beatmapSets;
-        public bool TakeFocusOnPopIn = true;
-        public bool NoResizeOnPopIn;
+        public const float PLAYLIST_HEIGHT = 510;
 
         private readonly BindableList<Live<BeatmapSetInfo>> beatmapSets = new BindableList<Live<BeatmapSetInfo>>();
 
@@ -85,7 +84,7 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            filter.Search.OnCommit += (sender, newText) =>
+            filter.Search.OnCommit += (_, _) =>
             {
                 list.FirstVisibleSet?.PerformRead(set =>
                 {
@@ -104,9 +103,7 @@ namespace osu.Game.Overlays.Music
         {
             base.LoadComplete();
 
-            // tests might bind externally, in which case we don't want to involve realm.
-            if (beatmapSets.Count == 0)
-                beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
+            beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
 
             list.Items.BindTo(beatmapSets);
             beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
@@ -131,11 +128,10 @@ namespace osu.Game.Overlays.Music
 
         protected override void PopIn()
         {
-            filter.Search.HoldFocus = TakeFocusOnPopIn;
-            if ( TakeFocusOnPopIn )
-                Schedule(() => filter.Search.TakeFocus());
+            filter.Search.HoldFocus = true;
+            Schedule(() => filter.Search.TakeFocus());
 
-            this.ResizeTo(new Vector2(1, playlist_height), transition_duration, Easing.OutQuint);
+            this.ResizeTo(new Vector2(1, RelativeSizeAxes.HasFlagFast(Axes.Y) ? 1f : PLAYLIST_HEIGHT), transition_duration, Easing.OutQuint);
             this.FadeIn(transition_duration, Easing.OutQuint);
         }
 

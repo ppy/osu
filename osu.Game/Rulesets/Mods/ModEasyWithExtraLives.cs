@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
 
         private int retries;
 
-        private BindableNumber<double> health;
+        private readonly BindableNumber<double> health = new BindableDouble();
 
         public override void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
-            health = healthProcessor.Health.GetBoundCopy();
+            health.BindTo(healthProcessor.Health);
         }
     }
 }

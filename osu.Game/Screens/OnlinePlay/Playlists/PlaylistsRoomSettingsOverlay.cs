@@ -27,9 +27,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class PlaylistsRoomSettingsOverlay : RoomSettingsOverlay
     {
-        public Action EditPlaylist;
+        public Action? EditPlaylist;
 
-        private MatchSettings settings;
+        private MatchSettings settings = null!;
 
         protected override OsuButton SubmitButton => settings.ApplyButton;
 
@@ -53,28 +53,30 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             private const float disabled_alpha = 0.2f;
 
-            public Action EditPlaylist;
+            public Action? EditPlaylist;
 
-            public OsuTextBox NameField, MaxParticipantsField, MaxAttemptsField;
-            public OsuDropdown<TimeSpan> DurationField;
-            public RoomAvailabilityPicker AvailabilityPicker;
-            public TriangleButton ApplyButton;
+            public OsuTextBox NameField = null!, MaxParticipantsField = null!, MaxAttemptsField = null!;
+            public OsuDropdown<TimeSpan> DurationField = null!;
+            public RoomAvailabilityPicker AvailabilityPicker = null!;
+            public TriangleButton ApplyButton = null!;
 
             public bool IsLoading => loadingLayer.State.Value == Visibility.Visible;
 
-            public OsuSpriteText ErrorText;
+            public OsuSpriteText ErrorText = null!;
 
-            private LoadingLayer loadingLayer;
-            private DrawableRoomPlaylist playlist;
-            private OsuSpriteText playlistLength;
+            private LoadingLayer loadingLayer = null!;
+            private DrawableRoomPlaylist playlist = null!;
+            private OsuSpriteText playlistLength = null!;
 
-            private PurpleTriangleButton editPlaylistButton;
-
-            [Resolved(CanBeNull = true)]
-            private IRoomManager manager { get; set; }
+            private PurpleTriangleButton editPlaylistButton = null!;
 
             [Resolved]
-            private IAPIProvider api { get; set; }
+            private IRoomManager? manager { get; set; }
+
+            [Resolved]
+            private IAPIProvider api { get; set; } = null!;
+
+            private IBindable<APIUser> localUser = null!;
 
             private readonly Room room;
 
@@ -127,7 +129,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                     Padding = new MarginPadding { Right = FIELD_PADDING / 2 },
                                                     Children = new[]
                                                     {
-                                                        new Section("screen.multi.playlistSettings.roomName")
+                                                        new Section("房间名")
                                                         {
                                                             Child = NameField = new OsuTextBox
                                                             {
@@ -136,23 +138,28 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 LengthLimit = 100
                                                             },
                                                         },
-                                                        new Section("screen.multi.playlistSettings.duration")
+                                                        new Section("持续时间")
                                                         {
-                                                            Child = DurationField = new DurationDropdown
+                                                            Child = new Container
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
+                                                                Height = 40,
+                                                                Child = DurationField = new DurationDropdown
+                                                                {
+                                                                    RelativeSizeAxes = Axes.X
+                                                                }
                                                             }
                                                         },
-                                                        new Section("screen.multi.playlistSettings.allowedAttempts")
+                                                        new Section("全局最大尝试次数")
                                                         {
                                                             Child = MaxAttemptsField = new OsuNumberBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
-                                                                PlaceholderText = "generic.unlimited",
+                                                                PlaceholderText = "无限制",
                                                             },
                                                         },
-                                                        new Section("screen.multi.playlistSettings.visibility")
+                                                        new Section("房间可见性")
                                                         {
                                                             Alpha = disabled_alpha,
                                                             Child = AvailabilityPicker = new RoomAvailabilityPicker
@@ -160,7 +167,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 Enabled = { Value = false }
                                                             },
                                                         },
-                                                        new Section("screen.multi.playlistSettings.maxParticipants")
+                                                        new Section("最大人数")
                                                         {
                                                             Alpha = disabled_alpha,
                                                             Child = MaxParticipantsField = new OsuNumberBox
@@ -170,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 ReadOnly = true,
                                                             },
                                                         },
-                                                        new Section("screen.multi.playlistSettings.password")
+                                                        new Section("密码 （可选）")
                                                         {
                                                             Alpha = disabled_alpha,
                                                             Child = new OsuPasswordTextBox
@@ -189,7 +196,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                     Padding = new MarginPadding { Left = FIELD_PADDING / 2 },
                                                     Children = new[]
                                                     {
-                                                        new Section("screen.multi.generic.playlist")
+                                                        new Section("课题")
                                                         {
                                                             Child = new GridContainer
                                                             {
@@ -210,7 +217,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                         {
                                                                             Margin = new MarginPadding { Vertical = 5 },
                                                                             Colour = colours.Yellow,
-                                                                            Font = OsuFont.GetFont(size: 15),
+                                                                            Font = OsuFont.GetFont(size: 12),
                                                                         }
                                                                     },
                                                                     new Drawable[]
@@ -219,7 +226,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             Height = 40,
-                                                                            Text = "screen.multi.playlistSettings.playlist.edit",
+                                                                            Text = "编辑课题",
                                                                             Action = () => EditPlaylist?.Invoke()
                                                                         }
                                                                     }
@@ -297,7 +304,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
 
-                api.LocalUser.BindValueChanged(populateDurations, true);
+                localUser = api.LocalUser.GetBoundCopy();
+                localUser.BindValueChanged(populateDurations, true);
 
                 playlist.Items.BindTo(Playlist);
                 Playlist.BindCollectionChanged(onPlaylistChanged, true);
@@ -341,7 +349,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             public void SelectBeatmap() => editPlaylistButton.TriggerClick();
 
             private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) =>
-                playlistLength.Text = $"时长: {Playlist.GetTotalDuration()}";
+                playlistLength.Text = $"长度: {Playlist.GetTotalDuration()}";
 
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0;
 
@@ -378,11 +386,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             private void onError(string text)
             {
                 // see https://github.com/ppy/osu-web/blob/2c97aaeb64fb4ed97c747d8383a35b30f57428c7/app/Models/Multiplayer/PlaylistItem.php#L48.
-                const string not_found_prefix = "beatmaps not found:";
+                const string not_found_prefix = "谱面未找到:";
 
                 if (text.StartsWith(not_found_prefix, StringComparison.Ordinal))
                 {
-                    ErrorText.Text = "One or more beatmaps were not available online. Please remove or replace the highlighted items.";
+                    ErrorText.Text = "一个或多个谱面无法在线上找到，请移除或替换高亮的谱面。";
 
                     int[] invalidBeatmapIDs = text
                                               .Substring(not_found_prefix.Length + 1)
@@ -410,7 +418,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             public CreateRoomButton()
             {
-                Text = "generic.create";
+                Text = "创建";
             }
 
             [BackgroundDependencyLoader]

@@ -1,5 +1,6 @@
 ﻿using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Rendering;
 using osuTK;
 
 namespace Mvis.Plugin.Sandbox.Components.Visualizers
@@ -44,15 +45,15 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers
                 barY = getBarPositionY();
             }
 
-            protected override void DrawBar(int index, float data, float spacing, Vector2 inflation)
+            protected override void DrawBar(int index, float data, float spacing, Vector2 inflation, IRenderer renderer)
             {
                 var barPosition = new Vector2(index * spacing, barY);
                 var barSize = new Vector2((float)BarWidth, data);
 
-                DrawBar(barPosition, barSize);
+                DrawBar(barPosition, barSize, renderer);
             }
 
-            protected abstract void DrawBar(Vector2 barPosition, Vector2 barSize);
+            protected abstract void DrawBar(Vector2 barPosition, Vector2 barSize, IRenderer renderer);
 
             private float getBarPositionY()
             {

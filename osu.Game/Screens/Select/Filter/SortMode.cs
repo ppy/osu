@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.ComponentModel;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
@@ -18,8 +20,17 @@ namespace osu.Game.Screens.Select.Filter
         [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.ArtistTracksBpm))]
         BPM,
 
+        [Description("提交日期")]
+        DateSubmitted,
+
         [Description("添加日期")]
         DateAdded,
+
+        [Description("上架日期")]
+        DateRanked,
+
+        [Description("上次游玩")]
+        LastPlayed,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingDifficulty))]
         Difficulty,
@@ -31,7 +42,7 @@ namespace osu.Game.Screens.Select.Filter
         // [Description("Rank Achieved")]
         // RankAchieved,
 
-        [Description("Source")]
+        [Description("来源")]
         Source,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingTitle))]

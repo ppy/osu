@@ -14,8 +14,6 @@ namespace osu.Game.Screens.LLin.SideBar.PluginsPage
 {
     internal class PluginsSection : Section
     {
-        public override int Columns => 2;
-
         private LLinPluginManager manager;
         private FillFlowContainer placeholder;
 
@@ -25,13 +23,12 @@ namespace osu.Game.Screens.LLin.SideBar.PluginsPage
             Icon = FontAwesome.Solid.Boxes;
         }
 
-        protected override float PieceWidth => 300;
-
         [BackgroundDependencyLoader]
         private void load(LLinPluginManager pluginManager)
         {
             manager = pluginManager;
-            FillFlow.Width = 600;
+            FillFlow.RelativeSizeAxes = Axes.None;
+            FillFlow.AutoSizeAxes = Axes.Both;
             FillFlow.Direction = FillDirection.Vertical;
 
             AddInternal(placeholder = new FillFlowContainer

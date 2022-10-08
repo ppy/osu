@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -116,7 +118,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.Solid.SearchPlus,
-                                                Action = () => changeZoom(1)
+                                                Action = () => Timeline.AdjustZoomRelatively(1)
                                             },
                                             new TimelineButton
                                             {
@@ -125,7 +127,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.Solid.SearchMinus,
-                                                Action = () => changeZoom(-1)
+                                                Action = () => Timeline.AdjustZoomRelatively(-1)
                                             },
                                         }
                                     }
@@ -151,7 +153,5 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Timeline.ControlPointsVisible.BindTo(controlPointsCheckbox.Current);
             Timeline.TicksVisible.BindTo(ticksCheckbox.Current);
         }
-
-        private void changeZoom(float change) => Timeline.Zoom += change;
     }
 }

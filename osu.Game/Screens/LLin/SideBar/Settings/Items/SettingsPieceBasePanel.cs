@@ -1,6 +1,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -10,6 +11,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.LLin.SideBar.Tabs;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -28,7 +30,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             Size = new Vector2(25)
         };
 
-        public LocalisableString Description
+        public virtual LocalisableString Description
         {
             get => description;
             set
@@ -38,7 +40,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             }
         }
 
-        public IconUsage Icon
+        public virtual IconUsage Icon
         {
             get => icon;
             set
@@ -67,13 +69,20 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 
         private Sample sampleOnClick;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        [Resolved]
+        private Bindable<TabControlPosition> tabpos { get; set; }
+
+        public SettingsPieceBasePanel()
         {
             Masking = true;
             CornerRadius = 7.5f;
             AutoSizeAxes = Axes.Y;
             Width = 150;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
             InternalChildren = new Drawable[]
             {
                 BgBox = new Box
@@ -107,6 +116,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.White,
                     Alpha = 0,
+                    Depth = -1
                 },
                 new HoverSounds()
             };
@@ -116,6 +126,30 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             if (!haveIconSet) spriteIcon.Icon = DefaultIcon;
 
             sampleOnClick = audio.Samples.Get("UI/default-select");
+        }
+
+        protected override void LoadComplete()
+        {
+            tabpos.BindValueChanged(onTabPositionChanged, true);
+            base.LoadComplete();
+        }
+
+        private void onTabPositionChanged(ValueChangedEvent<TabControlPosition> v)
+        {
+            switch (v.NewValue)
+            {
+                case TabControlPosition.Left:
+                    Anchor = Origin = Anchor.TopLeft;
+                    break;
+
+                case TabControlPosition.Right:
+                    Anchor = Origin = Anchor.TopRight;
+                    break;
+
+                case TabControlPosition.Top:
+                    Anchor = Origin = Anchor.TopCentre;
+                    break;
+            }
         }
 
         protected virtual void OnColorChanged()

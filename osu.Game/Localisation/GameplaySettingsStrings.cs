@@ -80,6 +80,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"总是显示按键框");
 
         /// <summary>
+        /// "总是显示游戏排行榜"
+        /// </summary>
+        public static LocalisableString AlwaysShowGameplayLeaderboard => new TranslatableString(getKey(@"gameplay_leaderboard"), @"总是显示游戏排行榜");
+
+        /// <summary>
         /// "总是播放第一次断连的提示音"
         /// </summary>
         public static LocalisableString AlwaysPlayFirstComboBreak => new TranslatableString(getKey(@"always_play_first_combo_break"), @"总是播放第一次断连的提示音");
@@ -103,6 +108,31 @@ namespace osu.Game.Localisation
         /// "在隐藏 Mod 下显示第一个物件的缩圈"
         /// </summary>
         public static LocalisableString IncreaseFirstObjectVisibility => new TranslatableString(getKey(@"increase_first_object_visibility"), @"在隐藏 Mod 下显示第一个物件的缩圈");
+
+        /// <summary>
+        /// "Hide during gameplay"
+        /// </summary>
+        public static LocalisableString HideDuringGameplay => new TranslatableString(getKey(@"hide_during_gameplay"), @"Hide during gameplay");
+
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString AlwaysShowHUD => new TranslatableString(getKey(@"always_show_hud"), @"Always");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString NeverShowHUD => new TranslatableString(getKey(@"never_show_hud"), @"Never");
+
+        /// <summary>
+        /// "Standardised"
+        /// </summary>
+        public static LocalisableString StandardisedScoreDisplay => new TranslatableString(getKey(@"standardised_score_display"), @"Standardised");
+
+        /// <summary>
+        /// "Classic"
+        /// </summary>
+        public static LocalisableString ClassicScoreDisplay => new TranslatableString(getKey(@"classic_score_display"), @"Classic");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using JetBrains.Annotations;
 using Moq;
@@ -17,6 +19,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets;
+using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
@@ -59,8 +62,8 @@ namespace osu.Game.Tests.Visual.Menus
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Remove(nowPlayingOverlay);
-            Remove(volumeOverlay);
+            Remove(nowPlayingOverlay, false);
+            Remove(volumeOverlay, false);
 
             Children = new Drawable[]
             {
@@ -153,11 +156,23 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("hover toolbar music button", () => InputManager.MoveMouseTo(this.ChildrenOfType<ToolbarMusicButton>().Single()));
 
             AddStep("reset volume", () => Audio.Volume.Value = 1);
+            AddStep("hide volume overlay", () => volumeOverlay.Hide());
 
             AddRepeatStep("scroll down", () => InputManager.ScrollVerticalBy(-10), 5);
             AddAssert("volume lowered down", () => Audio.Volume.Value < 1);
             AddRepeatStep("scroll up", () => InputManager.ScrollVerticalBy(10), 5);
             AddAssert("volume raised up", () => Audio.Volume.Value == 1);
+
+            AddStep("move mouse away", () => InputManager.MoveMouseTo(Vector2.Zero));
+            AddAssert("button not hovered", () => !this.ChildrenOfType<ToolbarMusicButton>().Single().IsHovered);
+
+            AddStep("set volume to 0.5", () => Audio.Volume.Value = 0.5);
+            AddStep("hide volume overlay", () => volumeOverlay.Hide());
+
+            AddRepeatStep("scroll down", () => InputManager.ScrollVerticalBy(-10), 5);
+            AddAssert("volume not changed", () => Audio.Volume.Value == 0.5);
+            AddRepeatStep("scroll up", () => InputManager.ScrollVerticalBy(10), 5);
+            AddAssert("volume not changed", () => Audio.Volume.Value == 0.5);
         }
 
         [Test]
@@ -166,11 +181,24 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("hover toolbar music button", () => InputManager.MoveMouseTo(this.ChildrenOfType<ToolbarMusicButton>().Single()));
 
             AddStep("reset volume", () => Audio.Volume.Value = 1);
+            AddStep("hide volume overlay", () => volumeOverlay.Hide());
 
             AddRepeatStep("arrow down", () => InputManager.Key(Key.Down), 5);
             AddAssert("volume lowered down", () => Audio.Volume.Value < 1);
             AddRepeatStep("arrow up", () => InputManager.Key(Key.Up), 5);
             AddAssert("volume raised up", () => Audio.Volume.Value == 1);
+
+            AddStep("hide volume overlay", () => volumeOverlay.Hide());
+            AddStep("move mouse away", () => InputManager.MoveMouseTo(Vector2.Zero));
+            AddAssert("button not hovered", () => !this.ChildrenOfType<ToolbarMusicButton>().Single().IsHovered);
+
+            AddStep("set volume", () => Audio.Volume.Value = 0.5);
+            AddStep("hide volume overlay", () => volumeOverlay.Hide());
+
+            AddRepeatStep("arrow down", () => InputManager.Key(Key.Down), 5);
+            AddAssert("volume not changed", () => Audio.Volume.Value == 0.5);
+            AddRepeatStep("arrow up", () => InputManager.Key(Key.Up), 5);
+            AddAssert("volume not changed", () => Audio.Volume.Value == 0.5);
         }
 
         public class TestToolbar : Toolbar

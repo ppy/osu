@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -19,7 +21,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private TestRankingsOverlay rankingsOverlay;
 
-        private readonly Bindable<Country> countryBindable = new Bindable<Country>();
+        private readonly Bindable<CountryCode> countryBindable = new Bindable<CountryCode>();
         private readonly Bindable<RankingsScope> scope = new Bindable<RankingsScope>();
 
         [SetUp]
@@ -46,15 +48,15 @@ namespace osu.Game.Tests.Visual.Online
         public void TestFlagScopeDependency()
         {
             AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
-            AddAssert("Check country is Null", () => countryBindable.Value == null);
-            AddStep("Set country", () => countryBindable.Value = us_country);
+            AddAssert("Check country is default", () => countryBindable.IsDefault);
+            AddStep("Set country", () => countryBindable.Value = CountryCode.US);
             AddAssert("Check scope is Performance", () => scope.Value == RankingsScope.Performance);
         }
 
         [Test]
         public void TestShowCountry()
         {
-            AddStep("Show US", () => rankingsOverlay.ShowCountry(us_country));
+            AddStep("Show US", () => rankingsOverlay.ShowCountry(CountryCode.US));
         }
 
         private void loadRankingsOverlay()
@@ -67,15 +69,9 @@ namespace osu.Game.Tests.Visual.Online
             };
         }
 
-        private static readonly Country us_country = new Country
-        {
-            FlagName = "US",
-            FullName = "United States"
-        };
-
         private class TestRankingsOverlay : RankingsOverlay
         {
-            public new Bindable<Country> Country => base.Country;
+            public new Bindable<CountryCode> Country => base.Country;
         }
     }
 }

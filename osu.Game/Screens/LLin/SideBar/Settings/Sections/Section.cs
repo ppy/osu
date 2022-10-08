@@ -1,3 +1,4 @@
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,8 +14,6 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Sections
 {
     public abstract class Section : CompositeDrawable, ISidebarContent
     {
-        public virtual int Columns => 3;
-
         public string Title
         {
             get => title.Text.ToString();
@@ -28,11 +27,10 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Sections
             Font = OsuFont.GetFont(size: 30)
         };
 
-        protected virtual float PieceWidth => 150;
-
         protected Section()
         {
-            AutoSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
             Anchor = Origin = Anchor.TopRight;
             Padding = new MarginPadding(10);
 
@@ -42,44 +40,58 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Sections
                 FillFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
-                    Width = (PieceWidth * Columns) + (5 * (Columns - 1)),
+                    RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(5),
                     Margin = new MarginPadding { Top = 40 }
                 }
             };
         }
 
-        private Bindable<TabControlPosition> currentTabPosition;
+        [Cached]
+        private Bindable<TabControlPosition> currentTabPosition { get; set; } = new Bindable<TabControlPosition>();
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
         {
-            currentTabPosition = config.GetBindable<TabControlPosition>(MSetting.MvisTabControlPosition);
+            config.BindWith(MSetting.MvisTabControlPosition, currentTabPosition);
         }
 
         protected override void LoadComplete()
         {
-            currentTabPosition.BindValueChanged(onTabPositionChanged, true);
+            currentTabPosition.BindValueChanged(OnTabPositionChanged, true);
+
             base.LoadComplete();
         }
 
-        private void onTabPositionChanged(ValueChangedEvent<TabControlPosition> v)
+        protected void FadeoutThen(double fadeOutDuration, Action action)
+        {
+            this.FadeTo(0.01f, fadeOutDuration, Easing.OutQuint)
+                .Then()
+                .Schedule(action.Invoke)
+                .Then()
+                .FadeIn(200, Easing.OutQuint);
+        }
+
+        protected virtual void OnTabPositionChanged(ValueChangedEvent<TabControlPosition> v)
         {
             switch (v.NewValue)
             {
                 case TabControlPosition.Left:
                     title.Anchor = title.Origin = Anchor.TopLeft;
                     Anchor = Origin = Anchor.TopLeft;
+                    FillFlow.Anchor = FillFlow.Origin = Anchor.TopLeft;
                     break;
 
                 case TabControlPosition.Right:
                     title.Anchor = title.Origin = Anchor.TopRight;
                     Anchor = Origin = Anchor.TopRight;
+                    FillFlow.Anchor = FillFlow.Origin = Anchor.TopRight;
                     break;
 
                 case TabControlPosition.Top:
                     title.Anchor = title.Origin = Anchor.TopCentre;
                     Anchor = Origin = Anchor.TopCentre;
+                    FillFlow.Anchor = FillFlow.Origin = Anchor.TopCentre;
                     break;
             }
         }

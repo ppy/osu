@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -80,7 +82,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                     new MostPlayedBeatmapMetadataContainer(mostPlayed.BeatmapInfo),
                                                     new LinkFlowContainer(t =>
                                                     {
-                                                        t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular);
+                                                        t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
                                                         t.Colour = colourProvider.Foreground1;
                                                     })
                                                     {
@@ -88,7 +90,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                         Direction = FillDirection.Horizontal,
                                                     }.With(d =>
                                                     {
-                                                        d.AddText("谱师: ");
+                                                        d.AddText("mapped by ");
                                                         d.AddUserLink(mostPlayed.BeatmapSet.Author);
                                                     }),
                                                 }

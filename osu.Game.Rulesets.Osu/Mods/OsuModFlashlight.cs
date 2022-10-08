@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObject
     {
-        public override double ScoreMultiplier => 1.12;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModBlinds)).ToArray();
 
         private const double default_follow_delay = 120;
@@ -32,26 +32,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = default_follow_delay,
         };
 
-        [SettingSource("电筒大小", "更改手电筒光照的大小")]
-        public override BindableFloat SizeMultiplier { get; } = new BindableFloat
+        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
             MaxValue = 2f,
-            Default = 1f,
-            Value = 1f,
             Precision = 0.1f
         };
 
-        [SettingSource("缩小范围", "在到达一定连击后缩小电筒范围")]
-        public override BindableBool ComboBasedSize { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        public override float DefaultFlashlightSize => 180;
+        public override float DefaultFlashlightSize => 200;
 
-        private OsuFlashlight flashlight;
+        private OsuFlashlight flashlight = null!;
 
         protected override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(this);
 
@@ -71,6 +63,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 followDelay = modFlashlight.FollowDelay.Value;
 
                 FlashlightSize = new Vector2(0, GetSizeFor(0));
+                FlashlightSmoothness = 1.4f;
             }
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)

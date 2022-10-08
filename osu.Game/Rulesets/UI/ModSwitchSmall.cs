@@ -13,8 +13,6 @@ using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 
-#nullable enable
-
 namespace osu.Game.Rulesets.UI
 {
     public class ModSwitchSmall : CompositeDrawable

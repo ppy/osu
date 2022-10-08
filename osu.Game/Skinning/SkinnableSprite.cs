@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,7 +100,7 @@ namespace osu.Game.Skinning
                 {
                     foreach (var skin in skins)
                     {
-                        if (skin is LegacySkinTransformer transformer && isUserSkin(transformer.Skin))
+                        if (skin is ISkinTransformer transformer && isUserSkin(transformer.Skin))
                             return transformer.Skin;
 
                         if (isUserSkin(skin))
@@ -110,7 +112,8 @@ namespace osu.Game.Skinning
 
                 // Temporarily used to exclude undesirable ISkin implementations
                 static bool isUserSkin(ISkin skin)
-                    => skin.GetType() == typeof(DefaultSkin)
+                    => skin.GetType() == typeof(TrianglesSkin)
+                       || skin.GetType() == typeof(ArgonSkin)
                        || skin.GetType() == typeof(DefaultLegacySkin)
                        || skin.GetType() == typeof(LegacySkin);
             }

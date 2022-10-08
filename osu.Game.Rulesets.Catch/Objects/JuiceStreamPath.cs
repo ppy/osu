@@ -9,8 +9,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
-#nullable enable
-
 namespace osu.Game.Rulesets.Catch.Objects
 {
     /// <summary>

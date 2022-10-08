@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -230,7 +232,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void removeUser(APIUser user)
         {
-            avatarFlow.RemoveAll(a => a.User == user);
+            avatarFlow.RemoveAll(a => a.User == user, true);
         }
 
         private void clearUsers()
@@ -248,7 +250,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             hiddenUsers.Count = hiddenCount;
 
             if (displayedCircles > NumberOfCircles)
-                avatarFlow.Remove(avatarFlow.Last());
+                avatarFlow.Remove(avatarFlow.Last(), true);
             else if (displayedCircles < NumberOfCircles)
             {
                 var nextUser = RecentParticipants.FirstOrDefault(u => avatarFlow.All(a => a.User != u));
@@ -263,8 +265,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             if (host.NewValue != null)
             {
-                hostText.AddText("hosted by ");
+                hostText.AddText("由 ");
                 hostText.AddUserLink(host.NewValue);
+                hostText.AddText(" 发起");
             }
         }
 

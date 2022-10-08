@@ -7,10 +7,10 @@ namespace osu.Game.Screens.LLin.Misc
     {
         public Action OnComplete { get; set; }
 
-        protected override void Completed()
+        public override void Close(bool runFlingAnimation)
         {
             OnComplete?.Invoke();
-            base.Completed();
+            base.Close(runFlingAnimation);
         }
     }
 }

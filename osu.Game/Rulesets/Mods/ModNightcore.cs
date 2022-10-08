@@ -8,6 +8,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "夜核";
         public override string Acronym => "NC";
         public override IconUsage? Icon => OsuIcon.ModNightcore;
-        public override string Description => "动次打次动次打次";
+        public override LocalisableString Description => "动次打次动次打次";
         public override Type[] IncompatibleMods => new[] { typeof(ModBeatCore) };
     }
 
@@ -58,10 +59,10 @@ namespace osu.Game.Rulesets.Mods
 
     public class NightcoreBeatContainer : BeatSyncedContainer
     {
-        private PausableSkinnableSound hatSample;
-        private PausableSkinnableSound clapSample;
-        private PausableSkinnableSound kickSample;
-        private PausableSkinnableSound finishSample;
+        private PausableSkinnableSound? hatSample;
+        private PausableSkinnableSound? clapSample;
+        private PausableSkinnableSound? kickSample;
+        private PausableSkinnableSound? finishSample;
 
         private int? firstBeat;
 

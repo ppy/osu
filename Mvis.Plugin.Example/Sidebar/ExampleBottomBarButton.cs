@@ -10,11 +10,20 @@ namespace Mvis.Plugin.Example.Sidebar
     public class ExampleBottomBarButton : IPluginFunctionProvider
     {
         public Vector2 Size { get; set; }
-        public Action Action { get; set; }
+
+        public Func<bool> Action { get; set; }
+
         public IconUsage Icon { get; set; } = FontAwesome.Solid.Egg;
         public LocalisableString Title { get; set; }
         public LocalisableString Description { get; set; } = "hi";
         public FunctionType Type { get; set; }
+
+        bool IFunctionProvider.Active()
+        {
+            return true;
+        }
+
+        public Action<bool> OnActive { get; set; }
 
         public void Active()
         {

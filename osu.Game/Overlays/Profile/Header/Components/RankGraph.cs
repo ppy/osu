@@ -1,9 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -29,7 +32,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = UsersStrings.ShowExtraUnranked,
-                Font = OsuFont.GetFont(size: 17, weight: FontWeight.Regular)
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular)
             });
         }
 
@@ -68,7 +71,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             return new UserGraphTooltipContent(
                 UsersStrings.ShowRankGlobalSimple,
                 rank.ToLocalisableString("\\##,##0"),
-                days == 0 ? "现在" : $"{days}天之前");
+                days == 0 ? "now" : $"{"day".ToQuantity(days)} ago");
         }
     }
 }

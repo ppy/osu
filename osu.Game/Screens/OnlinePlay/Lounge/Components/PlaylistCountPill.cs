@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
@@ -42,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             base.LoadComplete();
 
             PlaylistItemStats.BindValueChanged(_ => updateCount());
-            Playlist.BindCollectionChanged((_, __) => updateCount(), true);
+            Playlist.BindCollectionChanged((_, _) => updateCount(), true);
         }
 
         private void updateCount()
@@ -56,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             count.Clear();
             count.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
             count.AddText(" ");
-            count.AddText("Beatmap".ToQuantity(activeItems, ShowQuantityAs.None));
+            count.AddText("张谱面");
         }
     }
 }

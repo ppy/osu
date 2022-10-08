@@ -1,7 +1,7 @@
 ﻿using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osuTK;
 
@@ -9,11 +9,7 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers.Circular
 {
     public class DotsMusicVisualizerDrawable : CircularMusicVisualizerDrawable
     {
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            Texture = textures.Get("Visualizer/particle");
-        }
+        protected override Texture GetTexture(IRenderer renderer, TextureStore textures) => textures.Get("Visualizer/particle");
 
         protected override CircularVisualizerDrawNode CreateCircularVisualizerDrawNode() => new DotsVisualizerDrawNode(this);
 
@@ -32,7 +28,7 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers.Circular
                 dotSize = new Vector2((float)BarWidth);
             }
 
-            protected override void DrawBar(int index, float data, float spacing, Vector2 inflation)
+            protected override void DrawBar(int index, float data, float spacing, Vector2 inflation, IRenderer renderer)
             {
                 float rotation = MathHelper.DegreesToRadians(index * spacing - 90);
                 float rotationCos = MathF.Cos(rotation);
@@ -47,13 +43,13 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers.Circular
                 var amplitudeOffset = new Vector2(rotationCos * dotSize.X, rotationSin * dotSize.Y);
 
                 var rectangle = new Quad(
-                        Vector2Extensions.Transform(dotPosition - bottomOffset, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(dotPosition - bottomOffset + amplitudeOffset, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(dotPosition + bottomOffset, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(dotPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
-                    );
+                    Vector2Extensions.Transform(dotPosition - bottomOffset, DrawInfo.Matrix),
+                    Vector2Extensions.Transform(dotPosition - bottomOffset + amplitudeOffset, DrawInfo.Matrix),
+                    Vector2Extensions.Transform(dotPosition + bottomOffset, DrawInfo.Matrix),
+                    Vector2Extensions.Transform(dotPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
+                );
 
-                DrawQuad(
+                renderer.DrawQuad(
                     Texture,
                     rectangle,
                     DrawColourInfo.Colour,

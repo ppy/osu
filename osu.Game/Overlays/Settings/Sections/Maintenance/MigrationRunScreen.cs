@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -13,6 +15,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osuTK;
@@ -69,14 +72,14 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "正在迁移数据",
+                            Text = MaintenanceSettingsStrings.MigrationInProgress,
                             Font = OsuFont.Default.With(size: 40)
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "这可能要花费几分钟, 具体时间视情况而定",
+                            Text = MaintenanceSettingsStrings.MigrationDescription,
                             Font = OsuFont.Default.With(size: 30)
                         },
                         new LoadingSpinner(true)
@@ -87,7 +90,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "在此期间请不要进行任何操作!",
+                            Text = MaintenanceSettingsStrings.ProhibitedInteractDuringMigration,
                             Font = OsuFont.Default.With(size: 30)
                         },
                     }
@@ -109,7 +112,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     {
                                         notifications.Post(new SimpleNotification
                                         {
-                                            Text = "Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up.",
+                                            Text = MaintenanceSettingsStrings.FailedCleanupNotification,
                                             Activated = () =>
                                             {
                                                 originalStorage.PresentExternally();

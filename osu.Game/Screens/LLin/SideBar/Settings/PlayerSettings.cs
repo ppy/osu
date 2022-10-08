@@ -17,7 +17,8 @@ namespace osu.Game.Screens.LLin.SideBar.Settings
     {
         private readonly FillFlowContainer<Section> fillFlow = new FillFlowContainer<Section>
         {
-            AutoSizeAxes = Axes.Both,
+            AutoSizeAxes = Axes.Y,
+            RelativeSizeAxes = Axes.X,
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
             Spacing = new Vector2(5),
@@ -44,7 +45,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings
 
                 if (pluginSidebarSection != null)
                     AddSection(pluginSidebarSection);
-                else if (pl.GetSettingEntries()?.Length > 0)
+                else if (pluginManager.GetSettingsFor(pl)?.Length > 0)
                     AddSection(new NewPluginSettingsSection(pl));
             }
 

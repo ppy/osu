@@ -1,8 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Markdig;
-using Markdig.Extensions.AutoIdentifiers;
+using Markdig.Extensions.AutoLinks;
+using Markdig.Extensions.EmphasisExtras;
+using Markdig.Extensions.Footnotes;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
@@ -16,6 +20,18 @@ namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownContainer : MarkdownContainer
     {
+        /// <summary>
+        /// Allows this markdown container to parse and link footnotes.
+        /// </summary>
+        /// <seealso cref="FootnoteExtension"/>
+        protected virtual bool Footnotes => false;
+
+        /// <summary>
+        /// Allows this markdown container to make URL text clickable.
+        /// </summary>
+        /// <seealso cref="AutoLinkExtension"/>
+        protected virtual bool Autolinks => false;
+
         public OsuMarkdownContainer()
         {
             LineSpacing = 21;
@@ -25,7 +41,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         {
             switch (markdownObject)
             {
-                case YamlFrontMatterBlock _:
+                case YamlFrontMatterBlock:
                     // Don't parse YAML Frontmatter
                     break;
 
@@ -76,10 +92,22 @@ namespace osu.Game.Graphics.Containers.Markdown
             return new OsuMarkdownUnorderedListItem(level);
         }
 
+        // reference: https://github.com/ppy/osu-web/blob/05488a96b25b5a09f2d97c54c06dd2bae59d1dc8/app/Libraries/Markdown/OsuMarkdown.php#L301
         protected override MarkdownPipeline CreateBuilder()
-            => new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
-                                            .UseEmojiAndSmiley()
-                                            .UseYamlFrontMatter()
-                                            .UseAdvancedExtensions().Build();
+        {
+            var pipeline = new MarkdownPipelineBuilder()
+                           .UseAutoIdentifiers()
+                           .UsePipeTables()
+                           .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
+                           .UseYamlFrontMatter();
+
+            if (Footnotes)
+                pipeline = pipeline.UseFootnotes();
+
+            if (Autolinks)
+                pipeline = pipeline.UseAutoLinks();
+
+            return pipeline.Build();
+        }
     }
 }

@@ -4,6 +4,7 @@
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "日核";
         public override string Acronym => "DC";
         public override IconUsage? Icon => null;
-        public override string Description => "哇~~~~~~~~~~哦~~~~~~~~~~";
+        public override LocalisableString Description => "哇~~~~~~~~~~哦~~~~~~~~~~";
 
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
