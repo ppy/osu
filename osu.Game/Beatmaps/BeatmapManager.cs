@@ -312,7 +312,7 @@ namespace osu.Game.Beatmaps
                 if (existingFileInfo != null)
                     DeleteFile(setInfo, existingFileInfo);
 
-                string? oldMd5Hash = beatmapInfo.MD5Hash;
+                string oldMd5Hash = beatmapInfo.MD5Hash;
 
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
