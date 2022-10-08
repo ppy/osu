@@ -653,7 +653,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <remarks>
         /// This does not affect the time offset provided to invocations of <see cref="CheckForResult"/>.
         /// </remarks>
-        protected virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
+        public virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
 
         /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as

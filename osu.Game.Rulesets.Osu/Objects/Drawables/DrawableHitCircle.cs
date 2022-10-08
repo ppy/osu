@@ -204,12 +204,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // todo: temporary / arbitrary, used for lifetime optimisation.
             this.Delay(800).FadeOut();
 
-            // in the case of an early state change, the fade should be expedited to the current point in time.
-            if (HitStateUpdateTime < HitObject.StartTime)
-                ApproachCircle.FadeOut(50);
-
             switch (state)
             {
+                default:
+                    ApproachCircle.FadeOut();
+                    break;
+
                 case ArmedState.Idle:
                     HitArea.HitAction = null;
                     break;

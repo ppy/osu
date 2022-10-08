@@ -90,6 +90,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Collections => new TranslatableString(getKey(@"llin_collections"), @"收藏夹");
 
         /// <summary>
+        /// "Mod presets"
+        /// </summary>
+        public static LocalisableString ModPresets => new TranslatableString(getKey(@"mod_presets"), @"Mod presets");
+
+        /// <summary>
         /// "Name"
         /// </summary>
         public static LocalisableString Name => new TranslatableString(getKey(@"name"), @"Name");

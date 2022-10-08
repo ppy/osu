@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
         protected ManiaSelectionBlueprintTestScene(int columns)
         {
-            var stageDefinitions = new List<StageDefinition> { new StageDefinition { Columns = columns } };
+            var stageDefinitions = new List<StageDefinition> { new StageDefinition(columns) };
             base.Content.Child = scrollingTestContainer = new ScrollingTestContainer(ScrollingDirection.Up)
             {
                 RelativeSizeAxes = Axes.Both,

@@ -18,12 +18,10 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "加速>>>>>>>>>>";
 
         [SettingSource("速度调整", "要应用的速度")]
-        public override BindableNumber<double> SpeedChange { get; } = new BindableDouble
+        public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(1.5)
         {
             MinValue = 1.01,
             MaxValue = 2,
-            Default = 1.5,
-            Value = 1.5,
             Precision = 0.01,
         };
     }

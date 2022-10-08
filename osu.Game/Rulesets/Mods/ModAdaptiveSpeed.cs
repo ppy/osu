@@ -36,32 +36,24 @@ namespace osu.Game.Rulesets.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp), typeof(ModAutoplay) };
 
         [SettingSource("初始速度", "歌曲的初始速度")]
-        public BindableNumber<double> InitialRate { get; } = new BindableDouble
+        public BindableNumber<double> InitialRate { get; } = new BindableDouble(1)
         {
             MinValue = 0.5,
             MaxValue = 2,
-            Default = 1,
-            Value = 1,
             Precision = 0.01
         };
 
         [SettingSource("启用变调", "是否跟随速度调整音调")]
-        public BindableBool AdjustPitch { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public BindableBool AdjustPitch { get; } = new BindableBool(true);
 
         /// <summary>
         /// The instantaneous rate of the track.
         /// Every frame this mod will attempt to smoothly adjust this to meet <see cref="targetRate"/>.
         /// </summary>
-        public BindableNumber<double> SpeedChange { get; } = new BindableDouble
+        public BindableNumber<double> SpeedChange { get; } = new BindableDouble(1)
         {
             MinValue = min_allowable_rate,
             MaxValue = max_allowable_rate,
-            Default = 1,
-            Value = 1
         };
 
         // The two constants below denote the maximum allowable range of rates that `SpeedChange` can take.

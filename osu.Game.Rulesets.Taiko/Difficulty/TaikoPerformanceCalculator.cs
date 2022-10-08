@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
+        private double accuracy;
 
         private double effectiveMissCount;
 
@@ -36,6 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+            accuracy = customAccuracy;
 
             // The effectiveMissCount is calculated by gaining a ratio for totalSuccessfulHits and increasing the miss penalty for shorter object counts lower than 1000.
             if (totalSuccessfulHits > 0)
@@ -87,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= 1.050 * lengthBonus;
 
-            return difficultyValue * Math.Pow(score.Accuracy, 2.0);
+            return difficultyValue * Math.Pow(accuracy, 2.0);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
@@ -95,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (attributes.GreatHitWindow <= 0)
                 return 0;
 
-            double accuracyValue = Math.Pow(60.0 / attributes.GreatHitWindow, 1.1) * Math.Pow(score.Accuracy, 8.0) * Math.Pow(attributes.StarRating, 0.4) * 27.0;
+            double accuracyValue = Math.Pow(60.0 / attributes.GreatHitWindow, 1.1) * Math.Pow(accuracy, 8.0) * Math.Pow(attributes.StarRating, 0.4) * 27.0;
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
             accuracyValue *= lengthBonus;
@@ -110,5 +112,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int totalHits => countGreat + countOk + countMeh + countMiss;
 
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
+
+        private double customAccuracy => totalHits > 0 ? (countGreat * 300 + countOk * 150) / (totalHits * 300.0) : 0;
     }
 }

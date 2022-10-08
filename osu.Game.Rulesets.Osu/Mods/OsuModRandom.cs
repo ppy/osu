@@ -29,10 +29,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModTarget)).ToArray();
 
         [SettingSource("Angle sharpness", "How sharp angles should be", SettingControlType = typeof(SettingsSlider<float>))]
-        public BindableFloat AngleSharpness { get; } = new BindableFloat
+        public BindableFloat AngleSharpness { get; } = new BindableFloat(7)
         {
-            Default = 7,
-            Value = 7,
             MinValue = 1,
             MaxValue = 10,
             Precision = 0.1f

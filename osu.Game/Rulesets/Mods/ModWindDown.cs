@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -17,32 +16,21 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "越~来~~越~~~慢~~~~";
         public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleDown;
 
-        [SettingSource("初始速度", "歌曲的起始速度")]
-        public override BindableNumber<double> InitialRate { get; } = new BindableDouble
+        public override BindableNumber<double> InitialRate { get; } = new BindableDouble(1)
         {
             MinValue = 0.51,
             MaxValue = 2,
-            Default = 1,
-            Value = 1,
             Precision = 0.01,
         };
 
-        [SettingSource("最终速度", "歌曲的最终速度")]
-        public override BindableNumber<double> FinalRate { get; } = new BindableDouble
+        public override BindableNumber<double> FinalRate { get; } = new BindableDouble(0.75)
         {
             MinValue = 0.5,
             MaxValue = 1.99,
-            Default = 0.75,
-            Value = 0.75,
             Precision = 0.01,
         };
 
-        [SettingSource("启用变调", "是否要更随速度调整音调")]
-        public override BindableBool AdjustPitch { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public override BindableBool AdjustPitch { get; } = new BindableBool(true);
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModWindUp)).ToArray();
 

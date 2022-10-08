@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
@@ -36,7 +37,9 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            KeyBindingInputManager.Add(new CatchTouchInputMapper());
+            // With relax mod, input maps directly to x position and left/right buttons are not used.
+            if (!Mods.Any(m => m is ModRelax))
+                KeyBindingInputManager.Add(new CatchTouchInputMapper());
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);

@@ -68,6 +68,8 @@ namespace osu.Game.Overlays.Notifications
 
         public virtual bool Read { get; set; }
 
+        protected virtual bool AllowFlingDismiss => true;
+
         public new bool IsDragged => dragContainer.IsDragged;
 
         protected virtual IconUsage CloseButtonIcon => FontAwesome.Solid.Check;
@@ -315,7 +317,7 @@ namespace osu.Game.Overlays.Notifications
 
             protected override void OnDragEnd(DragEndEvent e)
             {
-                if (Rotation < -10 || velocity.X < -0.3f)
+                if (notification.AllowFlingDismiss && (Rotation < -10 || velocity.X < -0.3f))
                     notification.Close(true);
                 else if (X > 30 || velocity.X > 0.3f)
                     notification.ForwardToOverlay?.Invoke();

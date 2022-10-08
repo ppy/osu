@@ -138,7 +138,8 @@ namespace osu.Game.Screens.Select
                 return false;
             }
 
-            TriggerClick();
+            if (!e.Repeat)
+                TriggerClick();
             return true;
         }
 

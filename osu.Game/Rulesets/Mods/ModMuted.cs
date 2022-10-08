@@ -36,34 +36,20 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<int> currentCombo = new BindableInt();
 
         [SettingSource("启用节拍器", "添加节拍器来帮助你跟住歌曲的节奏。")]
-        public BindableBool EnableMetronome { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public BindableBool EnableMetronome { get; } = new BindableBool(true);
 
         [SettingSource("抵达最大音量的连击", "抵达最大音量时的连击数", SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
-        public BindableInt MuteComboCount { get; } = new BindableInt
+        public BindableInt MuteComboCount { get; } = new BindableInt(100)
         {
-            Default = 100,
-            Value = 100,
             MinValue = 0,
             MaxValue = 500,
         };
 
         [SettingSource("以静音开始", "随连击增加音量")]
-        public BindableBool InverseMuting { get; } = new BindableBool
-        {
-            Default = false,
-            Value = false
-        };
+        public BindableBool InverseMuting { get; } = new BindableBool();
 
         [SettingSource("静音音效", "音效也会跟着音频静音。")]
-        public BindableBool AffectsHitSounds { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public BindableBool AffectsHitSounds { get; } = new BindableBool(true);
 
         protected ModMuted()
         {

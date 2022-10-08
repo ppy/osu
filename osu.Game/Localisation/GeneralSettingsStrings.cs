@@ -64,6 +64,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString RunSetupWizard => new TranslatableString(getKey(@"llin_run_setup_wizard"), @"打开设置向导");
 
+        /// <summary>
+        /// "You are running the latest release ({0})"
+        /// </summary>
+        public static LocalisableString RunningLatestRelease(string version) => new TranslatableString(getKey(@"running_latest_release"), @"You are running the latest release ({0})", version);
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

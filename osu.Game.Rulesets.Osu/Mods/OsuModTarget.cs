@@ -53,11 +53,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         }).ToArray();
 
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SettingsNumberBox))]
-        public Bindable<int?> Seed { get; } = new Bindable<int?>
-        {
-            Default = null,
-            Value = null
-        };
+        public Bindable<int?> Seed { get; } = new Bindable<int?>();
 
         [SettingSource("Metronome ticks", "Whether a metronome beat should play in the background")]
         public Bindable<bool> Metronome { get; } = new BindableBool(true);

@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             beatmapSubscription?.Dispose();
         }
 
-        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error)
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error) => Schedule(() =>
         {
             currentlyLoadedBeatmaps.Text = FirstRunSetupBeatmapScreenStrings.CurrentlyLoadedBeatmaps(sender.Count);
 
@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 currentlyLoadedBeatmaps.ScaleTo(1.1f)
                                        .ScaleTo(1, 1500, Easing.OutQuint);
             }
-        }
+        });
 
         private void downloadTutorial()
         {
