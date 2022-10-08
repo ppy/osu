@@ -352,9 +352,9 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
-        /**
-         * Invokes comment deletion with confirmation.
-         */
+        /// <summary>
+        /// Invokes comment deletion with confirmation.
+        /// </summary>
         private void deleteComment()
         {
             if (dialogOverlay == null)
@@ -363,27 +363,27 @@ namespace osu.Game.Overlays.Comments
                 dialogOverlay.Push(new ConfirmDialog("Do you really want to delete your comment?", deleteCommentRequest));
         }
 
-        /**
-         * Invokes comment deletion directly.
-         */
+        /// <summary>
+        /// Invokes comment deletion directly.
+        /// </summary>
         private void deleteCommentRequest()
         {
             actionsContainer.Hide();
             actionsLoading.Show();
             var request = new CommentDeleteRequest(Comment.Id);
-            request.Success += _ =>
+            request.Success += _ => Schedule(() =>
             {
                 actionsLoading.Hide();
                 AutoSizeAxes = Axes.None;
                 Masking = true;
                 this.ResizeHeightTo(0, 1000, Easing.Out);
                 this.FadeOut(1000, Easing.Out).Expire();
-            };
-            request.Failure += _ =>
+            });
+            request.Failure += _ => Schedule(() =>
             {
                 actionsLoading.Hide();
                 actionsContainer.Show();
-            };
+            });
             api.Queue(request);
         }
 
