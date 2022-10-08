@@ -24,7 +24,6 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-
         private TestCommentsContainer comments;
 
         [SetUp]
