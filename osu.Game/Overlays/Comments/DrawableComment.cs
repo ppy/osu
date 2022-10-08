@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -35,7 +33,7 @@ namespace osu.Game.Overlays.Comments
     {
         private const int avatar_size = 40;
 
-        public Action<DrawableComment, int> RepliesRequested;
+        public Action<DrawableComment, int> RepliesRequested = null!;
 
         public readonly Comment Comment;
 
@@ -49,21 +47,21 @@ namespace osu.Game.Overlays.Comments
 
         private int currentPage;
 
-        private FillFlowContainer childCommentsVisibilityContainer;
-        private FillFlowContainer childCommentsContainer;
-        private LoadRepliesButton loadRepliesButton;
-        private ShowMoreRepliesButton showMoreButton;
-        private ShowRepliesButton showRepliesButton;
-        private ChevronButton chevronButton;
-        private LinkFlowContainer actionsContainer;
-        private LoadingSpinner actionsLoading;
-        private DeletedCommentsCounter deletedCommentsCounter;
+        private FillFlowContainer childCommentsVisibilityContainer = null!;
+        private FillFlowContainer childCommentsContainer = null!;
+        private LoadRepliesButton loadRepliesButton = null!;
+        private ShowMoreRepliesButton showMoreButton = null!;
+        private ShowRepliesButton showRepliesButton = null!;
+        private ChevronButton chevronButton = null!;
+        private LinkFlowContainer actionsContainer = null!;
+        private LoadingSpinner actionsLoading = null!;
+        private DeletedCommentsCounter deletedCommentsCounter = null!;
+
+        [Resolved(canBeNull: true)]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
-        private IDialogOverlay dialogOverlay { get; set; }
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         public DrawableComment(Comment comment)
         {
@@ -278,7 +276,7 @@ namespace osu.Game.Overlays.Comments
             if (Comment.UserId.HasValue)
                 username.AddUserLink(Comment.User);
             else
-                username.AddText(Comment.LegacyName);
+                username.AddText(Comment.LegacyName!);
 
             if (Comment.EditedAt.HasValue && Comment.EditedUser != null)
             {
@@ -354,28 +352,39 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
+        /**
+         * Invokes comment deletion with confirmation.
+         */
         private void deleteComment()
         {
-            dialogOverlay.Push(new ConfirmDialog("Do you really want to delete your comment?", () =>
+            if (dialogOverlay == null)
+                deleteCommentRequest();
+            else
+                dialogOverlay.Push(new ConfirmDialog("Do you really want to delete your comment?", deleteCommentRequest));
+        }
+
+        /**
+         * Invokes comment deletion directly.
+         */
+        private void deleteCommentRequest()
+        {
+            actionsContainer.Hide();
+            actionsLoading.Show();
+            var request = new CommentDeleteRequest(Comment.Id);
+            request.Success += _ =>
             {
-                actionsContainer.Hide();
-                actionsLoading.Show();
-                var request = new CommentDeleteRequest(Comment.Id);
-                request.Success += _ =>
-                {
-                    actionsLoading.Hide();
-                    AutoSizeAxes = Axes.None;
-                    Masking = true;
-                    this.ResizeHeightTo(0, 1000, Easing.Out);
-                    this.FadeOut(1000, Easing.Out).Expire();
-                };
-                request.Failure += _ =>
-                {
-                    actionsLoading.Hide();
-                    actionsContainer.Show();
-                };
-                api.Queue(request);
-            }));
+                actionsLoading.Hide();
+                AutoSizeAxes = Axes.None;
+                Masking = true;
+                this.ResizeHeightTo(0, 1000, Easing.Out);
+                this.FadeOut(1000, Easing.Out).Expire();
+            };
+            request.Failure += _ =>
+            {
+                actionsLoading.Hide();
+                actionsContainer.Show();
+            };
+            api.Queue(request);
         }
 
         protected override void LoadComplete()
@@ -486,7 +495,7 @@ namespace osu.Game.Overlays.Comments
         {
             public LocalisableString TooltipText => getParentMessage();
 
-            private readonly Comment parentComment;
+            private readonly Comment? parentComment;
 
             public ParentUsername(Comment comment)
             {
@@ -506,7 +515,7 @@ namespace osu.Game.Overlays.Comments
                     new OsuSpriteText
                     {
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                        Text = parentComment?.User?.Username ?? parentComment?.LegacyName
+                        Text = parentComment?.User?.Username ?? parentComment?.LegacyName!
                     }
                 };
             }
