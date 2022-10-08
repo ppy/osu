@@ -261,7 +261,7 @@ namespace osu.Game.Screens.Utility
 
             string exclusive = "unknown";
 
-            if (host.Renderer is IWindowsRenderer windowsRenderer)
+            if (host.Window is WindowsWindow windowsRenderer)
                 exclusive = windowsRenderer.FullscreenCapability.ToString();
 
             statusText.Clear();

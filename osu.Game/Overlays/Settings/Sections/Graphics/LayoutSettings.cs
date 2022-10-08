@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 windowModes.BindTo(host.Window.SupportedWindowModes);
             }
 
-            if (host.Renderer is IWindowsRenderer windowsRenderer)
+            if (host.Window is WindowsWindow windowsRenderer)
                 fullscreenCapability.BindTo(windowsRenderer.FullscreenCapability);
 
             Children = new Drawable[]
