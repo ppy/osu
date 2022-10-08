@@ -31,13 +31,11 @@ namespace osu.Game.Tests.Visual.Online
 
         [SetUp]
         public void SetUp() => Schedule(() =>
-        {
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = commentsContainer = new CommentsContainer()
-            };
-        });
+            });
 
         [Test]
         public void TestIdleState()
@@ -141,7 +139,7 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-        private static CommentBundle getExampleComments(bool withPinned = false)
+        private CommentBundle getExampleComments(bool withPinned = false)
         {
             var bundle = new CommentBundle
             {
