@@ -230,9 +230,9 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            protected override void ReloadMappings()
+            protected override void ReloadMappings(IQueryable<RealmKeyBinding> realmKeyBindings)
             {
-                base.ReloadMappings();
+                base.ReloadMappings(realmKeyBindings);
 
                 KeyBindings = KeyBindings.Where(b => RealmKeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
             }
