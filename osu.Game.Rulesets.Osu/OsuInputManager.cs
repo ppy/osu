@@ -3,8 +3,10 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -60,16 +62,13 @@ namespace osu.Game.Rulesets.Osu
         {
             public bool AllowUserPresses = true;
 
+            private static readonly OsuAction[] all_actions = (OsuAction[])Enum.GetValues(typeof(OsuAction));
+
+            protected override IEnumerable<OsuAction> BlockedActions => !AllowUserPresses ? all_actions.Where(a => a != OsuAction.Smoke) : Enumerable.Empty<OsuAction>();
+
             public OsuKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
             {
-            }
-
-            protected override bool Handle(UIEvent e)
-            {
-                if (!AllowUserPresses) return false;
-
-                return base.Handle(e);
             }
         }
     }
