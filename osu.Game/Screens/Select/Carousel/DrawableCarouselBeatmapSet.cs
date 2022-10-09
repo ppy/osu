@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Select.Carousel
         public const float HEIGHT = MAX_HEIGHT;
 
         private Action<BeatmapSetInfo> restoreHiddenRequested;
+        private Action<BeatmapSetInfo> hideAllRequested;
         private Action<int> viewDetails;
 
         [Resolved(CanBeNull = true)]
@@ -68,6 +69,14 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 foreach (var b in s.Beatmaps)
                     manager.Restore(b);
+            };
+
+            hideAllRequested = s =>
+            {
+                foreach (var b in s.Beatmaps)
+                {
+                    manager.Hide(b);
+                }
             };
 
             if (beatmapOverlay != null)
@@ -232,6 +241,8 @@ namespace osu.Game.Screens.Select.Carousel
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested(beatmapSet)));
+
+                items.Add(new OsuMenuItem("Hide...", MenuItemType.Destructive, () => hideAllRequested(beatmapSet)));
 
                 if (dialogOverlay != null)
                     items.Add(new OsuMenuItem("Delete...", MenuItemType.Destructive, () => dialogOverlay.Push(new BeatmapDeleteDialog(beatmapSet))));
