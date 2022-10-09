@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -11,6 +10,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu
@@ -60,15 +60,29 @@ namespace osu.Game.Rulesets.Osu
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
         {
-            public bool AllowUserPresses = true;
+            private bool allowUserPresses = true;
 
-            private static readonly OsuAction[] all_actions = (OsuAction[])Enum.GetValues(typeof(OsuAction));
-
-            protected override IEnumerable<OsuAction> BlockedActions => !AllowUserPresses ? all_actions.Where(a => a != OsuAction.Smoke) : Enumerable.Empty<OsuAction>();
+            public bool AllowUserPresses
+            {
+                get => allowUserPresses;
+                set
+                {
+                    allowUserPresses = value;
+                    ReloadMappings();
+                }
+            }
 
             public OsuKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
             {
+            }
+
+            protected override void ReloadMappings(IQueryable<RealmKeyBinding> realmKeyBindings)
+            {
+                base.ReloadMappings(realmKeyBindings);
+
+                if (!AllowUserPresses)
+                    KeyBindings = KeyBindings.Where(b => b.GetAction<OsuAction>() == OsuAction.Smoke).ToList();
             }
         }
     }
