@@ -178,7 +178,7 @@ namespace osu.Game.Beatmaps.Formats
                 : this()
             {
                 // Note: In stable, the division occurs on floats, but with compiler optimisations turned on actually seems to occur on doubles via some .NET black magic (possibly inlining?).
-                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 1000) / 100.0 : 1;
+                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
                 GenerateTicks = !double.IsNaN(beatLength);
             }
 
