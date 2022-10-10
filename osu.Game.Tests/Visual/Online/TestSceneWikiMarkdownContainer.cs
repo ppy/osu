@@ -195,7 +195,7 @@ Line after image";
             AddStep("Add flag", () =>
             {
                 markdownContainer.CurrentPath = @"https://dev.ppy.sh";
-                markdownContainer.Text = "::{flag=\"AU\"}::";
+                markdownContainer.Text = "::{flag=\"AU\"}:: ::{flag=\"ZZ\"}::";
             });
         }
 
