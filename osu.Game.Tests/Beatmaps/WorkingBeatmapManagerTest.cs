@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Beatmaps
 
             Assert.That(preserveCollection.BeatmapMD5Hashes, Does.Contain(initialHash));
             Assert.That(noNewCollection.BeatmapMD5Hashes, Does.Not.Contain(initialHash));
-            
+
             beatmaps.Save(map.BeatmapInfo, map.GetPlayableBeatmap(new OsuRuleset().RulesetInfo));
 
             string finalHash = map.BeatmapInfo.MD5Hash;
