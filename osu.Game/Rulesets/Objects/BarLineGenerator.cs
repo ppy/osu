@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Objects
             for (int i = 0; i < timingPoints.Count; i++)
             {
                 TimingControlPoint currentTimingPoint = timingPoints[i];
-                EffectControlPoint? currentEffectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTimingPoint.Time);
+                EffectControlPoint currentEffectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTimingPoint.Time);
                 int currentBeat = 0;
 
                 // Stop on the next timing point, or if there is no next timing point stop slightly past the last object
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Objects
                 double startTime = currentTimingPoint.Time;
                 double barLength = currentTimingPoint.BeatLength * currentTimingPoint.TimeSignature.Numerator;
 
-                if (currentEffectPoint != null && currentEffectPoint.OmitFirstBarLine)
+                if (currentEffectPoint.OmitFirstBarLine)
                 {
                     startTime += barLength;
                 }
