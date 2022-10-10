@@ -75,8 +75,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// </summary>
         private double customAccuracy()
         {
-            if (totalHits==0)
-            return 0;
+            if (totalHits == 0)
+                return 0;
 
             return (countPerfect * 320 + countGreat * 300 + countGood * 200 + countOk * 100 + countMeh * 50) / (totalHits * 320);
         } 
