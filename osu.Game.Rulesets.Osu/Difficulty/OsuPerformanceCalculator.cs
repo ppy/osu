@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
+        private int countSmallTickMiss;
 
         private double effectiveMissCount;
 
@@ -41,6 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+            countSmallTickMiss = score.Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
             effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
@@ -125,7 +127,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (attributes.SliderCount > 0)
             {
                 double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
-                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
+                double sliderEndsDropped = countSmallTickMiss > 0 ? Math.Min(countSmallTickMiss, estimateDifficultSliders) : estimateSliderEndsDropped;
+                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - sliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
                 aimValue *= sliderNerfFactor;
             }
 
