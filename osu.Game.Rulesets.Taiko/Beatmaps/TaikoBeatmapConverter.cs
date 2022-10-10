@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 #pragma warning disable 618
             if (difficultyPoint is LegacyBeatmapDecoder.LegacyDifficultyControlPoint legacyDifficultyPoint)
 #pragma warning restore 618
-                beatLength = timingPoint.BeatLength * legacyDifficultyPoint.BpmMultiplier;
+                beatLength = timingPoint.BeatLength * Math.Min(legacyDifficultyPoint.BpmMultiplier, 10);
             else
                 beatLength = timingPoint.BeatLength / difficultyPoint.SliderVelocity;
 
