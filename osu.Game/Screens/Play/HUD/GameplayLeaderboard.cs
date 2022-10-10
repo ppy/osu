@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Play.HUD
             float fadeBottom = scroll.Current + scroll.DrawHeight;
             float fadeTop = scroll.Current + panel_height;
 
-            if (scroll.Current <= 0) fadeTop -= panel_height;
+            if (scroll.IsScrolledToStart()) fadeTop -= panel_height;
             if (!scroll.IsScrolledToEnd()) fadeBottom -= panel_height;
 
             // logic is mostly shared with Leaderboard, copied here for simplicity.

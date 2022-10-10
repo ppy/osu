@@ -54,6 +54,7 @@ namespace osu.Game.Rulesets.Osu.UI
             InternalChildren = new Drawable[]
             {
                 playfieldBorder = new PlayfieldBorder { RelativeSizeAxes = Axes.Both },
+                new SmokeContainer { RelativeSizeAxes = Axes.Both },
                 spinnerProxies = new ProxyContainer { RelativeSizeAxes = Axes.Both },
                 FollowPoints = new FollowPointRenderer { RelativeSizeAxes = Axes.Both },
                 judgementLayer = new JudgementContainer<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
