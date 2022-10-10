@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osu.Game.Tests.Gameplay;
@@ -146,6 +147,42 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
             AddUntilStep("hidetarget is visible", () => hideTarget.IsPresent);
             AddAssert("key counters still hidden", () => !keyCounterFlow.IsPresent);
+        }
+
+        [Test]
+        public void TestInputDoesntWorkWhenHUDHidden()
+        {
+            SongProgressBar getSongProgress() => hudOverlay.ChildrenOfType<SongProgressBar>().Single();
+
+            bool seeked = false;
+
+            createNew();
+
+            AddStep("bind seek", () =>
+            {
+                seeked = false;
+
+                var progress = getSongProgress();
+
+                progress.ShowHandle = true;
+                progress.OnSeek += _ => seeked = true;
+            });
+
+            AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
+            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+
+            AddStep("attempt seek", () =>
+            {
+                InputManager.MoveMouseTo(getSongProgress());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("seek not performed", () => !seeked);
+
+            AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
+
+            AddStep("attempt seek", () => InputManager.Click(MouseButton.Left));
+            AddAssert("seek performed", () => seeked);
         }
 
         [Test]
