@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Objects
                     startTime += barLength;
                 }
 
-                for (double t = startTime; Precision.DefinitelyBigger(endTime, t); t += barLength, currentBeat++)
+                for (double t = startTime; Precision.AlmostBigger(endTime, t); t += barLength, currentBeat++)
                 {
                     double roundedTime = Math.Round(t, MidpointRounding.AwayFromZero);
 
