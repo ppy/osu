@@ -3,9 +3,11 @@
 
 #nullable disable
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests
@@ -37,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 {
                 }
 
-                protected override void ReloadMappings()
+                protected override void ReloadMappings(IQueryable<RealmKeyBinding> realmKeyBindings)
                 {
                     KeyBindings = DefaultKeyBindings;
                 }
