@@ -19,9 +19,16 @@ namespace osu.Game.Rulesets.Osu
     {
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
-        public bool AllowUserPresses
+        /// <summary>
+        /// Whether gameplay input buttons should be allowed.
+        /// Defaults to <c>true</c>, generally used for mods like Relax which turn off main inputs.
+        /// </summary>
+        /// <remarks>
+        /// Of note, auxiliary inputs like the "smoke" key are left usable.
+        /// </remarks>
+        public bool AllowGameplayInputs
         {
-            set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowUserPresses = value;
+            set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowGameplayInputs = value;
         }
 
         /// <summary>
@@ -60,14 +67,21 @@ namespace osu.Game.Rulesets.Osu
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
         {
-            private bool allowUserPresses = true;
+            private bool allowGameplayInputs = true;
 
-            public bool AllowUserPresses
+            /// <summary>
+            /// Whether gameplay input buttons should be allowed.
+            /// Defaults to <c>true</c>, generally used for mods like Relax which turn off main inputs.
+            /// </summary>
+            /// <remarks>
+            /// Of note, auxiliary inputs like the "smoke" key are left usable.
+            /// </remarks>
+            public bool AllowGameplayInputs
             {
-                get => allowUserPresses;
+                get => allowGameplayInputs;
                 set
                 {
-                    allowUserPresses = value;
+                    allowGameplayInputs = value;
                     ReloadMappings();
                 }
             }
@@ -81,7 +95,7 @@ namespace osu.Game.Rulesets.Osu
             {
                 base.ReloadMappings(realmKeyBindings);
 
-                if (!AllowUserPresses)
+                if (!AllowGameplayInputs)
                     KeyBindings = KeyBindings.Where(b => b.GetAction<OsuAction>() == OsuAction.Smoke).ToList();
             }
         }
