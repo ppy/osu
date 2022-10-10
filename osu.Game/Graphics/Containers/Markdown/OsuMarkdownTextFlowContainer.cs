@@ -57,7 +57,11 @@ namespace osu.Game.Graphics.Containers.Markdown
             }
 
             string flag = flagAttribute.Split('=').Last().Trim('"');
-            AddDrawable(new DrawableFlag(Enum.Parse<CountryCode>(flag)) { Size = new Vector2(20, 15) });
+
+            if (!Enum.TryParse<CountryCode>(flag, out var countryCode))
+                countryCode = CountryCode.Unknown;
+
+            AddDrawable(new DrawableFlag(countryCode) { Size = new Vector2(20, 15) });
         }
 
         private class OsuMarkdownInlineCode : Container
