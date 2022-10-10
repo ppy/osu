@@ -30,6 +30,11 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 new SettingsCheckbox
                 {
+                    LabelText = "Hide \"Great\" judgements",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.HideGreatJudgements)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Snaking in sliders",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingInSliders)
                 },

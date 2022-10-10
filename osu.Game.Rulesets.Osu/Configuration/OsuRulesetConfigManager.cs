@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
         protected override void InitialiseDefaults()
         {
             base.InitialiseDefaults();
+            SetDefault(OsuRulesetSetting.HideGreatJudgements, false);
             SetDefault(OsuRulesetSetting.SnakingInSliders, true);
             SetDefault(OsuRulesetSetting.SnakingOutSliders, true);
             SetDefault(OsuRulesetSetting.ShowCursorTrail, true);
@@ -28,6 +29,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
 
     public enum OsuRulesetSetting
     {
+        HideGreatJudgements,
         SnakingInSliders,
         SnakingOutSliders,
         ShowCursorTrail,

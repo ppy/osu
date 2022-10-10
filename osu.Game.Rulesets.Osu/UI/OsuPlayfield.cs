@@ -46,6 +46,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly Container judgementAboveHitObjectLayer;
 
+        [Resolved]
+        private OsuRulesetConfigManager rulesetConfig { get; set; }
+
         public OsuPlayfield()
         {
             Anchor = Anchor.Centre;
@@ -166,7 +169,11 @@ namespace osu.Game.Rulesets.Osu.UI
             // Hitobjects that block future hits should miss previous hitobjects if they're hit out-of-order.
             hitPolicy.HandleHit(judgedObject);
 
-            if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
+            bool hideGreats = rulesetConfig.Get<bool>(OsuRulesetSetting.HideGreatJudgements);
+
+            bool showJudgement = !hideGreats || result.Type != HitResult.Great;
+
+            if (!judgedObject.DisplayResult || !DisplayJudgements.Value || !showJudgement)
                 return;
 
             DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj => doj.Apply(result, judgedObject));
