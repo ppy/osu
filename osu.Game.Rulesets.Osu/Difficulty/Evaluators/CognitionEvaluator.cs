@@ -53,14 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             noteDensityDifficulty = Math.Pow(3 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence - 1)), 2.3);
-
-            // Objects that are arranged in a mostly-linear fashion should be easy to read (such as circles in a stream).
-            if (currObj.Angle.IsNotNull() && prevObj.IsNotNull())
-            {
-                double prevVelocity = prevObj.LazyJumpDistance / prevObj.StrainTime;
-                double velocityDifference = Math.Clamp(Math.Abs(currVelocity - prevVelocity), 0, 1);
-                noteDensityDifficulty *= 1 - velocityDifference * Math.Pow(Math.Sin(0.5 * currObj.Angle.Value), 5);
-            }
+            noteDensityDifficulty *= getConstantAngleNerfFactor(currObj);
 
             double hiddenDifficulty = 0;
 
