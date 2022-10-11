@@ -189,6 +189,16 @@ Line after image";
             });
         }
 
+        [Test]
+        public void TestFlag()
+        {
+            AddStep("Add flag", () =>
+            {
+                markdownContainer.CurrentPath = @"https://dev.ppy.sh";
+                markdownContainer.Text = "::{flag=\"AU\"}:: ::{flag=\"ZZ\"}::";
+            });
+        }
+
         private class TestMarkdownContainer : WikiMarkdownContainer
         {
             public LinkInline Link;
