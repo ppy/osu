@@ -330,11 +330,7 @@ namespace osu.Game.Beatmaps
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
 
-                    foreach (var collection in r.All<BeatmapCollection>())
-                    {
-                        if (collection.BeatmapMD5Hashes.Remove(oldMd5Hash))
-                            collection.BeatmapMD5Hashes.Add(beatmapInfo.MD5Hash);
-                    }
+                    beatmapInfo.transferCollectionsFrom(r, oldMd5Hash);
 
                     ProcessBeatmap?.Invoke((liveBeatmapSet, false));
                 });
