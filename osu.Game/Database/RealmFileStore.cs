@@ -40,8 +40,8 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="data">The file data stream.</param>
         /// <param name="realm">The realm instance to add to. Should already be in a transaction.</param>
-        /// <returns></returns>
-        public RealmFile Add(Stream data, Realm realm)
+        /// <param name="addToRealm">Whether the <see cref="RealmFile"/> should immediately be added to the underlying realm. If <c>false</c> is provided here, the instance must be manually added.</param>
+        public RealmFile Add(Stream data, Realm realm, bool addToRealm = true)
         {
             string hash = data.ComputeSHA2Hash();
 
@@ -52,7 +52,7 @@ namespace osu.Game.Database
             if (!checkFileExistsAndMatchesHash(file))
                 copyToStore(file, data);
 
-            if (!file.IsManaged)
+            if (addToRealm && !file.IsManaged)
                 realm.Add(file);
 
             return file;
