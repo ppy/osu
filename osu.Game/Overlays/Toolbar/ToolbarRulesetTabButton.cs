@@ -9,6 +9,8 @@ using osu.Game.Rulesets;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -29,7 +31,7 @@ namespace osu.Game.Overlays.Toolbar
             var rInstance = value.CreateInstance();
 
             ruleset.TooltipMain = rInstance.Description;
-            ruleset.TooltipSub = $"play some {rInstance.Description}";
+            ruleset.TooltipSub = LocalisableString.Format("{0} {1}", RulesetStrings.HeaderDescription, ($"{rInstance.Description}"));
             ruleset.SetIcon(rInstance.CreateIcon());
         }
 
