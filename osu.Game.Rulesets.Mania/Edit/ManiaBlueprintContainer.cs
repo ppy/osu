@@ -6,7 +6,6 @@
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -35,6 +34,6 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new ManiaSelectionHandler();
 
-        protected sealed override DragBox CreateDragBox() => new ScrollingDragBox((ManiaPlayfield)Composer.Playfield);
+        protected sealed override DragBox CreateDragBox() => new ScrollingDragBox(Composer.Playfield);
     }
 }

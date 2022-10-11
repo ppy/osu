@@ -5,7 +5,6 @@
 
 using osu.Game.Rulesets.Catch.Edit.Blueprints;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -38,6 +37,6 @@ namespace osu.Game.Rulesets.Catch.Edit
             return base.CreateHitObjectBlueprintFor(hitObject);
         }
 
-        protected sealed override DragBox CreateDragBox() => new ScrollingDragBox((CatchPlayfield)Composer.Playfield);
+        protected sealed override DragBox CreateDragBox() => new ScrollingDragBox(Composer.Playfield);
     }
 }
