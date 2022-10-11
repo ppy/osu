@@ -79,6 +79,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return 0;
 
             return (countPerfect * 320 + countGreat * 300 + countGood * 200 + countOk * 100 + countMeh * 50) / (totalHits * 320);
-        } 
+        }
     }
 }
