@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -20,9 +21,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private readonly ScrollingPlayfield playfield;
 
-        public ScrollingDragBox(ScrollingPlayfield playfield)
+        public ScrollingDragBox(Playfield playfield)
         {
-            this.playfield = playfield;
+            this.playfield = playfield as ScrollingPlayfield ?? throw new ArgumentException("Playfield must be of type {nameof(ScrollingPlayfield)} to use this class.", nameof(playfield));
         }
 
         public override void HandleDrag(MouseButtonEvent e)
