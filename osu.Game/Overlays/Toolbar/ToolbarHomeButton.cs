@@ -5,6 +5,7 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -19,8 +20,8 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load()
         {
-            TooltipMain = "home";
-            TooltipSub = "return to the main menu";
+            TooltipMain = HomeStrings.HeaderTitle;
+            TooltipSub = HomeStrings.HeaderDescription;
             SetIcon("Icons/Hexacons/home");
         }
     }
