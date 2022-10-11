@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Menu
 
         protected override string BeatmapFile => "circles.osz";
 
-        public const double TRACK_START_DELAY = 1000;
+        public const double TRACK_START_DELAY = 600;
 
         private const double delay_for_menu = 2900;
 
