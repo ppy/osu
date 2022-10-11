@@ -278,11 +278,11 @@ namespace osu.Game.Screens.Menu
 
             if (!UsingThemedIntro)
             {
-                initialBeatmap?.PrepareTrackForPreview(false, 2200);
+                initialBeatmap?.PrepareTrackForPreview(false, 2600);
 
                 drawableTrack.VolumeTo(0);
                 drawableTrack.Restart();
-                drawableTrack.VolumeTo(1, 2200, Easing.InCubic);
+                drawableTrack.VolumeTo(1, 2600, Easing.InCubic);
             }
             else
             {
