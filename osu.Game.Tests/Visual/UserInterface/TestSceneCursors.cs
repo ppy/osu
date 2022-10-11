@@ -96,10 +96,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void testUserCursor()
         {
             AddStep("Move to green area", () => InputManager.MoveMouseTo(cursorBoxes[0]));
-            AddAssert("Check green cursor visible", () => checkVisible(cursorBoxes[0].MenuCursor));
-            AddAssert("Check green cursor at mouse", () => checkAtMouse(cursorBoxes[0].MenuCursor));
+            AddAssert("Check green cursor visible", () => checkVisible(cursorBoxes[0].Cursor));
+            AddAssert("Check green cursor at mouse", () => checkAtMouse(cursorBoxes[0].Cursor));
             AddStep("Move out", moveOut);
-            AddAssert("Check green cursor invisible", () => !checkVisible(cursorBoxes[0].MenuCursor));
+            AddAssert("Check green cursor invisible", () => !checkVisible(cursorBoxes[0].Cursor));
             AddAssert("Check global cursor visible", () => checkVisible(globalCursorDisplay.MenuCursor));
         }
 
@@ -111,12 +111,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void testLocalCursor()
         {
             AddStep("Move to purple area", () => InputManager.MoveMouseTo(cursorBoxes[3]));
-            AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].MenuCursor));
-            AddAssert("Check purple cursor at mouse", () => checkAtMouse(cursorBoxes[3].MenuCursor));
+            AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].Cursor));
+            AddAssert("Check purple cursor at mouse", () => checkAtMouse(cursorBoxes[3].Cursor));
             AddAssert("Check global cursor visible", () => checkVisible(globalCursorDisplay.MenuCursor));
             AddAssert("Check global cursor at mouse", () => checkAtMouse(globalCursorDisplay.MenuCursor));
             AddStep("Move out", moveOut);
-            AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].MenuCursor));
+            AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].Cursor));
             AddAssert("Check global cursor visible", () => checkVisible(globalCursorDisplay.MenuCursor));
         }
 
@@ -128,12 +128,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void testUserCursorOverride()
         {
             AddStep("Move to blue-green boundary", () => InputManager.MoveMouseTo(cursorBoxes[1].ScreenSpaceDrawQuad.BottomRight - new Vector2(10)));
-            AddAssert("Check blue cursor visible", () => checkVisible(cursorBoxes[1].MenuCursor));
-            AddAssert("Check green cursor invisible", () => !checkVisible(cursorBoxes[0].MenuCursor));
-            AddAssert("Check blue cursor at mouse", () => checkAtMouse(cursorBoxes[1].MenuCursor));
+            AddAssert("Check blue cursor visible", () => checkVisible(cursorBoxes[1].Cursor));
+            AddAssert("Check green cursor invisible", () => !checkVisible(cursorBoxes[0].Cursor));
+            AddAssert("Check blue cursor at mouse", () => checkAtMouse(cursorBoxes[1].Cursor));
             AddStep("Move out", moveOut);
-            AddAssert("Check blue cursor not visible", () => !checkVisible(cursorBoxes[1].MenuCursor));
-            AddAssert("Check green cursor not visible", () => !checkVisible(cursorBoxes[0].MenuCursor));
+            AddAssert("Check blue cursor not visible", () => !checkVisible(cursorBoxes[1].Cursor));
+            AddAssert("Check green cursor not visible", () => !checkVisible(cursorBoxes[0].Cursor));
         }
 
         /// <summary>
@@ -143,13 +143,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void testMultipleLocalCursors()
         {
             AddStep("Move to yellow-purple boundary", () => InputManager.MoveMouseTo(cursorBoxes[5].ScreenSpaceDrawQuad.BottomRight - new Vector2(10)));
-            AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].MenuCursor));
-            AddAssert("Check purple cursor at mouse", () => checkAtMouse(cursorBoxes[3].MenuCursor));
-            AddAssert("Check yellow cursor visible", () => checkVisible(cursorBoxes[5].MenuCursor));
-            AddAssert("Check yellow cursor at mouse", () => checkAtMouse(cursorBoxes[5].MenuCursor));
+            AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].Cursor));
+            AddAssert("Check purple cursor at mouse", () => checkAtMouse(cursorBoxes[3].Cursor));
+            AddAssert("Check yellow cursor visible", () => checkVisible(cursorBoxes[5].Cursor));
+            AddAssert("Check yellow cursor at mouse", () => checkAtMouse(cursorBoxes[5].Cursor));
             AddStep("Move out", moveOut);
-            AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].MenuCursor));
-            AddAssert("Check yellow cursor visible", () => checkVisible(cursorBoxes[5].MenuCursor));
+            AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].Cursor));
+            AddAssert("Check yellow cursor visible", () => checkVisible(cursorBoxes[5].Cursor));
         }
 
         /// <summary>
@@ -159,13 +159,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void testUserOverrideWithLocal()
         {
             AddStep("Move to yellow-blue boundary", () => InputManager.MoveMouseTo(cursorBoxes[5].ScreenSpaceDrawQuad.TopRight - new Vector2(10)));
-            AddAssert("Check blue cursor visible", () => checkVisible(cursorBoxes[1].MenuCursor));
-            AddAssert("Check blue cursor at mouse", () => checkAtMouse(cursorBoxes[1].MenuCursor));
-            AddAssert("Check yellow cursor visible", () => checkVisible(cursorBoxes[5].MenuCursor));
-            AddAssert("Check yellow cursor at mouse", () => checkAtMouse(cursorBoxes[5].MenuCursor));
+            AddAssert("Check blue cursor visible", () => checkVisible(cursorBoxes[1].Cursor));
+            AddAssert("Check blue cursor at mouse", () => checkAtMouse(cursorBoxes[1].Cursor));
+            AddAssert("Check yellow cursor visible", () => checkVisible(cursorBoxes[5].Cursor));
+            AddAssert("Check yellow cursor at mouse", () => checkAtMouse(cursorBoxes[5].Cursor));
             AddStep("Move out", moveOut);
-            AddAssert("Check blue cursor invisible", () => !checkVisible(cursorBoxes[1].MenuCursor));
-            AddAssert("Check yellow cursor visible", () => checkVisible(cursorBoxes[5].MenuCursor));
+            AddAssert("Check blue cursor invisible", () => !checkVisible(cursorBoxes[1].Cursor));
+            AddAssert("Check yellow cursor visible", () => checkVisible(cursorBoxes[5].Cursor));
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public bool SmoothTransition;
 
-            public CursorContainer MenuCursor { get; }
+            public CursorContainer Cursor { get; }
             public bool ProvidingUserCursor { get; }
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) || (SmoothTransition && !ProvidingUserCursor);
@@ -218,7 +218,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Origin = Anchor.Centre,
                         Text = providesUserCursor ? "User cursor" : "Local cursor"
                     },
-                    MenuCursor = new TestCursorContainer
+                    Cursor = new TestCursorContainer
                     {
                         State = { Value = providesUserCursor ? Visibility.Hidden : Visibility.Visible },
                     }
