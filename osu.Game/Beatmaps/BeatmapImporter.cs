@@ -146,7 +146,7 @@ namespace osu.Game.Beatmaps
                 if (updatedBeatmap == null)
                     continue;
 
-                updatedBeatmap.transferCollectionsFrom(realm, originalBeatmap.MD5Hash);
+                updatedBeatmap.TransferCollectionsFrom(realm, originalBeatmap.MD5Hash);
             }
         }
 
