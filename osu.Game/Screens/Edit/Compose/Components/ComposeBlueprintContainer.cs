@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
@@ -37,9 +36,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected new EditorSelectionHandler SelectionHandler => (EditorSelectionHandler)base.SelectionHandler;
 
         private PlacementBlueprint currentPlacement;
-        private InputManager inputManager;
-
-        private DragEvent lastDragEvent;
 
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
@@ -67,8 +63,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            inputManager = GetContainingInputManager();
 
             Beatmap.HitObjectAdded += hitObjectAdded;
 
@@ -118,18 +112,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             return false;
-        }
-
-        protected override void OnDrag(DragEvent e)
-        {
-            base.OnDrag(e);
-            lastDragEvent = e;
-        }
-
-        protected override void OnDragEnd(DragEndEvent e)
-        {
-            base.OnDragEnd(e);
-            lastDragEvent = null;
         }
 
         /// <summary>
@@ -234,7 +216,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementPosition()
         {
-            var snapResult = Composer.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position);
+            var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position);
 
             // if no time was found from positional snapping, we should still quantize to the beat.
             snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
@@ -247,10 +229,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void Update()
         {
             base.Update();
-
-            // trigger every frame so drags continue to update selection while seeking time.
-            if (lastDragEvent != null)
-                OnDrag(lastDragEvent);
 
             if (currentPlacement != null)
             {

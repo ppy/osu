@@ -170,10 +170,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             finishSelectionMovement();
         }
 
+        private MouseButtonEvent lastDragEvent;
+
         protected override bool OnDragStart(DragStartEvent e)
         {
             if (e.Button == MouseButton.Right)
                 return false;
+
+            lastDragEvent = e;
 
             if (movementBlueprints != null)
             {
@@ -189,22 +193,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void OnDrag(DragEvent e)
         {
-            if (e.Button == MouseButton.Right)
-                return;
-
-            if (DragBox.State == Visibility.Visible)
-            {
-                DragBox.HandleDrag(e);
-                UpdateSelectionFromDragBox();
-            }
+            lastDragEvent = e;
 
             moveCurrentSelection(e);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            if (e.Button == MouseButton.Right)
-                return;
+            lastDragEvent = null;
 
             if (isDraggingBlueprint)
             {
@@ -213,6 +209,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             DragBox.Hide();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (lastDragEvent != null && DragBox.State == Visibility.Visible)
+            {
+                lastDragEvent.Target = this;
+                DragBox.HandleDrag(lastDragEvent);
+                UpdateSelectionFromDragBox();
+            }
         }
 
         /// <summary>
