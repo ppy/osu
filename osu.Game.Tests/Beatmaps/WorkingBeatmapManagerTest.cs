@@ -104,15 +104,17 @@ namespace osu.Game.Tests.Beatmaps
         {
             var beatmap = Realm.Run(r => r.Find<BeatmapInfo>(importedSet.Beatmaps.First().ID).Detach());
 
-            var map = beatmaps.GetWorkingBeatmap(beatmap);
+            var working = beatmaps.GetWorkingBeatmap(beatmap);
 
-            Assert.That(map.BeatmapInfo.BeatmapSet?.Files, Has.Count.GreaterThan(0));
+            Assert.That(working.BeatmapInfo.BeatmapSet?.Files, Has.Count.GreaterThan(0));
 
-            string initialHash = map.BeatmapInfo.MD5Hash;
+            string initialHash = working.BeatmapInfo.MD5Hash;
 
-            var preserveCollection = new BeatmapCollection("test save preserves collection");
+            var preserveCollection = new BeatmapCollection("test contained");
             preserveCollection.BeatmapMD5Hashes.Add(initialHash);
-            var noNewCollection = new BeatmapCollection("test save does not introduce new collection");
+
+            var noNewCollection = new BeatmapCollection("test not contained");
+
             Realm.Write(r =>
             {
                 r.Add(preserveCollection);
@@ -122,9 +124,9 @@ namespace osu.Game.Tests.Beatmaps
             Assert.That(preserveCollection.BeatmapMD5Hashes, Does.Contain(initialHash));
             Assert.That(noNewCollection.BeatmapMD5Hashes, Does.Not.Contain(initialHash));
 
-            beatmaps.Save(map.BeatmapInfo, map.GetPlayableBeatmap(new OsuRuleset().RulesetInfo));
+            beatmaps.Save(working.BeatmapInfo, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo));
 
-            string finalHash = map.BeatmapInfo.MD5Hash;
+            string finalHash = working.BeatmapInfo.MD5Hash;
 
             Assert.That(finalHash, Is.Not.SameAs(initialHash));
 
