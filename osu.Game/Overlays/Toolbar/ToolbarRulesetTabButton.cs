@@ -3,14 +3,14 @@
 
 #nullable disable
 
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Rulesets;
-using osuTK.Graphics;
-using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
+using osu.Game.Rulesets;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Toolbar
             var rInstance = value.CreateInstance();
 
             ruleset.TooltipMain = rInstance.Description;
-            ruleset.TooltipSub = LocalisableString.Format("{0} {1}", RulesetStrings.HeaderDescription, ($"{rInstance.Description}"));
+            ruleset.TooltipSub = LocalisableString.Format("{0} {1}", ToolbarStrings.RulesetHeaderDescription, ($"{rInstance.Description}"));
             ruleset.SetIcon(rInstance.CreateIcon());
         }
 

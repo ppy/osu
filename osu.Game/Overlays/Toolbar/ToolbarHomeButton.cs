@@ -20,8 +20,8 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load()
         {
-            TooltipMain = HomeStrings.HeaderTitle;
-            TooltipSub = HomeStrings.HeaderDescription;
+            TooltipMain = ToolbarStrings.HomeHeaderTitle;
+            TooltipSub = ToolbarStrings.HomeHeaderDescription;
             SetIcon("Icons/Hexacons/home");
         }
     }
