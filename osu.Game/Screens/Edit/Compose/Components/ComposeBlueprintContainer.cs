@@ -39,6 +39,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private PlacementBlueprint currentPlacement;
         private InputManager inputManager;
 
+        private DragEvent lastDragEvent;
+
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
         /// in order to handle composer blueprints which are partially offscreen.
@@ -83,8 +85,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        protected override bool AllowDeselectionDuringDrag => !EditorClock.IsRunning;
-
         protected override void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
         {
             base.TransferBlueprintFor(hitObject, drawableObject);
@@ -118,6 +118,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             return false;
+        }
+
+        protected override void OnDrag(DragEvent e)
+        {
+            base.OnDrag(e);
+            lastDragEvent = e;
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            base.OnDragEnd(e);
+            lastDragEvent = null;
         }
 
         /// <summary>
@@ -235,6 +247,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void Update()
         {
             base.Update();
+
+            // trigger every frame so drags continue to update selection while seeking time.
+            if (lastDragEvent != null)
+                OnDrag(lastDragEvent);
 
             if (currentPlacement != null)
             {
