@@ -214,7 +214,7 @@ namespace osu.Game.Beatmaps
             return fileHashX == fileHashY;
         }
 
-        public void transferCollectionsFrom(Realm realm, string oldMd5Hash)
+        public void TransferCollectionsFrom(Realm realm, string oldMd5Hash)
         {
             var collections = realm.All<BeatmapCollection>().AsEnumerable().Where(c => c.BeatmapMD5Hashes.Contains(oldMd5Hash));
 
