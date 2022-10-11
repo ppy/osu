@@ -3,15 +3,41 @@
 
 #nullable disable
 
+using osu.Framework.Bindables;
 using osu.Framework.Input;
+using osu.Framework.Input.StateChanges.Events;
 using osuTK.Input;
 
 namespace osu.Game.Input
 {
     public class OsuUserInputManager : UserInputManager
     {
+        /// <summary>
+        /// Whether the last input applied to the game is sourced from mouse.
+        /// </summary>
+        public IBindable<bool> IsMouseInputSource => isMouseInputSource;
+
+        private readonly Bindable<bool> isMouseInputSource = new Bindable<bool>();
+
         internal OsuUserInputManager()
         {
+        }
+
+        public override void HandleInputStateChange(InputStateChangeEvent inputStateChange)
+        {
+            switch (inputStateChange)
+            {
+                case ButtonStateChangeEvent<MouseButton>:
+                case MousePositionChangeEvent:
+                    isMouseInputSource.Value = true;
+                    break;
+
+                default:
+                    isMouseInputSource.Value = false;
+                    break;
+            }
+
+            base.HandleInputStateChange(inputStateChange);
         }
 
         protected override MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
