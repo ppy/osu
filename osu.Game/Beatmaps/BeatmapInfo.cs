@@ -214,13 +214,19 @@ namespace osu.Game.Beatmaps
             return fileHashX == fileHashY;
         }
 
-        public void TransferCollectionsFrom(Realm realm, string oldMd5Hash)
+        /// <summary>
+        /// When updating a beatmap, its hashes will change. Collections currently track beatmaps by hash, so they need to be updated.
+        /// This method will handle updating
+        /// </summary>
+        /// <param name="realm">A realm instance in an active write transaction.</param>
+        /// <param name="previousMD5Hash">The previous MD5 hash of the beatmap before update.</param>
+        public void TransferCollectionReferences(Realm realm, string previousMD5Hash)
         {
-            var collections = realm.All<BeatmapCollection>().AsEnumerable().Where(c => c.BeatmapMD5Hashes.Contains(oldMd5Hash));
+            var collections = realm.All<BeatmapCollection>().AsEnumerable().Where(c => c.BeatmapMD5Hashes.Contains(previousMD5Hash));
 
             foreach (var c in collections)
             {
-                c.BeatmapMD5Hashes.Remove(oldMd5Hash);
+                c.BeatmapMD5Hashes.Remove(previousMD5Hash);
                 c.BeatmapMD5Hashes.Add(MD5Hash);
             }
         }
