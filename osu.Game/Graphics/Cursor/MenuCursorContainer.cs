@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Input;
 using osuTK;
 
 namespace osu.Game.Graphics.Cursor
@@ -27,13 +28,21 @@ namespace osu.Game.Graphics.Cursor
 
         private Cursor activeCursor = null!;
 
+        private readonly Container fadeContainer;
+
+        protected override Container<Drawable> Content => fadeContainer;
+
         private DragRotationState dragRotationState;
         private Vector2 positionMouseDown;
-
         private Vector2 lastMovePosition;
 
         private Bindable<bool> cursorRotate = null!;
         private Sample tapSample = null!;
+
+        public MenuCursorContainer()
+        {
+            InternalChild = fadeContainer = new Container { RelativeSizeAxes = Axes.Both };
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, ScreenshotManager? screenshotManager, AudioManager audio)
@@ -44,6 +53,19 @@ namespace osu.Game.Graphics.Cursor
                 screenshotCursorVisibility.BindTo(screenshotManager.CursorVisibility);
 
             tapSample = audio.Samples.Get(@"UI/cursor-tap");
+        }
+
+        [Resolved]
+        private OsuUserInputManager inputManager { get; set; } = null!;
+
+        private IBindable<bool> mouseInputSource = null!;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            mouseInputSource = inputManager.IsMouseInputSource.GetBoundCopy();
+            mouseInputSource.BindValueChanged(m => updateInternalVisibilityState(m.NewValue), true);
         }
 
         protected override void Update()
@@ -145,6 +167,8 @@ namespace osu.Game.Graphics.Cursor
             activeCursor.FadeTo(0, 250, Easing.OutQuint);
             activeCursor.ScaleTo(0.6f, 250, Easing.In);
         }
+
+        private void updateInternalVisibilityState(bool show) => fadeContainer.FadeTo(show ? 1 : 0, 120, Easing.OutQuint);
 
         private void playTapSample(double baseFrequency = 1f)
         {
