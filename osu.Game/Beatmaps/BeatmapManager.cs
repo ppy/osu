@@ -17,7 +17,6 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
