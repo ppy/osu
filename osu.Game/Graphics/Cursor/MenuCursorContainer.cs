@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class MenuCursor : CursorContainer
+    public class MenuCursorContainer : CursorContainer
     {
         private readonly IBindable<bool> screenshotCursorVisibility = new Bindable<bool>(true);
         public override bool IsPresent => screenshotCursorVisibility.Value && base.IsPresent;
