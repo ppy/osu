@@ -1,10 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -28,17 +25,18 @@ namespace osu.Game.Graphics.Cursor
 
         protected override Drawable CreateCursor() => activeCursor = new Cursor();
 
-        private Cursor activeCursor;
+        private Cursor activeCursor = null!;
 
-        private Bindable<bool> cursorRotate;
         private DragRotationState dragRotationState;
         private Vector2 positionMouseDown;
 
-        private Sample tapSample;
         private Vector2 lastMovePosition;
 
-        [BackgroundDependencyLoader(true)]
-        private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager, AudioManager audio)
+        private Bindable<bool> cursorRotate = null!;
+        private Sample tapSample = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config, ScreenshotManager? screenshotManager, AudioManager audio)
         {
             cursorRotate = config.GetBindable<bool>(OsuSetting.CursorRotation);
 
@@ -163,11 +161,11 @@ namespace osu.Game.Graphics.Cursor
 
         public class Cursor : Container
         {
-            private Container cursorContainer;
-            private Bindable<float> cursorScale;
+            private Container cursorContainer = null!;
+            private Bindable<float> cursorScale = null!;
             private const float base_scale = 0.15f;
 
-            public Sprite AdditiveLayer;
+            public Sprite AdditiveLayer = null!;
 
             public Cursor()
             {
