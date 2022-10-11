@@ -330,7 +330,7 @@ namespace osu.Game.Beatmaps
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
 
-                    beatmapInfo.TransferCollectionsFrom(r, oldMd5Hash);
+                    beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
 
                     ProcessBeatmap?.Invoke((liveBeatmapSet, false));
                 });
