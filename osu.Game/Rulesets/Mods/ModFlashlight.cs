@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,7 +11,6 @@ using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.OpenGL.Vertices;
@@ -20,6 +18,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Graphics;
 
@@ -84,8 +83,6 @@ namespace osu.Game.Rulesets.Mods
 
             flashlight.Combo.BindTo(Combo);
             drawableRuleset.KeyBindingInputManager.Add(flashlight);
-
-            flashlight.Breaks = drawableRuleset.Beatmap.Breaks;
         }
 
         protected abstract Flashlight CreateFlashlight();
@@ -99,8 +96,6 @@ namespace osu.Game.Rulesets.Mods
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode(this);
 
             public override bool RemoveCompletedTransforms => false;
-
-            public List<BreakPeriod> Breaks = new List<BreakPeriod>();
 
             private readonly float defaultFlashlightSize;
             private readonly float sizeMultiplier;
@@ -119,37 +114,36 @@ namespace osu.Game.Rulesets.Mods
                 shader = shaderManager.Load("PositionAndColour", FragmentShader);
             }
 
+            [Resolved]
+            private Player? player { get; set; }
+
+            private readonly IBindable<bool> isBreakTime = new BindableBool();
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                Combo.ValueChanged += OnComboChange;
+                Combo.ValueChanged += _ => UpdateFlashlightSize(GetSize());
 
-                using (BeginAbsoluteSequence(0))
+                if (player != null)
                 {
-                    foreach (var breakPeriod in Breaks)
-                    {
-                        if (!breakPeriod.HasEffect)
-                            continue;
-
-                        if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
-
-                        this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);
-                        this.Delay(breakPeriod.EndTime - FLASHLIGHT_FADE_DURATION).FadeInFromZero(FLASHLIGHT_FADE_DURATION);
-                    }
+                    isBreakTime.BindTo(player.IsBreakTime);
+                    isBreakTime.BindValueChanged(_ => UpdateFlashlightSize(GetSize()), true);
                 }
             }
 
-            protected abstract void OnComboChange(ValueChangedEvent<int> e);
+            protected abstract void UpdateFlashlightSize(float size);
 
             protected abstract string FragmentShader { get; }
 
-            protected float GetSizeFor(int combo)
+            protected float GetSize()
             {
                 float size = defaultFlashlightSize * sizeMultiplier;
 
-                if (comboBasedSize)
-                    size *= GetComboScaleFor(combo);
+                if (isBreakTime.Value)
+                    size *= 2.5f;
+                else if (comboBasedSize)
+                    size *= GetComboScaleFor(Combo.Value);
 
                 return size;
             }

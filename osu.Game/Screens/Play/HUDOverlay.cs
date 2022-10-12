@@ -39,6 +39,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public float BottomScoringElementsHeight { get; private set; }
 
+        // HUD uses AlwaysVisible on child components so they can be in an updated state for next display.
+        // Without blocking input, this would also allow them to be interacted with in such a state.
+        public override bool PropagatePositionalInputSubTree => ShowHud.Value;
+
         public readonly KeyCounterDisplay KeyCounter;
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
