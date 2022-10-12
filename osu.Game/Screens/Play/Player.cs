@@ -94,6 +94,11 @@ namespace osu.Game.Screens.Play
 
         public int RestartCount;
 
+        /// <summary>
+        /// Whether the <see cref="HUDOverlay"/> is currently visible.
+        /// </summary>
+        public IBindable<bool> ShowingOverlayComponents = new Bindable<bool>();
+
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
@@ -1015,6 +1020,8 @@ namespace osu.Game.Screens.Play
             });
 
             HUDOverlay.IsPlaying.BindTo(localUserPlaying);
+            ShowingOverlayComponents.BindTo(HUDOverlay.ShowHud);
+
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
