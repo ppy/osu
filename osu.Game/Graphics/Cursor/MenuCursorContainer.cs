@@ -49,7 +49,11 @@ namespace osu.Game.Graphics.Cursor
         [Resolved]
         private OsuUserInputManager inputManager { get; set; } = null!;
 
+        [Resolved]
+        private OsuGame? game { get; set; }
+
         private readonly IBindable<bool> mouseInputSource = new BindableBool();
+        private readonly IBindable<bool> isIdle = new BindableBool();
 
         private readonly Bindable<Visibility> internalState = new Bindable<Visibility>();
 
@@ -62,6 +66,11 @@ namespace osu.Game.Graphics.Cursor
             mouseInputSource.BindTo(inputManager.IsMouseInputSource);
             mouseInputSource.BindValueChanged(_ => updateInternalVisibility(), true);
 
+            if (game != null)
+            {
+                isIdle.BindTo(game.IsIdle);
+                isIdle.BindValueChanged(_ => updateInternalVisibility());
+            }
         }
 
         private void updateInternalVisibility()
