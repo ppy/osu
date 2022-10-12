@@ -202,14 +202,12 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
+        [CanBeNull]
         public GameplayCursorContainer Cursor { get; private set; }
 
         /// <summary>
         /// Provide a cursor which is to be used for gameplay.
         /// </summary>
-        /// <remarks>
-        /// The default provided cursor is invisible when inside the bounds of the <see cref="Playfield"/>.
-        /// </remarks>
         /// <returns>The cursor, or null to show the menu cursor.</returns>
         protected virtual GameplayCursorContainer CreateCursor() => null;
 

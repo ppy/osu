@@ -499,6 +499,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor being displayed by the <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
+        [CanBeNull]
         public abstract GameplayCursorContainer Cursor { get; }
 
         /// <summary>
