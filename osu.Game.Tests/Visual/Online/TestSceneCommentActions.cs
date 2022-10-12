@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -78,11 +80,12 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
+        private ManualResetEventSlim deletionPerformed = new ManualResetEventSlim();
+
         [Test]
         public void TestDeletion()
         {
             DrawableComment? ourComment = null;
-            bool delete = false;
 
             addTestComments();
             AddUntilStep("Comment exists", () =>
@@ -102,6 +105,8 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Setup request handling", () =>
             {
+                deletionPerformed.Reset();
+
                 dummyAPI.HandleRequest = request =>
                 {
                     if (!(request is CommentDeleteRequest req))
@@ -130,18 +135,23 @@ namespace osu.Game.Tests.Visual.Online
                         IncludedComments = new List<Comment>(),
                         PinnedComments = new List<Comment>(),
                     };
-                    delete = true;
-                    req.TriggerSuccess(cb);
+
+                    Task.Run(() =>
+                    {
+                        deletionPerformed.Wait(10000);
+                        req.TriggerSuccess(cb);
+                    });
+
                     return true;
                 };
             });
             AddStep("Confirm dialog", () => InputManager.Key(Key.Number1));
-            AddUntilStep("Deletion requested", () => delete);
+
             AddAssert("Loading spinner shown", () => commentsContainer.ChildrenOfType<LoadingSpinner>().Any(d => d.IsPresent));
-            AddUntilStep("Comment is deleted locally", () =>
-            {
-                return this.ChildrenOfType<DrawableComment>().Single(x => x.Comment.Id == 1).WasDeleted;
-            });
+
+            AddStep("Complete request", () => deletionPerformed.Set());
+
+            AddUntilStep("Comment is deleted locally", () => this.ChildrenOfType<DrawableComment>().Single(x => x.Comment.Id == 1).WasDeleted);
         }
 
         [Test]
