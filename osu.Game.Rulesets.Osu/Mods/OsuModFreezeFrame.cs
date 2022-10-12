@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     {
                         //SliderRepeat wont layer correctly if preempt is changed.
                         case SliderRepeat:
-                            return;
+                            break;
 
                         default:
                             applyFadeInAdjustment(nested);
