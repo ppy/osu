@@ -278,7 +278,7 @@ namespace osu.Game.Screens.Menu
 
             if (!UsingThemedIntro)
             {
-                initialBeatmap?.PrepareTrackForPreview(false, 2600);
+                initialBeatmap?.PrepareTrackForPreview(false, -2600);
 
                 drawableTrack.VolumeTo(0);
                 drawableTrack.Restart();
