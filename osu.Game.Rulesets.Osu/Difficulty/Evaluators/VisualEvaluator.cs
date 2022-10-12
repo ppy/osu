@@ -90,7 +90,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Scale the value with overlapping factor.
             strain /= 10 * (1 + overlappingFactor);
 
-            if (osuObj.TimePreempt < 400) {
+            if (osuObj.TimePreempt < 400)
+            {
                 // Give bonus for AR higher than 10.33.
                 strain += Math.Pow(400 - osuObj.TimePreempt, 1.3) / 100;
             }
