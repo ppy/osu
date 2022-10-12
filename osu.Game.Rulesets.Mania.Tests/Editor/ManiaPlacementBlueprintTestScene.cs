@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -30,15 +31,18 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Cached(typeof(IScrollingInfo))]
         private IScrollingInfo scrollingInfo;
 
+        [Cached]
+        private readonly StageDefinition stage = new StageDefinition(5);
+
         protected ManiaPlacementBlueprintTestScene()
         {
             scrollingInfo = ((ScrollingTestContainer)HitObjectContainer).ScrollingInfo;
 
-            Add(column = new Column(0)
+            Add(column = new Column(0, false)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                AccentColour = Color4.OrangeRed,
+                AccentColour = { Value = Color4.OrangeRed },
                 Clock = new FramedClock(new StopwatchClock()), // No scroll
             });
         }

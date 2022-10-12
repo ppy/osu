@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        public override float DefaultFlashlightSize => 250;
+        public override float DefaultFlashlightSize => 200;
 
         protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, playfield);
 
@@ -46,20 +46,22 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 : base(modFlashlight)
             {
                 this.taikoPlayfield = taikoPlayfield;
-                FlashlightSize = getSizeFor(0);
+
+                FlashlightSize = adjustSize(GetSize());
+                FlashlightSmoothness = 1.4f;
 
                 AddLayout(flashlightProperties);
             }
 
-            private Vector2 getSizeFor(int combo)
+            private Vector2 adjustSize(float size)
             {
                 // Preserve flashlight size through the playfield's aspect adjustment.
-                return new Vector2(0, GetSizeFor(combo) * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
+                return new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
             }
 
-            protected override void OnComboChange(ValueChangedEvent<int> e)
+            protected override void UpdateFlashlightSize(float size)
             {
-                this.TransformTo(nameof(FlashlightSize), getSizeFor(e.NewValue), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), adjustSize(size), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
@@ -73,7 +75,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
 
                     ClearTransforms(targetMember: nameof(FlashlightSize));
-                    FlashlightSize = getSizeFor(Combo.Value);
+                    FlashlightSize = adjustSize(Combo.Value);
 
                     flashlightProperties.Validate();
                 }
