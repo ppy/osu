@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private ManualResetEventSlim deletionPerformed = new ManualResetEventSlim();
+        private readonly ManualResetEventSlim deletionPerformed = new ManualResetEventSlim();
 
         [Test]
         public void TestDeletion()
