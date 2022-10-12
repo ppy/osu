@@ -4,14 +4,16 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
+using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Graphics;
 
@@ -19,16 +21,19 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneComboCounter : CatchSkinnableTestScene
     {
-        private OsuConfigManager localConfig = null!;
-
         private ScoreProcessor scoreProcessor = null!;
 
         private Color4 judgedObjectColour = Color4.White;
 
+        private readonly Bindable<bool> showHud = new Bindable<bool>(true);
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Dependencies.Cache(localConfig = new OsuConfigManager(LocalStorage));
+            Dependencies.CacheAs<Player>(new TestPlayer
+            {
+                ShowingOverlayComponents = { BindTarget = showHud },
+            });
         }
 
         [SetUp]
@@ -36,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             scoreProcessor = new ScoreProcessor(new CatchRuleset());
 
-            localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
+            showHud.Value = true;
 
             SetContents(_ => new CatchComboDisplay
             {
@@ -62,10 +67,10 @@ namespace osu.Game.Rulesets.Catch.Tests
                 );
             });
 
-            AddStep("set hud to never show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
+            AddStep("set hud to never show", () => showHud.Value = false);
             AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 5);
 
-            AddStep("set hud to show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always));
+            AddStep("set hud to show", () => showHud.Value = true);
             AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 5);
         }
 
