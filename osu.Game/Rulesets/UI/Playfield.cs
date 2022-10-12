@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.UI
         /// The default provided cursor is invisible when inside the bounds of the <see cref="Playfield"/>.
         /// </remarks>
         /// <returns>The cursor, or null to show the menu cursor.</returns>
-        protected virtual GameplayCursorContainer CreateCursor() => new InvisibleCursorContainer();
+        protected virtual GameplayCursorContainer CreateCursor() => null;
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
@@ -522,14 +522,5 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
-
-        public class InvisibleCursorContainer : GameplayCursorContainer
-        {
-            protected override Drawable CreateCursor() => new InvisibleCursor();
-
-            private class InvisibleCursor : Drawable
-            {
-            }
-        }
     }
 }
