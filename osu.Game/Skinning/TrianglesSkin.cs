@@ -16,6 +16,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.ComboCounters;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK;
 using osuTK.Graphics;
