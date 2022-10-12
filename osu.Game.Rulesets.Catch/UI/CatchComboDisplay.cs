@@ -29,9 +29,13 @@ namespace osu.Game.Rulesets.Catch.UI
         {
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(Player? player)
+        [Resolved(canBeNull: true)]
+        private Player? player { get; set; }
+
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             if (player != null)
             {
                 showCombo.BindTo(player.ShowingOverlayComponents);
