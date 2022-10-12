@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -89,13 +90,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         Color4 colour;
 
+                        const int total_colours = 7;
+
                         if (stage.IsSpecialColumn(column))
                             colour = new Color4(159, 101, 255, 255);
                         else
                         {
-                            switch (column % 8)
+                            switch (column % total_colours)
                             {
-                                default:
+                                case 0:
                                     colour = new Color4(240, 216, 0, 255);
                                     break;
 
@@ -112,20 +115,19 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                     break;
 
                                 case 4:
-                                    colour = new Color4(178, 0, 240, 255);
-                                    break;
-
-                                case 5:
                                     colour = new Color4(0, 96, 240, 255);
                                     break;
 
-                                case 6:
+                                case 5:
                                     colour = new Color4(0, 226, 240, 255);
                                     break;
 
-                                case 7:
+                                case 6:
                                     colour = new Color4(0, 240, 96, 255);
                                     break;
+
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
                         }
 
