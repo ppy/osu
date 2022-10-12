@@ -78,13 +78,17 @@ namespace osu.Game.Screens.Menu
                     if (reverbChannel != null)
                         intro.LogoVisualisation.AddAmplitudeSource(reverbChannel);
 
-                    Scheduler.AddDelayed(() =>
-                    {
+                    if (!UsingThemedIntro)
                         StartTrack();
 
-                        // this classic intro loops forever.
+                    Scheduler.AddDelayed(() =>
+                    {
                         if (UsingThemedIntro)
+                        {
+                            StartTrack();
+                            // this classic intro loops forever.
                             Track.Looping = true;
+                        }
 
                         const float fade_in_time = 200;
 
