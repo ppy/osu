@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 #pragma warning disable 618
             if (difficultyPoint is LegacyBeatmapDecoder.LegacyDifficultyControlPoint legacyDifficultyPoint)
 #pragma warning restore 618
-                beatLength = timingPoint.BeatLength * Math.Min(legacyDifficultyPoint.BpmMultiplier, 10);
+                beatLength = timingPoint.BeatLength * legacyDifficultyPoint.BpmMultiplier;
             else
                 beatLength = timingPoint.BeatLength / difficultyPoint.SliderVelocity;
 

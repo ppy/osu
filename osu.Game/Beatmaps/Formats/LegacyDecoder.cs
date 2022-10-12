@@ -169,6 +169,13 @@ namespace osu.Game.Beatmaps.Formats
             public double BpmMultiplier { get; private set; }
 
             /// <summary>
+            /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
+            /// This is to be used for taiko and mania specific beatmaps.
+            /// DO NOT USE THIS UNLESS 100% SURE.
+            /// </summary>
+            public double BpmMultiplierMania { get; private set; }
+
+            /// <summary>
             /// Whether or not slider ticks should be generated at this control point.
             /// This exists for backwards compatibility with maps that abuse NaN slider velocity behavior on osu!stable (e.g. /b/2628991).
             /// </summary>
@@ -178,7 +185,8 @@ namespace osu.Game.Beatmaps.Formats
                 : this()
             {
                 // Note: In stable, the division occurs on floats, but with compiler optimisations turned on actually seems to occur on doubles via some .NET black magic (possibly inlining?).
-                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
+                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 1000) / 100.0 : 1;
+                BpmMultiplierMania = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
                 GenerateTicks = !double.IsNaN(beatLength);
             }
 
@@ -196,6 +204,7 @@ namespace osu.Game.Beatmaps.Formats
                 base.CopyFrom(other);
 
                 BpmMultiplier = ((LegacyDifficultyControlPoint)other).BpmMultiplier;
+                BpmMultiplierMania = ((LegacyDifficultyControlPoint)other).BpmMultiplierMania;
                 GenerateTicks = ((LegacyDifficultyControlPoint)other).GenerateTicks;
             }
 
@@ -206,10 +215,11 @@ namespace osu.Game.Beatmaps.Formats
             public bool Equals(LegacyDifficultyControlPoint? other)
                 => base.Equals(other)
                    && BpmMultiplier == other.BpmMultiplier
+                   && BpmMultiplierMania == other.BpmMultiplierMania
                    && GenerateTicks == other.GenerateTicks;
 
             // ReSharper disable twice NonReadonlyMemberInGetHashCode
-            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), BpmMultiplier, GenerateTicks);
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), BpmMultiplier, BpmMultiplierMania, GenerateTicks);
         }
 
         internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>
