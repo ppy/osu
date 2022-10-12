@@ -117,6 +117,11 @@ namespace osu.Game.Skinning.Editor
             return false;
         }
 
+        protected override void SelectAll()
+        {
+            SelectedItems.AddRange(targetComponents.SelectMany(list => list).Except(SelectedItems).ToArray());
+        }
+
         /// <summary>
         /// Move the current selection spatially by the specified delta, in screen coordinates (ie. the same coordinates as the blueprints).
         /// </summary>
