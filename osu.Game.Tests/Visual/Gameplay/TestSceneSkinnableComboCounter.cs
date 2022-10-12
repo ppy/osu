@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.ComboCounters;
 using osu.Game.Skinning;
 
