@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.OpenGL.Vertices;
@@ -138,24 +137,16 @@ namespace osu.Game.Rulesets.Mods
             private readonly float appliedFlashlightSize;
             private readonly float changeSizeDecreaseRatio;
 
-            private readonly bool comboBasedSize;
-
-            private readonly float sizeChangesAmount;
+            private readonly float maxSizeChanges;
             private readonly float changeSizeCombo;
 
             protected Flashlight(ModFlashlight modFlashlight)
             {
                 changeSizeCombo = modFlashlight.ChangeSizeComboDivisor.Value;
-                sizeChangesAmount = modFlashlight.FinalChangeSizeCombo.Value / changeSizeCombo;
+                maxSizeChanges = modFlashlight.FinalChangeSizeCombo.Value / changeSizeCombo;
 
                 appliedFlashlightSize = modFlashlight.DefaultFlashlightSize * modFlashlight.StartingFlashlightSize.Value;
-
-                float finalFlashlightSize = modFlashlight.FinalFlashlightSize.Value;
-
-                comboBasedSize = !Precision.AlmostEquals(finalFlashlightSize, 1);
-
-                if (comboBasedSize)
-                    changeSizeDecreaseRatio = (1 - finalFlashlightSize) / sizeChangesAmount;
+                changeSizeDecreaseRatio = (1 - modFlashlight.FinalFlashlightSize.Value) / maxSizeChanges;
             }
 
             [BackgroundDependencyLoader]
@@ -192,8 +183,11 @@ namespace osu.Game.Rulesets.Mods
 
                 if (isBreakTime.Value)
                     scale = 2.5f;
-                else if (comboBasedSize)
-                    scale = 1 - MathF.Min(sizeChangesAmount, MathF.Floor(Combo.Value / changeSizeCombo) * changeSizeDecreaseRatio);
+                else
+                {
+                    float sizeChangeCount = MathF.Min(maxSizeChanges, MathF.Floor(Combo.Value / changeSizeCombo));
+                    scale -= sizeChangeCount * changeSizeDecreaseRatio;
+                }
 
                 return appliedFlashlightSize * scale;
             }
