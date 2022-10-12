@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -40,6 +41,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double overlappingFactor = 0;
             var nextObj = (OsuDifficultyHitObject)current.Next(0);
 
+            // We'll have two visible object arrays. The first array contains objects before the current object starts in a reversed order,
+            // while the second array contains objects after the current object ends.
+            // For overlapping factor, we also need to consider previous visible objects.
+            var prevVisibleObjects = new List<OsuDifficultyHitObject>();
+            var nextVisibleObjects = new List<OsuDifficultyHitObject>();
+
             for (int i = 0; nextObj != null; nextObj = (OsuDifficultyHitObject)current.Next(++i))
             {
                 var osuNextObj = (OsuHitObject)nextObj.BaseObject;
@@ -52,12 +59,50 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (actualDeltaTime > osuObj.TimePreempt)
                     break;
 
+                nextVisibleObjects.Add(nextObj);
+            }
+
+            var prevObj = (OsuDifficultyHitObject)current.Previous(0);
+
+            for (int i = 0; prevObj != null; prevObj = (OsuDifficultyHitObject)current.Previous(++i))
+            {
+                var osuPrevObj = (OsuHitObject)prevObj.BaseObject;
+
+                if (osuPrevObj is Spinner)
+                    continue;
+
+                double actualDeltaTime = Math.Max(0, current.StartTime - prevObj.EndTime);
+
+                if (actualDeltaTime > osuObj.TimePreempt)
+                    break;
+
+                prevVisibleObjects.Add(prevObj);
+            }
+
+            foreach (var osuPrevObj in prevVisibleObjects)
+            {
+                double actualDeltaTime = current.StartTime - osuPrevObj.EndTime;
+                double distance = (osuObj.StackedPosition - ((OsuHitObject)osuPrevObj.BaseObject).StackedEndPosition).Length;
+
+                applyToOverlappingFactor(distance, actualDeltaTime);
+            }
+
+            foreach (var osuNextObj in nextVisibleObjects)
+            {
+                double actualDeltaTime = osuNextObj.StartTime - current.EndTime;
+                double distance = ((((OsuHitObject)osuNextObj.BaseObject).StackedPosition) - osuObj.StackedEndPosition).Length;
+
                 noteDensity += 1 - actualDeltaTime / osuObj.TimePreempt;
 
+                applyToOverlappingFactor(distance, actualDeltaTime);
+            }
+
+            void applyToOverlappingFactor(double distance, double deltaTime)
+            {
                 // Penalize objects that are too close to the object in both distance
                 // and delta time to prevent stream maps from being overweighted.
-                overlappingFactor += Math.Max(0, 1 - (osuObj.StackedPosition - osuNextObj.StackedEndPosition).Length / (3 * osuObj.Radius))
-                                    * 7.5 / (1 + Math.Exp(0.15 * (Math.Max(actualDeltaTime, 25) - 75)));
+                overlappingFactor += Math.Max(0, 1 - distance / (3 * osuObj.Radius)) * 7.5 /
+                                    (1 + Math.Exp(0.15 * (Math.Max(deltaTime, 25) - 75)));
             }
 
             // Start with base density and give global bonus for Hidden.
