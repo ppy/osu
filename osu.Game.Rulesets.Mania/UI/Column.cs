@@ -3,30 +3,30 @@
 
 #nullable disable
 
-using osuTK.Graphics;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mania.UI.Components;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
-using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.UI;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     [Cached]
-    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
+    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>
     {
         public const float COLUMN_WIDTH = 80;
         public const float SPECIAL_COLUMN_WIDTH = 70;
@@ -39,23 +39,46 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         public readonly ColumnHitObjectArea HitObjectArea;
-        internal readonly Container TopLevelContainer;
-        private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
+        internal readonly Container TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both };
+        private DrawablePool<PoolableHitExplosion> hitExplosionPool;
         private readonly OrderedHitPolicy hitPolicy;
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
-        private readonly GameplaySampleTriggerSource sampleTriggerSource;
+        private GameplaySampleTriggerSource sampleTriggerSource;
 
-        public Column(int index)
+        /// <summary>
+        /// Whether this is a special (ie. scratch) column.
+        /// </summary>
+        public readonly bool IsSpecial;
+
+        public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Black);
+
+        public Column(int index, bool isSpecial)
         {
             Index = index;
+            IsSpecial = isSpecial;
 
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
 
+            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+            HitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both };
+        }
+
+        [Resolved]
+        private ISkinSource skin { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
+        {
+            SkinnableDrawable keyArea;
+
+            skin.SourceChanged += onSourceChanged;
+            onSourceChanged();
+
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
             };
 
             InternalChildren = new[]
@@ -64,17 +87,18 @@ namespace osu.Game.Rulesets.Mania.UI
                 sampleTriggerSource = new GameplaySampleTriggerSource(HitObjectContainer),
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                HitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both },
-                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
+                HitObjectArea,
+                keyArea = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 background,
-                TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both },
+                TopLevelContainer,
                 new ColumnTouchInputArea(this)
             };
 
-            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+            applyGameWideClock(background);
+            applyGameWideClock(keyArea);
 
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
 
@@ -83,20 +107,38 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
             RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
             RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 250);
+
+            // Some elements don't handle rewind correctly and fixing them is non-trivial.
+            // In the future we need a better solution to this, but as a temporary work-around, give these components the game-wide
+            // clock so they don't need to worry about rewind.
+            // This only works because they handle OnPressed/OnReleased which results in a correct state while rewinding.
+            //
+            // This is kinda dodgy (and will cause weirdness when pausing gameplay) but is better than completely broken rewind.
+            void applyGameWideClock(Drawable drawable)
+            {
+                drawable.Clock = host.UpdateThread.Clock;
+                drawable.ProcessCustomClock = false;
+            }
+        }
+
+        private void onSourceChanged()
+        {
+            AccentColour.Value = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour, Index)?.Value ?? Color4.Black;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             NewResult += OnNewResult;
         }
 
-        public ColumnType ColumnType { get; set; }
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
 
-        public bool IsSpecial => ColumnType == ColumnType.Special;
-
-        public Color4 AccentColour { get; set; }
+            if (skin != null)
+                skin.SourceChanged -= onSourceChanged;
+        }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -111,7 +153,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)drawableHitObject;
 
-            maniaObject.AccentColour.Value = AccentColour;
+            maniaObject.AccentColour.BindTo(AccentColour);
             maniaObject.CheckHittable = hitPolicy.IsHittable;
         }
 

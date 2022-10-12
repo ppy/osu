@@ -561,9 +561,20 @@ namespace osu.Game
                 return;
             }
 
+            // This should be able to be performed from song select, but that is disabled for now
+            // due to the weird decoupled ruleset logic (which can cause a crash in certain filter scenarios).
+            //
+            // As a special case, if the beatmap and ruleset already match, allow immediately displaying the score from song select.
+            // This is guaranteed to not crash, and feels better from a user's perspective (ie. if they are clicking a score in the
+            // song select leaderboard).
+            IEnumerable<Type> validScreens =
+                Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap) && Ruleset.Value.Equals(databasedScore.ScoreInfo.Ruleset)
+                    ? new[] { typeof(SongSelect) }
+                    : Array.Empty<Type>();
+
             PerformFromScreen(screen =>
             {
-                Logger.Log($"{nameof(PresentScore)} updating beatmap ({databasedBeatmap}) and ruleset ({databasedScore.ScoreInfo.Ruleset} to match score");
+                Logger.Log($"{nameof(PresentScore)} updating beatmap ({databasedBeatmap}) and ruleset ({databasedScore.ScoreInfo.Ruleset}) to match score");
 
                 Ruleset.Value = databasedScore.ScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
@@ -578,7 +589,7 @@ namespace osu.Game
                         screen.Push(new SoloResultsScreen(databasedScore.ScoreInfo, false));
                         break;
                 }
-            }, validScreens: new[] { typeof(PlaySongSelect) });
+            }, validScreens: validScreens);
         }
 
         public override Task Import(params ImportTask[] imports)

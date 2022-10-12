@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -20,6 +21,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         [Resolved]
         protected Column Column { get; private set; }
 
+        [Resolved]
+        private StageDefinition stage { get; set; }
+
         /// <summary>
         /// The column type identifier to use for texture lookups, in the case of no user-provided configuration.
         /// </summary>
@@ -28,19 +32,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load()
         {
-            switch (Column.ColumnType)
+            if (Column.IsSpecial)
+                FallbackColumnIndex = "S";
+            else
             {
-                case ColumnType.Special:
-                    FallbackColumnIndex = "S";
-                    break;
-
-                case ColumnType.Odd:
-                    FallbackColumnIndex = "1";
-                    break;
-
-                case ColumnType.Even:
-                    FallbackColumnIndex = "2";
-                    break;
+                int distanceToEdge = Math.Min(Column.Index, (stage.Columns - 1) - Column.Index);
+                FallbackColumnIndex = distanceToEdge % 2 == 0 ? "1" : "2";
             }
         }
 
