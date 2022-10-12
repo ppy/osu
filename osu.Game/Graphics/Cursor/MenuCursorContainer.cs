@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.Cursor
         }
 
         [Resolved]
-        private OsuUserInputManager inputManager { get; set; } = null!;
+        private OsuUserInputManager? inputManager { get; set; }
 
         [Resolved]
         private OsuGame? game { get; set; }
@@ -63,8 +63,11 @@ namespace osu.Game.Graphics.Cursor
 
             internalState.ValueChanged += onInternalStateChanged;
 
-            mouseInputSource.BindTo(inputManager.IsMouseInputSource);
-            mouseInputSource.BindValueChanged(_ => updateInternalVisibility(), true);
+            if (inputManager != null)
+            {
+                mouseInputSource.BindTo(inputManager.IsMouseInputSource);
+                mouseInputSource.BindValueChanged(_ => updateInternalVisibility(), true);
+            }
 
             if (game != null)
             {
