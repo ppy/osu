@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -27,6 +28,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private HitObjectUsageEventBuffer usageEventBuffer;
 
+        protected InputManager InputManager { get; private set; }
+
         protected EditorBlueprintContainer(HitObjectComposer composer)
         {
             Composer = composer;
@@ -41,6 +44,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            InputManager = GetContainingInputManager();
 
             Beatmap.HitObjectAdded += AddBlueprintFor;
             Beatmap.HitObjectRemoved += RemoveBlueprintFor;
