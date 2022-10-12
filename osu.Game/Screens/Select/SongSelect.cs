@@ -37,6 +37,7 @@ using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
 using System.Diagnostics;
 using JetBrains.Annotations;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
@@ -83,6 +84,8 @@ namespace osu.Game.Screens.Select
         public virtual bool AllowEditing => true;
 
         public bool BeatmapSetsLoaded => IsLoaded && Carousel?.BeatmapSetsLoaded == true;
+
+        public virtual Func<BeatmapInfo, MenuItem>[] CustomMenuItems => new Func<BeatmapInfo, MenuItem>[] { b => new OsuMenuItem(@"Select", MenuItemType.Highlighted, () => FinaliseSelection(b)) };
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }

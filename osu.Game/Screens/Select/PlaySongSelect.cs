@@ -1,15 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -28,6 +33,13 @@ namespace osu.Game.Screens.Select
         private INotificationOverlay? notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;
+
+        public override Func<BeatmapInfo, MenuItem>[] CustomMenuItems =>
+            new Func<BeatmapInfo, MenuItem>[]
+            {
+                b => new OsuMenuItem("Play", MenuItemType.Highlighted, () => FinaliseSelection(b)),
+                b => new OsuMenuItem(CommonStrings.ButtonsEdit, MenuItemType.Standard, () => Edit(b))
+            };
 
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
 
