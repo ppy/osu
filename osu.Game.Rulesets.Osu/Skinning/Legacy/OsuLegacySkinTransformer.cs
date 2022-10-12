@@ -106,6 +106,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                         return null;
 
+                    case OsuSkinComponents.CursorSmoke:
+                        if (GetTexture("cursor-smoke") != null)
+                            return new LegacySmokeSegment();
+
+                        return null;
+
                     case OsuSkinComponents.HitCircleText:
                         if (!this.HasFont(LegacyFont.HitCircle))
                             return null;

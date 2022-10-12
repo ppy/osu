@@ -61,7 +61,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                             c.Add(CreateHitObject().With(h =>
                             {
                                 h.HitObject.StartTime = Time.Current + 5000;
-                                h.AccentColour.Value = Color4.Orange;
                             }));
                         })
                     },
