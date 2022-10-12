@@ -1,9 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
@@ -22,8 +19,7 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         private int currentCombo;
 
-        [CanBeNull]
-        public ICatchComboCounter ComboCounter => Drawable as ICatchComboCounter;
+        public ICatchComboCounter? ComboCounter => Drawable as ICatchComboCounter;
 
         private readonly IBindable<bool> showCombo = new BindableBool(true);
 
@@ -33,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(Player player)
+        private void load(Player? player)
         {
             if (player != null)
             {
