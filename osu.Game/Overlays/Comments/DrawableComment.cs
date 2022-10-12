@@ -362,7 +362,7 @@ namespace osu.Game.Overlays.Comments
         /// </summary>
         private void makeDeleted()
         {
-            deletedLabel.Alpha = 1f;
+            deletedLabel.Show();
             content.FadeColour(OsuColour.Gray(0.5f));
             votePill.Hide();
             actionsContainer.Expire();
