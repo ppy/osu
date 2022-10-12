@@ -387,14 +387,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (bindTarget != null) bindTarget.IsBinding = true;
         }
 
-        private void updateStoreFromButton(KeyButton button)
-        {
-            realm.Run(r =>
-            {
-                var binding = r.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
-                r.Write(() => binding.KeyCombinationString = button.KeyBinding.KeyCombinationString);
-            });
-        }
+        private void updateStoreFromButton(KeyButton button) =>
+            realm.WriteAsync(r => r.Find<RealmKeyBinding>(button.KeyBinding.ID).KeyCombinationString = button.KeyBinding.KeyCombinationString);
 
         private void updateIsDefaultValue()
         {
