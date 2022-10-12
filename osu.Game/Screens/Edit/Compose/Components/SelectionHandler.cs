@@ -305,7 +305,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected void DeleteSelected()
         {
-            DeleteItems(selectedBlueprints.Select(b => b.Item));
+            DeleteItems(SelectedItems.ToArray());
         }
 
         #endregion

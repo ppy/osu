@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,8 +19,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public class ManiaLegacySkinTransformer : LegacySkinTransformer
     {
-        private readonly ManiaBeatmap beatmap;
-
         /// <summary>
         /// Mapping of <see cref="HitResult"/> to their corresponding
         /// <see cref="LegacyManiaSkinConfigurationLookups"/> value.
@@ -59,6 +56,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         /// Used to determine if the mania ruleset is skinned.
         /// </summary>
         private readonly Lazy<bool> hasKeyTexture;
+
+        private readonly ManiaBeatmap beatmap;
 
         public ManiaLegacySkinTransformer(ISkin skin, IBeatmap beatmap)
             : base(skin)
@@ -113,8 +112,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             return new LegacyHitExplosion();
 
                         case ManiaSkinComponents.StageBackground:
-                            Debug.Assert(maniaComponent.StageDefinition != null);
-                            return new LegacyStageBackground(maniaComponent.StageDefinition.Value);
+                            return new LegacyStageBackground();
 
                         case ManiaSkinComponents.StageForeground:
                             return new LegacyStageForeground();
@@ -151,7 +149,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
             if (lookup is ManiaSkinConfigurationLookup maniaLookup)
-                return base.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.TargetColumn));
+            {
+                return base.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.ColumnIndex));
+            }
 
             return base.GetConfig<TLookup, TValue>(lookup);
         }

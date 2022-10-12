@@ -228,7 +228,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"rank_history")]
         private APIRankHistory rankHistory
         {
-            set => statistics.RankHistory = value;
+            set => Statistics.RankHistory = value;
         }
 
         [JsonProperty("badges")]

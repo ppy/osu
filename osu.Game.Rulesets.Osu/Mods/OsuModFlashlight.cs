@@ -32,24 +32,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = default_follow_delay,
         };
 
-        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
-        public override BindableFloat SizeMultiplier { get; } = new BindableFloat
+        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
             MaxValue = 2f,
-            Default = 1f,
-            Value = 1f,
             Precision = 0.1f
         };
 
-        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
-        public override BindableBool ComboBasedSize { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        public override float DefaultFlashlightSize => 180;
+        public override float DefaultFlashlightSize => 200;
 
         private OsuFlashlight flashlight = null!;
 
@@ -70,7 +62,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 followDelay = modFlashlight.FollowDelay.Value;
 
-                FlashlightSize = new Vector2(0, GetSizeFor(0));
+                FlashlightSize = new Vector2(0, GetSize());
+                FlashlightSmoothness = 1.4f;
             }
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
@@ -90,9 +83,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return base.OnMouseMove(e);
             }
 
-            protected override void OnComboChange(ValueChangedEvent<int> e)
+            protected override void UpdateFlashlightSize(float size)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, size), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
