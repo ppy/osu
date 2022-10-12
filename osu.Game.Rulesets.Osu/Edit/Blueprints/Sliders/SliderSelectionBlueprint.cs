@@ -163,7 +163,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override void OnDrag(DragEvent e)
         {
             if (placementControlPoint != null)
-                placementControlPoint.Position = e.MousePosition - HitObject.Position;
+            {
+                var result = snapProvider?.FindSnappedPositionAndTime(ToScreenSpace(e.MousePosition));
+                placementControlPoint.Position = ToLocalSpace(result?.ScreenSpacePosition ?? ToScreenSpace(e.MousePosition)) - HitObject.Position;
+            }
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
@@ -339,7 +342,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 double positionWithRepeats = (time - HitObject.StartTime) / HitObject.Duration * HitObject.SpanCount();
                 double pathPosition = positionWithRepeats - (int)positionWithRepeats;
                 // every second span is in the reverse direction - need to reverse the path position.
-                if (Precision.AlmostBigger(positionWithRepeats % 2, 1))
+                if (positionWithRepeats % 2 >= 1)
                     pathPosition = 1 - pathPosition;
 
                 Vector2 position = HitObject.Position + HitObject.Path.PositionAt(pathPosition);

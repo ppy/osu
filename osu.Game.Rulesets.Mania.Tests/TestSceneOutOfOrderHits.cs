@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             AddStep("load player", () =>
             {
-                Beatmap.Value = CreateWorkingBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 })
+                Beatmap.Value = CreateWorkingBeatmap(new ManiaBeatmap(new StageDefinition(4))
                 {
                     HitObjects = hitObjects,
                     BeatmapInfo =

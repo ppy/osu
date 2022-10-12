@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Filled = HitObject.FirstTick
             });
 
-        protected override double MaximumJudgementOffset => HitObject.HitWindow;
+        public override double MaximumJudgementOffset => HitObject.HitWindow;
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
