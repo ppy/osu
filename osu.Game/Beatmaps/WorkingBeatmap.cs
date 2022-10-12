@@ -110,7 +110,7 @@ namespace osu.Game.Beatmaps
 
         public Track LoadTrack() => track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
-        public void PrepareTrackForPreview(bool looping)
+        public void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0)
         {
             Track.Looping = looping;
             Track.RestartPoint = Metadata.PreviewTime;
@@ -125,6 +125,8 @@ namespace osu.Game.Beatmaps
 
                 Track.RestartPoint = 0.4f * Track.Length;
             }
+
+            Track.RestartPoint += offsetFromPreviewPoint;
         }
 
         /// <summary>
