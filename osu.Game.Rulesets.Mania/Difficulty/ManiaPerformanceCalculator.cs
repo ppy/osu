@@ -10,6 +10,8 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using MathNet.Numerics;
+using MathNet.Numerics.RootFinding;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
@@ -21,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
-        private double scoreAccuracy;
+        private double estimatedUR;
 
         public ManiaPerformanceCalculator()
             : base(new ManiaRuleset())
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            scoreAccuracy = calculateCustomAccuracy();
+            estimatedUR = computeEstimatedUR(maniaAttributes) * 10;
 
             // Arbitrary initial value for scaling pp in order to standardize distributions across game modes.
             // The specific number has no intrinsic meaning and can be adjusted as needed.
@@ -50,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 multiplier *= 0.5;
 
             double difficultyValue = computeDifficultyValue(maniaAttributes);
-            double totalValue = difficultyValue * multiplier;
+            double totalValue = estimatedUR;
 
             return new ManiaPerformanceAttributes
             {
@@ -61,24 +63,53 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeDifficultyValue(ManiaDifficultyAttributes attributes)
         {
-            double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2) // Star rating to pp curve
-                                     * Math.Max(0, 5 * scoreAccuracy - 4) // From 80% accuracy, 1/20th of total pp is awarded per additional 1% accuracy
-                                     * (1 + 0.1 * Math.Min(1, totalHits / 1500)); // Length bonus, capped at 1500 notes
+            double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2); // Star rating to pp curve
 
             return difficultyValue;
         }
 
         private double totalHits => countPerfect + countOk + countGreat + countGood + countMeh + countMiss;
+        private double totalSuccessfulHits => countPerfect + countOk + countGreat + countGood + countMeh;
 
         /// <summary>
         /// Accuracy used to weight judgements independently from the score's actual accuracy.
         /// </summary>
-        private double calculateCustomAccuracy()
+        private double computeEstimatedUR(ManiaDifficultyAttributes attributes)
         {
-            if (totalHits == 0)
-                return 0;
+            if (totalSuccessfulHits == 0)
+                return Double.PositiveInfinity;
 
-            return (countPerfect * 320 + countGreat * 300 + countGood * 200 + countOk * 100 + countMeh * 50) / (totalHits * 320);
+            // We need the size of every hit window in order to calculate deviation accurately.
+            double hMax = 16.5;
+            double h300 = Math.Floor(64 - 3 * attributes.OverallDifficulty) + 0.5;
+            double h200 = Math.Floor(97 - 3 * attributes.OverallDifficulty) + 0.5;
+            double h100 = Math.Floor(127 - 3 * attributes.OverallDifficulty) + 0.5;
+            double h50 = Math.Floor(151 - 3 * attributes.OverallDifficulty) + 0.5;
+
+            double root2 = Math.Sqrt(2);
+
+            // Returns the likelihood of any deviation resulting in the play
+            double likelihoodGradient(double d)
+            {
+                double pMax = 1 - SpecialFunctions.Erfc(hMax / (d * root2));
+                double p300 = SpecialFunctions.Erfc(hMax / (d * root2)) - SpecialFunctions.Erfc(h300 / (d * root2));
+                double p200 = SpecialFunctions.Erfc(h300 / (d * root2)) - SpecialFunctions.Erfc(h200 / (d * root2));
+                double p100 = SpecialFunctions.Erfc(h200 / (d * root2)) - SpecialFunctions.Erfc(h100 / (d * root2));
+                double p50 = SpecialFunctions.Erfc(h100 / (d * root2)) - SpecialFunctions.Erfc(h50 / (d * root2));
+                double p0 = SpecialFunctions.Erfc(h50 / (d * root2));
+
+                double gradient = Math.Pow(pMax, countPerfect / totalHits)
+                * Math.Pow(p300, (countGreat + 0.5) / totalHits)
+                * Math.Pow(p200, countGood / totalHits)
+                * Math.Pow(p100, countOk / totalHits)
+                * Math.Pow(p50, countMeh / totalHits)
+                * Math.Pow(p0, countMiss / totalHits);
+
+                return -gradient;
+            }
+
+            // Finding the minimum of the inverse likelihood function returns the most likely deviation for a play
+            return FindMinimum.OfScalarFunction(likelihoodGradient, 5);
         }
     }
 }

@@ -19,6 +19,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         [JsonProperty("great_hit_window")]
         public double GreatHitWindow { get; set; }
 
+        /// <summary>
+        /// The perceived overall difficulty of the map.
+        /// </summary>
+        [JsonProperty("overall_difficulty")]
+        public double OverallDifficulty { get; set; }
+
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             foreach (var v in base.ToDatabaseAttributes())
