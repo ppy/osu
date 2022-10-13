@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -150,6 +151,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestUpdateLocalBeatmap()
         {
             DialogOverlay dialogOverlay = null!;
+            UpdateBeatmapSetButton? updateButton = null;
 
             AddStep("create carousel with dialog overlay", () =>
             {
@@ -176,7 +178,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 carousel.UpdateBeatmapSet(testBeatmapSetInfo);
             });
 
-            AddStep("click button", () => getUpdateButton()?.TriggerClick());
+            AddUntilStep("wait for update button", () => (updateButton = getUpdateButton()) != null);
+            AddStep("click button", () => updateButton.AsNonNull().TriggerClick());
 
             AddAssert("dialog displayed", () => dialogOverlay.CurrentDialog is UpdateLocalConfirmationDialog);
             AddStep("click confirmation", () =>
