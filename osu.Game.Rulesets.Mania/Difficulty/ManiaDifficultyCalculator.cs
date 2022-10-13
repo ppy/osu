@@ -55,7 +55,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 // In osu-stable mania, rate-adjustment mods don't affect the hit window.
                 // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
                 GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),
-                MaxCombo = beatmap.HitObjects.Sum(maxComboForObject)
+                MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
+                OverallDifficulty = beatmap.Difficulty.OverallDifficulty
             };
         }
 

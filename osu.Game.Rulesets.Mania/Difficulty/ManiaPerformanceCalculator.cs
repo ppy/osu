@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using MathNet.Numerics;
-using MathNet.Numerics.RootFinding;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
@@ -82,10 +81,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             // We need the size of every hit window in order to calculate deviation accurately.
             double hMax = 16.5;
-            double h300 = Math.Floor(64 - 3 * attributes.OverallDifficulty) + 0.5;
-            double h200 = Math.Floor(97 - 3 * attributes.OverallDifficulty) + 0.5;
-            double h100 = Math.Floor(127 - 3 * attributes.OverallDifficulty) + 0.5;
-            double h50 = Math.Floor(151 - 3 * attributes.OverallDifficulty) + 0.5;
+            double h300 = Math.Floor(64 - 3 * attributes.OverallDifficulty);
+            double h200 = Math.Floor(97 - 3 * attributes.OverallDifficulty);
+            double h100 = Math.Floor(127 - 3 * attributes.OverallDifficulty);
+            double h50 = Math.Floor(151 - 3 * attributes.OverallDifficulty);
 
             double root2 = Math.Sqrt(2);
 
