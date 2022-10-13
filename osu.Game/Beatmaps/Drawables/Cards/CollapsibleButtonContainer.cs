@@ -48,12 +48,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
         }
 
-        public MarginPadding ButtonsPadding
-        {
-            get => buttons.Padding;
-            set => buttons.Padding = value;
-        }
-
         protected override Container<Drawable> Content => mainContent;
 
         private readonly Container background;
@@ -104,25 +98,32 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Child = buttons = new Container<BeatmapCardIconButton>
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding(3),
                         Children = new BeatmapCardIconButton[]
                         {
                             new FavouriteButton(beatmapSet)
                             {
                                 Current = FavouriteState,
                                 Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.48f,
                             },
                             new DownloadButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State }
+                                State = { BindTarget = downloadTracker.State },
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.48f,
                             },
                             new GoToBeatmapButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State }
+                                State = { BindTarget = downloadTracker.State },
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.48f,
                             }
                         }
                     }
