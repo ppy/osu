@@ -29,9 +29,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved(CanBeNull = true)]
         private Timeline timeline { get; set; }
 
-        private DragEvent lastDragEvent;
         private Bindable<HitObject> placement;
         private SelectionBlueprint<HitObject> placementBlueprint;
+
+        private bool hitObjectDragged;
 
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
@@ -98,24 +99,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return base.OnDragStart(e);
         }
 
-        protected override void OnDrag(DragEvent e)
-        {
-            handleScrollViaDrag(e);
-
-            base.OnDrag(e);
-        }
-
-        protected override void OnDragEnd(DragEndEvent e)
-        {
-            base.OnDragEnd(e);
-            lastDragEvent = null;
-        }
-
         protected override void Update()
         {
-            // trigger every frame so drags continue to update selection while playback is scrolling the timeline.
-            if (lastDragEvent != null)
-                OnDrag(lastDragEvent);
+            if (IsDragged || hitObjectDragged)
+                handleScrollViaDrag();
 
             if (Composer != null && timeline != null)
             {
@@ -170,7 +157,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             return new TimelineHitObjectBlueprint(item)
             {
-                OnDragHandled = handleScrollViaDrag,
+                OnDragHandled = e => hitObjectDragged = e != null,
             };
         }
 
@@ -197,24 +184,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        private void handleScrollViaDrag(DragEvent e)
+        private void handleScrollViaDrag()
         {
-            lastDragEvent = e;
+            if (timeline == null) return;
 
-            if (lastDragEvent == null)
-                return;
+            var timelineQuad = timeline.ScreenSpaceDrawQuad;
+            float mouseX = InputManager.CurrentState.Mouse.Position.X;
 
-            if (timeline != null)
-            {
-                var timelineQuad = timeline.ScreenSpaceDrawQuad;
-                float mouseX = e.ScreenSpaceMousePosition.X;
-
-                // scroll if in a drag and dragging outside visible extents
-                if (mouseX > timelineQuad.TopRight.X)
-                    timeline.ScrollBy((float)((mouseX - timelineQuad.TopRight.X) / 10 * Clock.ElapsedFrameTime));
-                else if (mouseX < timelineQuad.TopLeft.X)
-                    timeline.ScrollBy((float)((mouseX - timelineQuad.TopLeft.X) / 10 * Clock.ElapsedFrameTime));
-            }
+            // scroll if in a drag and dragging outside visible extents
+            if (mouseX > timelineQuad.TopRight.X)
+                timeline.ScrollBy((float)((mouseX - timelineQuad.TopRight.X) / 10 * Clock.ElapsedFrameTime));
+            else if (mouseX < timelineQuad.TopLeft.X)
+                timeline.ScrollBy((float)((mouseX - timelineQuad.TopLeft.X) / 10 * Clock.ElapsedFrameTime));
         }
 
         private class SelectableAreaBackground : CompositeDrawable
