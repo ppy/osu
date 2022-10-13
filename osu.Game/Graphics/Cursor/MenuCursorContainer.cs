@@ -35,6 +35,8 @@ namespace osu.Game.Graphics.Cursor
         private Bindable<bool> cursorRotate = null!;
         private Sample tapSample = null!;
 
+        private bool visible;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, ScreenshotManager? screenshotManager, AudioManager audio)
         {
@@ -52,46 +54,41 @@ namespace osu.Game.Graphics.Cursor
         [Resolved]
         private OsuGame? game { get; set; }
 
-        private readonly IBindable<bool> mouseInputSource = new BindableBool();
+        private readonly IBindable<bool> lastInputWasMouse = new BindableBool();
         private readonly IBindable<bool> isIdle = new BindableBool();
-
-        private readonly Bindable<Visibility> internalState = new Bindable<Visibility>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            internalState.ValueChanged += onInternalStateChanged;
-
             if (inputManager != null)
             {
-                mouseInputSource.BindTo(inputManager.IsMouseInputSource);
-                mouseInputSource.BindValueChanged(_ => updateInternalVisibility(), true);
+                lastInputWasMouse.BindTo(inputManager.LastInputWasMouseSource);
+                lastInputWasMouse.BindValueChanged(_ => updateState(), true);
             }
 
             if (game != null)
             {
                 isIdle.BindTo(game.IsIdle);
-                isIdle.BindValueChanged(_ => updateInternalVisibility());
+                isIdle.BindValueChanged(_ => updateState());
             }
         }
 
-        private void updateInternalVisibility()
-        {
-            bool visible = mouseInputSource.Value;
-            internalState.Value = visible ? Visibility.Visible : Visibility.Hidden;
-        }
+        protected override void UpdateState(ValueChangedEvent<Visibility> state) => updateState();
 
-        private void onInternalStateChanged(ValueChangedEvent<Visibility> internalState)
+        private void updateState()
         {
-            if (State.Value == Visibility.Visible)
-                base.UpdateState(internalState);
-        }
+            bool combinedVisibility = State.Value == Visibility.Visible && lastInputWasMouse.Value && !isIdle.Value;
 
-        protected override void UpdateState(ValueChangedEvent<Visibility> state)
-        {
-            if (internalState.Value == Visibility.Visible)
-                base.UpdateState(state);
+            if (visible == combinedVisibility)
+                return;
+
+            visible = combinedVisibility;
+
+            if (visible)
+                PopIn();
+            else
+                PopOut();
         }
 
         protected override void Update()
