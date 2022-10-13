@@ -12,6 +12,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
+using osu.Game.Overlays.OSD;
 using osuTK;
 using osuTK.Graphics;
 

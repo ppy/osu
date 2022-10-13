@@ -26,6 +26,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.OSD;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments

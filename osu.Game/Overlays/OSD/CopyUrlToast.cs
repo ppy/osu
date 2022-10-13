@@ -2,9 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Localisation;
-using osu.Game.Overlays.OSD;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Overlays.OSD
 {
     public class CopyUrlToast : Toast
     {
