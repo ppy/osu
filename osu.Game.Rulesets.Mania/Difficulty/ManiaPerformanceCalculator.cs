@@ -92,6 +92,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             // Returns the likelihood of any deviation resulting in the play
             double likelihoodGradient(double d)
             {
+                if (d <= 0)
+                    return double.PositiveInfinity;
+
                 double pMax = 1 - SpecialFunctions.Erfc(hMax / (d * root2));
                 double p300 = SpecialFunctions.Erfc(hMax / (d * root2)) - SpecialFunctions.Erfc(h300 / (d * root2));
                 double p200 = SpecialFunctions.Erfc(h300 / (d * root2)) - SpecialFunctions.Erfc(h200 / (d * root2));
