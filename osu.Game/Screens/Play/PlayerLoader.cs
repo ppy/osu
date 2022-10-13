@@ -64,6 +64,8 @@ namespace osu.Game.Screens.Play
 
         protected Task? DisposalTask { get; private set; }
 
+        private OsuScrollContainer settingsScroll = null!;
+
         private bool backgroundBrightnessReduction;
 
         private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
@@ -168,30 +170,30 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    new OsuScrollContainer
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        RelativeSizeAxes = Axes.Y,
-                        Width = SettingsToolboxGroup.CONTAINER_WIDTH + padding * 2,
-                        Padding = new MarginPadding { Vertical = padding },
-                        Masking = false,
-                        Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 20),
-                            Padding = new MarginPadding { Horizontal = padding },
-                            Children = new PlayerSettingsGroup[]
-                            {
-                                VisualSettings = new VisualSettings(),
-                                AudioSettings = new AudioSettings(),
-                                new InputSettings()
-                            }
-                        },
-                    },
-                    idleTracker = new IdleTracker(750),
                 }),
+                settingsScroll = new OsuScrollContainer
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = SettingsToolboxGroup.CONTAINER_WIDTH + padding * 2,
+                    Padding = new MarginPadding { Vertical = padding },
+                    Masking = false,
+                    Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
+                        Padding = new MarginPadding { Horizontal = padding },
+                        Children = new PlayerSettingsGroup[]
+                        {
+                            VisualSettings = new VisualSettings(),
+                            AudioSettings = new AudioSettings(),
+                            new InputSettings()
+                        }
+                    },
+                },
+                idleTracker = new IdleTracker(750),
                 lowPassFilter = new AudioFilter(audio.TrackMixer),
                 highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass)
             };
@@ -392,6 +394,8 @@ namespace osu.Game.Screens.Play
         {
             MetadataInfo.Loading = true;
 
+            settingsScroll.FadeInFromZero(400);
+
             content.FadeInFromZero(400);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
             lowPassFilter.CutoffTo(1000, 650, Easing.OutQuint);
@@ -407,6 +411,7 @@ namespace osu.Game.Screens.Play
 
             content.ScaleTo(0.7f, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
             content.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint);
+            settingsScroll.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint);
             lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, CONTENT_OUT_DURATION);
             highPassFilter.CutoffTo(0, CONTENT_OUT_DURATION);
         }
