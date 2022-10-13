@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -58,6 +59,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Label = FirstRunOverlayImportFromStableScreenStrings.LocateDirectoryLabel,
                     PlaceholderText = FirstRunOverlayImportFromStableScreenStrings.LocateDirectoryPlaceholder
                 },
+                // TODO: after stable path is selected, attempt a hard link and show a message here based on the success.
                 new ImportCheckbox(CommonStrings.Beatmaps, StableContent.Beatmaps),
                 new ImportCheckbox(CommonStrings.Scores, StableContent.Scores),
                 new ImportCheckbox(CommonStrings.Skins, StableContent.Skins),
@@ -105,6 +107,9 @@ namespace osu.Game.Overlays.FirstRunSetup
             toggleInteraction(true);
             stableLocatorTextBox.Current.Value = storage.GetFullPath(string.Empty);
             importButton.Enabled.Value = true;
+
+            bool available = legacyImportManager.CheckHardLinkAvailability();
+            Logger.Log($"Hard link support is {available}");
         }
 
         private void runImport()

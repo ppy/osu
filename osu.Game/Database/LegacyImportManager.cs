@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
+using osu.Game.Models;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Scoring;
@@ -53,6 +55,21 @@ namespace osu.Game.Database
         public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         public void UpdateStorage(string stablePath) => cachedStorage = new StableStorage(stablePath, desktopGameHost);
+
+        public bool CheckHardLinkAvailability()
+        {
+            if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+                return false;
+
+            var stableStorage = GetCurrentStableStorage();
+
+            if (stableStorage == null || desktopGameHost == null)
+                return false;
+
+            string testPath = desktopGameHost.Storage.GetFullPath("_hard_link_test");
+
+            return RealmFileStore.CreateHardLink(testPath, stableStorage.GetFiles(string.Empty).First(), IntPtr.Zero);
+        }
 
         public virtual async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
         {
