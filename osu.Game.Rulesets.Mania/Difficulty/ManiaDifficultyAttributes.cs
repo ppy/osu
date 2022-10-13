@@ -25,6 +25,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         [JsonProperty("overall_difficulty")]
         public double OverallDifficulty { get; set; }
 
+        /// <summary>
+        /// The number of notes in the beatmap.
+        /// </summary>
+        public int NoteCount { get; set; }
+
+        /// <summary>
+        /// The number of hold notes in the beatmap.
+        /// </summary>
+        public int HoldNoteCount { get; set; }
+
+        /// <summary>
+        /// Conversion status from standard.
+        /// </summary>
+        public bool Convert { get; set; }
+
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             foreach (var v in base.ToDatabaseAttributes())

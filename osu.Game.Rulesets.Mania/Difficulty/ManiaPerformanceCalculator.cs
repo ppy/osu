@@ -79,6 +79,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (totalSuccessfulHits == 0)
                 return Double.PositiveInfinity;
 
+            double overallDifficulty = attributes.OverallDifficulty;
+
+            if (attributes.Convert == true)
+                overallDifficulty = 10;
+
             // We need the size of every hit window in order to calculate deviation accurately.
             double hMax = 16.5;
             double h300 = Math.Floor(64 - 3 * attributes.OverallDifficulty);

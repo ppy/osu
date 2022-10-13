@@ -48,6 +48,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             HitWindows hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
+            int noteCount = beatmap.HitObjects.Count(h => h is Note);
+            int holdNoteCount = beatmap.HitObjects.Count(h => h is HoldNote);
+            bool convert = beatmap.BeatmapInfo.Ruleset.Name != "osu!mania";
+
             return new ManiaDifficultyAttributes
             {
                 StarRating = skills[0].DifficultyValue() * star_scaling_factor,
@@ -56,7 +60,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
                 GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),
                 MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
-                OverallDifficulty = beatmap.Difficulty.OverallDifficulty
+                OverallDifficulty = beatmap.Difficulty.OverallDifficulty,
+                NoteCount = noteCount,
+                HoldNoteCount = holdNoteCount,
+                Convert = convert
             };
         }
 
