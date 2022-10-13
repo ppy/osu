@@ -14,7 +14,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public class TaikoLegacySkinTransformer : LegacySkinTransformer
     {
+        public override bool IsProvidingLegacyResources => base.IsProvidingLegacyResources || hasHitCircle || hasBarLeft;
+
         private readonly Lazy<bool> hasExplosion;
+
+        private bool hasHitCircle => GetTexture("taikohitcircle") != null;
+        private bool hasBarLeft => GetTexture("taiko-bar-left") != null;
 
         public TaikoLegacySkinTransformer(ISkin skin)
             : base(skin)
@@ -42,14 +47,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         return null;
 
                     case TaikoSkinComponents.InputDrum:
-                        if (GetTexture("taiko-bar-left") != null)
+                        if (hasBarLeft)
                             return new LegacyInputDrum();
 
                         return null;
 
                     case TaikoSkinComponents.CentreHit:
                     case TaikoSkinComponents.RimHit:
-                        if (GetTexture("taikohitcircle") != null)
+                        if (hasHitCircle)
                             return new LegacyHit(taikoComponent.Component);
 
                         return null;
