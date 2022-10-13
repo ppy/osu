@@ -80,6 +80,7 @@ namespace osu.Game.Overlays
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Alpha = 0,
                     Colour = colourProvider?.Background5 ?? Color4.Black,
                 },
                 new FillFlowContainer
