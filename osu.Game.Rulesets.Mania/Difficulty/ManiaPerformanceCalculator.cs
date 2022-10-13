@@ -52,12 +52,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 multiplier *= 0.5;
 
             double difficultyValue = computeDifficultyValue(maniaAttributes);
-            double totalValue = estimatedUR;
+            double totalValue = difficultyValue * multiplier;
 
             return new ManiaPerformanceAttributes
             {
                 Difficulty = difficultyValue,
-                Total = totalValue
+                Total = totalValue,
+                EstimatedUR = estimatedUR
             };
         }
 
@@ -109,7 +110,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             }
 
             // Finding the minimum of the inverse likelihood function returns the most likely deviation for a play
-            return FindMinimum.OfScalarFunction(likelihoodGradient, 5);
+            return FindMinimum.OfScalarFunction(likelihoodGradient, 30);
         }
     }
 }
