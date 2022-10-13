@@ -106,6 +106,7 @@ namespace osu.Game.Screens.Edit
                             Name = "Main content",
                             RelativeSizeAxes = Axes.Both,
                             Depth = float.MaxValue,
+                            Padding = new MarginPadding(10),
                             Child = spinner = new LoadingSpinner(true)
                             {
                                 State = { Value = Visibility.Visible },
