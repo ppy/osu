@@ -92,7 +92,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                 }
             });
 
-            Size = new Vector2(24);
             IconSize = 12;
         }
 
