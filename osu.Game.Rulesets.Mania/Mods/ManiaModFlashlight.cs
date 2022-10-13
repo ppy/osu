@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
 using osu.Game.Rulesets.Mania.Objects;
@@ -18,8 +19,14 @@ namespace osu.Game.Rulesets.Mania.Mods
         public ManiaModFlashlight()
         {
             FinalFlashlightSize.Default = 1;
-            StartingFlashlightSize.MaxValue = 3;
         }
+
+        public override BindableFloat StartingFlashlightSize { get; } = new BindableFloat(1)
+        {
+            MinValue = 0.5f,
+            MaxValue = 3f,
+            Precision = 0.1f
+        };
 
         public override float DefaultFlashlightSize => 50;
 

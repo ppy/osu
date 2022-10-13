@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
@@ -14,10 +15,12 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
-        public CatchModFlashlight()
+        public override BindableFloat StartingFlashlightSize { get; } = new BindableFloat(1)
         {
-            StartingFlashlightSize.MaxValue = 1.5f;
-        }
+            MinValue = 0.5f,
+            MaxValue = 1.5f,
+            Precision = 0.1f
+        };
 
         public override float DefaultFlashlightSize => 325;
 

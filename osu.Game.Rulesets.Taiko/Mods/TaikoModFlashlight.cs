@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
 using osu.Game.Rulesets.Mods;
@@ -15,6 +16,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
+        public override BindableFloat StartingFlashlightSize { get; } = new BindableFloat(1)
+        {
+            MinValue = 0.5f,
+            MaxValue = 1.5f,
+            Precision = 0.1f
+        };
+
         public override float DefaultFlashlightSize => 200;
 
         protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, playfield);
@@ -24,9 +32,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             playfield = (TaikoPlayfield)drawableRuleset.Playfield;
-
-            StartingFlashlightSize.MaxValue = 1.5f;
-
             base.ApplyToDrawableRuleset(drawableRuleset);
         }
 

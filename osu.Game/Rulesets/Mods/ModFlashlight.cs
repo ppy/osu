@@ -32,8 +32,6 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => "Restricted view area.";
 
-        private const float size_customization_precision = 0.05f;
-
         private float findClosestMultipleFrom(int value, float multiple) => MathF.Round(value / multiple) * multiple;
 
         protected ModFlashlight()
@@ -51,19 +49,14 @@ namespace osu.Game.Rulesets.Mods
         }
 
         [SettingSource("Starting flashlight size", "Multiplier applied to the default flashlight size.")]
-        public BindableFloat StartingFlashlightSize { get; } = new BindableFloat(1)
-        {
-            MinValue = 0.5f,
-            MaxValue = 2,
-            Precision = size_customization_precision
-        };
+        public abstract BindableFloat StartingFlashlightSize { get; }
 
         [SettingSource("Final flashlight size", "Multiplier applied to the starting flashlight size after the max flashlight combo is reached.")]
         public BindableFloat FinalFlashlightSize { get; } = new BindableFloat(0.625f)
         {
             MinValue = 0.5f,
             MaxValue = 1,
-            Precision = size_customization_precision
+            Precision = 0.05f
         };
 
         [SettingSource("Change size combo divisor", "Changes the combo divisor where the flashlight size is changed.")]

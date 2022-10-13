@@ -32,6 +32,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = default_follow_delay,
         };
 
+        public override BindableFloat StartingFlashlightSize { get; } = new BindableFloat(1)
+        {
+            MinValue = 0.5f,
+            MaxValue = 2f,
+            Precision = 0.1f
+        };
+
         public override float DefaultFlashlightSize => 200;
 
         private OsuFlashlight flashlight = null!;
