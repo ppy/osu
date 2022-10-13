@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -105,6 +106,9 @@ namespace osu.Game.Overlays.FirstRunSetup
             toggleInteraction(true);
             stableLocatorTextBox.Current.Value = storage.GetFullPath(string.Empty);
             importButton.Enabled.Value = true;
+
+            bool available = legacyImportManager.CheckHardLinkAvailability();
+            Logger.Log($"Hard link support is {available}");
         }
 
         private void runImport()

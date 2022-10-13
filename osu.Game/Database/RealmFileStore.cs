@@ -94,7 +94,7 @@ namespace osu.Game.Database
         }
 
         [DllImport("Kernel32.dll", CharSet = CharSet.Unicode)]
-        private static extern bool CreateHardLink(
+        public static extern bool CreateHardLink(
             string lpFileName,
             string lpExistingFileName,
             IntPtr lpSecurityAttributes
