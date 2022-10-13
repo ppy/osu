@@ -15,9 +15,9 @@ namespace osu.Game.Input
         /// <summary>
         /// Whether the last input applied to the game is sourced from mouse.
         /// </summary>
-        public IBindable<bool> IsMouseInputSource => isMouseInputSource;
+        public IBindable<bool> LastInputWasMouseSource => lastInputWasMouseSource;
 
-        private readonly Bindable<bool> isMouseInputSource = new Bindable<bool>();
+        private readonly Bindable<bool> lastInputWasMouseSource = new Bindable<bool>();
 
         internal OsuUserInputManager()
         {
@@ -29,11 +29,11 @@ namespace osu.Game.Input
             {
                 case ButtonStateChangeEvent<MouseButton>:
                 case MousePositionChangeEvent:
-                    isMouseInputSource.Value = true;
+                    lastInputWasMouseSource.Value = true;
                     break;
 
                 default:
-                    isMouseInputSource.Value = false;
+                    lastInputWasMouseSource.Value = false;
                     break;
             }
 
