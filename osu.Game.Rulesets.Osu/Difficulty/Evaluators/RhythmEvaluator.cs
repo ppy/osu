@@ -129,7 +129,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 }
             }
 
-            return Math.Sqrt(4 + rhythmComplexitySum * calculateRhythmMultiplier(greatWindow)) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
+            double doubletapness = 1;
+            var osuNextObj = (OsuDifficultyHitObject)current.Next(0);
+
+            // Nerf doubles that can be tapped at the same time to get Great hit results.
+            if (osuNextObj != null)
+            {
+                double currDeltaTime = Math.Max(1, osuCurrObj.DeltaTime);
+                double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
+                double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
+                double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
+                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / osuCurrObj.HitWindowGreat), 2);
+                doubletapness = Math.Pow(speedRatio, 1 - windowRatio);
+            }
+
+            return Math.Sqrt(4 + rhythmComplexitySum * calculateRhythmMultiplier(greatWindow) * doubletapness) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
         }
 
         private static double calculateRhythmMultiplier(double greatWindow)
