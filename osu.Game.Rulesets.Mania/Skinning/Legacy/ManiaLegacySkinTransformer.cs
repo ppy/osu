@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                             if (components != null)
                             {
-                                // catch may provide its own combo counter; hide the default.
+                                // mania may provide its own combo counter; hide the default.
                                 // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
                                 foreach (var legacyComboCounter in components.OfType<LegacyDefaultComboCounter>())
                                     legacyComboCounter.HiddenByRulesetImplementation = false;
