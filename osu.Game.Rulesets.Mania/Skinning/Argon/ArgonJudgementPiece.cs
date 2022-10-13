@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             ringExplosion?.PlayAnimation();
         }
 
-        public Drawable? GetAboveHitObjectsProxiedContent() => null;
+        public Drawable? GetAboveHitObjectsProxiedContent() => JudgementText;
 
         private class RingExplosion : CompositeDrawable
         {
