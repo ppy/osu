@@ -216,8 +216,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 SmokeEndTime = Source.smokeEndTime;
                 CurrentTime = Source.Clock.CurrentTime;
 
-                rotationRNG = new Random(Source.rotationSeed);
-
                 initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
                 firstVisiblePointTime = SmokeEndTime - initialFadeOutDurationTrunc;
 
@@ -232,6 +230,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 if (points.Count == 0)
                     return;
+
+                rotationRNG = new Random(Source.rotationSeed);
 
                 quadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(max_point_count / 10, 10);
                 texture ??= renderer.WhitePixel;
