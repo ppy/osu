@@ -330,7 +330,7 @@ namespace osu.Game.Overlays.Comments
             if (WasDeleted)
                 makeDeleted();
 
-            actionsContainer.AddLink("Copy URL", copyUrl);
+            actionsContainer.AddLink("Copy link", copyUrl);
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
             {
