@@ -211,7 +211,6 @@ namespace osu.Game.Overlays.Comments
                                                         {
                                                             Name = @"Actions buttons",
                                                             AutoSizeAxes = Axes.Both,
-                                                            Spacing = new Vector2(10, 0)
                                                         },
                                                         actionsLoading = new LoadingSpinner
                                                         {
@@ -332,6 +331,7 @@ namespace osu.Game.Overlays.Comments
                 makeDeleted();
 
             actionsContainer.AddLink("Copy link", copyUrl);
+            actionsContainer.AddArbitraryDrawable(new Container { Width = 10 });
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
             {
