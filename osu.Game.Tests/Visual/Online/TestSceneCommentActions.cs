@@ -10,7 +10,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -35,9 +34,6 @@ namespace osu.Game.Tests.Visual.Online
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
-
-        [Resolved]
-        private GameHost host { get; set; } = null!;
 
         private CommentsContainer commentsContainer = null!;
 
@@ -206,22 +202,6 @@ namespace osu.Game.Tests.Visual.Online
             {
                 return ourComment.ChildrenOfType<LinkFlowContainer>().Single(x => x.Name == @"Actions buttons").IsPresent;
             });
-        }
-
-        [Test]
-        public void TestCopyLink()
-        {
-            addTestComments();
-            AddUntilStep("Comments loaded", () => this.ChildrenOfType<DrawableComment>().Count() == 2);
-            AddStep("Click copy link", () =>
-            {
-                var comment = this.ChildrenOfType<DrawableComment>().First();
-                var links = comment.ChildrenOfType<LinkFlowContainer>().Single(x => x.Name == @"Actions buttons");
-                var btn = links.ChildrenOfType<OsuSpriteText>().Single(x => x.Text.ToString().StartsWith("Copy"));
-                InputManager.MoveMouseTo(btn);
-                InputManager.Click(MouseButton.Left);
-            });
-            AddUntilStep("Link copied", () => host.GetClipboard()?.GetText() == "https://osu.ppy.sh/comments/1");
         }
 
         private void addTestComments()
