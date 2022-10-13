@@ -4,6 +4,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -60,6 +62,13 @@ namespace osu.Game.Database
 
         private void copyToStore(RealmFile file, Stream data)
         {
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows && data is FileStream fs)
+            {
+                // attempt to do a fast hard link rather than copy.
+                if (CreateHardLink(Storage.GetFullPath(file.GetStoragePath()), fs.Name, IntPtr.Zero))
+                    return;
+            }
+
             data.Seek(0, SeekOrigin.Begin);
 
             using (var output = Storage.CreateFileSafely(file.GetStoragePath()))
@@ -67,6 +76,13 @@ namespace osu.Game.Database
 
             data.Seek(0, SeekOrigin.Begin);
         }
+
+        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode)]
+        private static extern bool CreateHardLink(
+            string lpFileName,
+            string lpExistingFileName,
+            IntPtr lpSecurityAttributes
+        );
 
         private bool checkFileExistsAndMatchesHash(RealmFile file)
         {
