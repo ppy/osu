@@ -80,9 +80,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    // workaround for masking artifacts at the top & bottom of card,
-                    // which become especially visible on downloaded beatmaps (when the icon area has a lime background).
-                    Padding = new MarginPadding { Vertical = 1 },
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
