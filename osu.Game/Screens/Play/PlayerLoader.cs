@@ -318,6 +318,16 @@ namespace osu.Game.Screens.Play
             content.StopTracking();
         }
 
+        protected override void LogoSuspending(OsuLogo logo)
+        {
+            base.LogoSuspending(logo);
+            content.StopTracking();
+
+            logo
+                .FadeOut(CONTENT_OUT_DURATION / 2, Easing.OutQuint)
+                .ScaleTo(logo.Scale * 0.8f, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
+        }
+
         #endregion
 
         protected override void Update()
@@ -440,7 +450,7 @@ namespace osu.Game.Screens.Play
 
                 ContentOut();
 
-                TransformSequence<PlayerLoader> pushSequence = this.Delay(CONTENT_OUT_DURATION);
+                TransformSequence<PlayerLoader> pushSequence = this.Delay(0);
 
                 // only show if the warning was created (i.e. the beatmap needs it)
                 // and this is not a restart of the map (the warning expires after first load).
@@ -449,6 +459,7 @@ namespace osu.Game.Screens.Play
                     const double epilepsy_display_length = 3000;
 
                     pushSequence
+                        .Delay(CONTENT_OUT_DURATION)
                         .Schedule(() => epilepsyWarning.State.Value = Visibility.Visible)
                         .TransformBindableTo(volumeAdjustment, 0.25, EpilepsyWarning.FADE_DURATION, Easing.OutQuint)
                         .Delay(epilepsy_display_length)
