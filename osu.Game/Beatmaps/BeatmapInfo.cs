@@ -37,6 +37,8 @@ namespace osu.Game.Beatmaps
 
         public string DifficultyName { get; set; } = string.Empty;
 
+        public string VariantName { get; set; } = string.Empty;
+
         public RulesetInfo Ruleset { get; set; } = null!;
 
         public BeatmapDifficulty Difficulty { get; set; } = null!;

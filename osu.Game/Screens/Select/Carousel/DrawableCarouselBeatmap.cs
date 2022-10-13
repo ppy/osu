@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Select.Carousel
                                     {
                                         new OsuSpriteText
                                         {
-                                            Text = beatmapInfo.DifficultyName,
+                                            Text = beatmapInfo.DifficultyName + (!string.IsNullOrEmpty(beatmapInfo.VariantName) ? $" ({beatmapInfo.VariantName})" : string.Empty),
                                             Font = OsuFont.GetFont(size: 20),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft

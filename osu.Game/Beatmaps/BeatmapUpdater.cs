@@ -46,7 +46,8 @@ namespace osu.Game.Beatmaps
         public void Queue(Live<BeatmapSetInfo> beatmapSet, bool preferOnlineFetch = false)
         {
             Logger.Log($"Queueing change for local beatmap {beatmapSet}");
-            Task.Factory.StartNew(() => beatmapSet.PerformRead(b => Process(b, preferOnlineFetch)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+            Task.Factory.StartNew(() => beatmapSet.PerformRead(b => Process(b, preferOnlineFetch)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
+                updateScheduler);
         }
 
         /// <summary>
@@ -75,6 +76,8 @@ namespace osu.Game.Beatmaps
                 beatmap.StarRating = calculator.Calculate().StarRating;
                 beatmap.Length = calculateLength(working.Beatmap);
                 beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
+
+                beatmap.VariantName = ruleset.GetVariantName(working.GetPlayableBeatmap(ruleset.RulesetInfo));
             }
 
             // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.

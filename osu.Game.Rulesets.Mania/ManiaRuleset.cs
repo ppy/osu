@@ -333,7 +333,15 @@ namespace osu.Game.Rulesets.Mania
             return Array.Empty<KeyBinding>();
         }
 
-        public override LocalisableString GetVariantName(int variant)
+        public override string GetVariantName(IBeatmap beatmap)
+        {
+            if (beatmap is ManiaBeatmap maniaBeatmap)
+                return GetVariantName(maniaBeatmap.OriginalTotalColumns);
+
+            return base.GetVariantName(beatmap);
+        }
+
+        public override string GetVariantName(int variant)
         {
             switch (getPlayfieldType(variant))
             {
