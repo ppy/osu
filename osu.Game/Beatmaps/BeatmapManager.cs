@@ -311,6 +311,8 @@ namespace osu.Game.Beatmaps
                 if (existingFileInfo != null)
                     DeleteFile(setInfo, existingFileInfo);
 
+                string oldMd5Hash = beatmapInfo.MD5Hash;
+
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
@@ -326,6 +328,8 @@ namespace osu.Game.Beatmaps
                     var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
+
+                    beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
 
                     ProcessBeatmap?.Invoke((liveBeatmapSet, false));
                 });

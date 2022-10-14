@@ -9,8 +9,10 @@ using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
 
@@ -95,6 +97,42 @@ namespace osu.Game.Tests.Beatmaps
             var first = beatmaps.GetWorkingBeatmap(beatmap);
             var second = beatmaps.GetWorkingBeatmap(beatmap, true);
             Assert.That(first, Is.Not.SameAs(second));
+        });
+
+        [Test]
+        public void TestSavePreservesCollections() => AddStep("run test", () =>
+        {
+            var beatmap = Realm.Run(r => r.Find<BeatmapInfo>(importedSet.Beatmaps.First().ID).Detach());
+
+            var working = beatmaps.GetWorkingBeatmap(beatmap);
+
+            Assert.That(working.BeatmapInfo.BeatmapSet?.Files, Has.Count.GreaterThan(0));
+
+            string initialHash = working.BeatmapInfo.MD5Hash;
+
+            var preserveCollection = new BeatmapCollection("test contained");
+            preserveCollection.BeatmapMD5Hashes.Add(initialHash);
+
+            var noNewCollection = new BeatmapCollection("test not contained");
+
+            Realm.Write(r =>
+            {
+                r.Add(preserveCollection);
+                r.Add(noNewCollection);
+            });
+
+            Assert.That(preserveCollection.BeatmapMD5Hashes, Does.Contain(initialHash));
+            Assert.That(noNewCollection.BeatmapMD5Hashes, Does.Not.Contain(initialHash));
+
+            beatmaps.Save(working.BeatmapInfo, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo));
+
+            string finalHash = working.BeatmapInfo.MD5Hash;
+
+            Assert.That(finalHash, Is.Not.SameAs(initialHash));
+
+            Assert.That(preserveCollection.BeatmapMD5Hashes, Does.Not.Contain(initialHash));
+            Assert.That(preserveCollection.BeatmapMD5Hashes, Does.Contain(finalHash));
+            Assert.That(noNewCollection.BeatmapMD5Hashes, Does.Not.Contain(finalHash));
         });
     }
 }

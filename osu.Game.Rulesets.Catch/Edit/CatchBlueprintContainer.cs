@@ -36,5 +36,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             return base.CreateHitObjectBlueprintFor(hitObject);
         }
+
+        protected sealed override DragBox CreateDragBox() => new ScrollingDragBox(Composer.Playfield);
     }
 }

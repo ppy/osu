@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
@@ -211,6 +212,23 @@ namespace osu.Game.Beatmaps
             string? fileHashY = y.BeatmapSet.GetFile(getFilename(y.Metadata))?.File.Hash;
 
             return fileHashX == fileHashY;
+        }
+
+        /// <summary>
+        /// When updating a beatmap, its hashes will change. Collections currently track beatmaps by hash, so they need to be updated.
+        /// This method will handle updating
+        /// </summary>
+        /// <param name="realm">A realm instance in an active write transaction.</param>
+        /// <param name="previousMD5Hash">The previous MD5 hash of the beatmap before update.</param>
+        public void TransferCollectionReferences(Realm realm, string previousMD5Hash)
+        {
+            var collections = realm.All<BeatmapCollection>().AsEnumerable().Where(c => c.BeatmapMD5Hashes.Contains(previousMD5Hash));
+
+            foreach (var c in collections)
+            {
+                c.BeatmapMD5Hashes.Remove(previousMD5Hash);
+                c.BeatmapMD5Hashes.Add(MD5Hash);
+            }
         }
 
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
