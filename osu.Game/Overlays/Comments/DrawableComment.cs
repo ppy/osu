@@ -19,6 +19,8 @@ using System;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
+using osu.Framework.Extensions;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -29,7 +31,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class DrawableComment : CompositeDrawable
+    public class DrawableComment : CompositeDrawable, IHasPopover
     {
         private const int avatar_size = 40;
 
@@ -324,9 +326,9 @@ namespace osu.Game.Overlays.Comments
                 makeDeleted();
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
-            {
                 actionsContainer.AddLink("Delete", deleteComment);
-            }
+            else
+                actionsContainer.AddLink("Report", this.ShowPopover);
 
             if (Comment.IsTopLevel)
             {
@@ -543,6 +545,11 @@ namespace osu.Game.Overlays.Comments
 
                 return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? "deleted" : string.Empty;
             }
+        }
+
+        public Popover GetPopover()
+        {
+            return new ReportCommentPopover(Comment.Id);
         }
     }
 }
