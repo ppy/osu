@@ -527,9 +527,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Color4 colour = combo.GetComboColour(CurrentSkin);
 
             // Normalise the combo colour to the given brightness level.
-            colour = OsuColour.ToHSPA(colour);
-            colour.B = comboColourBrightness.Value;
-            colour = OsuColour.FromHSPA(colour);
+            colour = new HSPAColour(colour) { P = comboColourBrightness.Value }.ToColor4();
 
             AccentColour.Value = colour;
         }
