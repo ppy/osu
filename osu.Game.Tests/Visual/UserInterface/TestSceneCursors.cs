@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestUserOverrideWithLocal()
         {
-            AddStep("Move to yellow-blue boundary", () => InputManager.MoveMouseTo(cursorBoxes[5].ScreenSpaceDrawQuad.TopRight - new Vector2(10)));
+            AddStep("Move to yellow-blue boundary", () => InputManager.MoveMouseTo(cursorBoxes[5].ScreenSpaceDrawQuad.TopRight - new Vector2(10, 0)));
             AddAssert("Check blue cursor visible", () => checkVisible(cursorBoxes[1].Cursor));
             AddAssert("Check blue cursor at mouse", () => checkAtMouse(cursorBoxes[1].Cursor));
             AddAssert("Check yellow cursor visible", () => checkVisible(cursorBoxes[5].Cursor));
