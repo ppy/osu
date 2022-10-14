@@ -129,6 +129,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
 
         private readonly Bindable<float> positionalHitsoundsLevel = new Bindable<float>();
+        private readonly Bindable<bool> normaliseComboColourBrightness = new Bindable<bool>();
         private readonly Bindable<float> comboColourBrightness = new Bindable<float>();
         private readonly Bindable<int> comboIndexWithOffsetsBindable = new Bindable<int>();
 
@@ -173,6 +174,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load(OsuConfigManager config, ISkinSource skinSource)
         {
             config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
+            config.BindWith(OsuSetting.NormaliseComboColourBrightness, normaliseComboColourBrightness);
             config.BindWith(OsuSetting.ComboColourBrightness, comboColourBrightness);
 
             // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
@@ -195,6 +197,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             comboIndexBindable.BindValueChanged(_ => UpdateComboColour());
             comboIndexWithOffsetsBindable.BindValueChanged(_ => UpdateComboColour(), true);
 
+            normaliseComboColourBrightness.BindValueChanged(_ => UpdateComboColour());
             comboColourBrightness.BindValueChanged(_ => UpdateComboColour());
 
             // Apply transforms
@@ -527,7 +530,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Color4 colour = combo.GetComboColour(CurrentSkin);
 
             // Normalise the combo colour to the given brightness level.
-            colour = new HSPAColour(colour) { P = comboColourBrightness.Value }.ToColor4();
+            if (normaliseComboColourBrightness.Value)
+                colour = new HSPAColour(colour) { P = comboColourBrightness.Value }.ToColor4();
 
             AccentColour.Value = colour;
         }

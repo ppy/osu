@@ -175,6 +175,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
+
+            SetDefault(OsuSetting.NormaliseComboColourBrightness, false);
             SetDefault(OsuSetting.ComboColourBrightness, 0.7f, 0f, 1f);
         }
 
@@ -372,6 +374,7 @@ namespace osu.Game.Configuration
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,
+        NormaliseComboColourBrightness,
         ComboColourBrightness
     }
 }
