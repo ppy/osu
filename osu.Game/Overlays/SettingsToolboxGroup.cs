@@ -81,7 +81,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.1f,
-                    Colour = colourProvider?.Background5 ?? Color4.Black,
+                    Colour = colourProvider?.Background4 ?? Color4.Black,
                 },
                 new FillFlowContainer
                 {
