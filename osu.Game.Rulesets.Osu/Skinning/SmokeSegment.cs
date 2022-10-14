@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 if (points.Count == 0)
                     return;
 
-                rotationIndex = rotationSeed;
+                rotationIndex = 0;
 
                 quadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(max_point_count / 10, 10);
                 texture ??= renderer.WhitePixel;
@@ -314,11 +314,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 return new Vector2(MathF.Sin(angle), -MathF.Cos(angle));
             }
 
-            private float nextRotation()
-            {
-                rotationIndex++;
-                return max_rotation * (StatelessRNG.NextSingle(rotationIndex) * 2 - 1);
-            }
+            private float nextRotation() => max_rotation * (StatelessRNG.NextSingle(rotationSeed, rotationIndex++) * 2 - 1);
 
             private void drawPointQuad(SmokePoint point, RectangleF textureRect)
             {
