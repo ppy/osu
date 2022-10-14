@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -13,14 +15,14 @@ namespace osu.Game.Overlays.Comments
 {
     public class ReportCommentPopover : OsuPopover
     {
-        public readonly long ID;
+        private readonly Action<CommentReportReason, string> action;
         private LabelledEnumDropdown<CommentReportReason> reason = null!;
         private LabelledTextBox info = null!;
         private ShakeContainer shaker = null!;
 
-        public ReportCommentPopover(long id)
+        public ReportCommentPopover(Action<CommentReportReason, string> action)
         {
-            ID = id;
+            this.action = action;
         }
 
         [BackgroundDependencyLoader]
@@ -73,6 +75,9 @@ namespace osu.Game.Overlays.Comments
                 shaker.Shake();
                 return;
             }
+
+            this.HidePopover();
+            action.Invoke(reasonValue, infoValue);
         }
     }
 }

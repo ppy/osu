@@ -27,6 +27,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
@@ -72,6 +73,9 @@ namespace osu.Game.Overlays.Comments
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved(canBeNull: true)]
+        private NotificationOverlay? notificationOverlay { get; set; }
 
         public DrawableComment(Comment comment)
         {
@@ -405,6 +409,28 @@ namespace osu.Game.Overlays.Comments
             api.Queue(request);
         }
 
+        public void ReportComment(CommentReportReason reason, string comment)
+        {
+            actionsContainer.Hide();
+            actionsLoading.Show();
+            var request = new CommentReportRequest(Comment.Id, reason, comment);
+            request.Success += () =>
+            {
+                actionsLoading.Hide();
+                notificationOverlay?.Post(new SimpleNotification
+                {
+                    Icon = FontAwesome.Solid.CheckCircle,
+                    Text = "The comment reported successfully."
+                });
+            };
+            request.Failure += _ =>
+            {
+                actionsLoading.Hide();
+                actionsContainer.Show();
+            };
+            api.Queue(request);
+        }
+
         protected override void LoadComplete()
         {
             ShowDeleted.BindValueChanged(show =>
@@ -549,7 +575,7 @@ namespace osu.Game.Overlays.Comments
 
         public Popover GetPopover()
         {
-            return new ReportCommentPopover(Comment.Id);
+            return new ReportCommentPopover(ReportComment);
         }
     }
 }
