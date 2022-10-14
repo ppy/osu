@@ -414,7 +414,7 @@ namespace osu.Game.Overlays.Comments
             actionsContainer.Hide();
             actionsLoading.Show();
             var request = new CommentReportRequest(Comment.Id, reason, comment);
-            request.Success += () =>
+            request.Success += () => Schedule(() =>
             {
                 actionsLoading.Hide();
                 notificationOverlay?.Post(new SimpleNotification
@@ -422,12 +422,12 @@ namespace osu.Game.Overlays.Comments
                     Icon = FontAwesome.Solid.CheckCircle,
                     Text = "The comment reported successfully."
                 });
-            };
-            request.Failure += _ =>
+            });
+            request.Failure += _ => Schedule(() =>
             {
                 actionsLoading.Hide();
                 actionsContainer.Show();
-            };
+            });
             api.Queue(request);
         }
 
