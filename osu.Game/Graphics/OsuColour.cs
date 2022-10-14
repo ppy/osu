@@ -302,11 +302,10 @@ namespace osu.Game.Graphics
 
             if (minOverMax > 0f)
             {
-                float part = 1f + colour.R * (1f / minOverMax - 1f);
-
                 if (colour.R < 1f / 6f)
                 {
                     colour.R = 6f * (colour.R - 0f / 6f);
+                    float part = 1f + colour.R * (1f / minOverMax - 1f);
                     result.B = colour.B / MathF.Sqrt(p_r / minOverMax / minOverMax + p_g * part * part + p_b);
                     result.R = result.B / minOverMax;
                     result.G = result.B + colour.R * (result.R - result.B);
@@ -314,13 +313,15 @@ namespace osu.Game.Graphics
                 else if (colour.R < 2f / 6f)
                 {
                     colour.R = 6f * (-colour.R + 2f / 6f);
+                    float part = 1f + colour.R * (1f / minOverMax - 1f);
                     result.B = colour.B / MathF.Sqrt(p_g / minOverMax / minOverMax + p_r * part * part + p_b);
                     result.G = result.B / minOverMax;
-                    result.R = result.B + colour.R * (result.R - result.B);
+                    result.R = result.B + colour.R * (result.G - result.B);
                 }
                 else if (colour.R < 3f / 6f)
                 {
                     colour.R = 6f * (colour.R - 2f / 6f);
+                    float part = 1f + colour.R * (1f / minOverMax - 1f);
                     result.R = colour.B / MathF.Sqrt(p_g / minOverMax / minOverMax + p_b * part * part + p_r);
                     result.G = result.R / minOverMax;
                     result.B = result.R + colour.R * (result.G - result.R);
@@ -328,6 +329,7 @@ namespace osu.Game.Graphics
                 else if (colour.R < 4f / 6f)
                 {
                     colour.R = 6f * (-colour.R + 4f / 6f);
+                    float part = 1f + colour.R * (1f / minOverMax - 1f);
                     result.R = colour.B / MathF.Sqrt(p_b / minOverMax / minOverMax + p_g * part * part + p_r);
                     result.B = result.R / minOverMax;
                     result.G = result.R + colour.R * (result.B - result.R);
@@ -335,6 +337,7 @@ namespace osu.Game.Graphics
                 else if (colour.R < 5f / 6f)
                 {
                     colour.R = 6f * (colour.R - 4f / 6f);
+                    float part = 1f + colour.R * (1f / minOverMax - 1f);
                     result.G = colour.B / MathF.Sqrt(p_b / minOverMax / minOverMax + p_r * part * part + p_g);
                     result.B = result.G / minOverMax;
                     result.R = result.G + colour.R * (result.B - result.G);
@@ -342,6 +345,7 @@ namespace osu.Game.Graphics
                 else
                 {
                     colour.R = 6f * (-colour.R + 6f / 6f);
+                    float part = 1f + colour.R * (1f / minOverMax - 1f);
                     result.G = colour.B / MathF.Sqrt(p_r / minOverMax / minOverMax + p_b * part * part + p_g);
                     result.R = result.G / minOverMax;
                     result.B = result.G + colour.R * (result.R - result.G);
