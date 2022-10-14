@@ -10,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -42,9 +43,13 @@ namespace osu.Game.Tests.Visual.Online
         {
             base.Content.AddRange(new Drawable[]
             {
-                content = new OsuScrollContainer
+                new PopoverContainer()
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Child = content = new OsuScrollContainer
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }
                 },
                 dialogOverlay
             });
