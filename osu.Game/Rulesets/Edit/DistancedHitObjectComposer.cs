@@ -8,6 +8,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -52,20 +54,32 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
-            AddInternal(RightSideToolboxContainer = new ExpandingToolboxContainer(130, 250)
+            AddInternal(new Container
             {
-                Padding = new MarginPadding(10),
-                Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                Child = new EditorToolboxGroup("snapping")
+                RelativeSizeAxes = Axes.Y,
+                AutoSizeAxes = Axes.X,
+                Children = new Drawable[]
                 {
-                    Child = distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
+                    new Box
                     {
-                        Current = { BindTarget = DistanceSpacingMultiplier },
-                        KeyboardStep = adjust_step,
+                        Colour = colourProvider.Background5,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    RightSideToolboxContainer = new ExpandingToolboxContainer(130, 250)
+                    {
+                        Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
+                        Child = new EditorToolboxGroup("snapping")
+                        {
+                            Child = distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
+                            {
+                                Current = { BindTarget = DistanceSpacingMultiplier },
+                                KeyboardStep = adjust_step,
+                            }
+                        }
                     }
                 }
             });
