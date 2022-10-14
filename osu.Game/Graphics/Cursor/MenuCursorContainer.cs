@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
-using osu.Game.Input;
 using osuTK;
 
 namespace osu.Game.Graphics.Cursor
@@ -35,6 +34,8 @@ namespace osu.Game.Graphics.Cursor
         private Bindable<bool> cursorRotate = null!;
         private Sample tapSample = null!;
 
+        private MouseInputDetector mouseInputDetector = null!;
+
         private bool visible;
 
         [BackgroundDependencyLoader]
@@ -46,10 +47,9 @@ namespace osu.Game.Graphics.Cursor
                 screenshotCursorVisibility.BindTo(screenshotManager.CursorVisibility);
 
             tapSample = audio.Samples.Get(@"UI/cursor-tap");
-        }
 
-        [Resolved]
-        private OsuUserInputManager? inputManager { get; set; }
+            Add(mouseInputDetector = new MouseInputDetector());
+        }
 
         [Resolved]
         private OsuGame? game { get; set; }
@@ -61,11 +61,8 @@ namespace osu.Game.Graphics.Cursor
         {
             base.LoadComplete();
 
-            if (inputManager != null)
-            {
-                lastInputWasMouse.BindTo(inputManager.LastInputWasMouseSource);
-                lastInputWasMouse.BindValueChanged(_ => updateState(), true);
-            }
+            lastInputWasMouse.BindTo(mouseInputDetector.LastInputWasMouseSource);
+            lastInputWasMouse.BindValueChanged(_ => updateState(), true);
 
             if (game != null)
             {
@@ -244,6 +241,35 @@ namespace osu.Game.Graphics.Cursor
 
                 cursorScale = config.GetBindable<float>(OsuSetting.MenuCursorSize);
                 cursorScale.BindValueChanged(scale => cursorContainer.Scale = new Vector2(scale.NewValue * base_scale), true);
+            }
+        }
+
+        private class MouseInputDetector : Component
+        {
+            /// <summary>
+            /// Whether the last input applied to the game is sourced from mouse.
+            /// </summary>
+            public IBindable<bool> LastInputWasMouseSource => lastInputWasMouseSource;
+
+            private readonly Bindable<bool> lastInputWasMouseSource = new Bindable<bool>();
+
+            public MouseInputDetector()
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            protected override bool Handle(UIEvent e)
+            {
+                switch (e)
+                {
+                    case MouseEvent:
+                        lastInputWasMouseSource.Value = true;
+                        return false;
+
+                    default:
+                        lastInputWasMouseSource.Value = false;
+                        return false;
+                }
             }
         }
 
