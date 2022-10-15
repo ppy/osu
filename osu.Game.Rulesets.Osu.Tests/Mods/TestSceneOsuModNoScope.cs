@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Utils;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -149,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         private OsuPlayfield playfield => (OsuPlayfield)Player.DrawableRuleset.Playfield;
 
         private bool cursorAlphaAlmostEquals(float alpha) =>
-            Precision.AlmostEquals(playfield.Cursor.Alpha, alpha, 0.1f) &&
+            Precision.AlmostEquals(playfield.Cursor.AsNonNull().Alpha, alpha, 0.1f) &&
             Precision.AlmostEquals(playfield.Smoke.Alpha, alpha, 0.1f);
     }
 }
