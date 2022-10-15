@@ -539,36 +539,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestRulesetChangeResetsMods()
-        {
-            createSongSelect();
-            changeRuleset(0);
-
-            changeMods(new OsuModHardRock());
-
-            int actionIndex = 0;
-            int modChangeIndex = 0;
-            int rulesetChangeIndex = 0;
-
-            AddStep("change ruleset", () =>
-            {
-                SelectedMods.ValueChanged += onModChange;
-                songSelect!.Ruleset.ValueChanged += onRulesetChange;
-
-                Ruleset.Value = new TaikoRuleset().RulesetInfo;
-
-                SelectedMods.ValueChanged -= onModChange;
-                songSelect!.Ruleset.ValueChanged -= onRulesetChange;
-            });
-
-            AddAssert("mods changed before ruleset", () => modChangeIndex < rulesetChangeIndex);
-            AddAssert("empty mods", () => !SelectedMods.Value.Any());
-
-            void onModChange(ValueChangedEvent<IReadOnlyList<Mod>> e) => modChangeIndex = actionIndex++;
-            void onRulesetChange(ValueChangedEvent<RulesetInfo> e) => rulesetChangeIndex = actionIndex++;
-        }
-
-        [Test]
         public void TestModsRetainedBetweenSongSelect()
         {
             AddAssert("empty mods", () => !SelectedMods.Value.Any());
