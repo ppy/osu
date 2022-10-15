@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            estimatedUR = computeEstimatedUR(maniaAttributes) * 10;
+            estimatedUR = computeEstimatedUR(score, maniaAttributes) * 10;
 
             // Arbitrary initial value for scaling pp in order to standardize distributions across game modes.
             // The specific number has no intrinsic meaning and can be adjusted as needed.
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// <summary>
         /// Accuracy used to weight judgements independently from the score's actual accuracy.
         /// </summary>
-        private double computeEstimatedUR(ManiaDifficultyAttributes attributes)
+        private double computeEstimatedUR(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
             if (totalSuccessfulHits == 0)
                 return Double.PositiveInfinity;
@@ -84,12 +84,19 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (attributes.Convert)
                 overallDifficulty = 10;
 
+            double windowMultiplier = 1;
+
+            if (score.Mods.Any(m => m is ModHardRock))
+                windowMultiplier *= 1 / 1.4;
+            else if (score.Mods.Any(m => m is ModEasy))
+                windowMultiplier *= 1.4;
+
             // We need the size of every hit window in order to calculate deviation accurately.
-            double hMax = 16.5;
-            double h300 = Math.Floor(64 - 3 * overallDifficulty);
-            double h200 = Math.Floor(97 - 3 * overallDifficulty);
-            double h100 = Math.Floor(127 - 3 * overallDifficulty);
-            double h50 = Math.Floor(151 - 3 * overallDifficulty);
+            double hMax = Math.Floor(16 * windowMultiplier);
+            double h300 = Math.Floor((64 - 3 * overallDifficulty) * windowMultiplier);
+            double h200 = Math.Floor((97 - 3 * overallDifficulty) * windowMultiplier);
+            double h100 = Math.Floor((127 - 3 * overallDifficulty) * windowMultiplier);
+            double h50 = Math.Floor((151 - 3 * overallDifficulty) * windowMultiplier);
 
             double root2 = Math.Sqrt(2);
 
