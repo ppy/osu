@@ -71,7 +71,6 @@ namespace osu.Game.Rulesets.Edit
                     },
                     RightSideToolboxContainer = new ExpandingToolboxContainer(130, 250)
                     {
-                        Padding = new MarginPadding(10),
                         Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                         Child = new EditorToolboxGroup("snapping")
                         {

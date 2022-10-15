@@ -80,8 +80,8 @@ namespace osu.Game.Overlays
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    Colour = colourProvider?.Background5 ?? Color4.Black,
+                    Alpha = 0.1f,
+                    Colour = colourProvider?.Background4 ?? Color4.Black,
                 },
                 new FillFlowContainer
                 {
@@ -184,7 +184,7 @@ namespace osu.Game.Overlays
         {
             const float fade_duration = 500;
 
-            background.FadeTo(IsHovered ? 1 : 0, fade_duration, Easing.OutQuint);
+            background.FadeTo(IsHovered ? 1 : 0.1f, fade_duration, Easing.OutQuint);
             expandButton.FadeTo(IsHovered ? 1 : 0, fade_duration, Easing.OutQuint);
         }
     }

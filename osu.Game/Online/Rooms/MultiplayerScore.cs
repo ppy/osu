@@ -65,7 +65,7 @@ namespace osu.Game.Online.Rooms
         [CanBeNull]
         public MultiplayerScoresAround ScoresAround { get; set; }
 
-        public ScoreInfo CreateScoreInfo(RulesetStore rulesets, PlaylistItem playlistItem, [NotNull] BeatmapInfo beatmap)
+        public ScoreInfo CreateScoreInfo(ScoreManager scoreManager, RulesetStore rulesets, PlaylistItem playlistItem, [NotNull] BeatmapInfo beatmap)
         {
             var ruleset = rulesets.GetRuleset(playlistItem.RulesetID);
             if (ruleset == null)
@@ -89,6 +89,8 @@ namespace osu.Game.Online.Rooms
                 Mods = Mods?.Select(m => m.ToMod(rulesetInstance)).ToArray() ?? Array.Empty<Mod>(),
                 Position = Position,
             };
+
+            scoreManager.PopulateMaximumStatistics(scoreInfo);
 
             return scoreInfo;
         }
