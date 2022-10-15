@@ -12,10 +12,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -80,7 +82,7 @@ namespace osu.Game.Rulesets.Edit
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             Config = Dependencies.Get<IRulesetConfigCache>().GetConfigFor(Ruleset);
 
@@ -116,25 +118,37 @@ namespace osu.Game.Rulesets.Edit
                                               .WithChild(BlueprintContainer = CreateBlueprintContainer())
                     }
                 },
-                new ExpandingToolboxContainer(90, 200)
+                new Container
                 {
-                    Padding = new MarginPadding(10),
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new EditorToolboxGroup("toolbox (1-9)")
+                        new Box
                         {
-                            Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
+                            Colour = colourProvider.Background5,
+                            RelativeSizeAxes = Axes.Both,
                         },
-                        new EditorToolboxGroup("toggles (Q~P)")
+                        new ExpandingToolboxContainer(60, 200)
                         {
-                            Child = togglesCollection = new FillFlowContainer
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical,
-                                Spacing = new Vector2(0, 5),
-                            },
-                        }
+                                new EditorToolboxGroup("toolbox (1-9)")
+                                {
+                                    Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
+                                },
+                                new EditorToolboxGroup("toggles (Q~P)")
+                                {
+                                    Child = togglesCollection = new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(0, 5),
+                                    },
+                                }
+                            }
+                        },
                     }
                 },
             };

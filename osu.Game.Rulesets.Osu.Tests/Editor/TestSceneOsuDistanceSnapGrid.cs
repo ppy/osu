@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Edit;
@@ -32,6 +33,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Cached(typeof(EditorBeatmap))]
         [Cached(typeof(IBeatSnapProvider))]
         private readonly EditorBeatmap editorBeatmap;
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         [Cached]
         private readonly EditorClock editorClock;
