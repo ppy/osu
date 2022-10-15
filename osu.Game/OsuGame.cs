@@ -70,6 +70,7 @@ namespace osu.Game
     /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
     /// for initial components that are generally retrieved via DI.
     /// </summary>
+    [Cached(typeof(OsuGame))]
     public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
     {
         /// <summary>
@@ -135,6 +136,11 @@ namespace osu.Game
         private float toolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
 
         private IdleTracker idleTracker;
+
+        /// <summary>
+        /// Whether the user is currently in an idle state.
+        /// </summary>
+        public IBindable<bool> IsIdle => idleTracker.IsIdle;
 
         /// <summary>
         /// Whether overlays should be able to be opened game-wide. Value is sourced from the current active screen.
@@ -266,8 +272,6 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            dependencies.CacheAs(this);
-
             SentryLogger.AttachUser(API.LocalUser);
 
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
