@@ -45,8 +45,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         public Bindable<LabelStyles> LabelStyle { get; } = new Bindable<LabelStyles>(LabelStyles.Icons);
 
         private SpriteIcon arrow;
-        private Drawable labelEarly;
-        private Drawable labelLate;
+        private UprightAspectMaintainingContainer labelEarly;
+        private UprightAspectMaintainingContainer labelLate;
 
         private Container colourBarsEarly;
         private Container colourBarsLate;
@@ -122,6 +122,18 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
                                 Width = judgement_line_width,
+                            },
+                            labelEarly = new UprightAspectMaintainingContainer {
+                                AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.Centre,
+                                Y = -10,
+                            },
+                            labelLate = new UprightAspectMaintainingContainer {
+                                AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.Centre,
+                                Y = 10,
                             },
                         }
                     },
@@ -262,86 +274,39 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             const float icon_size = 14;
 
-            labelEarly?.Expire();
-            labelEarly = null;
-
-            labelLate?.Expire();
-            labelLate = null;
-
             switch (style)
             {
                 case LabelStyles.None:
                     break;
 
                 case LabelStyles.Icons:
-                    labelEarly = new UprightAspectMaintainingContainer
+                    labelEarly.Child = new SpriteIcon
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.Centre,
-                        Y = -10,
-                        Children = new Drawable[]
-                        {
-                            new SpriteIcon
-                            {
-                                Size = new Vector2(icon_size),
-                                Icon = FontAwesome.Solid.ShippingFast,
-                            }
-                        }
+                        Size = new Vector2(icon_size),
+                        Icon = FontAwesome.Solid.ShippingFast,
                     };
 
-                    labelLate = new UprightAspectMaintainingContainer
+                    labelLate.Child = new SpriteIcon
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.Centre,
-                        Y = 10,
-                        Children = new Drawable[]
-                        {
-                            new SpriteIcon
-                            {
-                                Y = 10,
-                                Size = new Vector2(icon_size),
-                                Icon = FontAwesome.Solid.Bicycle,
-                            }
-                        }
+                        Size = new Vector2(icon_size),
+                        Icon = FontAwesome.Solid.Bicycle,
                     };
 
                     break;
 
                 case LabelStyles.Text:
-                    labelEarly = new UprightAspectMaintainingContainer
+                    labelEarly.Child = new OsuSpriteText
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.Centre,
-                        Y = -10,
-                        Children = new Drawable[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Text = "Early",
-                                Font = OsuFont.Default.With(size: 10),
-                                Height = 12,
-                            }
-                        }
+                        Text = "Early",
+                        Font = OsuFont.Default.With(size: 10),
+                        Height = 12,
                     };
 
-                    labelLate = new UprightAspectMaintainingContainer
+                    labelLate.Child = new OsuSpriteText
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.Centre,
-                        Y = 10,
-                        Children = new Drawable[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Text = "Late",
-                                Font = OsuFont.Default.With(size: 10),
-                                Height = 12,
-                            }
-                        }
+                        Text = "Late",
+                        Font = OsuFont.Default.With(size: 10),
+                        Height = 12,
                     };
 
                     break;
@@ -350,17 +315,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                     throw new ArgumentOutOfRangeException(nameof(style), style, null);
             }
 
-            if (labelEarly != null)
-            {
-                colourBars.Add(labelEarly);
-                labelEarly.FadeInFromZero(500);
-            }
-
-            if (labelLate != null)
-            {
-                colourBars.Add(labelLate);
-                labelLate.FadeInFromZero(500);
-            }
+            labelEarly.FadeInFromZero(500);
+            labelLate.FadeInFromZero(500);
         }
 
         private void createColourBars((HitResult result, double length)[] windows)
