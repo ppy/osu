@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -273,45 +274,74 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                     break;
 
                 case LabelStyles.Icons:
-                    labelEarly = new SpriteIcon
+                    labelEarly = new UprightAspectMaintainingContainer
                     {
-                        Y = -10,
-                        Size = new Vector2(icon_size),
-                        Icon = FontAwesome.Solid.ShippingFast,
+                        AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.Centre,
+                        Y = -10,
+                        Children = new Drawable[]
+                        {
+                            new SpriteIcon
+                            {
+                                Size = new Vector2(icon_size),
+                                Icon = FontAwesome.Solid.ShippingFast,
+                            }
+                        }
                     };
 
-                    labelLate = new SpriteIcon
+                    labelLate = new UprightAspectMaintainingContainer
                     {
-                        Y = 10,
-                        Size = new Vector2(icon_size),
-                        Icon = FontAwesome.Solid.Bicycle,
+                        AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.Centre,
+                        Y = 10,
+                        Children = new Drawable[]
+                        {
+                            new SpriteIcon
+                            {
+                                Y = 10,
+                                Size = new Vector2(icon_size),
+                                Icon = FontAwesome.Solid.Bicycle,
+                            }
+                        }
                     };
 
                     break;
 
                 case LabelStyles.Text:
-                    labelEarly = new OsuSpriteText
+                    labelEarly = new UprightAspectMaintainingContainer
                     {
-                        Y = -10,
-                        Text = "Early",
-                        Font = OsuFont.Default.With(size: 10),
-                        Height = 12,
+                        AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.Centre,
+                        Y = -10,
+                        Children = new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Text = "Early",
+                                Font = OsuFont.Default.With(size: 10),
+                                Height = 12,
+                            }
+                        }
                     };
 
-                    labelLate = new OsuSpriteText
+                    labelLate = new UprightAspectMaintainingContainer
                     {
-                        Y = 10,
-                        Text = "Late",
-                        Font = OsuFont.Default.With(size: 10),
-                        Height = 12,
+                        AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.Centre,
+                        Y = 10,
+                        Children = new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Text = "Late",
+                                Font = OsuFont.Default.With(size: 10),
+                                Height = 12,
+                            }
+                        }
                     };
 
                     break;
@@ -330,33 +360,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             {
                 colourBars.Add(labelLate);
                 labelLate.FadeInFromZero(500);
-            }
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // undo any layout rotation to display icons in the correct orientation
-            bool xFlipped = Scale.X < 0;
-            bool yFlipped = Scale.Y < 0;
-            bool horizontal = Rotation == 90 || Rotation == -90;
-
-            bool flipX = (xFlipped && yFlipped) || (xFlipped && !horizontal) || (yFlipped && horizontal);
-            bool flipY = (xFlipped && yFlipped) || (xFlipped && horizontal) || (yFlipped && !horizontal);
-
-            Vector2 flipScale = new Vector2(flipX ? -1 : 1, flipY ? -1 : 1);
-
-            if (labelEarly != null)
-            {
-                labelEarly.Rotation = -Rotation;
-                labelEarly.Scale = flipScale;
-            }
-
-            if (labelLate != null)
-            {
-                labelLate.Rotation = -Rotation;
-                labelLate.Scale = flipScale;
             }
         }
 
