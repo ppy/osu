@@ -278,7 +278,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Loading spinner shown", () => targetComment.ChildrenOfType<LoadingSpinner>().Any(d => d.IsPresent));
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);
-            AddAssert("Request is correct", () => request != null && request.CommentID == 2 && request.Info == report_text && request.Reason == CommentReportReason.Other);
+            AddAssert("Request is correct", () => request != null && request.CommentID == 2 && request.Comment == report_text && request.Reason == CommentReportReason.Other);
             AddUntilStep("Buttons hidden", () => !targetComment.ChildrenOfType<LinkFlowContainer>().Single(x => x.Name == @"Actions buttons").IsPresent);
         }
 

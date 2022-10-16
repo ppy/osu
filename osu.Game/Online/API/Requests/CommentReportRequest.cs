@@ -11,13 +11,13 @@ namespace osu.Game.Online.API.Requests
     {
         public readonly long CommentID;
         public readonly CommentReportReason Reason;
-        public readonly string? Info;
+        public readonly string Comment;
 
-        public CommentReportRequest(long commentID, CommentReportReason reason, string? info)
+        public CommentReportRequest(long commentID, CommentReportReason reason, string comment)
         {
             CommentID = commentID;
             Reason = reason;
-            Info = info;
+            Comment = comment;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -28,8 +28,7 @@ namespace osu.Game.Online.API.Requests
             req.AddParameter(@"reportable_type", @"comment");
             req.AddParameter(@"reportable_id", $"{CommentID}");
             req.AddParameter(@"reason", Reason.ToString());
-            if (!string.IsNullOrWhiteSpace(Info))
-                req.AddParameter(@"comments", Info);
+            req.AddParameter(@"comments", Comment);
 
             return req;
         }
