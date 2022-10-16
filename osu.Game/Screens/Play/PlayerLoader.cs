@@ -71,6 +71,9 @@ namespace osu.Game.Screens.Play
         private AudioFilter lowPassFilter = null!;
         private AudioFilter highPassFilter = null!;
 
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
         protected bool BackgroundBrightnessReduction
         {
             set
