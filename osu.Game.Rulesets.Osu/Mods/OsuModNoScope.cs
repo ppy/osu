@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -35,7 +36,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             bool shouldAlwaysShowCursor = IsBreakTime.Value || spinnerPeriods.IsInAny(playfield.Clock.CurrentTime);
             float targetAlpha = shouldAlwaysShowCursor ? 1 : ComboBasedAlpha;
-            playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, targetAlpha, Math.Clamp(playfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
+
+            var cursor = playfield.Cursor.AsNonNull();
+            cursor.Alpha = (float)Interpolation.Lerp(cursor.Alpha, targetAlpha, Math.Clamp(playfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
         }
     }
 }
