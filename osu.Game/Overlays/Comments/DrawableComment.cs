@@ -23,11 +23,12 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.OSD;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
@@ -75,7 +76,7 @@ namespace osu.Game.Overlays.Comments
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved(canBeNull: true)]
-        private NotificationOverlay? notificationOverlay { get; set; }
+        private OnScreenDisplay? onScreenDisplay { get; set; }
 
         public DrawableComment(Comment comment)
         {
@@ -417,11 +418,7 @@ namespace osu.Game.Overlays.Comments
             request.Success += () => Schedule(() =>
             {
                 actionsLoading.Hide();
-                notificationOverlay?.Post(new SimpleNotification
-                {
-                    Icon = FontAwesome.Solid.CheckCircle,
-                    Text = "The comment reported successfully."
-                });
+                onScreenDisplay?.Display(new ReportToast());
             });
             request.Failure += _ => Schedule(() =>
             {
@@ -576,6 +573,14 @@ namespace osu.Game.Overlays.Comments
         public Popover GetPopover()
         {
             return new ReportCommentPopover(ReportComment);
+        }
+
+        private class ReportToast : Toast
+        {
+            public ReportToast()
+                : base(UserInterfaceStrings.GeneralHeader, UsersStrings.ReportThanks, "")
+            {
+            }
         }
     }
 }
