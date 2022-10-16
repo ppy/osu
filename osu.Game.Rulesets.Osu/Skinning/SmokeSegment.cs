@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -185,6 +186,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
             private float radius;
             private Vector2 drawSize;
             private Texture? texture;
+            private int rotationSeed;
+            private int rotationIndex;
 
             // anim calculation vars (color, scale, direction)
             private double initialFadeOutDurationTrunc;
@@ -193,8 +196,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
             private double initialFadeOutTime;
             private double reFadeInTime;
             private double finalFadeOutTime;
-
-            private Random rotationRNG = new Random();
 
             public SmokeDrawNode(ITexturedShaderDrawable source)
                 : base(source)
@@ -216,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 SmokeEndTime = Source.smokeEndTime;
                 CurrentTime = Source.Clock.CurrentTime;
 
-                rotationRNG = new Random(Source.rotationSeed);
+                rotationSeed = Source.rotationSeed;
 
                 initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
                 firstVisiblePointTime = SmokeEndTime - initialFadeOutDurationTrunc;
@@ -232,6 +233,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 if (points.Count == 0)
                     return;
+
+                rotationIndex = 0;
 
                 quadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(max_point_count / 10, 10);
                 texture ??= renderer.WhitePixel;
@@ -311,7 +314,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 return new Vector2(MathF.Sin(angle), -MathF.Cos(angle));
             }
 
-            private float nextRotation() => max_rotation * ((float)rotationRNG.NextDouble() * 2 - 1);
+            private float nextRotation() => max_rotation * (StatelessRNG.NextSingle(rotationSeed, rotationIndex++) * 2 - 1);
 
             private void drawPointQuad(SmokePoint point, RectangleF textureRect)
             {
