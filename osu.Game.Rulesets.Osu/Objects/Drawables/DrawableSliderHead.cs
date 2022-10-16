@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -44,10 +45,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuRulesetConfigManager config)
         {
+            ReadFromConfig(config);
             PositionBindable.BindValueChanged(_ => updatePosition());
             pathVersion.BindValueChanged(_ => updatePosition());
+        }
+
+         private void ReadFromConfig(OsuRulesetConfigManager config)
+        {
+           TrackFollowCircle = config.Get<bool>(OsuRulesetSetting.TrackFollowCircle);
         }
 
         protected override void OnFree()

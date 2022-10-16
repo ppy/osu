@@ -39,6 +39,11 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Snaking out sliders",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
                 },
+                 new SettingsCheckbox
+                {
+                    LabelText = "Track follow circle",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.TrackFollowCircle)
+                },
                 new SettingsCheckbox
                 {
                     LabelText = "Cursor trail",

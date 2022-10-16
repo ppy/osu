@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
             base.InitialiseDefaults();
             SetDefault(OsuRulesetSetting.SnakingInSliders, true);
             SetDefault(OsuRulesetSetting.SnakingOutSliders, true);
+            SetDefault(OsuRulesetSetting.TrackFollowCircle, true);
             SetDefault(OsuRulesetSetting.ShowCursorTrail, true);
             SetDefault(OsuRulesetSetting.PlayfieldBorderStyle, PlayfieldBorderStyle.None);
         }
@@ -30,6 +31,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
     {
         SnakingInSliders,
         SnakingOutSliders,
+        TrackFollowCircle,
         ShowCursorTrail,
         PlayfieldBorderStyle,
     }
