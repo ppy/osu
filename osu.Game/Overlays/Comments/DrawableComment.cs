@@ -415,7 +415,7 @@ namespace osu.Game.Overlays.Comments
 
         private void copyUrl()
         {
-            host.GetClipboard()?.SetText($@"https://osu.ppy.sh/comments/{Comment.Id}");
+            host.GetClipboard()?.SetText($@"{api.APIEndpointUrl}/comments/{Comment.Id}");
             onScreenDisplay?.Display(new CopyUrlToast());
         }
 
