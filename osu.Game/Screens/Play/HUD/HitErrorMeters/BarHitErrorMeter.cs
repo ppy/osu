@@ -338,8 +338,26 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             base.Update();
 
             // undo any layout rotation to display icons in the correct orientation
-            if (labelEarly != null) labelEarly.Rotation = -Rotation;
-            if (labelLate != null) labelLate.Rotation = -Rotation;
+            bool xFlipped = Scale.X < 0;
+            bool yFlipped = Scale.Y < 0;
+            bool horizontal = Rotation == 90 || Rotation == -90;
+
+            bool flipX = (xFlipped && yFlipped) || (xFlipped && !horizontal) || (yFlipped && horizontal);
+            bool flipY = (xFlipped && yFlipped) || (xFlipped && horizontal) || (yFlipped && !horizontal);
+
+            Vector2 flipScale = new Vector2(flipX ? -1 : 1, flipY ? -1 : 1);
+
+            if (labelEarly != null)
+            {
+                labelEarly.Rotation = -Rotation;
+                labelEarly.Scale = flipScale;
+            }
+
+            if (labelLate != null)
+            {
+                labelLate.Rotation = -Rotation;
+                labelLate.Scale = flipScale;
+            }
         }
 
         private void createColourBars((HitResult result, double length)[] windows)
