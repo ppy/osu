@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu;
@@ -22,7 +24,7 @@ namespace osu.Game.Tests.Gameplay
 {
     public class TestSceneScoring : OsuTestScene
     {
-        private Container graphs = null!;
+        private GraphContainer graphs = null!;
         private SettingsSlider<int> sliderMaxCombo = null!;
 
         [Test]
@@ -39,7 +41,7 @@ namespace osu.Game.Tests.Gameplay
                         {
                             new Drawable[]
                             {
-                                graphs = new Container
+                                graphs = new GraphContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Height = 200,
@@ -70,7 +72,10 @@ namespace osu.Game.Tests.Gameplay
                     }
                 };
 
-                sliderMaxCombo.Current.BindValueChanged(_ => rerun());
+                sliderMaxCombo.Current.BindValueChanged(_ => rerun(true));
+                graphs.MissLocations.BindCollectionChanged((_, __) => rerun());
+
+                graphs.MaxCombo.BindTo(sliderMaxCombo.Current);
 
                 rerun();
             });
@@ -78,7 +83,7 @@ namespace osu.Game.Tests.Gameplay
 
         private ScheduledDelegate? debouncedRun;
 
-        private void rerun()
+        private void rerun(bool debounce = false)
         {
             graphs.Clear();
 
@@ -87,7 +92,7 @@ namespace osu.Game.Tests.Gameplay
             {
                 runForProcessor("lazer-classic", new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Classic } });
                 runForProcessor("lazer-standardised", new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Standardised } });
-            }, 200);
+            }, debounce ? 200 : 0);
         }
 
         private void runForProcessor(string name, ScoreProcessor processor)
@@ -103,13 +108,11 @@ namespace osu.Game.Tests.Gameplay
 
             processor.ApplyBeatmap(beatmap);
 
-            int[] missLocations = { 200, 500, 800 };
-
             List<float> results = new List<float>();
 
             for (int i = 0; i < maxCombo; i++)
             {
-                if (missLocations.Contains(i))
+                if (graphs.MissLocations.Contains(i))
                 {
                     processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement())
                     {
@@ -133,6 +136,92 @@ namespace osu.Game.Tests.Gameplay
                 LineColour = Color4.Red,
                 Values = results
             });
+        }
+    }
+
+    public class GraphContainer : Container
+    {
+        public readonly BindableList<double> MissLocations = new BindableList<double>();
+
+        public Bindable<int> MaxCombo = new Bindable<int>();
+
+        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+
+        private readonly Box hoverLine;
+
+        private readonly Container missLines;
+
+        public GraphContainer()
+        {
+            InternalChild = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = OsuColour.Gray(0.1f),
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    Content,
+                    hoverLine = new Box
+                    {
+                        Colour = Color4.Yellow,
+                        RelativeSizeAxes = Axes.Y,
+                        Alpha = 0,
+                        Width = 1,
+                    },
+                    missLines = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                }
+            };
+
+            MissLocations.BindCollectionChanged((_, _) => updateMissLocations(), true);
+
+            MaxCombo.BindValueChanged(_ => updateMissLocations());
+        }
+
+        private void updateMissLocations()
+        {
+            missLines.Clear();
+
+            foreach (int miss in MissLocations)
+            {
+                missLines.Add(new Box
+                {
+                    Colour = Color4.Red,
+                    Width = 1,
+                    RelativeSizeAxes = Axes.Y,
+                    RelativePositionAxes = Axes.X,
+                    X = (float)miss / MaxCombo.Value,
+                });
+            }
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            hoverLine.Show();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            hoverLine.Hide();
+            base.OnHoverLost(e);
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            hoverLine.X = e.MousePosition.X;
+            return base.OnMouseMove(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            MissLocations.Add((int)(e.MousePosition.X / DrawWidth * MaxCombo.Value));
+            return true;
         }
     }
 }
