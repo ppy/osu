@@ -257,10 +257,12 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddWaitStep("Wait", 3);
             AddAssert("Nothing happened", () => this.ChildrenOfType<ReportCommentPopover>().Any());
-            AddStep("Enter some text", () =>
+            AddStep("Set report data", () =>
             {
                 var field = this.ChildrenOfType<OsuTextBox>().Single();
                 field.Current.Value = report_text;
+                var reason = this.ChildrenOfType<OsuEnumDropdown<CommentReportReason>>().Single();
+                reason.Current.Value = CommentReportReason.Other;
             });
             AddStep("Try to report", () =>
             {
