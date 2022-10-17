@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double getConstantAngleNerfFactor(OsuDifficultyHitObject current)
         {
             const double time_limit = 2000;
-            const double time_limit_low = 300;
+            const double time_limit_low = 500;
 
             double constantAngleCount = 0;
 
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 {
                     double angleDifference = Math.Abs(current.Angle.Value - loopObj.Angle.Value);
 
-                    constantAngleCount += Math.Cos(2 * Math.Min(Math.PI / 4, angleDifference)) * longIntervalFactor;
+                    constantAngleCount += Math.Cos(4 * Math.Min(Math.PI / 8, angleDifference)) * longIntervalFactor;
                 }
 
                 currentTimeGap = current.StartTime - loopObj.StartTime;
