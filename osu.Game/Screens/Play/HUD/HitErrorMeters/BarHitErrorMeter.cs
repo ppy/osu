@@ -123,13 +123,15 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 RelativeSizeAxes = Axes.Y,
                                 Width = judgement_line_width,
                             },
-                            labelEarly = new UprightAspectMaintainingContainer {
+                            labelEarly = new UprightAspectMaintainingContainer
+                            {
                                 AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.Centre,
                                 Y = -10,
                             },
-                            labelLate = new UprightAspectMaintainingContainer {
+                            labelLate = new UprightAspectMaintainingContainer
+                            {
                                 AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.Centre,
