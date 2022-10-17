@@ -8,7 +8,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Overlays.Comments
@@ -16,8 +19,8 @@ namespace osu.Game.Overlays.Comments
     public class ReportCommentPopover : OsuPopover
     {
         private readonly Action<CommentReportReason, string> action;
-        private LabelledEnumDropdown<CommentReportReason> reason = null!;
-        private LabelledTextBox info = null!;
+        private OsuEnumDropdown<CommentReportReason> reason = null!;
+        private OsuTextBox info = null!;
         private ShakeContainer shaker = null!;
 
         public ReportCommentPopover(Action<CommentReportReason, string> action)
@@ -36,13 +39,28 @@ namespace osu.Game.Overlays.Comments
                 Spacing = new Vector2(7),
                 Children = new Drawable[]
                 {
-                    reason = new LabelledEnumDropdown<CommentReportReason>
+                    new OsuSpriteText
                     {
-                        Label = "Reason"
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Text = UsersStrings.ReportReason,
+                        Font = OsuFont.Torus.With(size: 20),
                     },
-                    info = new LabelledTextBox
+                    reason = new OsuEnumDropdown<CommentReportReason>
                     {
-                        Label = "Additional info",
+                        RelativeSizeAxes = Axes.X
+                    },
+                    new OsuSpriteText
+                    {
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Text = UsersStrings.ReportComments,
+                        Font = OsuFont.Torus.With(size: 20),
+                    },
+                    info = new OsuTextBox
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        PlaceholderText = UsersStrings.ReportPlaceholder
                     },
                     new Container
                     {
@@ -54,10 +72,13 @@ namespace osu.Game.Overlays.Comments
                             AutoSizeAxes = Axes.Y,
                             Child = new RoundedButton
                             {
-                                BackgroundColour = colours.Pink3,
-                                Text = "Send report",
-                                RelativeSizeAxes = Axes.X,
-                                Action = send
+                                Origin = Anchor.TopCentre,
+                                Anchor = Anchor.TopCentre,
+                                Width = 200,
+                                BackgroundColour = colours.Red3,
+                                Text = UsersStrings.ReportActionsSend,
+                                Action = send,
+                                Margin = new MarginPadding { Bottom = 5, Top = 10 },
                             }
                         }
                     }
@@ -70,7 +91,7 @@ namespace osu.Game.Overlays.Comments
             string infoValue = info.Current.Value;
             var reasonValue = reason.Current.Value;
 
-            if (reasonValue == CommentReportReason.Other && string.IsNullOrWhiteSpace(infoValue))
+            if (string.IsNullOrWhiteSpace(infoValue))
             {
                 shaker.Shake();
                 return;

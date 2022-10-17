@@ -570,10 +570,7 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        public Popover GetPopover()
-        {
-            return new ReportCommentPopover(ReportComment);
-        }
+        public Popover GetPopover() => new ReportCommentPopover(ReportComment);
 
         private class ReportToast : Toast
         {
