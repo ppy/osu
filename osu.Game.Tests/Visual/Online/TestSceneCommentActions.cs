@@ -249,11 +249,6 @@ namespace osu.Game.Tests.Visual.Online
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
-            AddStep("Select \"other\"", () =>
-            {
-                var field = this.ChildrenOfType<LabelledEnumDropdown<CommentReportReason>>().Single();
-                field.Current.Value = CommentReportReason.Other;
-            });
             AddStep("Try to report", () =>
             {
                 var btn = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<RoundedButton>().Single();
@@ -264,7 +259,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Nothing happened", () => this.ChildrenOfType<ReportCommentPopover>().Any());
             AddStep("Enter some text", () =>
             {
-                var field = this.ChildrenOfType<LabelledTextBox>().Single();
+                var field = this.ChildrenOfType<OsuTextBox>().Single();
                 field.Current.Value = report_text;
             });
             AddStep("Try to report", () =>
