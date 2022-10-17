@@ -180,6 +180,7 @@ namespace osu.Game.Tests.Gameplay
         private readonly Box hoverLine;
 
         private readonly Container missLines;
+        private readonly Container verticalGridLines;
 
         public GraphContainer()
         {
@@ -191,6 +192,10 @@ namespace osu.Game.Tests.Gameplay
                     new Box
                     {
                         Colour = OsuColour.Gray(0.1f),
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    verticalGridLines = new Container
+                    {
                         RelativeSizeAxes = Axes.Both,
                     },
                     Content,
@@ -208,9 +213,33 @@ namespace osu.Game.Tests.Gameplay
                 }
             };
 
-            MissLocations.BindCollectionChanged((_, _) => updateMissLocations(), true);
+            MissLocations.BindCollectionChanged((_, _) => updateMissLocations());
 
-            MaxCombo.BindValueChanged(_ => updateMissLocations());
+            MaxCombo.BindValueChanged(_ =>
+            {
+                updateMissLocations();
+                updateVerticalGridLines();
+            }, true);
+        }
+
+        private void updateVerticalGridLines()
+        {
+            verticalGridLines.Clear();
+
+            for (int i = 0; i < MaxCombo.Value; i++)
+            {
+                if (i % 100 == 0)
+                {
+                    verticalGridLines.Add(new Box
+                    {
+                        Colour = OsuColour.Gray(0.2f),
+                        Width = 1,
+                        RelativeSizeAxes = Axes.Y,
+                        RelativePositionAxes = Axes.X,
+                        X = (float)i / MaxCombo.Value,
+                    });
+                }
+            }
         }
 
         private void updateMissLocations()
