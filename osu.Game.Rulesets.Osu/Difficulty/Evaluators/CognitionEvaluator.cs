@@ -29,7 +29,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
 
             List<OsuDifficultyHitObject> pastVisibleObjects = retrievePastVisibleObjects(currObj);
-            //List<OsuDifficultyHitObject> currentVisibleObjects = retrieveCurrentVisibleObjects(currObj);
 
             // Rather than note density being the number of on-screen objects visible at the current object,
             // consider it as how many objects the current object has been visible for.
@@ -72,35 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty += 2 * currVelocity;
             }
 
-            double preemptDifficulty = 0.0;
-
-            if (currObj.preempt < 400)
-            {
-                preemptDifficulty += Math.Pow(400 - currObj.preempt, 1.5) / (10 + (currObj.StrainTime * 0.05));
-
-                // Buff spacing.
-                preemptDifficulty *= 1 + 0.6 * currVelocity;
-
-                // Buff rhythm.
-                preemptDifficulty *= Math.Max(1, RhythmEvaluator.EvaluateDifficultyOf(current) - 0.1);
-
-                // Buff small circles.
-                // Very arbitrary, but lets assume CS5 is when AR11 becomes more uncomfortable.
-                // This is likely going to need adjustments in the future as player meta develops.
-                preemptDifficulty *= 1 + Math.Max((30 - ((OsuHitObject)currObj.BaseObject).Radius) / 20, 0);
-
-                // Nerf repeated angles.
-                if (current.Index > 1)
-                {
-                    preemptDifficulty *= getConstantAngleNerfFactor(currObj);
-                    preemptDifficulty *= getConstantAngleNerfFactor(prevObj);
-                }
-
-                // Nerf constant rhythm.
-                preemptDifficulty *= getConstantRhythmNerfFactor(currObj);
-            }
-
-            double difficulty = Math.Max(preemptDifficulty, hiddenDifficulty) + noteDensityDifficulty;
+            double difficulty = hiddenDifficulty + noteDensityDifficulty;
 
             // While there is slider leniency...
             if (currObj.BaseObject is Slider)
@@ -128,25 +99,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return objects;
         }
 
-        // Returns a list of objects that are visible on screen at
-        // the point in time at which the current object needs is clicked.
-        private static List<OsuDifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current)
-        {
-            List<OsuDifficultyHitObject> objects = new List<OsuDifficultyHitObject>();
-
-            for (int i = 0; i < current.Count; i++)
-            {
-                OsuDifficultyHitObject loopObj = (OsuDifficultyHitObject)current.Next(i);
-
-                if (loopObj.IsNull() || (loopObj.StartTime - current.StartTime) > cognition_window_size)
-                    break;
-
-                objects.Add(loopObj);
-            }
-
-            return objects;
-        }
-
         private static double getDurationSpentInvisible(OsuDifficultyHitObject current)
         {
             var baseObject = (OsuHitObject)current.BaseObject;
@@ -155,46 +107,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double fadeOutDuration = baseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
 
             return (fadeOutStartTime + fadeOutDuration) - (baseObject.StartTime - baseObject.TimePreempt);
-        }
-
-        private static double getConstantRhythmNerfFactor(OsuDifficultyHitObject current)
-        {
-            // Studies [citation needed] suggest that 33bpm is where humans stop interpreting notes as a part of a beat,
-            // instead interpreting them as individual events. We're gonna use this to both lessen the nerf of this factor,
-            // as well as using it as a convenient limit for how back in time we're gonna look for the calculation.
-            const double time_limit = 1800;
-            const double time_limit_low = 500;
-
-            double constantRhythmCount = 0;
-
-            int index = 0;
-            double currentTimeGap = 0;
-
-            while (currentTimeGap < time_limit)
-            {
-                var loopObj = (OsuDifficultyHitObject)current.Previous(index);
-
-                if (loopObj.IsNull())
-                    break;
-
-                double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - time_limit_low) / (time_limit - time_limit_low), 0, 1);
-
-                if (Math.Abs(current.StrainTime - loopObj.StrainTime) < 10) // constant rhythm, o-o-o-o
-                    constantRhythmCount += 1.0 * longIntervalFactor;
-                else if (Math.Abs(current.StrainTime - loopObj.StrainTime * 2) < 10) // speed up rhythm, o---o-o
-                    constantRhythmCount += 0.33 * longIntervalFactor;
-                else if (Math.Abs(current.StrainTime * 2 - loopObj.StrainTime) < 10) // slow down rhythm, o-o---o
-                    constantRhythmCount += 0.33 * longIntervalFactor;
-                else
-                    break;
-
-                currentTimeGap = current.StartTime - loopObj.StartTime;
-                index++;
-            }
-
-            double difficulty = Math.Pow(Math.Min(1, 2 / constantRhythmCount), 2);
-
-            return difficulty;
         }
 
         private static double getConstantAngleNerfFactor(OsuDifficultyHitObject current)

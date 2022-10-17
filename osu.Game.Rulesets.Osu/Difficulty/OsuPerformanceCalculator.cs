@@ -102,7 +102,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
 
             aimValue *= getComboScalingFactor(attributes);
-			
+
+            double approachRateFactor = 0.0;
+            if (attributes.ApproachRate > 10.33)
+                approachRateFactor = 0.4 * (attributes.ApproachRate - 10.33);
+
+            if (score.Mods.Any(h => h is OsuModRelax))
+                approachRateFactor = 0.0;
+
+            aimValue *= 1.0 + approachRateFactor;
+
             if (score.Mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
 
@@ -139,6 +148,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
             speedValue *= getComboScalingFactor(attributes);
+
+            double approachRateFactor = 0.0;
+            if (attributes.ApproachRate > 10.33)
+                approachRateFactor = 0.4 * (attributes.ApproachRate - 10.33);
+
+            speedValue *= 1.0 + approachRateFactor;
 
             if (score.Mods.Any(m => m is OsuModBlinds))
             {
