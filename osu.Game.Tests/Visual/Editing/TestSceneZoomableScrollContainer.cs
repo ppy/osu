@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Editing
                             }
                         }
                     },
-                    new MenuCursor()
+                    new MenuCursorContainer()
                 };
 
                 scrollContainer.Add(innerBox = new Box
