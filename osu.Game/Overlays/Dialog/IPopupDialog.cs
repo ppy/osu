@@ -10,7 +10,8 @@ namespace osu.Game.Overlays.Dialog
 {
     public interface IPopupDialog : IDrawable
     {
-        IEnumerable<PopupDialogButton> Buttons { get; }
+        IEnumerable<ClickableContainer> Buttons { get; }
+
         Bindable<Visibility> State { get; }
 
         /// <summary>
@@ -21,6 +22,6 @@ namespace osu.Game.Overlays.Dialog
         /// <summary>
         /// Programmatically clicks the first button of the provided type.
         /// </summary>
-        public void PerformAction<T>() where T : PopupDialogButton;
+        public void PerformAction<T>() where T : ClickableContainer;
     }
 }

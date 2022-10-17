@@ -103,6 +103,8 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
+        IEnumerable<ClickableContainer> IPopupDialog.Buttons => Buttons;
+
         Bindable<Visibility> IPopupDialog.State => State;
 
         protected PopupDialog()
@@ -229,7 +231,7 @@ namespace osu.Game.Overlays.Dialog
         /// <summary>
         /// Programmatically clicks the first button of the provided type.
         /// </summary>
-        public void PerformAction<T>() where T : PopupDialogButton => Buttons.OfType<T>().First().TriggerClick();
+        public void PerformAction<T>() where T : ClickableContainer => Buttons.OfType<T>().First().TriggerClick();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
