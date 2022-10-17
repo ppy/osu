@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public abstract class PopupDialog : VisibilityContainer
+    public abstract class PopupDialog : VisibilityContainer, IPopupDialog
     {
         public const float ENTER_DURATION = 500;
         public const float EXIT_DURATION = 200;
@@ -101,6 +102,8 @@ namespace osu.Game.Overlays.Dialog
                 }
             }
         }
+
+        Bindable<Visibility> IPopupDialog.State => State;
 
         protected PopupDialog()
         {

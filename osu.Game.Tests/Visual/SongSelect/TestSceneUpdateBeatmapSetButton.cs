@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("dialog displayed", () => dialogOverlay.CurrentDialog is UpdateLocalConfirmationDialog);
             AddStep("click confirmation", () =>
             {
-                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().First());
+                InputManager.MoveMouseTo((dialogOverlay.CurrentDialog as Drawable).ChildrenOfType<PopupDialogButton>().First());
                 InputManager.PressButton(MouseButton.Left);
             });
 

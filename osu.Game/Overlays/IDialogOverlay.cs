@@ -20,11 +20,11 @@ namespace osu.Game.Overlays
         /// If the dialog instance provided is already displayed, it will be a noop.
         /// </remarks>
         /// <param name="dialog">The dialog to be presented.</param>
-        void Push(PopupDialog dialog);
+        void Push(IPopupDialog dialog);
 
         /// <summary>
         /// The currently displayed dialog, if any.
         /// </summary>
-        PopupDialog? CurrentDialog { get; }
+        IPopupDialog? CurrentDialog { get; }
     }
 }

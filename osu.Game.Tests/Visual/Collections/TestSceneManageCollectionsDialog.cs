@@ -199,7 +199,7 @@ namespace osu.Game.Tests.Visual.Collections
             AddAssert("dialog displayed", () => dialogOverlay.CurrentDialog is DeleteCollectionDialog);
             AddStep("click confirmation", () =>
             {
-                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().First());
+                InputManager.MoveMouseTo((dialogOverlay.CurrentDialog as Drawable).ChildrenOfType<PopupDialogButton>().First());
                 InputManager.PressButton(MouseButton.Left);
             });
 
@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual.Collections
             AddAssert("dialog displayed", () => dialogOverlay.CurrentDialog is DeleteCollectionDialog);
             AddStep("click cancellation", () =>
             {
-                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().Last());
+                InputManager.MoveMouseTo((dialogOverlay.CurrentDialog as Drawable).ChildrenOfType<PopupDialogButton>().Last());
                 InputManager.Click(MouseButton.Left);
             });
 

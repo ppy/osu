@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Dialog;
@@ -23,9 +21,9 @@ namespace osu.Game.Overlays
         protected override string PopInSampleName => "UI/dialog-pop-in";
         protected override string PopOutSampleName => "UI/dialog-pop-out";
 
-        private AudioFilter lowPassFilter;
+        private AudioFilter lowPassFilter = null!;
 
-        public PopupDialog CurrentDialog { get; private set; }
+        public IPopupDialog? CurrentDialog { get; private set; }
 
         public DialogOverlay()
         {
@@ -47,7 +45,7 @@ namespace osu.Game.Overlays
             AddInternal(lowPassFilter = new AudioFilter(audio.TrackMixer));
         }
 
-        public void Push(PopupDialog dialog)
+        public void Push(IPopupDialog dialog)
         {
             if (dialog == CurrentDialog || dialog.State.Value == Visibility.Hidden) return;
 
@@ -68,7 +66,7 @@ namespace osu.Game.Overlays
                     return;
                 }
 
-                dialogContainer.Add(dialog);
+                dialogContainer.Add((Drawable)dialog);
                 Show();
 
                 dialog.State.BindValueChanged(state =>
@@ -76,7 +74,7 @@ namespace osu.Game.Overlays
                     if (state.NewValue != Visibility.Hidden) return;
 
                     // Trigger the demise of the dialog as soon as it hides.
-                    dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
+                    ((Drawable)dialog).Delay(PopupDialog.EXIT_DURATION).Expire();
 
                     dismiss();
                 });
@@ -123,7 +121,7 @@ namespace osu.Game.Overlays
                 case GlobalAction.Select:
                     var clickableButton =
                         CurrentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault() ??
-                        CurrentDialog?.Buttons.First();
+                        CurrentDialog?.Buttons.FirstOrDefault();
 
                     clickableButton?.TriggerClick();
                     return true;
