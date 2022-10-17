@@ -22,6 +22,7 @@ using System.Collections.Specialized;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -74,6 +75,9 @@ namespace osu.Game.Overlays.Comments
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private GameHost host { get; set; } = null!;
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay? onScreenDisplay { get; set; }
@@ -210,7 +214,6 @@ namespace osu.Game.Overlays.Comments
                                                         {
                                                             Name = @"Actions buttons",
                                                             AutoSizeAxes = Axes.Both,
-                                                            Spacing = new Vector2(10, 0)
                                                         },
                                                         actionsLoading = new LoadingSpinner
                                                         {
@@ -330,6 +333,9 @@ namespace osu.Game.Overlays.Comments
             if (WasDeleted)
                 makeDeleted();
 
+            actionsContainer.AddLink("Copy link", copyUrl);
+            actionsContainer.AddArbitraryDrawable(new Container { Width = 10 });
+
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
                 actionsContainer.AddLink("Delete", deleteComment);
             else
@@ -426,6 +432,12 @@ namespace osu.Game.Overlays.Comments
                 actionsContainer.Show();
             });
             api.Queue(request);
+        }
+
+        private void copyUrl()
+        {
+            host.GetClipboard()?.SetText($@"{api.APIEndpointUrl}/comments/{Comment.Id}");
+            onScreenDisplay?.Display(new CopyUrlToast());
         }
 
         protected override void LoadComplete()
