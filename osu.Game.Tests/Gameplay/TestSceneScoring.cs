@@ -1,15 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu;
@@ -26,6 +29,20 @@ namespace osu.Game.Tests.Gameplay
     {
         private GraphContainer graphs = null!;
         private SettingsSlider<int> sliderMaxCombo = null!;
+
+        private FillFlowContainer legend = null!;
+
+        private static readonly Color4[] line_colours =
+        {
+            Color4Extensions.FromHex("588c7e"),
+            Color4Extensions.FromHex("b2a367"),
+            Color4Extensions.FromHex("c98f65"),
+            Color4Extensions.FromHex("bc5151"),
+            Color4Extensions.FromHex("5c8bd6"),
+            Color4Extensions.FromHex("7f6ab7"),
+            Color4Extensions.FromHex("a368ad"),
+            Color4Extensions.FromHex("aa6880"),
+        };
 
         [Test]
         public void TestBasic()
@@ -49,6 +66,15 @@ namespace osu.Game.Tests.Gameplay
                             },
                             new Drawable[]
                             {
+                                legend = new FillFlowContainer
+                                {
+                                    Direction = FillDirection.Vertical,
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 200,
+                                },
+                            },
+                            new Drawable[]
+                            {
                                 new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -58,6 +84,7 @@ namespace osu.Game.Tests.Gameplay
                                         sliderMaxCombo = new SettingsSlider<int>
                                         {
                                             Width = 0.5f,
+                                            TransferValueOnCommit = true,
                                             Current = new BindableInt(1024)
                                             {
                                                 MinValue = 96,
@@ -72,7 +99,7 @@ namespace osu.Game.Tests.Gameplay
                     }
                 };
 
-                sliderMaxCombo.Current.BindValueChanged(_ => rerun(true));
+                sliderMaxCombo.Current.BindValueChanged(_ => rerun());
                 graphs.MissLocations.BindCollectionChanged((_, __) => rerun());
 
                 graphs.MaxCombo.BindTo(sliderMaxCombo.Current);
@@ -81,22 +108,19 @@ namespace osu.Game.Tests.Gameplay
             });
         }
 
-        private ScheduledDelegate? debouncedRun;
-
-        private void rerun(bool debounce = false)
+        private void rerun()
         {
             graphs.Clear();
+            legend.Clear();
 
-            debouncedRun?.Cancel();
-            debouncedRun = Scheduler.AddDelayed(() =>
-            {
-                runForProcessor("lazer-classic", new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Classic } });
-                runForProcessor("lazer-standardised", new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Standardised } });
-            }, debounce ? 200 : 0);
+            runForProcessor("lazer-classic", new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Classic } });
+            runForProcessor("lazer-standardised", new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Standardised } });
         }
 
         private void runForProcessor(string name, ScoreProcessor processor)
         {
+            Color4 colour = line_colours[Math.Abs(name.GetHashCode()) % line_colours.Length];
+
             int maxCombo = sliderMaxCombo.Current.Value;
 
             var beatmap = new OsuBeatmap();
@@ -133,8 +157,14 @@ namespace osu.Game.Tests.Gameplay
             graphs.Add(new LineGraph
             {
                 RelativeSizeAxes = Axes.Both,
-                LineColour = Color4.Red,
+                LineColour = colour,
                 Values = results
+            });
+
+            legend.Add(new OsuSpriteText
+            {
+                Colour = colour,
+                Text = $"{FontAwesome.Solid.Circle.Icon} {name}"
             });
         }
     }
