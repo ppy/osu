@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -18,14 +17,14 @@ namespace osu.Game.Overlays.Comments
 {
     public class ReportCommentPopover : OsuPopover
     {
-        private readonly Action<CommentReportReason, string> action;
+        private readonly DrawableComment comment;
         private OsuEnumDropdown<CommentReportReason> reason = null!;
         private OsuTextBox info = null!;
         private ShakeContainer shaker = null!;
 
-        public ReportCommentPopover(Action<CommentReportReason, string> action)
+        public ReportCommentPopover(DrawableComment comment)
         {
-            this.action = action;
+            this.comment = comment;
         }
 
         [BackgroundDependencyLoader]
@@ -39,6 +38,14 @@ namespace osu.Game.Overlays.Comments
                 Spacing = new Vector2(7),
                 Children = new Drawable[]
                 {
+                    new OsuSpriteText
+                    {
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Text = UsersStrings.ReportTitle(comment.Comment.User?.Username ?? comment.Comment.LegacyName!),
+                        Font = OsuFont.Torus.With(size: 25),
+                        Margin = new MarginPadding { Bottom = 10 }
+                    },
                     new OsuSpriteText
                     {
                         Origin = Anchor.TopCentre,
@@ -98,7 +105,7 @@ namespace osu.Game.Overlays.Comments
             }
 
             this.HidePopover();
-            action.Invoke(reasonValue, infoValue);
+            comment.ReportComment(reasonValue, infoValue);
         }
     }
 }
