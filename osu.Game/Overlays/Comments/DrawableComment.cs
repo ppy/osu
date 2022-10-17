@@ -333,7 +333,7 @@ namespace osu.Game.Overlays.Comments
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
                 actionsContainer.AddLink("Delete", deleteComment);
             else
-                actionsContainer.AddLink("Report", this.ShowPopover);
+                actionsContainer.AddLink(UsersStrings.ReportButtonText, this.ShowPopover);
 
             if (Comment.IsTopLevel)
             {
