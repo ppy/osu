@@ -196,8 +196,8 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the control point at.</param>
         /// <param name="fallback">The control point to use when <paramref name="time"/> is before any control points.</param>
         /// <returns>The active control point at <paramref name="time"/>, or a fallback <see cref="ControlPoint"/> if none found.</returns>
-        protected T BinarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T fallback)
-            where T : ControlPoint
+        internal static T BinarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T fallback)
+            where T : class, IControlPoint
         {
             return BinarySearch(list, time) ?? fallback;
         }
@@ -208,8 +208,8 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="list">The list to search.</param>
         /// <param name="time">The time to find the control point at.</param>
         /// <returns>The active control point at <paramref name="time"/>.</returns>
-        protected virtual T BinarySearch<T>(IReadOnlyList<T> list, double time)
-            where T : ControlPoint
+        internal static T BinarySearch<T>(IReadOnlyList<T> list, double time)
+            where T : class, IControlPoint
         {
             if (list == null)
                 throw new ArgumentNullException(nameof(list));

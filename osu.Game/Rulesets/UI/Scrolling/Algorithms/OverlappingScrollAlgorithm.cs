@@ -5,21 +5,18 @@
 
 using System;
 using osu.Framework.Lists;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 {
     public class OverlappingScrollAlgorithm : IScrollAlgorithm
     {
-        private readonly MultiplierControlPoint searchPoint;
-
         private readonly SortedList<MultiplierControlPoint> controlPoints;
 
         public OverlappingScrollAlgorithm(SortedList<MultiplierControlPoint> controlPoints)
         {
             this.controlPoints = controlPoints;
-
-            searchPoint = new MultiplierControlPoint();
         }
 
         public double GetDisplayStartTime(double originTime, float offset, double timeRange, float scrollLength)
@@ -52,7 +49,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             for (; i < controlPoints.Count; i++)
             {
                 float lastPos = pos;
-                pos = PositionAt(controlPoints[i].StartTime, currentTime, timeRange, scrollLength);
+                pos = PositionAt(controlPoints[i].Time, currentTime, timeRange, scrollLength);
 
                 if (pos > position)
                 {
@@ -64,7 +61,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 
             i = Math.Clamp(i, 0, controlPoints.Count - 1);
 
-            return controlPoints[i].StartTime + (position - pos) * timeRange / controlPoints[i].Multiplier / scrollLength;
+            return controlPoints[i].Time + (position - pos) * timeRange / controlPoints[i].Multiplier / scrollLength;
         }
 
         public void Reset()
@@ -76,21 +73,6 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
         /// </summary>
         /// <param name="time">The time which the <see cref="MultiplierControlPoint"/> should affect.</param>
         /// <returns>The <see cref="MultiplierControlPoint"/>.</returns>
-        private MultiplierControlPoint controlPointAt(double time)
-        {
-            if (controlPoints.Count == 0)
-                return new MultiplierControlPoint(double.NegativeInfinity);
-
-            if (time < controlPoints[0].StartTime)
-                return controlPoints[0];
-
-            searchPoint.StartTime = time;
-            int index = controlPoints.BinarySearch(searchPoint);
-
-            if (index < 0)
-                index = ~index - 1;
-
-            return controlPoints[index];
-        }
+        private MultiplierControlPoint controlPointAt(double time) => ControlPointInfo.BinarySearch(controlPoints, time) ?? new MultiplierControlPoint(double.NegativeInfinity);
     }
 }
