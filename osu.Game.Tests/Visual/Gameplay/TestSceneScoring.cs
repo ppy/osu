@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -20,6 +22,7 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
@@ -252,6 +255,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             graphs.Add(new LineGraph
             {
+                Name = name,
                 RelativeSizeAxes = Axes.Both,
                 LineColour = colour,
                 Values = results
@@ -275,7 +279,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
     }
 
-    public class GraphContainer : Container
+    public class GraphContainer : Container, IHasCustomTooltip<IEnumerable<LineGraph>>
     {
         public readonly BindableList<double> MissLocations = new BindableList<double>();
         public readonly BindableList<double> NonPerfectLocations = new BindableList<double>();
@@ -288,6 +292,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private readonly Container missLines;
         private readonly Container verticalGridLines;
+
+        public int CurrentHoverCombo { get; private set; }
 
         public GraphContainer()
         {
@@ -411,19 +417,82 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
+            CurrentHoverCombo = (int)(e.MousePosition.X / DrawWidth * MaxCombo.Value);
+
             hoverLine.X = e.MousePosition.X;
             return base.OnMouseMove(e);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            int combo = (int)(e.MousePosition.X / DrawWidth * MaxCombo.Value);
-
             if (e.Button == MouseButton.Left)
-                MissLocations.Add(combo);
+                MissLocations.Add(CurrentHoverCombo);
             else
-                NonPerfectLocations.Add(combo);
+                NonPerfectLocations.Add(CurrentHoverCombo);
+
             return true;
+        }
+
+        private GraphTooltip? tooltip;
+
+        public ITooltip<IEnumerable<LineGraph>> GetCustomTooltip() => tooltip ??= new GraphTooltip(this);
+
+        public IEnumerable<LineGraph> TooltipContent => Content.OfType<LineGraph>();
+
+        public class GraphTooltip : CompositeDrawable, ITooltip<IEnumerable<LineGraph>>
+        {
+            private readonly GraphContainer graphContainer;
+
+            private readonly OsuTextFlowContainer textFlow;
+
+            public GraphTooltip(GraphContainer graphContainer)
+            {
+                this.graphContainer = graphContainer;
+                AutoSizeAxes = Axes.Both;
+
+                Masking = true;
+                CornerRadius = 10;
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = OsuColour.Gray(0.15f),
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    textFlow = new OsuTextFlowContainer
+                    {
+                        Colour = Color4.White,
+                        AutoSizeAxes = Axes.Both,
+                        Padding = new MarginPadding(10),
+                    }
+                };
+            }
+
+            private int? lastContentCombo;
+
+            public void SetContent(IEnumerable<LineGraph> content)
+            {
+                int relevantCombo = graphContainer.CurrentHoverCombo;
+
+                if (lastContentCombo == relevantCombo)
+                    return;
+
+                lastContentCombo = relevantCombo;
+                textFlow.Clear();
+
+                textFlow.AddParagraph($"At combo {relevantCombo}:");
+
+                foreach (var graph in content)
+                {
+                    float valueAtHover = graph.Values.ElementAt(relevantCombo);
+                    float ofTotal = valueAtHover / graph.Values.Last();
+
+                    textFlow.AddParagraph($"{graph.Name}: {valueAtHover:#,0} ({ofTotal * 100:N0}% of final)\n", st => st.Colour = graph.LineColour);
+                }
+            }
+
+            public void Move(Vector2 pos) => this.MoveTo(pos);
         }
     }
 }
