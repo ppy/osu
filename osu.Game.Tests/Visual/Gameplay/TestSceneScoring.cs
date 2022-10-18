@@ -20,10 +20,9 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Tests.Visual;
 using osuTK.Graphics;
 
-namespace osu.Game.Tests.Gameplay
+namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneScoring : OsuTestScene
     {
