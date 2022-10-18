@@ -167,14 +167,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void runScoreV2()
         {
-            int currentCombo = 0;
-            double comboPortion = 0;
-
             int maxCombo = sliderMaxCombo.Current.Value;
 
+            int currentCombo = 0;
+            double comboPortion = 0;
             double currentBaseScore = 0;
             double maxBaseScore = 0;
-
             int currentHits = 0;
 
             for (int i = 0; i < maxCombo; i++)
@@ -182,9 +180,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             double comboPortionMax = comboPortion;
 
+            currentCombo = 0;
             comboPortion = 0;
-            maxBaseScore = 0;
             currentBaseScore = 0;
+            maxBaseScore = 0;
             currentHits = 0;
 
             void applyHitV2(int baseScore)
