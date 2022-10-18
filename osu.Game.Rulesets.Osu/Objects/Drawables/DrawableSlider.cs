@@ -341,7 +341,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
             }
 
-            this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
+            this.FadeOut(fade_out_time).Expire();
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => SliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
