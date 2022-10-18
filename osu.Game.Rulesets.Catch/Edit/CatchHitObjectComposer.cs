@@ -92,6 +92,9 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             switch (e.Action)
             {
+                // Note that right now these are hard to use as the default key bindings conflict with existing editor key bindings.
+                // In the future we will want to expose this via UI and potentially change the key bindings to be editor-specific.
+                // May be worth considering standardising "zoom" behaviour with what the timeline uses (ie. alt-wheel) but that may cause new conflicts.
                 case GlobalAction.IncreaseScrollSpeed:
                     this.TransformBindableTo(timeRangeMultiplier, timeRangeMultiplier.Value - 1, 200, Easing.OutQuint);
                     break;
