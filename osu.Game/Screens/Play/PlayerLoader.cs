@@ -229,6 +229,9 @@ namespace osu.Game.Screens.Play
 
             Beatmap.Value.Track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
+            // Start off-screen.
+            settingsScroll.MoveToX(settingsScroll.DrawWidth);
+
             content.ScaleTo(0.7f);
 
             contentIn();
@@ -404,10 +407,12 @@ namespace osu.Game.Screens.Play
         {
             MetadataInfo.Loading = true;
 
-            settingsScroll.FadeInFromZero(400);
-
             content.FadeInFromZero(400);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
+
+            settingsScroll.FadeInFromZero(500, Easing.Out)
+                          .MoveToX(0, 500, Easing.OutQuint);
+
             lowPassFilter.CutoffTo(1000, 650, Easing.OutQuint);
             highPassFilter.CutoffTo(300).Then().CutoffTo(0, 1250); // 1250 is to line up with the appearance of MetadataInfo (750 delay + 500 fade-in)
 
@@ -421,7 +426,10 @@ namespace osu.Game.Screens.Play
 
             content.ScaleTo(0.7f, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
             content.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint);
-            settingsScroll.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint);
+
+            settingsScroll.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
+                          .MoveToX(settingsScroll.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
+
             lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, CONTENT_OUT_DURATION);
             highPassFilter.CutoffTo(0, CONTENT_OUT_DURATION);
         }
