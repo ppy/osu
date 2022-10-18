@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -92,7 +93,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                             RelativeSizeAxes = Axes.X,
                                             Width = 0.5f,
                                             AutoSizeAxes = Axes.Y,
-                                            Text = "Left click to add miss"
+                                            Text = $"Left click to add miss\nRight click to add OK/{base_ok}"
                                         }
                                     }
                                 },
@@ -102,13 +103,18 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
 
                 sliderMaxCombo.Current.BindValueChanged(_ => rerun());
+
                 graphs.MissLocations.BindCollectionChanged((_, __) => rerun());
+                graphs.NonPerfectLocations.BindCollectionChanged((_, __) => rerun());
 
                 graphs.MaxCombo.BindTo(sliderMaxCombo.Current);
 
                 rerun();
             });
         }
+
+        private const int base_great = 300;
+        private const int base_ok = 100;
 
         private void rerun()
         {
@@ -118,33 +124,50 @@ namespace osu.Game.Tests.Visual.Gameplay
             runForProcessor("lazer-standardised", Color4.YellowGreen, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Standardised } });
             runForProcessor("lazer-classic", Color4.MediumPurple, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Classic } });
 
+            runScoreV1();
+            runScoreV2();
+        }
+
+        private void runScoreV1()
+        {
             int totalScore = 0;
             int currentCombo = 0;
 
-            const int base_score = 300;
-
-            runForAlgorithm("ScoreV1 (classic)", Color4.Purple, () =>
+            void applyHitV1(int baseScore)
             {
+                if (baseScore == 0)
+                {
+                    currentCombo = 0;
+                    return;
+                }
+
                 const float score_multiplier = 1;
 
-                totalScore += base_score;
+                totalScore += baseScore;
 
                 // combo multiplier
                 // ReSharper disable once PossibleLossOfFraction
-                totalScore += (int)(Math.Max(0, currentCombo - 1) * (base_score / 25 * score_multiplier));
+                totalScore += (int)(Math.Max(0, currentCombo - 1) * (baseScore / 25 * score_multiplier));
 
                 currentCombo++;
-            }, () =>
-            {
-                currentCombo = 0;
-            }, () =>
-            {
-                // Arbitrary value chosen towards the upper range.
-                const double score_multiplier = 4;
+            }
 
-                return (int)(totalScore * score_multiplier);
-            });
+            runForAlgorithm("ScoreV1 (classic)", Color4.Purple,
+                () => applyHitV1(base_great),
+                () => applyHitV1(base_ok),
+                () => applyHitV1(0),
+                () =>
+                {
+                    // Arbitrary value chosen towards the upper range.
+                    const double score_multiplier = 4;
 
+                    return (int)(totalScore * score_multiplier);
+                });
+        }
+
+        private void runScoreV2()
+        {
+            int currentCombo = 0;
             double comboPortion = 0;
 
             int maxCombo = sliderMaxCombo.Current.Value;
@@ -154,33 +177,43 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             int currentHits = 0;
 
-            double comboPortionMax = 0;
             for (int i = 0; i < maxCombo; i++)
-                comboPortionMax += base_score * (1 + (i + 1) / 10.0);
+                applyHitV2(base_great);
 
-            runForAlgorithm("ScoreV2", Color4.OrangeRed, () =>
+            double comboPortionMax = comboPortion;
+
+            comboPortion = 0;
+            maxBaseScore = 0;
+            currentBaseScore = 0;
+            currentHits = 0;
+
+            void applyHitV2(int baseScore)
             {
-                maxBaseScore += base_score;
-                currentBaseScore += base_score;
-                comboPortion += base_score * (1 + ++currentCombo / 10.0);
+                maxBaseScore += baseScore;
+                currentBaseScore += baseScore;
+                comboPortion += baseScore * (1 + ++currentCombo / 10.0);
 
                 currentHits++;
-            }, () =>
-            {
-                currentHits++;
-                maxBaseScore += base_score;
+            }
 
-                currentCombo = 0;
-            }, () =>
-            {
-                double accuracy = currentBaseScore / maxBaseScore;
+            runForAlgorithm("ScoreV2", Color4.OrangeRed,
+                () => applyHitV2(base_great),
+                () => applyHitV2(base_ok),
+                () =>
+                {
+                    currentHits++;
+                    maxBaseScore += base_great;
+                    currentCombo = 0;
+                }, () =>
+                {
+                    double accuracy = currentBaseScore / maxBaseScore;
 
-                return (int)Math.Round
-                (
-                    700000 * comboPortion / comboPortionMax +
-                    300000 * Math.Pow(accuracy, 10) * ((double)currentHits / maxCombo)
-                );
-            });
+                    return (int)Math.Round
+                    (
+                        700000 * comboPortion / comboPortionMax +
+                        300000 * Math.Pow(accuracy, 10) * ((double)currentHits / maxCombo)
+                    );
+                });
         }
 
         private void runForProcessor(string name, Color4 colour, ScoreProcessor processor)
@@ -195,11 +228,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             runForAlgorithm(name, colour,
                 () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Great }),
+                () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Ok }),
                 () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Miss }),
                 () => (int)processor.TotalScore.Value);
         }
 
-        private void runForAlgorithm(string name, Color4 colour, Action applyHit, Action applyMiss, Func<int> getTotalScore)
+        private void runForAlgorithm(string name, Color4 colour, Action applyHit, Action applyNonPerfect, Action applyMiss, Func<int> getTotalScore)
         {
             int maxCombo = sliderMaxCombo.Current.Value;
 
@@ -209,6 +243,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 if (graphs.MissLocations.Contains(i))
                     applyMiss();
+                else if (graphs.NonPerfectLocations.Contains(i))
+                    applyNonPerfect();
                 else
                     applyHit();
 
@@ -243,6 +279,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     public class GraphContainer : Container
     {
         public readonly BindableList<double> MissLocations = new BindableList<double>();
+        public readonly BindableList<double> NonPerfectLocations = new BindableList<double>();
 
         public Bindable<int> MaxCombo = new Bindable<int>();
 
@@ -287,6 +324,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             };
 
             MissLocations.BindCollectionChanged((_, _) => updateMissLocations());
+            NonPerfectLocations.BindCollectionChanged((_, _) => updateMissLocations());
 
             MaxCombo.BindValueChanged(_ =>
             {
@@ -345,6 +383,19 @@ namespace osu.Game.Tests.Visual.Gameplay
                     X = (float)miss / MaxCombo.Value,
                 });
             }
+
+            foreach (int miss in NonPerfectLocations)
+            {
+                missLines.Add(new Box
+                {
+                    Colour = Color4.Orange,
+                    Origin = Anchor.TopCentre,
+                    Width = 1,
+                    RelativeSizeAxes = Axes.Y,
+                    RelativePositionAxes = Axes.X,
+                    X = (float)miss / MaxCombo.Value,
+                });
+            }
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -365,9 +416,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             return base.OnMouseMove(e);
         }
 
-        protected override bool OnClick(ClickEvent e)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            MissLocations.Add((int)(e.MousePosition.X / DrawWidth * MaxCombo.Value));
+            int combo = (int)(e.MousePosition.X / DrawWidth * MaxCombo.Value);
+
+            if (e.Button == MouseButton.Left)
+                MissLocations.Add(combo);
+            else
+                NonPerfectLocations.Add(combo);
             return true;
         }
     }
