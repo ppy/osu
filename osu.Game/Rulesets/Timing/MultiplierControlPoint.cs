@@ -11,12 +11,12 @@ namespace osu.Game.Rulesets.Timing
     /// <summary>
     /// A control point which adds an aggregated multiplier based on the provided <see cref="TimingPoint"/>'s BeatLength and <see cref="EffectPoint"/>'s SpeedMultiplier.
     /// </summary>
-    public class MultiplierControlPoint : IComparable<MultiplierControlPoint>
+    public class MultiplierControlPoint : IComparable<MultiplierControlPoint>, IControlPoint
     {
         /// <summary>
         /// The time in milliseconds at which this <see cref="MultiplierControlPoint"/> starts.
         /// </summary>
-        public double StartTime;
+        public double Time { get; set; }
 
         /// <summary>
         /// The aggregate multiplier which this <see cref="MultiplierControlPoint"/> provides.
@@ -54,13 +54,13 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// Creates a <see cref="MultiplierControlPoint"/>.
         /// </summary>
-        /// <param name="startTime">The start time of this <see cref="MultiplierControlPoint"/>.</param>
-        public MultiplierControlPoint(double startTime)
+        /// <param name="time">The start time of this <see cref="MultiplierControlPoint"/>.</param>
+        public MultiplierControlPoint(double time)
         {
-            StartTime = startTime;
+            Time = time;
         }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        public int CompareTo(MultiplierControlPoint other) => StartTime.CompareTo(other?.StartTime);
+        public int CompareTo(MultiplierControlPoint other) => Time.CompareTo(other?.Time);
     }
 }
