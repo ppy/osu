@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 90) / 15);
+                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 80) / 15);
 
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
@@ -52,30 +52,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             noteDensityDifficulty = Math.Pow(3 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence - 1)), 2.3);
-            noteDensityDifficulty *= getConstantAngleNerfFactor(currObj);
 
             double hiddenDifficulty = 0;
 
             if (hidden)
             {
                 var timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
-                var isRhythmChange = (currObj.StrainTime - prevObj.StrainTime < 5);
-
                 var timeDifficultyFactor = 800 / pastObjectDifficultyInfluence;
 
                 hiddenDifficulty += Math.Pow(7 * timeSpentInvisible / timeDifficultyFactor, 1);
-
-                if (isRhythmChange)
-                    hiddenDifficulty *= 1.1;
-
                 hiddenDifficulty += 2 * currVelocity;
             }
 
             double difficulty = hiddenDifficulty + noteDensityDifficulty;
-
-            // While there is slider leniency...
-            if (currObj.BaseObject is Slider)
-                difficulty *= 0.2;
+            difficulty *= getConstantAngleNerfFactor(currObj);
 
             return difficulty;
         }
@@ -112,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double getConstantAngleNerfFactor(OsuDifficultyHitObject current)
         {
             const double time_limit = 2000;
-            const double time_limit_low = 500;
+            const double time_limit_low = 200;
 
             double constantAngleCount = 0;
 
