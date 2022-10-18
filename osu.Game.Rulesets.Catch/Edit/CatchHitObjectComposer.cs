@@ -12,8 +12,10 @@ using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Edit;
@@ -37,6 +39,12 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         private InputManager inputManager;
 
+        private readonly BindableDouble timeRangeMultiplier = new BindableDouble(1)
+        {
+            MinValue = 1,
+            MaxValue = 10,
+        };
+
         public CatchHitObjectComposer(CatchRuleset ruleset)
             : base(ruleset)
         {
@@ -51,7 +59,10 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             LayerBelowRuleset.Add(new PlayfieldBorder
             {
-                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                RelativeSizeAxes = Axes.X,
+                Height = CatchPlayfield.HEIGHT,
                 PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Corners }
             });
 
@@ -77,8 +88,30 @@ namespace osu.Game.Rulesets.Catch.Edit
             updateDistanceSnapGrid();
         }
 
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                // Note that right now these are hard to use as the default key bindings conflict with existing editor key bindings.
+                // In the future we will want to expose this via UI and potentially change the key bindings to be editor-specific.
+                // May be worth considering standardising "zoom" behaviour with what the timeline uses (ie. alt-wheel) but that may cause new conflicts.
+                case GlobalAction.IncreaseScrollSpeed:
+                    this.TransformBindableTo(timeRangeMultiplier, timeRangeMultiplier.Value - 1, 200, Easing.OutQuint);
+                    break;
+
+                case GlobalAction.DecreaseScrollSpeed:
+                    this.TransformBindableTo(timeRangeMultiplier, timeRangeMultiplier.Value + 1, 200, Easing.OutQuint);
+                    break;
+            }
+
+            return base.OnPressed(e);
+        }
+
         protected override DrawableRuleset<CatchHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null) =>
-            new DrawableCatchEditorRuleset(ruleset, beatmap, mods);
+            new DrawableCatchEditorRuleset(ruleset, beatmap, mods)
+            {
+                TimeRangeMultiplier = { BindTarget = timeRangeMultiplier, }
+            };
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
