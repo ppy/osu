@@ -93,9 +93,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// Given a time, return the position along the scrolling axis within this <see cref="HitObjectContainer"/> at time <paramref name="currentTime"/>.
         /// </summary>
-        public float PositionAtTime(double time, double currentTime)
+        public float PositionAtTime(double time, double currentTime, double? originTime = null)
         {
-            float scrollPosition = scrollingInfo.Algorithm.PositionAt(time, currentTime, timeRange.Value, scrollLength);
+            float scrollPosition = scrollingInfo.Algorithm.PositionAt(time, currentTime, timeRange.Value, scrollLength, originTime);
             return axisInverted ? -scrollPosition : scrollPosition;
         }
 
@@ -252,14 +252,14 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 updateLayoutRecursive(obj);
 
                 // Nested hitobjects don't need to scroll, but they do need accurate positions and start lifetime
-                updatePosition(obj, hitObject.HitObject.StartTime);
+                updatePosition(obj, hitObject.HitObject.StartTime, hitObject.HitObject.StartTime);
                 setComputedLifetimeStart(obj.Entry);
             }
         }
 
-        private void updatePosition(DrawableHitObject hitObject, double currentTime)
+        private void updatePosition(DrawableHitObject hitObject, double currentTime, double? parentHitObjectStartTime = null)
         {
-            float position = PositionAtTime(hitObject.HitObject.StartTime, currentTime);
+            float position = PositionAtTime(hitObject.HitObject.StartTime, currentTime, parentHitObjectStartTime);
 
             if (scrollingAxis == Direction.Horizontal)
                 hitObject.X = position;
