@@ -244,7 +244,10 @@ namespace osu.Game.Tests.Visual.Background
         public void TestResumeFromPlayer()
         {
             performFullSetup();
-            AddStep("Move mouse to Visual Settings", () => InputManager.MoveMouseTo(playerLoader.VisualSettingsPos));
+            AddStep("Move mouse to Visual Settings location", () => InputManager.MoveMouseTo(playerLoader.ScreenSpaceDrawQuad.TopRight
+                                                                                             + new Vector2(-playerLoader.VisualSettingsPos.ScreenSpaceDrawQuad.Width,
+                                                                                                 playerLoader.VisualSettingsPos.ScreenSpaceDrawQuad.Height / 2
+                                                                                             )));
             AddStep("Resume PlayerLoader", () => player.Restart());
             AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
