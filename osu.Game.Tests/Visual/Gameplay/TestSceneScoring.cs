@@ -122,43 +122,60 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             runForProcessor("lazer-classic", new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Classic } });
             runForProcessor("lazer-standardised", new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Standardised } });
+
+            int totalScore = 0;
+            int currentCombo = 0;
+
+            runForAlgorithm("stable-v1", () =>
+            {
+                const int base_score = 300;
+                const float score_multiplier = 1;
+
+                totalScore += base_score;
+
+                // combo multiplier
+                // ReSharper disable once PossibleLossOfFraction
+                totalScore += (int)(Math.Max(0, currentCombo - 1) * (base_score / 25 * score_multiplier));
+
+                currentCombo++;
+            }, () =>
+            {
+                currentCombo = 0;
+            }, () => totalScore);
         }
 
         private void runForProcessor(string name, ScoreProcessor processor)
         {
-            Color4 colour = line_colours[Math.Abs(name.GetHashCode()) % line_colours.Length];
-
             int maxCombo = sliderMaxCombo.Current.Value;
 
             var beatmap = new OsuBeatmap();
-
             for (int i = 0; i < maxCombo; i++)
-            {
                 beatmap.HitObjects.Add(new HitCircle());
-            }
 
             processor.ApplyBeatmap(beatmap);
+
+            runForAlgorithm(name,
+                () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Great }),
+                () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Miss }),
+                () => (int)processor.TotalScore.Value);
+        }
+
+        private void runForAlgorithm(string name, Action applyHit, Action applyMiss, Func<int> getTotalScore)
+        {
+            int maxCombo = sliderMaxCombo.Current.Value;
+
+            Color4 colour = line_colours[Math.Abs(name.GetHashCode()) % line_colours.Length];
 
             List<float> results = new List<float>();
 
             for (int i = 0; i < maxCombo; i++)
             {
                 if (graphs.MissLocations.Contains(i))
-                {
-                    processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement())
-                    {
-                        Type = HitResult.Miss
-                    });
-                }
+                    applyMiss();
                 else
-                {
-                    processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement())
-                    {
-                        Type = HitResult.Great
-                    });
-                }
+                    applyHit();
 
-                results.Add((float)processor.TotalScore.Value);
+                results.Add(getTotalScore());
             }
 
             graphs.Add(new LineGraph
