@@ -105,7 +105,8 @@ namespace osu.Game.Screens.OnlinePlay
                 while (this.IsCurrentScreen())
                     this.Exit();
             }
-            else
+            // Also handle the case where a child screen is current (ie. gameplay).
+            else if (this.GetChildScreen() != null)
             {
                 this.MakeCurrent();
                 Schedule(forcefullyExit);

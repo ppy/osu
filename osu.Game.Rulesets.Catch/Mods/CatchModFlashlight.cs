@@ -3,7 +3,6 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
@@ -16,7 +15,6 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
-        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
@@ -24,10 +22,9 @@ namespace osu.Game.Rulesets.Catch.Mods
             Precision = 0.1f
         };
 
-        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
         public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        public override float DefaultFlashlightSize => 350;
+        public override float DefaultFlashlightSize => 325;
 
         protected override Flashlight CreateFlashlight() => new CatchFlashlight(this, playfield);
 
@@ -47,7 +44,19 @@ namespace osu.Game.Rulesets.Catch.Mods
                 : base(modFlashlight)
             {
                 this.playfield = playfield;
-                FlashlightSize = new Vector2(0, GetSizeFor(0));
+
+                FlashlightSize = new Vector2(0, GetSize());
+                FlashlightSmoothness = 1.4f;
+            }
+
+            protected override float GetComboScaleFor(int combo)
+            {
+                if (combo >= 200)
+                    return 0.770f;
+                if (combo >= 100)
+                    return 0.885f;
+
+                return 1.0f;
             }
 
             protected override void Update()
@@ -57,9 +66,9 @@ namespace osu.Game.Rulesets.Catch.Mods
                 FlashlightPosition = playfield.CatcherArea.ToSpaceOfOtherDrawable(playfield.Catcher.DrawPosition, this);
             }
 
-            protected override void OnComboChange(ValueChangedEvent<int> e)
+            protected override void UpdateFlashlightSize(float size)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, size), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";

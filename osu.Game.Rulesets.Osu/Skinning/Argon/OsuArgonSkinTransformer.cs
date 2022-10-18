@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     return new ArgonJudgementPiece(resultComponent.Component);
 
                 case OsuSkinComponent osuComponent:
+                    // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (osuComponent.Component)
                     {
                         case OsuSkinComponents.HitCircle:

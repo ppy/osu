@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -27,6 +28,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private HitObjectUsageEventBuffer usageEventBuffer;
 
+        protected InputManager InputManager { get; private set; }
+
         protected EditorBlueprintContainer(HitObjectComposer composer)
         {
             Composer = composer;
@@ -41,6 +44,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            InputManager = GetContainingInputManager();
 
             Beatmap.HitObjectAdded += AddBlueprintFor;
             Beatmap.HitObjectRemoved += RemoveBlueprintFor;
@@ -65,8 +70,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override IEnumerable<SelectionBlueprint<HitObject>> SortForMovement(IReadOnlyList<SelectionBlueprint<HitObject>> blueprints)
             => blueprints.OrderBy(b => b.Item.StartTime);
-
-        protected override bool AllowDeselectionDuringDrag => !EditorClock.IsRunning;
 
         protected override bool ApplySnapResult(SelectionBlueprint<HitObject>[] blueprints, SnapResult result)
         {
@@ -133,8 +136,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void SelectAll()
         {
             Composer.Playfield.KeepAllAlive();
-
-            base.SelectAll();
+            SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).ToArray());
         }
 
         protected override void OnBlueprintSelected(SelectionBlueprint<HitObject> blueprint)
