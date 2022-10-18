@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             FlashBox
                 // Make sure the hit indicator usage of FlashBox doesn't get faded out prematurely by a kiai flash
                 .DelayUntilTransformsFinished()
-                .FadeTo(flash_opacity, 0, Easing.OutQuint)
+                .FadeTo(flash_opacity)
                 .Then()
                 .FadeOut(Math.Max(80, timingPoint.BeatLength - 80), Easing.OutSine);
 
