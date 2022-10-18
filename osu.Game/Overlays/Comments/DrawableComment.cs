@@ -20,11 +20,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.OSD;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
@@ -70,6 +72,12 @@ namespace osu.Game.Overlays.Comments
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private GameHost host { get; set; } = null!;
+
+        [Resolved(canBeNull: true)]
+        private OnScreenDisplay? onScreenDisplay { get; set; }
 
         public DrawableComment(Comment comment)
         {
@@ -203,7 +211,6 @@ namespace osu.Game.Overlays.Comments
                                                         {
                                                             Name = @"Actions buttons",
                                                             AutoSizeAxes = Axes.Both,
-                                                            Spacing = new Vector2(10, 0)
                                                         },
                                                         actionsLoading = new LoadingSpinner
                                                         {
@@ -323,6 +330,9 @@ namespace osu.Game.Overlays.Comments
             if (WasDeleted)
                 makeDeleted();
 
+            actionsContainer.AddLink("Copy link", copyUrl);
+            actionsContainer.AddArbitraryDrawable(new Container { Width = 10 });
+
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
             {
                 actionsContainer.AddLink("Delete", deleteComment);
@@ -401,6 +411,12 @@ namespace osu.Game.Overlays.Comments
                 actionsContainer.Show();
             });
             api.Queue(request);
+        }
+
+        private void copyUrl()
+        {
+            host.GetClipboard()?.SetText($@"{api.APIEndpointUrl}/comments/{Comment.Id}");
+            onScreenDisplay?.Display(new CopyUrlToast());
         }
 
         protected override void LoadComplete()
