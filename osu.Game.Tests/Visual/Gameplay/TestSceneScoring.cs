@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 legend = new FillFlowContainer
                                 {
                                     Padding = new MarginPadding(20),
-                                    Direction = FillDirection.Vertical,
+                                    Direction = FillDirection.Full,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                 },
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             graphs.Clear();
             legend.Clear();
 
-            runForProcessor("lazer-standardised", Color4.Cyan, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Standardised } });
+            runForProcessor("lazer-standardised", Color4.YellowGreen, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Standardised } });
             runForProcessor("lazer-classic", Color4.MediumPurple, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Classic } });
 
             int totalScore = 0;
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             const int base_score = 300;
 
-            runForAlgorithm("ScoreV1 (classic)", Color4.Beige, () =>
+            runForAlgorithm("ScoreV1 (classic)", Color4.Purple, () =>
             {
                 const float score_multiplier = 1;
 
@@ -129,7 +129,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             }, () =>
             {
                 currentCombo = 0;
-            }, () => totalScore);
+            }, () =>
+            {
+                // Arbitrary value chosen towards the upper range.
+                const double score_multiplier = 4;
+
+                return (int)(totalScore * score_multiplier);
+            });
 
             double comboPortion = 0;
 
@@ -211,7 +217,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             legend.Add(new OsuSpriteText
             {
                 Colour = colour,
+                RelativeSizeAxes = Axes.X,
+                Width = 0.5f,
                 Text = $"{FontAwesome.Solid.Circle.Icon} {name}"
+            });
+
+            legend.Add(new OsuSpriteText
+            {
+                Colour = colour,
+                RelativeSizeAxes = Axes.X,
+                Width = 0.5f,
+                Text = $"final score {getTotalScore():#,0}"
             });
         }
     }
