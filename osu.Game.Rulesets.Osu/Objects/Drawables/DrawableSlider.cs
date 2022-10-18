@@ -331,7 +331,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateHitStateTransforms(state);
 
-            const float fade_out_time = 450;
+            const float fade_out_time = 240;
 
             switch (state)
             {
