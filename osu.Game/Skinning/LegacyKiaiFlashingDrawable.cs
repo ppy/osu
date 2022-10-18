@@ -13,7 +13,7 @@ namespace osu.Game.Skinning
     {
         private readonly Drawable flashingDrawable;
 
-        private const float flash_opacity = 0.3f;
+        private const float flash_opacity = 0.55f;
 
         public LegacyKiaiFlashingDrawable(Func<Drawable?> creationFunc)
         {
@@ -44,7 +44,7 @@ namespace osu.Game.Skinning
             flashingDrawable
                 .FadeTo(flash_opacity)
                 .Then()
-                .FadeOut(timingPoint.BeatLength * 0.75f);
+                .FadeOut(Math.Max(80, timingPoint.BeatLength - 80), Easing.OutSine);
         }
     }
 }
