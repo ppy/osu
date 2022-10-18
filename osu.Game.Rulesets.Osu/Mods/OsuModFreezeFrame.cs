@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModFreezeFrame : Mod, IApplicableToDrawableHitObject, IApplicableToBeatmap
-
     {
         public override string Name => "Freeze Frame";
 
