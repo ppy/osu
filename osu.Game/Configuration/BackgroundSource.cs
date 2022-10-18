@@ -18,5 +18,8 @@ namespace osu.Game.Configuration
 
         [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.BeatmapWithStoryboard))]
         BeatmapWithStoryboard,
+
+        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Default))]
+        Default,
     }
 }
