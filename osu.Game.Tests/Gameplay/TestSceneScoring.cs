@@ -54,30 +54,38 @@ namespace osu.Game.Tests.Gameplay
                     new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
                         Content = new[]
                         {
                             new Drawable[]
                             {
                                 graphs = new GraphContainer
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 200,
+                                    RelativeSizeAxes = Axes.Both,
                                 },
                             },
                             new Drawable[]
                             {
                                 legend = new FillFlowContainer
                                 {
+                                    Padding = new MarginPadding(20),
                                     Direction = FillDirection.Vertical,
                                     RelativeSizeAxes = Axes.X,
-                                    Height = 200,
+                                    AutoSizeAxes = Axes.Y,
                                 },
                             },
                             new Drawable[]
                             {
                                 new FillFlowContainer
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding(20),
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Full,
                                     Children = new Drawable[]
                                     {
@@ -230,13 +238,26 @@ namespace osu.Game.Tests.Gameplay
             {
                 if (i % 100 == 0)
                 {
-                    verticalGridLines.Add(new Box
+                    verticalGridLines.AddRange(new Drawable[]
                     {
-                        Colour = OsuColour.Gray(0.2f),
-                        Width = 1,
-                        RelativeSizeAxes = Axes.Y,
-                        RelativePositionAxes = Axes.X,
-                        X = (float)i / MaxCombo.Value,
+                        new Box
+                        {
+                            Colour = OsuColour.Gray(0.2f),
+                            Width = 1,
+                            RelativeSizeAxes = Axes.Y,
+                            RelativePositionAxes = Axes.X,
+                            X = (float)i / MaxCombo.Value,
+                        },
+                        new OsuSpriteText
+                        {
+                            RelativePositionAxes = Axes.X,
+                            X = (float)i / MaxCombo.Value,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Text = $"{i:#,0}",
+                            Rotation = -30,
+                            Y = -20,
+                        }
                     });
                 }
             }
