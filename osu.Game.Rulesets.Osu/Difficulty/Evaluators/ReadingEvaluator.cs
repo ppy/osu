@@ -11,9 +11,9 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
-    public static class CognitionEvaluator
+    public static class ReadingEvaluator
     {
-        private const double cognition_window_size = 3000;
+        private const double reading_window_size = 3000;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
         {
@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
-            var prevObj = (OsuDifficultyHitObject)current.Previous(0);
-
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
 
             // Maybe I should just pass in clockrate...
@@ -38,8 +36,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             foreach (var loopObj in pastVisibleObjects)
             {
-                var prevLoopObj = loopObj.Previous(0) as OsuDifficultyHitObject;
-
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
@@ -80,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 OsuDifficultyHitObject loopObj = (OsuDifficultyHitObject)current.Previous(i);
 
-                if (loopObj.IsNull() || current.StartTime - loopObj.StartTime > cognition_window_size)
+                if (loopObj.IsNull() || current.StartTime - loopObj.StartTime > reading_window_size)
                     break;
 
                 objects.Add(loopObj);

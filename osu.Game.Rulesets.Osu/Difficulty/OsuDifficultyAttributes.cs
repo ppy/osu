@@ -39,10 +39,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double FlashlightDifficulty { get; set; }
 
         /// <summary>
-        /// The difficulty corresponding to the cognition skill.
+        /// The difficulty corresponding to the reading skill.
         /// </summary>
-        [JsonProperty("cognition_difficulty")]
-        public double CognitionDifficulty { get; set; }
+        [JsonProperty("reading_difficulty")]
+        public double ReadingDifficulty { get; set; }
 
         /// <summary>
         /// Describes how much of <see cref="AimDifficulty"/> is contributed to by hitcircles or sliders.

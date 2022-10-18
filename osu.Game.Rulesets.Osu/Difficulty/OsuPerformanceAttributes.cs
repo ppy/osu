@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("flashlight")]
         public double Flashlight { get; set; }
 
-        [JsonProperty("cognition")]
-        public double Cognition { get; set; }
+        [JsonProperty("reading")]
+        public double Reading { get; set; }
 
         [JsonProperty("effective_miss_count")]
         public double EffectiveMissCount { get; set; }
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return new PerformanceDisplayAttribute(nameof(Speed), "Speed", Speed);
             yield return new PerformanceDisplayAttribute(nameof(Accuracy), "Accuracy", Accuracy);
             yield return new PerformanceDisplayAttribute(nameof(Flashlight), "Flashlight Bonus", Flashlight);
-            yield return new PerformanceDisplayAttribute(nameof(Cognition), "Cognition", Cognition);
+            yield return new PerformanceDisplayAttribute(nameof(Reading), "Reading", Reading);
         }
     }
 }

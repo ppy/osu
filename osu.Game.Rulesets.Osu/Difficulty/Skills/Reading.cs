@@ -11,19 +11,19 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public class Cognition : Skill
+    public class Reading : Skill
     {
         private readonly List<double> difficulties = new List<double>();
         private readonly bool hasHiddenMod;
         private const double skill_multiplier = 2.4;
 
-        public Cognition(Mod[] mods)
+        public Reading(Mod[] mods)
             : base(mods)
         {
             hasHiddenMod = mods.Any(m => m is OsuModHidden);
         }
 
-        public override void Process(DifficultyHitObject current) => difficulties.Add(CognitionEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * skill_multiplier);
+        public override void Process(DifficultyHitObject current) => difficulties.Add(ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * skill_multiplier);
 
         public override double DifficultyValue()
         {

@@ -67,14 +67,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = computeSpeedValue(score, osuAttributes);
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
-            double cognitionValue = computeCognitionValue(score, osuAttributes);
+            double readingValue = computeReadingValue(score, osuAttributes);
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
                     Math.Pow(speedValue, 1.1) +
                     Math.Pow(accuracyValue, 1.1) +
                     Math.Pow(flashlightValue, 1.1) +
-                    Math.Pow(cognitionValue, 1.1), 1.0 / 1.1
+                    Math.Pow(readingValue, 1.1), 1.0 / 1.1
                 ) * multiplier;
 
             return new OsuPerformanceAttributes
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Speed = speedValue,
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
-                Cognition = cognitionValue,
+                Reading = readingValue,
                 EffectiveMissCount = effectiveMissCount,
                 Total = totalValue
             };
@@ -237,27 +237,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        private double computeCognitionValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeReadingValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double rawCognition = attributes.CognitionDifficulty;
+            double rawReading = attributes.ReadingDifficulty;
 
             if (score.Mods.Any(m => m is OsuModTouchDevice))
-                rawCognition = Math.Pow(rawCognition, 0.8);
+                rawReading = Math.Pow(rawReading, 0.8);
 
-            double cognitionValue = Math.Pow(rawCognition, 2.0) * 25.0;
+            double readingValue = Math.Pow(rawReading, 2.0) * 25.0;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-                cognitionValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
+                readingValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
-            cognitionValue *= getComboScalingFactor(attributes);
+            readingValue *= getComboScalingFactor(attributes);
 
-            // Scale the cognition value with accuracy _harshly_.
-            cognitionValue *= accuracy * accuracy;
+            // Scale the reading value with accuracy _harshly_.
+            readingValue *= accuracy * accuracy;
             // It is important to also consider accuracy difficulty when doing that.
-            cognitionValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
+            readingValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
 
-            return cognitionValue;
+            return readingValue;
         }
 
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)

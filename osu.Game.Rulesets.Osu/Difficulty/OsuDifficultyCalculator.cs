@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
             double speedNotes = ((Speed)skills[2]).RelevantNoteCount();
             double flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
-            double cognitionRating = Math.Sqrt(skills[4].DifficultyValue()) * difficulty_multiplier;
+            double readingRating = Math.Sqrt(skills[4].DifficultyValue()) * difficulty_multiplier;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
@@ -65,14 +65,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
                 baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 25.0;
 
-            double baseCognitionPerformance = Math.Pow(5 * Math.Max(1, cognitionRating / 0.0675) - 4, 3) / 100000;
+            double baseReadingPerformance = Math.Pow(5 * Math.Max(1, readingRating / 0.0675) - 4, 3) / 100000;
 
             double basePerformance =
                 Math.Pow(
                     Math.Pow(baseAimPerformance, 1.1) +
                     Math.Pow(baseSpeedPerformance, 1.1) +
                     Math.Pow(baseFlashlightPerformance, 1.1) +
-                    Math.Pow(baseCognitionPerformance, 1.1), 1.0 / 1.1
+                    Math.Pow(baseReadingPerformance, 1.1), 1.0 / 1.1
                 );
 
             double starRating = basePerformance > 0.00001 ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
-                CognitionDifficulty = cognitionRating,
+                ReadingDifficulty = readingRating,
                 SliderFactor = sliderFactor,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 new Aim(mods, false),
                 new Speed(mods),
                 new Flashlight(mods),
-                new Cognition(mods),
+                new Reading(mods),
             };
         }
 
