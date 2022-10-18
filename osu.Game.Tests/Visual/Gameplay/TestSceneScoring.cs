@@ -31,18 +31,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private FillFlowContainer legend = null!;
 
-        private static readonly Color4[] line_colours =
-        {
-            Color4Extensions.FromHex("588c7e"),
-            Color4Extensions.FromHex("b2a367"),
-            Color4Extensions.FromHex("c98f65"),
-            Color4Extensions.FromHex("bc5151"),
-            Color4Extensions.FromHex("5c8bd6"),
-            Color4Extensions.FromHex("7f6ab7"),
-            Color4Extensions.FromHex("a368ad"),
-            Color4Extensions.FromHex("aa6880"),
-        };
-
         [Test]
         public void TestBasic()
         {
@@ -120,13 +108,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             graphs.Clear();
             legend.Clear();
 
-            runForProcessor("lazer-classic", new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Classic } });
-            runForProcessor("lazer-standardised", new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Standardised } });
+            runForProcessor("lazer-standardised", Color4.Cyan, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Standardised } });
+            runForProcessor("lazer-classic", Color4.Orange, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Classic } });
 
             int totalScore = 0;
             int currentCombo = 0;
 
-            runForAlgorithm("stable-v1", () =>
+            runForAlgorithm("stable-v1", Color4.Beige, () =>
             {
                 const int base_score = 300;
                 const float score_multiplier = 1;
@@ -144,7 +132,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }, () => totalScore);
         }
 
-        private void runForProcessor(string name, ScoreProcessor processor)
+        private void runForProcessor(string name, Color4 colour, ScoreProcessor processor)
         {
             int maxCombo = sliderMaxCombo.Current.Value;
 
@@ -154,17 +142,15 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             processor.ApplyBeatmap(beatmap);
 
-            runForAlgorithm(name,
+            runForAlgorithm(name, colour,
                 () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Great }),
                 () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Miss }),
                 () => (int)processor.TotalScore.Value);
         }
 
-        private void runForAlgorithm(string name, Action applyHit, Action applyMiss, Func<int> getTotalScore)
+        private void runForAlgorithm(string name, Color4 colour, Action applyHit, Action applyMiss, Func<int> getTotalScore)
         {
             int maxCombo = sliderMaxCombo.Current.Value;
-
-            Color4 colour = line_colours[Math.Abs(name.GetHashCode()) % line_colours.Length];
 
             List<float> results = new List<float>();
 
