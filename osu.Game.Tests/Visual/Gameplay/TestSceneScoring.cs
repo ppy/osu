@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -85,6 +86,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                                                 MaxValue = 8192,
                                             },
                                             LabelText = "max combo",
+                                        },
+                                        new OsuTextFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Width = 0.5f,
+                                            AutoSizeAxes = Axes.Y,
+                                            Text = "Left click to add miss"
                                         }
                                     }
                                 },
@@ -261,18 +269,20 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    Content,
                     hoverLine = new Box
                     {
                         Colour = Color4.Yellow,
                         RelativeSizeAxes = Axes.Y,
+                        Origin = Anchor.TopCentre,
                         Alpha = 0,
                         Width = 1,
                     },
                     missLines = new Container
                     {
+                        Alpha = 0.6f,
                         RelativeSizeAxes = Axes.Both,
                     },
+                    Content,
                 }
             };
 
@@ -298,6 +308,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         new Box
                         {
                             Colour = OsuColour.Gray(0.2f),
+                            Origin = Anchor.TopCentre,
                             Width = 1,
                             RelativeSizeAxes = Axes.Y,
                             RelativePositionAxes = Axes.X,
@@ -327,6 +338,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 missLines.Add(new Box
                 {
                     Colour = Color4.Red,
+                    Origin = Anchor.TopCentre,
                     Width = 1,
                     RelativeSizeAxes = Axes.Y,
                     RelativePositionAxes = Axes.X,
