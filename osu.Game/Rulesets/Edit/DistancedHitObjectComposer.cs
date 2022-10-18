@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Edit
             return false;
         }
 
-        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
