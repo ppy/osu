@@ -342,7 +342,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 double positionWithRepeats = (time - HitObject.StartTime) / HitObject.Duration * HitObject.SpanCount();
                 double pathPosition = positionWithRepeats - (int)positionWithRepeats;
                 // every second span is in the reverse direction - need to reverse the path position.
-                if (Precision.AlmostBigger(positionWithRepeats % 2, 1))
+                if (positionWithRepeats % 2 >= 1)
                     pathPosition = 1 - pathPosition;
 
                 Vector2 position = HitObject.Position + HitObject.Path.PositionAt(pathPosition);

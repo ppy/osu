@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class OsuLegacySkinTransformer : LegacySkinTransformer
     {
+        public override bool IsProvidingLegacyResources => base.IsProvidingLegacyResources || hasHitCircle.Value;
+
         private readonly Lazy<bool> hasHitCircle;
 
         /// <summary>
@@ -103,6 +105,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     case OsuSkinComponents.CursorParticles:
                         if (GetTexture("star2") != null)
                             return new LegacyCursorParticles();
+
+                        return null;
+
+                    case OsuSkinComponents.CursorSmoke:
+                        if (GetTexture("cursor-smoke") != null)
+                            return new LegacySmokeSegment();
 
                         return null;
 

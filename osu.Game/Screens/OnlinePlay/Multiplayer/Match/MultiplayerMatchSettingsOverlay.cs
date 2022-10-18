@@ -54,6 +54,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             private const float disabled_alpha = 0.2f;
 
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
             public Action? SettingsApplied;
 
             public OsuTextBox NameField = null!;
