@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -31,6 +32,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         public const float SYMBOL_BORDER = 8;
 
         private const double pre_beat_transition_time = 80;
+
+        private const float flash_opacity = 0.3f;
 
         private Color4 accentColour;
 
@@ -156,6 +159,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         {
             if (!effectPoint.KiaiMode)
                 return;
+
+            FlashBox
+                // Make sure the hit indicator usage of FlashBox doesn't get faded out prematurely by a kiai flash
+                .DelayUntilTransformsFinished()
+                .FadeTo(flash_opacity, 0, Easing.OutQuint)
+                .Then()
+                .FadeOut(Math.Max(80, timingPoint.BeatLength - 80), Easing.OutSine);
 
             if (beatIndex % timingPoint.TimeSignature.Numerator != 0)
                 return;
