@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -109,14 +108,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             legend.Clear();
 
             runForProcessor("lazer-standardised", Color4.Cyan, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Standardised } });
-            runForProcessor("lazer-classic", Color4.Orange, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Classic } });
+            runForProcessor("lazer-classic", Color4.MediumPurple, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Classic } });
 
             int totalScore = 0;
             int currentCombo = 0;
 
-            runForAlgorithm("stable-v1", Color4.Beige, () =>
+            const int base_score = 300;
+
+            runForAlgorithm("ScoreV1 (classic)", Color4.Beige, () =>
             {
-                const int base_score = 300;
                 const float score_multiplier = 1;
 
                 totalScore += base_score;
@@ -130,6 +130,43 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 currentCombo = 0;
             }, () => totalScore);
+
+            double comboPortion = 0;
+
+            int maxCombo = sliderMaxCombo.Current.Value;
+
+            double currentBaseScore = 0;
+            double maxBaseScore = 0;
+
+            int currentHits = 0;
+
+            double comboPortionMax = 0;
+            for (int i = 0; i < maxCombo; i++)
+                comboPortionMax += base_score * (1 + (i + 1) / 10.0);
+
+            runForAlgorithm("ScoreV2", Color4.OrangeRed, () =>
+            {
+                maxBaseScore += base_score;
+                currentBaseScore += base_score;
+                comboPortion += base_score * (1 + ++currentCombo / 10.0);
+
+                currentHits++;
+            }, () =>
+            {
+                currentHits++;
+                maxBaseScore += base_score;
+
+                currentCombo = 0;
+            }, () =>
+            {
+                double accuracy = currentBaseScore / maxBaseScore;
+
+                return (int)Math.Round
+                (
+                    700000 * comboPortion / comboPortionMax +
+                    300000 * Math.Pow(accuracy, 10) * ((double)currentHits / maxCombo)
+                );
+            });
         }
 
         private void runForProcessor(string name, Color4 colour, ScoreProcessor processor)
