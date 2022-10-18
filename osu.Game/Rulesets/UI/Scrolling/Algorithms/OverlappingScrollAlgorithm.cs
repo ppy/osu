@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             return -PositionAt(startTime, endTime, timeRange, scrollLength);
         }
 
-        public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
-            => (float)((time - currentTime) / timeRange * controlPointAt(time).Multiplier * scrollLength);
+        public float PositionAt(double time, double currentTime, double timeRange, float scrollLength, double? originTime = null)
+            => (float)((time - currentTime) / timeRange * controlPointAt(originTime ?? time).Multiplier * scrollLength);
 
         public double TimeAt(float position, double currentTime, double timeRange, float scrollLength)
         {

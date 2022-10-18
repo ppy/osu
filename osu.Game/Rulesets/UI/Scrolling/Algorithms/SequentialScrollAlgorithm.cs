@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             return (float)(objectLength * scrollLength);
         }
 
-        public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
+        public float PositionAt(double time, double currentTime, double timeRange, float scrollLength, double? originTime = null)
         {
             double timelineLength = relativePositionAt(time, timeRange) - relativePositionAt(currentTime, timeRange);
             return (float)(timelineLength * scrollLength);
