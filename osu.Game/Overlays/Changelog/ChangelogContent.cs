@@ -7,20 +7,29 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using System;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogContent : FillFlowContainer
+    public class ChangelogContent : PopoverContainer
     {
         public Action<APIChangelogBuild> BuildSelected;
 
         public void SelectBuild(APIChangelogBuild build) => BuildSelected?.Invoke(build);
 
+        protected override Container<Drawable> Content { get; }
+
         public ChangelogContent()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
+            Content = new FillFlowContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical
+            };
+            base.Content.Add(Content);
         }
     }
 }

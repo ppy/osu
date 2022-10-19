@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
@@ -64,33 +63,28 @@ namespace osu.Game.Overlays.Changelog
             {
                 CommentsContainer comments;
 
-                Child = new PopoverContainer
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
+                    new ChangelogBuildWithNavigation(build) { SelectBuild = SelectBuild },
+                    new Box
                     {
-                        new ChangelogBuildWithNavigation(build) { SelectBuild = SelectBuild },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 2,
-                            Colour = colourProvider.Background6,
-                            Margin = new MarginPadding { Top = 30 },
-                        },
-                        new ChangelogSupporterPromo
-                        {
-                            Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 2,
-                            Colour = colourProvider.Background6,
-                            Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
-                        },
-                        comments = new CommentsContainer()
-                    }
+                        RelativeSizeAxes = Axes.X,
+                        Height = 2,
+                        Colour = colourProvider.Background6,
+                        Margin = new MarginPadding { Top = 30 },
+                    },
+                    new ChangelogSupporterPromo
+                    {
+                        Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 2,
+                        Colour = colourProvider.Background6,
+                        Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
+                    },
+                    comments = new CommentsContainer()
                 };
 
                 comments.ShowComments(CommentableType.Build, build.Id);
