@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -14,6 +15,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 using osuTK.Graphics;
 
@@ -155,17 +157,21 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             };
         }
 
+        [Resolved]
+        private DrawableHitObject drawableHitObject { get; set; }
+
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (!effectPoint.KiaiMode)
                 return;
 
-            FlashBox
-                // Make sure the hit indicator usage of FlashBox doesn't get faded out prematurely by a kiai flash
-                .DelayUntilTransformsFinished()
-                .FadeTo(flash_opacity)
-                .Then()
-                .FadeOut(Math.Max(80, timingPoint.BeatLength - 80), Easing.OutSine);
+            if (drawableHitObject.State.Value == ArmedState.Idle)
+            {
+                FlashBox
+                    .FadeTo(flash_opacity)
+                    .Then()
+                    .FadeOut(Math.Max(80, timingPoint.BeatLength - 80), Easing.OutSine);
+            }
 
             if (beatIndex % timingPoint.TimeSignature.Numerator != 0)
                 return;
