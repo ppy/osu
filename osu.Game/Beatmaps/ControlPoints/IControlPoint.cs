@@ -8,6 +8,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The time at which the control point takes effect.
         /// </summary>
-        public double Time { get; }
+        double Time { get; }
     }
 }
