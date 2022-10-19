@@ -116,6 +116,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 // Without removing transforms first, when it is rewound it may apply an old colour.
                 outerGradient.ClearTransforms(targetMember: nameof(Colour));
                 outerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.1f));
+
                 outerFill.Colour = innerFill.Colour = colour.NewValue.Darken(4);
                 innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
                 flash.Colour = colour.NewValue;
