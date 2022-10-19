@@ -108,18 +108,23 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         {
             base.LoadComplete();
 
-            accentColour.BindValueChanged(colour =>
-            {
-                outerFill.Colour = innerFill.Colour = colour.NewValue.Darken(4);
-                outerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.1f));
-                innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
-                flash.Colour = colour.NewValue;
-            }, true);
-
             indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
 
+            accentColour.BindValueChanged(colour =>
+            {
+                // A colour transform is applied.
+                // Without removing transforms first, when it is rewound it may apply an old colour.
+                outerGradient.ClearTransforms();
+                outerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.1f));
+
+                outerFill.Colour = innerFill.Colour = colour.NewValue.Darken(4);
+                innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
+                flash.Colour = colour.NewValue;
+
+                updateStateTransforms(drawableObject, drawableObject.State.Value);
+            }, true);
+
             drawableObject.ApplyCustomUpdateState += updateStateTransforms;
-            updateStateTransforms(drawableObject, drawableObject.State.Value);
         }
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
