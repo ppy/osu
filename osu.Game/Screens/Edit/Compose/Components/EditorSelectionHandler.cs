@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -70,17 +71,47 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     switch (state.NewValue)
                     {
                         case TernaryState.False:
-                            RemoveSampleBank(bankName);
+                            if (SelectedItems.Count == 0)
+                            {
+                                // Ensure that if this is the last selected bank, it should remain selected.
+                                if (SelectionBankStates.Values.All(b => b.Value == TernaryState.False))
+                                    bindable.Value = TernaryState.True;
+                            }
+                            else
+                            {
+                                // Never remove a sample bank.
+                                // These are basically radio buttons, not toggles.
+                                if (SelectedItems.All(h => h.SampleControlPoint.SampleBank == bankName))
+                                    bindable.Value = TernaryState.True;
+                            }
+
                             break;
 
                         case TernaryState.True:
-                            AddSampleBank(bankName);
+                            if (SelectedItems.Count == 0)
+                            {
+                                // Ensure the user can't stack multiple bank selections when there's no hitobject selection.
+                                // Note that in normal scenarios this is sorted out by the feedback from applying the bank to the selected objects.
+                                foreach (var other in SelectionBankStates.Values)
+                                {
+                                    if (other != bindable)
+                                        other.Value = TernaryState.False;
+                                }
+                            }
+                            else
+                            {
+                                AddSampleBank(bankName);
+                            }
+
                             break;
                     }
                 };
 
                 SelectionBankStates[bankName] = bindable;
             }
+
+            // start with normal selected.
+            SelectionBankStates[SampleControlPoint.DEFAULT_BANK].Value = TernaryState.True;
 
             foreach (string sampleName in HitSampleInfo.AllAdditions)
             {
