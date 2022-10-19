@@ -237,11 +237,13 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     return;
 
                 quadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(200, 4);
+
                 if (points.Count > quadBatch.Size * 4 && quadBatch.Size != 10922)
                 {
                     int batchSize = Math.Min((int)(quadBatch.Size * 1.5f), 10922);
                     quadBatch = renderer.CreateQuadBatch<TexturedVertex2D>(batchSize, 4);
                 }
+
                 texture ??= renderer.WhitePixel;
                 RectangleF textureRect = texture.GetTextureRect();
 
@@ -269,6 +271,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 var color = Color4.White;
 
                 double timeDoingFinalFadeOut = finalFadeOutTime - point.Time / final_fade_out_speed;
+
                 if (timeDoingFinalFadeOut > 0 && point.Time > firstVisiblePointTimeAfterSmokeEnded)
                 {
                     float fraction = Math.Clamp((float)(timeDoingFinalFadeOut / final_fade_out_duration), 0, 1);
@@ -278,6 +281,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 else
                 {
                     double timeDoingInitialFadeOut = initialFadeOutTime - point.Time;
+
                     if (timeDoingInitialFadeOut > 0)
                     {
                         float fraction = Math.Clamp((float)(timeDoingInitialFadeOut / initial_fade_out_duration), 0, 1);
@@ -287,6 +291,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     if (point.Time > firstVisiblePointTimeAfterSmokeEnded)
                     {
                         double timeDoingReFadeIn = reFadeInTime - point.Time / re_fade_in_speed;
+
                         if (timeDoingReFadeIn > 0)
                         {
                             float fraction = Math.Clamp((float)(timeDoingReFadeIn / re_fade_in_duration), 0, 1);
