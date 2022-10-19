@@ -14,6 +14,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -55,7 +57,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            TernaryStates = CreateTernaryButtons().ToArray();
+            MainTernaryStates = CreateTernaryButtons().ToArray();
+            SampleBankTernaryStates = createSampleBankTernaryButtons().ToArray();
 
             AddInternal(placementBlueprintContainer);
         }
@@ -172,7 +175,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// A collection of states which will be displayed to the user in the toolbox.
         /// </summary>
-        public TernaryButton[] TernaryStates { get; private set; }
+        public TernaryButton[] MainTernaryStates { get; private set; }
+
+        public TernaryButton[] SampleBankTernaryStates { get; private set; }
 
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
@@ -184,6 +189,39 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
                 yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => getIconForSample(kvp.Key));
+        }
+
+        private IEnumerable<TernaryButton> createSampleBankTernaryButtons()
+        {
+            foreach (var kvp in SelectionHandler.SelectionBankStates)
+                yield return new TernaryButton(kvp.Value, kvp.Key.Titleize(), () => getIconForBank(kvp.Key));
+        }
+
+        private Drawable getIconForBank(string sampleName)
+        {
+            return new Container
+            {
+                Size = new Vector2(30, 20),
+                Children = new Drawable[]
+                {
+                    new SpriteIcon
+                    {
+                        Size = new Vector2(8),
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Icon = FontAwesome.Solid.VolumeOff
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        X = 10,
+                        Y = -1,
+                        Font = OsuFont.Default.With(weight: FontWeight.Bold, size: 20),
+                        Text = $"{char.ToUpper(sampleName.First())}"
+                    }
+                }
+            };
         }
 
         private Drawable getIconForSample(string sampleName)
