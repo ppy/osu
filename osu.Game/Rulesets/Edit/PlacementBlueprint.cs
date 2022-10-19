@@ -74,9 +74,13 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="commitStart">Whether this call is committing a value for HitObject.StartTime and continuing with further adjustments.</param>
         protected void BeginPlacement(bool commitStart = false)
         {
+            // Store and copy the bank, since it is managed by the editor UI.
+            string bank = HitObject.SampleControlPoint.SampleBank;
+
             var nearestSampleControlPoint = beatmap.HitObjects.LastOrDefault(h => h.GetEndTime() < HitObject.StartTime)?.SampleControlPoint?.DeepClone() as SampleControlPoint;
 
             HitObject.SampleControlPoint = nearestSampleControlPoint ?? new SampleControlPoint();
+            HitObject.SampleControlPoint.SampleBank = bank;
 
             placementHandler.BeginPlacement(HitObject);
             if (commitStart)
