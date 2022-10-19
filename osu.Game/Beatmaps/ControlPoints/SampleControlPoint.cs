@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps.ControlPoints
     /// </remarks>
     public class SampleControlPoint : ControlPoint, IEquatable<SampleControlPoint>
     {
-        public const string DEFAULT_BANK = "normal";
+        public const string DEFAULT_BANK = HitSampleInfo.BANK_NORMAL;
 
         public static readonly SampleControlPoint DEFAULT = new SampleControlPoint
         {
@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public readonly Bindable<string> SampleBankBindable = new Bindable<string>(DEFAULT_BANK) { Default = DEFAULT_BANK };
 
         /// <summary>
-        /// The speed multiplier at this control point.
+        /// The sample bank at this control point.
         /// </summary>
         public string SampleBank
         {
