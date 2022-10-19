@@ -26,6 +26,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
@@ -86,6 +87,36 @@ namespace osu.Game.Rulesets.Catch.Edit
             base.Update();
 
             updateDistanceSnapGrid();
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat)
+                return false;
+
+            if (handleToggleViaKey(e.Key))
+                return true;
+
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            handleToggleViaKey(e.Key);
+            base.OnKeyUp(e);
+        }
+
+        private bool handleToggleViaKey(Key key)
+        {
+            switch (key)
+            {
+                case Key.AltLeft:
+                case Key.AltRight:
+                    distanceSnapToggle.Value = distanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+                    return true;
+            }
+
+            return false;
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
