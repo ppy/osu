@@ -236,8 +236,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (e.Repeat)
                 return false;
 
-            if (handleToggleViaKey(e.Key))
-                return true;
+            handleToggleViaKey(e.Key);
 
             return base.OnKeyDown(e);
         }
@@ -248,22 +247,20 @@ namespace osu.Game.Rulesets.Osu.Edit
             base.OnKeyUp(e);
         }
 
-        private bool handleToggleViaKey(Key key)
+        private void handleToggleViaKey(Key key)
         {
             switch (key)
             {
                 case Key.ShiftLeft:
                 case Key.ShiftRight:
                     rectangularGridSnapToggle.Value = rectangularGridSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
-                    return true;
+                    break;
 
                 case Key.AltLeft:
                 case Key.AltRight:
                     distanceSnapToggle.Value = distanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
-                    return true;
+                    break;
             }
-
-            return false;
         }
 
         private DistanceSnapGrid createDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)
