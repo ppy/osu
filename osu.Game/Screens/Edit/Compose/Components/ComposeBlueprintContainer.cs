@@ -77,9 +77,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // we own SelectionHandler so don't need to worry about making bindable copies (for simplicity)
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
-            {
                 kvp.Value.BindValueChanged(_ => updatePlacementSamples());
-            }
+
+            foreach (var kvp in SelectionHandler.SelectionBankStates)
+                kvp.Value.BindValueChanged(_ => updatePlacementSamples());
         }
 
         protected override void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
@@ -146,6 +147,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
                 sampleChanged(kvp.Key, kvp.Value.Value);
+
+            foreach (var kvp in SelectionHandler.SelectionBankStates)
+                bankChanged(kvp.Key, kvp.Value.Value);
         }
 
         private void sampleChanged(string sampleName, TernaryState state)
@@ -166,6 +170,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 case TernaryState.True:
                     if (existingSample == null)
                         samples.Add(new HitSampleInfo(sampleName));
+                    break;
+            }
+        }
+
+        private void bankChanged(string bankName, TernaryState state)
+        {
+            if (currentPlacement == null) return;
+
+            switch (state)
+            {
+                case TernaryState.True:
+                    currentPlacement.HitObject.SampleControlPoint.SampleBank = bankName;
                     break;
             }
         }
