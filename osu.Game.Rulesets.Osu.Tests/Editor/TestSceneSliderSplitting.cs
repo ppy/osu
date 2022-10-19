@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 if (slider is null) return;
 
-                slider.SampleControlPoint.SampleBank = "soft";
+                slider.SampleControlPoint.SampleBank = HitSampleInfo.BANK_SOFT;
                 slider.SampleControlPoint.SampleVolume = 70;
                 sample = new HitSampleInfo("hitwhistle");
                 slider.Samples.Add(sample);
@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("sliders have hitsounds", hasHitsounds);
 
             bool hasHitsounds() => sample is not null &&
-                                   EditorBeatmap.HitObjects.All(o => o.SampleControlPoint.SampleBank == "soft" &&
+                                   EditorBeatmap.HitObjects.All(o => o.SampleControlPoint.SampleBank == HitSampleInfo.BANK_SOFT &&
                                                                      o.SampleControlPoint.SampleVolume == 70 &&
                                                                      o.Samples.Contains(sample));
         }

@@ -7,6 +7,7 @@ using System.Linq;
 using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
@@ -41,7 +42,7 @@ namespace osu.Game.Tests.Visual.Editing
                     Position = (OsuPlayfield.BASE_SIZE - new Vector2(100, 0)) / 2,
                     SampleControlPoint = new SampleControlPoint
                     {
-                        SampleBank = "normal",
+                        SampleBank = HitSampleInfo.BANK_NORMAL,
                         SampleVolume = 80
                     }
                 });
@@ -52,7 +53,7 @@ namespace osu.Game.Tests.Visual.Editing
                     Position = (OsuPlayfield.BASE_SIZE + new Vector2(100, 0)) / 2,
                     SampleControlPoint = new SampleControlPoint
                     {
-                        SampleBank = "soft",
+                        SampleBank = HitSampleInfo.BANK_SOFT,
                         SampleVolume = 60
                     }
                 });
@@ -70,7 +71,7 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestSingleSelection()
         {
             clickSamplePiece(0);
-            samplePopoverHasSingleBank("normal");
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
             samplePopoverHasSingleVolume(80);
 
             dismissPopover();
@@ -80,14 +81,14 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("select first object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.First()));
 
             clickSamplePiece(1);
-            samplePopoverHasSingleBank("soft");
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
             samplePopoverHasSingleVolume(60);
 
             setVolumeViaPopover(90);
             hitObjectHasSampleVolume(1, 90);
 
-            setBankViaPopover("drum");
-            hitObjectHasSampleBank(1, "drum");
+            setBankViaPopover(HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
         }
 
         [Test]
@@ -136,27 +137,27 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("unify sample bank", () =>
             {
                 foreach (var h in EditorBeatmap.HitObjects)
-                    h.SampleControlPoint.SampleBank = "soft";
+                    h.SampleControlPoint.SampleBank = HitSampleInfo.BANK_SOFT;
             });
 
             AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
             clickSamplePiece(0);
-            samplePopoverHasSingleBank("soft");
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
 
             dismissPopover();
 
             clickSamplePiece(1);
-            samplePopoverHasSingleBank("soft");
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
 
             setBankViaPopover(string.Empty);
-            hitObjectHasSampleBank(0, "soft");
-            hitObjectHasSampleBank(1, "soft");
-            samplePopoverHasSingleBank("soft");
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
 
-            setBankViaPopover("drum");
-            hitObjectHasSampleBank(0, "drum");
-            hitObjectHasSampleBank(1, "drum");
-            samplePopoverHasSingleBank("drum");
+            setBankViaPopover(HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_DRUM);
         }
 
         [Test]
@@ -172,14 +173,14 @@ namespace osu.Game.Tests.Visual.Editing
             samplePopoverHasIndeterminateBank();
 
             setBankViaPopover(string.Empty);
-            hitObjectHasSampleBank(0, "normal");
-            hitObjectHasSampleBank(1, "soft");
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
             samplePopoverHasIndeterminateBank();
 
-            setBankViaPopover("normal");
-            hitObjectHasSampleBank(0, "normal");
-            hitObjectHasSampleBank(1, "normal");
-            samplePopoverHasSingleBank("normal");
+            setBankViaPopover(HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_NORMAL);
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
         }
 
         private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
