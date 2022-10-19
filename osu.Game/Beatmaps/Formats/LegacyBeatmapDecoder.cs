@@ -413,7 +413,7 @@ namespace osu.Game.Beatmaps.Formats
 
             string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
             if (stringSampleSet == @"none")
-                stringSampleSet = HitSampleInfo.HIT_NORMAL;
+                stringSampleSet = HitSampleInfo.BANK_NORMAL;
 
             if (timingChange)
             {
