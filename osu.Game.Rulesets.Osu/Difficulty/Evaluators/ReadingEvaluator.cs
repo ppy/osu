@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (hitObject.IsNull() ||
                     current.StartTime - hitObject.StartTime > reading_window_size ||
-                    hitObject.StartTime < current.StartTime - current.preempt)
+                    hitObject.StartTime < current.StartTime - current.Preempt)
                     break;
 
                 yield return hitObject;
