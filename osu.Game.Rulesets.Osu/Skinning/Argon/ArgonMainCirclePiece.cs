@@ -173,11 +173,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                                 .FadeOut(flash_in_duration);
                         }
 
-                        // The flash layer starts white to give the wanted brightness, but is almost immediately
-                        // recoloured to the accent colour. This would more correctly be done with two layers (one for the initial flash)
-                        // but works well enough with the colour fade.
                         flash.FadeTo(1, flash_in_duration, Easing.OutQuint);
-                        flash.FlashColour(accentColour.Value, fade_out_time, Easing.OutQuint);
 
                         this.FadeOut(fade_out_time, Easing.OutQuad);
                         break;
