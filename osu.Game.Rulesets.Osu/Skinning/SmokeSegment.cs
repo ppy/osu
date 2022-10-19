@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             private Vector2 drawSize;
             private Texture? texture;
             private int rotationSeed;
-            private int firstVisibleIndex;
+            private int firstVisiblePointIndex;
 
             // anim calculation vars (color, scale, direction)
             private double initialFadeOutDurationTrunc;
@@ -221,12 +221,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 reFadeInTime = CurrentTime - initialFadeOutDurationTrunc - firstVisiblePointTimeAfterSmokeEnded * (1 - 1 / re_fade_in_speed);
                 finalFadeOutTime = CurrentTime - initialFadeOutDurationTrunc - firstVisiblePointTimeAfterSmokeEnded * (1 - 1 / final_fade_out_speed);
 
-                double firstVisibleTime = Math.Min(SmokeEndTime, CurrentTime) - initialFadeOutDurationTrunc;
-                firstVisibleIndex = ~Source.SmokePoints.BinarySearch(new SmokePoint { Time = firstVisibleTime }, new SmokePoint.LowerBoundComparer());
-                int futureIndex = ~Source.SmokePoints.BinarySearch(new SmokePoint { Time = CurrentTime }, new SmokePoint.UpperBoundComparer());
+                double firstVisiblePointTime = Math.Min(SmokeEndTime, CurrentTime) - initialFadeOutDurationTrunc;
+                firstVisiblePointIndex = ~Source.SmokePoints.BinarySearch(new SmokePoint { Time = firstVisiblePointTime }, new SmokePoint.LowerBoundComparer());
+                int futurePointIndex = ~Source.SmokePoints.BinarySearch(new SmokePoint { Time = CurrentTime }, new SmokePoint.UpperBoundComparer());
 
                 points.Clear();
-                points.AddRange(Source.SmokePoints.Skip(firstVisibleIndex).Take(futureIndex - firstVisibleIndex));
+                points.AddRange(Source.SmokePoints.Skip(firstVisiblePointIndex).Take(futurePointIndex - firstVisiblePointIndex));
             }
 
             public sealed override void Draw(IRenderer renderer)
@@ -256,7 +256,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 texture.Bind();
 
                 for (int i = 0; i < points.Count; i++)
-                    drawPointQuad(points[i], textureRect, i + firstVisibleIndex);
+                    drawPointQuad(points[i], textureRect, i + firstVisiblePointIndex);
 
                 shader.Unbind();
                 renderer.PopLocalMatrix();
@@ -272,7 +272,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 double timeDoingFinalFadeOut = finalFadeOutTime - point.Time / final_fade_out_speed;
 
-                if (timeDoingFinalFadeOut > 0 && point.Time > firstVisiblePointTimeAfterSmokeEnded)
+                if (timeDoingFinalFadeOut > 0 && point.Time >= firstVisiblePointTimeAfterSmokeEnded)
                 {
                     float fraction = Math.Clamp((float)(timeDoingFinalFadeOut / final_fade_out_duration), 0, 1);
                     fraction = MathF.Pow(fraction, 5);
