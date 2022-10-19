@@ -49,10 +49,39 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public readonly Dictionary<string, Bindable<TernaryState>> SelectionSampleStates = new Dictionary<string, Bindable<TernaryState>>();
 
         /// <summary>
+        /// The state of each sample bank type for all selected hitobjects.
+        /// </summary>
+        public readonly Dictionary<string, Bindable<TernaryState>> SelectionBankStates = new Dictionary<string, Bindable<TernaryState>>();
+
+        /// <summary>
         /// Set up ternary state bindables and bind them to selection/hitobject changes (in both directions)
         /// </summary>
         private void createStateBindables()
         {
+            foreach (string bankName in HitSampleInfo.AllBanks)
+            {
+                var bindable = new Bindable<TernaryState>
+                {
+                    Description = bankName.Titleize()
+                };
+
+                bindable.ValueChanged += state =>
+                {
+                    switch (state.NewValue)
+                    {
+                        case TernaryState.False:
+                            RemoveSampleBank(bankName);
+                            break;
+
+                        case TernaryState.True:
+                            AddSampleBank(bankName);
+                            break;
+                    }
+                };
+
+                SelectionBankStates[bankName] = bindable;
+            }
+
             foreach (string sampleName in HitSampleInfo.AllAdditions)
             {
                 var bindable = new Bindable<TernaryState>
@@ -104,11 +133,47 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 bindable.Value = GetStateFromSelection(SelectedItems, h => h.Samples.Any(s => s.Name == sampleName));
             }
+
+            foreach ((string bankName, var bindable) in SelectionBankStates)
+            {
+                bindable.Value = GetStateFromSelection(SelectedItems, h => h.SampleControlPoint.SampleBank == bankName);
+            }
         }
 
         #endregion
 
         #region Ternary state changes
+
+        /// <summary>
+        /// Adds a sample bank to all selected <see cref="HitObject"/>s.
+        /// </summary>
+        /// <param name="bankName">The name of the sample bank.</param>
+        public void AddSampleBank(string bankName)
+        {
+            EditorBeatmap.PerformOnSelection(h =>
+            {
+                if (h.SampleControlPoint.SampleBank == bankName)
+                    return;
+
+                h.SampleControlPoint.SampleBank = bankName;
+                EditorBeatmap.Update(h);
+            });
+        }
+
+        /// <summary>
+        /// Removes a sample bank from all selected <see cref="HitObject"/>s.
+        /// </summary>
+        /// <param name="bankName">The name of the sample bank.</param>
+        public void RemoveSampleBank(string bankName)
+        {
+            EditorBeatmap.PerformOnSelection(h =>
+            {
+                if (h.SampleControlPoint.SampleBank == bankName)
+                    h.SampleControlPoint.SampleBankBindable.SetDefault();
+
+                EditorBeatmap.Update(h);
+            });
+        }
 
         /// <summary>
         /// Adds a hit sample to all selected <see cref="HitObject"/>s.
@@ -174,9 +239,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 yield return new TernaryStateToggleMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } };
             }
 
-            yield return new OsuMenuItem("Sound")
+            yield return new OsuMenuItem("Sample")
             {
                 Items = SelectionSampleStates.Select(kvp =>
+                    new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
+            };
+
+            yield return new OsuMenuItem("Bank")
+            {
+                Items = SelectionBankStates.Select(kvp =>
                     new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
             };
         }
