@@ -207,7 +207,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="list">The list to search.</param>
         /// <param name="time">The time to find the control point at.</param>
-        /// <returns>The active control point at <paramref name="time"/>.</returns>
+        /// <returns>The active control point at <paramref name="time"/>. Will return <c>null</c> if there are no control points, or if the time is before the first control point.</returns>
         public static T BinarySearch<T>(IReadOnlyList<T> list, double time)
             where T : class, IControlPoint
         {
