@@ -21,7 +21,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Handlers;
+using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Midi;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -46,6 +50,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
+using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -521,6 +526,24 @@ namespace osu.Game
         /// <remarks>Should be overriden per-platform to provide settings for platform-specific handlers.</remarks>
         public virtual SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
         {
+            if (RuntimeInfo.IsDesktop)
+            {
+                switch (handler)
+                {
+                    case ITabletHandler th:
+                        return new TabletSettings(th);
+
+                    case MouseHandler mh:
+                        return new MouseSettings(mh);
+
+                    case JoystickHandler jh:
+                        return new JoystickSettings(jh);
+
+                    case TouchHandler:
+                        return new InputSection.HandlerSection(handler);
+                }
+            }
+
             switch (handler)
             {
                 case MidiHandler:
