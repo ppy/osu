@@ -594,7 +594,7 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        private class ReportButton : LinkFlowContainer, IHasPopover
+        internal class ReportButton : LinkFlowContainer, IHasPopover
         {
             public ReportButton()
                 : base(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold))
