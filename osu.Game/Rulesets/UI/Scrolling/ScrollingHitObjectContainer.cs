@@ -236,8 +236,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
             entry.LifetimeStart = Math.Min(entry.HitObject.StartTime - judgementOffset, computedStartTime);
         }
 
-        private void updateLayoutRecursive(DrawableHitObject hitObject)
+        private void updateLayoutRecursive(DrawableHitObject hitObject, double? parentHitObjectStartTime = null)
         {
+            parentHitObjectStartTime ??= hitObject.HitObject.StartTime;
+
             if (hitObject.HitObject is IHasDuration e)
             {
                 float length = LengthAtTime(hitObject.HitObject.StartTime, e.EndTime);
@@ -249,10 +251,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             foreach (var obj in hitObject.NestedHitObjects)
             {
-                updateLayoutRecursive(obj);
+                updateLayoutRecursive(obj, parentHitObjectStartTime);
 
                 // Nested hitobjects don't need to scroll, but they do need accurate positions and start lifetime
-                updatePosition(obj, hitObject.HitObject.StartTime, hitObject.HitObject.StartTime);
+                updatePosition(obj, hitObject.HitObject.StartTime, parentHitObjectStartTime);
                 setComputedLifetimeStart(obj.Entry);
             }
         }
