@@ -86,16 +86,13 @@ namespace osu.Game.Screens.Play
 
             // Generally a timeout would not happen here as APIAccess will timeout first.
             if (!tcs.Task.Wait(60000))
-                handleTokenFailure(new InvalidOperationException("Token retrieval timed out (request never run)"));
+                req.TriggerFailure(new InvalidOperationException("Token retrieval timed out (request never run)"));
 
             return true;
 
             void handleTokenFailure(Exception exception)
             {
-                // This method may be invoked multiple times due to the Task.Wait call above.
-                // We only really care about the first error.
-                if (!tcs.TrySetResult(false))
-                    return;
+                tcs.SetResult(false);
 
                 if (HandleTokenRetrievalFailure(exception))
                 {

@@ -5,10 +5,12 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu
@@ -17,9 +19,16 @@ namespace osu.Game.Rulesets.Osu
     {
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
-        public bool AllowUserPresses
+        /// <summary>
+        /// Whether gameplay input buttons should be allowed.
+        /// Defaults to <c>true</c>, generally used for mods like Relax which turn off main inputs.
+        /// </summary>
+        /// <remarks>
+        /// Of note, auxiliary inputs like the "smoke" key are left usable.
+        /// </remarks>
+        public bool AllowGameplayInputs
         {
-            set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowUserPresses = value;
+            set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowGameplayInputs = value;
         }
 
         /// <summary>
@@ -58,18 +67,36 @@ namespace osu.Game.Rulesets.Osu
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
         {
-            public bool AllowUserPresses = true;
+            private bool allowGameplayInputs = true;
+
+            /// <summary>
+            /// Whether gameplay input buttons should be allowed.
+            /// Defaults to <c>true</c>, generally used for mods like Relax which turn off main inputs.
+            /// </summary>
+            /// <remarks>
+            /// Of note, auxiliary inputs like the "smoke" key are left usable.
+            /// </remarks>
+            public bool AllowGameplayInputs
+            {
+                get => allowGameplayInputs;
+                set
+                {
+                    allowGameplayInputs = value;
+                    ReloadMappings();
+                }
+            }
 
             public OsuKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
             {
             }
 
-            protected override bool Handle(UIEvent e)
+            protected override void ReloadMappings(IQueryable<RealmKeyBinding> realmKeyBindings)
             {
-                if (!AllowUserPresses) return false;
+                base.ReloadMappings(realmKeyBindings);
 
-                return base.Handle(e);
+                if (!AllowGameplayInputs)
+                    KeyBindings = KeyBindings.Where(b => b.GetAction<OsuAction>() == OsuAction.Smoke).ToList();
             }
         }
     }

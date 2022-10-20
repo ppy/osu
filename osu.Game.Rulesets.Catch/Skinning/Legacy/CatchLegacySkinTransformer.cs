@@ -13,6 +13,10 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     public class CatchLegacySkinTransformer : LegacySkinTransformer
     {
+        public override bool IsProvidingLegacyResources => base.IsProvidingLegacyResources || hasPear;
+
+        private bool hasPear => GetTexture("fruit-pear") != null;
+
         /// <summary>
         /// For simplicity, let's use legacy combo font texture existence as a way to identify legacy skins from default.
         /// </summary>
@@ -49,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 switch (catchSkinComponent.Component)
                 {
                     case CatchSkinComponents.Fruit:
-                        if (GetTexture("fruit-pear") != null)
+                        if (hasPear)
                             return new LegacyFruitPiece();
 
                         return null;

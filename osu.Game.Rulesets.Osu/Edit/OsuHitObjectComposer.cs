@@ -60,6 +60,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
+            // Give a bit of breathing room around the playfield content.
+            PlayfieldContentContainer.Padding = new MarginPadding(10);
+
             LayerBelowRuleset.AddRange(new Drawable[]
             {
                 distanceSnapGridContainer = new Container

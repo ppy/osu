@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
@@ -94,15 +93,7 @@ namespace osu.Game.Graphics.UserInterface
         private void copyUrl()
         {
             host.GetClipboard()?.SetText(Link);
-            onScreenDisplay?.Display(new CopyUrlToast(ToastStrings.UrlCopied));
-        }
-
-        private class CopyUrlToast : Toast
-        {
-            public CopyUrlToast(LocalisableString value)
-                : base(UserInterfaceStrings.GeneralHeader, value, "")
-            {
-            }
+            onScreenDisplay?.Display(new CopyUrlToast());
         }
     }
 }
