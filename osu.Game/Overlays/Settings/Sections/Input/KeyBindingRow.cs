@@ -327,6 +327,50 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             finalise();
         }
 
+        protected override bool OnTabletAuxiliaryButtonPress(TabletAuxiliaryButtonPressEvent e)
+        {
+            if (!HasFocus)
+                return false;
+
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            finalise();
+
+            return true;
+        }
+
+        protected override void OnTabletAuxiliaryButtonRelease(TabletAuxiliaryButtonReleaseEvent e)
+        {
+            if (!HasFocus)
+            {
+                base.OnTabletAuxiliaryButtonRelease(e);
+                return;
+            }
+
+            finalise();
+        }
+
+        protected override bool OnTabletPenButtonPress(TabletPenButtonPressEvent e)
+        {
+            if (!HasFocus)
+                return false;
+
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            finalise();
+
+            return true;
+        }
+
+        protected override void OnTabletPenButtonRelease(TabletPenButtonReleaseEvent e)
+        {
+            if (!HasFocus)
+            {
+                base.OnTabletPenButtonRelease(e);
+                return;
+            }
+
+            finalise();
+        }
+
         private void clear()
         {
             if (bindTarget == null)
