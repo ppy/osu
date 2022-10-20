@@ -7,6 +7,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Child = new FillFlowContainer
+            Child = new ReverseChildIDFillFlowContainer<Drawable>
             {
                 Direction = FillDirection.Vertical,
                 Width = 500,
@@ -53,9 +54,14 @@ namespace osu.Game.Overlays.Comments
                         Text = UsersStrings.ReportReason,
                         Font = OsuFont.Torus.With(size: 20),
                     },
-                    reason = new OsuEnumDropdown<CommentReportReason>
+                    new Container
                     {
-                        RelativeSizeAxes = Axes.X
+                        RelativeSizeAxes = Axes.X,
+                        Height = 40,
+                        Child = reason = new OsuEnumDropdown<CommentReportReason>
+                        {
+                            RelativeSizeAxes = Axes.X
+                        }
                     },
                     new OsuSpriteText
                     {
