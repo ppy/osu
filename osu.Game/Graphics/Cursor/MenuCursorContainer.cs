@@ -54,8 +54,13 @@ namespace osu.Game.Graphics.Cursor
 
         private bool visible;
 
-        //M
+        //mfosu start
         public BindableBool UseSystemCursor = new BindableBool();
+        private bool changedWhenHidden;
+
+        [Resolved]
+        private GameHost host { get; set; }
+        //mfosu end
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, ScreenshotManager? screenshotManager, AudioManager audio, MConfigManager mConfig)
