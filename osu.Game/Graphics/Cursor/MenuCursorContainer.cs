@@ -23,6 +23,21 @@ namespace osu.Game.Graphics.Cursor
         private readonly IBindable<bool> screenshotCursorVisibility = new Bindable<bool>(true);
         public override bool IsPresent => screenshotCursorVisibility.Value && base.IsPresent;
 
+        private bool hideCursorOnNonMouseInput;
+
+        public bool HideCursorOnNonMouseInput
+        {
+            get => hideCursorOnNonMouseInput;
+            set
+            {
+                if (hideCursorOnNonMouseInput == value)
+                    return;
+
+                hideCursorOnNonMouseInput = value;
+                updateState();
+            }
+        }
+
         protected override Drawable CreateCursor() => activeCursor = new Cursor();
 
         private Cursor activeCursor = null!;
@@ -75,7 +90,7 @@ namespace osu.Game.Graphics.Cursor
 
         private void updateState()
         {
-            bool combinedVisibility = State.Value == Visibility.Visible && lastInputWasMouse.Value && !isIdle.Value;
+            bool combinedVisibility = State.Value == Visibility.Visible && (lastInputWasMouse.Value || !hideCursorOnNonMouseInput) && !isIdle.Value;
 
             if (visible == combinedVisibility)
                 return;
