@@ -331,7 +331,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateHitStateTransforms(state);
 
-            const float fade_out_time = 450;
+            const float fade_out_time = 240;
 
             switch (state)
             {
@@ -341,7 +341,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
             }
 
-            this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
+            this.FadeOut(fade_out_time).Expire();
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => SliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
