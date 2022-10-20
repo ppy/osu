@@ -135,25 +135,15 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     });
                     return true;
 
+                case GetBeatmapRequest getBeatmapRequest:
+                {
+                    getBeatmapRequest.TriggerSuccess(createResponseBeatmaps(getBeatmapRequest.BeatmapInfo.OnlineID).Single());
+                    return true;
+                }
+
                 case GetBeatmapsRequest getBeatmapsRequest:
                 {
-                    var result = new List<APIBeatmap>();
-
-                    foreach (int id in getBeatmapsRequest.BeatmapIds)
-                    {
-                        var baseBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == id);
-
-                        if (baseBeatmap == null)
-                        {
-                            baseBeatmap = new TestBeatmap(new RulesetInfo { OnlineID = 0 }).BeatmapInfo;
-                            baseBeatmap.OnlineID = id;
-                            baseBeatmap.BeatmapSet!.OnlineID = id;
-                        }
-
-                        result.Add(OsuTestScene.CreateAPIBeatmap(baseBeatmap));
-                    }
-
-                    getBeatmapsRequest.TriggerSuccess(new GetBeatmapsResponse { Beatmaps = result });
+                    getBeatmapsRequest.TriggerSuccess(new GetBeatmapsResponse { Beatmaps = createResponseBeatmaps(getBeatmapsRequest.BeatmapIds.ToArray()) });
                     return true;
                 }
 
@@ -173,6 +163,27 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     getBeatmapSetRequest.TriggerSuccess(OsuTestScene.CreateAPIBeatmapSet(baseBeatmap));
                     return true;
                 }
+            }
+
+            List<APIBeatmap> createResponseBeatmaps(params int[] beatmapIds)
+            {
+                var result = new List<APIBeatmap>();
+
+                foreach (int id in beatmapIds)
+                {
+                    var baseBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == id);
+
+                    if (baseBeatmap == null)
+                    {
+                        baseBeatmap = new TestBeatmap(new RulesetInfo { OnlineID = 0 }).BeatmapInfo;
+                        baseBeatmap.OnlineID = id;
+                        baseBeatmap.BeatmapSet!.OnlineID = id;
+                    }
+
+                    result.Add(OsuTestScene.CreateAPIBeatmap(baseBeatmap));
+                }
+
+                return result;
             }
 
             return false;

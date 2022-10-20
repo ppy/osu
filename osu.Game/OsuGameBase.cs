@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -124,6 +125,8 @@ namespace osu.Game
 
         protected SessionStatics SessionStatics { get; private set; }
 
+        protected OsuColour Colours { get; private set; }
+
         protected BeatmapManager BeatmapManager { get; private set; }
 
         protected BeatmapModelDownloader BeatmapDownloader { get; private set; }
@@ -179,11 +182,17 @@ namespace osu.Game
 
         private SpectatorClient spectatorClient;
 
-        private MultiplayerClient multiplayerClient;
+        protected MultiplayerClient MultiplayerClient { get; private set; }
 
         private MetadataClient metadataClient;
 
         private RealmAccess realm;
+
+        /// <summary>
+        /// For now, this is used as a source specifically for beat synced components.
+        /// Going forward, it could potentially be used as the single source-of-truth for beatmap timing.
+        /// </summary>
+        private readonly FramedBeatmapClock beatmapClock = new FramedBeatmapClock(true);
 
         protected override Container<Drawable> Content => content;
 
@@ -192,11 +201,6 @@ namespace osu.Game
         private DependencyContainer dependencies;
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(global_track_volume_adjust);
-
-        /// <summary>
-        /// A legacy EF context factory if migration has not been performed to realm yet.
-        /// </summary>
-        protected DatabaseContextFactory EFContextFactory { get; private set; }
 
         /// <summary>
         /// Number of unhandled exceptions to allow before aborting execution.
@@ -236,10 +240,7 @@ namespace osu.Game
 
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
-            if (Storage.Exists(DatabaseContextFactory.DATABASE_NAME))
-                dependencies.Cache(EFContextFactory = new DatabaseContextFactory(Storage));
-
-            dependencies.Cache(realm = new RealmAccess(Storage, CLIENT_DATABASE_FILENAME, Host.UpdateThread, EFContextFactory));
+            dependencies.Cache(realm = new RealmAccess(Storage, CLIENT_DATABASE_FILENAME, Host.UpdateThread));
 
             dependencies.CacheAs<RulesetStore>(RulesetStore = new RealmRulesetStore(realm, Storage));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
@@ -257,6 +258,8 @@ namespace osu.Game
 
             InitialiseFonts();
 
+            addFilesWarning();
+
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
             dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
@@ -273,7 +276,7 @@ namespace osu.Game
             dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, API, difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, API, LocalConfig));
 
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
 
@@ -286,7 +289,7 @@ namespace osu.Game
             // TODO: OsuGame or OsuGameBase?
             dependencies.CacheAs(beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage));
             dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
-            dependencies.CacheAs(multiplayerClient = new OnlineMultiplayerClient(endpoints));
+            dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
 
             AddInternal(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
@@ -310,7 +313,7 @@ namespace osu.Game
                 dependencies.CacheAs(powerStatus);
 
             dependencies.Cache(SessionStatics = new SessionStatics());
-            dependencies.Cache(new OsuColour());
+            dependencies.Cache(Colours = new OsuColour());
 
             RegisterImportHandler(BeatmapManager);
             RegisterImportHandler(ScoreManager);
@@ -331,7 +334,7 @@ namespace osu.Game
                 AddInternal(apiAccess);
 
             AddInternal(spectatorClient);
-            AddInternal(multiplayerClient);
+            AddInternal(MultiplayerClient);
             AddInternal(metadataClient);
 
             AddInternal(rulesetConfigCache);
@@ -368,8 +371,45 @@ namespace osu.Game
             AddInternal(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);
 
+            MusicController.TrackChanged += onTrackChanged;
+            AddInternal(beatmapClock);
+
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
+        }
+
+        private void addFilesWarning()
+        {
+            var realmStore = new RealmFileStore(realm, Storage);
+
+            const string filename = "IMPORTANT READ ME.txt";
+
+            if (!realmStore.Storage.Exists(filename))
+            {
+                using (var stream = realmStore.Storage.CreateFileSafely(filename))
+                using (var textWriter = new StreamWriter(stream))
+                {
+                    textWriter.WriteLine(@"This folder contains all your user files (beatmaps, skins, replays etc.)");
+                    textWriter.WriteLine(@"Please do not touch or delete this folder!!");
+                    textWriter.WriteLine();
+                    textWriter.WriteLine(@"If you are really looking to completely delete user data, please delete");
+                    textWriter.WriteLine(@"the parent folder including all other files and directories");
+                    textWriter.WriteLine();
+                    textWriter.WriteLine(@"For more information on how these files are organised,");
+                    textWriter.WriteLine(@"see https://github.com/ppy/osu/wiki/User-file-storage");
+                }
+            }
+        }
+
+        private void onTrackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction)
+        {
+            // FramedBeatmapClock uses a decoupled clock internally which will mutate the source if it is an `IAdjustableClock`.
+            // We don't want this for now, as the intention of beatmapClock is to be a read-only source for beat sync components.
+            //
+            // Encapsulating in a FramedClock will avoid any mutations.
+            var framedClock = new FramedClock(beatmap.Track);
+
+            beatmapClock.ChangeSource(framedClock);
         }
 
         protected virtual void InitialiseFonts()
@@ -587,7 +627,7 @@ namespace osu.Game
         }
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.BeatmapLoaded ? Beatmap.Value.Beatmap.ControlPointInfo : null;
-        IClock IBeatSyncProvider.Clock => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track : (IClock)null;
+        IClock IBeatSyncProvider.Clock => beatmapClock;
         ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
     }
 }

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             Add(gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time));
 
-            Dependencies.CacheAs(gameplayClockContainer.GameplayClock);
+            Dependencies.CacheAs<IGameplayClock>(gameplayClockContainer);
         }
 
         [SetUpSteps]
@@ -51,13 +51,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestToggleSeeking()
         {
-            DefaultSongProgress getDefaultProgress() => this.ChildrenOfType<DefaultSongProgress>().Single();
+            void applyToDefaultProgress(Action<DefaultSongProgress> action) =>
+                this.ChildrenOfType<DefaultSongProgress>().ForEach(action);
 
-            AddStep("allow seeking", () => getDefaultProgress().AllowSeeking.Value = true);
-            AddStep("hide graph", () => getDefaultProgress().ShowGraph.Value = false);
-            AddStep("disallow seeking", () => getDefaultProgress().AllowSeeking.Value = false);
-            AddStep("allow seeking", () => getDefaultProgress().AllowSeeking.Value = true);
-            AddStep("show graph", () => getDefaultProgress().ShowGraph.Value = true);
+            AddStep("allow seeking", () => applyToDefaultProgress(s => s.AllowSeeking.Value = true));
+            AddStep("hide graph", () => applyToDefaultProgress(s => s.ShowGraph.Value = false));
+            AddStep("disallow seeking", () => applyToDefaultProgress(s => s.AllowSeeking.Value = false));
+            AddStep("allow seeking", () => applyToDefaultProgress(s => s.AllowSeeking.Value = true));
+            AddStep("show graph", () => applyToDefaultProgress(s => s.ShowGraph.Value = true));
         }
 
         private void setHitObjects()

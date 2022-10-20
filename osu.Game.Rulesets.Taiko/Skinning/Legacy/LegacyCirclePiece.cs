@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -19,6 +20,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     public class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
     {
         private Drawable backgroundLayer;
+
+        // required for editor blueprints (not sure why these circle pieces are zero size).
+        public override Quad ScreenSpaceDrawQuad => backgroundLayer.ScreenSpaceDrawQuad;
 
         public LegacyCirclePiece()
         {

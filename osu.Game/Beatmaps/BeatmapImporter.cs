@@ -55,7 +55,14 @@ namespace osu.Game.Beatmaps
 
             // If there were no changes, ensure we don't accidentally nuke ourselves.
             if (first.ID == original.ID)
+            {
+                first.PerformRead(s =>
+                {
+                    // Re-run processing even in this case. We might have outdated metadata.
+                    ProcessBeatmap?.Invoke((s, false));
+                });
                 return first;
+            }
 
             first.PerformWrite(updated =>
             {

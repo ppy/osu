@@ -292,7 +292,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Selected -= OnBlueprintSelected;
             blueprint.Deselected -= OnBlueprintDeselected;
 
-            SelectionBlueprints.Remove(blueprint);
+            SelectionBlueprints.Remove(blueprint, true);
 
             if (movementBlueprints?.Contains(blueprint) == true)
                 finishSelectionMovement();

@@ -24,6 +24,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -44,8 +45,6 @@ namespace osu.Game.Database
         /// The filename of this realm.
         /// </summary>
         public readonly string Filename;
-
-        private readonly IDatabaseContextFactory? efContextFactory;
 
         private readonly SynchronizationContext? updateThreadSyncContext;
 
@@ -68,8 +67,11 @@ namespace osu.Game.Database
         /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo, changed default value of BeatmapInfo.StarRating to -1.
         /// 21   2022-07-27    Migrate collections to realm (BeatmapCollection).
         /// 22   2022-07-31    Added ModPreset.
+        /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
+        /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
+        /// 25   2022-09-18    Remove skins to add with new naming.
         /// </summary>
-        private const int schema_version = 22;
+        private const int schema_version = 25;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -160,11 +162,9 @@ namespace osu.Game.Database
         /// <param name="storage">The game storage which will be used to create the realm backing file.</param>
         /// <param name="filename">The filename to use for the realm backing file. A ".realm" extension will be added automatically if not specified.</param>
         /// <param name="updateThread">The game update thread, used to post realm operations into a thread-safe context.</param>
-        /// <param name="efContextFactory">An EF factory used only for migration purposes.</param>
-        public RealmAccess(Storage storage, string filename, GameThread? updateThread = null, IDatabaseContextFactory? efContextFactory = null)
+        public RealmAccess(Storage storage, string filename, GameThread? updateThread = null)
         {
             this.storage = storage;
-            this.efContextFactory = efContextFactory;
 
             updateThreadSyncContext = updateThread?.SynchronizationContext ?? SynchronizationContext.Current;
 
@@ -871,11 +871,25 @@ namespace osu.Game.Database
                     }
 
                     break;
+
+                case 25:
+                    // Remove the default skins so they can be added back by SkinManager with updated naming.
+                    migration.NewRealm.RemoveRange(migration.NewRealm.All<SkinInfo>().Where(s => s.Protected));
+                    break;
             }
         }
 
-        private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
-            efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
+        private string? getRulesetShortNameFromLegacyID(long rulesetId)
+        {
+            try
+            {
+                return new APIBeatmap.APIRuleset { OnlineID = (int)rulesetId }.ShortName;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         /// <summary>
         /// Create a full realm backup.
@@ -900,8 +914,15 @@ namespace osu.Game.Database
                 try
                 {
                     using (var source = storage.GetStream(Filename, mode: FileMode.Open))
-                    using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
-                        source.CopyTo(destination);
+                    {
+                        // source may not exist.
+                        if (source == null)
+                            return;
+
+                        using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                            source.CopyTo(destination);
+                    }
+
                     return;
                 }
                 catch (IOException)

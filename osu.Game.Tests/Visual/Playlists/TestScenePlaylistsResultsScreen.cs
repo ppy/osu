@@ -61,6 +61,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 userScore = TestResources.CreateTestScoreInfo();
                 userScore.TotalScore = 0;
                 userScore.Statistics = new Dictionary<HitResult, int>();
+                userScore.MaximumStatistics = new Dictionary<HitResult, int>();
 
                 bindHandler();
 

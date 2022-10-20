@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Editing
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Clock.Seek(10000);
+            EditorClock.Seek(10000);
         }
     }
 }

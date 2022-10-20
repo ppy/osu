@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Editing
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("Stop clock", () => Clock.Stop());
+            AddStep("Stop clock", () => EditorClock.Stop());
 
             AddUntilStep("wait for rows to load", () => Child.ChildrenOfType<EffectRowAttribute>().Any());
         }
@@ -68,10 +68,10 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 54670);
-            AddUntilStep("Ensure seeked to correct time", () => Clock.CurrentTimeAccurate == 54670);
+            AddUntilStep("Ensure seeked to correct time", () => EditorClock.CurrentTimeAccurate == 54670);
 
-            AddStep("Seek to just before next point", () => Clock.Seek(69000));
-            AddStep("Start clock", () => Clock.Start());
+            AddStep("Seek to just before next point", () => EditorClock.Seek(69000));
+            AddStep("Start clock", () => EditorClock.Start());
 
             AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 69670);
         }
@@ -86,9 +86,9 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 54670);
-            AddUntilStep("Ensure seeked to correct time", () => Clock.CurrentTimeAccurate == 54670);
+            AddUntilStep("Ensure seeked to correct time", () => EditorClock.CurrentTimeAccurate == 54670);
 
-            AddStep("Seek to later", () => Clock.Seek(80000));
+            AddStep("Seek to later", () => EditorClock.Seek(80000));
             AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 69670);
         }
 

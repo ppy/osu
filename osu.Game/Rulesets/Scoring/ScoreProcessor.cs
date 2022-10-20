@@ -121,15 +121,14 @@ namespace osu.Game.Rulesets.Scoring
 
         /// <summary>
         /// The maximum <see cref="HitResult"/> of a basic (non-tick and non-bonus) hitobject.
-        /// Only populated via <see cref="ComputeFinalScore"/> or <see cref="ResetFromReplayFrame"/>.
+        /// Only populated via <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoreInfo)"/> or <see cref="ResetFromReplayFrame"/>.
         /// </summary>
         private HitResult? maxBasicResult;
 
         private bool beatmapApplied;
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
-
-        private Dictionary<HitResult, int>? maximumResultCounts;
+        private readonly Dictionary<HitResult, int> maximumResultCounts = new Dictionary<HitResult, int>();
 
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
@@ -273,7 +272,24 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Computes the total score of a given finalised <see cref="ScoreInfo"/>. This should be used when a score is known to be complete.
+        /// Computes the accuracy of a given <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
+        /// <returns>The score's accuracy.</returns>
+        [Pure]
+        public double ComputeAccuracy(ScoreInfo scoreInfo)
+        {
+            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+
+            // We only extract scoring values from the score's statistics. This is because accuracy is always relative to the point of pass or fail rather than relative to the whole beatmap.
+            extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
+
+            return maximum.BaseScore > 0 ? current.BaseScore / maximum.BaseScore : 1;
+        }
+
+        /// <summary>
+        /// Computes the total score of a given <see cref="ScoreInfo"/>.
         /// </summary>
         /// <remarks>
         /// Does not require <see cref="JudgementProcessor.ApplyBeatmap"/> to have been called before use.
@@ -282,7 +298,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         [Pure]
-        public double ComputeFinalScore(ScoringMode mode, ScoreInfo scoreInfo)
+        public double ComputeScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
@@ -290,60 +306,6 @@ namespace osu.Game.Rulesets.Scoring
             ExtractScoringValues(scoreInfo, out var current, out var maximum);
 
             return ComputeScore(mode, current, maximum);
-        }
-
-        /// <summary>
-        /// Computes the total score of a partially-completed <see cref="ScoreInfo"/>. This should be used when it is unknown whether a score is complete.
-        /// </summary>
-        /// <remarks>
-        /// Requires <see cref="JudgementProcessor.ApplyBeatmap"/> to have been called before use.
-        /// </remarks>
-        /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
-        /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
-        /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
-        [Pure]
-        public double ComputePartialScore(ScoringMode mode, ScoreInfo scoreInfo)
-        {
-            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
-                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
-
-            if (!beatmapApplied)
-                throw new InvalidOperationException($"Cannot compute partial score without calling {nameof(ApplyBeatmap)}.");
-
-            ExtractScoringValues(scoreInfo, out var current, out _);
-
-            return ComputeScore(mode, current, MaximumScoringValues);
-        }
-
-        /// <summary>
-        /// Computes the total score of a given <see cref="ScoreInfo"/> with a given custom max achievable combo.
-        /// </summary>
-        /// <remarks>
-        /// This is useful for processing legacy scores in which the maximum achievable combo can be more accurately determined via external means (e.g. database values or difficulty calculation).
-        /// <p>Does not require <see cref="JudgementProcessor.ApplyBeatmap"/> to have been called before use.</p>
-        /// </remarks>
-        /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
-        /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
-        /// <param name="maxAchievableCombo">The maximum achievable combo for the provided beatmap.</param>
-        /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
-        [Pure]
-        public double ComputeFinalLegacyScore(ScoringMode mode, ScoreInfo scoreInfo, int maxAchievableCombo)
-        {
-            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
-                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
-
-            double accuracyRatio = scoreInfo.Accuracy;
-            double comboRatio = maxAchievableCombo > 0 ? (double)scoreInfo.MaxCombo / maxAchievableCombo : 1;
-
-            ExtractScoringValues(scoreInfo, out var current, out var maximum);
-
-            // For legacy osu!mania scores, a full-GREAT score has 100% accuracy. If combined with a full-combo, the score becomes indistinguishable from a full-PERFECT score.
-            // To get around this, the accuracy ratio is always recalculated based on the hit statistics rather than trusting the score.
-            // Note: This cannot be applied universally to all legacy scores, as some rulesets (e.g. catch) group multiple judgements together.
-            if (scoreInfo.IsLegacyScore && scoreInfo.Ruleset.OnlineID == 3 && maximum.BaseScore > 0)
-                accuracyRatio = current.BaseScore / maximum.BaseScore;
-
-            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.CountBasicHitObjects);
         }
 
         /// <summary>
@@ -405,8 +367,6 @@ namespace osu.Game.Rulesets.Scoring
             return ScoreRank.D;
         }
 
-        public int GetStatistic(HitResult result) => scoreResultCounts.GetValueOrDefault(result);
-
         /// <summary>
         /// Resets this ScoreProcessor to a default state.
         /// </summary>
@@ -421,7 +381,9 @@ namespace osu.Game.Rulesets.Scoring
             if (storeResults)
             {
                 maximumScoringValues = currentScoringValues;
-                maximumResultCounts = new Dictionary<HitResult, int>(scoreResultCounts);
+
+                maximumResultCounts.Clear();
+                maximumResultCounts.AddRange(scoreResultCounts);
             }
 
             scoreResultCounts.Clear();
@@ -449,14 +411,17 @@ namespace osu.Game.Rulesets.Scoring
             score.HitEvents = hitEvents;
 
             foreach (var result in HitResultExtensions.ALL_TYPES)
-                score.Statistics[result] = GetStatistic(result);
+                score.Statistics[result] = scoreResultCounts.GetValueOrDefault(result);
+
+            foreach (var result in HitResultExtensions.ALL_TYPES)
+                score.MaximumStatistics[result] = maximumResultCounts.GetValueOrDefault(result);
 
             // Populate total score after everything else.
-            score.TotalScore = (long)Math.Round(ComputeFinalScore(ScoringMode.Standardised, score));
+            score.TotalScore = (long)Math.Round(ComputeScore(ScoringMode.Standardised, score));
         }
 
         /// <summary>
-        /// Populates the given score with remaining statistics as "missed" and marks it with <see cref="ScoreRank.F"/> rank.
+        /// Populates a failed score, marking it with the <see cref="ScoreRank.F"/> rank.
         /// </summary>
         public void FailScore(ScoreInfo score)
         {
@@ -465,22 +430,6 @@ namespace osu.Game.Rulesets.Scoring
 
             score.Passed = false;
             Rank.Value = ScoreRank.F;
-
-            Debug.Assert(maximumResultCounts != null);
-
-            if (maximumResultCounts.TryGetValue(HitResult.LargeTickHit, out int maximumLargeTick))
-                scoreResultCounts[HitResult.LargeTickMiss] = maximumLargeTick - scoreResultCounts.GetValueOrDefault(HitResult.LargeTickHit);
-
-            if (maximumResultCounts.TryGetValue(HitResult.SmallTickHit, out int maximumSmallTick))
-                scoreResultCounts[HitResult.SmallTickMiss] = maximumSmallTick - scoreResultCounts.GetValueOrDefault(HitResult.SmallTickHit);
-
-            int maximumBonusOrIgnore = maximumResultCounts.Where(kvp => kvp.Key.IsBonus() || kvp.Key == HitResult.IgnoreHit).Sum(kvp => kvp.Value);
-            int currentBonusOrIgnore = scoreResultCounts.Where(kvp => kvp.Key.IsBonus() || kvp.Key == HitResult.IgnoreHit).Sum(kvp => kvp.Value);
-            scoreResultCounts[HitResult.IgnoreMiss] = maximumBonusOrIgnore - currentBonusOrIgnore;
-
-            int maximumBasic = maximumResultCounts.SingleOrDefault(kvp => kvp.Key.IsBasic()).Value;
-            int currentBasic = scoreResultCounts.Where(kvp => kvp.Key.IsBasic() && kvp.Key != HitResult.Miss).Sum(kvp => kvp.Value);
-            scoreResultCounts[HitResult.Miss] = maximumBasic - currentBasic;
 
             PopulateScore(score);
         }
@@ -534,6 +483,9 @@ namespace osu.Game.Rulesets.Scoring
         {
             extractScoringValues(scoreInfo.Statistics, out current, out maximum);
             current.MaxCombo = scoreInfo.MaxCombo;
+
+            if (scoreInfo.MaximumStatistics.Count > 0)
+                extractScoringValues(scoreInfo.MaximumStatistics, out _, out maximum);
         }
 
         /// <summary>
@@ -589,7 +541,8 @@ namespace osu.Game.Rulesets.Scoring
 
                 if (result.IsBonus())
                     current.BonusScore += count * Judgement.ToNumericResult(result);
-                else
+
+                if (result.AffectsAccuracy())
                 {
                     // The maximum result of this judgement if it wasn't a miss.
                     // E.g. For a GOOD judgement, the max result is either GREAT/PERFECT depending on which one the ruleset uses (osu!: GREAT, osu!mania: PERFECT).

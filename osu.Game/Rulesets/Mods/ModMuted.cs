@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Muted";
         public override string Acronym => "MU";
         public override IconUsage? Icon => FontAwesome.Solid.VolumeMute;
-        public override string Description => "Can you still feel the rhythm without music?";
+        public override LocalisableString Description => "Can you still feel the rhythm without music?";
         public override ModType Type => ModType.Fun;
         public override double ScoreMultiplier => 1;
     }
@@ -36,34 +36,20 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<int> currentCombo = new BindableInt();
 
         [SettingSource("Enable metronome", "Add a metronome beat to help you keep track of the rhythm.")]
-        public BindableBool EnableMetronome { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public BindableBool EnableMetronome { get; } = new BindableBool(true);
 
         [SettingSource("Final volume at combo", "The combo count at which point the track reaches its final volume.", SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
-        public BindableInt MuteComboCount { get; } = new BindableInt
+        public BindableInt MuteComboCount { get; } = new BindableInt(100)
         {
-            Default = 100,
-            Value = 100,
             MinValue = 0,
             MaxValue = 500,
         };
 
         [SettingSource("Start muted", "Increase volume as combo builds.")]
-        public BindableBool InverseMuting { get; } = new BindableBool
-        {
-            Default = false,
-            Value = false
-        };
+        public BindableBool InverseMuting { get; } = new BindableBool();
 
         [SettingSource("Mute hit sounds", "Hit sounds are also muted alongside the track.")]
-        public BindableBool AffectsHitSounds { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public BindableBool AffectsHitSounds { get; } = new BindableBool(true);
 
         protected ModMuted()
         {

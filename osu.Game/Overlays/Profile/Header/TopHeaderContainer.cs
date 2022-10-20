@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -70,85 +71,90 @@ namespace osu.Game.Overlays.Profile.Header
                             Masking = true,
                             CornerRadius = avatar_size * 0.25f,
                         },
-                        new Container
+                        new OsuContextMenuContainer
                         {
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
-                            Padding = new MarginPadding { Left = 10 },
-                            Children = new Drawable[]
+                            Child = new Container
                             {
-                                new FillFlowContainer
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X,
+                                Padding = new MarginPadding { Left = 10 },
+                                Children = new Drawable[]
                                 {
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Vertical,
-                                    Children = new Drawable[]
+                                    new FillFlowContainer
                                     {
-                                        new FillFlowContainer
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Vertical,
+                                        Children = new Drawable[]
                                         {
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Children = new Drawable[]
+                                            new FillFlowContainer
                                             {
-                                                usernameText = new OsuSpriteText
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Children = new Drawable[]
                                                 {
-                                                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
-                                                },
-                                                openUserExternally = new ExternalLinkButton
-                                                {
-                                                    Margin = new MarginPadding { Left = 5 },
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                },
-                                            }
-                                        },
-                                        titleText = new OsuSpriteText
-                                        {
-                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular)
-                                        },
-                                    }
-                                },
-                                new FillFlowContainer
-                                {
-                                    Origin = Anchor.BottomLeft,
-                                    Anchor = Anchor.BottomLeft,
-                                    Direction = FillDirection.Vertical,
-                                    AutoSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        supporterTag = new SupporterIcon
-                                        {
-                                            Height = 20,
-                                            Margin = new MarginPadding { Top = 5 }
-                                        },
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = 1.5f,
-                                            Margin = new MarginPadding { Top = 10 },
-                                            Colour = colourProvider.Light1,
-                                        },
-                                        new FillFlowContainer
-                                        {
-                                            AutoSizeAxes = Axes.Both,
-                                            Margin = new MarginPadding { Top = 5 },
-                                            Direction = FillDirection.Horizontal,
-                                            Children = new Drawable[]
-                                            {
-                                                userFlag = new UpdateableFlag
-                                                {
-                                                    Size = new Vector2(28, 20),
-                                                    ShowPlaceholderOnUnknown = false,
-                                                },
-                                                userCountryText = new OsuSpriteText
-                                                {
-                                                    Font = OsuFont.GetFont(size: 17.5f, weight: FontWeight.Regular),
-                                                    Margin = new MarginPadding { Left = 10 },
-                                                    Origin = Anchor.CentreLeft,
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Colour = colourProvider.Light1,
+                                                    usernameText = new OsuSpriteText
+                                                    {
+                                                        Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
+                                                    },
+                                                    openUserExternally = new ExternalLinkButton
+                                                    {
+                                                        Margin = new MarginPadding { Left = 5 },
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft,
+                                                    },
                                                 }
-                                            }
-                                        },
+                                            },
+                                            titleText = new OsuSpriteText
+                                            {
+                                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular)
+                                            },
+                                        }
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        Origin = Anchor.BottomLeft,
+                                        Anchor = Anchor.BottomLeft,
+                                        Direction = FillDirection.Vertical,
+                                        AutoSizeAxes = Axes.Both,
+                                        Children = new Drawable[]
+                                        {
+                                            supporterTag = new SupporterIcon
+                                            {
+                                                Height = 20,
+                                                Margin = new MarginPadding { Top = 5 }
+                                            },
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 1.5f,
+                                                Margin = new MarginPadding { Top = 10 },
+                                                Colour = colourProvider.Light1,
+                                            },
+                                            new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Margin = new MarginPadding { Top = 5 },
+                                                Direction = FillDirection.Horizontal,
+                                                Children = new Drawable[]
+                                                {
+                                                    userFlag = new UpdateableFlag
+                                                    {
+                                                        Size = new Vector2(28, 20),
+                                                        ShowPlaceholderOnUnknown = false,
+                                                    },
+                                                    userCountryText = new OsuSpriteText
+                                                    {
+                                                        Font = OsuFont.GetFont(size: 17.5f, weight: FontWeight.Regular),
+                                                        Margin = new MarginPadding { Left = 10 },
+                                                        Origin = Anchor.CentreLeft,
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Colour = colourProvider.Light1,
+                                                    }
+                                                }
+                                            },
+                                        }
                                     }
                                 }
                             }

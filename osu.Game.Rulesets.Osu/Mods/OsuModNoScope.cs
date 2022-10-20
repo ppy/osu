@@ -4,10 +4,9 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
@@ -17,19 +16,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModNoScope : ModNoScope, IUpdatableByPlayfield, IApplicableToBeatmap
     {
-        public override string Description => "Where's the cursor?";
+        public override LocalisableString Description => "Where's the cursor?";
 
         private PeriodTracker spinnerPeriods = null!;
 
-        [SettingSource(
-            "Hidden at combo",
-            "The combo count at which the cursor becomes completely hidden",
-            SettingControlType = typeof(SettingsSlider<int, HiddenComboSlider>)
-        )]
-        public override BindableInt HiddenComboCount { get; } = new BindableInt
+        public override BindableInt HiddenComboCount { get; } = new BindableInt(10)
         {
-            Default = 10,
-            Value = 10,
             MinValue = 0,
             MaxValue = 50,
         };

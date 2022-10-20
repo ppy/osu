@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        player?.Restart();
+                        player?.Restart(true);
                     },
                 });
             }
@@ -317,7 +317,7 @@ namespace osu.Game.Screens.Ranking
                 var screenSpacePos = detachedPanel.ScreenSpaceDrawQuad.TopLeft;
 
                 // Remove from the local container and re-attach.
-                detachedPanelContainer.Remove(detachedPanel);
+                detachedPanelContainer.Remove(detachedPanel, false);
                 ScorePanelList.Attach(detachedPanel);
 
                 // Move into its original location in the attached container first, then to the final location.

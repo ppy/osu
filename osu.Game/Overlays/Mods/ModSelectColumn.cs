@@ -159,12 +159,15 @@ namespace osu.Game.Overlays.Mods
 
             int wordIndex = 0;
 
-            headerText.AddText(text, t =>
+            ITextPart part = headerText.AddText(text, t =>
             {
                 if (wordIndex == 0)
                     t.Font = t.Font.With(weight: FontWeight.SemiBold);
                 wordIndex += 1;
             });
+
+            // Reset the index so that if the parts are refreshed (e.g. through changes in localisation) the correct word is re-emboldened.
+            part.DrawablePartsRecreated += _ => wordIndex = 0;
         }
 
         [BackgroundDependencyLoader]

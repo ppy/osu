@@ -102,6 +102,14 @@ namespace osu.Game.Beatmaps
 
         public string OnlineMD5Hash { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The last time of a local modification (via the editor).
+        /// </summary>
+        public DateTimeOffset? LastLocalUpdate { get; set; }
+
+        /// <summary>
+        /// The last time online metadata was applied to this beatmap.
+        /// </summary>
         public DateTimeOffset? LastOnlineUpdate { get; set; }
 
         /// <summary>
