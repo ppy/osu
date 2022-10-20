@@ -277,14 +277,19 @@ namespace osu.Game.Graphics.Cursor
             {
                 switch (e)
                 {
-                    case MouseEvent:
+                    case MouseDownEvent:
+                    case MouseMoveEvent:
                         lastInputWasMouseSource.Value = true;
                         return false;
 
-                    default:
+                    case KeyDownEvent keyDown when !keyDown.Repeat:
+                    case JoystickPressEvent:
+                    case MidiDownEvent:
                         lastInputWasMouseSource.Value = false;
                         return false;
                 }
+
+                return false;
             }
         }
 
