@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Comments
                     {
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
-                        Text = UsersStrings.ReportTitle(comment.Comment.User?.Username ?? comment.Comment.LegacyName!),
+                        Text = ReportStrings.CommentTitle(comment.Comment.User?.Username ?? comment.Comment.LegacyName!),
                         Font = OsuFont.Torus.With(size: 25),
                         Margin = new MarginPadding { Bottom = 10 }
                     },
