@@ -34,7 +34,8 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class DrawableComment : CompositeDrawable, IHasPopover
+    [Cached]
+    public class DrawableComment : CompositeDrawable
     {
         private const int avatar_size = 40;
 
@@ -64,6 +65,7 @@ namespace osu.Game.Overlays.Comments
         private ShowRepliesButton showRepliesButton = null!;
         private ChevronButton chevronButton = null!;
         private LinkFlowContainer actionsContainer = null!;
+        private ReportButton? reportButton;
         private LoadingSpinner actionsLoading = null!;
         private DeletedCommentsCounter deletedCommentsCounter = null!;
         private OsuSpriteText deletedLabel = null!;
@@ -334,12 +336,12 @@ namespace osu.Game.Overlays.Comments
                 makeDeleted();
 
             actionsContainer.AddLink("Copy link", copyUrl);
-            actionsContainer.AddArbitraryDrawable(new Container { Width = 10 });
+            actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
                 actionsContainer.AddLink("Delete", deleteComment);
             else
-                actionsContainer.AddLink(UsersStrings.ReportButtonText, this.ShowPopover);
+                actionsContainer.AddArbitraryDrawable(reportButton = new ReportButton());
 
             if (Comment.IsTopLevel)
             {
@@ -424,6 +426,8 @@ namespace osu.Game.Overlays.Comments
             request.Success += () => Schedule(() =>
             {
                 actionsLoading.Hide();
+                reportButton?.Expire();
+                actionsContainer.Show();
                 onScreenDisplay?.Display(new ReportToast());
             });
             request.Failure += _ => Schedule(() =>
@@ -582,14 +586,32 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        public Popover GetPopover() => new ReportCommentPopover(this);
-
         private class ReportToast : Toast
         {
             public ReportToast()
                 : base(UserInterfaceStrings.GeneralHeader, UsersStrings.ReportThanks, "")
             {
             }
+        }
+
+        private class ReportButton : LinkFlowContainer, IHasPopover
+        {
+            public ReportButton()
+                : base(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold))
+            {
+            }
+
+            [Resolved]
+            private DrawableComment comment { get; set; } = null!;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                AutoSizeAxes = Axes.Both;
+                AddLink(UsersStrings.ReportButtonText, this.ShowPopover);
+            }
+
+            public Popover GetPopover() => new ReportCommentPopover(comment);
         }
     }
 }
