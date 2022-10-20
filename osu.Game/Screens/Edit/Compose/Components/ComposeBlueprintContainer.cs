@@ -234,7 +234,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         X = 10,
                         Y = -1,
                         Font = OsuFont.Default.With(weight: FontWeight.Bold, size: 20),
-                        Text = $"{char.ToUpper(sampleName.First())}"
+                        Text = $"{char.ToUpperInvariant(sampleName.First())}"
                     }
                 }
             };
