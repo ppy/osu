@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -19,8 +19,8 @@ namespace osu.Game.Overlays.Comments
     {
         private readonly DrawableComment comment;
         private OsuEnumDropdown<CommentReportReason> reason = null!;
-        private OsuTextBox info = null!;
-        private ShakeContainer shaker = null!;
+        private readonly Bindable<string> commentText = new Bindable<string>();
+        private RoundedButton submitButton = null!;
 
         public ReportCommentPopover(DrawableComment comment)
         {
@@ -64,48 +64,37 @@ namespace osu.Game.Overlays.Comments
                         Text = UsersStrings.ReportComments,
                         Font = OsuFont.Torus.With(size: 20),
                     },
-                    info = new OsuTextBox
+                    new OsuTextBox
                     {
                         RelativeSizeAxes = Axes.X,
-                        PlaceholderText = UsersStrings.ReportPlaceholder
+                        PlaceholderText = UsersStrings.ReportPlaceholder,
+                        Current = commentText
                     },
-                    new Container
+                    submitButton = new RoundedButton
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Child = shaker = new ShakeContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Child = new RoundedButton
-                            {
-                                Origin = Anchor.TopCentre,
-                                Anchor = Anchor.TopCentre,
-                                Width = 200,
-                                BackgroundColour = colours.Red3,
-                                Text = UsersStrings.ReportActionsSend,
-                                Action = send,
-                                Margin = new MarginPadding { Bottom = 5, Top = 10 },
-                            }
-                        }
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Width = 200,
+                        BackgroundColour = colours.Red3,
+                        Text = UsersStrings.ReportActionsSend,
+                        Action = send,
+                        Margin = new MarginPadding { Bottom = 5, Top = 10 },
                     }
                 }
             };
+            commentText.BindValueChanged(e =>
+            {
+                submitButton.Enabled.Value = !string.IsNullOrWhiteSpace(e.NewValue);
+            }, true);
         }
 
         private void send()
         {
-            string infoValue = info.Current.Value;
-            var reasonValue = reason.Current.Value;
-
-            if (string.IsNullOrWhiteSpace(infoValue))
-            {
-                shaker.Shake();
+            if (string.IsNullOrWhiteSpace(commentText.Value))
                 return;
-            }
 
             this.HidePopover();
-            comment.ReportComment(reasonValue, infoValue);
+            comment.ReportComment(reason.Current.Value, commentText.Value);
         }
     }
 }
