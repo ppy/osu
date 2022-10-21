@@ -94,29 +94,36 @@ namespace osu.Game.Rulesets.Catch.Edit
             if (e.Repeat)
                 return false;
 
-            if (handleToggleViaKey(e.Key))
-                return true;
-
+            handleToggleViaKey(e);
             return base.OnKeyDown(e);
         }
 
         protected override void OnKeyUp(KeyUpEvent e)
         {
-            handleToggleViaKey(e.Key);
+            handleToggleViaKey(e);
             base.OnKeyUp(e);
         }
 
-        private bool handleToggleViaKey(Key key)
-        {
-            switch (key)
-            {
-                case Key.AltLeft:
-                case Key.AltRight:
-                    distanceSnapToggle.Value = distanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
-                    return true;
-            }
+        private TernaryState? distanceSnapBeforeMomentary;
 
-            return false;
+        private void handleToggleViaKey(KeyboardEvent key)
+        {
+            if (key.AltPressed)
+            {
+                if (distanceSnapBeforeMomentary == null)
+                {
+                    distanceSnapBeforeMomentary = distanceSnapToggle.Value;
+                    distanceSnapToggle.Value = distanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+                }
+            }
+            else
+            {
+                if (distanceSnapBeforeMomentary != null)
+                {
+                    distanceSnapToggle.Value = distanceSnapBeforeMomentary.Value;
+                    distanceSnapBeforeMomentary = null;
+                }
+            }
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
