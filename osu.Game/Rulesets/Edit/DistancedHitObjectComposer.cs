@@ -94,6 +94,7 @@ namespace osu.Game.Rulesets.Edit
                                         Debug.Assert(objects != null);
 
                                         DistanceSpacingMultiplier.Value = ReadCurrentDistanceSnap(objects.Value.before, objects.Value.after);
+                                        // TODO: This should probably also force distance spacing grid on.
                                     },
                                     RelativeSizeAxes = Axes.X,
                                 }
@@ -130,20 +131,22 @@ namespace osu.Game.Rulesets.Edit
 
             (HitObject before, HitObject after)? objects = getObjectsOnEitherSideOfCurrentTime();
 
-            if (objects != null)
-            {
-                double currentSnap = ReadCurrentDistanceSnap(objects.Value.before, objects.Value.after);
+            double currentSnap = objects == null
+                ? 0
+                : ReadCurrentDistanceSnap(objects.Value.before, objects.Value.after);
 
+            if (currentSnap > DistanceSpacingMultiplier.MinValue)
+            {
                 currentDistanceSpacingButton.Enabled.Value = currentDistanceSpacingButton.Expanded.Value
                                                              && !Precision.AlmostEquals(currentSnap, DistanceSpacingMultiplier.Value, DistanceSpacingMultiplier.Precision / 2);
-                currentDistanceSpacingButton.ContractedLabelText = $"(current {currentSnap:N2}x)";
+                currentDistanceSpacingButton.ContractedLabelText = $"current {currentSnap:N2}x";
                 currentDistanceSpacingButton.ExpandedLabelText = $"Use current ({currentSnap:N2}x)";
             }
             else
             {
                 currentDistanceSpacingButton.Enabled.Value = false;
-                currentDistanceSpacingButton.ContractedLabelText = "Current N/A";
-                currentDistanceSpacingButton.ExpandedLabelText = "Use current (N/A)";
+                currentDistanceSpacingButton.ContractedLabelText = string.Empty;
+                currentDistanceSpacingButton.ExpandedLabelText = "Use current (unavailable)";
             }
         }
 
