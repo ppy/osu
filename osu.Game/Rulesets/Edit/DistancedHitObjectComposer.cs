@@ -17,7 +17,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -48,9 +47,7 @@ namespace osu.Game.Rulesets.Edit
         protected ExpandingToolboxContainer RightSideToolboxContainer { get; private set; }
 
         private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
-        private ExpandableButton readCurrentButton;
-
-        private OsuSpriteText currentDistanceSpacingDisplay;
+        private ExpandableButton currentDistanceSpacingButton;
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
@@ -88,12 +85,8 @@ namespace osu.Game.Rulesets.Edit
                                     Current = { BindTarget = DistanceSpacingMultiplier },
                                     KeyboardStep = adjust_step,
                                 },
-                                currentDistanceSpacingDisplay = new OsuSpriteText
+                                currentDistanceSpacingButton = new ExpandableButton
                                 {
-                                },
-                                readCurrentButton = new ExpandableButton
-                                {
-                                    Text = "Use current",
                                     Action = () =>
                                     {
                                         (HitObject before, HitObject after)? objects = getObjectsOnEitherSideOfCurrentTime();
@@ -140,14 +133,17 @@ namespace osu.Game.Rulesets.Edit
             if (objects != null)
             {
                 double currentSnap = ReadCurrentDistanceSnap(objects.Value.before, objects.Value.after);
-                readCurrentButton.Enabled.Value = Precision.AlmostEquals(currentSnap, DistanceSpacingMultiplier.Value, DistanceSpacingMultiplier.Precision);
 
-                currentDistanceSpacingDisplay.Text = $"Current {currentSnap:N1}x";
+                currentDistanceSpacingButton.Enabled.Value = currentDistanceSpacingButton.Expanded.Value
+                                                             && !Precision.AlmostEquals(currentSnap, DistanceSpacingMultiplier.Value, DistanceSpacingMultiplier.Precision / 2);
+                currentDistanceSpacingButton.ContractedLabelText = $"(current {currentSnap:N2}x)";
+                currentDistanceSpacingButton.ExpandedLabelText = $"Use current ({currentSnap:N2}x)";
             }
             else
             {
-                readCurrentButton.Enabled.Value = false;
-                currentDistanceSpacingDisplay.Text = "Current: -";
+                currentDistanceSpacingButton.Enabled.Value = false;
+                currentDistanceSpacingButton.ContractedLabelText = "Current N/A";
+                currentDistanceSpacingButton.ExpandedLabelText = "Use current (N/A)";
             }
         }
 
