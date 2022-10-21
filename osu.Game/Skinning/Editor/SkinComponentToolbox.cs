@@ -85,10 +85,6 @@ namespace osu.Game.Skinning.Editor
         {
             public Action<Type>? RequestPlacement;
 
-            protected override bool ShouldBeConsideredForInput(Drawable child) => false;
-
-            public override bool PropagateNonPositionalInputSubTree => false;
-
             private readonly Drawable component;
             private readonly CompositeDrawable? dependencySource;
 
@@ -177,6 +173,10 @@ namespace osu.Game.Skinning.Editor
 
         public class DependencyBorrowingContainer : Container
         {
+            protected override bool ShouldBeConsideredForInput(Drawable child) => false;
+
+            public override bool PropagateNonPositionalInputSubTree => false;
+
             private readonly CompositeDrawable? donor;
 
             public DependencyBorrowingContainer(CompositeDrawable? donor)
