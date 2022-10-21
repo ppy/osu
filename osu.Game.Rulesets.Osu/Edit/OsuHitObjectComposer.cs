@@ -112,6 +112,14 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private RectangularPositionSnapGrid rectangularPositionSnapGrid;
 
+        protected override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
+        {
+            float expectedDistance = DurationToDistance(before, after.StartTime - before.GetEndTime());
+            float actualDistance = Vector2.Distance(((OsuHitObject)before).EndPosition, ((OsuHitObject)after).Position);
+
+            return actualDistance / expectedDistance;
+        }
+
         protected override void Update()
         {
             base.Update();

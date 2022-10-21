@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -13,7 +15,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -32,7 +36,7 @@ namespace osu.Game.Rulesets.Edit
     {
         private const float adjust_step = 0.1f;
 
-        public Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1.0)
+        public BindableDouble DistanceSpacingMultiplier { get; } = new BindableDouble(1.0)
         {
             MinValue = 0.1,
             MaxValue = 6.0,
@@ -44,6 +48,9 @@ namespace osu.Game.Rulesets.Edit
         protected ExpandingToolboxContainer RightSideToolboxContainer { get; private set; }
 
         private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
+        private ExpandableButton readCurrentButton;
+
+        private OsuSpriteText currentDistanceSpacingDisplay;
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
@@ -74,15 +81,74 @@ namespace osu.Game.Rulesets.Edit
                         Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                         Child = new EditorToolboxGroup("snapping")
                         {
-                            Child = distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
+                            Children = new Drawable[]
                             {
-                                Current = { BindTarget = DistanceSpacingMultiplier },
-                                KeyboardStep = adjust_step,
+                                distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
+                                {
+                                    Current = { BindTarget = DistanceSpacingMultiplier },
+                                    KeyboardStep = adjust_step,
+                                },
+                                currentDistanceSpacingDisplay = new OsuSpriteText
+                                {
+                                },
+                                readCurrentButton = new ExpandableButton
+                                {
+                                    Text = "Use current",
+                                    Action = () =>
+                                    {
+                                        (HitObject before, HitObject after)? objects = getObjectsOnEitherSideOfCurrentTime();
+
+                                        Debug.Assert(objects != null);
+
+                                        DistanceSpacingMultiplier.Value = ReadCurrentDistanceSnap(objects.Value.before, objects.Value.after);
+                                    },
+                                    RelativeSizeAxes = Axes.X,
+                                }
                             }
                         }
                     }
                 }
             });
+        }
+
+        private (HitObject before, HitObject after)? getObjectsOnEitherSideOfCurrentTime()
+        {
+            HitObject lastBefore = Playfield.HitObjectContainer.AliveObjects.LastOrDefault(h => h.HitObject.GetEndTime() <= EditorClock.CurrentTime)?.HitObject;
+
+            if (lastBefore == null)
+                return null;
+
+            HitObject firstAfter = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime >= EditorClock.CurrentTime)?.HitObject;
+
+            if (firstAfter == null)
+                return null;
+
+            if (lastBefore == firstAfter)
+                return null;
+
+            return (lastBefore, firstAfter);
+        }
+
+        protected abstract double ReadCurrentDistanceSnap(HitObject before, HitObject after);
+
+        protected override void Update()
+        {
+            base.Update();
+
+            (HitObject before, HitObject after)? objects = getObjectsOnEitherSideOfCurrentTime();
+
+            if (objects != null)
+            {
+                double currentSnap = ReadCurrentDistanceSnap(objects.Value.before, objects.Value.after);
+                readCurrentButton.Enabled.Value = Precision.AlmostEquals(currentSnap, DistanceSpacingMultiplier.Value, DistanceSpacingMultiplier.Precision);
+
+                currentDistanceSpacingDisplay.Text = $"Current {currentSnap:N1}x";
+            }
+            else
+            {
+                readCurrentButton.Enabled.Value = false;
+                currentDistanceSpacingDisplay.Text = "Current: -";
+            }
         }
 
         protected override void LoadComplete()
