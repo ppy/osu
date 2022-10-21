@@ -238,9 +238,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 quadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(200, 4);
 
-                if (points.Count > quadBatch.Size * 4 && quadBatch.Size != 10922)
+                if (points.Count > quadBatch.Size && quadBatch.Size != IRenderer.MAX_QUADS)
                 {
-                    int batchSize = Math.Min((int)(quadBatch.Size * 1.5f), 10922);
+                    int batchSize = Math.Min(quadBatch.Size * 2, IRenderer.MAX_QUADS);
                     quadBatch = renderer.CreateQuadBatch<TexturedVertex2D>(batchSize, 4);
                 }
 
