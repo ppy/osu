@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 case GlobalAction.EditorIncreaseDistanceSpacing:
                 case GlobalAction.EditorDecreaseDistanceSpacing:
-                    return adjustDistanceSpacing(e.Action, adjust_step);
+                    return AdjustDistanceSpacing(e.Action, adjust_step);
             }
 
             return false;
@@ -127,13 +127,13 @@ namespace osu.Game.Rulesets.Edit
             {
                 case GlobalAction.EditorIncreaseDistanceSpacing:
                 case GlobalAction.EditorDecreaseDistanceSpacing:
-                    return adjustDistanceSpacing(e.Action, e.ScrollAmount * adjust_step);
+                    return AdjustDistanceSpacing(e.Action, e.ScrollAmount * adjust_step);
             }
 
             return false;
         }
 
-        private bool adjustDistanceSpacing(GlobalAction action, float amount)
+        protected virtual bool AdjustDistanceSpacing(GlobalAction action, float amount)
         {
             if (DistanceSpacingMultiplier.Disabled)
                 return false;
