@@ -276,7 +276,6 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);
             AddAssert("Request is correct", () => request != null && request.CommentID == 2 && request.Comment == report_text && request.Reason == CommentReportReason.Other);
-            AddUntilStep("Button expired", () => !targetComment.ChildrenOfType<DrawableComment.ReportButton>().Any());
         }
 
         private void addTestComments()

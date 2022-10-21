@@ -24,7 +24,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
@@ -426,9 +425,8 @@ namespace osu.Game.Overlays.Comments
             request.Success += () => Schedule(() =>
             {
                 actionsLoading.Hide();
-                reportButton?.Expire();
+                reportButton?.MarkReported();
                 actionsContainer.Show();
-                onScreenDisplay?.Display(new ReportToast());
             });
             request.Failure += _ => Schedule(() =>
             {
@@ -586,14 +584,6 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        private class ReportToast : Toast
-        {
-            public ReportToast()
-                : base(UserInterfaceStrings.GeneralHeader, UsersStrings.ReportThanks, "")
-            {
-            }
-        }
-
         internal class ReportButton : LinkFlowContainer, IHasPopover
         {
             public ReportButton()
@@ -609,6 +599,13 @@ namespace osu.Game.Overlays.Comments
             {
                 AutoSizeAxes = Axes.Both;
                 AddLink(UsersStrings.ReportButtonText, this.ShowPopover);
+            }
+
+            public void MarkReported()
+            {
+                Clear(true);
+                AddText(UsersStrings.ReportThanks);
+                this.Delay(3000).Then().FadeOut(2000);
             }
 
             public Popover GetPopover() => new ReportCommentPopover(comment);
