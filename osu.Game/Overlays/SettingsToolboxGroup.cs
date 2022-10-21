@@ -40,8 +40,6 @@ namespace osu.Game.Overlays
             Anchor = Anchor.TopCentre,
             Direction = FillDirection.Vertical,
             RelativeSizeAxes = Axes.X,
-            AutoSizeDuration = transition_duration,
-            AutoSizeEasing = Easing.OutQuint,
             AutoSizeAxes = Axes.Y,
             Padding = new MarginPadding { Horizontal = 10, Top = 5, Bottom = 10 },
             Spacing = new Vector2(0, 15),
