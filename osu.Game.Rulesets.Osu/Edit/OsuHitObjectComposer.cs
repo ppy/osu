@@ -261,7 +261,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             if (key.ShiftPressed)
             {
-                if (gridSnapBeforeMomentary == null)
+                if (distanceSnapBeforeMomentary == null && gridSnapBeforeMomentary == null)
                 {
                     gridSnapBeforeMomentary = rectangularGridSnapToggle.Value;
                     rectangularGridSnapToggle.Value = rectangularGridSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             if (key.AltPressed)
             {
-                if (distanceSnapBeforeMomentary == null)
+                if (gridSnapBeforeMomentary == null && distanceSnapBeforeMomentary == null)
                 {
                     distanceSnapBeforeMomentary = distanceSnapToggle.Value;
                     distanceSnapToggle.Value = distanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
