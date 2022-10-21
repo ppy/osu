@@ -3,6 +3,9 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 
@@ -10,6 +13,54 @@ namespace osu.Game.Rulesets.Edit
 {
     internal class ExpandableButton : RoundedButton, IExpandable
     {
+        private float actualHeight;
+
+        public override float Height
+        {
+            get => base.Height;
+            set => base.Height = actualHeight = value;
+        }
+
+        private LocalisableString contractedLabelText;
+
+        /// <summary>
+        /// The label text to display when this slider is in a contracted state.
+        /// </summary>
+        public LocalisableString ContractedLabelText
+        {
+            get => contractedLabelText;
+            set
+            {
+                if (value == contractedLabelText)
+                    return;
+
+                contractedLabelText = value;
+
+                if (!Expanded.Value)
+                    Text = value;
+            }
+        }
+
+        private LocalisableString expandedLabelText;
+
+        /// <summary>
+        /// The label text to display when this slider is in an expanded state.
+        /// </summary>
+        public LocalisableString ExpandedLabelText
+        {
+            get => expandedLabelText;
+            set
+            {
+                if (value == expandedLabelText)
+                    return;
+
+                expandedLabelText = value;
+
+                if (Expanded.Value)
+                    Text = value;
+            }
+        }
+
         public BindableBool Expanded { get; } = new BindableBool();
 
         [Resolved(canBeNull: true)]
@@ -26,10 +77,24 @@ namespace osu.Game.Rulesets.Edit
 
             Expanded.BindValueChanged(expanded =>
             {
+                Text = expanded.NewValue ? expandedLabelText : contractedLabelText;
+
                 if (expanded.NewValue)
-                    Show();
+                {
+                    SpriteText.Anchor = Anchor.Centre;
+                    SpriteText.Origin = Anchor.Centre;
+                    SpriteText.Font = OsuFont.GetFont(weight: FontWeight.Bold);
+                    base.Height = actualHeight;
+                    Background.Show();
+                }
                 else
-                    Hide();
+                {
+                    SpriteText.Anchor = Anchor.CentreLeft;
+                    SpriteText.Origin = Anchor.CentreLeft;
+                    SpriteText.Font = OsuFont.GetFont(weight: FontWeight.Regular);
+                    base.Height = SpriteText.DrawHeight;
+                    Background.Hide();
+                }
             }, true);
         }
     }
