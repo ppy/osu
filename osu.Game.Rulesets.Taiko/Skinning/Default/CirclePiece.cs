@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
@@ -170,7 +169,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                 FlashBox
                     .FadeTo(flash_opacity)
                     .Then()
-                    .FadeOut(Math.Max(80, timingPoint.BeatLength - 80), Easing.OutSine);
+                    .FadeOut(timingPoint.BeatLength * 0.75, Easing.OutSine);
             }
 
             if (beatIndex % timingPoint.TimeSignature.Numerator != 0)
