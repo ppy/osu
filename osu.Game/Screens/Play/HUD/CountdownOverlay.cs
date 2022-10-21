@@ -5,6 +5,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -18,6 +20,7 @@ namespace osu.Game.Screens.Play.HUD
     public class CountdownOverlay : CompositeDrawable, ISkinnableDrawable
     {
         private readonly GameplayState gameplayState;
+        private Sample countdownSample;
 
         public CountdownOverlay(GameplayState gameplayState)
         {
@@ -27,15 +30,14 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkin skin)
+        private void load(ISkinSource skin, AudioManager audio)
         {
+            countdownSample = audio.Samples.Get(@"UI/dialog-cancel-select"); // placeholder
             OnLoadComplete += _ => updateCountdown(skin);
         }
 
-        private void updateCountdown(ISkin skin)
+        private void updateCountdown(ISkinSource skin)
         {
-            base.LoadComplete();
-
             IBeatmap beatmap = gameplayState.Beatmap;
 
             double firstObject = beatmap.HitObjects[0].StartTime;
@@ -107,6 +109,8 @@ namespace osu.Game.Screens.Play.HUD
                 // set SkipBoundary to goTime - 6 * beatLength;
                 // set CountdownTime to goTime - 3 * beatLength;
 
+                countdownSample?.Play();
+
                 Sprite ready = createSprite(skin.GetTexture("count1"), 1); // (placeholder texture)
                 Sprite count3 = createSprite(skin.GetTexture("count3"));
                 Sprite count2 = createSprite(skin.GetTexture("count2"));
@@ -118,6 +122,12 @@ namespace osu.Game.Screens.Play.HUD
                 AddInternal(count2);
                 AddInternal(count1);
                 AddInternal(go);
+
+                Scheduler.AddDelayed(playCountdownSample, goTime - 5.9 * beatLength);
+                Scheduler.AddDelayed(playCountdownSample, goTime - 3 * beatLength);
+                Scheduler.AddDelayed(playCountdownSample, goTime - 2 * beatLength);
+                Scheduler.AddDelayed(playCountdownSample, goTime - 1 * beatLength);
+                Scheduler.AddDelayed(playCountdownSample, goTime);
 
                 // stable uses start/end time instead of durations,
                 // if the start time is (goTime - 6 * beatLength) and end time (goTime - 5 * beatLength), then the duration is (6-5)*beatLength
@@ -156,7 +166,17 @@ namespace osu.Game.Screens.Play.HUD
             else if (beatmap.HitObjects[0].StartTime > 6000)
             {
                 // todo: some arrow thing?
+                /*
+                int loopStartTime = hitObjectManager.hitObjects[0].StartTime - hitObjectManager.PreEmpt - 900;
+                int loopCount = ARROW_LOOP_COUNT + Math.Min(2, hitObjectManager.PreEmpt / 200);
+                ApplyArrowTransformations(loopCount, loopStartTime);
+                */
             }
+        }
+
+        private void playCountdownSample()
+        {
+            countdownSample?.Play();
         }
 
         public bool UsesFixedAnchor { get; set; }
