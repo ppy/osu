@@ -39,6 +39,13 @@ namespace osu.Game.Overlays.Comments
                 Spacing = new Vector2(7),
                 Children = new Drawable[]
                 {
+                    new SpriteIcon
+                    {
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Icon = FontAwesome.Solid.ExclamationTriangle,
+                        Size = new Vector2(36),
+                    },
                     new OsuSpriteText
                     {
                         Origin = Anchor.TopCentre,
@@ -52,7 +59,6 @@ namespace osu.Game.Overlays.Comments
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Text = UsersStrings.ReportReason,
-                        Font = OsuFont.Torus.With(size: 20),
                     },
                     new Container
                     {
@@ -68,7 +74,6 @@ namespace osu.Game.Overlays.Comments
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Text = UsersStrings.ReportComments,
-                        Font = OsuFont.Torus.With(size: 20),
                     },
                     new OsuTextBox
                     {
