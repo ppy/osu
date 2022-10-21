@@ -1,16 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
@@ -18,12 +20,15 @@ namespace osu.Game.Overlays.Comments
 {
     public class ReportCommentPopover : OsuPopover
     {
-        private readonly DrawableComment comment;
-        private OsuEnumDropdown<CommentReportReason> reason = null!;
-        private readonly Bindable<string> commentText = new Bindable<string>();
+        public Action<CommentReportReason, string>? Action;
+
+        private readonly Comment? comment;
+
+        private OsuEnumDropdown<CommentReportReason> reasonDropdown = null!;
+        private OsuTextBox commentsTextBox = null!;
         private RoundedButton submitButton = null!;
 
-        public ReportCommentPopover(DrawableComment comment)
+        public ReportCommentPopover(Comment? comment)
         {
             this.comment = comment;
         }
@@ -50,7 +55,7 @@ namespace osu.Game.Overlays.Comments
                     {
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
-                        Text = ReportStrings.CommentTitle(comment.Comment.User?.Username ?? comment.Comment.LegacyName!),
+                        Text = ReportStrings.CommentTitle(comment?.User?.Username ?? comment?.LegacyName ?? @"Someone"),
                         Font = OsuFont.Torus.With(size: 25),
                         Margin = new MarginPadding { Bottom = 10 }
                     },
@@ -64,7 +69,7 @@ namespace osu.Game.Overlays.Comments
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 40,
-                        Child = reason = new OsuEnumDropdown<CommentReportReason>
+                        Child = reasonDropdown = new OsuEnumDropdown<CommentReportReason>
                         {
                             RelativeSizeAxes = Axes.X
                         }
@@ -75,11 +80,10 @@ namespace osu.Game.Overlays.Comments
                         Anchor = Anchor.TopCentre,
                         Text = UsersStrings.ReportComments,
                     },
-                    new OsuTextBox
+                    commentsTextBox = new OsuTextBox
                     {
                         RelativeSizeAxes = Axes.X,
                         PlaceholderText = UsersStrings.ReportPlaceholder,
-                        Current = commentText
                     },
                     submitButton = new RoundedButton
                     {
@@ -88,24 +92,20 @@ namespace osu.Game.Overlays.Comments
                         Width = 200,
                         BackgroundColour = colours.Red3,
                         Text = UsersStrings.ReportActionsSend,
-                        Action = send,
+                        Action = () =>
+                        {
+                            Action?.Invoke(reasonDropdown.Current.Value, commentsTextBox.Text);
+                            this.HidePopover();
+                        },
                         Margin = new MarginPadding { Bottom = 5, Top = 10 },
                     }
                 }
             };
-            commentText.BindValueChanged(e =>
+
+            commentsTextBox.Current.BindValueChanged(e =>
             {
                 submitButton.Enabled.Value = !string.IsNullOrWhiteSpace(e.NewValue);
             }, true);
-        }
-
-        private void send()
-        {
-            if (string.IsNullOrWhiteSpace(commentText.Value))
-                return;
-
-            this.HidePopover();
-            comment.ReportComment(reason.Current.Value, commentText.Value);
         }
     }
 }
