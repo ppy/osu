@@ -125,6 +125,8 @@ namespace osu.Game.Screens.Play
 
         private BreakTracker breakTracker;
 
+        private CountdownOverlay countdownOverlay;
+
         private SkipOverlay skipIntroOverlay;
         private SkipOverlay skipOutroOverlay;
 
@@ -418,6 +420,10 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
+                    countdownOverlay = new CountdownOverlay(GameplayState)
+                    {
+                        Clock = DrawableRuleset.FrameStableClock,
+                    },
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
                     BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                     {
