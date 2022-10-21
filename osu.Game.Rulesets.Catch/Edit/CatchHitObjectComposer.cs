@@ -81,6 +81,12 @@ namespace osu.Game.Rulesets.Catch.Edit
             inputManager = GetContainingInputManager();
         }
 
+        protected override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
+        {
+            // TODO: catch lol
+            return 1;
+        }
+
         protected override void Update()
         {
             base.Update();
