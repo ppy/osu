@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -25,7 +26,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -236,30 +236,61 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (e.Repeat)
                 return false;
 
-            handleToggleViaKey(e.Key);
-
+            handleToggleViaKey(e);
             return base.OnKeyDown(e);
         }
 
         protected override void OnKeyUp(KeyUpEvent e)
         {
-            handleToggleViaKey(e.Key);
+            handleToggleViaKey(e);
             base.OnKeyUp(e);
         }
 
-        private void handleToggleViaKey(Key key)
+        protected override bool AdjustDistanceSpacing(GlobalAction action, float amount)
         {
-            switch (key)
-            {
-                case Key.ShiftLeft:
-                case Key.ShiftRight:
-                    rectangularGridSnapToggle.Value = rectangularGridSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
-                    break;
+            // To allow better visualisation, ensure that the spacing grid is visible before adjusting.
+            distanceSnapToggle.Value = TernaryState.True;
 
-                case Key.AltLeft:
-                case Key.AltRight:
+            return base.AdjustDistanceSpacing(action, amount);
+        }
+
+        private TernaryState? gridSnapBeforeMomentary;
+        private TernaryState? distanceSnapBeforeMomentary;
+
+        private void handleToggleViaKey(KeyboardEvent key)
+        {
+            if (key.ShiftPressed)
+            {
+                if (gridSnapBeforeMomentary == null)
+                {
+                    gridSnapBeforeMomentary = rectangularGridSnapToggle.Value;
+                    rectangularGridSnapToggle.Value = rectangularGridSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+                }
+            }
+            else
+            {
+                if (gridSnapBeforeMomentary != null)
+                {
+                    rectangularGridSnapToggle.Value = gridSnapBeforeMomentary.Value;
+                    gridSnapBeforeMomentary = null;
+                }
+            }
+
+            if (key.AltPressed)
+            {
+                if (distanceSnapBeforeMomentary == null)
+                {
+                    distanceSnapBeforeMomentary = distanceSnapToggle.Value;
                     distanceSnapToggle.Value = distanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
-                    break;
+                }
+            }
+            else
+            {
+                if (distanceSnapBeforeMomentary != null)
+                {
+                    distanceSnapToggle.Value = distanceSnapBeforeMomentary.Value;
+                    distanceSnapBeforeMomentary = null;
+                }
             }
         }
 
