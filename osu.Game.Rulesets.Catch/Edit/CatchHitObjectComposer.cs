@@ -26,7 +26,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
