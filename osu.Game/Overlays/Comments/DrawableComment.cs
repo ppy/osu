@@ -19,8 +19,6 @@ using System;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
-using osu.Framework.Extensions;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
@@ -64,7 +62,6 @@ namespace osu.Game.Overlays.Comments
         private ShowRepliesButton showRepliesButton = null!;
         private ChevronButton chevronButton = null!;
         private LinkFlowContainer actionsContainer = null!;
-        private ReportButton? reportButton;
         private LoadingSpinner actionsLoading = null!;
         private DeletedCommentsCounter deletedCommentsCounter = null!;
         private OsuSpriteText deletedLabel = null!;
@@ -340,7 +337,7 @@ namespace osu.Game.Overlays.Comments
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
                 actionsContainer.AddLink("Delete", deleteComment);
             else
-                actionsContainer.AddArbitraryDrawable(reportButton = new ReportButton());
+                actionsContainer.AddArbitraryDrawable(new CommentReportButton(Comment));
 
             if (Comment.IsTopLevel)
             {
@@ -408,25 +405,6 @@ namespace osu.Game.Overlays.Comments
                 WasDeleted = true;
                 if (!ShowDeleted.Value)
                     Hide();
-            });
-            request.Failure += _ => Schedule(() =>
-            {
-                actionsLoading.Hide();
-                actionsContainer.Show();
-            });
-            api.Queue(request);
-        }
-
-        public void ReportComment(CommentReportReason reason, string comment)
-        {
-            actionsContainer.Hide();
-            actionsLoading.Show();
-            var request = new CommentReportRequest(Comment.Id, reason, comment);
-            request.Success += () => Schedule(() =>
-            {
-                actionsLoading.Hide();
-                reportButton?.MarkReported();
-                actionsContainer.Show();
             });
             request.Failure += _ => Schedule(() =>
             {
@@ -582,33 +560,6 @@ namespace osu.Game.Overlays.Comments
 
                 return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? "deleted" : string.Empty;
             }
-        }
-
-        internal class ReportButton : LinkFlowContainer, IHasPopover
-        {
-            public ReportButton()
-                : base(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold))
-            {
-            }
-
-            [Resolved]
-            private DrawableComment comment { get; set; } = null!;
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                AutoSizeAxes = Axes.Both;
-                AddLink(UsersStrings.ReportButtonText, this.ShowPopover);
-            }
-
-            public void MarkReported()
-            {
-                Clear(true);
-                AddText(UsersStrings.ReportThanks);
-                this.Delay(3000).Then().FadeOut(2000);
-            }
-
-            public Popover GetPopover() => new ReportCommentPopover(comment);
         }
     }
 }
