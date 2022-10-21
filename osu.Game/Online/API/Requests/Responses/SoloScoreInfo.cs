@@ -180,7 +180,7 @@ namespace osu.Game.Online.API.Requests.Responses
         {
             Rank = score.Rank,
             TotalScore = (int)score.TotalScore,
-            Accuracy = score.Accuracy,
+            Accuracy = Math.Round(score.Accuracy, 4, MidpointRounding.ToEven),
             PP = score.PP,
             MaxCombo = score.MaxCombo,
             RulesetID = score.RulesetID,
