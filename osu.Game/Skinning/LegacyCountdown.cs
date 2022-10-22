@@ -102,11 +102,7 @@ namespace osu.Game.Skinning
                 AddInternal(count1);
                 AddInternal(go);
 
-                Scheduler.AddDelayed(() => playCountdownSample(@"readys", false), goTime - 5.9 * beatLength);
-                Scheduler.AddDelayed(() => playCountdownSample(@"count3s"), goTime - 3 * beatLength);
-                Scheduler.AddDelayed(() => playCountdownSample(@"count2s"), goTime - 2 * beatLength);
-                Scheduler.AddDelayed(() => playCountdownSample(@"count1s"), goTime - 1 * beatLength);
-                Scheduler.AddDelayed(() => playCountdownSample(@"gos"), goTime);
+                scheduleAudio(goTime, beatLength);
 
                 // stable uses start/end time instead of durations,
                 // if the start time is (goTime - x * beatLength) and end time (goTime - y * beatLength), then the duration is ((y-x)*beatLength)
@@ -153,21 +149,39 @@ namespace osu.Game.Skinning
             }
         }
 
-        /// <param name="name">The name of the sample to play</param>
-        /// <param name="playFallback">Whether or not to play a fallback sample if the desired can't be found</param>
-        private void playCountdownSample(string name, bool playFallback = true)
+        private void scheduleAudio(double goTime, double beatLength)
         {
-            ISample sample = Skin.GetSample(new SampleInfo(name));
+            // the "ready" audio will only play if added to the skin, it does not have a default
+            ISample sampleReady = Skin.GetSample(new SampleInfo(@"readys"));
+            if (sampleReady != null)
+                Scheduler.AddDelayed(() => sampleReady.Play(), goTime - 5.9 * beatLength);
 
-            if (sample == null)
+            // if "count3s" exists, "count2s", "count1s" and "gos" will be used for the remaining count. if one is missing, that count will be skipped
+            // if "count3" does not exist, "count" will be used for all counts
+            ISample sampleCount3 = Skin.GetSample(new SampleInfo(@"count3s"));
+            ISample sampleCount2;
+            ISample sampleCount1;
+            ISample sampleGo;
+
+            if (sampleCount3 != null)
             {
-                if (playFallback)
-                    sample = Skin.GetSample(new SampleInfo(@"count")); // placeholder sample
-                else
-                    return;
+                sampleCount2 = Skin.GetSample(new SampleInfo(@"count2s"));
+                sampleCount1 = Skin.GetSample(new SampleInfo(@"count1s"));
+                sampleGo = Skin.GetSample(new SampleInfo(@"gos"));
+            }
+            else
+            {
+                ISample count = Skin.GetSample(new SampleInfo(@"count"));
+                sampleCount3 = count;
+                sampleCount2 = count;
+                sampleCount1 = count;
+                sampleGo = count;
             }
 
-            sample?.Play();
+            Scheduler.AddDelayed(() => sampleCount3?.Play(), goTime - 3 * beatLength);
+            Scheduler.AddDelayed(() => sampleCount2?.Play(), goTime - 2 * beatLength);
+            Scheduler.AddDelayed(() => sampleCount1?.Play(), goTime - 1 * beatLength);
+            Scheduler.AddDelayed(() => sampleGo?.Play(), goTime);
         }
 
         private Sprite createSprite(Texture texture, float scale = 1.4f)
