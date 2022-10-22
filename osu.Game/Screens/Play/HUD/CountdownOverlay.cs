@@ -8,19 +8,21 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class CountdownOverlay : CompositeDrawable, ISkinnableDrawable
+    public class CountdownOverlay : BeatSyncedContainer, ISkinnableDrawable
     {
         private readonly GameplayState gameplayState;
-        private Sample countdownSample;
+        private AudioManager audioManager;
+        private ISkinSource skin;
 
         public CountdownOverlay(GameplayState gameplayState)
         {
@@ -30,13 +32,13 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, AudioManager audio)
+        private void load(ISkinSource skin, AudioManager audioManager)
         {
-            countdownSample = audio.Samples.Get(@"UI/dialog-cancel-select"); // placeholder
-            OnLoadComplete += _ => updateCountdown(skin);
+            this.audioManager = audioManager;
+            this.skin = skin;
         }
 
-        private void updateCountdown(ISkinSource skin)
+        protected override void LoadComplete()
         {
             IBeatmap beatmap = gameplayState.Beatmap;
 
@@ -109,13 +111,11 @@ namespace osu.Game.Screens.Play.HUD
                 // set SkipBoundary to goTime - 6 * beatLength;
                 // set CountdownTime to goTime - 3 * beatLength;
 
-                countdownSample?.Play();
-
-                Sprite ready = createSprite(skin.GetTexture("count1"), 1); // (placeholder texture)
-                Sprite count3 = createSprite(skin.GetTexture("count3"));
-                Sprite count2 = createSprite(skin.GetTexture("count2"));
-                Sprite count1 = createSprite(skin.GetTexture("count1"));
-                Sprite go = createSprite(skin.GetTexture("go"));
+                Sprite ready = createSprite(skin.GetTexture(@"count1"), 1); // (placeholder texture)
+                Sprite count3 = createSprite(skin.GetTexture(@"count3"));
+                Sprite count2 = createSprite(skin.GetTexture(@"count2"));
+                Sprite count1 = createSprite(skin.GetTexture(@"count1"));
+                Sprite go = createSprite(skin.GetTexture(@"go"));
 
                 AddInternal(ready);
                 AddInternal(count3);
@@ -123,11 +123,11 @@ namespace osu.Game.Screens.Play.HUD
                 AddInternal(count1);
                 AddInternal(go);
 
-                Scheduler.AddDelayed(playCountdownSample, goTime - 5.9 * beatLength);
-                Scheduler.AddDelayed(playCountdownSample, goTime - 3 * beatLength);
-                Scheduler.AddDelayed(playCountdownSample, goTime - 2 * beatLength);
-                Scheduler.AddDelayed(playCountdownSample, goTime - 1 * beatLength);
-                Scheduler.AddDelayed(playCountdownSample, goTime);
+                Scheduler.AddDelayed(() => playCountdownSample(@"readys", false), goTime - 5.9 * beatLength);
+                Scheduler.AddDelayed(() => playCountdownSample(@"count3s"), goTime - 3 * beatLength);
+                Scheduler.AddDelayed(() => playCountdownSample(@"count2s"), goTime - 2 * beatLength);
+                Scheduler.AddDelayed(() => playCountdownSample(@"count1s"), goTime - 1 * beatLength);
+                Scheduler.AddDelayed(() => playCountdownSample(@"gos"), goTime);
 
                 // stable uses start/end time instead of durations,
                 // if the start time is (goTime - 6 * beatLength) and end time (goTime - 5 * beatLength), then the duration is (6-5)*beatLength
@@ -174,9 +174,21 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void playCountdownSample()
+        /// <param name="name">The name of the sample to play</param>
+        /// <param name="playFallback">Whether or not to play a fallback sample if the desired can't be found</param>
+        private void playCountdownSample(string name, bool playFallback = true)
         {
-            countdownSample?.Play();
+            ISample sample = skin.GetSample(new SampleInfo(name));
+
+            if (sample == null)
+            {
+                if (playFallback)
+                    sample = skin.GetSample(new SampleInfo(@"count")); // placeholder sample
+                else
+                    return;
+            }
+
+            sample?.Play();
         }
 
         public bool UsesFixedAnchor { get; set; }
