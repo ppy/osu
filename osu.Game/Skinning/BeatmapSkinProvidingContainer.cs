@@ -4,16 +4,22 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets;
 using osu.Game.Storyboards;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
     /// A container which overrides existing skin options with beatmap-local values.
+    /// This also applies ruleset-specific skin transformer to the beatmap skin, similar to <see cref="RulesetSkinProvidingContainer"/>.
     /// </summary>
     public class BeatmapSkinProvidingContainer : SkinProvidingContainer
     {
@@ -67,12 +73,20 @@ namespace osu.Game.Skinning
             return sampleInfo is StoryboardSampleInfo || beatmapHitsounds.Value;
         }
 
+        [CanBeNull]
         private readonly ISkin skin;
 
-        public BeatmapSkinProvidingContainer(ISkin skin)
-            : base(skin)
+        [CanBeNull]
+        private readonly Ruleset ruleset;
+
+        [CanBeNull]
+        private readonly IBeatmap beatmap;
+
+        public BeatmapSkinProvidingContainer(ISkin skin, Ruleset ruleset = null, IBeatmap beatmap = null)
         {
             this.skin = skin;
+            this.ruleset = ruleset;
+            this.beatmap = beatmap;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -86,22 +100,28 @@ namespace osu.Game.Skinning
             return base.CreateChildDependencies(parent);
         }
 
+        [Resolved]
+        private SkinManager skins { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(SkinManager skins)
+        private void load()
         {
             beatmapSkins.BindValueChanged(_ => TriggerSourceChanged());
             beatmapColours.BindValueChanged(_ => TriggerSourceChanged());
             beatmapHitsounds.BindValueChanged(_ => TriggerSourceChanged());
 
-            // If the beatmap skin looks to have skinnable resources, add the default classic skin as a fallback opportunity.
-            if (skin is LegacySkinTransformer legacySkin && legacySkin.IsProvidingLegacyResources)
-            {
-                SetSources(new[]
-                {
-                    skin,
-                    skins.DefaultClassicSkin
-                });
-            }
+            if (skin != null)
+                SetSources(getBeatmapSkinSources());
+        }
+
+        private IEnumerable<ISkin> getBeatmapSkinSources()
+        {
+            ISkin transformedSkin;
+
+            yield return transformedSkin = ruleset == null ? skin : skin.WithRulesetTransformer(ruleset, beatmap.AsNonNull());
+
+            if (transformedSkin is LegacySkinTransformer legacySkin && legacySkin.IsProvidingLegacyResources)
+                yield return ruleset == null ? skins.DefaultClassicSkin : skins.DefaultClassicSkin.WithRulesetTransformer(ruleset, beatmap.AsNonNull());
         }
     }
 }
