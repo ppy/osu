@@ -72,7 +72,7 @@ namespace osu.Game.Skinning
                 switch (source)
                 {
                     case Skin skin:
-                        sources.Add(GetRulesetTransformedSkin(skin));
+                        sources.Add(skin.WithRulesetTransformer(Ruleset, Beatmap));
                         break;
 
                     default:
@@ -95,18 +95,6 @@ namespace osu.Game.Skinning
                 sources.Add(rulesetResourcesSkin);
 
             SetSources(sources);
-        }
-
-        protected ISkin GetRulesetTransformedSkin(ISkin skin)
-        {
-            if (skin == null)
-                return null;
-
-            var rulesetTransformed = Ruleset.CreateSkinTransformer(skin, Beatmap);
-            if (rulesetTransformed != null)
-                return rulesetTransformed;
-
-            return skin;
         }
 
         protected override void Dispose(bool isDisposing)
