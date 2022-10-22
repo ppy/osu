@@ -76,6 +76,8 @@ namespace osu.Game.Skinning
                         break;
 
                     default:
+                        // sources that do not derive from Skin are unlikely to require transformation (or could already be transformed),
+                        // add such sources to the list as-is.
                         sources.Add(source);
                         break;
                 }
