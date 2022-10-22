@@ -370,6 +370,7 @@ namespace osu.Game.Skinning
                                     new LegacyHealthDisplay(),
                                     new LegacySongProgress(),
                                     new BarHitErrorMeter(),
+                                    new LegacyCountdown(),
                                 }
                             };
 
