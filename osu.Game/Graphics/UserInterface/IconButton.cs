@@ -6,6 +6,7 @@
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 
@@ -64,6 +65,10 @@ namespace osu.Game.Graphics.UserInterface
         public IconButton()
         {
             Size = new Vector2(DEFAULT_BUTTON_SIZE);
+
+            // base implementation applies a shadow effect, but that looks ugly on an icon button
+            // since the "shadow" would appear as a darkened background box for the button instead.
+            Content.EdgeEffect = new EdgeEffectParameters();
 
             Add(icon = new SpriteIcon
             {
