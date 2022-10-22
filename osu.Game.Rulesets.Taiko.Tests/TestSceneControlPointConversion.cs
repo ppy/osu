@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             };
 
             var convertedBeatmap = new TaikoRuleset().CreateBeatmapConverter(beatmap).Convert();
-            
+
             AddAssert("effect point generated", () => convertedBeatmap.ControlPointInfo.EffectPointAt(start_time).ScrollSpeed == slider_velocity);
         }
     }
