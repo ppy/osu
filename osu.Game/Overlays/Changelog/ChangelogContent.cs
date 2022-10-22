@@ -23,13 +23,13 @@ namespace osu.Game.Overlays.Changelog
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Content = new FillFlowContainer
+
+            base.Content.Add(Content = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical
-            };
-            base.Content.Add(Content);
+            });
         }
     }
 }
