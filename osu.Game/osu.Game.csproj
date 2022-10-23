@@ -18,7 +18,7 @@
     </None>
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="AutoMapper" Version="12.0.0" />
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
     <PackageReference Include="DiffPlex" Version="1.7.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="Humanizer" Version="2.14.1" />
