@@ -82,7 +82,7 @@ namespace osu.Game.Skinning
             bool useCountdown = goTime - 4 * beatLength > 0;
 
             // in stable the countdown is active in osu, catch and mania, but since it falls behind the playfield in mania it's not added here
-            bool rulesetAllowsCountdown = GameplayState.Ruleset.ShortName is "osu" or "catch";
+            bool rulesetAllowsCountdown = GameplayState.Ruleset.ShortName is "osu" or "fruits";
 
             if (useCountdown && rulesetAllowsCountdown)
             {
