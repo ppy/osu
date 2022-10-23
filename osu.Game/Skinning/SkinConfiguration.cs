@@ -38,7 +38,8 @@ namespace osu.Game.Skinning
             HitCirclePrefix,
             HitCircleOverlap,
             AnimationFramerate,
-            LayeredHitSounds
+            LayeredHitSounds,
+            AllowSliderBallTint,
         }
 
         public static List<Color4> DefaultComboColours { get; } = new List<Color4>

@@ -24,6 +24,12 @@ namespace osu.Game.Rulesets.Catch.UI
         public const float WIDTH = 512;
 
         /// <summary>
+        /// The height of the playfield.
+        /// This doesn't include the catcher area.
+        /// </summary>
+        public const float HEIGHT = 384;
+
+        /// <summary>
         /// The center position of the playfield.
         /// </summary>
         public const float CENTER_X = WIDTH / 2;
