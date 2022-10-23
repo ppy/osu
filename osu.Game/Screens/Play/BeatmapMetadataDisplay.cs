@@ -5,7 +5,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -161,7 +160,7 @@ namespace osu.Game.Screens.Play
                                     FillMode = FillMode.Fill,
                                 },
                                 loading = new LoadingLayer(true),
-                                ruleseticon = new SelectedRulesetIcon(beatmap.BeatmapInfo.Ruleset)
+                                ruleseticon = new SelectedRulesetIcon()
                             }
                         },
                         versionFlow = new FillFlowContainer
@@ -326,17 +325,14 @@ namespace osu.Game.Screens.Play
 
             private const float target_width = 200;
 
-            [CanBeNull]
-            private readonly Ruleset ruleset;
-
-            public SelectedRulesetIcon(IRulesetInfo rulesetInfo)
-            {
-                ruleset = rulesetInfo?.CreateInstance();
-            }
+            [Resolved]
+            private IBindable<RulesetInfo> currentRuleset { get; set; }
 
             [BackgroundDependencyLoader]
             private void load()
             {
+                var ruleset = currentRuleset?.Value?.CreateInstance();
+
                 Size = new Vector2(0, 40);
                 Alpha = 0;
                 Origin = Anchor.Centre;
