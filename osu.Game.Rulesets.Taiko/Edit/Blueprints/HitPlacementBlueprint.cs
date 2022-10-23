@@ -27,6 +27,12 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            BeginPlacement();
+        }
+
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             switch (e.Button)
