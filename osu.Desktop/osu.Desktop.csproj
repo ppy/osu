@@ -39,4 +39,10 @@
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="lazer.ico" />
   </ItemGroup>
+  <PropertyGroup>
+    <PublishReadyToRun>true</PublishReadyToRun>
+  </PropertyGroup>
+  <ItemGroup>
+    <PublishReadyToRunExclude Include="osuTK.dll" />
+  </ItemGroup>
 </Project>
