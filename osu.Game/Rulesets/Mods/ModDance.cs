@@ -14,7 +14,8 @@ namespace osu.Game.Rulesets.Mods
         {
             typeof(ModRelax),
             typeof(ModFailCondition),
-            typeof(ModNoFail)
+            typeof(ModNoFail),
+            typeof(ModAutoplay)
         };
 
         [SettingSource("保存Dance回放")]
