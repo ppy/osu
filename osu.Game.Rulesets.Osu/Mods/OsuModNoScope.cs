@@ -2,14 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osu.Game.Utils;
 
@@ -34,11 +35,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            bool shouldAlwaysShowCursor = IsBreakTime.Value || spinnerPeriods.IsInAny(playfield.Clock.CurrentTime);
-            float targetAlpha = shouldAlwaysShowCursor ? 1 : ComboBasedAlpha;
+            var osuPlayfield = (OsuPlayfield)playfield;
+            Debug.Assert(osuPlayfield.Cursor != null);
 
-            var cursor = playfield.Cursor.AsNonNull();
-            cursor.Alpha = (float)Interpolation.Lerp(cursor.Alpha, targetAlpha, Math.Clamp(playfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
+            bool shouldAlwaysShowCursor = IsBreakTime.Value || spinnerPeriods.IsInAny(osuPlayfield.Clock.CurrentTime);
+            float targetAlpha = shouldAlwaysShowCursor ? 1 : ComboBasedAlpha;
+            float currentAlpha = (float)Interpolation.Lerp(osuPlayfield.Cursor.Alpha, targetAlpha, Math.Clamp(osuPlayfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
+
+            osuPlayfield.Cursor.Alpha = currentAlpha;
+            osuPlayfield.Smoke.Alpha = currentAlpha;
         }
     }
 }
