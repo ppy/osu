@@ -12,6 +12,7 @@ namespace osu.Game.Screens.Select.Filter
     public enum SortMode
     {
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingArtist))]
+        [Description("艺术家")]
         Artist,
 
         [Description("谱师")]
@@ -32,10 +33,12 @@ namespace osu.Game.Screens.Select.Filter
         [Description("上次游玩")]
         LastPlayed,
 
-        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingDifficulty))]
+        //[LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingDifficulty))]
+        [Description("难度")]
         Difficulty,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.ArtistTracksLength))]
+        //[LocalisableDescription(typeof(SortStrings), nameof(SortStrings.ArtistTracksLength))]
+        [Description("长度")]
         Length,
 
         // todo: pending support (https://github.com/ppy/osu/issues/4917)
@@ -46,6 +49,7 @@ namespace osu.Game.Screens.Select.Filter
         Source,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingTitle))]
+        [Description("标题")]
         Title,
     }
 }

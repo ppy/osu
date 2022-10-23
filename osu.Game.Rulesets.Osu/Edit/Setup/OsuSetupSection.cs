@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Setup
             {
                 stackLeniency = new LabelledSliderBar<float>
                 {
-                    Label = "Stack Leniency",
-                    Description = "In play mode, osu! automatically stacks notes which occur at the same location. Increasing this value means it is more likely to snap notes of further time-distance.",
+                    Label = "堆栈指数",
+                    Description = "游玩模式下, osu! 会自动将处于同一位置下的物件堆起来。 增加此值会使物件在一段时间内更容易重叠在一起。",
                     Current = new BindableFloat(Beatmap.BeatmapInfo.StackLeniency)
                     {
                         Default = 0.7f,

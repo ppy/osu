@@ -78,16 +78,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 LabelText = "波形图",
                                                 Current = { Value = true },
                                             },
-                                            controlPointsCheckbox = new OsuCheckbox
-                                            {
-                                                LabelText = "控制点",
-                                                Current = { Value = true },
-                                            },
                                             ticksCheckbox = new OsuCheckbox
                                             {
                                                 LabelText = "音乐节拍(时间点)",
                                                 Current = { Value = true },
-                                            }
+                                            },
+                                            controlPointsCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = "BPM",
+                                                Current = { Value = true },
+                                            },
                                         }
                                     }
                                 }

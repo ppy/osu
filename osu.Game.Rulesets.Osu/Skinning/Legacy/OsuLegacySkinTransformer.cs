@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class OsuLegacySkinTransformer : LegacySkinTransformer
     {
+        public override bool IsProvidingLegacyResources => base.IsProvidingLegacyResources || hasHitCircle.Value;
+
         private readonly Lazy<bool> hasHitCircle;
 
         /// <summary>

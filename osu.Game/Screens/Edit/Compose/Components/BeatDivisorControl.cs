@@ -124,16 +124,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         },
                         new Drawable[]
                         {
-                            new TextFlowContainer(s => s.Font = s.Font.With(size: 18))
-                            {
-                                Padding = new MarginPadding { Horizontal = 15 },
-                                Text = "节拍细分",
-                                RelativeSizeAxes = Axes.X,
-                                TextAnchor = Anchor.TopCentre
-                            },
-                        },
-                        new Drawable[]
-                        {
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -172,6 +162,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                     }
                                 }
                             }
+                        },
+                        new Drawable[]
+                        {
+                            new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
+                            {
+                                Padding = new MarginPadding { Horizontal = 15, Vertical = 8 },
+                                Text = "beat snap",
+                                RelativeSizeAxes = Axes.X,
+                                TextAnchor = Anchor.TopCentre,
+                            },
                         },
                     },
                     RowDimensions = new[]

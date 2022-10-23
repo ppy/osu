@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Timing;
@@ -46,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            var cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
+            var cursorPos = playfield.Cursor.AsNonNull().ActiveCursor.DrawPosition;
 
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
