@@ -27,7 +27,10 @@ namespace osu.Game.Storyboards
         public void Add(Easing easing, double startTime, double endTime, T startValue, T endValue)
         {
             if (endTime < startTime)
-                return;
+            {
+                (startTime, endTime) = (endTime, startTime);
+                (startValue, endValue) = (endValue, startValue);
+            }
 
             commands.Add(new TypedCommand { Easing = easing, StartTime = startTime, EndTime = endTime, StartValue = startValue, EndValue = endValue });
 

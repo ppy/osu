@@ -17,6 +17,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -42,6 +43,8 @@ namespace osu.Game.Tests.Visual
 
         protected override bool CreateNestedActionContainer => false;
 
+        protected override bool DisplayCursorForManualInput => false;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -58,10 +61,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Create new game instance", () =>
             {
                 if (Game?.Parent != null)
-                {
-                    Remove(Game);
-                    Game.Dispose();
-                }
+                    Remove(Game, true);
 
                 RecycleLocalStorage(false);
 
@@ -122,6 +122,8 @@ namespace osu.Game.Tests.Visual
 
             public RealmAccess Realm => Dependencies.Get<RealmAccess>();
 
+            public new GlobalCursorDisplay GlobalCursorDisplay => base.GlobalCursorDisplay;
+
             public new BackButton BackButton => base.BackButton;
 
             public new BeatmapManager BeatmapManager => base.BeatmapManager;
@@ -171,6 +173,11 @@ namespace osu.Game.Tests.Visual
                 API.Login("Rhythm Champion", "osu!");
 
                 Dependencies.Get<SessionStatics>().SetValue(Static.MutedAudioNotificationShownOnce, true);
+
+                // set applied version to latest so that the BackgroundBeatmapProcessor doesn't consider
+                // beatmap star ratings as outdated and reset them throughout the test.
+                foreach (var ruleset in RulesetStore.AvailableRulesets)
+                    ruleset.LastAppliedDifficultyVersion = ruleset.CreateInstance().CreateDifficultyCalculator(Beatmap.Default).Version;
             }
 
             protected override void Update()

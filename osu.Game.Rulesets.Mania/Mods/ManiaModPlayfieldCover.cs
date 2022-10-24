@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -33,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 HitObjectContainer hoc = column.HitObjectArea.HitObjectContainer;
                 Container hocParent = (Container)hoc.Parent;
 
-                hocParent.Remove(hoc);
+                hocParent.Remove(hoc, false);
                 hocParent.Add(new PlayfieldCoveringWrapper(hoc).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;

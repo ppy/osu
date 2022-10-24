@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Setup
         private void updateBeatmap()
         {
             Beatmap.BeatmapInfo.StackLeniency = stackLeniency.Current.Value;
+            Beatmap.SaveState();
         }
     }
 }

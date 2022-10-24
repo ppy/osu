@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play
     public class ScreenSuspensionHandler : Component
     {
         private readonly GameplayClockContainer gameplayClockContainer;
-        private Bindable<bool> isPaused;
+        private IBindable<bool> isPaused;
 
         private readonly Bindable<bool> disableSuspensionBindable = new Bindable<bool>();
 

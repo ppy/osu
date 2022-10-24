@@ -8,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -59,7 +60,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         private static Drawable createHeader(StatisticItem item)
         {
-            if (string.IsNullOrEmpty(item.Name))
+            if (LocalisableString.IsNullOrEmpty(item.Name))
                 return Empty();
 
             return new FillFlowContainer

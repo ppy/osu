@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Mods;
@@ -27,11 +25,11 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestDrumRoll(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new DrumRoll { StartTime = 1000, EndTime = 3000 }), shouldMiss);
+        public void TestDrumRoll(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new DrumRoll { StartTime = 1000, EndTime = 3000 }, false), shouldMiss);
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestSwell(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Swell { StartTime = 1000, EndTime = 3000 }), shouldMiss);
+        public void TestSwell(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Swell { StartTime = 1000, EndTime = 3000 }, false), shouldMiss);
 
         private class TestTaikoRuleset : TaikoRuleset
         {

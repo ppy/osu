@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(200),
-                    Child = new InputDrum(playfield.HitObjectContainer)
+                    Child = new InputDrum()
                 }
             });
         }

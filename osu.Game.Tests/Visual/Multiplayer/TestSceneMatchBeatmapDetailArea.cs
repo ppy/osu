@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
@@ -18,19 +17,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchBeatmapDetailArea : OnlinePlayTestScene
     {
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            SelectedRoom.Value = new Room();
+            base.SetUpSteps();
 
-            Child = new MatchBeatmapDetailArea
+            AddStep("create area", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(500),
-                CreateNewItem = createNewItem
-            };
-        });
+                SelectedRoom.Value = new Room();
+
+                Child = new MatchBeatmapDetailArea
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(500),
+                    CreateNewItem = createNewItem
+                };
+            });
+        }
 
         private void createNewItem()
         {

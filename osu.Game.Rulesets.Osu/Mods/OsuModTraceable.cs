@@ -1,11 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -18,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => "Traceable";
         public override string Acronym => "TC";
         public override ModType Type => ModType.Fun;
-        public override string Description => "Put your faith in the approach circles...";
+        public override LocalisableString Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles) };
@@ -59,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private void applyCirclePieceState(DrawableOsuHitObject hitObject, IDrawable hitCircle = null)
+        private void applyCirclePieceState(DrawableOsuHitObject hitObject, IDrawable? hitCircle = null)
         {
             var h = hitObject.HitObject;
             using (hitObject.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))

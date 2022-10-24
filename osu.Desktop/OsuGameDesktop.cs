@@ -22,11 +22,15 @@ using osu.Framework.Input.Handlers;
 using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.Threading;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Overlays.Settings.Sections.Input;
+using osu.Game.Utils;
+using SDL2;
 
 namespace osu.Desktop
 {
@@ -133,12 +137,13 @@ namespace osu.Desktop
         {
             base.SetHost(host);
 
-            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
-
             var desktopWindow = (SDL2DesktopWindow)host.Window;
 
+            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
+            if (iconStream != null)
+                desktopWindow.SetIconFromStream(iconStream);
+
             desktopWindow.CursorState |= CursorState.Hidden;
-            desktopWindow.SetIconFromStream(iconStream);
             desktopWindow.Title = Name;
             desktopWindow.DragDrop += f => fileDrop(new[] { f });
         }
@@ -156,10 +161,15 @@ namespace osu.Desktop
                 case JoystickHandler jh:
                     return new JoystickSettings(jh);
 
+                case TouchHandler th:
+                    return new InputSection.HandlerSection(th);
+
                 default:
                     return base.CreateSettingsSubsectionFor(handler);
             }
         }
+
+        protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
 
         private readonly List<string> importableFiles = new List<string>();
         private ScheduledDelegate? importSchedule;
@@ -200,6 +210,24 @@ namespace osu.Desktop
         {
             base.Dispose(isDisposing);
             osuSchemeLinkIPCChannel?.Dispose();
+        }
+
+        private class SDL2BatteryInfo : BatteryInfo
+        {
+            public override double? ChargeLevel
+            {
+                get
+                {
+                    SDL.SDL_GetPowerInfo(out _, out int percentage);
+
+                    if (percentage == -1)
+                        return null;
+
+                    return percentage / 100.0;
+                }
+            }
+
+            public override bool OnBattery => SDL.SDL_GetPowerInfo(out _, out _) == SDL.SDL_PowerState.SDL_POWERSTATE_ON_BATTERY;
         }
     }
 }

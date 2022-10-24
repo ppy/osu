@@ -16,20 +16,21 @@ namespace osu.Game.Rulesets.Mania.Skinning
         public readonly LegacyManiaSkinConfigurationLookups Lookup;
 
         /// <summary>
-        /// The intended <see cref="Column"/> index for the configuration.
+        /// The column which is being looked up.
         /// May be null if the configuration does not apply to a <see cref="Column"/>.
+        /// Note that this is the absolute index across all stages.
         /// </summary>
-        public readonly int? TargetColumn;
+        public readonly int? ColumnIndex;
 
         /// <summary>
         /// Creates a new <see cref="ManiaSkinConfigurationLookup"/>.
         /// </summary>
         /// <param name="lookup">The lookup value.</param>
-        /// <param name="targetColumn">The intended <see cref="Column"/> index for the configuration. May be null if the configuration does not apply to a <see cref="Column"/>.</param>
-        public ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups lookup, int? targetColumn = null)
+        /// <param name="columnIndex">The intended <see cref="Column"/> index for the configuration. May be null if the configuration does not apply to a <see cref="Column"/>.</param>
+        public ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups lookup, int? columnIndex = null)
         {
             Lookup = lookup;
-            TargetColumn = targetColumn;
+            ColumnIndex = columnIndex;
         }
     }
 }

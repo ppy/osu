@@ -96,6 +96,9 @@ namespace osu.Android
                 case AndroidMouseHandler mh:
                     return new AndroidMouseSettings(mh);
 
+                case AndroidJoystickHandler jh:
+                    return new AndroidJoystickSettings(jh);
+
                 default:
                     return base.CreateSettingsSubsectionFor(handler);
             }
@@ -103,9 +106,9 @@ namespace osu.Android
 
         private class AndroidBatteryInfo : BatteryInfo
         {
-            public override double ChargeLevel => Battery.ChargeLevel;
+            public override double? ChargeLevel => Battery.ChargeLevel;
 
-            public override bool IsCharging => Battery.PowerSource != BatteryPowerSource.Battery;
+            public override bool OnBattery => Battery.PowerSource == BatteryPowerSource.Battery;
         }
     }
 }

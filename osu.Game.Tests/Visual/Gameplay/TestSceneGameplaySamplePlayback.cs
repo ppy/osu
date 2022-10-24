@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -21,22 +19,22 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestAllSamplesStopDuringSeek()
         {
-            DrawableSlider slider = null;
-            PoolableSkinnableSample[] samples = null;
-            ISamplePlaybackDisabler sampleDisabler = null;
+            DrawableSlider? slider = null;
+            PoolableSkinnableSample[] samples = null!;
+            ISamplePlaybackDisabler sampleDisabler = null!;
 
             AddUntilStep("get variables", () =>
             {
                 sampleDisabler = Player;
                 slider = Player.ChildrenOfType<DrawableSlider>().MinBy(s => s.HitObject.StartTime);
-                samples = slider?.ChildrenOfType<PoolableSkinnableSample>().ToArray();
+                samples = slider.ChildrenOfType<PoolableSkinnableSample>().ToArray();
 
                 return slider != null;
             });
 
             AddUntilStep("wait for slider sliding then seek", () =>
             {
-                if (!slider.Tracking.Value)
+                if (slider?.Tracking.Value != true)
                     return false;
 
                 if (!samples.Any(s => s.Playing))

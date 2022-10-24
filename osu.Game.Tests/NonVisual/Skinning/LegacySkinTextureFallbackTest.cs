@@ -11,6 +11,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Database;
@@ -141,6 +143,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
                     this.textureStore = textureStore;
                 }
 
+                public IRenderer Renderer => new DummyRenderer();
                 public AudioManager AudioManager => null;
                 public IResourceStore<byte[]> Files => null;
                 public IResourceStore<byte[]> Resources => null;

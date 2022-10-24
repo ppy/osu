@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             {
                                 notifications?.Post(new SimpleNotification
                                 {
-                                    Text = $"You are running the latest release ({game.Version})",
+                                    Text = GeneralSettingsStrings.RunningLatestRelease(game.Version),
                                     Icon = FontAwesome.Solid.CheckCircle,
                                 });
                             }

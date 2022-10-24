@@ -44,6 +44,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public virtual LocalisableString TooltipText { get; private set; }
 
+        public bool PlaySamplesOnAdjust { get; set; } = true;
+
         /// <summary>
         /// Whether to format the tooltip as a percentage or the actual value.
         /// </summary>
@@ -187,6 +189,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private void playSample(T value)
         {
+            if (!PlaySamplesOnAdjust)
+                return;
+
             if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
                 return;
 
@@ -228,10 +233,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            LeftBox.Scale = new Vector2(Math.Clamp(
-                RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
-            RightBox.Scale = new Vector2(Math.Clamp(
-                DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2, 0, DrawWidth), 1);
+            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, Math.Max(0, DrawWidth)), 1);
+            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2, 0, Math.Max(0, DrawWidth)), 1);
         }
 
         protected override void UpdateValue(float value)
