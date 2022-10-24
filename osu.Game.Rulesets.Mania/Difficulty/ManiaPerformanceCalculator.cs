@@ -106,12 +106,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 if (d <= 0)
                     return double.PositiveInfinity;
 
-                double pMax = 1 - SpecialFunctions.Erfc(hMax / (d * root2));
-                double p300 = SpecialFunctions.Erfc(hMax / (d * root2)) - SpecialFunctions.Erfc(h300 / (d * root2));
-                double p200 = SpecialFunctions.Erfc(h300 / (d * root2)) - SpecialFunctions.Erfc(h200 / (d * root2));
-                double p100 = SpecialFunctions.Erfc(h200 / (d * root2)) - SpecialFunctions.Erfc(h100 / (d * root2));
-                double p50 = SpecialFunctions.Erfc(h100 / (d * root2)) - SpecialFunctions.Erfc(h50 / (d * root2));
-                double p0 = SpecialFunctions.Erfc(h50 / (d * root2));
+                double pMax = 1 - erfcApprox(hMax / (d * root2));
+                double p300 = erfcApprox(hMax / (d * root2)) - erfcApprox(h300 / (d * root2));
+                double p200 = erfcApprox(h300 / (d * root2)) - erfcApprox(h200 / (d * root2));
+                double p100 = erfcApprox(h200 / (d * root2)) - erfcApprox(h100 / (d * root2));
+                double p50 = erfcApprox(h100 / (d * root2)) - erfcApprox(h50 / (d * root2));
+                double p0 = erfcApprox(h50 / (d * root2));
 
                 double gradient = Math.Pow(pMax, countPerfect / totalHits)
                 * Math.Pow(p300, (countGreat + 0.5) / totalHits)
@@ -126,5 +126,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             // Finding the minimum of the inverse likelihood function returns the most likely deviation for a play
             return FindMinimum.OfScalarFunction(likelihoodGradient, 30);
         }
+ 
+        double erfcApprox(double x)
+        {
+            if (x <= 5)
+                return SpecialFunctions.Erfc(x);
+
+            // Approximation is most accurate with values over 5, and is much more performant than the Erfc function
+            return Math.Pow(Math.E, -Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)));
+        } 
     }
 }
