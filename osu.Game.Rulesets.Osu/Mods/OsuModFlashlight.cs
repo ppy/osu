@@ -62,7 +62,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 followDelay = modFlashlight.FollowDelay.Value;
 
-                FlashlightSize = new Vector2(0, GetSize());
                 FlashlightSmoothness = 1.4f;
             }
 
@@ -83,10 +82,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return base.OnMouseMove(e);
             }
 
-            protected override void UpdateFlashlightSize(float size)
-            {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, size), FLASHLIGHT_FADE_DURATION);
-            }
+            protected override Vector2 AdjustSize(float size) => new Vector2(0, size);
 
             protected override string FragmentShader => "CircularFlashlight";
         }

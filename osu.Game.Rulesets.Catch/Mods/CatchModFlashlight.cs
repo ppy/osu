@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
@@ -45,7 +44,6 @@ namespace osu.Game.Rulesets.Catch.Mods
             {
                 this.playfield = playfield;
 
-                FlashlightSize = new Vector2(0, GetSize());
                 FlashlightSmoothness = 1.4f;
             }
 
@@ -66,10 +64,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                 FlashlightPosition = playfield.CatcherArea.ToSpaceOfOtherDrawable(playfield.Catcher.DrawPosition, this);
             }
 
-            protected override void UpdateFlashlightSize(float size)
-            {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, size), FLASHLIGHT_FADE_DURATION);
-            }
+            protected override Vector2 AdjustSize(float size) => new Vector2(0, size);
 
             protected override string FragmentShader => "CircularFlashlight";
         }

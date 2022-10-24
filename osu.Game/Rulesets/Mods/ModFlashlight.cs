@@ -48,7 +48,6 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
         where T : HitObject
     {
-        public const double FLASHLIGHT_FADE_DURATION = 800;
         protected readonly BindableInt Combo = new BindableInt();
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
@@ -123,16 +122,22 @@ namespace osu.Game.Rulesets.Mods
             {
                 base.LoadComplete();
 
-                Combo.ValueChanged += _ => UpdateFlashlightSize(GetSize());
+                FlashlightSize = adjustCurrentSize();
+
+                Combo.ValueChanged += _ => updateFlashlightSize();
 
                 if (player != null)
                 {
                     isBreakTime.BindTo(player.IsBreakTime);
-                    isBreakTime.BindValueChanged(_ => UpdateFlashlightSize(GetSize()), true);
+                    isBreakTime.BindValueChanged(_ => updateFlashlightSize(), true);
                 }
             }
 
-            protected abstract void UpdateFlashlightSize(float size);
+            private Vector2 adjustCurrentSize() => AdjustSize(GetSize());
+
+            private void updateFlashlightSize() => this.TransformTo(nameof(FlashlightSize), adjustCurrentSize(), 800);
+
+            protected abstract Vector2 AdjustSize(float size);
 
             protected abstract string FragmentShader { get; }
 
