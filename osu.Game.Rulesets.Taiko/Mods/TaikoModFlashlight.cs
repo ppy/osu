@@ -66,6 +66,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             protected override string FragmentShader => "CircularFlashlight";
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                UpdateFlashlightSize(GetSize());
+            }
+
             protected override void Update()
             {
                 base.Update();
