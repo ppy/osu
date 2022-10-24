@@ -90,6 +90,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.F3 }, GlobalAction.EditorTimingMode),
             new KeyBinding(new[] { InputKey.F4 }, GlobalAction.EditorSetupMode),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.A }, GlobalAction.EditorVerifyMode),
+            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.EditorDuplicateSelection),
             new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
             new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridDisplayMode),
@@ -346,5 +347,8 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleProfile))]
         ToggleProfile,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorDuplicateSelection))]
+        EditorDuplicateSelection
     }
 }
