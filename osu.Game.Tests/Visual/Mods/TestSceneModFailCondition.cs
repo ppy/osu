@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
@@ -21,7 +23,7 @@ namespace osu.Game.Tests.Visual.Mods
         protected override TestPlayer CreateModPlayer(Ruleset ruleset)
         {
             var player = base.CreateModPlayer(ruleset);
-            player.RestartRequested = () => restartRequested = true;
+            player.RestartRequested = _ => restartRequested = true;
             return player;
         }
 

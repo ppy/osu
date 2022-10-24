@@ -11,12 +11,13 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>A free-to-win rhythm game. Rhythm is just a *click* away!</description>
         <releaseNotes>testing</releaseNotes>
-        <copyright>Copyright (c) 2021 ppy Pty Ltd</copyright>
+        <copyright>Copyright (c) 2022 ppy Pty Ltd</copyright>
         <language>en-AU</language>
     </metadata>
     <files>
       <file src="**.exe" target="lib\net45\" exclude="**vshost**"/>
       <file src="**.dll" target="lib\net45\"/>
       <file src="**.config" target="lib\net45\"/>
+      <file src="**.json" target="lib\net45\"/>
     </files>
 </package>

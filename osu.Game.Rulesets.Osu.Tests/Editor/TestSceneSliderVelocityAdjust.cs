@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
@@ -8,7 +10,6 @@ using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
@@ -39,10 +40,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
 
-        private bool editorComponentsReady => editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
-                                              && editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true
-                                              && editor?.ChildrenOfType<Playfield>().FirstOrDefault()?.IsLoaded == true;
-
         [TestCase(true)]
         [TestCase(false)]
         public void TestVelocityChangeSavesCorrectly(bool adjustVelocity)
@@ -50,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             double? velocity = null;
 
             AddStep("enter editor", () => Game.ScreenStack.Push(new EditorLoader()));
-            AddUntilStep("wait for editor load", () => editorComponentsReady);
+            AddUntilStep("wait for editor load", () => editor?.ReadyForUse == true);
 
             AddStep("seek to first control point", () => editorClock.Seek(editorBeatmap.ControlPointInfo.TimingPoints.First().Time));
             AddStep("enter slider placement mode", () => InputManager.Key(Key.Number3));
@@ -89,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("exit", () => InputManager.Key(Key.Escape));
 
             AddStep("enter editor (again)", () => Game.ScreenStack.Push(new EditorLoader()));
-            AddUntilStep("wait for editor load", () => editorComponentsReady);
+            AddUntilStep("wait for editor load", () => editor?.ReadyForUse == true);
 
             AddStep("seek to slider", () => editorClock.Seek(slider.StartTime));
             AddAssert("slider has correct velocity", () => slider.Velocity == velocity);

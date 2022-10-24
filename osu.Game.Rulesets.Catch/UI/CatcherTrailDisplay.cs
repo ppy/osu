@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -91,15 +93,15 @@ namespace osu.Game.Rulesets.Catch.UI
             switch (entry.Animation)
             {
                 case CatcherTrailAnimation.Dashing:
-                    dashTrails.Remove(drawable);
+                    dashTrails.Remove(drawable, false);
                     break;
 
                 case CatcherTrailAnimation.HyperDashing:
-                    hyperDashTrails.Remove(drawable);
+                    hyperDashTrails.Remove(drawable, false);
                     break;
 
                 case CatcherTrailAnimation.HyperDashAfterImage:
-                    hyperDashAfterImages.Remove(drawable);
+                    hyperDashAfterImages.Remove(drawable, false);
                     break;
             }
         }

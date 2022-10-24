@@ -2,18 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 
@@ -22,32 +19,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public class MultiplayerMatchSongSelect : OnlinePlaySongSelect
     {
         [Resolved]
-        private MultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; } = null!;
 
-        private readonly long? itemToEdit;
+        [Resolved]
+        private OngoingOperationTracker operationTracker { get; set; } = null!;
 
-        private LoadingLayer loadingLayer;
+        private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
+        private readonly PlaylistItem? itemToEdit;
+
+        private LoadingLayer loadingLayer = null!;
+        private IDisposable? selectionOperation;
 
         /// <summary>
         /// Construct a new instance of multiplayer song select.
         /// </summary>
         /// <param name="room">The room.</param>
         /// <param name="itemToEdit">The item to be edited. May be null, in which case a new item will be added to the playlist.</param>
-        /// <param name="beatmap">An optional initial beatmap selection to perform.</param>
-        /// <param name="ruleset">An optional initial ruleset selection to perform.</param>
-        public MultiplayerMatchSongSelect(Room room, long? itemToEdit = null, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
-            : base(room)
+        public MultiplayerMatchSongSelect(Room room, PlaylistItem? itemToEdit = null)
+            : base(room, itemToEdit)
         {
             this.itemToEdit = itemToEdit;
-
-            if (beatmap != null || ruleset != null)
-            {
-                Schedule(() =>
-                {
-                    if (beatmap != null) Beatmap.Value = beatmap;
-                    if (ruleset != null) Ruleset.Value = ruleset;
-                });
-            }
         }
 
         [BackgroundDependencyLoader]
@@ -56,17 +47,39 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             AddInternal(loadingLayer = new LoadingLayer(true));
         }
 
-        protected override void SelectItem(PlaylistItem item)
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
+            operationInProgress.BindTo(operationTracker.InProgress);
+            operationInProgress.BindValueChanged(_ => updateLoadingLayer(), true);
+        }
+
+        private void updateLoadingLayer()
+        {
+            if (operationInProgress.Value)
+                loadingLayer.Show();
+            else
+                loadingLayer.Hide();
+        }
+
+        protected override bool SelectItem(PlaylistItem item)
+        {
+            if (operationInProgress.Value)
+            {
+                Logger.Log($"{nameof(SelectItem)} aborted due to {nameof(operationInProgress)}");
+                return false;
+            }
+
             // If the client is already in a room, update via the client.
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.
             if (client.Room != null)
             {
-                loadingLayer.Show();
+                selectionOperation = operationTracker.BeginOperation();
 
                 var multiplayerItem = new MultiplayerPlaylistItem
                 {
-                    ID = itemToEdit ?? 0,
+                    ID = itemToEdit?.ID ?? 0,
                     BeatmapID = item.Beatmap.OnlineID,
                     BeatmapChecksum = item.Beatmap.MD5Hash,
                     RulesetID = item.RulesetID,
@@ -76,34 +89,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);
 
-                task.ContinueWith(t =>
+                task.FireAndForget(onSuccess: () =>
                 {
+                    selectionOperation.Dispose();
+
                     Schedule(() =>
                     {
-                        loadingLayer.Hide();
+                        // If an error or server side trigger occurred this screen may have already exited by external means.
+                        if (this.IsCurrentScreen())
+                            this.Exit();
+                    });
+                }, onError: _ =>
+                {
+                    selectionOperation.Dispose();
 
-                        if (t.IsFaulted)
-                        {
-                            Exception exception = t.Exception;
-
-                            if (exception is AggregateException ae)
-                                exception = ae.InnerException;
-
-                            Debug.Assert(exception != null);
-
-                            string message = exception is HubException
-                                // HubExceptions arrive with additional message context added, but we want to display the human readable message:
-                                // "An unexpected error occurred invoking 'AddPlaylistItem' on the server.InvalidStateException: Can't enqueue more than 3 items at once."
-                                // We generally use the message field for a user-parseable error (eventually to be replaced), so drop the first part for now.
-                                ? exception.Message.Substring(exception.Message.IndexOf(':') + 1).Trim()
-                                : exception.Message;
-
-                            Logger.Log(message, level: LogLevel.Important);
-                            Carousel.AllowSelection = true;
-                            return;
-                        }
-
-                        this.Exit();
+                    Schedule(() =>
+                    {
+                        Carousel.AllowSelection = true;
                     });
                 });
             }
@@ -113,10 +115,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Playlist.Add(item);
                 this.Exit();
             }
+
+            return true;
         }
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
-        protected override bool IsValidFreeMod(Mod mod) => base.IsValidFreeMod(mod) && !(mod is ModTimeRamp) && !(mod is ModRateAdjust);
+        protected override bool IsValidMod(Mod mod) => base.IsValidMod(mod) && mod.ValidForMultiplayer;
+
+        protected override bool IsValidFreeMod(Mod mod) => base.IsValidFreeMod(mod) && mod.ValidForMultiplayerAsFreeMod;
     }
 }

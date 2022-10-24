@@ -1,14 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
@@ -53,25 +55,43 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             return dependencies;
         }
 
-        [SetUp]
-        public void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            // Reset the room dependencies to a fresh state.
-            drawableDependenciesContainer.Clear();
-            dependencies.OnlinePlayDependencies = CreateOnlinePlayDependencies();
-            drawableDependenciesContainer.AddRange(OnlinePlayDependencies.DrawableComponents);
+            base.SetUpSteps();
 
-            var handler = OnlinePlayDependencies.RequestsHandler;
+            AddStep("setup dependencies", () =>
+            {
+                // Reset the room dependencies to a fresh state.
+                drawableDependenciesContainer.Clear();
+                dependencies.OnlinePlayDependencies = CreateOnlinePlayDependencies();
+                drawableDependenciesContainer.AddRange(OnlinePlayDependencies.DrawableComponents);
 
-            // Resolving the BeatmapManager in the test scene will inject the game-wide BeatmapManager, while many test scenes cache their own BeatmapManager instead.
-            // To get around this, the BeatmapManager is looked up from the dependencies provided to the children of the test scene instead.
-            var beatmapManager = dependencies.Get<BeatmapManager>();
+                var handler = OnlinePlayDependencies.RequestsHandler;
 
-            ((DummyAPIAccess)API).HandleRequest = request => handler.HandleRequest(request, API.LocalUser.Value, beatmapManager);
-        });
+                // Resolving the BeatmapManager in the test scene will inject the game-wide BeatmapManager, while many test scenes cache their own BeatmapManager instead.
+                // To get around this, the BeatmapManager is looked up from the dependencies provided to the children of the test scene instead.
+                var beatmapManager = dependencies.Get<BeatmapManager>();
+
+                ((DummyAPIAccess)API).HandleRequest = request =>
+                {
+                    try
+                    {
+                        return handler.HandleRequest(request, API.LocalUser.Value, beatmapManager);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // These requests can be fired asynchronously, but potentially arrive after game components
+                        // have been disposed (ie. realm in BeatmapManager).
+                        // This only happens in tests and it's easiest to ignore them for now.
+                        Logger.Log($"Handled {nameof(ObjectDisposedException)} in test request handling");
+                        return true;
+                    }
+                };
+            });
+        }
 
         /// <summary>
-        /// Creates the room dependencies. Called every <see cref="Setup"/>.
+        /// Creates the room dependencies. Called every <see cref="SetUpSteps"/>.
         /// </summary>
         /// <remarks>
         /// Any custom dependencies required for online play sub-classes should be added here.

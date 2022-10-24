@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -12,6 +14,8 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens;
+using osu.Game.Screens.Edit.Components;
+using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -19,19 +23,21 @@ namespace osu.Game.Skinning.Editor
     /// A container which handles loading a skin editor on user request for a specified target.
     /// This also handles the scaling / positioning adjustment of the target.
     /// </summary>
-    public class SkinEditorOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public class SkinEditorOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly ScalingContainer scalingContainer;
 
+        protected override bool BlockNonPositionalInput => true;
+
         [CanBeNull]
         private SkinEditor skinEditor;
-
-        public const float VISIBLE_TARGET_SCALE = 0.8f;
 
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
         private OsuScreen lastTargetScreen;
+
+        private Vector2 lastDrawSize;
 
         public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
@@ -49,33 +55,13 @@ namespace osu.Game.Skinning.Editor
 
                     Hide();
                     return true;
-
-                case GlobalAction.ToggleSkinEditor:
-                    Toggle();
-                    return true;
             }
 
             return false;
         }
 
-        public void Toggle()
+        protected override void PopIn()
         {
-            if (skinEditor == null)
-                Show();
-            else
-                skinEditor.ToggleVisibility();
-        }
-
-        public override void Hide()
-        {
-            // base call intentionally omitted.
-            skinEditor?.Hide();
-        }
-
-        public override void Show()
-        {
-            // base call intentionally omitted as we have custom behaviour.
-
             if (skinEditor != null)
             {
                 skinEditor.Show();
@@ -83,38 +69,60 @@ namespace osu.Game.Skinning.Editor
             }
 
             var editor = new SkinEditor();
-            editor.State.BindValueChanged(visibility => updateComponentVisibility());
+
+            editor.State.BindValueChanged(_ => updateComponentVisibility());
 
             skinEditor = editor;
 
-            // Schedule ensures that if `Show` is called before this overlay is loaded,
-            // it will not throw (LoadComponentAsync requires the load target to be in a loaded state).
-            Schedule(() =>
+            LoadComponentAsync(editor, _ =>
             {
                 if (editor != skinEditor)
                     return;
 
-                LoadComponentAsync(editor, _ =>
-                {
-                    if (editor != skinEditor)
-                        return;
+                AddInternal(editor);
 
-                    AddInternal(editor);
-
-                    SetTarget(lastTargetScreen);
-                });
+                SetTarget(lastTargetScreen);
             });
+        }
+
+        protected override void PopOut() => skinEditor?.Hide();
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (game.DrawSize != lastDrawSize)
+            {
+                lastDrawSize = game.DrawSize;
+                updateScreenSizing();
+            }
+        }
+
+        private void updateScreenSizing()
+        {
+            if (skinEditor?.State.Value != Visibility.Visible) return;
+
+            const float padding = 10;
+
+            float relativeSidebarWidth = (EditorSidebar.WIDTH + padding) / DrawWidth;
+            float relativeToolbarHeight = (SkinEditorSceneLibrary.HEIGHT + SkinEditor.MENU_HEIGHT + padding) / DrawHeight;
+
+            var rect = new RectangleF(
+                relativeSidebarWidth,
+                relativeToolbarHeight,
+                1 - relativeSidebarWidth * 2,
+                1f - relativeToolbarHeight - padding / DrawHeight);
+
+            scalingContainer.SetCustomRect(rect, true);
         }
 
         private void updateComponentVisibility()
         {
             Debug.Assert(skinEditor != null);
 
-            const float toolbar_padding_requirement = 0.18f;
-
             if (skinEditor.State.Value == Visibility.Visible)
             {
-                scalingContainer.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.2f, 0.8f - toolbar_padding_requirement, 0.7f), true);
+                Scheduler.AddOnce(updateScreenSizing);
 
                 game?.Toolbar.Hide();
                 game?.CloseAllOverlays();
@@ -152,6 +160,9 @@ namespace osu.Game.Skinning.Editor
 
         private void setTarget(OsuScreen target)
         {
+            if (target == null)
+                return;
+
             Debug.Assert(skinEditor != null);
 
             if (!target.IsLoaded)

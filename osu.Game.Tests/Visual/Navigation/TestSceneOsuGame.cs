@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -23,7 +25,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
-using osu.Game.Utils;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -33,11 +35,10 @@ namespace osu.Game.Tests.Visual.Navigation
         private IReadOnlyList<Type> requiredGameDependencies => new[]
         {
             typeof(OsuGame),
-            typeof(SentryLogger),
             typeof(OsuLogo),
             typeof(IdleTracker),
             typeof(OnScreenDisplay),
-            typeof(NotificationOverlay),
+            typeof(INotificationOverlay),
             typeof(BeatmapListingOverlay),
             typeof(DashboardOverlay),
             typeof(NewsOverlay),
@@ -49,7 +50,7 @@ namespace osu.Game.Tests.Visual.Navigation
             typeof(LoginOverlay),
             typeof(MusicController),
             typeof(AccountCreationOverlay),
-            typeof(DialogOverlay),
+            typeof(IDialogOverlay),
             typeof(ScreenshotManager)
         };
 
@@ -78,6 +79,16 @@ namespace osu.Game.Tests.Visual.Navigation
 
         [Resolved]
         private OsuGameBase gameBase { get; set; }
+
+        [Test]
+        public void TestCursorHidesWhenIdle()
+        {
+            AddStep("click mouse", () => InputManager.Click(MouseButton.Left));
+            AddUntilStep("wait until idle", () => Game.IsIdle.Value);
+            AddUntilStep("menu cursor hidden", () => Game.GlobalCursorDisplay.MenuCursor.ActiveCursor.Alpha == 0);
+            AddStep("click mouse", () => InputManager.Click(MouseButton.Left));
+            AddUntilStep("menu cursor shown", () => Game.GlobalCursorDisplay.MenuCursor.ActiveCursor.Alpha == 1);
+        }
 
         [Test]
         public void TestNullRulesetHandled()

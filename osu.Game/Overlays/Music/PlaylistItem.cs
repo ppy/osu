@@ -1,8 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -113,7 +116,7 @@ namespace osu.Game.Overlays.Music
             }
         }
 
-        public IEnumerable<string> FilterTerms => Model.PerformRead(m => m.Metadata.GetSearchableTerms());
+        public IEnumerable<LocalisableString> FilterTerms => Model.PerformRead(m => m.Metadata.GetSearchableTerms()).Select(s => (LocalisableString)s).ToArray();
 
         private bool matchingFilter = true;
 

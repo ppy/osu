@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -59,6 +61,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// Tests whether can still pause after cancelling completion by reverting <see cref="IScreen.ValidForResume"/> back to true.
         /// </summary>
         [Test]
+        [FlakyTest]
+        /*
+         * Fail rate around 0.45%
+         *
+         * TearDown : System.TimeoutException : "completion set by processor" timed out
+         * --TearDown
+         *    at osu.Framework.Testing.Drawables.Steps.UntilStepButton.<>c__DisplayClass11_0.<.ctor>b__0()
+         *    at osu.Framework.Testing.Drawables.Steps.StepButton.PerformStep(Boolean userTriggered)
+         *    at osu.Framework.Testing.TestScene.runNextStep(Action onCompletion, Action`1 onError, Func`2 stopCondition)
+         */
         public void TestCanPauseAfterCancellation()
         {
             complete();

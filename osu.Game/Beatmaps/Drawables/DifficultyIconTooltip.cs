@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -16,11 +17,11 @@ namespace osu.Game.Beatmaps.Drawables
 {
     internal class DifficultyIconTooltip : VisibilityContainer, ITooltip<DifficultyIconTooltipContent>
     {
-        private readonly OsuSpriteText difficultyName, starRating;
-        private readonly Box background;
-        private readonly FillFlowContainer difficultyFlow;
+        private OsuSpriteText difficultyName;
+        private StarRatingDisplay starRating;
 
-        public DifficultyIconTooltip()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Both;
             Masking = true;
@@ -28,9 +29,10 @@ namespace osu.Game.Beatmaps.Drawables
 
             Children = new Drawable[]
             {
-                background = new Box
+                new Box
                 {
                     Alpha = 0.9f,
+                    Colour = colours.Gray3,
                     RelativeSizeAxes = Axes.Both
                 },
                 new FillFlowContainer
@@ -40,6 +42,7 @@ namespace osu.Game.Beatmaps.Drawables
                     AutoSizeEasing = Easing.OutQuint,
                     Direction = FillDirection.Vertical,
                     Padding = new MarginPadding(10),
+                    Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
                         difficultyName = new OsuSpriteText
@@ -48,57 +51,27 @@ namespace osu.Game.Beatmaps.Drawables
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
                         },
-                        difficultyFlow = new FillFlowContainer
+                        starRating = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
                         {
-                            AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Direction = FillDirection.Horizontal,
-                            Children = new Drawable[]
-                            {
-                                starRating = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
-                                },
-                                new SpriteIcon
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Margin = new MarginPadding { Left = 4 },
-                                    Icon = FontAwesome.Solid.Star,
-                                    Size = new Vector2(12),
-                                },
-                            }
                         }
                     }
                 }
             };
         }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            background.Colour = colours.Gray3;
-        }
-
-        private readonly IBindable<StarDifficulty> starDifficulty = new Bindable<StarDifficulty>();
+        private DifficultyIconTooltipContent displayedContent;
 
         public void SetContent(DifficultyIconTooltipContent content)
         {
-            difficultyName.Text = content.BeatmapInfo.DifficultyName;
+            if (displayedContent != null)
+                starRating.Current.UnbindFrom(displayedContent.Difficulty);
 
-            starDifficulty.UnbindAll();
-            starDifficulty.BindTo(content.Difficulty);
-            starDifficulty.BindValueChanged(difficulty =>
-            {
-                starRating.Text = $"{difficulty.NewValue.Stars:0.##}";
-                difficultyFlow.Colour = colours.ForStarDifficulty(difficulty.NewValue.Stars);
-            }, true);
+            displayedContent = content;
+
+            starRating.Current.BindTarget = displayedContent.Difficulty;
+            difficultyName.Text = displayedContent.BeatmapInfo.DifficultyName;
         }
 
         public void Move(Vector2 pos) => Position = pos;

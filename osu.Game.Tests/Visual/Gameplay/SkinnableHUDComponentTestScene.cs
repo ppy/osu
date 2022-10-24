@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             SetContents(skin =>
             {
-                var implementation = skin != null
+                var implementation = skin is LegacySkin
                     ? CreateLegacyImplementation()
                     : CreateDefaultImplementation();
 

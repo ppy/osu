@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+#nullable disable
+
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -48,7 +49,7 @@ namespace osu.Game.Tests.Visual.Background
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
             Dependencies.Cache(Realm);
 
@@ -243,7 +244,10 @@ namespace osu.Game.Tests.Visual.Background
         public void TestResumeFromPlayer()
         {
             performFullSetup();
-            AddStep("Move mouse to Visual Settings", () => InputManager.MoveMouseTo(playerLoader.VisualSettingsPos));
+            AddStep("Move mouse to Visual Settings location", () => InputManager.MoveMouseTo(playerLoader.ScreenSpaceDrawQuad.TopRight
+                                                                                             + new Vector2(-playerLoader.VisualSettingsPos.ScreenSpaceDrawQuad.Width,
+                                                                                                 playerLoader.VisualSettingsPos.ScreenSpaceDrawQuad.Height / 2
+                                                                                             )));
             AddStep("Resume PlayerLoader", () => player.Restart());
             AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
@@ -283,7 +287,7 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Song select has selection", () => songSelect.Carousel?.SelectedBeatmapInfo != null);
             AddStep("Set default user settings", () =>
             {
-                SelectedMods.Value = SelectedMods.Value.Concat(new[] { new OsuModNoFail() }).ToArray();
+                SelectedMods.Value = new[] { new OsuModNoFail() };
                 songSelect.DimLevel.Value = 0.7f;
                 songSelect.BlurLevel.Value = 0.4f;
             });
@@ -359,9 +363,9 @@ namespace osu.Game.Tests.Visual.Background
             protected override BackgroundScreen CreateBackground() =>
                 new FadeAccessibleBackground(Beatmap.Value);
 
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
-                base.OnEntering(last);
+                base.OnEntering(e);
 
                 ApplyToBackground(b => ReplacesBackground.BindTo(b.StoryboardReplacesBackground));
             }

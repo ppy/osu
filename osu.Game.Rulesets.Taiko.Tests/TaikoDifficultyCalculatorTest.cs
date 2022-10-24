@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -14,15 +16,15 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
 
-        [TestCase(2.2420075288523802d, "diffcalc-test")]
-        [TestCase(2.2420075288523802d, "diffcalc-test-strong")]
-        public void Test(double expected, string name)
-            => base.Test(expected, name);
+        [TestCase(3.1098944660126882d, 200, "diffcalc-test")]
+        [TestCase(3.1098944660126882d, 200, "diffcalc-test-strong")]
+        public void Test(double expectedStarRating, int expectedMaxCombo, string name)
+            => base.Test(expectedStarRating, expectedMaxCombo, name);
 
-        [TestCase(3.134084469440479d, "diffcalc-test")]
-        [TestCase(3.134084469440479d, "diffcalc-test-strong")]
-        public void TestClockRateAdjusted(double expected, string name)
-            => Test(expected, name, new TaikoModDoubleTime());
+        [TestCase(4.0974106752474251d, 200, "diffcalc-test")]
+        [TestCase(4.0974106752474251d, 200, "diffcalc-test-strong")]
+        public void TestClockRateAdjusted(double expectedStarRating, int expectedMaxCombo, string name)
+            => Test(expectedStarRating, expectedMaxCombo, name, new TaikoModDoubleTime());
 
         protected override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new TaikoDifficultyCalculator(new TaikoRuleset().RulesetInfo, beatmap);
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -18,16 +20,15 @@ using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler
+    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachHUDPieces, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
         public readonly KeyBindingContainer<T> KeyBindingContainer;
-
-        private readonly Ruleset ruleset;
 
         [Resolved(CanBeNull = true)]
         private ScoreProcessor scoreProcessor { get; set; }
@@ -57,8 +58,6 @@ namespace osu.Game.Rulesets.UI
 
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
-            this.ruleset = ruleset.CreateInstance();
-
             InternalChild = KeyBindingContainer =
                 CreateKeyBindingContainer(ruleset, variant, unique)
                     .WithChild(content = new Container { RelativeSizeAxes = Axes.Both });
@@ -85,7 +84,7 @@ namespace osu.Game.Rulesets.UI
                     break;
 
                 case ReplayStatisticsFrameEvent statisticsStateChangeEvent:
-                    scoreProcessor?.ResetFromReplayFrame(ruleset, statisticsStateChangeEvent.Frame);
+                    scoreProcessor?.ResetFromReplayFrame(statisticsStateChangeEvent.Frame);
                     break;
 
                 default:
@@ -125,7 +124,7 @@ namespace osu.Game.Rulesets.UI
         {
             switch (e)
             {
-                case MouseDownEvent _:
+                case MouseDownEvent:
                     if (mouseDisabled.Value)
                         return true; // importantly, block upwards propagation so global bindings also don't fire.
 
@@ -170,7 +169,7 @@ namespace osu.Game.Rulesets.UI
                                                    .Select(action => new KeyCounterAction<T>(action)));
         }
 
-        public class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
+        private class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
         {
             public ActionReceptor(KeyCounterDisplay target)
                 : base(target)
@@ -188,6 +187,37 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
+        #region Keys per second Counter Attachment
+
+        public void Attach(ClicksPerSecondCalculator calculator)
+        {
+            var listener = new ActionListener(calculator);
+
+            KeyBindingContainer.Add(listener);
+        }
+
+        private class ActionListener : Component, IKeyBindingHandler<T>
+        {
+            private readonly ClicksPerSecondCalculator calculator;
+
+            public ActionListener(ClicksPerSecondCalculator calculator)
+            {
+                this.calculator = calculator;
+            }
+
+            public bool OnPressed(KeyBindingPressEvent<T> e)
+            {
+                calculator.AddInputTimestamp();
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<T> e)
+            {
+            }
+        }
+
+        #endregion
+
         protected virtual KeyBindingContainer<T> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new RulesetKeyBindingContainer(ruleset, variant, unique);
 
@@ -200,9 +230,9 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            protected override void ReloadMappings()
+            protected override void ReloadMappings(IQueryable<RealmKeyBinding> realmKeyBindings)
             {
-                base.ReloadMappings();
+                base.ReloadMappings(realmKeyBindings);
 
                 KeyBindings = KeyBindings.Where(b => RealmKeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
             }
@@ -223,12 +253,13 @@ namespace osu.Game.Rulesets.UI
     }
 
     /// <summary>
-    /// Supports attaching a <see cref="KeyCounterDisplay"/>.
+    /// Supports attaching various HUD pieces.
     /// Keys will be populated automatically and a receptor will be injected inside.
     /// </summary>
-    public interface ICanAttachKeyCounter
+    public interface ICanAttachHUDPieces
     {
         void Attach(KeyCounterDisplay keyCounter);
+        void Attach(ClicksPerSecondCalculator calculator);
     }
 
     public class RulesetInputManagerInputState<T> : InputState

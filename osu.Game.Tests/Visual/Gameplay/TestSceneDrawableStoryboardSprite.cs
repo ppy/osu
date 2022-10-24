@@ -7,11 +7,10 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
 using osuTK;
@@ -36,7 +35,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
 
-            assertSpritesFromSkin(false);
+            AddAssert("sprite didn't find texture", () =>
+                sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Texture == null)));
         }
 
         [Test]
@@ -48,9 +48,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
 
-            assertSpritesFromSkin(true);
+            // Only checking for at least one sprite that succeeded, as not all skins in this test provide the hitcircleoverlay texture.
+            AddAssert("sprite found texture", () =>
+                sprites.Any(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Texture != null)));
 
-            AddAssert("skinnable sprite has correct size", () => sprites.Any(s => Precision.AlmostEquals(s.ChildrenOfType<SkinnableSprite>().Single().Size, new Vector2(128, 128))));
+            AddAssert("skinnable sprite has correct size", () =>
+                sprites.Any(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Size == new Vector2(128))));
         }
 
         [Test]
@@ -66,6 +69,18 @@ namespace osu.Game.Tests.Visual.Gameplay
                 s.FlipV = true;
             }));
             AddAssert("origin flipped", () => sprites.All(s => s.Origin == Anchor.BottomRight));
+        }
+
+        [Test]
+        public void TestZeroScale()
+        {
+            const string lookup_name = "hitcircleoverlay";
+
+            AddStep("allow skin lookup", () => storyboard.UseSkinSprites = true);
+            AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
+            AddAssert("sprites present", () => sprites.All(s => s.IsPresent));
+            AddStep("scale sprite", () => sprites.ForEach(s => s.VectorScale = new Vector2(0, 1)));
+            AddAssert("sprites not present", () => sprites.All(s => !s.IsPresent));
         }
 
         [Test]
@@ -104,9 +119,5 @@ namespace osu.Game.Tests.Visual.Gameplay
                 s.LifetimeStart = double.MinValue;
                 s.LifetimeEnd = double.MaxValue;
             });
-
-        private void assertSpritesFromSkin(bool fromSkin) =>
-            AddAssert($"sprites are {(fromSkin ? "from skin" : "from storyboard")}",
-                () => sprites.All(sprite => sprite.ChildrenOfType<SkinnableSprite>().Any() == fromSkin));
     }
 }

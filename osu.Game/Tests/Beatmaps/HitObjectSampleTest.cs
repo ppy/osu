@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,8 +12,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -36,6 +40,9 @@ namespace osu.Game.Tests.Beatmaps
 
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         private readonly SkinInfo userSkinInfo = new SkinInfo();
 
@@ -96,12 +103,14 @@ namespace osu.Game.Tests.Beatmaps
             AddStep("setup skins", () =>
             {
                 userSkinInfo.Files.Clear();
-                userSkinInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = userFile }, userFile));
+                if (!string.IsNullOrEmpty(userFile))
+                    userSkinInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = userFile }, userFile));
 
                 Debug.Assert(beatmapInfo.BeatmapSet != null);
 
                 beatmapInfo.BeatmapSet.Files.Clear();
-                beatmapInfo.BeatmapSet.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = beatmapFile }, beatmapFile));
+                if (!string.IsNullOrEmpty(beatmapFile))
+                    beatmapInfo.BeatmapSet.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = beatmapFile }, beatmapFile));
 
                 // Need to refresh the cached skin source to refresh the skin resource store.
                 dependencies.SkinSource = new SkinProvidingContainer(Skin = new LegacySkin(userSkinInfo, this));
@@ -119,6 +128,7 @@ namespace osu.Game.Tests.Beatmaps
 
         #region IResourceStorageProvider
 
+        public IRenderer Renderer => host.Renderer;
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => userSkinResourceStore;
         public new IResourceStore<byte[]> Resources => base.Resources;
@@ -191,22 +201,33 @@ namespace osu.Game.Tests.Beatmaps
             }
         }
 
-        private class TestWorkingBeatmap : ClockBackedTestWorkingBeatmap
+        private class TestWorkingBeatmap : ClockBackedTestWorkingBeatmap, IStorageResourceProvider
         {
             private readonly BeatmapInfo skinBeatmapInfo;
-            private readonly IResourceStore<byte[]> resourceStore;
 
             private readonly IStorageResourceProvider resources;
 
-            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> resourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, IStorageResourceProvider resources)
+            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> accessMarkingResourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock,
+                                      IStorageResourceProvider resources)
                 : base(beatmap, storyboard, referenceClock, resources.AudioManager)
             {
                 this.skinBeatmapInfo = skinBeatmapInfo;
-                this.resourceStore = resourceStore;
+                Files = accessMarkingResourceStore;
                 this.resources = resources;
             }
 
-            protected internal override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, resourceStore, resources);
+            protected internal override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, this);
+
+            public IRenderer Renderer => resources.Renderer;
+            public AudioManager AudioManager => resources.AudioManager;
+
+            public IResourceStore<byte[]> Files { get; }
+
+            public IResourceStore<byte[]> Resources => resources.Resources;
+
+            public RealmAccess RealmAccess => resources.RealmAccess;
+
+            public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => resources.CreateTextureLoaderStore(underlyingStore);
         }
     }
 }

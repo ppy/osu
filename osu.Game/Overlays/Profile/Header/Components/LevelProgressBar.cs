@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -62,7 +64,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void updateProgress(APIUser user)
         {
             levelProgressBar.Length = user?.Statistics?.Level.Progress / 100f ?? 0;
-            levelProgressText.Text = user?.Statistics?.Level.Progress.ToLocalisableString("0'%'");
+            levelProgressText.Text = user?.Statistics?.Level.Progress.ToLocalisableString("0'%'") ?? default;
         }
     }
 }

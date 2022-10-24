@@ -1,6 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
+using System.Linq;
+using Markdig.Extensions.CustomContainers;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -9,6 +14,9 @@ using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Users;
+using osu.Game.Users.Drawables;
+using osuTK;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
@@ -30,6 +38,31 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override SpriteText CreateEmphasisedSpriteText(bool bold, bool italic)
             => CreateSpriteText().With(t => t.Font = t.Font.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, italics: italic));
+
+        protected override void AddCustomComponent(CustomContainerInline inline)
+        {
+            if (!(inline.FirstChild is LiteralInline literal))
+            {
+                base.AddCustomComponent(inline);
+                return;
+            }
+
+            string[] attributes = literal.Content.ToString().Trim(' ', '{', '}').Split();
+            string flagAttribute = attributes.SingleOrDefault(a => a.StartsWith(@"flag", StringComparison.Ordinal));
+
+            if (flagAttribute == null)
+            {
+                base.AddCustomComponent(inline);
+                return;
+            }
+
+            string flag = flagAttribute.Split('=').Last().Trim('"');
+
+            if (!Enum.TryParse<CountryCode>(flag, out var countryCode))
+                countryCode = CountryCode.Unknown;
+
+            AddDrawable(new DrawableFlag(countryCode) { Size = new Vector2(20, 15) });
+        }
 
         private class OsuMarkdownInlineCode : Container
         {

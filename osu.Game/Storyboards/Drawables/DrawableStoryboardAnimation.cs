@@ -1,17 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardAnimation : DrawableAnimation, IFlippable, IVectorScalable
+    public class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
     {
         public StoryboardAnimation Animation { get; }
 
@@ -52,11 +57,6 @@ namespace osu.Game.Storyboards.Drawables
             get => vectorScale;
             set
             {
-                if (Math.Abs(value.X) < Precision.FLOAT_EPSILON)
-                    value.X = Precision.FLOAT_EPSILON;
-                if (Math.Abs(value.Y) < Precision.FLOAT_EPSILON)
-                    value.Y = Precision.FLOAT_EPSILON;
-
                 if (vectorScale == value)
                     return;
 
@@ -88,17 +88,67 @@ namespace osu.Game.Storyboards.Drawables
             LifetimeEnd = animation.EndTime;
         }
 
+        [Resolved]
+        private ISkinSource skin { get; set; }
+
+        [Resolved]
+        private IBeatSyncProvider beatSyncProvider { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textureStore, Storyboard storyboard)
         {
-            for (int frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
+            int frameIndex = 0;
+
+            Texture frameTexture = storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore);
+
+            if (frameTexture != null)
             {
-                string framePath = Animation.Path.Replace(".", frameIndex + ".");
-                Drawable frame = storyboard.CreateSpriteFromResourcePath(framePath, textureStore) ?? Empty();
-                AddFrame(frame, Animation.FrameDelay);
+                // sourcing from storyboard.
+                for (frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
+                {
+                    AddFrame(storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore), Animation.FrameDelay);
+                }
+            }
+            else if (storyboard.UseSkinSprites)
+            {
+                // fallback to skin if required.
+                skin.SourceChanged += skinSourceChanged;
+                skinSourceChanged();
             }
 
             Animation.ApplyTransforms(this);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Framework animation class tries its best to synchronise the animation at LoadComplete,
+            // but in some cases (such as fast forward) this results in an incorrect start offset.
+            //
+            // In the case of storyboard animations, we want to synchronise with game time perfectly
+            // so let's get a correct time based on gameplay clock and earliest transform.
+            PlaybackPosition = (beatSyncProvider.Clock?.CurrentTime ?? Clock.CurrentTime) - Animation.EarliestTransformTime;
+        }
+
+        private void skinSourceChanged()
+        {
+            ClearFrames();
+
+            // When reading from a skin, we match stables weird behaviour where `FrameCount` is ignored
+            // and resources are retrieved until the end of the animation.
+            foreach (var texture in skin.GetTextures(Path.GetFileNameWithoutExtension(Animation.Path), default, default, true, string.Empty, out _))
+                AddFrame(texture, Animation.FrameDelay);
+        }
+
+        private string getFramePath(int i) => Animation.Path.Replace(".", $"{i}.");
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skin != null)
+                skin.SourceChanged -= skinSourceChanged;
         }
     }
 }

@@ -1,11 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -13,7 +14,6 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
@@ -26,8 +26,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneReplayDownloadButton : OsuManualInputManagerTestScene
     {
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private const long online_score_id = 2553163309;
 
         private TestReplayDownloadButton downloadButton;
 
@@ -41,6 +40,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void load()
         {
             beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+        }
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("delete previous imports", () =>
+            {
+                scoreManager.Delete(s => s.OnlineID == online_score_id);
+            });
         }
 
         [Test]
@@ -130,6 +138,28 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestLocallyAvailableWithoutReplay()
+        {
+            Live<ScoreInfo> imported = null;
+
+            AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(false, false)));
+
+            AddStep("create button without replay", () =>
+            {
+                Child = downloadButton = new TestReplayDownloadButton(imported.Value)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            });
+
+            AddUntilStep("wait for load", () => downloadButton.IsLoaded);
+
+            AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
+        }
+
+        [Test]
         public void TestScoreImportThenDelete()
         {
             Live<ScoreInfo> imported = null;
@@ -150,10 +180,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(true)));
 
             AddUntilStep("state is available", () => downloadButton.State.Value == DownloadState.LocallyAvailable);
+            AddAssert("button is enabled", () => downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
 
             AddStep("delete score", () => scoreManager.Delete(imported.Value));
 
             AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
         [Test]
@@ -170,25 +202,22 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for load", () => downloadButton.IsLoaded);
 
-            AddAssert("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            AddAssert("state is unknown", () => downloadButton.State.Value == DownloadState.Unknown);
             AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
-        private ScoreInfo getScoreInfo(bool replayAvailable)
+        private ScoreInfo getScoreInfo(bool replayAvailable, bool hasOnlineId = true) => new ScoreInfo
         {
-            return new APIScore
+            OnlineID = hasOnlineId ? online_score_id : 0,
+            Ruleset = new OsuRuleset().RulesetInfo,
+            BeatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First(),
+            Hash = replayAvailable ? "online" : string.Empty,
+            User = new APIUser
             {
-                OnlineID = 2553163309,
-                RulesetID = 0,
-                Beatmap = CreateAPIBeatmapSet(new OsuRuleset().RulesetInfo).Beatmaps.First(),
-                HasReplay = replayAvailable,
-                User = new APIUser
-                {
-                    Id = 39828,
-                    Username = @"WubWoofWolf",
-                }
-            }.CreateScoreInfo(rulesets, beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First());
-        }
+                Id = 39828,
+                Username = @"WubWoofWolf",
+            }
+        };
 
         private class TestReplayDownloadButton : ReplayDownloadButton
         {

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -35,6 +37,7 @@ namespace osu.Game.Tests.Beatmaps
             BeatmapInfo.Length = 75000;
             BeatmapInfo.OnlineInfo = new APIBeatmap();
             BeatmapInfo.OnlineID = Interlocked.Increment(ref onlineBeatmapID);
+            BeatmapInfo.Status = BeatmapOnlineStatus.Ranked;
 
             Debug.Assert(BeatmapInfo.BeatmapSet != null);
 

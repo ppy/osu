@@ -3,8 +3,6 @@
 
 using osu.Game.Skinning;
 
-#nullable enable
-
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
@@ -16,7 +14,7 @@ namespace osu.Game.Screens.Edit
         private readonly EditorBeatmapSkin? beatmapSkin;
 
         public EditorSkinProvidingContainer(EditorBeatmap editorBeatmap)
-            : base(editorBeatmap.PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin)
+            : base(editorBeatmap.PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin?.Skin)
         {
             beatmapSkin = editorBeatmap.BeatmapSkin;
         }

@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -22,14 +23,16 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
     {
         public override string Name => "Blinds";
-        public override string Description => "Play with blinds on your screen.";
+        public override LocalisableString Description => "Play with blinds on your screen.";
         public override string Acronym => "BL";
 
         public override IconUsage? Icon => FontAwesome.Solid.Adjust;
         public override ModType Type => ModType.DifficultyIncrease;
 
-        public override double ScoreMultiplier => 1.12;
-        private DrawableOsuBlinds blinds;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight) };
+
+        private DrawableOsuBlinds blinds = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -51,9 +54,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// <summary>
             /// Black background boxes behind blind panel textures.
             /// </summary>
-            private Box blackBoxLeft, blackBoxRight;
+            private Box blackBoxLeft = null!, blackBoxRight = null!;
 
-            private Drawable panelLeft, panelRight, bgPanelLeft, bgPanelRight;
+            private Drawable panelLeft = null!;
+            private Drawable panelRight = null!;
+            private Drawable bgPanelLeft = null!;
+            private Drawable bgPanelRight = null!;
 
             private readonly Beatmap<OsuHitObject> beatmap;
 

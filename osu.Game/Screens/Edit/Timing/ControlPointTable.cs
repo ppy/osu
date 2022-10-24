@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,6 +54,8 @@ namespace osu.Game.Screens.Edit.Timing
 
                 Columns = createHeaders();
                 Content = value.Select(createContent).ToArray().ToRectangular();
+
+                updateSelectedGroup();
             }
         }
 
@@ -59,10 +63,18 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            selectedGroup.BindValueChanged(group =>
+            selectedGroup.BindValueChanged(_ =>
             {
-                foreach (var b in BackgroundFlow) b.Selected = b.Item == group.NewValue;
+                // TODO: This should scroll the selected row into view.
+                updateSelectedGroup();
             }, true);
+        }
+
+        private void updateSelectedGroup()
+        {
+            // TODO: This should scroll the selected row into view.
+            foreach (var b in BackgroundFlow)
+                b.Selected = ReferenceEquals(b.Item, selectedGroup?.Value);
         }
 
         private TableColumn[] createHeaders()
@@ -141,7 +153,7 @@ namespace osu.Game.Screens.Edit.Timing
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                controlPoints.CollectionChanged += (_, __) => createChildren();
+                controlPoints.CollectionChanged += (_, _) => createChildren();
             }
 
             private void createChildren()

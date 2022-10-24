@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -65,6 +68,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 get
                 {
+                    if (OsuGameBase.VIDEO_EXTENSIONS.Contains(File.Extension))
+                        return FontAwesome.Regular.FileVideo;
+
                     switch (File.Extension)
                     {
                         case @".ogg":
@@ -76,12 +82,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         case @".jpeg":
                         case @".png":
                             return FontAwesome.Regular.FileImage;
-
-                        case @".mp4":
-                        case @".avi":
-                        case @".mov":
-                        case @".flv":
-                            return FontAwesome.Regular.FileVideo;
 
                         default:
                             return FontAwesome.Regular.File;

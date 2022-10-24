@@ -3,6 +3,7 @@
 
 using System;
 using MessagePack;
+using osu.Game.Online.Multiplayer.Countdown;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -11,6 +12,9 @@ namespace osu.Game.Online.Multiplayer
     /// </summary>
     [Serializable]
     [MessagePackObject]
+    // IMPORTANT: Add rules to SignalRUnionWorkaroundResolver for new derived types.
+    [Union(0, typeof(CountdownStartedEvent))]
+    [Union(1, typeof(CountdownStoppedEvent))]
     public abstract class MatchServerEvent
     {
     }

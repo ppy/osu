@@ -1,22 +1,24 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
 using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayRulesetTabItem : TabItem<RulesetInfo>
+    public class OverlayRulesetTabItem : TabItem<RulesetInfo>, IHasTooltip
     {
         private Color4 accentColour;
 
@@ -26,7 +28,7 @@ namespace osu.Game.Overlays
             set
             {
                 accentColour = value;
-                text.FadeColour(value, 120, Easing.OutQuint);
+                icon.FadeColour(value, 120, Easing.OutQuint);
             }
         }
 
@@ -35,7 +37,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        private readonly OsuSpriteText text;
+        private readonly Drawable icon;
+
+        public LocalisableString TooltipText => Value.Name;
 
         public OverlayRulesetTabItem(RulesetInfo value)
             : base(value)
@@ -48,15 +52,14 @@ namespace osu.Game.Overlays
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(3, 0),
-                    Child = text = new OsuSpriteText
+                    Spacing = new Vector2(4, 0),
+                    Child = icon = new ConstrainedIconContainer
                     {
-                        Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Text = value.Name,
-                        Font = OsuFont.GetFont(size: 14),
-                        ShadowColour = Color4.Black.Opacity(0.75f)
-                    }
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(20f),
+                        Icon = value.CreateInstance().CreateIcon(),
+                    },
                 },
                 new HoverClickSounds()
             });
@@ -70,7 +73,7 @@ namespace osu.Game.Overlays
             Enabled.BindValueChanged(_ => updateState(), true);
         }
 
-        public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
+        public override bool PropagatePositionalInputSubTree => Enabled.Value && base.PropagatePositionalInputSubTree;
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -91,7 +94,6 @@ namespace osu.Game.Overlays
 
         private void updateState()
         {
-            text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
             AccentColour = Enabled.Value ? getActiveColour() : colourProvider.Foreground1;
         }
 

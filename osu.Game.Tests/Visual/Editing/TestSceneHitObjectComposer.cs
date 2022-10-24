@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -19,8 +21,10 @@ using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -69,6 +73,11 @@ namespace osu.Game.Tests.Visual.Editing
                 Child = editorBeatmapContainer = new EditorBeatmapContainer(Beatmap.Value)
                 {
                     Child = hitObjectComposer = new OsuHitObjectComposer(new OsuRuleset())
+                    {
+                        // force the composer to fully overlap the playfield area by setting a 4:3 aspect ratio.
+                        FillMode = FillMode.Fit,
+                        FillAspectRatio = 4 / 3f
+                    }
                 };
             });
         }
@@ -84,6 +93,78 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("Hitcircle button is clickable", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").Enabled.Value);
             AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
             AddAssert("Tool changed", () => hitObjectComposer.ChildrenOfType<ComposeBlueprintContainer>().First().CurrentTool is HitCircleCompositionTool);
+        }
+
+        [Test]
+        public void TestPlacementFailsWhenClickingButton()
+        {
+            AddStep("clear all control points and hitobjects", () =>
+            {
+                editorBeatmap.ControlPointInfo.Clear();
+                editorBeatmap.Clear();
+            });
+
+            AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
+
+            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
+
+            AddStep("move mouse to overlapping toggle button", () =>
+            {
+                var playfield = hitObjectComposer.Playfield.ScreenSpaceDrawQuad;
+                var button = hitObjectComposer
+                             .ChildrenOfType<ExpandingToolboxContainer>().First()
+                             .ChildrenOfType<DrawableTernaryButton>().First(b => playfield.Contains(b.ScreenSpaceDrawQuad.Centre));
+
+                InputManager.MoveMouseTo(button);
+            });
+
+            AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
+
+            AddStep("attempt place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
+        }
+
+        [Test]
+        public void TestPlacementWithinToolboxScrollArea()
+        {
+            AddStep("clear all control points and hitobjects", () =>
+            {
+                editorBeatmap.ControlPointInfo.Clear();
+                editorBeatmap.Clear();
+            });
+
+            AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
+
+            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
+
+            AddStep("move mouse to scroll area", () =>
+            {
+                // Specifically wanting to test the area of overlap between the left expanding toolbox container
+                // and the playfield/composer.
+                var scrollArea = hitObjectComposer.ChildrenOfType<ExpandingToolboxContainer>().First().ScreenSpaceDrawQuad;
+                var playfield = hitObjectComposer.Playfield.ScreenSpaceDrawQuad;
+                InputManager.MoveMouseTo(new Vector2(scrollArea.TopLeft.X + 1, playfield.Centre.Y));
+            });
+
+            AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
+        }
+
+        [Test]
+        public void TestDistanceSpacingHotkeys()
+        {
+            double originalSpacing = 0;
+
+            AddStep("retrieve original spacing", () => originalSpacing = editorBeatmap.BeatmapInfo.DistanceSpacing);
+
+            AddStep("hold ctrl", () => InputManager.PressKey(Key.LControl));
+            AddStep("hold alt", () => InputManager.PressKey(Key.LAlt));
+
+            AddStep("scroll mouse 5 steps", () => InputManager.ScrollVerticalBy(5));
+            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
+
+            AddStep("release alt", () => InputManager.ReleaseKey(Key.LAlt));
+            AddStep("release ctrl", () => InputManager.ReleaseKey(Key.LControl));
         }
 
         public class EditorBeatmapContainer : Container

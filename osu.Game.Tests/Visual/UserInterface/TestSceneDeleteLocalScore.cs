@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -36,7 +37,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         private readonly ContextMenuContainer contextMenuContainer;
         private readonly BeatmapLeaderboard leaderboard;
 
-        private RulesetStore rulesetStore;
         private BeatmapManager beatmapManager;
         private ScoreManager scoreManager;
 
@@ -44,10 +44,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private BeatmapInfo beatmapInfo;
 
-        [Resolved]
-        private RealmAccess realm { get; set; }
-
-        [Cached]
+        [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay;
 
         public TestSceneDeleteLocalScore()
@@ -63,20 +60,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Anchor = Anchor.Centre,
                         Size = new Vector2(550f, 450f),
                         Scope = BeatmapLeaderboardScope.Local,
-                        BeatmapInfo = new BeatmapInfo
-                        {
-                            ID = Guid.NewGuid(),
-                            Metadata = new BeatmapMetadata
-                            {
-                                Title = "TestSong",
-                                Artist = "TestArtist",
-                                Author = new RealmUser
-                                {
-                                    Username = "TestAuthor"
-                                },
-                            },
-                            DifficultyName = "Insane"
-                        },
+                        BeatmapInfo = TestResources.CreateTestBeatmapSetInfo().Beatmaps.First()
                     }
                 },
                 dialogOverlay = new DialogOverlay()
@@ -87,11 +71,17 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RealmRulesetStore(Realm));
-            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, Scheduler));
+            dependencies.Cache(new RealmRulesetStore(Realm));
+            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
+            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, API));
             Dependencies.Cache(Realm);
 
+            return dependencies;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load() => Schedule(() =>
+        {
             var imported = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).GetResultSafely();
 
             imported?.PerformRead(s =>
@@ -110,31 +100,32 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Rank = ScoreRank.XH,
                         User = new APIUser { Username = "TestUser" },
                         Ruleset = new OsuRuleset().RulesetInfo,
+                        Files = { new RealmNamedFileUsage(new RealmFile { Hash = $"{i}" }, string.Empty) }
                     };
 
                     importedScores.Add(scoreManager.Import(score).Value);
                 }
             });
-
-            return dependencies;
-        }
-
-        [SetUp]
-        public void Setup() => Schedule(() =>
-        {
-            realm.Run(r =>
-            {
-                // Due to soft deletions, we can re-use deleted scores between test runs
-                scoreManager.Undelete(r.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
-            });
-
-            leaderboard.BeatmapInfo = beatmapInfo;
-            leaderboard.RefetchScores(); // Required in the case that the beatmap hasn't changed
         });
 
         [SetUpSteps]
         public void SetupSteps()
         {
+            AddUntilStep("ensure scores imported", () => importedScores.Count == 50);
+            AddStep("undelete scores", () =>
+            {
+                Realm.Run(r =>
+                {
+                    // Due to soft deletions, we can re-use deleted scores between test runs
+                    scoreManager.Undelete(r.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
+                });
+            });
+            AddStep("set up leaderboard", () =>
+            {
+                leaderboard.BeatmapInfo = beatmapInfo;
+                leaderboard.RefetchScores(); // Required in the case that the beatmap hasn't changed
+            });
+
             // Ensure the leaderboard items have finished showing up
             AddStep("finish transforms", () => leaderboard.FinishTransforms(true));
             AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<LeaderboardScore>().Any());
@@ -169,18 +160,21 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("click delete button", () =>
             {
                 InputManager.MoveMouseTo(dialogOverlay.ChildrenOfType<DialogButton>().First());
-                InputManager.Click(MouseButton.Left);
+                InputManager.PressButton(MouseButton.Left);
             });
 
-            AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
+            AddUntilStep("wait for fetch", () => leaderboard.Scores.Any());
             AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != scoreBeingDeleted.OnlineID));
+
+            // "Clean up"
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
         [Test]
         public void TestDeleteViaDatabase()
         {
             AddStep("delete top score", () => scoreManager.Delete(importedScores[0]));
-            AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
+            AddUntilStep("wait for fetch", () => leaderboard.Scores.Any());
             AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != importedScores[0].OnlineID));
         }
     }

@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -12,8 +10,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
-using osu.Game.Database;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Play
 {
@@ -27,124 +25,143 @@ namespace osu.Game.Screens.Play
     /// <remarks>
     /// This is intended to be used as a single controller for gameplay, or as a reference source for other <see cref="GameplayClockContainer"/>s.
     /// </remarks>
-    public class MasterGameplayClockContainer : GameplayClockContainer
+    public class MasterGameplayClockContainer : GameplayClockContainer, IBeatSyncProvider
     {
         /// <summary>
         /// Duration before gameplay start time required before skip button displays.
         /// </summary>
         public const double MINIMUM_SKIP_TIME = 1000;
 
-        protected Track Track => (Track)SourceClock;
-
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
-            Default = 1,
             MinValue = 0.5,
             MaxValue = 2,
             Precision = 0.1,
         };
 
-        private double totalAppliedOffset => userBeatmapOffsetClock.RateAdjustedOffset + userGlobalOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset;
-
-        private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
-
         private readonly WorkingBeatmap beatmap;
-        private readonly double gameplayStartTime;
-        private readonly bool startAtGameplayStart;
-        private readonly double firstHitObjectTime;
 
-        private HardwareCorrectionOffsetClock userGlobalOffsetClock;
-        private HardwareCorrectionOffsetClock userBeatmapOffsetClock;
-        private HardwareCorrectionOffsetClock platformOffsetClock;
-        private MasterGameplayClock masterGameplayClock;
-        private Bindable<double> userAudioOffset;
-        private double startOffset;
+        private readonly Track track;
 
-        private IDisposable beatmapOffsetSubscription;
+        private readonly double skipTargetTime;
+
+        /// <summary>
+        /// Stores the time at which the last <see cref="StopGameplayClock"/> call was triggered.
+        /// This is used to ensure we resume from that precise point in time, ignoring the proceeding frequency ramp.
+        ///
+        /// Optimally, we'd have gameplay ramp down with the frequency, but I believe this was intentionally disabled
+        /// to avoid fails occurring after the pause screen has been shown.
+        ///
+        /// In the future I want to change this.
+        /// </summary>
+        private double? actualStopTime;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private MusicController musicController { get; set; } = null!;
 
-        [Resolved]
-        private OsuConfigManager config { get; set; }
-
-        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
-            : base(beatmap.Track)
+        /// <summary>
+        /// Create a new master gameplay clock container.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to be used for time and metadata references.</param>
+        /// <param name="skipTargetTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
+        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double skipTargetTime)
+            : base(beatmap.Track, true)
         {
             this.beatmap = beatmap;
-            this.gameplayStartTime = gameplayStartTime;
-            this.startAtGameplayStart = startAtGameplayStart;
+            this.skipTargetTime = skipTargetTime;
 
-            firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
+            track = beatmap.Track;
+
+            StartTime = findEarliestStartTime();
         }
 
-        protected override void LoadComplete()
+        private double findEarliestStartTime()
         {
-            base.LoadComplete();
+            // here we are trying to find the time to start playback from the "zero" point.
+            // generally this is either zero, or some point earlier than zero in the case of storyboards, lead-ins etc.
 
-            userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
-            userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
+            // start with the originally provided latest time (if before zero).
+            double time = Math.Min(0, skipTargetTime);
 
-            beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
-                r => r.Find<BeatmapInfo>(beatmap.BeatmapInfo.ID)?.UserSettings,
-                settings => settings.Offset,
-                val => userBeatmapOffsetClock.Offset = val);
+            // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
+            // this is commonly used to display an intro before the audio track start.
+            double? firstStoryboardEvent = beatmap.Storyboard.EarliestEventTime;
+            if (firstStoryboardEvent != null)
+                time = Math.Min(time, firstStoryboardEvent.Value);
 
-            // sane default provided by ruleset.
-            startOffset = gameplayStartTime;
+            // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
+            // this is not available as an option in the live editor but can still be applied via .osu editing.
+            double firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
+            if (beatmap.BeatmapInfo.AudioLeadIn > 0)
+                time = Math.Min(time, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
 
-            if (!startAtGameplayStart)
-            {
-                startOffset = Math.Min(0, startOffset);
-
-                // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
-                // this is commonly used to display an intro before the audio track start.
-                double? firstStoryboardEvent = beatmap.Storyboard.EarliestEventTime;
-                if (firstStoryboardEvent != null)
-                    startOffset = Math.Min(startOffset, firstStoryboardEvent.Value);
-
-                // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
-                // this is not available as an option in the live editor but can still be applied via .osu editing.
-                if (beatmap.BeatmapInfo.AudioLeadIn > 0)
-                    startOffset = Math.Min(startOffset, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
-            }
-
-            Seek(startOffset);
+            return time;
         }
 
-        protected override void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
+        protected override void StopGameplayClock()
         {
-            // The source is stopped by a frequency fade first.
-            if (isPaused.NewValue)
+            actualStopTime = GameplayClock.CurrentTime;
+
+            if (IsLoaded)
             {
-                this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ =>
+                // During normal operation, the source is stopped after performing a frequency ramp.
+                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 0, 200, Easing.Out).OnComplete(_ =>
                 {
-                    if (IsPaused.Value == isPaused.NewValue)
-                        AdjustableSource.Stop();
+                    if (IsPaused.Value)
+                        base.StopGameplayClock();
                 });
             }
             else
-                this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
+            {
+                base.StopGameplayClock();
+
+                // If not yet loaded, we still want to ensure relevant state is correct, as it is used for offset calculations.
+                GameplayClock.ExternalPauseFrequencyAdjust.Value = 0;
+
+                // We must also process underlying gameplay clocks to update rate-adjusted offsets with the new frequency adjustment.
+                // Without doing this, an initial seek may be performed with the wrong offset.
+                GameplayClock.ProcessFrame();
+            }
         }
 
-        public override void Start()
-        {
-            addSourceClockAdjustments();
-            base.Start();
-        }
-
-        /// <summary>
-        /// Seek to a specific time in gameplay.
-        /// </summary>
-        /// <remarks>
-        /// Adjusts for any offsets which have been applied (so the seek may not be the expected point in time on the underlying audio track).
-        /// </remarks>
-        /// <param name="time">The destination time to seek to.</param>
         public override void Seek(double time)
         {
-            // remove the offset component here because most of the time we want the seek to be aligned to gameplay, not the audio track.
-            // we may want to consider reversing the application of offsets in the future as it may feel more correct.
-            base.Seek(time - totalAppliedOffset);
+            // Safety in case the clock is seeked while stopped.
+            actualStopTime = null;
+
+            base.Seek(time);
+        }
+
+        protected override void PrepareStart()
+        {
+            if (actualStopTime != null)
+            {
+                Seek(actualStopTime.Value);
+                actualStopTime = null;
+            }
+            else
+                base.PrepareStart();
+        }
+
+        protected override void StartGameplayClock()
+        {
+            addSourceClockAdjustments();
+
+            base.StartGameplayClock();
+
+            if (IsLoaded)
+            {
+                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 1, 200, Easing.In);
+            }
+            else
+            {
+                // If not yet loaded, we still want to ensure relevant state is correct, as it is used for offset calculations.
+                GameplayClock.ExternalPauseFrequencyAdjust.Value = 1;
+
+                // We must also process underlying gameplay clocks to update rate-adjusted offsets with the new frequency adjustment.
+                // Without doing this, an initial seek may be performed with the wrong offset.
+                GameplayClock.ProcessFrame();
+            }
         }
 
         /// <summary>
@@ -152,35 +169,16 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void Skip()
         {
-            if (GameplayClock.CurrentTime > gameplayStartTime - MINIMUM_SKIP_TIME)
+            if (GameplayClock.CurrentTime > skipTargetTime - MINIMUM_SKIP_TIME)
                 return;
 
-            double skipTarget = gameplayStartTime - MINIMUM_SKIP_TIME;
+            double skipTarget = skipTargetTime - MINIMUM_SKIP_TIME;
 
             if (GameplayClock.CurrentTime < 0 && skipTarget > 6000)
                 // double skip exception for storyboards with very long intros
                 skipTarget = 0;
 
             Seek(skipTarget);
-        }
-
-        public override void Reset()
-        {
-            base.Reset();
-            Seek(startOffset);
-        }
-
-        protected override GameplayClock CreateGameplayClock(IFrameBasedClock source)
-        {
-            // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
-            // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            platformOffsetClock = new HardwareCorrectionOffsetClock(source, pauseFreqAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
-
-            // the final usable gameplay clock with user-set offsets applied.
-            userGlobalOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock, pauseFreqAdjust);
-            userBeatmapOffsetClock = new HardwareCorrectionOffsetClock(userGlobalOffsetClock, pauseFreqAdjust);
-
-            return masterGameplayClock = new MasterGameplayClock(userBeatmapOffsetClock);
         }
 
         /// <summary>
@@ -200,11 +198,11 @@ namespace osu.Game.Screens.Play
             if (speedAdjustmentsApplied)
                 return;
 
-            Track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            Track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            musicController.ResetTrackAdjustments();
 
-            masterGameplayClock.MutableNonGameplayAdjustments.Add(pauseFreqAdjust);
-            masterGameplayClock.MutableNonGameplayAdjustments.Add(UserPlaybackRate);
+            track.BindAdjustments(AdjustmentsFromMods);
+            track.AddAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
         }
@@ -214,11 +212,9 @@ namespace osu.Game.Screens.Play
             if (!speedAdjustmentsApplied)
                 return;
 
-            Track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            Track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
-
-            masterGameplayClock.MutableNonGameplayAdjustments.Remove(pauseFreqAdjust);
-            masterGameplayClock.MutableNonGameplayAdjustments.Remove(UserPlaybackRate);
+            track.UnbindAdjustments(AdjustmentsFromMods);
+            track.RemoveAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
+            track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
             speedAdjustmentsApplied = false;
         }
@@ -226,65 +222,12 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            beatmapOffsetSubscription?.Dispose();
             removeSourceClockAdjustments();
         }
 
-        private class HardwareCorrectionOffsetClock : FramedOffsetClock
-        {
-            private readonly BindableDouble pauseRateAdjust;
+        ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.Beatmap.ControlPointInfo;
+        IClock IBeatSyncProvider.Clock => this;
 
-            private double offset;
-
-            public new double Offset
-            {
-                get => offset;
-                set
-                {
-                    if (value == offset)
-                        return;
-
-                    offset = value;
-
-                    updateOffset();
-                }
-            }
-
-            public double RateAdjustedOffset => base.Offset;
-
-            public HardwareCorrectionOffsetClock(IClock source, BindableDouble pauseRateAdjust)
-                : base(source)
-            {
-                this.pauseRateAdjust = pauseRateAdjust;
-            }
-
-            public override void ProcessFrame()
-            {
-                base.ProcessFrame();
-                updateOffset();
-            }
-
-            private void updateOffset()
-            {
-                // changing this during the pause transform effect will cause a potentially large offset to be suddenly applied as we approach zero rate.
-                if (pauseRateAdjust.Value == 1)
-                {
-                    // we always want to apply the same real-time offset, so it should be adjusted by the difference in playback rate (from realtime) to achieve this.
-                    base.Offset = Offset * Rate;
-                }
-            }
-        }
-
-        private class MasterGameplayClock : GameplayClock
-        {
-            public readonly List<Bindable<double>> MutableNonGameplayAdjustments = new List<Bindable<double>>();
-
-            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => MutableNonGameplayAdjustments;
-
-            public MasterGameplayClock(FramedOffsetClock underlyingClock)
-                : base(underlyingClock)
-            {
-            }
-        }
+        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
     }
 }

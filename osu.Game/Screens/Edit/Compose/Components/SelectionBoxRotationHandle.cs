@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateTooltipText()
         {
-            TooltipText = cumulativeRotation.Value?.ToLocalisableString("0.0°") ?? default(LocalisableString);
+            TooltipText = cumulativeRotation.Value?.ToLocalisableString("0.0°") ?? default;
         }
     }
 }

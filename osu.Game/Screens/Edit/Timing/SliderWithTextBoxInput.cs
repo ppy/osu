@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Globalization;
 using osu.Framework.Bindables;
@@ -11,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -33,6 +36,7 @@ namespace osu.Game.Screens.Edit.Timing
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(20),
                     Children = new Drawable[]
                     {
                         textBox = new LabelledTextBox
@@ -66,7 +70,7 @@ namespace osu.Game.Screens.Edit.Timing
                 Current.TriggerChange();
             };
 
-            Current.BindValueChanged(val =>
+            Current.BindValueChanged(_ =>
             {
                 decimal decimalValue = slider.Current.Value.ToDecimal(NumberFormatInfo.InvariantInfo);
                 textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");

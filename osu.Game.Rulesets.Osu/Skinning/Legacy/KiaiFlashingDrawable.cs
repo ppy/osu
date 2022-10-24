@@ -7,8 +7,6 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 
-#nullable enable
-
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     internal class KiaiFlashingDrawable : BeatSyncedContainer

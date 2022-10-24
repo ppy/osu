@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -41,7 +43,7 @@ namespace osu.Game.Overlays
 
         public void ShowUser(IUser user)
         {
-            if (user == APIUser.SYSTEM_USER)
+            if (user.OnlineID == APIUser.SYSTEM_USER_ID)
                 return;
 
             Show();

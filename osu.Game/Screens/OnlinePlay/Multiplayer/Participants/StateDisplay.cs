@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -23,9 +22,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
     {
         private const double fade_time = 50;
 
-        private SpriteIcon icon;
-        private OsuSpriteText text;
-        private ProgressBar progressBar;
+        private SpriteIcon icon = null!;
+        private OsuSpriteText text = null!;
+        private ProgressBar progressBar = null!;
 
         public StateDisplay()
         {
@@ -84,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             };
         }
 
-        private OsuColour colours;
+        private OsuColour colours = null!;
 
         public void UpdateStatus(MultiplayerUserState state, BeatmapAvailability availability)
         {
@@ -112,6 +111,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     break;
 
                 case MultiplayerUserState.Loaded:
+                case MultiplayerUserState.ReadyForGameplay:
                     text.Text = "loaded";
                     icon.Icon = FontAwesome.Solid.DotCircle;
                     icon.Colour = colours.YellowLight;
@@ -161,10 +161,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     break;
 
                 case DownloadState.Downloading:
-                    Debug.Assert(availability.DownloadProgress != null);
-
                     progressBar.FadeIn(fade_time);
-                    progressBar.CurrentTime = availability.DownloadProgress.Value;
+                    progressBar.CurrentTime = availability.DownloadProgress ?? 0;
 
                     text.Text = "downloading map";
                     icon.Icon = FontAwesome.Solid.ArrowAltCircleDown;

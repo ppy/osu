@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -25,7 +27,7 @@ namespace osu.Game.Tests.Chat
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            var container = new ChannelManagerContainer();
+            var container = new ChannelManagerContainer(API);
             Child = container;
             channelManager = container.ChannelManager;
         });
@@ -145,11 +147,11 @@ namespace osu.Game.Tests.Chat
         private class ChannelManagerContainer : CompositeDrawable
         {
             [Cached]
-            public ChannelManager ChannelManager { get; } = new ChannelManager();
+            public ChannelManager ChannelManager { get; }
 
-            public ChannelManagerContainer()
+            public ChannelManagerContainer(IAPIProvider apiProvider)
             {
-                InternalChild = ChannelManager;
+                InternalChild = ChannelManager = new ChannelManager(apiProvider);
             }
         }
     }

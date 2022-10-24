@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -59,7 +61,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                             c.Add(CreateHitObject().With(h =>
                             {
                                 h.HitObject.StartTime = Time.Current + 5000;
-                                h.AccentColour.Value = Color4.Orange;
                             }));
                         })
                     },

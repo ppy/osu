@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +28,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -79,14 +80,16 @@ namespace osu.Game.Screens.Menu
 
         private readonly ButtonArea buttonArea;
 
-        private readonly Button backButton;
+        private readonly MainMenuButton backButton;
 
-        private readonly List<Button> buttonsTopLevel = new List<Button>();
-        private readonly List<Button> buttonsPlay = new List<Button>();
+        private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
+        private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
 
         private Sample sampleBack;
 
         private readonly LogoTrackingContainer logoTrackingContainer;
+
+        public bool ReturnToTopOnIdle { get; set; } = true;
 
         public ButtonSystem()
         {
@@ -100,8 +103,9 @@ namespace osu.Game.Screens.Menu
 
             buttonArea.AddRange(new Drawable[]
             {
-                new Button(ButtonSystemStrings.Settings, string.Empty, FontAwesome.Solid.Cog, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
-                backButton = new Button(ButtonSystemStrings.Back, @"button-back-select", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel, -WEDGE_WIDTH)
+                new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, FontAwesome.Solid.Cog, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
+                backButton = new MainMenuButton(ButtonSystemStrings.Back, @"button-back-select", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel,
+                    -WEDGE_WIDTH)
                 {
                     VisibleState = ButtonSystemState.Play,
                 },
@@ -118,32 +122,31 @@ namespace osu.Game.Screens.Menu
         private IAPIProvider api { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private NotificationOverlay notifications { get; set; }
-
-        [Resolved(CanBeNull = true)]
         private LoginOverlay loginOverlay { get; set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
         {
-            buttonsPlay.Add(new Button(ButtonSystemStrings.Solo, @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new Button(ButtonSystemStrings.Multi, @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
-            buttonsPlay.Add(new Button(ButtonSystemStrings.Playlists, @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Solo, @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
-            buttonsTopLevel.Add(new Button(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
-            buttonsTopLevel.Add(new Button(ButtonSystemStrings.Edit, @"button-edit-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new Button(ButtonSystemStrings.Browse, @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.D));
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH,
+                Key.P));
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-edit-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0,
+                Key.D));
 
             if (host.CanExit)
-                buttonsTopLevel.Add(new Button(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
+                buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
 
             buttonArea.AddRange(buttonsPlay);
             buttonArea.AddRange(buttonsTopLevel);
 
             buttonArea.ForEach(b =>
             {
-                if (b is Button)
+                if (b is MainMenuButton)
                 {
                     b.Origin = Anchor.CentreLeft;
                     b.Anchor = Anchor.CentreLeft;
@@ -161,17 +164,7 @@ namespace osu.Game.Screens.Menu
         {
             if (api.State.Value != APIState.Online)
             {
-                notifications?.Post(new SimpleNotification
-                {
-                    Text = "You gotta be online to multi 'yo!",
-                    Icon = FontAwesome.Solid.Globe,
-                    Activated = () =>
-                    {
-                        loginOverlay?.Show();
-                        return true;
-                    }
-                });
-
+                loginOverlay?.Show();
                 return;
             }
 
@@ -182,17 +175,7 @@ namespace osu.Game.Screens.Menu
         {
             if (api.State.Value != APIState.Online)
             {
-                notifications?.Post(new SimpleNotification
-                {
-                    Text = "You gotta be online to view playlists 'yo!",
-                    Icon = FontAwesome.Solid.Globe,
-                    Activated = () =>
-                    {
-                        loginOverlay?.Show();
-                        return true;
-                    }
-                });
-
+                loginOverlay?.Show();
                 return;
             }
 
@@ -201,22 +184,53 @@ namespace osu.Game.Screens.Menu
 
         private void updateIdleState(bool isIdle)
         {
+            if (!ReturnToTopOnIdle)
+                return;
+
             if (isIdle && State != ButtonSystemState.Exit && State != ButtonSystemState.EnteringMode)
                 State = ButtonSystemState.Initial;
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
+        /// <summary>
+        /// Triggers the <see cref="logo"/> if the current <see cref="State"/> is <see cref="ButtonSystemState.Initial"/>.
+        /// </summary>
+        /// <returns><c>true</c> if the <see cref="logo"/> was triggered, <c>false</c> otherwise.</returns>
+        private bool triggerInitialOsuLogo()
         {
             if (State == ButtonSystemState.Initial)
             {
-                if (buttonsTopLevel.Any(b => e.Key == b.TriggerKey))
-                {
-                    logo?.TriggerClick();
-                    return true;
-                }
+                logo?.TriggerClick();
+                return true;
             }
 
+            return false;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed || e.SuperPressed)
+                return false;
+
+            if (triggerInitialOsuLogo())
+                return true;
+
             return base.OnKeyDown(e);
+        }
+
+        protected override bool OnJoystickPress(JoystickPressEvent e)
+        {
+            if (triggerInitialOsuLogo())
+                return true;
+
+            return base.OnJoystickPress(e);
+        }
+
+        protected override bool OnMidiDown(MidiDownEvent e)
+        {
+            if (triggerInitialOsuLogo())
+                return true;
+
+            return base.OnMidiDown(e);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -305,7 +319,7 @@ namespace osu.Game.Screens.Menu
                 {
                     buttonArea.ButtonSystemState = state;
 
-                    foreach (var b in buttonArea.Children.OfType<Button>())
+                    foreach (var b in buttonArea.Children.OfType<MainMenuButton>())
                         b.ButtonSystemState = state;
                 }
 

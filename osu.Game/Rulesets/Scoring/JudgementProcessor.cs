@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -63,6 +61,11 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
         public void ApplyResult(JudgementResult result)
         {
+#pragma warning disable CS0618
+            if (result.Type == HitResult.LegacyComboIncrease)
+                throw new ArgumentException(@$"A {nameof(HitResult.LegacyComboIncrease)} hit result cannot be applied.");
+#pragma warning restore CS0618
+
             JudgedHits++;
             lastAppliedResult = result;
 
@@ -117,9 +120,8 @@ namespace osu.Game.Rulesets.Scoring
         /// <remarks>
         /// If the provided replay frame does not have any header information, this will be a noop.
         /// </remarks>
-        /// <param name="ruleset">The ruleset to be used for retrieving statistics.</param>
         /// <param name="frame">The replay frame to read header statistics from.</param>
-        public virtual void ResetFromReplayFrame(Ruleset ruleset, ReplayFrame frame)
+        public virtual void ResetFromReplayFrame(ReplayFrame frame)
         {
             if (frame.Header == null)
                 return;

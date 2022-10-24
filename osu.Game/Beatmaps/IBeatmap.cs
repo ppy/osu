@@ -1,13 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A materialised beatmap.
+    /// Generally this interface will be implemented alongside <see cref="IBeatmap{T}"/>, which exposes the ruleset-typed hit objects.
+    /// </summary>
     public interface IBeatmap
     {
         /// <summary>
@@ -62,6 +69,9 @@ namespace osu.Game.Beatmaps
         IBeatmap Clone();
     }
 
+    /// <summary>
+    /// A materialised beatmap containing converted HitObjects.
+    /// </summary>
     public interface IBeatmap<out T> : IBeatmap
         where T : HitObject
     {
@@ -69,5 +79,28 @@ namespace osu.Game.Beatmaps
         /// The hitobjects contained by this beatmap.
         /// </summary>
         new IReadOnlyList<T> HitObjects { get; }
+    }
+
+    public static class BeatmapExtensions
+    {
+        /// <summary>
+        /// Finds the maximum achievable combo by hitting all <see cref="HitObject"/>s in a beatmap.
+        /// </summary>
+        public static int GetMaxCombo(this IBeatmap beatmap)
+        {
+            int combo = 0;
+            foreach (var h in beatmap.HitObjects)
+                addCombo(h, ref combo);
+            return combo;
+
+            static void addCombo(HitObject hitObject, ref int combo)
+            {
+                if (hitObject.CreateJudgement().MaxResult.AffectsCombo())
+                    combo++;
+
+                foreach (var nested in hitObject.NestedHitObjects)
+                    addCombo(nested, ref combo);
+            }
+        }
     }
 }

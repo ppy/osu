@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -68,6 +70,15 @@ namespace osu.Game.Graphics.UserInterface
         {
             get => slider.Current;
             set => slider.Current = value;
+        }
+
+        /// <summary>
+        /// A custom step value for each key press which actuates a change on this control.
+        /// </summary>
+        public float KeyboardStep
+        {
+            get => slider.KeyboardStep;
+            set => slider.KeyboardStep = value;
         }
 
         public BindableBool Expanded { get; } = new BindableBool();

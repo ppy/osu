@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -39,7 +37,7 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// The states of all users currently being watched.
         /// </summary>
-        public IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
+        public virtual IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
 
         /// <summary>
         /// A global list of all players currently playing.
@@ -54,24 +52,25 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// Called whenever new frames arrive from the server.
         /// </summary>
-        public event Action<int, FrameDataBundle>? OnNewFrames;
+        public virtual event Action<int, FrameDataBundle>? OnNewFrames;
 
         /// <summary>
         /// Called whenever a user starts a play session, or immediately if the user is being watched and currently in a play session.
         /// </summary>
-        public event Action<int, SpectatorState>? OnUserBeganPlaying;
+        public virtual event Action<int, SpectatorState>? OnUserBeganPlaying;
 
         /// <summary>
         /// Called whenever a user finishes a play session.
         /// </summary>
-        public event Action<int, SpectatorState>? OnUserFinishedPlaying;
+        public virtual event Action<int, SpectatorState>? OnUserFinishedPlaying;
 
         /// <summary>
-        /// All users currently being watched.
+        /// A dictionary containing all users currently being watched, with the number of watching components for each user.
         /// </summary>
-        private readonly List<int> watchedUsers = new List<int>();
+        private readonly Dictionary<int, int> watchedUsersRefCounts = new Dictionary<int, int>();
 
         private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
+
         private readonly BindableList<int> playingUsers = new BindableList<int>();
         private readonly SpectatorState currentState = new SpectatorState();
 
@@ -96,12 +95,15 @@ namespace osu.Game.Online.Spectator
                 if (connected.NewValue)
                 {
                     // get all the users that were previously being watched
-                    int[] users = watchedUsers.ToArray();
-                    watchedUsers.Clear();
+                    var users = new Dictionary<int, int>(watchedUsersRefCounts);
+                    watchedUsersRefCounts.Clear();
 
                     // resubscribe to watched users.
-                    foreach (int userId in users)
-                        WatchUser(userId);
+                    foreach ((int user, int watchers) in users)
+                    {
+                        for (int i = 0; i < watchers; i++)
+                            WatchUser(user);
+                    }
 
                     // re-send state in case it wasn't received
                     if (IsPlaying)
@@ -123,7 +125,7 @@ namespace osu.Game.Online.Spectator
                 if (!playingUsers.Contains(userId))
                     playingUsers.Add(userId);
 
-                if (watchedUsers.Contains(userId))
+                if (watchedUsersRefCounts.ContainsKey(userId))
                     watchedUserStates[userId] = state;
 
                 OnUserBeganPlaying?.Invoke(userId, state);
@@ -138,7 +140,7 @@ namespace osu.Game.Online.Spectator
             {
                 playingUsers.Remove(userId);
 
-                if (watchedUsers.Contains(userId))
+                if (watchedUsersRefCounts.ContainsKey(userId))
                     watchedUserStates[userId] = state;
 
                 OnUserFinishedPlaying?.Invoke(userId, state);
@@ -172,6 +174,7 @@ namespace osu.Game.Online.Spectator
                 currentState.RulesetID = score.ScoreInfo.RulesetID;
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
                 currentState.State = SpectatedUserState.Playing;
+                currentState.MaximumScoringValues = state.ScoreProcessor.MaximumScoringValues;
 
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
@@ -189,7 +192,10 @@ namespace osu.Game.Online.Spectator
             }
 
             if (frame is IConvertibleReplayFrame convertible)
+            {
+                Debug.Assert(currentBeatmap != null);
                 pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
+            }
 
             if (pendingFrames.Count > max_pending_frames)
                 purgePendingFrames();
@@ -202,6 +208,11 @@ namespace osu.Game.Online.Spectator
             Schedule(() =>
             {
                 if (!IsPlaying)
+                    return;
+
+                // Disposal can take some time, leading to EndPlaying potentially being called after a future play session.
+                // Account for this by ensuring the score of the current play matches the one in the provided state.
+                if (currentScore != state.Score)
                     return;
 
                 if (pendingFrames.Count > 0)
@@ -221,15 +232,17 @@ namespace osu.Game.Online.Spectator
             });
         }
 
-        public void WatchUser(int userId)
+        public virtual void WatchUser(int userId)
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            if (watchedUsers.Contains(userId))
+            if (watchedUsersRefCounts.ContainsKey(userId))
+            {
+                watchedUsersRefCounts[userId]++;
                 return;
+            }
 
-            watchedUsers.Add(userId);
-
+            watchedUsersRefCounts.Add(userId, 1);
             WatchUserInternal(userId);
         }
 
@@ -239,7 +252,13 @@ namespace osu.Game.Online.Spectator
             // Todo: This should not be a thing, but requires framework changes.
             Schedule(() =>
             {
-                watchedUsers.Remove(userId);
+                if (watchedUsersRefCounts.TryGetValue(userId, out int watchers) && watchers > 1)
+                {
+                    watchedUsersRefCounts[userId]--;
+                    return;
+                }
+
+                watchedUsersRefCounts.Remove(userId);
                 watchedUserStates.Remove(userId);
                 StopWatchingUserInternal(userId);
             });
@@ -295,17 +314,21 @@ namespace osu.Game.Online.Spectator
 
             lastSend = tcs.Task;
 
-            SendFramesInternal(bundle).ContinueWith(t => Schedule(() =>
+            SendFramesInternal(bundle).ContinueWith(t =>
             {
+                // Handle exception outside of `Schedule` to ensure it doesn't go unobserved.
                 bool wasSuccessful = t.Exception == null;
 
-                // If the last bundle send wasn't successful, try again without dequeuing.
-                if (wasSuccessful)
-                    pendingFrameBundles.Dequeue();
+                return Schedule(() =>
+                {
+                    // If the last bundle send wasn't successful, try again without dequeuing.
+                    if (wasSuccessful)
+                        pendingFrameBundles.Dequeue();
 
-                tcs.SetResult(wasSuccessful);
-                sendNextBundleIfRequired();
-            }));
+                    tcs.SetResult(wasSuccessful);
+                    sendNextBundleIfRequired();
+                });
+            });
         }
     }
 }

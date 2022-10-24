@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -22,10 +24,11 @@ namespace osu.Game.Tests.Visual.Menus
         public void TestMusicPlayAction()
         {
             AddStep("ensure playing something", () => Game.MusicController.EnsurePlayingSomething());
+            AddUntilStep("music playing", () => Game.MusicController.IsPlaying);
             AddStep("toggle playback", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPlay));
-            AddAssert("music paused", () => !Game.MusicController.IsPlaying && Game.MusicController.UserPauseRequested);
+            AddUntilStep("music paused", () => !Game.MusicController.IsPlaying && Game.MusicController.UserPauseRequested);
             AddStep("toggle playback", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPlay));
-            AddAssert("music resumed", () => Game.MusicController.IsPlaying && !Game.MusicController.UserPauseRequested);
+            AddUntilStep("music resumed", () => Game.MusicController.IsPlaying && !Game.MusicController.UserPauseRequested);
         }
 
         [Test]

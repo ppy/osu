@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -9,7 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -27,8 +29,10 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class SkinnableTestScene : OsuGridTestScene, IStorageResourceProvider
     {
+        private TrianglesSkin trianglesSkin;
         private Skin metricsSkin;
-        private Skin defaultSkin;
+        private Skin legacySkin;
+        private Skin argonSkin;
         private Skin specialSkin;
         private Skin oldSkin;
 
@@ -45,8 +49,10 @@ namespace osu.Game.Tests.Visual
         {
             var dllStore = new DllResourceStore(GetType().Assembly);
 
+            argonSkin = new ArgonSkin(this);
+            trianglesSkin = new TrianglesSkin(this);
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), this, true);
-            defaultSkin = new DefaultLegacySkin(this);
+            legacySkin = new DefaultLegacySkin(this);
             specialSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), this, true);
             oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), this, true);
         }
@@ -59,11 +65,12 @@ namespace osu.Game.Tests.Visual
 
             var beatmap = CreateBeatmapForSkinProvider();
 
-            Cell(0).Child = createProvider(null, creationFunction, beatmap);
-            Cell(1).Child = createProvider(metricsSkin, creationFunction, beatmap);
-            Cell(2).Child = createProvider(defaultSkin, creationFunction, beatmap);
-            Cell(3).Child = createProvider(specialSkin, creationFunction, beatmap);
-            Cell(4).Child = createProvider(oldSkin, creationFunction, beatmap);
+            Cell(0).Child = createProvider(argonSkin, creationFunction, beatmap);
+            Cell(1).Child = createProvider(trianglesSkin, creationFunction, beatmap);
+            Cell(2).Child = createProvider(metricsSkin, creationFunction, beatmap);
+            Cell(3).Child = createProvider(legacySkin, creationFunction, beatmap);
+            Cell(4).Child = createProvider(specialSkin, creationFunction, beatmap);
+            Cell(5).Child = createProvider(oldSkin, creationFunction, beatmap);
         }
 
         protected IEnumerable<Drawable> CreatedDrawables => createdDrawables;
@@ -74,10 +81,11 @@ namespace osu.Game.Tests.Visual
 
             createdDrawables.Add(created);
 
-            SkinProvidingContainer mainProvider;
             Container childContainer;
             OutlineBox outlineBox;
             SkinProvidingContainer skinProvider;
+
+            ISkin provider = Ruleset.Value.CreateInstance().CreateSkinTransformer(skin, beatmap) ?? skin;
 
             var children = new Container
             {
@@ -96,7 +104,7 @@ namespace osu.Game.Tests.Visual
                     },
                     new OsuSpriteText
                     {
-                        Text = skin?.SkinInfo?.Value.Name ?? "none",
+                        Text = skin.SkinInfo.Value.Name,
                         Scale = new Vector2(1.5f),
                         Padding = new MarginPadding(5),
                     },
@@ -107,12 +115,10 @@ namespace osu.Game.Tests.Visual
                         Children = new Drawable[]
                         {
                             outlineBox = new OutlineBox(),
-                            (mainProvider = new SkinProvidingContainer(skin)).WithChild(
-                                skinProvider = new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
-                                {
-                                    Child = created,
-                                }
-                            )
+                            skinProvider = new SkinProvidingContainer(provider)
+                            {
+                                Child = created,
+                            }
                         }
                     },
                 }
@@ -130,10 +136,11 @@ namespace osu.Game.Tests.Visual
             {
                 bool autoSize = created.RelativeSizeAxes == Axes.None;
 
-                foreach (var c in new[] { mainProvider, childContainer, skinProvider })
+                foreach (var c in new[] { childContainer, skinProvider })
                 {
                     c.RelativeSizeAxes = Axes.None;
                     c.AutoSizeAxes = Axes.None;
+                    c.Size = Vector2.Zero;
 
                     c.RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None;
                     c.AutoSizeAxes = autoSize ? Axes.Both : Axes.None;
@@ -155,6 +162,7 @@ namespace osu.Game.Tests.Visual
 
         #region IResourceStorageProvider
 
+        public IRenderer Renderer => host.Renderer;
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
         public new IResourceStore<byte[]> Resources => base.Resources;
@@ -187,7 +195,7 @@ namespace osu.Game.Tests.Visual
             private readonly bool extrapolateAnimations;
 
             public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, IStorageResourceProvider resources, bool extrapolateAnimations)
-                : base(skin, storage, resources, "skin.ini")
+                : base(skin, resources, storage)
             {
                 this.extrapolateAnimations = extrapolateAnimations;
             }

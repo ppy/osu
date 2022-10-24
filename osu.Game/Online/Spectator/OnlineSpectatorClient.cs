@@ -1,14 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Online.Spectator
 {
@@ -47,14 +47,30 @@ namespace osu.Game.Online.Spectator
             }
         }
 
-        protected override Task BeginPlayingInternal(SpectatorState state)
+        protected override async Task BeginPlayingInternal(SpectatorState state)
         {
             if (!IsConnected.Value)
-                return Task.CompletedTask;
+                return;
 
             Debug.Assert(connection != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), state);
+            try
+            {
+                await connection.InvokeAsync(nameof(ISpectatorServer.BeginPlaySession), state);
+            }
+            catch (Exception exception)
+            {
+                if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
+                {
+                    Debug.Assert(connector != null);
+
+                    await connector.Reconnect();
+                    await BeginPlayingInternal(state);
+                }
+
+                // Exceptions can occur if, for instance, the locally played beatmap doesn't have a server-side counterpart.
+                // For now, let's ignore these so they don't cause unobserved exceptions to appear to the user (and sentry).
+            }
         }
 
         protected override Task SendFramesInternal(FrameDataBundle bundle)
@@ -74,7 +90,7 @@ namespace osu.Game.Online.Spectator
 
             Debug.Assert(connection != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), state);
+            return connection.InvokeAsync(nameof(ISpectatorServer.EndPlaySession), state);
         }
 
         protected override Task WatchUserInternal(int userId)
@@ -84,7 +100,7 @@ namespace osu.Game.Online.Spectator
 
             Debug.Assert(connection != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
+            return connection.InvokeAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
         }
 
         protected override Task StopWatchingUserInternal(int userId)
@@ -94,7 +110,7 @@ namespace osu.Game.Online.Spectator
 
             Debug.Assert(connection != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
+            return connection.InvokeAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
         }
     }
 }

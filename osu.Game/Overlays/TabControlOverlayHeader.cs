@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -106,19 +108,7 @@ namespace osu.Game.Overlays
                 public OverlayHeaderTabItem(T value)
                     : base(value)
                 {
-                    if (!(Value is Enum enumValue))
-                        Text.Text = Value.ToString().ToLower();
-                    else
-                    {
-                        var localisableDescription = enumValue.GetLocalisableDescription();
-                        string nonLocalisableDescription = enumValue.GetDescription();
-
-                        // If localisable == non-localisable, then we must have a basic string, so .ToLower() is used.
-                        Text.Text = localisableDescription.Equals(nonLocalisableDescription)
-                            ? nonLocalisableDescription.ToLower()
-                            : localisableDescription;
-                    }
-
+                    Text.Text = value.GetLocalisableDescription().ToLower();
                     Text.Font = OsuFont.GetFont(size: 14);
                     Text.Margin = new MarginPadding { Vertical = 16.5f }; // 15px padding + 1.5px line-height difference compensation
                     Bar.Margin = new MarginPadding { Bottom = bar_height };

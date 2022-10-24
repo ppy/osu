@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
@@ -87,44 +89,46 @@ namespace osu.Game.Screens.OnlinePlay.Components
                         },
                     };
 
-                // case MatchType.TagCoop:
-                //     return new SpriteIcon
-                //     {
-                //         Anchor = Anchor.Centre,
-                //         Origin = Anchor.Centre,
-                //         Size = new Vector2(size),
-                //         Icon = FontAwesome.Solid.Sync,
-                //         Colour = colours.Blue,
-                //
-                //         Shadow = false
-                //     };
+#pragma warning disable IDE0055 // Indentation of commented code
+                    // case MatchType.TagCoop:
+                    //     return new SpriteIcon
+                    //     {
+                    //         Anchor = Anchor.Centre,
+                    //         Origin = Anchor.Centre,
+                    //         Size = new Vector2(size),
+                    //         Icon = FontAwesome.Solid.Sync,
+                    //         Colour = colours.Blue,
+                    //
+                    //         Shadow = false
+                    //     };
 
-                // case MatchType.TagTeamCoop:
-                //     return new FillFlowContainer
-                //     {
-                //         Anchor = Anchor.Centre,
-                //         Origin = Anchor.Centre,
-                //         AutoSizeAxes = Axes.Both,
-                //         Direction = FillDirection.Horizontal,
-                //         Spacing = new Vector2(2f),
-                //         Children = new[]
-                //         {
-                //             new SpriteIcon
-                //             {
-                //                 Icon = FontAwesome.Solid.Sync,
-                //                 Size = new Vector2(size * 0.75f),
-                //                 Colour = colours.Blue,
-                //                 Shadow = false,
-                //             },
-                //             new SpriteIcon
-                //             {
-                //                 Icon = FontAwesome.Solid.Sync,
-                //                 Size = new Vector2(size * 0.75f),
-                //                 Colour = colours.Pink,
-                //                 Shadow = false,
-                //             },
-                //         },
-                //     };
+                    // case MatchType.TagTeamCoop:
+                    //     return new FillFlowContainer
+                    //     {
+                    //         Anchor = Anchor.Centre,
+                    //         Origin = Anchor.Centre,
+                    //         AutoSizeAxes = Axes.Both,
+                    //         Direction = FillDirection.Horizontal,
+                    //         Spacing = new Vector2(2f),
+                    //         Children = new[]
+                    //         {
+                    //             new SpriteIcon
+                    //             {
+                    //                 Icon = FontAwesome.Solid.Sync,
+                    //                 Size = new Vector2(size * 0.75f),
+                    //                 Colour = colours.Blue,
+                    //                 Shadow = false,
+                    //             },
+                    //             new SpriteIcon
+                    //             {
+                    //                 Icon = FontAwesome.Solid.Sync,
+                    //                 Size = new Vector2(size * 0.75f),
+                    //                 Colour = colours.Pink,
+                    //                 Shadow = false,
+                    //             },
+                    //         },
+                    //     };
+#pragma warning restore IDE0055
             }
         }
 

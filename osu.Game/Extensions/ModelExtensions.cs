@@ -11,8 +11,6 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Users;
 
-#nullable enable
-
 namespace osu.Game.Extensions
 {
     public static class ModelExtensions

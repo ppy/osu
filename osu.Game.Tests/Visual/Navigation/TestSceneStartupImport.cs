@@ -11,7 +11,7 @@ namespace osu.Game.Tests.Visual.Navigation
 {
     public class TestSceneStartupImport : OsuGameTestScene
     {
-        private string importFilename;
+        private string? importFilename;
 
         protected override TestOsuGame CreateTestGame() => new TestOsuGame(LocalStorage, API, new[] { importFilename });
 

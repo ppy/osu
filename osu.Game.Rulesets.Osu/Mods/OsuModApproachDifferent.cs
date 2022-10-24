@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -16,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Approach Different";
         public override string Acronym => "AD";
-        public override string Description => "Never trust the approach circles...";
+        public override LocalisableString Description => "Never trust the approach circles...";
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon { get; } = FontAwesome.Regular.Circle;
 
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            drawable.ApplyCustomUpdateState += (drawableObject, state) =>
+            drawable.ApplyCustomUpdateState += (drawableObject, _) =>
             {
                 if (!(drawableObject is DrawableHitCircle drawableHitCircle)) return;
 

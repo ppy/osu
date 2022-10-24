@@ -1,13 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary
 {
@@ -17,8 +19,10 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
     public class SummaryTimeline : BottomBarContainer
     {
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
+            Background.Colour = colourProvider.Background6;
+
             Children = new Drawable[]
             {
                 new MarkerPart { RelativeSizeAxes = Axes.Both },
@@ -41,7 +45,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                 {
                     Name = "centre line",
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Gray5,
+                    Colour = colourProvider.Background2,
                     Children = new Drawable[]
                     {
                         new Circle

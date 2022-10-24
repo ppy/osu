@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -36,8 +38,8 @@ namespace osu.Game.Screens.OnlinePlay
             };
 
             // unnecessary to unbind these as this header has the same lifetime as the screen stack we are attaching to.
-            stack.ScreenPushed += (_, __) => updateSubScreenTitle();
-            stack.ScreenExited += (_, __) => updateSubScreenTitle();
+            stack.ScreenPushed += (_, _) => updateSubScreenTitle();
+            stack.ScreenExited += (_, _) => updateSubScreenTitle();
         }
 
         private void updateSubScreenTitle() => title.Screen = stack.CurrentScreen as IOnlinePlaySubScreen;

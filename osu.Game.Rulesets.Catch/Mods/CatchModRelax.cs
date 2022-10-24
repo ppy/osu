@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
@@ -16,19 +17,22 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
     {
-        public override string Description => @"Use the mouse to control the catcher.";
+        public override LocalisableString Description => @"Use the mouse to control the catcher.";
 
-        private DrawableRuleset<CatchHitObject> drawableRuleset;
+        private DrawableCatchRuleset drawableRuleset = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            this.drawableRuleset = drawableRuleset;
+            this.drawableRuleset = (DrawableCatchRuleset)drawableRuleset;
         }
 
         public void ApplyToPlayer(Player player)
         {
             if (!drawableRuleset.HasReplayLoaded.Value)
-                drawableRuleset.Cursor.Add(new MouseInputHelper((CatchPlayfield)drawableRuleset.Playfield));
+            {
+                var catchPlayfield = (CatchPlayfield)drawableRuleset.Playfield;
+                catchPlayfield.CatcherArea.Add(new MouseInputHelper(catchPlayfield.CatcherArea));
+            }
         }
 
         private class MouseInputHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
@@ -37,9 +41,10 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-            public MouseInputHelper(CatchPlayfield playfield)
+            public MouseInputHelper(CatcherArea catcherArea)
             {
-                catcherArea = playfield.CatcherArea;
+                this.catcherArea = catcherArea;
+
                 RelativeSizeAxes = Axes.Both;
             }
 

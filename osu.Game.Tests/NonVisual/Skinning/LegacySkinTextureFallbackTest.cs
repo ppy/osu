@@ -1,12 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Audio;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
+using osu.Game.Database;
+using osu.Game.IO;
 using osu.Game.Skinning;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace osu.Game.Tests.NonVisual.Skinning
 {
@@ -60,6 +73,34 @@ namespace osu.Game.Tests.NonVisual.Skinning
                 "Gameplay/osu/followpoint",
                 "followpoint", 1
             },
+            new object[]
+            {
+                // Looking up a filename with extension specified should work.
+                new[] { "followpoint.png" },
+                "followpoint.png",
+                "followpoint.png", 1
+            },
+            new object[]
+            {
+                // Looking up a filename with extension specified should also work with @2x sprites.
+                new[] { "followpoint@2x.png" },
+                "followpoint.png",
+                "followpoint@2x.png", 2
+            },
+            new object[]
+            {
+                // Looking up a path with extension specified should work.
+                new[] { "Gameplay/osu/followpoint.png" },
+                "Gameplay/osu/followpoint.png",
+                "Gameplay/osu/followpoint.png", 1
+            },
+            new object[]
+            {
+                // Looking up a path with extension specified should also work with @2x sprites.
+                new[] { "Gameplay/osu/followpoint@2x.png" },
+                "Gameplay/osu/followpoint.png",
+                "Gameplay/osu/followpoint@2x.png", 2
+            },
         };
 
         [TestCaseSource(nameof(fallbackTestCases))]
@@ -71,7 +112,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
             var texture = legacySkin.GetTexture(requestedComponent);
 
             Assert.IsNotNull(texture);
-            Assert.AreEqual(textureStore.Textures[expectedTexture], texture);
+            Assert.AreEqual(textureStore.Textures[expectedTexture].Width, texture.Width);
             Assert.AreEqual(expectedScale, texture.ScaleAdjust);
         }
 
@@ -88,23 +129,51 @@ namespace osu.Game.Tests.NonVisual.Skinning
 
         private class TestLegacySkin : LegacySkin
         {
-            public TestLegacySkin(TextureStore textureStore)
-                : base(new SkinInfo(), null, null, string.Empty)
+            public TestLegacySkin(IResourceStore<TextureUpload> textureStore)
+                : base(new SkinInfo(), new TestResourceProvider(textureStore), null, string.Empty)
             {
-                Textures = textureStore;
+            }
+
+            private class TestResourceProvider : IStorageResourceProvider
+            {
+                private readonly IResourceStore<TextureUpload> textureStore;
+
+                public TestResourceProvider(IResourceStore<TextureUpload> textureStore)
+                {
+                    this.textureStore = textureStore;
+                }
+
+                public IRenderer Renderer => new DummyRenderer();
+                public AudioManager AudioManager => null;
+                public IResourceStore<byte[]> Files => null;
+                public IResourceStore<byte[]> Resources => null;
+                public RealmAccess RealmAccess => null;
+                public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => textureStore;
             }
         }
 
-        private class TestTextureStore : TextureStore
+        private class TestTextureStore : IResourceStore<TextureUpload>
         {
-            public readonly Dictionary<string, Texture> Textures;
+            public readonly Dictionary<string, TextureUpload> Textures;
 
             public TestTextureStore(params string[] fileNames)
             {
-                Textures = fileNames.ToDictionary(fileName => fileName, fileName => new Texture(1, 1));
+                // use an incrementing width to allow assertion matching on correct textures as they turn from uploads into actual textures.
+                int width = 1;
+                Textures = fileNames.ToDictionary(fileName => fileName, _ => new TextureUpload(new Image<Rgba32>(width, width++)));
             }
 
-            public override Texture Get(string name, WrapMode wrapModeS, WrapMode wrapModeT) => Textures.GetValueOrDefault(name);
+            public TextureUpload Get(string name) => Textures.GetValueOrDefault(name);
+
+            public Task<TextureUpload> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken()) => Task.FromResult(Get(name));
+
+            public Stream GetStream(string name) => throw new NotImplementedException();
+
+            public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
+
+            public void Dispose()
+            {
+            }
         }
     }
 }

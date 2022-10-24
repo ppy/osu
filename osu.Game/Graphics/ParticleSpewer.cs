@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -105,10 +107,13 @@ namespace osu.Game.Graphics
                 sourceSize = Source.DrawSize;
             }
 
-            protected override void Blit(Action<TexturedVertex2D> vertexAction)
+            protected override void Blit(IRenderer renderer)
             {
                 foreach (var p in particles)
                 {
+                    if (p.Duration == 0)
+                        continue;
+
                     float timeSinceStart = currentTime - p.StartTime;
 
                     // ignore particles from the future.
@@ -131,9 +136,9 @@ namespace osu.Game.Graphics
                         transformPosition(rect.BottomRight, rect.Centre, angle)
                     );
 
-                    DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null, vertexAction,
-                        new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
-                        null, TextureCoords);
+                    renderer.DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha),
+                        inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
+                        textureCoords: TextureCoords);
                 }
             }
 

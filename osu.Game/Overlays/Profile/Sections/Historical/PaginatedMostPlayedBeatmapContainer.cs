@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,7 +21,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         public PaginatedMostPlayedBeatmapContainer(Bindable<APIUser> user)
             : base(user, UsersStrings.ShowExtraHistoricalMostPlayedTitle)
         {
-            ItemsPerPage = 5;
         }
 
         [BackgroundDependencyLoader]
@@ -30,8 +31,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         protected override int GetCount(APIUser user) => user.BeatmapPlayCountsCount;
 
-        protected override APIRequest<List<APIUserMostPlayedBeatmap>> CreateRequest() =>
-            new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
+        protected override APIRequest<List<APIUserMostPlayedBeatmap>> CreateRequest(PaginationParameters pagination) =>
+            new GetUserMostPlayedBeatmapsRequest(User.Value.Id, pagination);
 
         protected override Drawable CreateDrawableItem(APIUserMostPlayedBeatmap mostPlayed) =>
             new DrawableMostPlayedBeatmap(mostPlayed);

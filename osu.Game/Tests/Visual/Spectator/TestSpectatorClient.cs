@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -39,6 +38,7 @@ namespace osu.Game.Tests.Visual.Spectator
         private readonly Dictionary<int, ReplayFrame> lastReceivedUserFrames = new Dictionary<int, ReplayFrame>();
 
         private readonly Dictionary<int, int> userBeatmapDictionary = new Dictionary<int, int>();
+        private readonly Dictionary<int, APIMod[]> userModsDictionary = new Dictionary<int, APIMod[]>();
         private readonly Dictionary<int, int> userNextFrameDictionary = new Dictionary<int, int>();
 
         [Resolved]
@@ -54,9 +54,11 @@ namespace osu.Game.Tests.Visual.Spectator
         /// </summary>
         /// <param name="userId">The user to start play for.</param>
         /// <param name="beatmapId">The playing beatmap id.</param>
-        public void SendStartPlay(int userId, int beatmapId)
+        /// <param name="mods">The mods the user has applied.</param>
+        public void SendStartPlay(int userId, int beatmapId, APIMod[]? mods = null)
         {
             userBeatmapDictionary[userId] = beatmapId;
+            userModsDictionary[userId] = mods ?? Array.Empty<APIMod>();
             userNextFrameDictionary[userId] = 0;
             sendPlayingState(userId);
         }
@@ -75,10 +77,12 @@ namespace osu.Game.Tests.Visual.Spectator
             {
                 BeatmapID = userBeatmapDictionary[userId],
                 RulesetID = 0,
+                Mods = userModsDictionary[userId],
                 State = state
             });
 
             userBeatmapDictionary.Remove(userId);
+            userModsDictionary.Remove(userId);
         }
 
         /// <summary>
@@ -88,7 +92,8 @@ namespace osu.Game.Tests.Visual.Spectator
         /// </summary>
         /// <param name="userId">The user to send frames for.</param>
         /// <param name="count">The total number of frames to send.</param>
-        public void SendFramesFromUser(int userId, int count)
+        /// <param name="startTime">The time to start gameplay frames from.</param>
+        public void SendFramesFromUser(int userId, int count, double startTime = 0)
         {
             var frames = new List<LegacyReplayFrame>();
 
@@ -102,7 +107,7 @@ namespace osu.Game.Tests.Visual.Spectator
                     flush();
 
                 var buttonState = currentFrameIndex == lastFrameIndex ? ReplayButtonState.None : ReplayButtonState.Left1;
-                frames.Add(new LegacyReplayFrame(currentFrameIndex * 100, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
+                frames.Add(new LegacyReplayFrame(currentFrameIndex * 100 + startTime, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
             }
 
             flush();
@@ -126,6 +131,7 @@ namespace osu.Game.Tests.Visual.Spectator
             // Track the local user's playing beatmap ID.
             Debug.Assert(state.BeatmapID != null);
             userBeatmapDictionary[api.LocalUser.Value.Id] = state.BeatmapID.Value;
+            userModsDictionary[api.LocalUser.Value.Id] = state.Mods.ToArray();
 
             return ((ISpectatorClient)this).UserBeganPlaying(api.LocalUser.Value.Id, state);
         }
@@ -135,7 +141,7 @@ namespace osu.Game.Tests.Visual.Spectator
             FrameSendAttempts++;
 
             if (ShouldFailSendingFrames)
-                return Task.FromException(new InvalidOperationException());
+                return Task.FromException(new InvalidOperationException($"Intentional fail via {nameof(ShouldFailSendingFrames)}"));
 
             return ((ISpectatorClient)this).UserSentFrames(api.LocalUser.Value.Id, bundle);
         }
@@ -159,6 +165,7 @@ namespace osu.Game.Tests.Visual.Spectator
             {
                 BeatmapID = userBeatmapDictionary[userId],
                 RulesetID = 0,
+                Mods = userModsDictionary[userId],
                 State = SpectatedUserState.Playing
             });
         }

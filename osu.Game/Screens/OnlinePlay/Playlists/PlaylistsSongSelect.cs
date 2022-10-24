@@ -22,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             CreateNewItem = createNewItem
         };
 
-        protected override void SelectItem(PlaylistItem item)
+        protected override bool SelectItem(PlaylistItem item)
         {
             switch (Playlist.Count)
             {
@@ -37,6 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
 
             this.Exit();
+            return true;
         }
 
         private void createNewItem()

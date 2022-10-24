@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,6 +15,10 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
     public class TeamDisplay : DrawableTournamentTeam
     {
         private readonly TeamScore score;
+
+        private readonly TournamentSpriteTextWithBackground teamText;
+
+        private readonly Bindable<string> teamName = new Bindable<string>("???");
 
         private bool showScore;
 
@@ -91,7 +97,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                                             }
                                         }
                                     },
-                                    new TournamentSpriteTextWithBackground(team?.FullName.Value ?? "???")
+                                    teamText = new TournamentSpriteTextWithBackground
                                     {
                                         Scale = new Vector2(0.5f),
                                         Origin = anchor,
@@ -111,6 +117,11 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             updateDisplay();
             FinishTransforms(true);
+
+            if (Team != null)
+                teamName.BindTo(Team.FullName);
+
+            teamName.BindValueChanged(name => teamText.Text.Text = name.NewValue, true);
         }
 
         private void updateDisplay()

@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
-
-#nullable enable
 
 namespace osu.Game.Rulesets
 {
@@ -70,11 +68,24 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var resolvedType = Type.GetType(r.InstantiationInfo)
-                                           ?? throw new RulesetLoadException(@"Type could not be resolved");
+                        var resolvedType = Type.GetType(r.InstantiationInfo);
 
-                        var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
+                        if (resolvedType == null)
+                        {
+                            // ruleset DLL was probably deleted.
+                            r.Available = false;
+                            continue;
+                        }
+
+                        var instance = (Activator.CreateInstance(resolvedType) as Ruleset);
+                        var instanceInfo = instance?.RulesetInfo
                                            ?? throw new RulesetLoadException(@"Instantiation failure");
+
+                        if (!checkRulesetUpToDate(instance))
+                        {
+                            throw new ArgumentOutOfRangeException(nameof(instance.RulesetAPIVersionSupported),
+                                $"Ruleset API version is too old (was {instance.RulesetAPIVersionSupported}, expected {Ruleset.CURRENT_RULESET_API_VERSION})");
+                        }
 
                         // If a ruleset isn't up-to-date with the API, it could cause a crash at an arbitrary point of execution.
                         // To eagerly handle cases of missing implementations, enumerate all types here and mark as non-available on throw.
@@ -85,17 +96,52 @@ namespace osu.Game.Rulesets
                         r.InstantiationInfo = instanceInfo.InstantiationInfo;
                         r.Available = true;
 
+                        testRulesetCompatibility(r);
+
                         detachedRulesets.Add(r.Clone());
                     }
                     catch (Exception ex)
                     {
                         r.Available = false;
-                        Logger.Log($"Could not load ruleset {r}: {ex.Message}");
+                        LogFailedLoad(r.Name, ex);
                     }
                 }
 
                 availableRulesets.AddRange(detachedRulesets.OrderBy(r => r));
             });
+        }
+
+        private bool checkRulesetUpToDate(Ruleset instance)
+        {
+            switch (instance.RulesetAPIVersionSupported)
+            {
+                // The default `virtual` implementation leaves the version string empty.
+                // Consider rulesets which haven't override the version as up-to-date for now.
+                // At some point (once ruleset devs add versioning), we'll probably want to disallow this for deployed builds.
+                case @"":
+                // Ruleset is up-to-date, all good.
+                case Ruleset.CURRENT_RULESET_API_VERSION:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        private void testRulesetCompatibility(RulesetInfo rulesetInfo)
+        {
+            // do various operations to ensure that we are in a good state.
+            // if we can avoid loading the ruleset at this point (rather than erroring later in runtime) then that is preferred.
+            var instance = rulesetInfo.CreateInstance();
+
+            instance.CreateAllMods();
+            instance.CreateIcon();
+            instance.CreateResourceStore();
+
+            var beatmap = new Beatmap();
+            var converter = instance.CreateBeatmapConverter(beatmap);
+
+            instance.CreateBeatmapProcessor(converter.Convert());
         }
     }
 }

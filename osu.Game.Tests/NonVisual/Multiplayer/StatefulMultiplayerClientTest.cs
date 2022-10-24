@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using Humanizer;
 using NUnit.Framework;
@@ -22,7 +24,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             var user = new APIUser { Id = 33 };
 
             AddRepeatStep("add user multiple times", () => MultiplayerClient.AddUser(user), 3);
-            AddAssert("room has 2 users", () => MultiplayerClient.Room?.Users.Count == 2);
+            AddUntilStep("room has 2 users", () => MultiplayerClient.ClientRoom?.Users.Count == 2);
         }
 
         [Test]
@@ -31,10 +33,10 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             var user = new APIUser { Id = 44 };
 
             AddStep("add user", () => MultiplayerClient.AddUser(user));
-            AddAssert("room has 2 users", () => MultiplayerClient.Room?.Users.Count == 2);
+            AddUntilStep("room has 2 users", () => MultiplayerClient.ClientRoom?.Users.Count == 2);
 
-            AddRepeatStep("remove user multiple times", () => MultiplayerClient.RemoveUser(user), 3);
-            AddAssert("room has 1 user", () => MultiplayerClient.Room?.Users.Count == 1);
+            AddStep("remove user", () => MultiplayerClient.RemoveUser(user));
+            AddUntilStep("room has 1 user", () => MultiplayerClient.ClientRoom?.Users.Count == 1);
         }
 
         [Test]
@@ -57,7 +59,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             changeState(6, MultiplayerUserState.WaitingForLoad);
             checkPlayingUserCount(6);
 
-            AddStep("another user left", () => MultiplayerClient.RemoveUser((MultiplayerClient.Room?.Users.Last().User).AsNonNull()));
+            AddStep("another user left", () => MultiplayerClient.RemoveUser((MultiplayerClient.ServerRoom?.Users.Last().User).AsNonNull()));
             checkPlayingUserCount(5);
 
             AddStep("leave room", () => MultiplayerClient.LeaveRoom());
@@ -101,7 +103,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             {
                 for (int i = 0; i < userCount; ++i)
                 {
-                    int userId = MultiplayerClient.Room?.Users[i].UserID ?? throw new AssertionException("Room cannot be null!");
+                    int userId = MultiplayerClient.ServerRoom?.Users[i].UserID ?? throw new AssertionException("Room cannot be null!");
                     MultiplayerClient.ChangeUserState(userId, state);
                 }
             });

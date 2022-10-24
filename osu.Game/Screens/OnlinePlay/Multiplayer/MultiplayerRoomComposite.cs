@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Game.Online.Multiplayer;
@@ -21,6 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             Client.RoomUpdated += invokeOnRoomUpdated;
+            Client.LoadRequested += invokeOnRoomLoadRequested;
             Client.UserLeft += invokeUserLeft;
             Client.UserKicked += invokeUserKicked;
             Client.UserJoined += invokeUserJoined;
@@ -38,6 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void invokeItemAdded(MultiplayerPlaylistItem item) => Schedule(() => PlaylistItemAdded(item));
         private void invokeItemRemoved(long item) => Schedule(() => PlaylistItemRemoved(item));
         private void invokeItemChanged(MultiplayerPlaylistItem item) => Schedule(() => PlaylistItemChanged(item));
+        private void invokeOnRoomLoadRequested() => Scheduler.AddOnce(OnRoomLoadRequested);
 
         /// <summary>
         /// Invoked when a user has joined the room.
@@ -94,11 +98,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
         }
 
+        /// <summary>
+        /// Invoked when the room requests the local user to load into gameplay.
+        /// </summary>
+        protected virtual void OnRoomLoadRequested()
+        {
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             if (Client != null)
             {
                 Client.RoomUpdated -= invokeOnRoomUpdated;
+                Client.LoadRequested -= invokeOnRoomLoadRequested;
                 Client.UserLeft -= invokeUserLeft;
                 Client.UserKicked -= invokeUserKicked;
                 Client.UserJoined -= invokeUserJoined;

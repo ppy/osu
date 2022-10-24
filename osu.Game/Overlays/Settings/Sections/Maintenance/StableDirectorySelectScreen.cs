@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,10 +32,10 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             this.Exit();
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             taskCompletionSource.TrySetCanceled();
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
     }
 }

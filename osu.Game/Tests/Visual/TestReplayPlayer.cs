@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -40,7 +42,7 @@ namespace osu.Game.Tests.Visual
         /// Instantiate a replay player that renders an autoplay mod.
         /// </summary>
         public TestReplayPlayer(bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)
-            : base((beatmap, mods) => mods.OfType<ModAutoplay>().First().CreateReplayScore(beatmap, mods), new PlayerConfiguration
+            : base((beatmap, mods) => mods.OfType<ModAutoplay>().First().CreateScoreFromReplayData(beatmap, mods), new PlayerConfiguration
             {
                 AllowPause = allowPause,
                 ShowResults = showResults

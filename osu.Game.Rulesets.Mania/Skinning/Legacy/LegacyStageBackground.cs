@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,20 +18,17 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public class LegacyStageBackground : CompositeDrawable
     {
-        private readonly StageDefinition stageDefinition;
-
         private Drawable leftSprite;
         private Drawable rightSprite;
         private ColumnFlow<Drawable> columnBackgrounds;
 
-        public LegacyStageBackground(StageDefinition stageDefinition)
+        public LegacyStageBackground()
         {
-            this.stageDefinition = stageDefinition;
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load(ISkinSource skin, StageDefinition stageDefinition)
         {
             string leftImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.LeftStageImage)?.Value
                                ?? "mania-stage-left";

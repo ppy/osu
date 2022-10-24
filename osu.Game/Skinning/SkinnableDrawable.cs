@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
@@ -31,7 +33,7 @@ namespace osu.Game.Skinning
             set => base.AutoSizeAxes = value;
         }
 
-        private readonly ISkinComponent component;
+        protected readonly ISkinComponent Component;
 
         private readonly ConfineMode confineMode;
 
@@ -49,7 +51,7 @@ namespace osu.Game.Skinning
 
         protected SkinnableDrawable(ISkinComponent component, ConfineMode confineMode = ConfineMode.NoScaling)
         {
-            this.component = component;
+            Component = component;
             this.confineMode = confineMode;
 
             RelativeSizeAxes = Axes.Both;
@@ -75,13 +77,13 @@ namespace osu.Game.Skinning
 
         protected override void SkinChanged(ISkinSource skin)
         {
-            Drawable = skin.GetDrawableComponent(component);
+            Drawable = skin.GetDrawableComponent(Component);
 
             isDefault = false;
 
             if (Drawable == null)
             {
-                Drawable = CreateDefault(component);
+                Drawable = CreateDefault(Component);
                 isDefault = true;
             }
 

@@ -3,12 +3,14 @@
 
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osuTK;
 
 namespace osu.Game.Updater
 {
@@ -25,13 +27,13 @@ namespace osu.Game.Updater
                                          GetType() != typeof(UpdateManager);
 
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
         [Resolved]
-        private OsuGameBase game { get; set; }
+        private OsuGameBase game { get; set; } = null!;
 
         [Resolved]
-        protected NotificationOverlay Notifications { get; private set; }
+        protected INotificationOverlay Notifications { get; private set; } = null!;
 
         protected override void LoadComplete()
         {
@@ -57,7 +59,7 @@ namespace osu.Game.Updater
 
         private readonly object updateTaskLock = new object();
 
-        private Task<bool> updateCheckTask;
+        private Task<bool>? updateCheckTask;
 
         public async Task<bool> CheckForUpdateAsync()
         {
@@ -94,10 +96,10 @@ namespace osu.Game.Updater
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChangelogOverlay changelog, NotificationOverlay notificationOverlay)
+            private void load(OsuColour colours, ChangelogOverlay changelog, INotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.CheckSquare;
-                IconBackground.Colour = colours.BlueDark;
+                IconContent.Colour = colours.BlueDark;
 
                 Activated = delegate
                 {
@@ -105,6 +107,78 @@ namespace osu.Game.Updater
                     changelog.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
                     return true;
                 };
+            }
+        }
+
+        public class UpdateApplicationCompleteNotification : ProgressCompletionNotification
+        {
+            public UpdateApplicationCompleteNotification()
+            {
+                Text = @"Update ready to install. Click to restart!";
+            }
+        }
+
+        public class UpdateProgressNotification : ProgressNotification
+        {
+            protected override Notification CreateCompletionNotification() => new UpdateApplicationCompleteNotification
+            {
+                Activated = CompletionClickAction
+            };
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                IconContent.AddRange(new Drawable[]
+                {
+                    new SpriteIcon
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Icon = FontAwesome.Solid.Upload,
+                        Size = new Vector2(34),
+                        Colour = OsuColour.Gray(0.2f),
+                        Depth = float.MaxValue,
+                    }
+                });
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                StartDownload();
+            }
+
+            public override void Close(bool runFlingAnimation)
+            {
+                // cancelling updates is not currently supported by the underlying updater.
+                // only allow dismissing for now.
+
+                switch (State)
+                {
+                    case ProgressNotificationState.Cancelled:
+                    case ProgressNotificationState.Completed:
+                        base.Close(runFlingAnimation);
+                        break;
+                }
+            }
+
+            public void StartDownload()
+            {
+                State = ProgressNotificationState.Active;
+                Progress = 0;
+                Text = @"Downloading update...";
+            }
+
+            public void StartInstall()
+            {
+                Progress = 0;
+                Text = @"Installing update...";
+            }
+
+            public void FailDownload()
+            {
+                State = ProgressNotificationState.Cancelled;
+                Close(false);
             }
         }
     }

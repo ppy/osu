@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -24,6 +26,8 @@ namespace osu.Game.Overlays
 {
     public class OverlaySortTabControl<T> : CompositeDrawable, IHasCurrentValue<T>
     {
+        public TabControl<T> TabControl { get; }
+
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
         public Bindable<T> Current
@@ -57,7 +61,7 @@ namespace osu.Game.Overlays
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                         Text = SortStrings.Default
                     },
-                    CreateControl().With(c =>
+                    TabControl = CreateControl().With(c =>
                     {
                         c.Anchor = Anchor.CentreLeft;
                         c.Origin = Anchor.CentreLeft;
@@ -149,7 +153,7 @@ namespace osu.Game.Overlays
                     }
                 });
 
-                AddInternal(new HoverClickSounds());
+                AddInternal(new HoverClickSounds(HoverSampleSet.TabSelect));
             }
 
             protected override void LoadComplete()

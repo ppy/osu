@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,8 +21,8 @@ namespace osu.Game.Screens.Play.HUD
         private const float bar_height = 18;
         private const float font_size = 50;
 
-        public BindableInt Team1Score = new BindableInt();
-        public BindableInt Team2Score = new BindableInt();
+        public BindableLong Team1Score = new BindableLong();
+        public BindableLong Team2Score = new BindableLong();
 
         protected MatchScoreCounter Score1Text;
         protected MatchScoreCounter Score2Text;
@@ -133,7 +135,7 @@ namespace osu.Game.Screens.Play.HUD
             var winningBar = Team1Score.Value > Team2Score.Value ? score1Bar : score2Bar;
             var losingBar = Team1Score.Value <= Team2Score.Value ? score1Bar : score2Bar;
 
-            int diff = Math.Max(Team1Score.Value, Team2Score.Value) - Math.Min(Team1Score.Value, Team2Score.Value);
+            long diff = Math.Max(Team1Score.Value, Team2Score.Value) - Math.Min(Team1Score.Value, Team2Score.Value);
 
             losingBar.ResizeWidthTo(0, 400, Easing.OutQuint);
             winningBar.ResizeWidthTo(Math.Min(0.4f, MathF.Pow(diff / 1500000f, 0.5f) / 2), 400, Easing.OutQuint);

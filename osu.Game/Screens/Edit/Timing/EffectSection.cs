@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -31,18 +33,33 @@ namespace osu.Game.Screens.Edit.Timing
             });
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            kiai.Current.BindValueChanged(_ => saveChanges());
+            omitBarLine.Current.BindValueChanged(_ => saveChanges());
+            scrollSpeedSlider.Current.BindValueChanged(_ => saveChanges());
+
+            void saveChanges()
+            {
+                if (!isRebinding) ChangeHandler?.SaveState();
+            }
+        }
+
+        private bool isRebinding;
+
         protected override void OnControlPointChanged(ValueChangedEvent<EffectControlPoint> point)
         {
             if (point.NewValue != null)
             {
+                isRebinding = true;
+
                 kiai.Current = point.NewValue.KiaiModeBindable;
-                kiai.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
-
                 omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
-                omitBarLine.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
-
                 scrollSpeedSlider.Current = point.NewValue.ScrollSpeedBindable;
-                scrollSpeedSlider.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+
+                isRebinding = false;
             }
         }
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -38,17 +40,16 @@ namespace osu.Game.Screens
 
         public virtual bool AllowExternalScreenChange => false;
 
-        /// <summary>
-        /// Whether all overlays should be hidden when this screen is entered or resumed.
-        /// </summary>
         public virtual bool HideOverlaysOnEnter => false;
+
+        public virtual bool HideMenuCursorOnNonMouseInput => false;
 
         /// <summary>
         /// The initial overlay activation mode to use when this screen is entered for the first time.
         /// </summary>
         protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
-        protected readonly Bindable<OverlayActivation> OverlayActivationMode;
+        public readonly Bindable<OverlayActivation> OverlayActivationMode;
 
         IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
 
@@ -77,7 +78,7 @@ namespace osu.Game.Screens
 
         private Sample sampleExit;
 
-        protected virtual bool PlayResumeSound => true;
+        protected virtual bool PlayExitSound => true;
 
         public virtual float BackgroundParallaxAmount => 1;
 
@@ -171,11 +172,8 @@ namespace osu.Game.Screens
             background.ApplyToBackground(action);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            if (PlayResumeSound)
-                sampleExit?.Play();
-
             applyArrivingDefaults(true);
 
             // it's feasible to resume to a screen if the target screen never loaded successfully.
@@ -183,19 +181,19 @@ namespace osu.Game.Screens
             if (trackAdjustmentStateAtSuspend != null)
                 musicController.AllowTrackAdjustments = trackAdjustmentStateAtSuspend.Value;
 
-            base.OnResuming(last);
+            base.OnResuming(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
 
             trackAdjustmentStateAtSuspend = musicController.AllowTrackAdjustments;
 
             onSuspendingLogo();
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
             applyArrivingDefaults(false);
 
@@ -210,15 +208,18 @@ namespace osu.Game.Screens
             }
 
             background = backgroundStack?.CurrentScreen as BackgroundScreen;
-            base.OnEntering(last);
+            base.OnEntering(e);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
+            if (ValidForResume && PlayExitSound)
+                sampleExit?.Play();
+
             if (ValidForResume && logo != null)
                 onExitingLogo();
 
-            if (base.OnExiting(next))
+            if (base.OnExiting(e))
                 return true;
 
             if (ownedBackground != null && backgroundStack?.CurrentScreen == ownedBackground)

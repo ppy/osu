@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.ComponentModel;
 
 namespace osu.Game.Graphics.UserInterface
@@ -10,11 +12,11 @@ namespace osu.Game.Graphics.UserInterface
         [Description("default")]
         Default,
 
-        [Description("submit")]
-        Submit,
-
         [Description("button")]
         Button,
+
+        [Description("button-sidebar")]
+        ButtonSidebar,
 
         [Description("toolbar")]
         Toolbar,
@@ -23,6 +25,12 @@ namespace osu.Game.Graphics.UserInterface
         TabSelect,
 
         [Description("scrolltotop")]
-        ScrollToTop
+        ScrollToTop,
+
+        [Description("dialog-cancel")]
+        DialogCancel,
+
+        [Description("dialog-ok")]
+        DialogOk
     }
 }

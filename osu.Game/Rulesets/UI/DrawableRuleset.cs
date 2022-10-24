@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +30,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI
@@ -36,7 +39,7 @@ namespace osu.Game.Rulesets.UI
     /// Displays an interactive ruleset gameplay instance.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
-    public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
+    public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachHUDPieces
         where TObject : HitObject
     {
         public override event Action<JudgementResult> NewResult;
@@ -65,7 +68,7 @@ namespace osu.Game.Rulesets.UI
 
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        public override IFrameStableClock FrameStableClock => frameStabilityContainer.FrameStableClock;
+        public override IFrameStableClock FrameStableClock => frameStabilityContainer;
 
         private bool frameStablePlayback = true;
 
@@ -133,6 +136,11 @@ namespace osu.Game.Rulesets.UI
                 p.NewResult += (_, r) => NewResult?.Invoke(r);
                 p.RevertResult += (_, r) => RevertResult?.Invoke(r);
             }));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             IsPaused.ValueChanged += paused =>
             {
@@ -331,7 +339,10 @@ namespace osu.Game.Rulesets.UI
         public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
         public void Attach(KeyCounterDisplay keyCounter) =>
-            (KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(keyCounter);
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(keyCounter);
+
+        public void Attach(ClicksPerSecondCalculator calculator) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(calculator);
 
         /// <summary>
         /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.
@@ -488,6 +499,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor being displayed by the <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
+        [CanBeNull]
         public abstract GameplayCursorContainer Cursor { get; }
 
         /// <summary>

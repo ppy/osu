@@ -20,7 +20,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
+using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.OSD;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
@@ -29,7 +35,7 @@ namespace osu.Game.Overlays.Comments
     {
         private const int avatar_size = 40;
 
-        public Action<DrawableComment, int> RepliesRequested;
+        public Action<DrawableComment, int> RepliesRequested = null!;
 
         public readonly Comment Comment;
 
@@ -43,13 +49,35 @@ namespace osu.Game.Overlays.Comments
 
         private int currentPage;
 
-        private FillFlowContainer childCommentsVisibilityContainer;
-        private FillFlowContainer childCommentsContainer;
-        private LoadRepliesButton loadRepliesButton;
-        private ShowMoreRepliesButton showMoreButton;
-        private ShowRepliesButton showRepliesButton;
-        private ChevronButton chevronButton;
-        private DeletedCommentsCounter deletedCommentsCounter;
+        /// <summary>
+        /// Local field for tracking comment state. Initialized from Comment.IsDeleted, may change when deleting was requested by user.
+        /// </summary>
+        public bool WasDeleted { get; protected set; }
+
+        private FillFlowContainer childCommentsVisibilityContainer = null!;
+        private FillFlowContainer childCommentsContainer = null!;
+        private LoadRepliesButton loadRepliesButton = null!;
+        private ShowMoreRepliesButton showMoreButton = null!;
+        private ShowRepliesButton showRepliesButton = null!;
+        private ChevronButton chevronButton = null!;
+        private LinkFlowContainer actionsContainer = null!;
+        private LoadingSpinner actionsLoading = null!;
+        private DeletedCommentsCounter deletedCommentsCounter = null!;
+        private OsuSpriteText deletedLabel = null!;
+        private GridContainer content = null!;
+        private VotePill votePill = null!;
+
+        [Resolved(canBeNull: true)]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private GameHost host { get; set; } = null!;
+
+        [Resolved(canBeNull: true)]
+        private OnScreenDisplay? onScreenDisplay { get; set; }
 
         public DrawableComment(Comment comment)
         {
@@ -62,8 +90,6 @@ namespace osu.Game.Overlays.Comments
             LinkFlowContainer username;
             FillFlowContainer info;
             CommentMarkdownContainer message;
-            GridContainer content;
-            VotePill votePill;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -146,11 +172,11 @@ namespace osu.Game.Overlays.Comments
                                                         },
                                                         Comment.Pinned ? new PinnedCommentNotice() : Empty(),
                                                         new ParentUsername(Comment),
-                                                        new OsuSpriteText
+                                                        deletedLabel = new OsuSpriteText
                                                         {
-                                                            Alpha = Comment.IsDeleted ? 1 : 0,
+                                                            Alpha = 0f,
                                                             Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                                            Text = "deleted"
+                                                            Text = CommentsStrings.Deleted
                                                         }
                                                     }
                                                 },
@@ -161,16 +187,36 @@ namespace osu.Game.Overlays.Comments
                                                     DocumentMargin = new MarginPadding(0),
                                                     DocumentPadding = new MarginPadding(0),
                                                 },
-                                                info = new FillFlowContainer
+                                                new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10, 0),
                                                     Children = new Drawable[]
                                                     {
-                                                        new DrawableDate(Comment.CreatedAt, 12, false)
+                                                        info = new FillFlowContainer
                                                         {
-                                                            Colour = colourProvider.Foreground1
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Direction = FillDirection.Horizontal,
+                                                            Spacing = new Vector2(10, 0),
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new DrawableDate(Comment.CreatedAt, 12, false)
+                                                                {
+                                                                    Colour = colourProvider.Foreground1
+                                                                }
+                                                            }
+                                                        },
+                                                        actionsContainer = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold))
+                                                        {
+                                                            Name = @"Actions buttons",
+                                                            AutoSizeAxes = Axes.Both,
+                                                        },
+                                                        actionsLoading = new LoadingSpinner
+                                                        {
+                                                            Size = new Vector2(12f),
+                                                            Anchor = Anchor.TopLeft,
+                                                            Origin = Anchor.TopLeft
                                                         }
                                                     }
                                                 },
@@ -244,9 +290,9 @@ namespace osu.Game.Overlays.Comments
             if (Comment.UserId.HasValue)
                 username.AddUserLink(Comment.User);
             else
-                username.AddText(Comment.LegacyName);
+                username.AddText(Comment.LegacyName!);
 
-            if (Comment.EditedAt.HasValue)
+            if (Comment.EditedAt.HasValue && Comment.EditedUser != null)
             {
                 var font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
                 var colour = colourProvider.Foreground1;
@@ -280,10 +326,16 @@ namespace osu.Game.Overlays.Comments
             if (Comment.HasMessage)
                 message.Text = Comment.Message;
 
-            if (Comment.IsDeleted)
+            WasDeleted = Comment.IsDeleted;
+            if (WasDeleted)
+                makeDeleted();
+
+            actionsContainer.AddLink("Copy link", copyUrl);
+            actionsContainer.AddArbitraryDrawable(new Container { Width = 10 });
+
+            if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
             {
-                content.FadeColour(OsuColour.Gray(0.5f));
-                votePill.Hide();
+                actionsContainer.AddLink("Delete", deleteComment);
             }
 
             if (Comment.IsTopLevel)
@@ -315,11 +367,63 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
+        /// <summary>
+        /// Transforms some comment's components to show it as deleted. Invoked both from loading and deleting.
+        /// </summary>
+        private void makeDeleted()
+        {
+            deletedLabel.Show();
+            content.FadeColour(OsuColour.Gray(0.5f));
+            votePill.Hide();
+            actionsContainer.Expire();
+        }
+
+        /// <summary>
+        /// Invokes comment deletion with confirmation.
+        /// </summary>
+        private void deleteComment()
+        {
+            if (dialogOverlay == null)
+                deleteCommentRequest();
+            else
+                dialogOverlay.Push(new ConfirmDialog("Do you really want to delete your comment?", deleteCommentRequest));
+        }
+
+        /// <summary>
+        /// Invokes comment deletion directly.
+        /// </summary>
+        private void deleteCommentRequest()
+        {
+            actionsContainer.Hide();
+            actionsLoading.Show();
+            var request = new CommentDeleteRequest(Comment.Id);
+            request.Success += _ => Schedule(() =>
+            {
+                actionsLoading.Hide();
+                makeDeleted();
+                WasDeleted = true;
+                if (!ShowDeleted.Value)
+                    Hide();
+            });
+            request.Failure += _ => Schedule(() =>
+            {
+                actionsLoading.Hide();
+                actionsContainer.Show();
+            });
+            api.Queue(request);
+        }
+
+        private void copyUrl()
+        {
+            host.GetClipboard()?.SetText($@"{api.APIEndpointUrl}/comments/{Comment.Id}");
+            onScreenDisplay?.Display(new CopyUrlToast());
+        }
+
         protected override void LoadComplete()
         {
             ShowDeleted.BindValueChanged(show =>
             {
-                if (Comment.IsDeleted)
+                if (WasDeleted)
                     this.FadeTo(show.NewValue ? 1 : 0);
             }, true);
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
@@ -423,7 +527,7 @@ namespace osu.Game.Overlays.Comments
         {
             public LocalisableString TooltipText => getParentMessage();
 
-            private readonly Comment parentComment;
+            private readonly Comment? parentComment;
 
             public ParentUsername(Comment comment)
             {
@@ -443,7 +547,7 @@ namespace osu.Game.Overlays.Comments
                     new OsuSpriteText
                     {
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                        Text = parentComment?.User?.Username ?? parentComment?.LegacyName
+                        Text = parentComment?.User?.Username ?? parentComment?.LegacyName!
                     }
                 };
             }

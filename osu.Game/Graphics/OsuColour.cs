@@ -1,9 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -99,26 +102,31 @@ namespace osu.Game.Graphics
         /// <summary>
         /// Retrieves the colour for a <see cref="HitResult"/>.
         /// </summary>
-        public Color4 ForHitResult(HitResult judgement)
+        public Color4 ForHitResult(HitResult result)
         {
-            switch (judgement)
+            switch (result)
             {
-                case HitResult.Perfect:
-                case HitResult.Great:
-                    return Blue;
-
-                case HitResult.Ok:
-                case HitResult.Good:
-                    return Green;
+                case HitResult.SmallTickMiss:
+                case HitResult.LargeTickMiss:
+                case HitResult.Miss:
+                    return Red;
 
                 case HitResult.Meh:
                     return Yellow;
 
-                case HitResult.Miss:
-                    return Red;
+                case HitResult.Ok:
+                    return Green;
+
+                case HitResult.Good:
+                    return GreenLight;
+
+                case HitResult.SmallTickHit:
+                case HitResult.LargeTickHit:
+                case HitResult.Great:
+                    return Blue;
 
                 default:
-                    return Color4.White;
+                    return BlueLight;
             }
         }
 
@@ -134,6 +142,9 @@ namespace osu.Game.Graphics
         {
             switch (status)
             {
+                case BeatmapOnlineStatus.LocallyModified:
+                    return Color4.OrangeRed;
+
                 case BeatmapOnlineStatus.Ranked:
                 case BeatmapOnlineStatus.Approved:
                     return Color4Extensions.FromHex(@"b3ff66");
@@ -185,6 +196,24 @@ namespace osu.Game.Graphics
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(modType), modType, "Unknown mod type");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the main accent colour for a <see cref="RoomCategory"/>.
+        /// </summary>
+        public Color4? ForRoomCategory(RoomCategory roomCategory)
+        {
+            switch (roomCategory)
+            {
+                case RoomCategory.Spotlight:
+                    return SpotlightColour;
+
+                case RoomCategory.FeaturedArtist:
+                    return FeaturedArtistColour;
+
+                default:
+                    return null;
             }
         }
 
@@ -360,5 +389,8 @@ namespace osu.Game.Graphics
         public readonly Color4 ChatBlue = Color4Extensions.FromHex(@"17292e");
 
         public readonly Color4 ContextMenuGray = Color4Extensions.FromHex(@"223034");
+
+        public Color4 SpotlightColour => Green2;
+        public Color4 FeaturedArtistColour => Blue2;
     }
 }

@@ -1,13 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Legacy;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens
 {
@@ -37,7 +39,7 @@ namespace osu.Game.Tournament.Screens
             SongBar.Mods = mods.NewValue;
         }
 
-        private void beatmapChanged(ValueChangedEvent<APIBeatmap> beatmap)
+        private void beatmapChanged(ValueChangedEvent<TournamentBeatmap> beatmap)
         {
             SongBar.FadeInFromZero(300, Easing.OutQuint);
             SongBar.Beatmap = beatmap.NewValue;
