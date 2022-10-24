@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Linq;
+using Markdig.Extensions.CustomContainers;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
@@ -15,6 +16,9 @@ namespace osu.Game.Overlays.Wiki.Markdown
 {
     public class WikiMarkdownContainer : OsuMarkdownContainer
     {
+        protected override bool Footnotes => true;
+        protected override bool CustomContainers => true;
+
         public string CurrentPath
         {
             set => DocumentUrl = value;
@@ -24,6 +28,11 @@ namespace osu.Game.Overlays.Wiki.Markdown
         {
             switch (markdownObject)
             {
+                case CustomContainer:
+                    // infoboxes are parsed into CustomContainer objects, but we don't have support for infoboxes yet.
+                    // todo: add support for infobox.
+                    break;
+
                 case YamlFrontMatterBlock yamlFrontMatterBlock:
                     container.Add(new WikiNoticeContainer(yamlFrontMatterBlock));
                     break;

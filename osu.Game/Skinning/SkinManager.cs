@@ -39,6 +39,11 @@ namespace osu.Game.Skinning
     [ExcludeFromDynamicCompile]
     public class SkinManager : ModelManager<SkinInfo>, ISkinSource, IStorageResourceProvider, IModelImporter<SkinInfo>
     {
+        /// <summary>
+        /// The default "classic" skin.
+        /// </summary>
+        public Skin DefaultClassicSkin { get; }
+
         private readonly AudioManager audio;
 
         private readonly Scheduler scheduler;
@@ -49,24 +54,15 @@ namespace osu.Game.Skinning
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
 
-        public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged())
-        {
-            Default = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged()
-        };
+        public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(ArgonSkin.CreateInfo().ToLiveUnmanaged());
 
         private readonly SkinImporter skinImporter;
 
         private readonly IResourceStore<byte[]> userFiles;
 
-        /// <summary>
-        /// The default skin.
-        /// </summary>
-        public Skin DefaultSkin { get; }
+        private Skin argonSkin { get; }
 
-        /// <summary>
-        /// The default legacy skin.
-        /// </summary>
-        public Skin DefaultLegacySkin { get; }
+        private Skin trianglesSkin { get; }
 
         public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
             : base(storage, realm)
@@ -85,8 +81,9 @@ namespace osu.Game.Skinning
 
             var defaultSkins = new[]
             {
-                DefaultLegacySkin = new DefaultLegacySkin(this),
-                DefaultSkin = new DefaultSkin(this),
+                DefaultClassicSkin = new DefaultLegacySkin(this),
+                trianglesSkin = new TrianglesSkin(this),
+                argonSkin = new ArgonSkin(this),
             };
 
             // Ensure the default entries are present.
@@ -104,7 +101,7 @@ namespace osu.Game.Skinning
                 CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
             };
 
-            CurrentSkin.Value = DefaultSkin;
+            CurrentSkin.Value = argonSkin;
             CurrentSkin.ValueChanged += skin =>
             {
                 if (!skin.NewValue.SkinInfo.Equals(CurrentSkinInfo.Value))
@@ -119,11 +116,13 @@ namespace osu.Game.Skinning
             Realm.Run(r =>
             {
                 // choose from only user skins, removing the current selection to ensure a new one is chosen.
-                var randomChoices = r.All<SkinInfo>().Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
+                var randomChoices = r.All<SkinInfo>()
+                                     .Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID)
+                                     .ToArray();
 
                 if (randomChoices.Length == 0)
                 {
-                    CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged();
+                    CurrentSkinInfo.Value = ArgonSkin.CreateInfo().ToLiveUnmanaged();
                     return;
                 }
 
@@ -227,11 +226,15 @@ namespace osu.Game.Skinning
             {
                 yield return CurrentSkin.Value;
 
-                if (CurrentSkin.Value is LegacySkin && CurrentSkin.Value != DefaultLegacySkin)
-                    yield return DefaultLegacySkin;
+                // Skin manager provides default fallbacks.
+                // This handles cases where a user skin doesn't have the required resources for complete display of
+                // certain elements.
 
-                if (CurrentSkin.Value != DefaultSkin)
-                    yield return DefaultSkin;
+                if (CurrentSkin.Value is LegacySkin && CurrentSkin.Value != DefaultClassicSkin)
+                    yield return DefaultClassicSkin;
+
+                if (CurrentSkin.Value != trianglesSkin)
+                    yield return trianglesSkin;
             }
         }
 
@@ -292,10 +295,26 @@ namespace osu.Game.Skinning
                 Guid currentUserSkin = CurrentSkinInfo.Value.ID;
 
                 if (items.Any(s => s.ID == currentUserSkin))
-                    scheduler.Add(() => CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged());
+                    scheduler.Add(() => CurrentSkinInfo.Value = ArgonSkin.CreateInfo().ToLiveUnmanaged());
 
                 Delete(items.ToList(), silent);
             });
+        }
+
+        public void SetSkinFromConfiguration(string guidString)
+        {
+            Live<SkinInfo> skinInfo = null;
+
+            if (Guid.TryParse(guidString, out var guid))
+                skinInfo = Query(s => s.ID == guid);
+
+            if (skinInfo == null)
+            {
+                if (guid == SkinInfo.CLASSIC_SKIN)
+                    skinInfo = DefaultClassicSkin.SkinInfo;
+            }
+
+            CurrentSkinInfo.Value = skinInfo ?? trianglesSkin.SkinInfo;
         }
     }
 }

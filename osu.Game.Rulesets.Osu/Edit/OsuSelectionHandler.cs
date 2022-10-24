@@ -127,16 +127,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     didFlip = true;
 
-                    var controlPoints = slider.Path.ControlPoints.Select(p =>
-                        new PathControlPoint(new Vector2(
-                            (direction == Direction.Horizontal ? -1 : 1) * p.Position.X,
-                            (direction == Direction.Vertical ? -1 : 1) * p.Position.Y
-                        ), p.Type)).ToArray();
-
-                    // Importantly, update as a single operation so automatic adjustment of control points to different
-                    // curve types does not unexpectedly trigger and change the slider's shape.
-                    slider.Path.ControlPoints.Clear();
-                    slider.Path.ControlPoints.AddRange(controlPoints);
+                    foreach (var cp in slider.Path.ControlPoints)
+                    {
+                        cp.Position = new Vector2(
+                            (direction == Direction.Horizontal ? -1 : 1) * cp.Position.X,
+                            (direction == Direction.Vertical ? -1 : 1) * cp.Position.Y
+                        );
+                    }
                 }
             }
 
@@ -186,13 +183,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (h is IHasPath path)
                 {
-                    var controlPoints = path.Path.ControlPoints.Select(p =>
-                        new PathControlPoint(RotatePointAroundOrigin(p.Position, Vector2.Zero, delta), p.Type)).ToArray();
-
-                    // Importantly, update as a single operation so automatic adjustment of control points to different
-                    // curve types does not unexpectedly trigger and change the slider's shape.
-                    path.Path.ControlPoints.Clear();
-                    path.Path.ControlPoints.AddRange(controlPoints);
+                    foreach (PathControlPoint cp in path.Path.ControlPoints)
+                        cp.Position = RotatePointAroundOrigin(cp.Position, Vector2.Zero, delta);
                 }
             }
 
@@ -358,10 +350,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var mergeableObjects = selectedMergeableObjects;
 
-            if (mergeableObjects.Length < 2)
+            if (!canMerge(mergeableObjects))
                 return;
 
-            ChangeHandler?.BeginChange();
+            EditorBeatmap.BeginChange();
 
             // Have an initial slider object.
             var firstHitObject = mergeableObjects[0];
@@ -371,6 +363,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 Position = firstHitObject.Position,
                 NewCombo = firstHitObject.NewCombo,
                 SampleControlPoint = firstHitObject.SampleControlPoint,
+                Samples = firstHitObject.Samples,
             };
 
             if (mergedHitObject.Path.ControlPoints.Count == 0)
@@ -436,7 +429,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             SelectedItems.Clear();
             SelectedItems.Add(mergedHitObject);
 
-            ChangeHandler?.EndChange();
+            EditorBeatmap.EndChange();
         }
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
@@ -444,8 +437,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            if (selectedMergeableObjects.Length > 1)
+            if (canMerge(selectedMergeableObjects))
                 yield return new OsuMenuItem("Merge selection", MenuItemType.Destructive, mergeSelection);
         }
+
+        private bool canMerge(IReadOnlyList<OsuHitObject> objects) =>
+            objects.Count > 1
+            && (objects.Any(h => h is Slider)
+                || objects.Zip(objects.Skip(1), (h1, h2) => Precision.DefinitelyBigger(Vector2.DistanceSquared(h1.Position, h2.Position), 1)).Any(x => x));
     }
 }

@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         public const double FINAL_RATE_PROGRESS = 0.75f;
 
+        public override double ScoreMultiplier => 0.5;
+
         [SettingSource("Initial rate", "The starting speed of the track")]
         public abstract BindableNumber<double> InitialRate { get; }
 
@@ -37,10 +39,8 @@ namespace osu.Game.Rulesets.Mods
         private double finalRateTime;
         private double beginRampTime;
 
-        public BindableNumber<double> SpeedChange { get; } = new BindableDouble
+        public BindableNumber<double> SpeedChange { get; } = new BindableDouble(1)
         {
-            Default = 1,
-            Value = 1,
             Precision = 0.01,
         };
 

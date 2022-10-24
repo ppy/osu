@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for load", () => downloadButton.IsLoaded);
 
-            AddAssert("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            AddAssert("state is unknown", () => downloadButton.State.Value == DownloadState.Unknown);
             AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 

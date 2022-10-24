@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         private Container keyIcon;
         private Drawable gradient;
 
+        private Bindable<Color4> accentColour;
+
         [Resolved]
         private Column column { get; set; }
 
@@ -75,15 +77,19 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 }
             };
 
-            keyIcon.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Radius = 5,
-                Colour = column.AccentColour.Opacity(0.5f),
-            };
-
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
+
+            accentColour = column.AccentColour.GetBoundCopy();
+            accentColour.BindValueChanged(colour =>
+            {
+                keyIcon.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 5,
+                    Colour = colour.NewValue.Opacity(0.5f),
+                };
+            }, true);
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)

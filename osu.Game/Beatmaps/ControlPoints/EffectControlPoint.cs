@@ -28,7 +28,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         public readonly BindableDouble ScrollSpeedBindable = new BindableDouble(1)
         {
             Precision = 0.01,
-            Default = 1,
             MinValue = 0.01,
             MaxValue = 10
         };

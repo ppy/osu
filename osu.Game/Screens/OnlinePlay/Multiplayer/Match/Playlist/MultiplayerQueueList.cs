@@ -78,9 +78,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                     return;
 
                 bool isItemOwner = Item.OwnerID == api.LocalUser.Value.OnlineID || multiplayerClient.IsHost;
+                bool isValidItem = isItemOwner && !Item.Expired;
 
-                AllowDeletion = isItemOwner && !Item.Expired && Item.ID != multiplayerClient.Room.Settings.PlaylistItemId;
-                AllowEditing = isItemOwner && !Item.Expired;
+                AllowDeletion = isValidItem
+                                && (Item.ID != multiplayerClient.Room.Settings.PlaylistItemId // This is an optimisation for the following check.
+                                    || multiplayerClient.Room.Playlist.Count(i => !i.Expired) > 1);
+
+                AllowEditing = isValidItem;
             }
 
             protected override void Dispose(bool isDisposing)

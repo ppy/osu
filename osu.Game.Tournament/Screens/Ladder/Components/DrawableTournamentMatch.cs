@@ -280,7 +280,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (editorInfo == null || Match is ConditionalTournamentMatch)
+            if (editorInfo == null || Match is ConditionalTournamentMatch || e.Button != MouseButton.Left)
                 return false;
 
             Selected = true;

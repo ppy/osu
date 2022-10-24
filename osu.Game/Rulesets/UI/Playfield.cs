@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
+using osu.Game.Rulesets.Objects.Pooling;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -94,6 +95,8 @@ namespace osu.Game.Rulesets.UI
         [Resolved(CanBeNull = true)]
         private IReadOnlyList<Mod> mods { get; set; }
 
+        private readonly HitObjectEntryManager entryManager = new HitObjectEntryManager();
+
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
         /// </summary>
@@ -108,6 +111,9 @@ namespace osu.Game.Rulesets.UI
                 h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
                 h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
             }));
+
+            entryManager.OnEntryAdded += onEntryAdded;
+            entryManager.OnEntryRemoved += onEntryRemoved;
         }
 
         [BackgroundDependencyLoader]
@@ -171,6 +177,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="hitObject">The added <see cref="HitObject"/>.</param>
         protected virtual void OnHitObjectAdded(HitObject hitObject)
         {
+            preloadSamples(hitObject);
         }
 
         /// <summary>
@@ -195,16 +202,14 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
+        [CanBeNull]
         public GameplayCursorContainer Cursor { get; private set; }
 
         /// <summary>
         /// Provide a cursor which is to be used for gameplay.
         /// </summary>
-        /// <remarks>
-        /// The default provided cursor is invisible when inside the bounds of the <see cref="Playfield"/>.
-        /// </remarks>
         /// <returns>The cursor, or null to show the menu cursor.</returns>
-        protected virtual GameplayCursorContainer CreateCursor() => new InvisibleCursorContainer();
+        protected virtual GameplayCursorContainer CreateCursor() => null;
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
@@ -264,12 +269,7 @@ namespace osu.Game.Rulesets.UI
         public virtual void Add(HitObject hitObject)
         {
             var entry = CreateLifetimeEntry(hitObject);
-            lifetimeEntryMap[entry.HitObject] = entry;
-
-            preloadSamples(hitObject);
-
-            HitObjectContainer.Add(entry);
-            OnHitObjectAdded(entry.HitObject);
+            entryManager.Add(entry, null);
         }
 
         private void preloadSamples(HitObject hitObject)
@@ -292,14 +292,29 @@ namespace osu.Game.Rulesets.UI
         /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
         public virtual bool Remove(HitObject hitObject)
         {
-            if (lifetimeEntryMap.Remove(hitObject, out var entry))
+            if (entryManager.TryGet(hitObject, out var entry))
             {
-                HitObjectContainer.Remove(entry);
-                OnHitObjectRemoved(hitObject);
+                entryManager.Remove(entry);
                 return true;
             }
 
             return nestedPlayfields.Any(p => p.Remove(hitObject));
+        }
+
+        private void onEntryAdded(HitObjectLifetimeEntry entry, [CanBeNull] HitObject parentHitObject)
+        {
+            if (parentHitObject != null) return;
+
+            HitObjectContainer.Add(entry);
+            OnHitObjectAdded(entry.HitObject);
+        }
+
+        private void onEntryRemoved(HitObjectLifetimeEntry entry, [CanBeNull] HitObject parentHitObject)
+        {
+            if (parentHitObject != null) return;
+
+            HitObjectContainer.Remove(entry);
+            OnHitObjectRemoved(entry.HitObject);
         }
 
         /// <summary>
@@ -366,8 +381,11 @@ namespace osu.Game.Rulesets.UI
                     }
                 }
 
-                if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))
-                    lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
+                if (!entryManager.TryGet(hitObject, out var entry))
+                {
+                    entry = CreateLifetimeEntry(hitObject);
+                    entryManager.Add(entry, parent?.HitObject);
+                }
 
                 dho.ParentHitObject = parent;
                 dho.Apply(entry);
@@ -442,8 +460,6 @@ namespace osu.Game.Rulesets.UI
         /// </remarks>
         internal event Action<HitObject> HitObjectUsageFinished;
 
-        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
-
         /// <summary>
         /// Sets whether to keep a given <see cref="HitObject"/> always alive within this or any nested <see cref="Playfield"/>.
         /// </summary>
@@ -451,7 +467,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="keepAlive">Whether to keep <paramref name="hitObject"/> always alive.</param>
         internal void SetKeepAlive(HitObject hitObject, bool keepAlive)
         {
-            if (lifetimeEntryMap.TryGetValue(hitObject, out var entry))
+            if (entryManager.TryGet(hitObject, out var entry))
             {
                 entry.KeepAlive = keepAlive;
                 return;
@@ -466,7 +482,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal void KeepAllAlive()
         {
-            foreach (var (_, entry) in lifetimeEntryMap)
+            foreach (var entry in entryManager.AllEntries)
                 entry.KeepAlive = true;
 
             foreach (var p in nestedPlayfields)
@@ -504,14 +520,5 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
-
-        public class InvisibleCursorContainer : GameplayCursorContainer
-        {
-            protected override Drawable CreateCursor() => new InvisibleCursor();
-
-            private class InvisibleCursor : Drawable
-            {
-            }
-        }
     }
 }

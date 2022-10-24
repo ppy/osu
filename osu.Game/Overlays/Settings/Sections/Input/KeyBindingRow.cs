@@ -327,6 +327,50 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             finalise();
         }
 
+        protected override bool OnTabletAuxiliaryButtonPress(TabletAuxiliaryButtonPressEvent e)
+        {
+            if (!HasFocus)
+                return false;
+
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            finalise();
+
+            return true;
+        }
+
+        protected override void OnTabletAuxiliaryButtonRelease(TabletAuxiliaryButtonReleaseEvent e)
+        {
+            if (!HasFocus)
+            {
+                base.OnTabletAuxiliaryButtonRelease(e);
+                return;
+            }
+
+            finalise();
+        }
+
+        protected override bool OnTabletPenButtonPress(TabletPenButtonPressEvent e)
+        {
+            if (!HasFocus)
+                return false;
+
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            finalise();
+
+            return true;
+        }
+
+        protected override void OnTabletPenButtonRelease(TabletPenButtonReleaseEvent e)
+        {
+            if (!HasFocus)
+            {
+                base.OnTabletPenButtonRelease(e);
+                return;
+            }
+
+            finalise();
+        }
+
         private void clear()
         {
             if (bindTarget == null)
@@ -387,14 +431,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (bindTarget != null) bindTarget.IsBinding = true;
         }
 
-        private void updateStoreFromButton(KeyButton button)
-        {
-            realm.Run(r =>
-            {
-                var binding = r.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
-                r.Write(() => binding.KeyCombinationString = button.KeyBinding.KeyCombinationString);
-            });
-        }
+        private void updateStoreFromButton(KeyButton button) =>
+            realm.WriteAsync(r => r.Find<RealmKeyBinding>(button.KeyBinding.ID).KeyCombinationString = button.KeyBinding.KeyCombinationString);
 
         private void updateIsDefaultValue()
         {

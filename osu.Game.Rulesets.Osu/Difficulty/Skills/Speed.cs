@@ -26,14 +26,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;
-        private readonly double greatWindow;
 
         private readonly List<double> objectStrains = new List<double>();
 
-        public Speed(Mod[] mods, double hitWindowGreat)
+        public Speed(Mod[] mods)
             : base(mods)
         {
-            greatWindow = hitWindowGreat;
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -43,9 +41,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
-            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current, greatWindow) * skillMultiplier;
+            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
 
-            currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current, greatWindow);
+            currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
             double totalStrain = currentStrain * currentRhythm;
 
@@ -64,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (maxStrain == 0)
                 return 0;
 
-            return objectStrains.Aggregate((total, next) => total + (1.0 / (1.0 + Math.Exp(-(next / maxStrain * 12.0 - 6.0)))));
+            return objectStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
         }
     }
 }

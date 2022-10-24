@@ -31,8 +31,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public BindableDouble Current { get; } = new BindableDouble
         {
-            Default = 0,
-            Value = 0,
             MinValue = -50,
             MaxValue = 50,
             Precision = 0.1,
