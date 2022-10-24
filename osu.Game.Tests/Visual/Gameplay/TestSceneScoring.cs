@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             void applyHitV2(int baseScore)
             {
-                maxBaseScore += baseScore;
+                maxBaseScore += base_great;
                 currentBaseScore += baseScore;
                 comboPortion += baseScore * (1 + ++currentCombo / 10.0);
 
