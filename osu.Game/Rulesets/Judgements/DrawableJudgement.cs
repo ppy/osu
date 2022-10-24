@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
@@ -112,8 +113,17 @@ namespace osu.Game.Rulesets.Judgements
             runAnimation();
         }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         private void runAnimation()
         {
+            // hide the judgement body if the user has disabled them.
+            if ((Result.Type == HitResult.Great) && config.Get<bool>(OsuSetting.ForceHideGreatJudgement)) {
+                JudgementBody.Scale = new Vector2(0);
+                return;
+            }
+
             // is a no-op if the drawables are already in a correct state.
             prepareDrawables();
 

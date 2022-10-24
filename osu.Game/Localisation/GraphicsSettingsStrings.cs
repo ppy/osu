@@ -105,6 +105,11 @@ namespace osu.Game.Localisation
         public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"Hit lighting");
 
         /// <summary>
+        /// "Force hide Great hit judgements"
+        /// </summary>
+        public static LocalisableString ForceHideGreatJudgement => new TranslatableString(getKey(@"force_hide_great_hit_judgement"), @"Force hide Great hit judgements");
+
+        /// <summary>
         /// "Screenshots"
         /// </summary>
         public static LocalisableString Screenshots => new TranslatableString(getKey(@"screenshots"), @"Screenshots");

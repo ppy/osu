@@ -33,6 +33,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GraphicsSettingsStrings.HitLighting,
                     Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = GraphicsSettingsStrings.ForceHideGreatJudgement,
+                    Current = config.GetBindable<bool>(OsuSetting.ForceHideGreatJudgement)
+                },
             };
         }
     }
