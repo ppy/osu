@@ -1,13 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Scoring
@@ -135,6 +135,8 @@ namespace osu.Game.Rulesets.Scoring
 #pragma warning disable CS0618
     public static class HitResultExtensions
     {
+        private static readonly IList<HitResult> order = EnumExtensions.GetValuesInOrder<HitResult>().ToList();
+
         /// <summary>
         /// Whether a <see cref="HitResult"/> increases the combo.
         /// </summary>
@@ -282,6 +284,13 @@ namespace osu.Game.Rulesets.Scoring
             Debug.Assert(minResult <= maxResult);
             return result > minResult && result < maxResult;
         }
+
+        /// <summary>
+        /// Ordered index of a <see cref="HitResult"/>. Used for consistent order when displaying hit results to the user.
+        /// </summary>
+        /// <param name="result">The <see cref="HitResult"/> to get the index of.</param>
+        /// <returns>The index of <paramref name="result"/>.</returns>
+        public static int GetIndexForOrderedDisplay(this HitResult result) => order.IndexOf(result);
     }
 #pragma warning restore CS0618
 }

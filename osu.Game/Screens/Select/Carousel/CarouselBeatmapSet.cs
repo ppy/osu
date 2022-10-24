@@ -129,12 +129,13 @@ namespace osu.Game.Screens.Select.Carousel
         public override void Filter(FilterCriteria criteria)
         {
             base.Filter(criteria);
-            bool match = Items.All(i => i.Filtered.Value);
 
-            match &= criteria.Sort != SortMode.DateRanked || BeatmapSet?.DateRanked != null;
-            match &= criteria.Sort != SortMode.DateSubmitted || BeatmapSet?.DateSubmitted != null;
+            bool filtered = Items.All(i => i.Filtered.Value);
 
-            Filtered.Value = match;
+            filtered |= criteria.Sort == SortMode.DateRanked && BeatmapSet?.DateRanked == null;
+            filtered |= criteria.Sort == SortMode.DateSubmitted && BeatmapSet?.DateSubmitted == null;
+
+            Filtered.Value = filtered;
         }
 
         public override string ToString() => BeatmapSet.ToString();

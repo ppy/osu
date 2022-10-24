@@ -65,11 +65,12 @@ namespace osu.Game.Online.Spectator
         public virtual event Action<int, SpectatorState>? OnUserFinishedPlaying;
 
         /// <summary>
-        /// All users currently being watched.
+        /// A dictionary containing all users currently being watched, with the number of watching components for each user.
         /// </summary>
-        private readonly List<int> watchedUsers = new List<int>();
+        private readonly Dictionary<int, int> watchedUsersRefCounts = new Dictionary<int, int>();
 
         private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
+
         private readonly BindableList<int> playingUsers = new BindableList<int>();
         private readonly SpectatorState currentState = new SpectatorState();
 
@@ -94,12 +95,15 @@ namespace osu.Game.Online.Spectator
                 if (connected.NewValue)
                 {
                     // get all the users that were previously being watched
-                    int[] users = watchedUsers.ToArray();
-                    watchedUsers.Clear();
+                    var users = new Dictionary<int, int>(watchedUsersRefCounts);
+                    watchedUsersRefCounts.Clear();
 
                     // resubscribe to watched users.
-                    foreach (int userId in users)
-                        WatchUser(userId);
+                    foreach ((int user, int watchers) in users)
+                    {
+                        for (int i = 0; i < watchers; i++)
+                            WatchUser(user);
+                    }
 
                     // re-send state in case it wasn't received
                     if (IsPlaying)
@@ -121,7 +125,7 @@ namespace osu.Game.Online.Spectator
                 if (!playingUsers.Contains(userId))
                     playingUsers.Add(userId);
 
-                if (watchedUsers.Contains(userId))
+                if (watchedUsersRefCounts.ContainsKey(userId))
                     watchedUserStates[userId] = state;
 
                 OnUserBeganPlaying?.Invoke(userId, state);
@@ -136,7 +140,7 @@ namespace osu.Game.Online.Spectator
             {
                 playingUsers.Remove(userId);
 
-                if (watchedUsers.Contains(userId))
+                if (watchedUsersRefCounts.ContainsKey(userId))
                     watchedUserStates[userId] = state;
 
                 OnUserFinishedPlaying?.Invoke(userId, state);
@@ -232,11 +236,13 @@ namespace osu.Game.Online.Spectator
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            if (watchedUsers.Contains(userId))
+            if (watchedUsersRefCounts.ContainsKey(userId))
+            {
+                watchedUsersRefCounts[userId]++;
                 return;
+            }
 
-            watchedUsers.Add(userId);
-
+            watchedUsersRefCounts.Add(userId, 1);
             WatchUserInternal(userId);
         }
 
@@ -246,7 +252,13 @@ namespace osu.Game.Online.Spectator
             // Todo: This should not be a thing, but requires framework changes.
             Schedule(() =>
             {
-                watchedUsers.Remove(userId);
+                if (watchedUsersRefCounts.TryGetValue(userId, out int watchers) && watchers > 1)
+                {
+                    watchedUsersRefCounts[userId]--;
+                    return;
+                }
+
+                watchedUsersRefCounts.Remove(userId);
                 watchedUserStates.Remove(userId);
                 StopWatchingUserInternal(userId);
             });

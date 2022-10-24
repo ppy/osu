@@ -38,9 +38,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public readonly int UserId;
 
         /// <summary>
-        /// The <see cref="SpectatorPlayerClock"/> used to control the gameplay running state of a loaded <see cref="Player"/>.
+        /// The <see cref="Spectate.SpectatorPlayerClock"/> used to control the gameplay running state of a loaded <see cref="Player"/>.
         /// </summary>
-        public readonly SpectatorPlayerClock GameplayClock;
+        public readonly SpectatorPlayerClock SpectatorPlayerClock;
+
+        /// <summary>
+        /// The clock adjustments applied by the <see cref="Player"/> loaded in this area.
+        /// </summary>
+        public IAggregateAudioAdjustment ClockAdjustmentsFromMods => clockAdjustmentsFromMods;
 
         /// <summary>
         /// The currently-loaded score.
@@ -50,6 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
+        private readonly AudioAdjustments clockAdjustmentsFromMods = new AudioAdjustments();
         private readonly BindableDouble volumeAdjustment = new BindableDouble();
         private readonly Container gameplayContent;
         private readonly LoadingLayer loadingLayer;
@@ -58,7 +64,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public PlayerArea(int userId, SpectatorPlayerClock clock)
         {
             UserId = userId;
-            GameplayClock = clock;
+            SpectatorPlayerClock = clock;
 
             RelativeSizeAxes = Axes.Both;
             Masking = true;
@@ -95,8 +101,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             stack.Push(new MultiSpectatorPlayerLoader(Score, () =>
             {
-                var player = new MultiSpectatorPlayer(Score, GameplayClock);
+                var player = new MultiSpectatorPlayer(Score, SpectatorPlayerClock);
                 player.OnGameplayStarted += () => OnGameplayStarted?.Invoke();
+
+                clockAdjustmentsFromMods.BindAdjustments(player.ClockAdjustmentsFromMods);
+
                 return player;
             }));
 

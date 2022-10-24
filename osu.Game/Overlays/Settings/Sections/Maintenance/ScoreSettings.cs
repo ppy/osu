@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class ScoreSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Scores";
+        protected override LocalisableString Header => CommonStrings.Scores;
 
         private SettingsButton importScoresButton = null!;
         private SettingsButton deleteScoresButton = null!;

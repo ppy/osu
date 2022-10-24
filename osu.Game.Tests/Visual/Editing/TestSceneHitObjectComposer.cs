@@ -148,10 +148,6 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
-
-            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
-
-            AddAssert("circle placed", () => editorBeatmap.HitObjects.Count == 1);
         }
 
         [Test]

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -12,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -21,6 +20,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
@@ -33,19 +33,20 @@ namespace osu.Game.Screens.Play.HUD
         public readonly SortedDictionary<int, BindableLong> TeamScores = new SortedDictionary<int, BindableLong>();
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
+        private SpectatorClient spectatorClient { get; set; } = null!;
 
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
-        private UserLookupCache userLookupCache { get; set; }
+        private UserLookupCache userLookupCache { get; set; } = null!;
+
+        private Bindable<ScoringMode> scoringMode = null!;
 
         private readonly MultiplayerRoomUser[] playingUsers;
-        private Bindable<ScoringMode> scoringMode;
 
         private readonly IBindableList<int> playingUserIds = new BindableList<int>();
 
@@ -125,14 +126,17 @@ namespace osu.Game.Screens.Play.HUD
             playingUserIds.BindCollectionChanged(playingUsersChanged);
         }
 
-        protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(APIUser user, bool isTracked)
+        protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(IUser? user, bool isTracked)
         {
             var leaderboardScore = base.CreateLeaderboardScoreDrawable(user, isTracked);
 
-            if (UserScores[user.Id].Team is int team)
+            if (user != null)
             {
-                leaderboardScore.BackgroundColour = getTeamColour(team).Lighten(1.2f);
-                leaderboardScore.TextColour = Color4.White;
+                if (UserScores[user.OnlineID].Team is int team)
+                {
+                    leaderboardScore.BackgroundColour = getTeamColour(team).Lighten(1.2f);
+                    leaderboardScore.TextColour = Color4.White;
+                }
             }
 
             return leaderboardScore;
@@ -188,7 +192,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            if (spectatorClient != null)
+            if (spectatorClient.IsNotNull())
             {
                 foreach (var user in playingUsers)
                     spectatorClient.StopWatchingUser(user.UserID);

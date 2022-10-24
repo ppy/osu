@@ -89,6 +89,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                     HitObject.DifficultyControlPoint = nearestDifficultyPoint ?? new DifficultyControlPoint();
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
+
+                    // Replacing the DifficultyControlPoint above doesn't trigger any kind of invalidation.
+                    // Without re-applying defaults, velocity won't be updated.
+                    ApplyDefaultsToHitObject();
                     break;
 
                 case SliderPlacementState.Body:
@@ -194,7 +198,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
 
                 // Update the cursor position.
-                cursor.Position = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+                var result = snapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position);
+                cursor.Position = ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
             }
             else if (cursor != null)
             {

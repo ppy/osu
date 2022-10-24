@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -42,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; } = null!;
+
+        private IAggregateAudioAdjustment? boundAdjustments;
 
         private readonly PlayerArea[] instances;
         private MasterGameplayClockContainer masterClockContainer = null!;
@@ -132,7 +135,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }, _ =>
             {
                 foreach (var instance in instances)
-                    leaderboard.AddClock(instance.UserId, instance.GameplayClock);
+                    leaderboard.AddClock(instance.UserId, instance.SpectatorPlayerClock);
 
                 leaderboardFlow.Insert(0, leaderboard);
 
@@ -157,21 +160,37 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             base.LoadComplete();
 
             masterClockContainer.Reset();
+
+            // Start with adjustments from the first player to keep a sane state.
+            bindAudioAdjustments(instances.First());
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (!isCandidateAudioSource(currentAudioSource?.GameplayClock))
+            if (!isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
             {
-                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.GameplayClock))
-                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.CurrentMasterTime))
+                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock))
+                                              .OrderBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime))
                                               .FirstOrDefault();
+
+                // Only bind adjustments if there's actually a valid source, else just use the previous ones to ensure no sudden changes to audio.
+                if (currentAudioSource != null)
+                    bindAudioAdjustments(currentAudioSource);
 
                 foreach (var instance in instances)
                     instance.Mute = instance != currentAudioSource;
             }
+        }
+
+        private void bindAudioAdjustments(PlayerArea first)
+        {
+            if (boundAdjustments != null)
+                masterClockContainer.AdjustmentsFromMods.UnbindAdjustments(boundAdjustments);
+
+            boundAdjustments = first.ClockAdjustmentsFromMods;
+            masterClockContainer.AdjustmentsFromMods.BindAdjustments(boundAdjustments);
         }
 
         private bool isCandidateAudioSource(SpectatorPlayerClock? clock)
@@ -187,8 +206,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                                         .DefaultIfEmpty(0)
                                         .Min();
 
-            masterClockContainer.StartTime = startTime;
-            masterClockContainer.Reset(true);
+            masterClockContainer.Reset(startTime, true);
         }
 
         protected override void OnNewPlayingUserState(int userId, SpectatorState spectatorState)
@@ -198,25 +216,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         protected override void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState)
             => instances.Single(i => i.UserId == userId).LoadScore(spectatorGameplayState.Score);
 
-        protected override void EndGameplay(int userId, SpectatorState state)
+        protected override void QuitGameplay(int userId)
         {
-            // Allowed passed/failed users to complete their remaining replay frames.
-            // The failed state isn't really possible in multiplayer (yet?) but is added here just for safety in case it starts being used.
-            if (state.State == SpectatedUserState.Passed || state.State == SpectatedUserState.Failed)
-                return;
-
-            // we could also potentially receive EndGameplay with "Playing" state, at which point we can only early-return and hope it's a passing player.
-            // todo: this shouldn't exist, but it's here as a hotfix for an issue with multi-spectator screen not proceeding to results screen.
-            // see: https://github.com/ppy/osu/issues/19593
-            if (state.State == SpectatedUserState.Playing)
-                return;
-
             RemoveUser(userId);
 
             var instance = instances.Single(i => i.UserId == userId);
 
             instance.FadeColour(colours.Gray4, 400, Easing.OutQuint);
-            syncManager.RemoveManagedClock(instance.GameplayClock);
+            syncManager.RemoveManagedClock(instance.SpectatorPlayerClock);
         }
 
         public override bool OnBackButton()

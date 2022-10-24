@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private InputManager inputManager;
 
         public Action<List<PathControlPoint>> RemoveControlPointsRequested;
+        public Action<List<PathControlPoint>> SplitControlPointsRequested;
 
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider snapProvider { get; set; }
@@ -103,6 +104,29 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             return true;
         }
+
+        private bool splitSelected()
+        {
+            List<PathControlPoint> controlPointsToSplitAt = Pieces.Where(p => p.IsSelected.Value && isSplittable(p)).Select(p => p.ControlPoint).ToList();
+
+            // Ensure that there are any points to be split
+            if (controlPointsToSplitAt.Count == 0)
+                return false;
+
+            changeHandler?.BeginChange();
+            SplitControlPointsRequested?.Invoke(controlPointsToSplitAt);
+            changeHandler?.EndChange();
+
+            // Since pieces are re-used, they will not point to the deleted control points while remaining selected
+            foreach (var piece in Pieces)
+                piece.IsSelected.Value = false;
+
+            return true;
+        }
+
+        private bool isSplittable(PathControlPointPiece p) =>
+            // A slider can only be split on control points which connect two different slider segments.
+            p.ControlPoint.Type.HasValue && p != Pieces.FirstOrDefault() && p != Pieces.LastOrDefault();
 
         private void onControlPointsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -279,11 +303,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
             {
+                var result = snapProvider?.FindSnappedPositionAndTime(Parent.ToScreenSpace(e.MousePosition));
+
+                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? Parent.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - slider.Position;
+
                 for (int i = 0; i < controlPoints.Count; ++i)
                 {
                     var controlPoint = controlPoints[i];
                     if (selectedControlPoints.Contains(controlPoint))
-                        controlPoint.Position = dragStartPositions[i] + (e.MousePosition - e.MouseDownPosition);
+                        controlPoint.Position = dragStartPositions[i] + movementDelta;
                 }
             }
 
@@ -324,25 +352,42 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 if (count == 0)
                     return null;
 
-                List<MenuItem> items = new List<MenuItem>();
+                var splittablePieces = selectedPieces.Where(isSplittable).ToList();
+                int splittableCount = splittablePieces.Count;
+
+                List<MenuItem> curveTypeItems = new List<MenuItem>();
 
                 if (!selectedPieces.Contains(Pieces[0]))
-                    items.Add(createMenuItemForPathType(null));
+                    curveTypeItems.Add(createMenuItemForPathType(null));
 
                 // todo: hide/disable items which aren't valid for selected points
-                items.Add(createMenuItemForPathType(PathType.Linear));
-                items.Add(createMenuItemForPathType(PathType.PerfectCurve));
-                items.Add(createMenuItemForPathType(PathType.Bezier));
-                items.Add(createMenuItemForPathType(PathType.Catmull));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.Linear));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.PerfectCurve));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.Bezier));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.Catmull));
 
-                return new MenuItem[]
+                var menuItems = new List<MenuItem>
                 {
-                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => DeleteSelected()),
                     new OsuMenuItem("Curve type")
                     {
-                        Items = items
+                        Items = curveTypeItems
                     }
                 };
+
+                if (splittableCount > 0)
+                {
+                    menuItems.Add(new OsuMenuItem($"Split {"control point".ToQuantity(splittableCount, splittableCount > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}",
+                        MenuItemType.Destructive,
+                        () => splitSelected()));
+                }
+
+                menuItems.Add(
+                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}",
+                        MenuItemType.Destructive,
+                        () => DeleteSelected())
+                );
+
+                return menuItems.ToArray();
             }
         }
 
