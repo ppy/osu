@@ -176,6 +176,8 @@ namespace osu.Game.Screens.Edit
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
+        private Bindable<bool> useUserDim;
+
         public Editor(EditorLoader loader = null)
         {
             this.loader = loader;
@@ -260,6 +262,9 @@ namespace osu.Game.Screens.Edit
             OsuMenuItem undoMenuItem;
             OsuMenuItem redoMenuItem;
 
+            TernaryStateRadioMenuItem backgroundDim;
+            useUserDim = config.GetBindable<bool>(OsuSetting.EditorUseDim);
+
             AddInternal(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -311,6 +316,7 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
+                                            backgroundDim = new TernaryStateRadioMenuItem("Background Dim", MenuItemType.Standard, _ => useUserDim.Value = !useUserDim.Value),
                                         }
                                     }
                                 }
@@ -330,6 +336,13 @@ namespace osu.Game.Screens.Edit
 
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+
+            useUserDim.BindValueChanged(s =>
+            {
+                dimBackground();
+                backgroundDim.State.Value = s.NewValue ? TernaryState.True : TernaryState.False;
+            });
+            backgroundDim.State.Value = useUserDim.Value ? TernaryState.True : TernaryState.False;
         }
 
         [Resolved]
@@ -626,9 +639,9 @@ namespace osu.Game.Screens.Edit
             ApplyToBackground(b =>
             {
                 // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
-                b.FadeColour(Color4.DarkGray, 500);
+                if (!useUserDim.Value) b.FadeColour(Color4.DarkGray, 500);
 
-                b.IgnoreUserSettings.Value = true;
+                b.IgnoreUserSettings.Value = !useUserDim.Value;
                 b.BlurAmount.Value = 0;
             });
         }
@@ -656,7 +669,11 @@ namespace osu.Game.Screens.Edit
                 }
             }
 
-            ApplyToBackground(b => b.FadeColour(Color4.White, 500));
+            ApplyToBackground(b =>
+            {
+                b.FadeColour(Color4.White, 500);
+                b.IgnoreUserSettings.Value = true;
+            });
             resetTrack();
 
             refetchBeatmap();
