@@ -1,12 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
@@ -20,8 +19,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
-        public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModMagnetised), typeof(OsuModAlternate) }).ToArray();
+        public override LocalisableString Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
+
+        public override Type[] IncompatibleMods =>
+            base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModMagnetised), typeof(OsuModAlternate), typeof(OsuModSingleTap) }).ToArray();
 
         /// <summary>
         /// How early before a hitobject's start time to trigger a hit.
@@ -31,9 +32,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         private bool isDownState;
         private bool wasLeft;
 
-        private OsuInputManager osuInputManager;
+        private OsuInputManager osuInputManager = null!;
 
-        private ReplayState<OsuAction> state;
+        private ReplayState<OsuAction> state = null!;
         private double lastStateChangeTime;
 
         private bool hasReplay;
@@ -52,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
             }
 
-            osuInputManager.AllowUserPresses = false;
+            osuInputManager.AllowGameplayInputs = false;
         }
 
         public void Update(Playfield playfield)
@@ -134,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     wasLeft = !wasLeft;
                 }
 
-                state?.Apply(osuInputManager.CurrentState, osuInputManager);
+                state.Apply(osuInputManager.CurrentState, osuInputManager);
             }
         }
     }

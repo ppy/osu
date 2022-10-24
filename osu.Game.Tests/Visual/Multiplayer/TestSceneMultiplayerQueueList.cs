@@ -29,15 +29,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private MultiplayerQueueList playlist;
         private BeatmapManager beatmaps;
-        private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
         private BeatmapInfo importedBeatmap;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
 
@@ -98,14 +97,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestCurrentItemDoesNotHaveDeleteButton()
+        public void TestSingleItemDoesNotHaveDeleteButton()
+        {
+            AddStep("set all players queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
+            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+
+            assertDeleteButtonVisibility(0, false);
+        }
+
+        [Test]
+        public void TestCurrentItemHasDeleteButtonIfNotSingle()
         {
             AddStep("set all players queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
             AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
 
             addPlaylistItem(() => API.LocalUser.Value.OnlineID);
 
-            assertDeleteButtonVisibility(0, false);
+            assertDeleteButtonVisibility(0, true);
             assertDeleteButtonVisibility(1, true);
 
             AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());

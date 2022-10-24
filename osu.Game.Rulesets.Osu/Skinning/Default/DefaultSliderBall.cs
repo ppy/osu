@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -19,13 +17,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class DefaultSliderBall : CompositeDrawable
     {
-        private Box box;
+        private Box box = null!;
+
+        [Resolved(canBeNull: true)]
+        private DrawableHitObject? parentObject { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableObject, ISkinSource skin)
+        private void load(ISkinSource skin)
         {
-            var slider = (DrawableSlider)drawableObject;
-
             RelativeSizeAxes = Axes.Both;
 
             float radius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
@@ -51,10 +50,62 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 }
             };
 
-            slider.Tracking.BindValueChanged(trackingChanged, true);
+            if (parentObject != null)
+            {
+                var slider = (DrawableSlider)parentObject;
+                slider.Tracking.BindValueChanged(trackingChanged, true);
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (parentObject != null)
+            {
+                parentObject.ApplyCustomUpdateState += updateStateTransforms;
+                updateStateTransforms(parentObject, parentObject.State.Value);
+            }
         }
 
         private void trackingChanged(ValueChangedEvent<bool> tracking) =>
             box.FadeTo(tracking.NewValue ? 0.3f : 0.05f, 200, Easing.OutQuint);
+
+        private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState state)
+        {
+            // Gets called by slider ticks, tails, etc., leading to duplicated
+            // animations which may negatively affect performance
+            if (drawableObject is not DrawableSlider)
+                return;
+
+            const float fade_duration = 450f;
+
+            using (BeginAbsoluteSequence(drawableObject.StateUpdateTime))
+            {
+                this.FadeIn()
+                    .ScaleTo(1f);
+            }
+
+            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
+            {
+                // intentionally pile on an extra FadeOut to make it happen much faster
+                this.FadeOut(fade_duration / 4, Easing.Out);
+
+                switch (state)
+                {
+                    case ArmedState.Hit:
+                        this.ScaleTo(1.4f, fade_duration, Easing.Out);
+                        break;
+                }
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (parentObject != null)
+                parentObject.ApplyCustomUpdateState -= updateStateTransforms;
+        }
     }
 }

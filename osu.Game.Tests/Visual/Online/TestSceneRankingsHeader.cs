@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneRankingsHeader()
         {
-            var countryBindable = new Bindable<Country>();
+            var countryBindable = new Bindable<CountryCode>();
             var ruleset = new Bindable<RulesetInfo>();
             var scope = new Bindable<RankingsScope>();
 
@@ -30,21 +30,12 @@ namespace osu.Game.Tests.Visual.Online
                 Ruleset = { BindTarget = ruleset }
             });
 
-            var country = new Country
-            {
-                FlagName = "BY",
-                FullName = "Belarus"
-            };
-
-            var unknownCountry = new Country
-            {
-                FlagName = "CK",
-                FullName = "Cook Islands"
-            };
+            const CountryCode country = CountryCode.BY;
+            const CountryCode unknown_country = CountryCode.CK;
 
             AddStep("Set country", () => countryBindable.Value = country);
             AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
-            AddStep("Set country with no flag", () => countryBindable.Value = unknownCountry);
+            AddStep("Set country with no flag", () => countryBindable.Value = unknown_country);
         }
     }
 }

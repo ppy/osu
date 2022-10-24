@@ -1,14 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -25,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Nightcore";
         public override string Acronym => "NC";
         public override IconUsage? Icon => OsuIcon.ModNightcore;
-        public override string Description => "Uguuuuuuuu...";
+        public override LocalisableString Description => "Uguuuuuuuu...";
     }
 
     public abstract class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
@@ -57,10 +56,10 @@ namespace osu.Game.Rulesets.Mods
 
         public class NightcoreBeatContainer : BeatSyncedContainer
         {
-            private PausableSkinnableSound hatSample;
-            private PausableSkinnableSound clapSample;
-            private PausableSkinnableSound kickSample;
-            private PausableSkinnableSound finishSample;
+            private PausableSkinnableSound? hatSample;
+            private PausableSkinnableSound? clapSample;
+            private PausableSkinnableSound? kickSample;
+            private PausableSkinnableSound? finishSample;
 
             private int? firstBeat;
 

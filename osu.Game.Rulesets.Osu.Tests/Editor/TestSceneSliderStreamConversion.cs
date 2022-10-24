@@ -148,6 +148,37 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
         }
 
+        [Test]
+        public void TestFloatEdgeCaseConversion()
+        {
+            Slider slider = null;
+
+            AddStep("select first slider", () =>
+            {
+                slider = (Slider)EditorBeatmap.HitObjects.First(h => h is Slider);
+                EditorClock.Seek(slider.StartTime);
+                EditorBeatmap.SelectedHitObjects.Add(slider);
+            });
+
+            AddStep("change to these specific circumstances", () =>
+            {
+                EditorBeatmap.Difficulty.SliderMultiplier = 1;
+                var timingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(slider.StartTime);
+                timingPoint.BeatLength = 352.941176470588;
+                slider.Path.ControlPoints[^1].Position = new Vector2(-110, 16);
+                slider.Path.ExpectedDistance.Value = 100;
+            });
+
+            convertToStream();
+
+            AddAssert("stream created", () => streamCreatedFor(slider,
+                (time: 0, pathPosition: 0),
+                (time: 0.25, pathPosition: 0.25),
+                (time: 0.5, pathPosition: 0.5),
+                (time: 0.75, pathPosition: 0.75),
+                (time: 1, pathPosition: 1)));
+        }
+
         private bool streamCreatedFor(Slider slider, params (double time, double pathPosition)[] expectedCircles)
         {
             if (EditorBeatmap.HitObjects.Contains(slider))

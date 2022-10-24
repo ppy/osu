@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("force save config", () => Game.LocalConfig.Save());
 
-            AddStep("remove game", () => Remove(Game));
+            AddStep("remove game", () => Remove(Game, true));
 
             AddStep("create game again", CreateGame);
 

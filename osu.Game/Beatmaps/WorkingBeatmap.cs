@@ -110,9 +110,9 @@ namespace osu.Game.Beatmaps
 
         public Track LoadTrack() => track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
-        public void PrepareTrackForPreviewLooping()
+        public void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0)
         {
-            Track.Looping = true;
+            Track.Looping = looping;
             Track.RestartPoint = Metadata.PreviewTime;
 
             if (Track.RestartPoint == -1)
@@ -125,6 +125,8 @@ namespace osu.Game.Beatmaps
 
                 Track.RestartPoint = 0.4f * Track.Length;
             }
+
+            Track.RestartPoint += offsetFromPreviewPoint;
         }
 
         /// <summary>
@@ -146,6 +148,7 @@ namespace osu.Game.Beatmaps
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
         /// This generally happens via MusicController when changing the global beatmap.
         /// </summary>
+        [NotNull]
         public Track Track
         {
             get
@@ -279,12 +282,15 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
+            var processor = rulesetInstance.CreateBeatmapProcessor(converted);
 
-            foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
-                mod.ApplyToBeatmapProcessor(processor);
+            if (processor != null)
+            {
+                foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
+                    mod.ApplyToBeatmapProcessor(processor);
 
-            processor?.PreProcess();
+                processor.PreProcess();
+            }
 
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
             foreach (var obj in converted.HitObjects)

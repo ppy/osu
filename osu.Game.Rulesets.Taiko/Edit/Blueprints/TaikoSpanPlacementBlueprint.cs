@@ -52,6 +52,12 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
         private double originalStartTime;
         private Vector2 originalPosition;
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            BeginPlacement();
+        }
+
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (e.Button != MouseButton.Left)
@@ -67,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
                 return;
 
             base.OnMouseUp(e);
-            EndPlacement(true);
+            EndPlacement(spanPlacementObject.Duration > 0);
         }
 
         public override void UpdateTimeAndPosition(SnapResult result)

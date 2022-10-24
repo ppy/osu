@@ -120,7 +120,13 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     };
 
                 default:
-                    return Empty();
+                    return new RecentActivityIcon(activity)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
             }
         }
 

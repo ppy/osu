@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             var topProvider = source.FindProvider(s => s.GetTexture("spinner-top") != null);
 
-            if (topProvider is LegacySkinTransformer transformer && !(transformer.Skin is DefaultLegacySkin))
+            if (topProvider is ISkinTransformer transformer && !(transformer.Skin is DefaultLegacySkin))
             {
                 AddInternal(ApproachCircle = new Sprite
                 {
@@ -107,8 +107,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                         this.FadeOut();
 
-                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2))
-                        this.FadeInFromZero(spinner.TimeFadeIn / 2);
+                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn))
+                        this.FadeInFromZero(spinner.TimeFadeIn);
 
                     using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                     {

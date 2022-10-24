@@ -1,17 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -24,79 +23,62 @@ namespace osu.Game.Collections
     /// <summary>
     /// Visualises a <see cref="BeatmapCollection"/> inside a <see cref="DrawableCollectionList"/>.
     /// </summary>
-    public class DrawableCollectionListItem : OsuRearrangeableListItem<BeatmapCollection>
+    public class DrawableCollectionListItem : OsuRearrangeableListItem<Live<BeatmapCollection>>
     {
         private const float item_height = 35;
         private const float button_width = item_height * 0.75f;
 
         /// <summary>
-        /// Whether the <see cref="BeatmapCollection"/> currently exists inside the <see cref="CollectionManager"/>.
-        /// </summary>
-        public IBindable<bool> IsCreated => isCreated;
-
-        private readonly Bindable<bool> isCreated = new Bindable<bool>();
-
-        /// <summary>
         /// Creates a new <see cref="DrawableCollectionListItem"/>.
         /// </summary>
         /// <param name="item">The <see cref="BeatmapCollection"/>.</param>
-        /// <param name="isCreated">Whether <paramref name="item"/> currently exists inside the <see cref="CollectionManager"/>.</param>
-        public DrawableCollectionListItem(BeatmapCollection item, bool isCreated)
+        /// <param name="isCreated">Whether <paramref name="item"/> currently exists inside realm.</param>
+        public DrawableCollectionListItem(Live<BeatmapCollection> item, bool isCreated)
             : base(item)
         {
-            this.isCreated.Value = isCreated;
-
-            ShowDragHandle.BindTo(this.isCreated);
+            ShowDragHandle.Value = item.IsManaged;
         }
 
-        protected override Drawable CreateContent() => new ItemContent(Model)
-        {
-            IsCreated = { BindTarget = isCreated }
-        };
+        protected override Drawable CreateContent() => new ItemContent(Model);
 
         /// <summary>
         /// The main content of the <see cref="DrawableCollectionListItem"/>.
         /// </summary>
         private class ItemContent : CircularContainer
         {
-            public readonly Bindable<bool> IsCreated = new Bindable<bool>();
+            private readonly Live<BeatmapCollection> collection;
 
-            private readonly IBindable<string> collectionName;
-            private readonly BeatmapCollection collection;
+            private ItemTextBox textBox = null!;
 
-            [Resolved(CanBeNull = true)]
-            private CollectionManager collectionManager { get; set; }
+            [Resolved]
+            private RealmAccess realm { get; set; } = null!;
 
-            private Container textBoxPaddingContainer;
-            private ItemTextBox textBox;
-
-            public ItemContent(BeatmapCollection collection)
+            public ItemContent(Live<BeatmapCollection> collection)
             {
                 this.collection = collection;
 
                 RelativeSizeAxes = Axes.X;
                 Height = item_height;
                 Masking = true;
-
-                collectionName = collection.Name.GetBoundCopy();
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Children = new Drawable[]
+                Children = new[]
                 {
-                    new DeleteButton(collection)
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        IsCreated = { BindTarget = IsCreated },
-                        IsTextBoxHovered = v => textBox.ReceivePositionalInputAt(v)
-                    },
-                    textBoxPaddingContainer = new Container
+                    collection.IsManaged
+                        ? new DeleteButton(collection)
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            IsTextBoxHovered = v => textBox.ReceivePositionalInputAt(v)
+                        }
+                        : Empty(),
+                    new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Right = button_width },
+                        Padding = new MarginPadding { Right = collection.IsManaged ? button_width : 0 },
                         Children = new Drawable[]
                         {
                             textBox = new ItemTextBox
@@ -104,7 +86,7 @@ namespace osu.Game.Collections
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 CornerRadius = item_height / 2,
-                                PlaceholderText = IsCreated.Value ? string.Empty : "Create a new collection"
+                                PlaceholderText = collection.IsManaged ? string.Empty : "Create a new collection"
                             },
                         }
                     },
@@ -116,28 +98,18 @@ namespace osu.Game.Collections
                 base.LoadComplete();
 
                 // Bind late, as the collection name may change externally while still loading.
-                textBox.Current = collection.Name;
-
-                collectionName.BindValueChanged(_ => createNewCollection(), true);
-                IsCreated.BindValueChanged(created => textBoxPaddingContainer.Padding = new MarginPadding { Right = created.NewValue ? button_width : 0 }, true);
+                textBox.Current.Value = collection.PerformRead(c => c.IsValid ? c.Name : string.Empty);
+                textBox.OnCommit += onCommit;
             }
 
-            private void createNewCollection()
+            private void onCommit(TextBox sender, bool newText)
             {
-                if (IsCreated.Value)
-                    return;
+                if (collection.IsManaged)
+                    collection.PerformWrite(c => c.Name = textBox.Current.Value);
+                else if (!string.IsNullOrEmpty(textBox.Current.Value))
+                    realm.Write(r => r.Add(new BeatmapCollection(textBox.Current.Value)));
 
-                if (string.IsNullOrEmpty(collectionName.Value))
-                    return;
-
-                // Add the new collection and disable our placeholder. If all text is removed, the placeholder should not show back again.
-                collectionManager?.Collections.Add(collection);
-                textBox.PlaceholderText = string.Empty;
-
-                // When this item changes from placeholder to non-placeholder (via changing containers), its textbox will lose focus, so it needs to be re-focused.
-                Schedule(() => GetContainingInputManager().ChangeFocus(textBox));
-
-                IsCreated.Value = true;
+                textBox.Text = string.Empty;
             }
         }
 
@@ -155,22 +127,17 @@ namespace osu.Game.Collections
 
         public class DeleteButton : CompositeDrawable
         {
-            public readonly IBindable<bool> IsCreated = new Bindable<bool>();
+            public Func<Vector2, bool> IsTextBoxHovered = null!;
 
-            public Func<Vector2, bool> IsTextBoxHovered;
+            [Resolved]
+            private IDialogOverlay? dialogOverlay { get; set; }
 
-            [Resolved(CanBeNull = true)]
-            private IDialogOverlay dialogOverlay { get; set; }
+            private readonly Live<BeatmapCollection> collection;
 
-            [Resolved(CanBeNull = true)]
-            private CollectionManager collectionManager { get; set; }
+            private Drawable fadeContainer = null!;
+            private Drawable background = null!;
 
-            private readonly BeatmapCollection collection;
-
-            private Drawable fadeContainer;
-            private Drawable background;
-
-            public DeleteButton(BeatmapCollection collection)
+            public DeleteButton(Live<BeatmapCollection> collection)
             {
                 this.collection = collection;
                 RelativeSizeAxes = Axes.Y;
@@ -204,12 +171,6 @@ namespace osu.Game.Collections
                 };
             }
 
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                IsCreated.BindValueChanged(created => Alpha = created.NewValue ? 1 : 0, true);
-            }
-
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) && !IsTextBoxHovered(screenSpacePos);
 
             protected override bool OnHover(HoverEvent e)
@@ -227,7 +188,7 @@ namespace osu.Game.Collections
             {
                 background.FlashColour(Color4.White, 150);
 
-                if (collection.BeatmapHashes.Count == 0)
+                if (collection.PerformRead(c => c.BeatmapMD5Hashes.Count) == 0)
                     deleteCollection();
                 else
                     dialogOverlay?.Push(new DeleteCollectionDialog(collection, deleteCollection));
@@ -235,7 +196,7 @@ namespace osu.Game.Collections
                 return true;
             }
 
-            private void deleteCollection() => collectionManager?.Collections.Remove(collection);
+            private void deleteCollection() => collection.PerformWrite(c => c.Realm.Remove(c));
         }
     }
 }

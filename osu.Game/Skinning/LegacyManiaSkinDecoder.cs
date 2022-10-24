@@ -121,7 +121,7 @@ namespace osu.Game.Skinning
                         break;
 
                     case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
-                        HandleColours(currentConfig, line);
+                        HandleColours(currentConfig, line, true);
                         break;
 
                     // Custom sprite paths

@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -46,7 +47,7 @@ namespace osu.Game.Tests.Visual.Editing
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = OsuColour.Gray(30)
                             },
-                            scrollContainer = new ZoomableScrollContainer
+                            scrollContainer = new ZoomableScrollContainer(1, 60, 1)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -54,7 +55,7 @@ namespace osu.Game.Tests.Visual.Editing
                             }
                         }
                     },
-                    new MenuCursor()
+                    new MenuCursorContainer()
                 };
 
                 scrollContainer.Add(innerBox = new Box
@@ -64,6 +65,18 @@ namespace osu.Game.Tests.Visual.Editing
                 });
             });
             AddUntilStep("Scroll container is loaded", () => scrollContainer.LoadState >= LoadState.Loaded);
+        }
+
+        [Test]
+        public void TestInitialZoomOutOfRange()
+        {
+            AddStep("Invalid ZoomableScrollContainer throws ArgumentException", () =>
+            {
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    _ = new ZoomableScrollContainer(1, 60, 0);
+                });
+            });
         }
 
         [Test]
@@ -78,21 +91,6 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Shrink scroll container", () => scrollContainer.Width = 0.5f);
             AddAssert("Scroll container width shrunk", () => scrollContainer.DrawWidth == scrollContainer.Parent.DrawWidth / 2);
             AddAssert("Inner container width matches scroll container", () => innerBox.DrawWidth == scrollContainer.DrawWidth);
-        }
-
-        [Test]
-        public void TestZoomRangeUpdate()
-        {
-            AddStep("set zoom to 2", () => scrollContainer.Zoom = 2);
-            AddStep("set min zoom to 5", () => scrollContainer.MinZoom = 5);
-            AddAssert("zoom = 5", () => scrollContainer.Zoom == 5);
-
-            AddStep("set max zoom to 10", () => scrollContainer.MaxZoom = 10);
-            AddAssert("zoom = 5", () => scrollContainer.Zoom == 5);
-
-            AddStep("set min zoom to 20", () => scrollContainer.MinZoom = 20);
-            AddStep("set max zoom to 40", () => scrollContainer.MaxZoom = 40);
-            AddAssert("zoom = 20", () => scrollContainer.Zoom == 20);
         }
 
         [Test]

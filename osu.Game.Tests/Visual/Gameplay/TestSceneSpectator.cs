@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             sendFrames(startTime: gameplay_start);
 
-            AddAssert("time is greater than seek target", () => currentFrameStableTime > gameplay_start);
+            AddAssert("time is greater than seek target", () => currentFrameStableTime, () => Is.GreaterThan(gameplay_start));
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             waitForPlayer();
 
             AddUntilStep("state is playing", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Playing);
-            AddAssert("time is greater than seek target", () => currentFrameStableTime > gameplay_start);
+            AddAssert("time is greater than seek target", () => currentFrameStableTime, () => Is.GreaterThan(gameplay_start));
         }
 
         [Test]
@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for frame starvation", () => replayHandler.WaitingForFrame);
             checkPaused(true);
 
-            AddAssert("time advanced", () => currentFrameStableTime > pausedTime);
+            AddAssert("time advanced", () => currentFrameStableTime, () => Is.GreaterThan(pausedTime));
         }
 
         [Test]
@@ -176,7 +176,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             sendFrames(300);
 
-            AddUntilStep("playing from correct point in time", () => player.ChildrenOfType<DrawableRuleset>().First().FrameStableClock.CurrentTime > 30000);
+            AddUntilStep("playing from correct point in time", () => player.ChildrenOfType<DrawableRuleset>().First().FrameStableClock.CurrentTime, () => Is.GreaterThan(30000));
         }
 
         [Test]
@@ -363,7 +363,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private Player player => Stack.CurrentScreen as Player;
 
         private double currentFrameStableTime
-            => player.ChildrenOfType<FrameStabilityContainer>().First().FrameStableClock.CurrentTime;
+            => player.ChildrenOfType<FrameStabilityContainer>().First().CurrentTime;
 
         private void waitForPlayer() => AddUntilStep("wait for player", () => (Stack.CurrentScreen as Player)?.IsLoaded == true);
 

@@ -108,6 +108,7 @@ namespace osu.Game.Tests.Visual.Online
                 Version = "2018.712.0",
                 DisplayVersion = "2018.712.0",
                 UpdateStream = streams[OsuGameBase.CLIENT_STREAM_NAME],
+                CreatedAt = new DateTime(2018, 7, 12),
                 ChangelogEntries = new List<APIChangelogEntry>
                 {
                     new APIChangelogEntry
@@ -171,6 +172,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Version = "2019.920.0",
                 DisplayVersion = "2019.920.0",
+                CreatedAt = new DateTime(2019, 9, 20),
                 UpdateStream = new APIUpdateStream
                 {
                     Name = "Test",

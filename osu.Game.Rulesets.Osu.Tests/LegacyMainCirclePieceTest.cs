@@ -6,7 +6,8 @@ using System.Diagnostics;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
@@ -19,6 +20,9 @@ namespace osu.Game.Rulesets.Osu.Tests
     [HeadlessTest]
     public class LegacyMainCirclePieceTest : OsuTestScene
     {
+        [Resolved]
+        private IRenderer renderer { get; set; } = null!;
+
         private static readonly object?[][] texture_priority_cases =
         {
             // default priority lookup
@@ -76,7 +80,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                 skin.Setup(s => s.GetTexture(It.IsAny<string>())).CallBase();
 
                 skin.Setup(s => s.GetTexture(It.IsIn(textureFilenames), It.IsAny<WrapMode>(), It.IsAny<WrapMode>()))
-                    .Returns((string componentName, WrapMode _, WrapMode _) => new Texture(1, 1) { AssetName = componentName });
+                    .Returns((string componentName, WrapMode _, WrapMode _) =>
+                    {
+                        var tex = renderer.CreateTexture(1, 1);
+                        tex.AssetName = componentName;
+                        return tex;
+                    });
 
                 Child = new DependencyProvidingContainer
                 {
@@ -84,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     Child = piece = new TestLegacyMainCirclePiece(priorityLookup),
                 };
 
-                var sprites = this.ChildrenOfType<Sprite>().Where(s => s.Texture.AssetName != null).DistinctBy(s => s.Texture.AssetName).ToArray();
+                var sprites = this.ChildrenOfType<Sprite>().Where(s => !string.IsNullOrEmpty(s.Texture.AssetName)).DistinctBy(s => s.Texture.AssetName).ToArray();
                 Debug.Assert(sprites.Length <= 2);
             });
 

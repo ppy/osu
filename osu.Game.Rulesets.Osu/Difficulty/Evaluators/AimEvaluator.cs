@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class AimEvaluator
     {
         private const double wide_angle_multiplier = 1.5;
-        private const double acute_angle_multiplier = 2.0;
-        private const double slider_multiplier = 1.5;
+        private const double acute_angle_multiplier = 1.95;
+        private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
 
         /// <summary>
@@ -108,19 +108,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
                 double overlapVelocityBuff = Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
 
-                // Reward for % distance slowed down compared to previous, paying attention to not award overlap
-                double nonOverlapVelocityBuff = Math.Abs(prevVelocity - currVelocity)
-                                                // do not award overlap
-                                                * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, Math.Min(osuCurrObj.LazyJumpDistance, osuLastObj.LazyJumpDistance) / 100)), 2);
-
-                // Choose the largest bonus, multiplied by ratio.
-                velocityChangeBonus = Math.Max(overlapVelocityBuff, nonOverlapVelocityBuff) * distRatio;
+                velocityChangeBonus = overlapVelocityBuff * distRatio;
 
                 // Penalize for rhythm changes.
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
             }
 
-            if (osuLastObj.TravelTime != 0)
+            if (osuLastObj.BaseObject is Slider)
             {
                 // Reward sliders based on velocity.
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;

@@ -9,7 +9,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 using osuTK;

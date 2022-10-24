@@ -6,11 +6,13 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Select;
@@ -23,7 +25,9 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestCantExitWithoutSaving()
         {
+            AddUntilStep("Wait for dialog overlay load", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
             AddRepeatStep("Exit", () => InputManager.Key(Key.Escape), 10);
+            AddAssert("Sample playback disabled", () => Editor.SamplePlaybackDisabled.Value);
             AddAssert("Editor is still active screen", () => Game.ScreenStack.CurrentScreen is Editor);
         }
 

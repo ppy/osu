@@ -20,6 +20,10 @@ namespace osu.Game.Database
 
         protected override IEnumerable<string> GetStableImportPaths(Storage storage)
         {
+            // make sure the directory exists
+            if (!storage.ExistsDirectory(string.Empty))
+                yield break;
+
             foreach (string directory in storage.GetDirectories(string.Empty))
             {
                 var directoryStorage = storage.GetStorageForDirectory(directory);

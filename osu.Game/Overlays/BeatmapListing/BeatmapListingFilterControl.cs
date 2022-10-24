@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         public void Search(string query)
-            => searchControl.Query.Value = query;
+            => Schedule(() => searchControl.Query.Value = query);
 
         protected override void LoadComplete()
         {
@@ -151,19 +151,20 @@ namespace osu.Game.Overlays.BeatmapListing
 
             config.BindWith(OsuSetting.BeatmapListingCardSize, cardSize);
 
-            var sortCriteria = sortControl.Current;
-            var sortDirection = sortControl.SortDirection;
-
-            searchControl.Query.BindValueChanged(query =>
+            searchControl.Query.BindValueChanged(_ =>
             {
-                sortCriteria.Value = string.IsNullOrEmpty(query.NewValue) ? SortCriteria.Ranked : SortCriteria.Relevance;
-                sortDirection.Value = SortDirection.Descending;
+                resetSortControl();
                 queueUpdateSearch(true);
+            });
+
+            searchControl.Category.BindValueChanged(_ =>
+            {
+                resetSortControl();
+                queueUpdateSearch();
             });
 
             searchControl.General.CollectionChanged += (_, _) => queueUpdateSearch();
             searchControl.Ruleset.BindValueChanged(_ => queueUpdateSearch());
-            searchControl.Category.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Genre.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Language.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Extra.CollectionChanged += (_, _) => queueUpdateSearch();
@@ -171,8 +172,8 @@ namespace osu.Game.Overlays.BeatmapListing
             searchControl.Played.BindValueChanged(_ => queueUpdateSearch());
             searchControl.ExplicitContent.BindValueChanged(_ => queueUpdateSearch());
 
-            sortCriteria.BindValueChanged(_ => queueUpdateSearch());
-            sortDirection.BindValueChanged(_ => queueUpdateSearch());
+            sortControl.Current.BindValueChanged(_ => queueUpdateSearch());
+            sortControl.SortDirection.BindValueChanged(_ => queueUpdateSearch());
 
             apiUser = api.LocalUser.GetBoundCopy();
             apiUser.BindValueChanged(_ => queueUpdateSearch());
@@ -198,6 +199,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
             performRequest();
         }
+
+        private void resetSortControl() => sortControl.Reset(searchControl.Category.Value, !string.IsNullOrEmpty(searchControl.Query.Value));
 
         private void queueUpdateSearch(bool queryTextChanged = false)
         {

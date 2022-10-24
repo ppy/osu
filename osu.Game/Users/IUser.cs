@@ -10,6 +10,8 @@ namespace osu.Game.Users
     {
         string Username { get; }
 
+        CountryCode CountryCode { get; }
+
         bool IsBot { get; }
 
         bool IEquatable<IUser>.Equals(IUser? other)

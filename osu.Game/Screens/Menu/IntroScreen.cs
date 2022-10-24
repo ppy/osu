@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -195,10 +196,14 @@ namespace osu.Game.Screens.Menu
 
                 PrepareMenuLoad();
                 LoadMenu();
-                notifications.Post(new SimpleErrorNotification
+
+                if (!Debugger.IsAttached)
                 {
-                    Text = "osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
-                });
+                    notifications.Post(new SimpleErrorNotification
+                    {
+                        Text = "osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
+                    });
+                }
             }, 5000);
         }
 
@@ -267,11 +272,22 @@ namespace osu.Game.Screens.Menu
                 FadeInBackground(200);
         }
 
-        protected virtual void StartTrack()
+        protected void StartTrack()
         {
-            // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-            if (UsingThemedIntro)
-                Track.Start();
+            var drawableTrack = musicController.CurrentTrack;
+
+            if (!UsingThemedIntro)
+            {
+                initialBeatmap?.PrepareTrackForPreview(false, -2600);
+
+                drawableTrack.VolumeTo(0);
+                drawableTrack.Restart();
+                drawableTrack.VolumeTo(1, 2600, Easing.InCubic);
+            }
+            else
+            {
+                drawableTrack.Restart();
+            }
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

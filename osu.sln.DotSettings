@@ -350,6 +350,7 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=PM/@EntryIndexedValue">PM</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=RGB/@EntryIndexedValue">RGB</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=RNG/@EntryIndexedValue">RNG</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SDL/@EntryIndexedValue">SDL</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SHA/@EntryIndexedValue">SHA</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SRGB/@EntryIndexedValue">SRGB</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=TK/@EntryIndexedValue">TK</s:String>
@@ -806,9 +807,9 @@ See the LICENCE file in the repository root for full licence text.&#xD;
 	<s:String x:Key="/Default/CustomTools/CustomToolsData/@EntryValue"></s:String>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=Microsoft_002EExtensions_002ELogging_002E_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=Microsoft_002EToolkit_002EHighPerformance_002EBox_002A/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=NUnit_002EFramework_002EInternal_002ELogger/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=OpenTabletDriver_002EPlugin_002EDependencyInjection_002E_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=Realms_002ELogging_002ELogger/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002EComponentModel_002EComponent/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002EComponentModel_002EContainer/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002ENumerics_002E_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002ESecurity_002ECryptography_002ERSA/@EntryIndexedValue">True</s:Boolean>

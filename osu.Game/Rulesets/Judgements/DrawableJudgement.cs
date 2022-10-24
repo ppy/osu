@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Judgements
 
             // sub-classes might have added their own children that would be removed here if .InternalChild was used.
             if (JudgementBody != null)
-                RemoveInternal(JudgementBody);
+                RemoveInternal(JudgementBody, true);
 
             AddInternal(JudgementBody = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ =>
                 CreateDefaultJudgement(type), confineMode: ConfineMode.NoScaling)

@@ -31,20 +31,20 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override void AddCheckSteps()
         {
-            // It doesn't matter which ruleset is used - this beatmap is only used for reference.
-            var beatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            // we only want this beatmap for time reference.
+            var referenceBeatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
 
             AddUntilStep("score above zero", () => Player.ScoreProcessor.TotalScore.Value > 0);
             AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 2));
 
-            seekTo(beatmap.Beatmap.Breaks[0].StartTime);
+            seekTo(referenceBeatmap.Breaks[0].StartTime);
             AddAssert("keys not counting", () => !Player.HUDOverlay.KeyCounter.IsCounting);
             AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
 
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
             AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
 
-            seekTo(beatmap.Beatmap.HitObjects[^1].GetEndTime());
+            seekTo(referenceBeatmap.HitObjects[^1].GetEndTime());
             AddUntilStep("results displayed", () => getResultsScreen()?.IsLoaded == true);
 
             AddAssert("score has combo", () => getResultsScreen().Score.Combo > 100);

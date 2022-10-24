@@ -10,8 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -22,13 +20,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     /// </summary>
     internal class LegacyInputDrum : Container
     {
+        private Container content;
         private LegacyHalfDrum left;
         private LegacyHalfDrum right;
-        private Container content;
 
         public LegacyInputDrum()
         {
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
@@ -114,9 +113,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             public readonly Sprite Rim;
             public readonly Sprite Centre;
 
-            [Resolved]
-            private DrumSampleTriggerSource sampleTriggerSource { get; set; }
-
             public LegacyHalfDrum(bool flipped)
             {
                 Masking = true;
@@ -151,12 +147,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 if (e.Action == CentreAction)
                 {
                     target = Centre;
-                    sampleTriggerSource.Play(HitType.Centre);
                 }
                 else if (e.Action == RimAction)
                 {
                     target = Rim;
-                    sampleTriggerSource.Play(HitType.Rim);
                 }
 
                 if (target != null)

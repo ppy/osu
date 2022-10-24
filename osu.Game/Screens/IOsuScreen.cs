@@ -42,6 +42,11 @@ namespace osu.Game.Screens
         bool HideOverlaysOnEnter { get; }
 
         /// <summary>
+        /// Whether the menu cursor should be hidden when non-mouse input is received.
+        /// </summary>
+        bool HideMenuCursorOnNonMouseInput { get; }
+
+        /// <summary>
         /// Whether overlays should be able to be opened when this screen is current.
         /// </summary>
         IBindable<OverlayActivation> OverlayActivationMode { get; }

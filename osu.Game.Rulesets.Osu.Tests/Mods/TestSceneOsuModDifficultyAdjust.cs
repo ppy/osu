@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -10,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -90,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             if (!objects.Any())
                 return false;
 
-            return objects.All(o => Precision.AlmostEquals(o.ChildrenOfType<ShakeContainer>().First().Children.OfType<Container>().Single().Scale.X, target));
+            return objects.All(o => Precision.AlmostEquals(o.ChildrenOfType<Container>().First().Scale.X, target));
         }
 
         private bool checkSomeHit()

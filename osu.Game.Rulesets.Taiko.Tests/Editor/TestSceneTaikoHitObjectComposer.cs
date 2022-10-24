@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
         public void Setup() => Schedule(() =>
         {
             BeatDivisor.Value = 8;
-            Clock.Seek(0);
+            EditorClock.Seek(0);
 
             Child = new TestComposer { RelativeSizeAxes = Axes.Both };
         });
