@@ -1,12 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -54,7 +54,8 @@ namespace osu.Game.Online.Multiplayer
                     connection.On<MultiplayerRoomSettings>(nameof(IMultiplayerClient.SettingsChanged), ((IMultiplayerClient)this).SettingsChanged);
                     connection.On<int, MultiplayerUserState>(nameof(IMultiplayerClient.UserStateChanged), ((IMultiplayerClient)this).UserStateChanged);
                     connection.On(nameof(IMultiplayerClient.LoadRequested), ((IMultiplayerClient)this).LoadRequested);
-                    connection.On(nameof(IMultiplayerClient.MatchStarted), ((IMultiplayerClient)this).MatchStarted);
+                    connection.On(nameof(IMultiplayerClient.GameplayStarted), ((IMultiplayerClient)this).GameplayStarted);
+                    connection.On(nameof(IMultiplayerClient.LoadAborted), ((IMultiplayerClient)this).LoadAborted);
                     connection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
                     connection.On<int, IEnumerable<APIMod>>(nameof(IMultiplayerClient.UserModsChanged), ((IMultiplayerClient)this).UserModsChanged);
                     connection.On<int, BeatmapAvailability>(nameof(IMultiplayerClient.UserBeatmapAvailabilityChanged), ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged);
@@ -70,14 +71,29 @@ namespace osu.Game.Online.Multiplayer
             }
         }
 
-        protected override Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
+        protected override async Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
         {
             if (!IsConnected.Value)
-                return Task.FromCanceled<MultiplayerRoom>(new CancellationToken(true));
+                throw new OperationCanceledException();
 
             Debug.Assert(connection != null);
 
-            return connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), roomId, password ?? string.Empty);
+            try
+            {
+                return await connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), roomId, password ?? string.Empty);
+            }
+            catch (HubException exception)
+            {
+                if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
+                {
+                    Debug.Assert(connector != null);
+
+                    await connector.Reconnect();
+                    return await JoinRoom(roomId, password);
+                }
+
+                throw;
+            }
         }
 
         protected override Task LeaveRoomInternal()

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using Newtonsoft.Json;
 using osu.Game.Rulesets.Mods;
@@ -8,6 +10,9 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
+    /// <summary>
+    /// Represents an aggregate score for a user based off all beatmaps that have been played in the playlist.
+    /// </summary>
     public class APIUserScoreAggregate
     {
         [JsonProperty("attempts")]

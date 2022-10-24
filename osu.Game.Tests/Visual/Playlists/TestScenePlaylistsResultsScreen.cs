@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +61,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 userScore = TestResources.CreateTestScoreInfo();
                 userScore.TotalScore = 0;
                 userScore.Statistics = new Dictionary<HitResult, int>();
+                userScore.MaximumStatistics = new Dictionary<HitResult, int>();
 
                 bindHandler();
 
@@ -173,6 +176,8 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddUntilStep("wait for scores loaded", () =>
                 requestComplete
+                // request handler may need to fire more than once to get scores.
+                && totalCount > 0
                 && resultsScreen.ScorePanelList.GetScorePanels().Count() == totalCount
                 && resultsScreen.ScorePanelList.AllPanelsVisible);
             AddWaitStep("wait for display", 5);
@@ -183,8 +188,8 @@ namespace osu.Game.Tests.Visual.Playlists
             // pre-check for requests we should be handling (as they are scheduled below).
             switch (request)
             {
-                case ShowPlaylistUserScoreRequest _:
-                case IndexPlaylistScoresRequest _:
+                case ShowPlaylistUserScoreRequest:
+                case IndexPlaylistScoresRequest:
                     break;
 
                 default:
@@ -259,7 +264,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 multiplayerUserScore.ScoresAround.Lower.Scores.Add(new MultiplayerScore
                 {
-                    ID = --highestScoreId,
+                    ID = getNextLowestScoreId(),
                     Accuracy = userScore.Accuracy,
                     Passed = true,
                     Rank = userScore.Rank,
@@ -274,7 +279,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
                 multiplayerUserScore.ScoresAround.Higher.Scores.Add(new MultiplayerScore
                 {
-                    ID = ++lowestScoreId,
+                    ID = getNextHighestScoreId(),
                     Accuracy = userScore.Accuracy,
                     Passed = true,
                     Rank = userScore.Rank,
@@ -306,7 +311,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 result.Scores.Add(new MultiplayerScore
                 {
-                    ID = sort == "score_asc" ? --highestScoreId : ++lowestScoreId,
+                    ID = sort == "score_asc" ? getNextHighestScoreId() : getNextLowestScoreId(),
                     Accuracy = 1,
                     Passed = true,
                     Rank = ScoreRank.X,
@@ -327,6 +332,17 @@ namespace osu.Game.Tests.Visual.Playlists
             return result;
         }
 
+        /// <summary>
+        /// The next highest score ID to appear at the left of the list. Monotonically decreasing.
+        /// </summary>
+        private int getNextHighestScoreId() => --highestScoreId;
+
+        /// <summary>
+        /// The next lowest score ID to appear at the right of the list. Monotonically increasing.
+        /// </summary>
+        /// <returns></returns>
+        private int getNextLowestScoreId() => ++lowestScoreId;
+
         private void addCursor(MultiplayerScores scores)
         {
             scores.Cursor = new Cursor
@@ -342,7 +358,9 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 Properties = new Dictionary<string, JToken>
                 {
-                    { "sort", JToken.FromObject(scores.Scores[^1].ID > scores.Scores[^2].ID ? "score_asc" : "score_desc") }
+                    // [ 1, 2, 3, ... ] => score_desc (will be added to the right of the list)
+                    // [ 3, 2, 1, ... ] => score_asc (will be added to the left of the list)
+                    { "sort", JToken.FromObject(scores.Scores[^1].ID > scores.Scores[^2].ID ? "score_desc" : "score_asc") }
                 }
             };
         }

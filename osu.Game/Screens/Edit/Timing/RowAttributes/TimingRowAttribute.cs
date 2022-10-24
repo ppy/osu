@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
@@ -24,9 +27,11 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             Content.Add(text = new AttributeText(Point));
+
+            Background.Colour = colourProvider.Background4;
 
             timeSignature.BindValueChanged(_ => updateText());
             beatLength.BindValueChanged(_ => updateText(), true);

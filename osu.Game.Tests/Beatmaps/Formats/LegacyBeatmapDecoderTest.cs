@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -304,7 +306,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(128, 255, 128, 255),
                     new Color4(255, 187, 255, 255),
                     new Color4(255, 177, 140, 255),
-                    new Color4(100, 100, 100, 100),
+                    new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
                 };
                 Assert.AreEqual(expectedColors.Length, comboColors.Count);
                 for (int i = 0; i < expectedColors.Length; i++)
@@ -861,6 +863,85 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var decoded = decoder.Decode(stream);
                 Assert.That(decoded.Difficulty.ApproachRate, Is.EqualTo(9));
                 Assert.That(decoded.Difficulty.OverallDifficulty, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void TestLegacyAdjacentImplicitCatmullSegmentsAreMerged()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("adjacent-catmull-segments.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
+
+                Assert.That(controlPoints.Count, Is.EqualTo(6));
+                Assert.That(controlPoints.Single(c => c.Type != null).Type, Is.EqualTo(PathType.Catmull));
+            }
+        }
+
+        [Test]
+        public void TestNonLegacyAdjacentImplicitCatmullSegmentsAreNotMerged()
+        {
+            var decoder = new LegacyBeatmapDecoder(LegacyBeatmapEncoder.FIRST_LAZER_VERSION) { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("adjacent-catmull-segments.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
+
+                Assert.That(controlPoints.Count, Is.EqualTo(4));
+                Assert.That(controlPoints[0].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[1].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[2].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[3].Type, Is.Null);
+            }
+        }
+
+        [Test]
+        public void TestLegacyDuplicateInitialCatmullPointIsMerged()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("catmull-duplicate-initial-controlpoint.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
+
+                Assert.That(controlPoints.Count, Is.EqualTo(4));
+                Assert.That(controlPoints[0].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[0].Position, Is.EqualTo(Vector2.Zero));
+                Assert.That(controlPoints[1].Type, Is.Null);
+                Assert.That(controlPoints[1].Position, Is.Not.EqualTo(Vector2.Zero));
+            }
+        }
+
+        [Test]
+        public void TestNaNControlPoints()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("nan-control-points.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.TimingPoints.Count, Is.EqualTo(1));
+                Assert.That(controlPoints.DifficultyPoints.Count, Is.EqualTo(2));
+
+                Assert.That(controlPoints.TimingPointAt(1000).BeatLength, Is.EqualTo(500));
+
+                Assert.That(controlPoints.DifficultyPointAt(2000).SliderVelocity, Is.EqualTo(1));
+                Assert.That(controlPoints.DifficultyPointAt(3000).SliderVelocity, Is.EqualTo(1));
+
+#pragma warning disable 618
+                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(2000)).GenerateTicks, Is.False);
+                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(3000)).GenerateTicks, Is.True);
+#pragma warning restore 618
             }
         }
     }

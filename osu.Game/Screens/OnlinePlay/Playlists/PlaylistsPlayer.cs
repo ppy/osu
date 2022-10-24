@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -45,9 +47,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            if (base.OnExiting(next))
+            if (base.OnExiting(e))
                 return true;
 
             Exited?.Invoke();
@@ -65,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
-            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.ComputeFinalScore(ScoringMode.Standardised, Score.ScoreInfo));
+            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.ComputeScore(ScoringMode.Standardised, Score.ScoreInfo));
         }
 
         protected override void Dispose(bool isDisposing)

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -175,7 +177,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private class TestLegacySkin : LegacySkin
         {
             public TestLegacySkin(IResourceStore<byte[]> storage, string fileName)
-                : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, storage, null, fileName)
+                : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, null, storage, fileName)
             {
             }
         }

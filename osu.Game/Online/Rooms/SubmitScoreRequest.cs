@@ -1,24 +1,26 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Net.Http;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Game.Online.API;
-using osu.Game.Online.Solo;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 
 namespace osu.Game.Online.Rooms
 {
     public abstract class SubmitScoreRequest : APIRequest<MultiplayerScore>
     {
-        public readonly SubmittableScore Score;
+        public readonly SoloScoreInfo Score;
 
         protected readonly long ScoreId;
 
         protected SubmitScoreRequest(ScoreInfo scoreInfo, long scoreId)
         {
-            Score = new SubmittableScore(scoreInfo);
+            Score = SoloScoreInfo.ForSubmission(scoreInfo);
             ScoreId = scoreId;
         }
 

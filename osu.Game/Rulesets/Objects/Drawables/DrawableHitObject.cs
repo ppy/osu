@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -170,7 +172,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
 
-            // Explicit non-virtual function call.
+            // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
             base.AddInternal(Samples = new PausableSkinnableSound());
 
             CurrentSkin = skinSource;
@@ -403,7 +405,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
-        protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
+        protected override void ClearInternal(bool disposeChildren = true) =>
+            // See sample addition in load method.
+            throw new InvalidOperationException(
+                $"Should never clear a {nameof(DrawableHitObject)} as the base implementation adds components. If attempting to use {nameof(InternalChild)} or {nameof(InternalChildren)}, using {nameof(AddInternal)} or {nameof(AddRangeInternal)} instead.");
 
         private void updateState(ArmedState newState, bool force = false)
         {
@@ -448,7 +453,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Reapplies the current <see cref="ArmedState"/>.
         /// </summary>
-        protected void RefreshStateTransforms() => updateState(State.Value, true);
+        public void RefreshStateTransforms() => updateState(State.Value, true);
 
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
@@ -646,7 +651,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <remarks>
         /// This does not affect the time offset provided to invocations of <see cref="CheckForResult"/>.
         /// </remarks>
-        protected virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
+        public virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
 
         /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as

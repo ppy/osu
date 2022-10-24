@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,6 +22,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
@@ -42,12 +45,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float alpha_when_invalid = 0.3f;
 
-        [CanBeNull]
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private ScoreProcessor scoreProcessor { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
+        [Resolved]
         private GameplayState gameplayState { get; set; }
 
         [CanBeNull]
@@ -200,7 +201,7 @@ namespace osu.Game.Screens.Play.HUD
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Text = @"pp",
+                            Text = BeatmapsetsStrings.ShowScoreboardHeaderspp,
                             Font = OsuFont.Numeric.With(size: 8),
                             Padding = new MarginPadding { Bottom = 1.5f }, // align baseline better
                         }

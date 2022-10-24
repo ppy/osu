@@ -6,8 +6,6 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
-#nullable enable
-
 namespace osu.Game.Rulesets.Objects
 {
     public static class SliderPathExtensions
@@ -15,10 +13,10 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Snaps the provided <paramref name="hitObject"/>'s duration using the <paramref name="snapProvider"/>.
         /// </summary>
-        public static void SnapTo<THitObject>(this THitObject hitObject, IPositionSnapProvider? snapProvider)
+        public static void SnapTo<THitObject>(this THitObject hitObject, IDistanceSnapProvider? snapProvider)
             where THitObject : HitObject, IHasPath
         {
-            hitObject.Path.ExpectedDistance.Value = snapProvider?.GetSnappedDistanceFromDistance(hitObject, (float)hitObject.Path.CalculatedDistance) ?? hitObject.Path.CalculatedDistance;
+            hitObject.Path.ExpectedDistance.Value = snapProvider?.FindSnappedDistance(hitObject, (float)hitObject.Path.CalculatedDistance) ?? hitObject.Path.CalculatedDistance;
         }
 
         /// <summary>

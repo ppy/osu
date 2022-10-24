@@ -1,11 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
@@ -49,7 +52,7 @@ namespace osu.Game.Overlays.Dashboard.Home
             flow.AddRange(beatmapSets.Select(CreateBeatmapPanel));
         }
 
-        protected abstract string Title { get; }
+        protected abstract LocalisableString Title { get; }
 
         protected abstract DashboardBeatmapPanel CreateBeatmapPanel(APIBeatmapSet beatmapSet);
     }

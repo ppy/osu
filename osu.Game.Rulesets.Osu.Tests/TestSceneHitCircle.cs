@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -56,10 +58,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null)
         {
-            var drawable = createSingle(circleSize, auto, timeOffset, positionOffset);
-
             var playfield = new TestOsuPlayfield();
-            playfield.Add(drawable);
+
+            for (double t = timeOffset; t < timeOffset + 60000; t += 2000)
+                playfield.Add(createSingle(circleSize, auto, t, positionOffset));
+
             return playfield;
         }
 

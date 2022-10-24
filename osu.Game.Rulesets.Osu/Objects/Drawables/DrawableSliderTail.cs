@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -56,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Origin = Anchor.Centre;
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 scaleContainer = new Container
                 {
@@ -69,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
                     }
                 },
-            };
+            });
 
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }

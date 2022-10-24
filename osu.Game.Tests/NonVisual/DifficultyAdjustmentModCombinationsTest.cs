@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -158,7 +161,7 @@ namespace osu.Game.Tests.NonVisual
         {
             public override string Name => nameof(ModA);
             public override string Acronym => nameof(ModA);
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModIncompatibleWithA), typeof(ModIncompatibleWithAAndB) };
@@ -167,7 +170,7 @@ namespace osu.Game.Tests.NonVisual
         private class ModB : Mod
         {
             public override string Name => nameof(ModB);
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override string Acronym => nameof(ModB);
             public override double ScoreMultiplier => 1;
 
@@ -178,7 +181,7 @@ namespace osu.Game.Tests.NonVisual
         {
             public override string Name => nameof(ModC);
             public override string Acronym => nameof(ModC);
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override double ScoreMultiplier => 1;
         }
 
@@ -186,7 +189,7 @@ namespace osu.Game.Tests.NonVisual
         {
             public override string Name => $"Incompatible With {nameof(ModA)}";
             public override string Acronym => $"Incompatible With {nameof(ModA)}";
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModA) };
@@ -205,7 +208,7 @@ namespace osu.Game.Tests.NonVisual
         {
             public override string Name => $"Incompatible With {nameof(ModA)} and {nameof(ModB)}";
             public override string Acronym => $"Incompatible With {nameof(ModA)} and {nameof(ModB)}";
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModA), typeof(ModB) };

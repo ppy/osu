@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System;
@@ -336,8 +338,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             while (++endIndex < vertices.Length - endPointLength)
             {
-                // Keep incrementing while an implicit segment doesn't need to be started
+                // Keep incrementing while an implicit segment doesn't need to be started.
                 if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
+                    continue;
+
+                // Legacy Catmull sliders don't support multiple segments, so adjacent Catmull segments should be treated as a single one.
+                // Importantly, this is not applied to the first control point, which may duplicate the slider path's position
+                // resulting in a duplicate (0,0) control point in the resultant list.
+                if (type == PathType.Catmull && endIndex > 1 && FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
                     continue;
 
                 // The last control point of each segment is not allowed to start a new implicit segment.
@@ -500,12 +508,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newVolume.GetOr(Volume), newCustomSampleBank.GetOr(CustomSampleBank), newIsLayered.GetOr(IsLayered));
 
             public bool Equals(LegacyHitSampleInfo? other)
-                => base.Equals(other) && CustomSampleBank == other.CustomSampleBank;
+                // The additions to equality checks here are *required* to ensure that pooling works correctly.
+                // Of note, `IsLayered` may cause the usage of `SampleVirtual` instead of an actual sample (in cases playback is not required).
+                // Removing it would cause samples which may actually require playback to potentially source for a `SampleVirtual` sample pool.
+                => base.Equals(other) && CustomSampleBank == other.CustomSampleBank && IsLayered == other.IsLayered;
 
             public override bool Equals(object? obj)
                 => obj is LegacyHitSampleInfo other && Equals(other);
 
-            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank);
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank, IsLayered);
         }
 
         private class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>

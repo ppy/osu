@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -45,10 +44,45 @@ namespace osu.Game.Configuration
         /// </remarks>
         public Type? SettingControlType { get; set; }
 
+        public SettingSourceAttribute(Type declaringType, string label, string? description = null)
+        {
+            Label = getLocalisableStringFromMember(label) ?? string.Empty;
+            Description = getLocalisableStringFromMember(description) ?? string.Empty;
+
+            LocalisableString? getLocalisableStringFromMember(string? member)
+            {
+                if (member == null)
+                    return null;
+
+                var property = declaringType.GetMember(member, BindingFlags.Static | BindingFlags.Public).FirstOrDefault();
+
+                if (property == null)
+                    return null;
+
+                switch (property)
+                {
+                    case FieldInfo f:
+                        return (LocalisableString)f.GetValue(null).AsNonNull();
+
+                    case PropertyInfo p:
+                        return (LocalisableString)p.GetValue(null).AsNonNull();
+
+                    default:
+                        throw new InvalidOperationException($"Member \"{member}\" was not found in type {declaringType} (must be a static field or property)");
+                }
+            }
+        }
+
         public SettingSourceAttribute(string? label, string? description = null)
         {
             Label = label ?? string.Empty;
             Description = description ?? string.Empty;
+        }
+
+        public SettingSourceAttribute(Type declaringType, string label, string description, int orderPosition)
+            : this(declaringType, label, description)
+        {
+            OrderPosition = orderPosition;
         }
 
         public SettingSourceAttribute(string label, string description, int orderPosition)
@@ -88,6 +122,7 @@ namespace osu.Game.Configuration
                         throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} had an unsupported custom control type ({controlType.ReadableName()})");
 
                     var control = (Drawable)Activator.CreateInstance(controlType);
+                    controlType.GetProperty(nameof(SettingsItem<object>.SettingSourceObject))?.SetValue(control, obj);
                     controlType.GetProperty(nameof(SettingsItem<object>.LabelText))?.SetValue(control, attr.Label);
                     controlType.GetProperty(nameof(SettingsItem<object>.TooltipText))?.SetValue(control, attr.Description);
                     controlType.GetProperty(nameof(SettingsItem<object>.Current))?.SetValue(control, value);

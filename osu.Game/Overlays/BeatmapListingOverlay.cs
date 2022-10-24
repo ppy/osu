@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -102,11 +104,11 @@ namespace osu.Game.Overlays
             filterControl.CardSize.BindValueChanged(_ => onCardSizeChanged());
 
             apiUser = api.LocalUser.GetBoundCopy();
-            apiUser.BindValueChanged(_ =>
+            apiUser.BindValueChanged(_ => Schedule(() =>
             {
                 if (api.IsLoggedIn)
                     addContentToResultsArea(Drawable.Empty());
-            });
+            }));
         }
 
         public void ShowWithSearch(string query)
@@ -174,6 +176,11 @@ namespace osu.Game.Overlays
             }
             else
             {
+                // new results may contain beatmaps from a previous page,
+                // this is dodgy but matches web behaviour for now.
+                // see: https://github.com/ppy/osu-web/issues/9270
+                newCards = newCards.Except(foundContent);
+
                 panelLoadTask = LoadComponentsAsync(newCards, loaded =>
                 {
                     lastFetchDisplayedTime = Time.Current;
@@ -183,7 +190,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private BeatmapCard[] createCardsFor(IEnumerable<APIBeatmapSet> beatmapSets) => beatmapSets.Select(set => BeatmapCard.Create(set, filterControl.CardSize.Value).With(c =>
+        private IEnumerable<BeatmapCard> createCardsFor(IEnumerable<APIBeatmapSet> beatmapSets) => beatmapSets.Select(set => BeatmapCard.Create(set, filterControl.CardSize.Value).With(c =>
         {
             c.Anchor = Anchor.TopCentre;
             c.Origin = Anchor.TopCentre;

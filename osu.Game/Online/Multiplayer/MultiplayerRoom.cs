@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using MessagePack;
@@ -53,6 +51,12 @@ namespace osu.Game.Online.Multiplayer
 
         [Key(6)]
         public IList<MultiplayerPlaylistItem> Playlist { get; set; } = new List<MultiplayerPlaylistItem>();
+
+        /// <summary>
+        /// The currently running countdowns.
+        /// </summary>
+        [Key(7)]
+        public IList<MultiplayerCountdown> ActiveCountdowns { get; set; } = new List<MultiplayerCountdown>();
 
         [JsonConstructor]
         [SerializationConstructor]

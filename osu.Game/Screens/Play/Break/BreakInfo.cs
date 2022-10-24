@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osuTK;
 
@@ -42,8 +45,7 @@ namespace osu.Game.Screens.Play.Break
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            AccuracyDisplay = new PercentageBreakInfoLine("Accuracy"),
-
+                            AccuracyDisplay = new PercentageBreakInfoLine(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy),
                             // See https://github.com/ppy/osu/discussions/15185
                             // RankDisplay = new BreakInfoLine<int>("Rank"),
                             GradeDisplay = new BreakInfoLine<ScoreRank>("Grade"),

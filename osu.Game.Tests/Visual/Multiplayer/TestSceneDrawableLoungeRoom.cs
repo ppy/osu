@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -40,11 +42,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             var mockLounge = new Mock<LoungeSubScreen>();
             mockLounge
                 .Setup(l => l.Join(It.IsAny<Room>(), It.IsAny<string>(), It.IsAny<Action<Room>>(), It.IsAny<Action<string>>()))
-                .Callback<Room, string, Action<Room>, Action<string>>((a, b, c, d) =>
+                .Callback<Room, string, Action<Room>, Action<string>>((_, _, _, d) =>
                 {
                     Task.Run(() =>
                     {
-                        allowResponseCallback.Wait();
+                        allowResponseCallback.Wait(10000);
                         allowResponseCallback.Reset();
                         Schedule(() => d?.Invoke("Incorrect password"));
                     });

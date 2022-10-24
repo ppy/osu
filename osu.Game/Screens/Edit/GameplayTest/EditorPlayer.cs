@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -25,7 +27,11 @@ namespace osu.Game.Screens.Edit.GameplayTest
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-            => new MasterGameplayClockContainer(beatmap, editorState.Time, true);
+        {
+            var masterGameplayClockContainer = new MasterGameplayClockContainer(beatmap, gameplayStart);
+            masterGameplayClockContainer.Reset(editorState.Time);
+            return masterGameplayClockContainer;
+        }
 
         protected override void LoadComplete()
         {
@@ -33,7 +39,13 @@ namespace osu.Game.Screens.Edit.GameplayTest
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
             {
                 if (completed.NewValue)
-                    Scheduler.AddDelayed(this.Exit, RESULTS_DISPLAY_DELAY);
+                {
+                    Scheduler.AddDelayed(() =>
+                    {
+                        if (this.IsCurrentScreen())
+                            this.Exit();
+                    }, RESULTS_DISPLAY_DELAY);
+                }
             });
         }
 
@@ -44,9 +56,9 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         protected override bool CheckModsAllowFailure() => false; // never fail.
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             // finish alpha transforms on entering to avoid gameplay starting in a half-hidden state.
             // the finish calls are purposefully not propagated to children to avoid messing up their state.
@@ -54,13 +66,13 @@ namespace osu.Game.Screens.Edit.GameplayTest
             GameplayClockContainer.FinishTransforms(false, nameof(Alpha));
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             musicController.Stop();
 
             editorState.Time = GameplayClockContainer.CurrentTime;
             editor.RestoreState(editorState);
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
     }
 }

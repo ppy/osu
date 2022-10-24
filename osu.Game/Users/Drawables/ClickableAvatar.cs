@@ -1,13 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users.Drawables
@@ -21,7 +22,7 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public bool OpenOnClick
         {
-            set => clickableArea.Enabled.Value = value;
+            set => clickableArea.Enabled.Value = clickableArea.Action != null && value;
         }
 
         /// <summary>
@@ -52,8 +53,10 @@ namespace osu.Game.Users.Drawables
             Add(clickableArea = new ClickableArea
             {
                 RelativeSizeAxes = Axes.Both,
-                Action = openProfile
             });
+
+            if (user?.Id != APIUser.SYSTEM_USER_ID)
+                clickableArea.Action = openProfile;
         }
 
         [BackgroundDependencyLoader]
@@ -71,11 +74,6 @@ namespace osu.Game.Users.Drawables
         private class ClickableArea : OsuClickableContainer
         {
             private LocalisableString tooltip = default_tooltip_text;
-
-            public ClickableArea()
-                : base(HoverSampleSet.Submit)
-            {
-            }
 
             public override LocalisableString TooltipText
             {

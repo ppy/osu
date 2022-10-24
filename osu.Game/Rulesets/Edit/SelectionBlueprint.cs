@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework;
 using osu.Framework.Graphics;
@@ -89,16 +91,12 @@ namespace osu.Game.Rulesets.Edit
             // set the body piece's alpha directly to avoid arbitrarily rendering frame buffers etc. of children.
             foreach (var d in InternalChildren)
                 d.Hide();
-
-            Hide();
         }
 
         protected virtual void OnSelected()
         {
             foreach (var d in InternalChildren)
                 d.Show();
-
-            Show();
         }
 
         // When not selected, input is only required for the blueprint itself to receive IsHovering

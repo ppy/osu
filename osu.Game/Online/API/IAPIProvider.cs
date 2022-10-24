@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
@@ -15,19 +13,16 @@ namespace osu.Game.Online.API
     {
         /// <summary>
         /// The local user.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         IBindable<APIUser> LocalUser { get; }
 
         /// <summary>
         /// The user's friends.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         IBindableList<APIUser> Friends { get; }
 
         /// <summary>
         /// The current user's activity.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         IBindable<UserActivity> Activity { get; }
 

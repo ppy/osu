@@ -1,22 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
+#nullable disable
+
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
     public enum APIPlayStyle
     {
-        [Description("Keyboard")]
+        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.DeviceKeyboard))]
         Keyboard,
 
-        [Description("Mouse")]
+        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.DeviceMouse))]
         Mouse,
 
-        [Description("Tablet")]
+        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.DeviceTablet))]
         Tablet,
 
-        [Description("Touch Screen")]
+        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.DeviceTouch))]
         Touch,
     }
 }

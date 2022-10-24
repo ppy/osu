@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 
@@ -267,9 +268,9 @@ namespace osu.Game.Skinning
             {
                 switch (lookup)
                 {
-                    case GlobalSkinColours _:
-                    case SkinComboColourLookup _:
-                    case SkinCustomColourLookup _:
+                    case GlobalSkinColours:
+                    case SkinComboColourLookup:
+                    case SkinCustomColourLookup:
                         if (provider.AllowColourLookup)
                             return skin.GetConfig<TLookup, TValue>(lookup);
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public void UpdateResult() => base.UpdateResult(true);
 
-        protected override double MaximumJudgementOffset => base.MaximumJudgementOffset * release_window_lenience;
+        public override double MaximumJudgementOffset => base.MaximumJudgementOffset * release_window_lenience;
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {

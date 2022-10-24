@@ -2,19 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using SharpCompress.Compressors.LZMA;
-
-#nullable enable
 
 namespace osu.Game.Scoring.Legacy
 {
@@ -111,6 +111,9 @@ namespace osu.Game.Scoring.Legacy
             {
                 StringBuilder replayData = new StringBuilder();
 
+                // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
+                double offset = beatmap?.BeatmapInfo.BeatmapVersion < 5 ? -LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
+
                 if (score.Replay != null)
                 {
                     int lastTime = 0;
@@ -120,7 +123,7 @@ namespace osu.Game.Scoring.Legacy
                         var legacyFrame = getLegacyFrame(f);
 
                         // Rounding because stable could only parse integral values
-                        int time = (int)Math.Round(legacyFrame.Time);
+                        int time = (int)Math.Round(legacyFrame.Time + offset);
                         replayData.Append(FormattableString.Invariant($"{time - lastTime}|{legacyFrame.MouseX ?? 0}|{legacyFrame.MouseY ?? 0}|{(int)legacyFrame.ButtonState},"));
                         lastTime = time;
                     }
@@ -141,6 +144,7 @@ namespace osu.Game.Scoring.Legacy
                     return legacyFrame;
 
                 case IConvertibleReplayFrame convertibleFrame:
+                    Debug.Assert(beatmap != null);
                     return convertibleFrame.ToLegacy(beatmap);
 
                 default:

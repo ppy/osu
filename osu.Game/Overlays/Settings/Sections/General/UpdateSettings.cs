@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -27,7 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private SettingsButton checkForUpdatesButton;
 
         [Resolved(CanBeNull = true)]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuConfigManager config, OsuGame game)
@@ -52,7 +54,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             {
                                 notifications?.Post(new SimpleNotification
                                 {
-                                    Text = $"You are running the latest release ({game.Version})",
+                                    Text = GeneralSettingsStrings.RunningLatestRelease(game.Version),
                                     Icon = FontAwesome.Solid.CheckCircle,
                                 });
                             }
@@ -68,7 +70,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.OpenOsuFolder,
-                    Action = storage.PresentExternally,
+                    Action = () => storage.PresentExternally(),
                 });
 
                 Add(new SettingsButton

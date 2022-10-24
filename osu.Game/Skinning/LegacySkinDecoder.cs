@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Globalization;
 using osu.Game.Beatmaps.Formats;
 
@@ -46,7 +48,7 @@ namespace osu.Game.Skinning
                     // osu!catch section only has colour settings
                     // so no harm in handling the entire section
                     case Section.CatchTheBeat:
-                        HandleColours(skin, line);
+                        HandleColours(skin, line, true);
                         return;
                 }
 

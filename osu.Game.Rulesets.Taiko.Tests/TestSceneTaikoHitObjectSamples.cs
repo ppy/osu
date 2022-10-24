@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
         protected override IResourceStore<byte[]> RulesetResources => new DllResourceStore(Assembly.GetAssembly(typeof(TestSceneTaikoHitObjectSamples)));
 
         [TestCase("taiko-normal-hitnormal")]
-        [TestCase("normal-hitnormal")]
         [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromBeatmap(string expectedSample)
         {
@@ -27,7 +26,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
         }
 
         [TestCase("taiko-normal-hitnormal")]
-        [TestCase("normal-hitnormal")]
         [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromUserSkinFallback(string expectedSample)
         {
@@ -39,7 +37,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
         }
 
         [TestCase("taiko-normal-hitnormal2")]
-        [TestCase("normal-hitnormal2")]
         public void TestUserSkinLookupIgnoresSampleBank(string unwantedSample)
         {
             SetupSkins(string.Empty, unwantedSample);

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -8,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
@@ -23,7 +26,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         private RollingCounter<int> counter;
 
         public PerformanceStatistic(ScoreInfo score)
-            : base("PP")
+            : base(BeatmapsetsStrings.ShowScoreboardHeaderspp)
         {
             this.score = score;
         }

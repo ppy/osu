@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -8,12 +10,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
+using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -29,6 +35,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
+        [Cached]
+        private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
+
+        [Cached(typeof(IGameplayClock))]
+        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
 
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.KeyCounter;
@@ -138,6 +150,63 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestInputDoesntWorkWhenHUDHidden()
+        {
+            SongProgressBar getSongProgress() => hudOverlay.ChildrenOfType<SongProgressBar>().Single();
+
+            bool seeked = false;
+
+            createNew();
+
+            AddStep("bind seek", () =>
+            {
+                seeked = false;
+
+                var progress = getSongProgress();
+
+                progress.ShowHandle = true;
+                progress.OnSeek += _ => seeked = true;
+            });
+
+            AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
+            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+
+            AddStep("attempt seek", () =>
+            {
+                InputManager.MoveMouseTo(getSongProgress());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("seek not performed", () => !seeked);
+
+            AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
+
+            AddStep("attempt seek", () => InputManager.Click(MouseButton.Left));
+            AddAssert("seek performed", () => seeked);
+        }
+
+        [Test]
+        public void TestHiddenHUDDoesntBlockComponentUpdates()
+        {
+            int updateCount = 0;
+
+            AddStep("set hud to never show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
+
+            createNew();
+
+            AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
+            AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
+
+            AddStep("bind on update", () =>
+            {
+                hudOverlay.ChildrenOfType<BarHitErrorMeter>().First().OnUpdate += _ => updateCount++;
+            });
+
+            AddUntilStep("wait for updates", () => updateCount > 0);
+        }
+
+        [Test]
         public void TestHiddenHUDDoesntBlockSkinnableComponentsLoad()
         {
             AddStep("set hud to never show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
@@ -145,7 +214,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             createNew();
 
             AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
-            AddUntilStep("wait for components to be hidden", () => !hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().IsPresent);
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
 
             AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Reload());
             AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().ComponentsLoaded);

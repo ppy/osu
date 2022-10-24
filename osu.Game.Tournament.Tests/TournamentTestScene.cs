@@ -1,20 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
-using osu.Game.Users;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tournament.Tests
 {
@@ -121,11 +121,11 @@ namespace osu.Game.Tournament.Tests
                     },
                     Players =
                     {
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 12 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 16 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 20 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 24 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 30 } },
+                        new TournamentUser { Username = "Hello", Rank = 12 },
+                        new TournamentUser { Username = "Hello", Rank = 16 },
+                        new TournamentUser { Username = "Hello", Rank = 20 },
+                        new TournamentUser { Username = "Hello", Rank = 24 },
+                        new TournamentUser { Username = "Hello", Rank = 30 },
                     }
                 }
             },
@@ -138,11 +138,11 @@ namespace osu.Game.Tournament.Tests
                     FullName = { Value = "United States" },
                     Players =
                     {
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
                     }
                 }
             },
@@ -152,10 +152,10 @@ namespace osu.Game.Tournament.Tests
             }
         };
 
-        public static APIBeatmap CreateSampleBeatmap() =>
-            new APIBeatmap
+        public static TournamentBeatmap CreateSampleBeatmap() =>
+            new TournamentBeatmap
             {
-                BeatmapSet = new APIBeatmapSet
+                Metadata = new BeatmapMetadata
                 {
                     Title = "Test Title",
                     Artist = "Test Artist",

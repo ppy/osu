@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -68,6 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Width = metadata_width,
                             Padding = new MarginPadding { Horizontal = 10 },
                             Margin = new MarginPadding { Right = BeatmapSetOverlay.RIGHT_WIDTH + spacing },
+                            Masking = true,
                             Child = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,

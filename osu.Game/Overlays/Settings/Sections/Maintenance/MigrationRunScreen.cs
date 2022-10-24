@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -13,6 +15,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osuTK;
@@ -27,7 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private OsuGame game { get; set; }
 
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         [Resolved]
         private Storage storage { get; set; }
@@ -69,14 +72,14 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "Migration in progress",
+                            Text = MaintenanceSettingsStrings.MigrationInProgress,
                             Font = OsuFont.Default.With(size: 40)
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "This could take a few minutes depending on the speed of your disk(s).",
+                            Text = MaintenanceSettingsStrings.MigrationDescription,
                             Font = OsuFont.Default.With(size: 30)
                         },
                         new LoadingSpinner(true)
@@ -87,7 +90,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "Please avoid interacting with the game!",
+                            Text = MaintenanceSettingsStrings.ProhibitedInteractDuringMigration,
                             Font = OsuFont.Default.With(size: 30)
                         },
                     }
@@ -109,7 +112,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     {
                                         notifications.Post(new SimpleNotification
                                         {
-                                            Text = "Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up.",
+                                            Text = MaintenanceSettingsStrings.FailedCleanupNotification,
                                             Activated = () =>
                                             {
                                                 originalStorage.PresentExternally();
@@ -124,20 +127,20 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         protected virtual bool PerformMigration() => game?.Migrate(destination.FullName) != false;
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             this.FadeOut().Delay(250).Then().FadeIn(250);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             // block until migration is finished
             if (migrationTask?.IsCompleted == false)
                 return true;
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
     }
 }

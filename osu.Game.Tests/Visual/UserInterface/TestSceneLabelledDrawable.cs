@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -76,7 +78,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     Width = 500,
                     AutoSizeAxes = Axes.Y,
-                    Child = component = padded ? (LabelledDrawable<Drawable>)new PaddedLabelledDrawable() : new NonPaddedLabelledDrawable(),
+                    Child = component = padded ? new PaddedLabelledDrawable() : new NonPaddedLabelledDrawable(),
                 };
 
                 component.Label = "a sample component";

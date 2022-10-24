@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -10,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -55,7 +58,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("no mods selected", () => SelectedMods.Value = Array.Empty<Mod>());
 
-            AddAssert("first bar text is Circle Size", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == "Circle Size");
+            AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCs);
             AddAssert("circle size bar is white", () => barIsWhite(advancedStats.FirstValue));
             AddAssert("HP drain bar is white", () => barIsWhite(advancedStats.HpDrain));
             AddAssert("accuracy bar is white", () => barIsWhite(advancedStats.Accuracy));
@@ -67,7 +70,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("set beatmap", () => advancedStats.BeatmapInfo = new BeatmapInfo
             {
-                Ruleset = rulesets.GetRuleset(3) ?? throw new InvalidOperationException(),
+                Ruleset = rulesets.GetRuleset(3) ?? throw new InvalidOperationException("osu!mania ruleset not found"),
                 Difficulty = new BeatmapDifficulty
                 {
                     CircleSize = 5,
@@ -78,7 +81,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 StarRating = 8
             });
 
-            AddAssert("first bar text is Key Count", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == "Key Count");
+            AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCsMania);
         }
 
         [Test]
@@ -123,7 +126,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select unchanged Difficulty Adjust mod", () =>
             {
                 var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance().AsNonNull();
-                var difficultyAdjustMod = ruleset.CreateMod<ModDifficultyAdjust>();
+                var difficultyAdjustMod = ruleset.CreateMod<ModDifficultyAdjust>().AsNonNull();
                 difficultyAdjustMod.ReadFromDifficulty(advancedStats.BeatmapInfo.Difficulty);
                 SelectedMods.Value = new[] { difficultyAdjustMod };
             });
@@ -142,7 +145,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select changed Difficulty Adjust mod", () =>
             {
                 var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance().AsNonNull();
-                var difficultyAdjustMod = ruleset.CreateMod<OsuModDifficultyAdjust>();
+                var difficultyAdjustMod = ruleset.CreateMod<OsuModDifficultyAdjust>().AsNonNull();
                 var originalDifficulty = advancedStats.BeatmapInfo.Difficulty;
 
                 difficultyAdjustMod.ReadFromDifficulty(originalDifficulty);

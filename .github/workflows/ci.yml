@@ -1,100 +1,13 @@
 on: [push, pull_request]
 name: Continuous Integration
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
 
 jobs:
-  test:
-    name: Test
-    runs-on: ${{matrix.os.fullname}}
-    env:
-      OSU_EXECUTION_MODE: ${{matrix.threadingMode}}
-    strategy:
-       fail-fast: false
-       matrix:
-          os:
-            - { prettyname: Windows, fullname: windows-latest }
-            - { prettyname: macOS, fullname: macos-latest }
-            - { prettyname: Linux, fullname: ubuntu-latest }
-          threadingMode: ['SingleThread', 'MultiThreaded']
-    timeout-minutes: 60
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Install .NET 6.0.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "6.0.x"
-
-      # FIXME: libavformat is not included in Ubuntu. Let's fix that.
-      # https://github.com/ppy/osu-framework/issues/4349
-      # Remove this once https://github.com/actions/virtual-environments/issues/3306 has been resolved.
-      - name: Install libavformat-dev
-        if: ${{matrix.os.fullname == 'ubuntu-latest'}}
-        run: |
-         sudo apt-get update && \
-         sudo apt-get -y install libavformat-dev
-
-      - name: Compile
-        run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
-
-      - name: Test
-        run: dotnet test $pwd/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
-        shell: pwsh
-
-      # Attempt to upload results even if test fails.
-      # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v2
-        if: ${{ always() }}
-        with:
-          name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
-          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
-
-  build-only-android:
-    name: Build only (Android)
-    runs-on: macos-latest
-    timeout-minutes: 60
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      # Pin Xamarin.Android version to 11.2 for now to avoid build failures caused by a Xamarin-side regression.
-      # See: https://github.com/xamarin/xamarin-android/issues/6284
-      # This can be removed/reverted when the fix makes it to upstream and is deployed on github runners.
-      - name: Set default Xamarin SDK version
-        run: |
-            $VM_ASSETS/select-xamarin-sdk-v2.sh --mono=6.12 --android=11.2
-
-      - name: Install .NET 6.0.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "6.0.x"
-
-      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
-      # cannot accept .sln(f) files as arguments.
-      # Build just the main game for now.
-      - name: Build
-        run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
-
-  build-only-ios:
-    name: Build only (iOS)
-    runs-on: macos-latest
-    timeout-minutes: 60
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Install .NET 6.0.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "6.0.x"
-
-      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
-      # cannot accept .sln(f) files as arguments.
-      # Build just the main game for now.
-      - name: Build
-        run: msbuild osu.iOS/osu.iOS.csproj /restore /p:Configuration=Debug
-
   inspect-code:
     name: Code Quality
     runs-on: ubuntu-latest
@@ -120,6 +33,15 @@ jobs:
       - name: Restore Packages
         run: dotnet restore
 
+      - name: Restore inspectcode cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/inspectcode
+          key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', 'osu*.slnf', '.editorconfig', '.globalconfig', 'CodeAnalysis/*', '**/*.csproj', '**/*.props') }}
+
+      - name: Dotnet code style
+        run: dotnet build -c Debug -warnaserror osu.Desktop.slnf -p:EnforceCodeStyleInBuild=true
+
       - name: CodeFileSanity
         run: |
           # TODO: Add ignore filters and GitHub Workflow Command Reporting in CFS. That way we don't have to do this workaround.
@@ -133,12 +55,85 @@ jobs:
           done <<< $(dotnet codefilesanity)
           exit $exit_code
 
-      # Temporarily disabled due to test failures, but it won't work anyway until the tool is upgraded.
-      # - name: .NET Format (Dry Run)
-      #   run: dotnet format --dry-run --check
-
       - name: InspectCode
-        run: dotnet jb inspectcode $(pwd)/osu.Desktop.slnf --output=$(pwd)/inspectcodereport.xml --cachesDir=$(pwd)/inspectcode --verbosity=WARN
+        run: dotnet jb inspectcode $(pwd)/osu.Desktop.slnf --no-build --output="inspectcodereport.xml" --caches-home="inspectcode" --verbosity=WARN
 
       - name: NVika
         run: dotnet nvika parsereport "${{github.workspace}}/inspectcodereport.xml" --treatwarningsaserrors
+
+  test:
+    name: Test
+    runs-on: ${{matrix.os.fullname}}
+    env:
+      OSU_EXECUTION_MODE: ${{matrix.threadingMode}}
+    strategy:
+       fail-fast: false
+       matrix:
+          os:
+            - { prettyname: Windows, fullname: windows-latest }
+            - { prettyname: macOS, fullname: macos-latest }
+            - { prettyname: Linux, fullname: ubuntu-latest }
+          threadingMode: ['SingleThread', 'MultiThreaded']
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install .NET 6.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "6.0.x"
+
+      - name: Compile
+        run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
+
+      - name: Test
+        run: dotnet test $pwd/**/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx" -- NUnit.ConsoleOut=0
+        shell: pwsh
+
+      # Attempt to upload results even if test fails.
+      # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
+          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
+
+  build-only-android:
+    name: Build only (Android)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install .NET 6.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "6.0.x"
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Build
+        run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
+
+  build-only-ios:
+    name: Build only (iOS)
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install .NET 6.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "6.0.x"
+
+      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
+      # cannot accept .sln(f) files as arguments.
+      # Build just the main game for now.
+      - name: Build
+        run: msbuild osu.iOS/osu.iOS.csproj /restore /p:Configuration=Debug

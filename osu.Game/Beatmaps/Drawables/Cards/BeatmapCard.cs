@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public abstract class BeatmapCard : OsuClickableContainer
+    public abstract class BeatmapCard : OsuClickableContainer, IEquatable<BeatmapCard>
     {
         public const float TRANSITION_DURATION = 400;
         public const float CORNER_RADIUS = 10;
@@ -35,7 +33,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         protected readonly BeatmapDownloadTracker DownloadTracker;
 
         protected BeatmapCard(APIBeatmapSet beatmapSet, bool allowExpansion = true)
-            : base(HoverSampleSet.Submit)
+            : base(HoverSampleSet.Button)
         {
             Expanded = new BindableBool { Disabled = !allowExpansion };
 
@@ -98,5 +96,16 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     throw new ArgumentOutOfRangeException(nameof(size), size, @"Unsupported card size");
             }
         }
+
+        public bool Equals(BeatmapCard? other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return BeatmapSet.Equals(other.BeatmapSet);
+        }
+
+        public override bool Equals(object obj) => obj is BeatmapCard other && Equals(other);
+        public override int GetHashCode() => BeatmapSet.GetHashCode();
     }
 }

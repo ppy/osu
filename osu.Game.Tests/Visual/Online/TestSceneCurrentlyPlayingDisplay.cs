@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -11,6 +13,7 @@ using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Tests.Visual.Spectator;
 using osu.Game.Users;
@@ -42,7 +45,8 @@ namespace osu.Game.Tests.Visual.Online
                         CachedDependencies = new (Type, object)[]
                         {
                             (typeof(SpectatorClient), spectatorClient),
-                            (typeof(UserLookupCache), lookupCache)
+                            (typeof(UserLookupCache), lookupCache),
+                            (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Purple)),
                         },
                         Child = currentlyPlaying = new CurrentlyPlayingDisplay
                         {

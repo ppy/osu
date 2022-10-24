@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -18,6 +19,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -31,18 +33,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private SkinManager skinManager { get; set; }
 
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
-
-        [Cached(typeof(HealthProcessor))]
-        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
-
         protected override bool HasCustomSteps => true;
 
         [Test]
         public void TestEmptyLegacyBeatmapSkinFallsBack()
         {
-            CreateSkinTest(DefaultSkin.CreateInfo(), () => new LegacyBeatmapSkin(new BeatmapInfo(), null, null));
+            CreateSkinTest(TrianglesSkin.CreateInfo(), () => new LegacyBeatmapSkin(new BeatmapInfo(), null));
             AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
             AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(SkinnableTarget.MainHUDComponents, skinManager.CurrentSkin.Value));
         }
@@ -73,17 +69,25 @@ namespace osu.Game.Tests.Visual.Gameplay
             if (expectedComponentsContainer == null)
                 return false;
 
-            var expectedComponentsAdjustmentContainer = new Container
+            var expectedComponentsAdjustmentContainer = new DependencyProvidingContainer
             {
                 Position = actualComponentsContainer.Parent.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
                 Size = actualComponentsContainer.DrawSize,
                 Child = expectedComponentsContainer,
+                // proxy the same required dependencies that `actualComponentsContainer` is using.
+                CachedDependencies = new (Type, object)[]
+                {
+                    (typeof(ScoreProcessor), actualComponentsContainer.Dependencies.Get<ScoreProcessor>()),
+                    (typeof(HealthProcessor), actualComponentsContainer.Dependencies.Get<HealthProcessor>()),
+                    (typeof(GameplayState), actualComponentsContainer.Dependencies.Get<GameplayState>()),
+                    (typeof(IGameplayClock), actualComponentsContainer.Dependencies.Get<IGameplayClock>())
+                },
             };
 
             Add(expectedComponentsAdjustmentContainer);
             expectedComponentsAdjustmentContainer.UpdateSubTree();
             var expectedInfo = expectedComponentsContainer.CreateSkinnableInfo();
-            Remove(expectedComponentsAdjustmentContainer);
+            Remove(expectedComponentsAdjustmentContainer, true);
 
             return almostEqual(actualInfo, expectedInfo);
         }
@@ -118,7 +122,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestOsuRuleset : OsuRuleset
         {
-            public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new TestOsuLegacySkinTransformer(skin);
+            public override ISkin CreateSkinTransformer(ISkin skin, IBeatmap beatmap) => new TestOsuLegacySkinTransformer(skin);
 
             private class TestOsuLegacySkinTransformer : OsuLegacySkinTransformer
             {

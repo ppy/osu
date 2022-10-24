@@ -3,8 +3,6 @@
 
 using osu.Game.IO;
 
-#nullable enable
-
 namespace osu.Game.Database
 {
     /// <summary>

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -22,7 +23,7 @@ namespace osu.Game.Screens.Select
         {
             foreach (Match match in query_syntax_regex.Matches(query))
             {
-                string key = match.Groups["key"].Value.ToLower();
+                string key = match.Groups["key"].Value.ToLowerInvariant();
                 var op = parseOperator(match.Groups["op"].Value);
                 string value = match.Groups["value"].Value;
 
@@ -121,10 +122,27 @@ namespace osu.Game.Screens.Select
 
         private static bool tryParseEnum<TEnum>(string value, out TEnum result) where TEnum : struct
         {
-            if (Enum.TryParse(value, true, out result)) return true;
+            // First try an exact match.
+            if (Enum.TryParse(value, true, out result))
+                return true;
 
-            value = Enum.GetNames(typeof(TEnum)).FirstOrDefault(name => name.StartsWith(value, true, CultureInfo.InvariantCulture));
-            return Enum.TryParse(value, true, out result);
+            // Then try a prefix match.
+            string? prefixMatch = Enum.GetNames(typeof(TEnum)).FirstOrDefault(name => name.StartsWith(value, true, CultureInfo.InvariantCulture));
+
+            if (prefixMatch == null)
+                return false;
+
+            return Enum.TryParse(prefixMatch, true, out result);
+        }
+
+        private static GroupCollection? tryMatchRegex(string value, string regex)
+        {
+            Match matches = Regex.Match(value, regex);
+
+            if (matches.Success)
+                return matches.Groups;
+
+            return null;
         }
 
         /// <summary>
@@ -310,11 +328,45 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateLengthRange(FilterCriteria criteria, Operator op, string val)
         {
-            if (!tryParseDoubleWithPoint(val.TrimEnd('m', 's', 'h'), out double length))
+            List<string> parts = new List<string>();
+
+            GroupCollection? match = null;
+
+            match ??= tryMatchRegex(val, @"^((?<hours>\d+):)?(?<minutes>\d+):(?<seconds>\d+)$");
+            match ??= tryMatchRegex(val, @"^((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
+            match ??= tryMatchRegex(val, @"^(?<seconds>\d+(\.\d+)?)$");
+
+            if (match == null)
                 return false;
 
-            int scale = getLengthScale(val);
-            return tryUpdateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
+            if (match["seconds"].Success)
+                parts.Add(match["seconds"].Value + "s");
+            if (match["minutes"].Success)
+                parts.Add(match["minutes"].Value + "m");
+            if (match["hours"].Success)
+                parts.Add(match["hours"].Value + "h");
+
+            double totalLength = 0;
+            int minScale = 3600000;
+
+            for (int i = 0; i < parts.Count; i++)
+            {
+                string part = parts[i];
+                string partNoUnit = part.TrimEnd('m', 's', 'h');
+                if (!tryParseDoubleWithPoint(partNoUnit, out double length))
+                    return false;
+
+                if (i != parts.Count - 1 && length >= 60)
+                    return false;
+                if (i != 0 && partNoUnit.Contains('.'))
+                    return false;
+
+                int scale = getLengthScale(part);
+                totalLength += length * scale;
+                minScale = Math.Min(minScale, scale);
+            }
+
+            return tryUpdateCriteriaRange(ref criteria.Length, op, totalLength, minScale / 2.0);
         }
     }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -237,7 +239,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 roomCategory.BindTo(Room.Category);
                 roomCategory.BindValueChanged(c =>
                 {
-                    if (c.NewValue == RoomCategory.Spotlight)
+                    if (c.NewValue > RoomCategory.Normal)
                         specialCategoryPill.Show();
                     else
                         specialCategoryPill.Hide();
@@ -418,10 +420,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                       var retrievedBeatmap = task.GetResultSafely();
 
                                       statusText.Text = "Currently playing ";
-                                      beatmapText.AddLink(retrievedBeatmap.GetDisplayTitleRomanisable(),
-                                          LinkAction.OpenBeatmap,
-                                          retrievedBeatmap.OnlineID.ToString(),
-                                          creationParameters: s => s.Truncate = true);
+
+                                      if (retrievedBeatmap != null)
+                                      {
+                                          beatmapText.AddLink(retrievedBeatmap.GetDisplayTitleRomanisable(),
+                                              LinkAction.OpenBeatmap,
+                                              retrievedBeatmap.OnlineID.ToString(),
+                                              creationParameters: s => s.Truncate = true);
+                                      }
+                                      else
+                                          beatmapText.AddText("unknown beatmap");
                                   }), cancellationSource.Token);
             }
         }

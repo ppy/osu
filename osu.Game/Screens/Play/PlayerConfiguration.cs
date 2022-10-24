@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 namespace osu.Game.Screens.Play
 {
     public class PlayerConfiguration
@@ -29,5 +31,15 @@ namespace osu.Game.Screens.Play
         /// Whether the player should be allowed to skip intros/outros, advancing to the start of gameplay or the end of a storyboard.
         /// </summary>
         public bool AllowSkipping { get; set; } = true;
+
+        /// <summary>
+        /// Whether the intro should be skipped by default.
+        /// </summary>
+        public bool AutomaticallySkipIntro { get; set; }
+
+        /// <summary>
+        /// Whether the gameplay leaderboard should always be shown (usually in a contracted state).
+        /// </summary>
+        public bool AlwaysShowLeaderboard { get; set; }
     }
 }

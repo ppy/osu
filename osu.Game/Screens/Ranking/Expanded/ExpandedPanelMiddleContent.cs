@@ -1,16 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -68,7 +72,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, !score.Statistics.TryGetValue(HitResult.Miss, out int missCount) || missCount == 0),
+                new ComboStatistic(score.MaxCombo, scoreManager.GetMaximumAchievableCombo(score)),
                 new PerformanceStatistic(score),
             };
 
@@ -79,8 +83,6 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             statisticDisplays.AddRange(topStatistics);
             statisticDisplays.AddRange(bottomStatistics);
-
-            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely();
 
             AddInternal(new FillFlowContainer
             {
@@ -131,7 +133,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     FillMode = FillMode.Fit,
                                 }
                             },
-                            scoreCounter = new TotalScoreCounter
+                            scoreCounter = new TotalScoreCounter(!withFlair)
                             {
                                 Margin = new MarginPadding { Top = 0, Bottom = 5 },
                                 Current = { Value = 0 },
@@ -159,6 +161,8 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Origin = Anchor.TopCentre,
                                         Text = beatmap.DifficultyName,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
+                                        MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                                        Truncate = true,
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
                                     {
@@ -224,6 +228,8 @@ namespace osu.Game.Screens.Ranking.Expanded
             if (score.Date != default)
                 AddInternal(new PlayedOnText(score.Date));
 
+            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely();
+
             if (starDifficulty != null)
             {
                 starAndModDisplay.Add(new StarRatingDisplay(starDifficulty.Value)
@@ -276,12 +282,34 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         public class PlayedOnText : OsuSpriteText
         {
+            private readonly DateTimeOffset time;
+            private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
+
             public PlayedOnText(DateTimeOffset time)
             {
+                this.time = time;
+
                 Anchor = Anchor.BottomCentre;
                 Origin = Anchor.BottomCentre;
                 Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold);
-                Text = $"Played on {time.ToLocalTime():d MMMM yyyy HH:mm}";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager configManager)
+            {
+                configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                prefer24HourTime.BindValueChanged(_ => updateDisplay(), true);
+            }
+
+            private void updateDisplay()
+            {
+                Text = prefer24HourTime.Value ? $"Played on {time.ToLocalTime():d MMMM yyyy HH:mm}" : $"Played on {time.ToLocalTime():d MMMM yyyy h:mm tt}";
             }
         }
     }

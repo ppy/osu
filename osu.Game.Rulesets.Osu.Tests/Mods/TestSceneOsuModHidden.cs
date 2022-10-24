@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         private class TestOsuModHidden : OsuModHidden
         {
-            public new HitObject FirstObject => base.FirstObject;
+            public new HitObject? FirstObject => base.FirstObject;
         }
     }
 }

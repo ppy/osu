@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,6 +20,8 @@ namespace osu.Game.Screens.Edit.Timing
         protected readonly ControlPoint Point;
 
         private readonly string label;
+
+        protected Drawable Background { get; private set; }
 
         protected FillFlowContainer Content { get; private set; }
 
@@ -41,11 +45,11 @@ namespace osu.Game.Screens.Edit.Timing
             Masking = true;
             CornerRadius = 3;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
-                new Box
+                Background = new Box
                 {
-                    Colour = overlayColours.Background4,
+                    Colour = overlayColours.Background5,
                     RelativeSizeAxes = Axes.Both,
                 },
                 Content = new FillFlowContainer

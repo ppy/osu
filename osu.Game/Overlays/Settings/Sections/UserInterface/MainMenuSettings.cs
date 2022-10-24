@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -61,7 +63,10 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
             user.BindValueChanged(u =>
             {
-                backgroundSourceDropdown.WarningText = u.NewValue?.IsSupporter != true ? UserInterfaceStrings.NotSupporterNote : default;
+                if (u.NewValue?.IsSupporter != true)
+                    backgroundSourceDropdown.SetNoticeText(UserInterfaceStrings.NotSupporterNote, true);
+                else
+                    backgroundSourceDropdown.ClearNoticeText();
             }, true);
         }
     }

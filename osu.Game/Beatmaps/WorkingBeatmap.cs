@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,7 +19,6 @@ using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -109,9 +110,9 @@ namespace osu.Game.Beatmaps
 
         public Track LoadTrack() => track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
-        public void PrepareTrackForPreviewLooping()
+        public void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0)
         {
-            Track.Looping = true;
+            Track.Looping = looping;
             Track.RestartPoint = Metadata.PreviewTime;
 
             if (Track.RestartPoint == -1)
@@ -124,19 +125,30 @@ namespace osu.Game.Beatmaps
 
                 Track.RestartPoint = 0.4f * Track.Length;
             }
+
+            Track.RestartPoint += offsetFromPreviewPoint;
         }
 
         /// <summary>
-        /// Transfer a valid audio track into this working beatmap. Used as an optimisation to avoid reload / track swap
-        /// across difficulties in the same beatmap set.
+        /// Attempts to transfer the audio track to a target working beatmap, if valid for transferring.
+        /// Used as an optimisation to avoid reload / track swap across difficulties in the same beatmap set.
         /// </summary>
-        /// <param name="track">The track to transfer.</param>
-        public void TransferTrack([NotNull] Track track) => this.track = track ?? throw new ArgumentNullException(nameof(track));
+        /// <param name="target">The target working beatmap to transfer this track to.</param>
+        /// <returns>Whether the track has been transferred to the <paramref name="target"/>.</returns>
+        public virtual bool TryTransferTrack([NotNull] WorkingBeatmap target)
+        {
+            if (BeatmapInfo?.AudioEquals(target.BeatmapInfo) != true || Track.IsDummyDevice)
+                return false;
+
+            target.track = Track;
+            return true;
+        }
 
         /// <summary>
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
         /// This generally happens via MusicController when changing the global beatmap.
         /// </summary>
+        [NotNull]
         public Track Track
         {
             get
@@ -152,24 +164,7 @@ namespace osu.Game.Beatmaps
         {
             const double excess_length = 1000;
 
-            var lastObject = Beatmap?.HitObjects.LastOrDefault();
-
-            double length;
-
-            switch (lastObject)
-            {
-                case null:
-                    length = emptyLength;
-                    break;
-
-                case IHasDuration endTime:
-                    length = endTime.EndTime + excess_length;
-                    break;
-
-                default:
-                    length = lastObject.StartTime + excess_length;
-                    break;
-            }
+            double length = (BeatmapInfo?.Length + excess_length) ?? emptyLength;
 
             return audioManager.Tracks.GetVirtual(length);
         }
@@ -287,12 +282,15 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
+            var processor = rulesetInstance.CreateBeatmapProcessor(converted);
 
-            foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
-                mod.ApplyToBeatmapProcessor(processor);
+            if (processor != null)
+            {
+                foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
+                    mod.ApplyToBeatmapProcessor(processor);
 
-            processor?.PreProcess();
+                processor.PreProcess();
+            }
 
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
             foreach (var obj in converted.HitObjects)

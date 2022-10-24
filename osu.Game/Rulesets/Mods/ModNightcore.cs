@@ -7,6 +7,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Nightcore";
         public override string Acronym => "NC";
         public override IconUsage? Icon => OsuIcon.ModNightcore;
-        public override string Description => "Uguuuuuuuu...";
+        public override LocalisableString Description => "Uguuuuuuuu...";
     }
 
     public abstract class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Mods
             }, true);
         }
 
-        public override void ApplyToTrack(ITrack track)
+        public override void ApplyToTrack(IAdjustableAudioComponent track)
         {
             // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
             track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
@@ -55,10 +56,10 @@ namespace osu.Game.Rulesets.Mods
 
         public class NightcoreBeatContainer : BeatSyncedContainer
         {
-            private PausableSkinnableSound hatSample;
-            private PausableSkinnableSound clapSample;
-            private PausableSkinnableSound kickSample;
-            private PausableSkinnableSound finishSample;
+            private PausableSkinnableSound? hatSample;
+            private PausableSkinnableSound? clapSample;
+            private PausableSkinnableSound? kickSample;
+            private PausableSkinnableSound? finishSample;
 
             private int? firstBeat;
 

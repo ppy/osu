@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using Markdig.Syntax.Inlines;
@@ -184,6 +186,16 @@ Line after image";
             {
                 var spriteImage = markdownContainer.ChildrenOfType<Sprite>().First();
                 return Precision.DefinitelyBigger(markdownContainer.DrawWidth, spriteImage.DrawWidth);
+            });
+        }
+
+        [Test]
+        public void TestFlag()
+        {
+            AddStep("Add flag", () =>
+            {
+                markdownContainer.CurrentPath = @"https://dev.ppy.sh";
+                markdownContainer.Text = "::{flag=\"AU\"}:: ::{flag=\"ZZ\"}::";
             });
         }
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using Newtonsoft.Json;
@@ -93,6 +95,16 @@ namespace osu.Game.Online.Rooms
         }
 
         [Cached]
+        public readonly Bindable<TimeSpan> AutoStartDuration = new Bindable<TimeSpan>();
+
+        [JsonProperty("auto_start_duration")]
+        private ushort autoStartDuration
+        {
+            get => (ushort)AutoStartDuration.Value.TotalSeconds;
+            set => AutoStartDuration.Value = TimeSpan.FromSeconds(value);
+        }
+
+        [Cached]
         public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
 
         [Cached]
@@ -147,11 +159,22 @@ namespace osu.Game.Online.Rooms
             set => MaxAttempts.Value = value;
         }
 
+        [Cached]
+        [JsonProperty("auto_skip")]
+        public readonly Bindable<bool> AutoSkip = new Bindable<bool>();
+
         public Room()
         {
             Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
         }
 
+        /// <summary>
+        /// Copies values from another <see cref="Room"/> into this one.
+        /// </summary>
+        /// <remarks>
+        /// **Beware**: This will store references between <see cref="Room"/>s.
+        /// </remarks>
+        /// <param name="other">The <see cref="Room"/> to copy values from.</param>
         public void CopyFrom(Room other)
         {
             RoomID.Value = other.RoomID.Value;
@@ -172,9 +195,11 @@ namespace osu.Game.Online.Rooms
             EndDate.Value = other.EndDate.Value;
             UserScore.Value = other.UserScore.Value;
             QueueMode.Value = other.QueueMode.Value;
+            AutoStartDuration.Value = other.AutoStartDuration.Value;
             DifficultyRange.Value = other.DifficultyRange.Value;
             PlaylistItemStats.Value = other.PlaylistItemStats.Value;
             CurrentPlaylistItem.Value = other.CurrentPlaylistItem.Value;
+            AutoSkip.Value = other.AutoSkip.Value;
 
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();

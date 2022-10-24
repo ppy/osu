@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -17,7 +19,7 @@ namespace osu.Game.Screens.Select.Carousel
         public readonly CarouselBeatmap Item;
 
         public FilterableDifficultyIcon(CarouselBeatmap item)
-            : base(item.BeatmapInfo, performBackgroundDifficultyLookup: false)
+            : base(item.BeatmapInfo)
         {
             filtered.BindTo(item.Filtered);
             filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));

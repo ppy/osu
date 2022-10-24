@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
@@ -25,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 // This is so on repeats ticks don't appear too late to be visually processed by the player.
                 offset = 200;
             else
-                offset = TimeFadeIn * 0.66f;
+                offset = TimePreempt * 0.66f;
 
             TimePreempt = (StartTime - SpanStartTime) / 2 + offset;
         }
