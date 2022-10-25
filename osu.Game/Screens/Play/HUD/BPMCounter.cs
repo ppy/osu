@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class BPMCounter : RollingCounter<double>, ISkinnableDrawable
     {
-        protected override double RollingDuration => 450;
+        protected override double RollingDuration => 300;
 
         [Resolved]
         private GameplayState gameplayState { get; set; } = null!;
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(4, 0),
+                    Spacing = new Vector2(3, 0),
                     Children = new Drawable[]
                     {
                         text = new OsuSpriteText
