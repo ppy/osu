@@ -79,10 +79,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                     flashlightProperties.Validate();
                 }
-                else
-                {
-                    UpdateFlashlightSize(200);
-                }
             }
         }
     }
