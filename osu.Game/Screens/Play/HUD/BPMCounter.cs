@@ -71,17 +71,17 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(3, 0),
+                    Spacing = new Vector2(5, 0),
                     Children = new Drawable[]
                     {
                         text = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                            Font = OsuFont.Numeric.With(size: 16, fixedWidth: true)
                         },
                         new OsuSpriteText
                         {
                             Text = "BPM",
-                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
+                            Font = OsuFont.Numeric.With(size: 6, fixedWidth: true)
                         },
                     },
                 };
