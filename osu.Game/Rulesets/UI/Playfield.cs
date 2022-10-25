@@ -239,9 +239,9 @@ namespace osu.Game.Rulesets.UI
                 AddInternal(HitObjectContainer);
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             if (!IsNested && mods != null)
             {
