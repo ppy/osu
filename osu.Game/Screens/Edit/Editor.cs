@@ -304,7 +304,7 @@ namespace osu.Game.Screens.Edit
                                             cutMenuItem = new EditorMenuItem("Cut", MenuItemType.Standard, Cut),
                                             copyMenuItem = new EditorMenuItem("Copy", MenuItemType.Standard, Copy),
                                             pasteMenuItem = new EditorMenuItem("Paste", MenuItemType.Standard, Paste),
-                                            duplicateMenuItem = new EditorMenuItem("Clone", MenuItemType.Standard, Clone),
+                                            cloneMenuItem = new EditorMenuItem("Clone", MenuItemType.Standard, Clone),
                                         }
                                     },
                                     new MenuItem("View")
@@ -746,7 +746,7 @@ namespace osu.Game.Screens.Edit
 
         private EditorMenuItem cutMenuItem;
         private EditorMenuItem copyMenuItem;
-        private EditorMenuItem duplicateMenuItem;
+        private EditorMenuItem cloneMenuItem;
         private EditorMenuItem pasteMenuItem;
 
         private readonly BindableWithCurrent<bool> canCut = new BindableWithCurrent<bool>();
@@ -759,7 +759,7 @@ namespace osu.Game.Screens.Edit
             canCopy.Current.BindValueChanged(copy =>
             {
                 copyMenuItem.Action.Disabled = !copy.NewValue;
-                duplicateMenuItem.Action.Disabled = !copy.NewValue;
+                cloneMenuItem.Action.Disabled = !copy.NewValue;
             }, true);
             canPaste.Current.BindValueChanged(paste => pasteMenuItem.Action.Disabled = !paste.NewValue, true);
         }
