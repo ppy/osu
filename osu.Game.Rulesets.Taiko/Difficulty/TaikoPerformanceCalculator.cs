@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 Difficulty = difficultyValue,
                 Accuracy = accuracyValue,
                 EffectiveMissCount = effectiveMissCount,
-                EstimatedUR = 10 * estimatedUR,
+                EstimatedUR = estimatedUR,
                 Total = totalValue
             };
         }
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (attributes.GreatHitWindow <= 0)
                 return 0;
 
-            double accuracyValue = Math.Pow(75 / estimatedUR, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 70.0;
+            double accuracyValue = Math.Pow(75 / estimatedUR, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
