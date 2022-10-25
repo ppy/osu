@@ -82,19 +82,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             placementObject = EditorBeatmap.PlacementObject.GetBoundCopy();
             placementObject.ValueChanged += _ => updateDistanceSnapGrid();
-            distanceSnapToggle.ValueChanged += _ =>
-            {
-                updateDistanceSnapGrid();
-
-                if (distanceSnapToggle.Value == TernaryState.True)
-                    rectangularGridSnapToggle.Value = TernaryState.False;
-            };
-
-            rectangularGridSnapToggle.ValueChanged += _ =>
-            {
-                if (rectangularGridSnapToggle.Value == TernaryState.True)
-                    distanceSnapToggle.Value = TernaryState.False;
-            };
+            distanceSnapToggle.ValueChanged += _ => updateDistanceSnapGrid();
 
             // we may be entering the screen with a selection already active
             updateDistanceSnapGrid();
@@ -136,22 +124,27 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (snapType.HasFlagFast(SnapType.NearbyObjects) && snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
                 return snapResult;
 
+            SnapResult result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
+
             if (snapType.HasFlagFast(SnapType.Grids))
             {
                 if (distanceSnapToggle.Value == TernaryState.True && distanceSnapGrid != null)
                 {
                     (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
-                    return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time, PlayfieldAtScreenSpacePosition(screenSpacePosition));
+
+                    result.ScreenSpacePosition = distanceSnapGrid.ToScreenSpace(pos);
+                    result.Time = time;
                 }
 
                 if (rectangularGridSnapToggle.Value == TernaryState.True)
                 {
-                    Vector2 pos = rectangularPositionSnapGrid.GetSnappedPosition(rectangularPositionSnapGrid.ToLocalSpace(screenSpacePosition));
-                    return new SnapResult(rectangularPositionSnapGrid.ToScreenSpace(pos), null, PlayfieldAtScreenSpacePosition(screenSpacePosition));
+                    Vector2 pos = rectangularPositionSnapGrid.GetSnappedPosition(rectangularPositionSnapGrid.ToLocalSpace(result.ScreenSpacePosition));
+
+                    result.ScreenSpacePosition = rectangularPositionSnapGrid.ToScreenSpace(pos);
                 }
             }
 
-            return base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
+            return result;
         }
 
         private bool snapToVisibleBlueprints(Vector2 screenSpacePosition, out SnapResult snapResult)
