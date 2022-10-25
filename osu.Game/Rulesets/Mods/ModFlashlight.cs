@@ -118,10 +118,22 @@ namespace osu.Game.Rulesets.Mods
 
             private readonly IBindable<bool> isBreakTime = new BindableBool();
 
+            /// <summary>
+            /// Defines the flashlight area's vector, according to a given flashlight size.
+            /// </summary>
+            /// <param name="size">The flashlight size to adjust the area to.</param>
+            /// <returns>The flashlight area's vector.</returns>
+            protected abstract Vector2 AdjustSize(float size);
+
+            private Vector2 adjustCurrentSize() => AdjustSize(GetSize());
+
+            private void updateFlashlightSize() => this.TransformTo(nameof(FlashlightSize), adjustCurrentSize(), 800);
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
+                // Defining the Flashlight area before doing any transforms.
                 FlashlightSize = adjustCurrentSize();
 
                 Combo.ValueChanged += _ => updateFlashlightSize();
@@ -132,12 +144,6 @@ namespace osu.Game.Rulesets.Mods
                     isBreakTime.BindValueChanged(_ => updateFlashlightSize(), true);
                 }
             }
-
-            private Vector2 adjustCurrentSize() => AdjustSize(GetSize());
-
-            private void updateFlashlightSize() => this.TransformTo(nameof(FlashlightSize), adjustCurrentSize(), 800);
-
-            protected abstract Vector2 AdjustSize(float size);
 
             protected abstract string FragmentShader { get; }
 
