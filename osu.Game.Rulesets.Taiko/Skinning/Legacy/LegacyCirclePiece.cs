@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             }
 
             // backgroundLayer is guaranteed to exist due to the pre-check in TaikoLegacySkinTransformer.
-            AddInternal(backgroundLayer = getDrawableFor("circle"));
+            AddInternal(backgroundLayer = new LegacyKiaiFlashingDrawable(() => getDrawableFor("circle")));
 
             var foregroundLayer = getDrawableFor("circleoverlay");
             if (foregroundLayer != null)
