@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5, 0),
+                    Spacing = new Vector2(3, 0),
                     Children = new Drawable[]
                     {
                         text = new OsuSpriteText
