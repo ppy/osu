@@ -78,6 +78,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     FlashlightSize = adjustSize(Combo.Value);
 
                     flashlightProperties.Validate();
+                } else
+                {
+                    UpdateFlashlightSize(200);
                 }
             }
         }
