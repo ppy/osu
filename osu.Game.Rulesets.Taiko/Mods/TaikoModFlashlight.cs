@@ -27,17 +27,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public override float DefaultFlashlightSize => 200;
 
-        protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, playfield);
+        protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, Playfield);
 
-        private TaikoPlayfield playfield = null!;
+        protected TaikoPlayfield Playfield { get; private set; } = null!;
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
-            playfield = (TaikoPlayfield)drawableRuleset.Playfield;
+            Playfield = (TaikoPlayfield)drawableRuleset.Playfield;
             base.ApplyToDrawableRuleset(drawableRuleset);
         }
 
-        private class TaikoFlashlight : Flashlight
+        public class TaikoFlashlight : Flashlight
         {
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
             private readonly TaikoPlayfield taikoPlayfield;
