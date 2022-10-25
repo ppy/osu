@@ -114,6 +114,9 @@ namespace osu.Game.Screens.Select.Carousel
         /// <returns>An unfiltered item nearest to the last selected one or null if all items are filtered</returns>
         protected virtual CarouselItem GetNextToSelect()
         {
+            if (Items.Count == 0)
+                return null;
+
             int forwardsIndex = lastSelectedIndex;
             bool hasForwards;
 
