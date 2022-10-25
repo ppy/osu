@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
 
                     ClearTransforms(targetMember: nameof(FlashlightSize));
-                    FlashlightSize = adjustSize(Combo.Value);
+                    FlashlightSize = adjustSize(GetSize());
 
                     flashlightProperties.Validate();
                 }
