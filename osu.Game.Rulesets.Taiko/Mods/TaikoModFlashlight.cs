@@ -47,21 +47,28 @@ namespace osu.Game.Rulesets.Taiko.Mods
             {
                 this.taikoPlayfield = taikoPlayfield;
 
-                FlashlightSize = adjustSize(GetSize());
+                FlashlightSize = adjustSizeForPlayfieldAspectRatio(GetSize());
                 FlashlightSmoothness = 1.4f;
 
                 AddLayout(flashlightProperties);
             }
 
-            private Vector2 adjustSize(float size)
+            /// <summary>
+            /// Returns the aspect ratio-adjusted size of the flashlight.
+            /// This ensures that the size of the flashlight remains independent of taiko-specific aspect ratio adjustments.
+            /// </summary>
+            /// <param name="size">
+            /// The size of the flashlight.
+            /// The value provided here should always come from <see cref="ModFlashlight{T}.Flashlight.GetSize"/>.
+            /// </param>
+            private Vector2 adjustSizeForPlayfieldAspectRatio(float size)
             {
-                // Preserve flashlight size through the playfield's aspect adjustment.
                 return new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
             }
 
             protected override void UpdateFlashlightSize(float size)
             {
-                this.TransformTo(nameof(FlashlightSize), adjustSize(size), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), adjustSizeForPlayfieldAspectRatio(size), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
@@ -75,7 +82,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
 
                     ClearTransforms(targetMember: nameof(FlashlightSize));
-                    FlashlightSize = adjustSize(GetSize());
+                    FlashlightSize = adjustSizeForPlayfieldAspectRatio(GetSize());
 
                     flashlightProperties.Validate();
                 }
