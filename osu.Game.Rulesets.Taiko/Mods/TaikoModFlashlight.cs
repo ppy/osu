@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 }
                 else
                 {
-                    UpdateFlashlightSize(200);
+                    UpdateFlashlightSize(GetSize());
                 }
             }
         }
