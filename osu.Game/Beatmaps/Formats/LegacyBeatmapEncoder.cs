@@ -185,19 +185,12 @@ namespace osu.Game.Beatmaps.Formats
             SampleControlPoint lastRelevantSamplePoint = null;
             DifficultyControlPoint lastRelevantDifficultyPoint = null;
 
-            // In osu!taiko and osu!mania, a scroll speed is stored as "slider velocity" in legacy formats.
-            // In that case, a scrolling speed change is a global effect and per-hit object difficulty control points are ignored.
-            bool scrollSpeedEncodedAsSliderVelocity = onlineRulesetID == 1 || onlineRulesetID == 3;
-
             // iterate over hitobjects and pull out all required sample and difficulty changes
             extractDifficultyControlPoints(beatmap.HitObjects);
             extractSampleControlPoints(beatmap.HitObjects);
 
-            if (scrollSpeedEncodedAsSliderVelocity)
-            {
-                foreach (var point in legacyControlPoints.EffectPoints)
-                    legacyControlPoints.Add(point.Time, new DifficultyControlPoint { SliderVelocity = point.ScrollSpeed });
-            }
+            foreach (var point in legacyControlPoints.EffectPoints)
+                legacyControlPoints.Add(point.Time, new DifficultyControlPoint { SliderVelocity = point.ScrollSpeed });
 
             foreach (var group in legacyControlPoints.Groups)
             {
@@ -244,9 +237,6 @@ namespace osu.Game.Beatmaps.Formats
 
             IEnumerable<DifficultyControlPoint> collectDifficultyControlPoints(IEnumerable<HitObject> hitObjects)
             {
-                if (scrollSpeedEncodedAsSliderVelocity)
-                    yield break;
-
                 foreach (var hitObject in hitObjects)
                     yield return hitObject.DifficultyControlPoint;
             }
