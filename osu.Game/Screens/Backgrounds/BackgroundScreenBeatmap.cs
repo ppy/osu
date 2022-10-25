@@ -43,6 +43,8 @@ namespace osu.Game.Screens.Backgrounds
         /// </summary>
         public readonly Bindable<float> BlurAmount = new BindableFloat();
 
+        public readonly Bindable<float> DimAmount = new Bindable<float>();
+
         internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
         private readonly DimmableBackground dimmable;
@@ -58,6 +60,7 @@ namespace osu.Game.Screens.Backgrounds
             dimmable.IgnoreUserSettings.BindTo(IgnoreUserSettings);
             dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
+            dimmable.DimAmount.BindTo(DimAmount);
 
             StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
