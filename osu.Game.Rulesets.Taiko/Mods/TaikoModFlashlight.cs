@@ -42,6 +42,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
             private readonly TaikoPlayfield taikoPlayfield;
 
+            private float sizeMultiplier;
+            private bool comboBasedSize;
+
             public TaikoFlashlight(TaikoModFlashlight modFlashlight, TaikoPlayfield taikoPlayfield)
                 : base(modFlashlight)
             {
@@ -50,7 +53,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 FlashlightSize = adjustSize(GetSize());
                 FlashlightSmoothness = 1.4f;
 
+                modFlashlight.SizeMultiplier.BindValueChanged(_ => updateSize(modFlashlight), true);
+                modFlashlight.ComboBasedSize.BindValueChanged(_ => updateSize(modFlashlight), true);
+
                 AddLayout(flashlightProperties);
+            }
+
+            private void updateSize(TaikoModFlashlight modFlashlight)
+            {
+                sizeMultiplier = modFlashlight.SizeMultiplier.Value;
+                comboBasedSize = modFlashlight.ComboBasedSize.Value;
+                FlashlightSize = adjustSize(GetSize());
             }
 
             private Vector2 adjustSize(float size)
@@ -66,16 +79,14 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             protected override string FragmentShader => "CircularFlashlight";
 
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                UpdateFlashlightSize(GetSize());
-            }
-
             protected override void Update()
             {
                 base.Update();
+
+                if (FlashlightSize.Y < 5)
+                {
+                    UpdateFlashlightSize(GetSize());
+                }
 
                 if (!flashlightProperties.IsValid)
                 {
