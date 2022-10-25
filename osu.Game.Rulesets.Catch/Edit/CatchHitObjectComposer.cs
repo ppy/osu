@@ -103,25 +103,16 @@ namespace osu.Game.Rulesets.Catch.Edit
             base.OnKeyUp(e);
         }
 
-        private TernaryState? distanceSnapBeforeMomentary;
+        private bool distanceSnapMomentary;
 
         private void handleToggleViaKey(KeyboardEvent key)
         {
-            if (key.AltPressed)
+            bool altPressed = key.AltPressed;
+
+            if (altPressed != distanceSnapMomentary)
             {
-                if (distanceSnapBeforeMomentary == null)
-                {
-                    distanceSnapBeforeMomentary = distanceSnapToggle.Value;
-                    distanceSnapToggle.Value = distanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
-                }
-            }
-            else
-            {
-                if (distanceSnapBeforeMomentary != null)
-                {
-                    distanceSnapToggle.Value = distanceSnapBeforeMomentary.Value;
-                    distanceSnapBeforeMomentary = null;
-                }
+                distanceSnapMomentary = altPressed;
+                distanceSnapToggle.Value = distanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
             }
         }
 

@@ -247,43 +247,25 @@ namespace osu.Game.Rulesets.Osu.Edit
             return base.AdjustDistanceSpacing(action, amount);
         }
 
-        private TernaryState? gridSnapBeforeMomentary;
-        private TernaryState? distanceSnapBeforeMomentary;
+        private bool distanceSnapMomentary;
+        private bool gridSnapMomentary;
 
         private void handleToggleViaKey(KeyboardEvent key)
         {
-            if (key.ShiftPressed)
+            bool altPressed = key.AltPressed;
+
+            if (altPressed != distanceSnapMomentary)
             {
-                if (distanceSnapBeforeMomentary == null && gridSnapBeforeMomentary == null)
-                {
-                    gridSnapBeforeMomentary = rectangularGridSnapToggle.Value;
-                    rectangularGridSnapToggle.Value = rectangularGridSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
-                }
-            }
-            else
-            {
-                if (gridSnapBeforeMomentary != null)
-                {
-                    rectangularGridSnapToggle.Value = gridSnapBeforeMomentary.Value;
-                    gridSnapBeforeMomentary = null;
-                }
+                distanceSnapMomentary = altPressed;
+                distanceSnapToggle.Value = distanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
             }
 
-            if (key.AltPressed)
+            bool shiftPressed = key.ShiftPressed;
+
+            if (shiftPressed != gridSnapMomentary)
             {
-                if (gridSnapBeforeMomentary == null && distanceSnapBeforeMomentary == null)
-                {
-                    distanceSnapBeforeMomentary = distanceSnapToggle.Value;
-                    distanceSnapToggle.Value = distanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
-                }
-            }
-            else
-            {
-                if (distanceSnapBeforeMomentary != null)
-                {
-                    distanceSnapToggle.Value = distanceSnapBeforeMomentary.Value;
-                    distanceSnapBeforeMomentary = null;
-                }
+                gridSnapMomentary = shiftPressed;
+                rectangularGridSnapToggle.Value = rectangularGridSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
             }
         }
 
