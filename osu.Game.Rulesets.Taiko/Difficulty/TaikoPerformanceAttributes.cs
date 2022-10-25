@@ -19,6 +19,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         [JsonProperty("effective_miss_count")]
         public double EffectiveMissCount { get; set; }
+        
+        [JsonProperty("estimated_ur")]
+        public double EstimatedUR { get; set; }
 
         public override IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
