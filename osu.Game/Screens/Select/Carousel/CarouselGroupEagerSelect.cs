@@ -118,13 +118,16 @@ namespace osu.Game.Screens.Select.Carousel
                 return null;
 
             int forwardsIndex = lastSelectedIndex;
-            bool hasForwards;
-
             int backwardsIndex = lastSelectedIndex;
-            bool hasBackwards;
 
-            while ((hasBackwards = backwardsIndex >= 0) | (hasForwards = forwardsIndex < Items.Count))
+            while (true)
             {
+                bool hasBackwards = backwardsIndex >= 0 && backwardsIndex < Items.Count;
+                bool hasForwards = forwardsIndex < Items.Count;
+
+                if (!hasBackwards && !hasForwards)
+                    return null;
+
                 if (hasForwards && !Items[forwardsIndex].Filtered.Value)
                     return Items[forwardsIndex];
 
@@ -134,8 +137,6 @@ namespace osu.Game.Screens.Select.Carousel
                 forwardsIndex++;
                 backwardsIndex--;
             }
-
-            return null;
         }
 
         protected virtual void PerformSelection()
