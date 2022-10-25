@@ -48,13 +48,15 @@ namespace osu.Game.Graphics.Containers
 
         protected Bindable<double> UserDimLevel { get; private set; }
 
+        public Bindable<float> DimAmount { get; set; } = new Bindable<float>();
+
         protected Bindable<bool> LightenDuringBreaks { get; private set; }
 
         protected Bindable<bool> ShowStoryboard { get; private set; }
 
         private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
 
-        protected float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : 0, 0);
+        protected float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : DimAmount.Value, 0);
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -76,6 +78,7 @@ namespace osu.Game.Graphics.Containers
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             UserDimLevel.ValueChanged += _ => UpdateVisuals();
+            DimAmount.ValueChanged += _ => UpdateVisuals();
             LightenDuringBreaks.ValueChanged += _ => UpdateVisuals();
             IsBreakTime.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
