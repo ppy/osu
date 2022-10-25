@@ -20,20 +20,27 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
         [Test]
-        public void TestGridExclusivity()
+        public void TestGridToggles()
         {
             AddStep("enable distance snap grid", () => InputManager.Key(Key.T));
             AddStep("select second object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.ElementAt(1)));
+
             AddUntilStep("distance snap grid visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
             rectangularGridActive(false);
 
             AddStep("enable rectangular grid", () => InputManager.Key(Key.Y));
-            AddUntilStep("distance snap grid hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+
+            AddStep("select second object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.ElementAt(1)));
+            AddUntilStep("distance snap grid still visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
             rectangularGridActive(true);
 
-            AddStep("enable distance snap grid", () => InputManager.Key(Key.T));
+            AddStep("disable distance snap grid", () => InputManager.Key(Key.T));
+            AddUntilStep("distance snap grid hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
             AddStep("select second object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.ElementAt(1)));
-            AddUntilStep("distance snap grid visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+            rectangularGridActive(true);
+
+            AddStep("disable rectangular grid", () => InputManager.Key(Key.Y));
+            AddUntilStep("distance snap grid still hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
             rectangularGridActive(false);
         }
 
