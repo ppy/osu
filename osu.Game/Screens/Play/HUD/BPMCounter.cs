@@ -89,5 +89,3 @@ namespace osu.Game.Screens.Play.HUD
         }
     }
 }
-
-
