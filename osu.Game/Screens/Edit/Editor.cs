@@ -777,6 +777,10 @@ namespace osu.Game.Screens.Edit
 
         protected void Duplicate()
         {
+            // Avoid attempting to clone if copying is not available (as it may result in pasting something unexpected).
+            if (!canCopy.Value)
+                return;
+
             // This is an initial implementation just to get an idea of how people used this function.
             // There are a couple of differences from osu!stable's implementation which will require more work to match:
             // - The "clipboard" is not populated during the duplication process.
