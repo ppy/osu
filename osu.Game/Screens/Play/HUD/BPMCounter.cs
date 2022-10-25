@@ -76,12 +76,12 @@ namespace osu.Game.Screens.Play.HUD
                     {
                         text = new OsuSpriteText
                         {
-                            Font = OsuFont.Numeric.With(size: 16, fixedWidth: true)
+                            Font = OsuFont.Numeric.With(size: 20, fixedWidth: true)
                         },
                         new OsuSpriteText
                         {
                             Text = "BPM",
-                            Font = OsuFont.Numeric.With(size: 6, fixedWidth: true)
+                            Font = OsuFont.Numeric.With(size: 10, fixedWidth: true)
                         },
                     },
                 };
