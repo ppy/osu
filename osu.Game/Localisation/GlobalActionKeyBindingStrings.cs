@@ -185,9 +185,9 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorTapForBPM => new TranslatableString(getKey(@"editor_tap_for_bpm"), @"Tap for BPM");
 
         /// <summary>
-        /// "Duplicate selection"
+        /// "Clone selection"
         /// </summary>
-        public static LocalisableString EditorDuplicateSelection => new TranslatableString(getKey(@"editor_duplicate_selection"), @"Duplicate selection");
+        public static LocalisableString EditorCloneSelection => new TranslatableString(getKey(@"editor_clone_selection"), @"Clone selection");
 
         /// <summary>
         /// "Cycle grid display mode"
