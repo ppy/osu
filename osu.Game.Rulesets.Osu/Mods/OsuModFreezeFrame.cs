@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var hitCircle = drawableHitCircle.HitObject;
                 var approachCircle = drawableHitCircle.ApproachCircle;
 
-                // Reapply scale, ensuring the AR isn't changes due to the new preempt.
+                // Reapply scale, ensuring the AR isn't changed due to the new preempt.
                 approachCircle.ClearTransforms(targetMember: nameof(approachCircle.Scale));
                 approachCircle.ScaleTo(4 * (float)(hitCircle.TimePreempt / originalPreempt));
 
