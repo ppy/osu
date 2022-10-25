@@ -44,6 +44,28 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             rectangularGridActive(false);
         }
 
+        [Test]
+        public void TestDistanceSnapMomentaryToggle()
+        {
+            AddStep("select second object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.ElementAt(1)));
+
+            AddUntilStep("distance snap grid hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+            AddStep("hold alt", () => InputManager.PressKey(Key.AltLeft));
+            AddUntilStep("distance snap grid visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+            AddStep("release alt", () => InputManager.ReleaseKey(Key.AltLeft));
+            AddUntilStep("distance snap grid hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+        }
+
+        [Test]
+        public void TestGridSnapMomentaryToggle()
+        {
+            rectangularGridActive(false);
+            AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
+            rectangularGridActive(true);
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
+            rectangularGridActive(false);
+        }
+
         private void rectangularGridActive(bool active)
         {
             AddStep("choose placement tool", () => InputManager.Key(Key.Number2));
