@@ -29,12 +29,17 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
 
         //mod breaks normal approach circle preempt
-        private double approachCircleTimePreempt;
+        private double originalPreempt;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
+            var firstHitObject = beatmap.HitObjects.OfType<OsuHitObject>().FirstOrDefault();
+            if (firstHitObject == null)
+                return;
+
             double lastNewComboTime = 0;
-            approachCircleTimePreempt = beatmap.HitObjects.OfType<OsuHitObject>().FirstOrDefault()!.TimePreempt;
+
+            originalPreempt = firstHitObject.TimePreempt;
 
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
             {
@@ -72,17 +77,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var hitCircle = drawableHitCircle.HitObject;
                 var approachCircle = drawableHitCircle.ApproachCircle;
 
-                approachCircle.ClearTransforms();
-                approachCircle.ScaleTo(4);
-                approachCircle.FadeTo(0);
+                // Reapply scale, ensuring the AR isn't changes due to the new preempt.
+                approachCircle.ClearTransforms(targetMember: nameof(approachCircle.Scale));
+                approachCircle.ScaleTo(4 * (float)(hitCircle.TimePreempt / originalPreempt));
 
-                using (drawableHitCircle.ApproachCircle.BeginAbsoluteSequence(hitCircle.StartTime - approachCircleTimePreempt))
-                {
-                    //Redo ApproachCircle animation with correct startTime.
-                    approachCircle.LifetimeStart = hitCircle.StartTime - approachCircleTimePreempt;
-                    approachCircle.FadeTo(1, Math.Min(hitCircle.TimeFadeIn * 2, hitCircle.TimePreempt));
-                    approachCircle.ScaleTo(1, approachCircleTimePreempt).Then().Expire();
-                }
+                using (drawableHitCircle.ApproachCircle.BeginAbsoluteSequence(hitCircle.StartTime - hitCircle.TimePreempt))
+                    approachCircle.ScaleTo(1, hitCircle.TimePreempt).Then().Expire();
             };
         }
     }
