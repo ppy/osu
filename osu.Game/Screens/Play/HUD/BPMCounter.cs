@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
-            Current.Value = GetBPM().Value;
+            Current.Value = gameplayState.Beatmap.ControlPointInfo.TimingPointAt(GameplayClock.CurrentTime).BPM;
         }
 
         protected override IHasText CreateText() => new TextComponent();
