@@ -163,9 +163,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("select added object", () => EditorBeatmap.SelectedHitObjects.Add(addedObject));
 
             AddAssert("is one object", () => EditorBeatmap.HitObjects.Count == 1);
-            AddStep("clone", () => Editor.Duplicate());
+            AddStep("clone", () => Editor.Clone());
             AddAssert("is two objects", () => EditorBeatmap.HitObjects.Count == 2);
-            AddStep("clone", () => Editor.Duplicate());
+            AddStep("clone", () => Editor.Clone());
             AddAssert("is three objects", () => EditorBeatmap.HitObjects.Count == 3);
         }
 
@@ -203,7 +203,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("deselect all objects", () => EditorBeatmap.SelectedHitObjects.Clear());
 
             AddAssert("is one object", () => EditorBeatmap.HitObjects.Count == 1);
-            AddStep("clone", () => Editor.Duplicate());
+            AddStep("clone", () => Editor.Clone());
             AddAssert("still one object", () => EditorBeatmap.HitObjects.Count == 1);
         }
     }

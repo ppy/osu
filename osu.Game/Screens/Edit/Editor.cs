@@ -304,7 +304,7 @@ namespace osu.Game.Screens.Edit
                                             cutMenuItem = new EditorMenuItem("Cut", MenuItemType.Standard, Cut),
                                             copyMenuItem = new EditorMenuItem("Copy", MenuItemType.Standard, Copy),
                                             pasteMenuItem = new EditorMenuItem("Paste", MenuItemType.Standard, Paste),
-                                            duplicateMenuItem = new EditorMenuItem("Duplicate", MenuItemType.Standard, Duplicate),
+                                            duplicateMenuItem = new EditorMenuItem("Clone", MenuItemType.Standard, Clone),
                                         }
                                     },
                                     new MenuItem("View")
@@ -576,8 +576,8 @@ namespace osu.Game.Screens.Edit
                     this.Exit();
                     return true;
 
-                case GlobalAction.EditorDuplicateSelection:
-                    Duplicate();
+                case GlobalAction.EditorCloneSelection:
+                    Clone();
                     return true;
 
                 case GlobalAction.EditorComposeMode:
@@ -775,7 +775,7 @@ namespace osu.Game.Screens.Edit
 
         protected void Copy() => currentScreen?.Copy();
 
-        protected void Duplicate()
+        protected void Clone()
         {
             // Avoid attempting to clone if copying is not available (as it may result in pasting something unexpected).
             if (!canCopy.Value)
