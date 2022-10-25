@@ -115,26 +115,24 @@ namespace osu.Game.Screens.Select.Carousel
         protected virtual CarouselItem GetNextToSelect()
         {
             int forwardsIndex = lastSelectedIndex;
+            bool hasForwards;
+
             int backwardsIndex = lastSelectedIndex;
+            bool hasBackwards;
 
-            while (true)
+            while ((hasBackwards = backwardsIndex >= 0) | (hasForwards = forwardsIndex < Items.Count))
             {
-                // check if a direction has been exhausted and an item (or null) from the other direction should be returned
-                if (forwardsIndex >= Items.Count)
-                    return Items.Reverse().Skip(Items.Count - backwardsIndex - 1).FirstOrDefault(item => !item.Filtered.Value);
-                if (backwardsIndex < 0)
-                    return Items.Skip(forwardsIndex).FirstOrDefault(item => !item.Filtered.Value);
-
-                // check if an unfiltered item has been reached
-                if (!Items[forwardsIndex].Filtered.Value)
+                if (hasForwards && !Items[forwardsIndex].Filtered.Value)
                     return Items[forwardsIndex];
-                if (!Items[backwardsIndex].Filtered.Value)
+
+                if (hasBackwards && !Items[backwardsIndex].Filtered.Value)
                     return Items[backwardsIndex];
 
-                // increment the indices
                 forwardsIndex++;
                 backwardsIndex--;
             }
+
+            return null;
         }
 
         protected virtual void PerformSelection()
