@@ -21,7 +21,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
-        private double accuracy;
         private double estimatedUR;
 
         private double effectiveMissCount;
@@ -92,7 +91,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= 1.050 * lengthBonus;
 
-            return difficultyValue * Math.Pow(accuracy, 2.0);
+            return difficultyValue * Math.Pow(100 * SpecialFunctions.Erf(400 / (Math.Sqrt(2) * estimatedUR)), 2.0);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
