@@ -355,6 +355,14 @@ namespace osu.Game.Beatmaps.Formats
 
             switch (type)
             {
+                case LegacyEventType.Sprite:
+                    // Generally, the background is the first thing defined in a beatmap file.
+                    // In some older beatmaps, it is not present and replaced by a storyboard-level background instead.
+                    // Allow the first sprite (by file order) to act as the background in such cases.
+                    if (string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
+                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[3]);
+                    break;
+
                 case LegacyEventType.Background:
                     beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
                     break;

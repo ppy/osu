@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,6 +14,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 using osuTK.Graphics;
 
@@ -31,6 +33,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         public const float SYMBOL_BORDER = 8;
 
         private const double pre_beat_transition_time = 80;
+
+        private const float flash_opacity = 0.3f;
 
         private Color4 accentColour;
 
@@ -152,10 +156,21 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             };
         }
 
+        [Resolved]
+        private DrawableHitObject drawableHitObject { get; set; }
+
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (!effectPoint.KiaiMode)
                 return;
+
+            if (drawableHitObject.State.Value == ArmedState.Idle)
+            {
+                FlashBox
+                    .FadeTo(flash_opacity)
+                    .Then()
+                    .FadeOut(timingPoint.BeatLength * 0.75, Easing.OutSine);
+            }
 
             if (beatIndex % timingPoint.TimeSignature.Numerator != 0)
                 return;

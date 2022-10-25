@@ -71,9 +71,9 @@ namespace osu.Game.Tests.Editing
 
         [TestCase(1)]
         [TestCase(2)]
-        public void TestSpeedMultiplier(float multiplier)
+        public void TestSpeedMultiplierDoesNotChangeDistanceSnap(float multiplier)
         {
-            assertSnapDistance(100 * multiplier, new HitObject
+            assertSnapDistance(100, new HitObject
             {
                 DifficultyControlPoint = new DifficultyControlPoint
                 {

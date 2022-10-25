@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
@@ -13,11 +14,24 @@ namespace osu.Game.Rulesets.Catch.Edit
 {
     public class DrawableCatchEditorRuleset : DrawableCatchRuleset
     {
+        public readonly BindableDouble TimeRangeMultiplier = new BindableDouble(1);
+
         public DrawableCatchEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            double gamePlayTimeRange = GetTimeRange(Beatmap.Difficulty.ApproachRate);
+            float playfieldStretch = Playfield.DrawHeight / CatchPlayfield.HEIGHT;
+            TimeRange.Value = gamePlayTimeRange * TimeRangeMultiplier.Value * playfieldStretch;
+        }
+
         protected override Playfield CreatePlayfield() => new CatchEditorPlayfield(Beatmap.Difficulty);
+
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new CatchEditorPlayfieldAdjustmentContainer();
     }
 }
