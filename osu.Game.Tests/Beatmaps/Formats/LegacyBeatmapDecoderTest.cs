@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(4, controlPoints.TimingPoints.Count);
                 Assert.AreEqual(5, controlPoints.DifficultyPoints.Count);
                 Assert.AreEqual(34, controlPoints.SamplePoints.Count);
-                Assert.AreEqual(8, controlPoints.EffectPoints.Count);
+                Assert.AreEqual(13, controlPoints.EffectPoints.Count);
 
                 var timingPoint = controlPoints.TimingPointAt(0);
                 Assert.AreEqual(956, timingPoint.Time);
