@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => "Burn the notes into your memory.";
 
         //Alters the transforms of the approach circles, breaking the effects of these mods.
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModApproachDifferent), typeof(OsuModHidden) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModApproachDifferent) };
 
         public override ModType Type => ModType.Fun;
 
