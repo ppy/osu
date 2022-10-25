@@ -9,7 +9,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
     {
         SliderBorderSize,
         SliderPathRadius,
-        AllowSliderBallTint,
         CursorCentre,
         CursorExpand,
         CursorRotate,

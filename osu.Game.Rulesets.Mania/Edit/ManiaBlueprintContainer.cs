@@ -33,5 +33,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         }
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new ManiaSelectionHandler();
+
+        protected sealed override DragBox CreateDragBox() => new ScrollingDragBox(Composer.Playfield);
     }
 }

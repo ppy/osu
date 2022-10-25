@@ -389,18 +389,17 @@ namespace osu.Game.Skinning
 
                         if (particle != null)
                             return new LegacyJudgementPieceNew(resultComponent.Component, createDrawable, particle);
-                        else
-                            return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
+
+                        return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
                     }
 
                     return null;
 
                 case SkinnableSprite.SpriteComponent sprite:
                     return this.GetAnimation(sprite.LookupName, false, false);
-
-                default:
-                    throw new UnsupportedSkinComponentException(component);
             }
+
+            return null;
         }
 
         private Texture? getParticleTexture(HitResult result)
