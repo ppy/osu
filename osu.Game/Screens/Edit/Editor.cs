@@ -51,7 +51,6 @@ using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
-using osuTK.Graphics;
 using osuTK.Input;
 using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
@@ -176,7 +175,7 @@ namespace osu.Game.Screens.Edit
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
-        private Bindable<bool> useUserDim;
+        private Bindable<float> editorDim;
 
         public Editor(EditorLoader loader = null)
         {
@@ -262,8 +261,7 @@ namespace osu.Game.Screens.Edit
             OsuMenuItem undoMenuItem;
             OsuMenuItem redoMenuItem;
 
-            TernaryStateRadioMenuItem backgroundDim;
-            useUserDim = config.GetBindable<bool>(OsuSetting.EditorUseDim);
+            editorDim = config.GetBindable<float>(OsuSetting.EditorDim);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -316,7 +314,7 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
-                                            backgroundDim = new TernaryStateRadioMenuItem("Background Dim", MenuItemType.Standard, _ => useUserDim.Value = !useUserDim.Value),
+                                            new BackgroundDimMenuItem(editorDim),
                                         }
                                     }
                                 }
@@ -337,12 +335,7 @@ namespace osu.Game.Screens.Edit
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
-            useUserDim.BindValueChanged(s =>
-            {
-                dimBackground();
-                backgroundDim.State.Value = s.NewValue ? TernaryState.True : TernaryState.False;
-            });
-            backgroundDim.State.Value = useUserDim.Value ? TernaryState.True : TernaryState.False;
+            editorDim.BindValueChanged(_ => dimBackground());
         }
 
         [Resolved]
@@ -638,10 +631,8 @@ namespace osu.Game.Screens.Edit
         {
             ApplyToBackground(b =>
             {
-                // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
-                if (!useUserDim.Value) b.FadeColour(Color4.DarkGray, 500);
-
-                b.IgnoreUserSettings.Value = !useUserDim.Value;
+                b.IgnoreUserSettings.Value = true;
+                b.DimAmount.Value = editorDim.Value;
                 b.BlurAmount.Value = 0;
             });
         }
@@ -671,8 +662,8 @@ namespace osu.Game.Screens.Edit
 
             ApplyToBackground(b =>
             {
-                b.FadeColour(Color4.White, 500);
-                b.IgnoreUserSettings.Value = true;
+                //b.DimAmount.UnbindAll();
+                b.DimAmount.Value = 0;
             });
             resetTrack();
 
