@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -79,8 +80,15 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         protected override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
         {
-            // TODO: catch lol
-            return 1;
+            // osu!catch's distance snap implementation is limited, in that a custom spacing cannot be specified.
+            // Therefore this functionality is not currently used.
+            //
+            // The implementation below is probably correct but should be checked if/when exposed via controls.
+
+            float expectedDistance = DurationToDistance(before, after.StartTime - before.GetEndTime());
+            float actualDistance = Math.Abs(((CatchHitObject)before).EffectiveX - ((CatchHitObject)after).EffectiveX);
+
+            return actualDistance / expectedDistance;
         }
 
         protected override void Update()
