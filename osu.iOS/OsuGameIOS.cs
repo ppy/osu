@@ -12,6 +12,7 @@ using osu.Game;
 using osu.Game.Overlays.Settings;
 using osu.Game.Updater;
 using osu.Game.Utils;
+using UIKit;
 using Xamarin.Essentials;
 
 namespace osu.iOS
@@ -23,6 +24,8 @@ namespace osu.iOS
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
 
         protected override BatteryInfo CreateBatteryInfo() => new IOSBatteryInfo();
+
+        protected override KeyboardService CreateKeyboardService() => new IOSKeyboardService();
 
         protected override Edges SafeAreaOverrideEdges =>
             // iOS shows a home indicator at the bottom, and adds a safe area to account for this.
@@ -46,6 +49,13 @@ namespace osu.iOS
             public override double? ChargeLevel => Battery.ChargeLevel;
 
             public override bool OnBattery => Battery.PowerSource == BatteryPowerSource.Battery;
+        }
+
+        private class IOSKeyboardService : KeyboardService
+        {
+            private readonly KeyboardServiceEvents keyboardServiceEvents = new KeyboardServiceEvents();
+
+            public override double? Height => keyboardServiceEvents.KeyboardHeight;
         }
     }
 }

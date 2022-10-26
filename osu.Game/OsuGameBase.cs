@@ -312,6 +312,10 @@ namespace osu.Game
             if (powerStatus != null)
                 dependencies.CacheAs(powerStatus);
 
+            var keyboardService = CreateKeyboardService();
+            if (keyboardService != null)
+                dependencies.CacheAs(keyboardService);
+
             dependencies.Cache(SessionStatics = new SessionStatics());
             dependencies.Cache(Colours = new OsuColour());
 
@@ -510,6 +514,8 @@ namespace osu.Game
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
         protected virtual BatteryInfo CreateBatteryInfo() => null;
+
+        protected virtual KeyboardService CreateKeyboardService() => null;
 
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 

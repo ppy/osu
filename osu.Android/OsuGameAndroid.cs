@@ -89,6 +89,8 @@ namespace osu.Android
 
         protected override BatteryInfo CreateBatteryInfo() => new AndroidBatteryInfo();
 
+        protected override KeyboardService CreateKeyboardService() => new AndroidKeyboardSerivce();
+
         public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
         {
             switch (handler)
@@ -109,6 +111,11 @@ namespace osu.Android
             public override double? ChargeLevel => Battery.ChargeLevel;
 
             public override bool OnBattery => Battery.PowerSource == BatteryPowerSource.Battery;
+        }
+        private class AndroidKeyboardSerivce : KeyboardService
+        {
+            // Not Implemented
+            public override double? Height => 0;
         }
     }
 }

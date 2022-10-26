@@ -171,6 +171,8 @@ namespace osu.Desktop
 
         protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
 
+        protected override KeyboardService CreateKeyboardService() => new DesktopKeyboardSerivce();
+
         private readonly List<string> importableFiles = new List<string>();
         private ScheduledDelegate? importSchedule;
 
@@ -228,6 +230,12 @@ namespace osu.Desktop
             }
 
             public override bool OnBattery => SDL.SDL_GetPowerInfo(out _, out _) == SDL.SDL_PowerState.SDL_POWERSTATE_ON_BATTERY;
+        }
+
+        private class DesktopKeyboardSerivce : KeyboardService
+        {
+            // Not Implemented
+            public override double? Height => 0;
         }
     }
 }

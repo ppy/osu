@@ -9,6 +9,8 @@ using osu.Game.Input.Bindings;
 using osuTK.Input;
 using osu.Framework.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Utils;
+using osu.Framework.Logging;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -17,6 +19,9 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class FocusedTextBox : OsuTextBox, IKeyBindingHandler<GlobalAction>
     {
+        [Resolved(CanBeNull = true)]
+        private KeyboardService? keyboardService { get; set; }
+
         private bool focus;
 
         private bool allowImmediateFocus => host?.OnScreenKeyboardOverlapsGameWindow != true;
@@ -72,6 +77,8 @@ namespace osu.Game.Graphics.UserInterface
 
             if (e.Key == Key.Escape)
                 return false; // disable the framework-level handling of escape key for conformity (we use GlobalAction.Back).
+
+            Logger.Log("[Keyboard] Keyboard Height: " + keyboardService?.Height);
 
             return base.OnKeyDown(e);
         }
