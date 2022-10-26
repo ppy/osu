@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
@@ -190,7 +191,14 @@ namespace osu.Game.Beatmaps.Formats
             extractSampleControlPoints(beatmap.HitObjects);
 
             foreach (var point in legacyControlPoints.EffectPoints)
+            {
+                DifficultyControlPoint difficultyPoint = legacyControlPoints.DifficultyPointAt(point.Time);
+
+                if (Precision.AlmostEquals(difficultyPoint.SliderVelocity, point.ScrollSpeed, acceptableDifference: point.ScrollSpeedBindable.Precision))
+                    continue;
+
                 legacyControlPoints.Add(point.Time, new DifficultyControlPoint { SliderVelocity = point.ScrollSpeed });
+            }
 
             foreach (var group in legacyControlPoints.Groups)
             {
