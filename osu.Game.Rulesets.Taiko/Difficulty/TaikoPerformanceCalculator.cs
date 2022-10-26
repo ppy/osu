@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
-        private double estimatedUR;
+        private double estimatedDeviation;
 
         private double effectiveMissCount;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            estimatedUR = 10 * computeEstimatedUR(score, taikoAttributes);
+            estimatedDeviation = computeEstimatedDeviation(score, taikoAttributes);
 
             // The effectiveMissCount is calculated by gaining a ratio for totalSuccessfulHits and increasing the miss penalty for shorter object counts lower than 1000.
             if (totalSuccessfulHits > 0)
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 Difficulty = difficultyValue,
                 Accuracy = accuracyValue,
                 EffectiveMissCount = effectiveMissCount,
-                EstimatedUR = estimatedUR,
+                EstimatedUR = estimatedDeviation * 10,
                 Total = totalValue
             };
         }
@@ -86,12 +86,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 difficultyValue *= 1.025;
 
             if (score.Mods.Any(m => m is ModHardRock))
-                difficultyValue *= 1.050;
+                difficultyValue *= 1.10;
 
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= 1.050 * lengthBonus;
 
-            return difficultyValue * Math.Pow(SpecialFunctions.Erf(400 / (Math.Sqrt(2) * estimatedUR)), 2.0);
+            return difficultyValue * Math.Pow(SpecialFunctions.Erf(400 / (Math.Sqrt(2) * estimatedDeviation)), 2.0);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
@@ -99,18 +99,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (attributes.GreatHitWindow <= 0)
                 return 0;
 
-            double accuracyValue = Math.Pow(75 / estimatedUR, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
+            double accuracyValue = Math.Pow(7.5 / estimatedDeviation, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
             // Slight HDFL Bonus for accuracy. A clamp is used to prevent against negative values
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden))
-                accuracyValue *= Math.Max(1.050, 1.075 * lengthBonus);
+                accuracyValue *= Math.Max(1.0, 1.05 * lengthBonus);
 
             return accuracyValue;
         }
 
-        private double computeEstimatedUR(ScoreInfo score, TaikoDifficultyAttributes attributes)
+        private double computeEstimatedDeviation(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
             if (totalHits == 0)
                 return double.PositiveInfinity;
