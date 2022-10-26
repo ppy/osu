@@ -157,11 +157,7 @@ namespace osu.Game.Screens.Backgrounds
             // seasonal background loading gets highest priority.
             Background newBackground = seasonalBackgroundLoader.LoadNextBackground();
 
-#if DEBUG
-            if (newBackground == null)
-#else
             if (newBackground == null && user.Value?.IsSupporter == true)
-#endif
             {
                 switch (source.Value)
                 {
