@@ -304,6 +304,7 @@ namespace osu.Game.Screens.Edit
                                             cutMenuItem = new EditorMenuItem("Cut", MenuItemType.Standard, Cut),
                                             copyMenuItem = new EditorMenuItem("Copy", MenuItemType.Standard, Copy),
                                             pasteMenuItem = new EditorMenuItem("Paste", MenuItemType.Standard, Paste),
+                                            cloneMenuItem = new EditorMenuItem("Clone", MenuItemType.Standard, Clone),
                                         }
                                     },
                                     new MenuItem("View")
@@ -575,6 +576,10 @@ namespace osu.Game.Screens.Edit
                     this.Exit();
                     return true;
 
+                case GlobalAction.EditorCloneSelection:
+                    Clone();
+                    return true;
+
                 case GlobalAction.EditorComposeMode:
                     Mode.Value = EditorScreenMode.Compose;
                     return true;
@@ -741,6 +746,7 @@ namespace osu.Game.Screens.Edit
 
         private EditorMenuItem cutMenuItem;
         private EditorMenuItem copyMenuItem;
+        private EditorMenuItem cloneMenuItem;
         private EditorMenuItem pasteMenuItem;
 
         private readonly BindableWithCurrent<bool> canCut = new BindableWithCurrent<bool>();
@@ -750,7 +756,11 @@ namespace osu.Game.Screens.Edit
         private void setUpClipboardActionAvailability()
         {
             canCut.Current.BindValueChanged(cut => cutMenuItem.Action.Disabled = !cut.NewValue, true);
-            canCopy.Current.BindValueChanged(copy => copyMenuItem.Action.Disabled = !copy.NewValue, true);
+            canCopy.Current.BindValueChanged(copy =>
+            {
+                copyMenuItem.Action.Disabled = !copy.NewValue;
+                cloneMenuItem.Action.Disabled = !copy.NewValue;
+            }, true);
             canPaste.Current.BindValueChanged(paste => pasteMenuItem.Action.Disabled = !paste.NewValue, true);
         }
 
@@ -764,6 +774,21 @@ namespace osu.Game.Screens.Edit
         protected void Cut() => currentScreen?.Cut();
 
         protected void Copy() => currentScreen?.Copy();
+
+        protected void Clone()
+        {
+            // Avoid attempting to clone if copying is not available (as it may result in pasting something unexpected).
+            if (!canCopy.Value)
+                return;
+
+            // This is an initial implementation just to get an idea of how people used this function.
+            // There are a couple of differences from osu!stable's implementation which will require more work to match:
+            // - The "clipboard" is not populated during the duplication process.
+            // - The duplicated hitobjects are inserted after the original pattern (add one beat_length and then quantize using beat snap).
+            // - The duplicated hitobjects are selected (but this is also applied for all paste operations so should be changed there).
+            Copy();
+            Paste();
+        }
 
         protected void Paste() => currentScreen?.Paste();
 
