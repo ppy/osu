@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -23,7 +22,6 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -34,8 +32,6 @@ namespace osu.Game.Rulesets.Catch.Edit
         private const float distance_snap_radius = 50;
 
         private CatchDistanceSnapGrid distanceSnapGrid;
-
-        private readonly Bindable<TernaryState> distanceSnapToggle = new Bindable<TernaryState>();
 
         private InputManager inputManager;
 
@@ -88,34 +84,6 @@ namespace osu.Game.Rulesets.Catch.Edit
             updateDistanceSnapGrid();
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.Repeat)
-                return false;
-
-            handleToggleViaKey(e);
-            return base.OnKeyDown(e);
-        }
-
-        protected override void OnKeyUp(KeyUpEvent e)
-        {
-            handleToggleViaKey(e);
-            base.OnKeyUp(e);
-        }
-
-        private bool distanceSnapMomentary;
-
-        private void handleToggleViaKey(KeyboardEvent key)
-        {
-            bool altPressed = key.AltPressed;
-
-            if (altPressed != distanceSnapMomentary)
-            {
-                distanceSnapMomentary = altPressed;
-                distanceSnapToggle.Value = distanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
-            }
-        }
-
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
@@ -147,11 +115,6 @@ namespace osu.Game.Rulesets.Catch.Edit
             new JuiceStreamCompositionTool(),
             new BananaShowerCompositionTool()
         };
-
-        protected override IEnumerable<TernaryButton> CreateTernaryButtons() => base.CreateTernaryButtons().Concat(new[]
-        {
-            new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
-        });
 
         public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
@@ -224,7 +187,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         private void updateDistanceSnapGrid()
         {
-            if (distanceSnapToggle.Value != TernaryState.True)
+            if (DistanceSnapToggle.Value != TernaryState.True)
             {
                 distanceSnapGrid.Hide();
                 return;
