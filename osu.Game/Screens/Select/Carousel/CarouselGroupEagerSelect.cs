@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Select.Carousel
                 return null;
 
             int forwardsIndex = lastSelectedIndex;
-            int backwardsIndex = lastSelectedIndex;
+            int backwardsIndex = Math.Min(lastSelectedIndex, Items.Count - 1);
 
             while (true)
             {
