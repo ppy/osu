@@ -89,8 +89,9 @@ namespace osu.Game.Rulesets.Edit
                             {
                                 distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
                                 {
-                                    Current = { BindTarget = DistanceSpacingMultiplier },
                                     KeyboardStep = adjust_step,
+                                    // Manual binding in LoadComplete to handle one-way event flow.
+                                    Current = DistanceSpacingMultiplier.GetUnboundCopy(),
                                 },
                                 currentDistanceSpacingButton = new ExpandableButton
                                 {
@@ -101,6 +102,7 @@ namespace osu.Game.Rulesets.Edit
                                         Debug.Assert(objects != null);
 
                                         DistanceSpacingMultiplier.Value = ReadCurrentDistanceSnap(objects.Value.before, objects.Value.after);
+                                        DistanceSnapToggle.Value = TernaryState.True;
                                     },
                                     RelativeSizeAxes = Axes.X,
                                 }
@@ -173,6 +175,14 @@ namespace osu.Game.Rulesets.Edit
 
                     EditorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
                 }, true);
+
+                // Manual binding to handle enabling distance spacing when the slider is interacted with.
+                distanceSpacingSlider.Current.BindValueChanged(spacing =>
+                {
+                    DistanceSpacingMultiplier.Value = spacing.NewValue;
+                    DistanceSnapToggle.Value = TernaryState.True;
+                });
+                DistanceSpacingMultiplier.BindValueChanged(spacing => distanceSpacingSlider.Current.Value = spacing.NewValue);
             }
         }
 
@@ -245,6 +255,7 @@ namespace osu.Game.Rulesets.Edit
             else if (action == GlobalAction.EditorDecreaseDistanceSpacing)
                 DistanceSpacingMultiplier.Value -= amount;
 
+            DistanceSnapToggle.Value = TernaryState.True;
             return true;
         }
 
