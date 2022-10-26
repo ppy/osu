@@ -134,7 +134,7 @@ namespace osu.Game.Skinning.Editor
             }
 
             [BackgroundDependencyLoader(true)]
-            private void load([CanBeNull] OverlayColourProvider overlayColourProvider, OsuColour colours)
+            private void load(OverlayColourProvider? overlayColourProvider, OsuColour colours)
             {
                 BackgroundColour = overlayColourProvider?.Background3 ?? colours.Blue3;
                 Content.CornerRadius = 5;
