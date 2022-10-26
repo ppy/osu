@@ -10,8 +10,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -20,14 +23,17 @@ using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.Menu;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -73,6 +79,9 @@ namespace osu.Game.Skinning.Editor
         private EditorSidebar componentsSidebar;
         private EditorSidebar settingsSidebar;
 
+        private SkinEditorMenuBackgroundChooser menuBackgroundChooser;
+        private MenuBackgroundPreview previewBackground;
+
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
@@ -93,93 +102,106 @@ namespace osu.Game.Skinning.Editor
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new GridContainer
+                Child = new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[]
+                    Children = new Drawable[]
                     {
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(),
-                    },
-
-                    Content = new[]
-                    {
-                        new Drawable[]
+                        menuBackgroundChooser = new SkinEditorMenuBackgroundChooser(this)
                         {
-                            new Container
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            RowDimensions = new[]
                             {
-                                Name = "Menu container",
-                                RelativeSizeAxes = Axes.X,
-                                Depth = float.MinValue,
-                                Height = MENU_HEIGHT,
-                                Children = new Drawable[]
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
                                 {
-                                    new EditorMenuBar
+                                    new Container
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        RelativeSizeAxes = Axes.Both,
-                                        Items = new[]
+                                        Name = "Menu container",
+                                        RelativeSizeAxes = Axes.X,
+                                        Depth = float.MinValue,
+                                        Height = MENU_HEIGHT,
+                                        Children = new Drawable[]
                                         {
-                                            new MenuItem("File")
+                                            new EditorMenuBar
                                             {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                RelativeSizeAxes = Axes.Both,
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem("Save", MenuItemType.Standard, Save),
-                                                    new EditorMenuItem("Revert to default", MenuItemType.Destructive, revert),
-                                                    new EditorMenuItemSpacer(),
-                                                    new EditorMenuItem("Exit", MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
-                                                },
+                                                    new MenuItem("File")
+                                                    {
+                                                        Items = new[]
+                                                        {
+                                                            new EditorMenuItem("Save", MenuItemType.Standard, Save),
+                                                            new EditorMenuItem("Revert to default", MenuItemType.Destructive, revert),
+                                                            new EditorMenuItemSpacer(),
+                                                            new EditorMenuItem("Set meun background", MenuItemType.Standard, () => menuBackgroundChooser.ShowPopover()),
+                                                            new EditorMenuItem("Remove meun background", MenuItemType.Standard, removeMenuBackground),
+                                                            new EditorMenuItemSpacer(),
+                                                            new EditorMenuItem("Exit", MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
+                                                        },
+                                                    },
+                                                }
                                             },
-                                        }
-                                    },
-                                    headerText = new OsuTextFlowContainer
-                                    {
-                                        TextAnchor = Anchor.TopRight,
-                                        Padding = new MarginPadding(5),
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        AutoSizeAxes = Axes.X,
-                                        RelativeSizeAxes = Axes.Y,
-                                    },
-                                },
-                            },
-                        },
-                        new Drawable[]
-                        {
-                            new SkinEditorSceneLibrary
-                            {
-                                RelativeSizeAxes = Axes.X,
-                            },
-                        },
-                        new Drawable[]
-                        {
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
-                                    {
-                                        componentsSidebar = new EditorSidebar(),
-                                        content = new Container
-                                        {
-                                            Depth = float.MaxValue,
-                                            RelativeSizeAxes = Axes.Both,
+                                            headerText = new OsuTextFlowContainer
+                                            {
+                                                TextAnchor = Anchor.TopRight,
+                                                Padding = new MarginPadding(5),
+                                                Anchor = Anchor.TopRight,
+                                                Origin = Anchor.TopRight,
+                                                AutoSizeAxes = Axes.X,
+                                                RelativeSizeAxes = Axes.Y,
+                                            },
                                         },
-                                        settingsSidebar = new EditorSidebar(),
+                                    },
+                                },
+                                new Drawable[]
+                                {
+                                    new SkinEditorSceneLibrary
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                    },
+                                },
+                                new Drawable[]
+                                {
+                                    new GridContainer
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        ColumnDimensions = new[]
+                                        {
+                                            new Dimension(GridSizeMode.AutoSize),
+                                            new Dimension(),
+                                            new Dimension(GridSizeMode.AutoSize),
+                                        },
+                                        Content = new[]
+                                        {
+                                            new Drawable[]
+                                            {
+                                                componentsSidebar = new EditorSidebar(),
+                                                content = new Container
+                                                {
+                                                    Depth = float.MaxValue,
+                                                    RelativeSizeAxes = Axes.Both,
+                                                },
+                                                settingsSidebar = new EditorSidebar(),
+                                            }
+                                        }
                                     }
-                                }
+                                },
                             }
                         },
-                    }
+                    },
                 }
             };
         }
@@ -330,6 +352,59 @@ namespace osu.Game.Skinning.Editor
                 // add back default components
                 getTarget(t.Target).Reload();
             }
+
+            RemoveMenuBackground();
+        }
+
+        private void removeMenuBackground()
+        {
+            RemoveMenuBackground();
+
+            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.MenuBackgroundChanged, CommonStrings.Default));
+        }
+
+        public void SetMenuBackground(FileInfo fileInfo)
+        {
+            using MemoryStream menuBackgroundStream = new MemoryStream();
+            using (var stream = fileInfo.OpenRead())
+                stream.CopyTo(menuBackgroundStream);
+            menuBackgroundStream.Seek(0, SeekOrigin.Begin);
+
+            Texture previewTexture = Texture.FromStream((skins as IO.IStorageResourceProvider).Renderer, menuBackgroundStream);
+            menuBackgroundStream.Seek(0, SeekOrigin.Begin);
+
+            currentSkin.Value.SkinInfo.PerformWrite(skinInfo =>
+            {
+                using (menuBackgroundStream)
+                    skins.AddFile(skinInfo, menuBackgroundStream, $"menu-background{fileInfo.Extension}");
+            });
+            realm.Run(r => r.Refresh());
+
+            if (previewBackground != null)
+                Remove(previewBackground, true);
+
+            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.MenuBackgroundChanged, fileInfo.Name));
+            game?.PerformFromScreen(screen =>
+            {
+                (screen as MainMenu)?.ApplyToBackground(b =>
+                {
+                    if (b is BackgroundScreenDefault targetScreen)
+                        AddInternal(previewBackground = new MenuBackgroundPreview(targetScreen, previewTexture));
+                });
+            });
+        }
+
+        public void RemoveMenuBackground()
+        {
+            currentSkin.Value.SkinInfo.PerformWrite(skinInfo =>
+            {
+                foreach (var file in skinInfo.Files.Where(f => f.Filename.StartsWith("menu-background.")))
+                    skins.DeleteFile(skinInfo, file);
+            });
+            realm.Run(r => r.Refresh());
+
+            if (previewBackground != null)
+                Remove(previewBackground, true);
         }
 
         public void Save()
@@ -343,6 +418,7 @@ namespace osu.Game.Skinning.Editor
                 currentSkin.Value.UpdateDrawableTarget(t);
 
             skins.Save(skins.CurrentSkin.Value);
+            skins.Reload();
             onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString()));
         }
 
@@ -354,6 +430,9 @@ namespace osu.Game.Skinning.Editor
         {
             base.Hide();
             SelectedComponents.Clear();
+
+            if (previewBackground != null)
+                Remove(previewBackground, true);
         }
 
         protected override void PopIn()
@@ -379,8 +458,16 @@ namespace osu.Game.Skinning.Editor
 
         public Task Import(params string[] paths)
         {
+            if (menuBackgroundChooser.PopoverVisible)
+                return Task.CompletedTask;
+
             Schedule(() =>
             {
+                var target = getFirstTarget();
+
+                if (target == null)
+                    return;
+
                 var file = new FileInfo(paths.First());
 
                 // import to skin
@@ -400,7 +487,7 @@ namespace osu.Game.Skinning.Editor
                 {
                     SpriteName = { Value = file.Name },
                     Origin = Anchor.Centre,
-                    Position = getFirstTarget().ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position),
+                    Position = target.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position),
                 };
 
                 placeComponent(sprite, false);
@@ -426,9 +513,60 @@ namespace osu.Game.Skinning.Editor
 
         private class SkinEditorToast : Toast
         {
-            public SkinEditorToast(LocalisableString value, string skinDisplayName)
+            public SkinEditorToast(LocalisableString value, LocalisableString skinDisplayName)
                 : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName)
             {
+            }
+        }
+
+        private class MenuBackgroundPreview : Drawable
+        {
+            private readonly BackgroundScreenDefault screen;
+            private readonly PreviewBackground preview;
+
+            private bool isDisposed;
+
+            public MenuBackgroundPreview(BackgroundScreenDefault targetScreen, Texture texture)
+            {
+                screen = targetScreen;
+                preview = new PreviewBackground(texture);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                screen.Next(preview);
+                screen.Lock(this);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                if (isDisposed)
+                    return;
+
+                screen.Unlock(this);
+                screen.Next();
+
+                isDisposed = true;
+            }
+
+            private class PreviewBackground : Background
+            {
+                private readonly Texture texture;
+
+                public PreviewBackground(Texture texture)
+                {
+                    this.texture = texture;
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    Sprite.Texture = texture;
+                }
             }
         }
     }

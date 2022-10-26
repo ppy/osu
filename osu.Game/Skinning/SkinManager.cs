@@ -189,6 +189,11 @@ namespace osu.Game.Skinning
             skinImporter.Save(skin);
         }
 
+        public void Reload()
+        {
+            CurrentSkin.Value = CurrentSkinInfo.Value.PerformRead(GetSkin);
+        }
+
         /// <summary>
         /// Perform a lookup query on available <see cref="SkinInfo"/>s.
         /// </summary>

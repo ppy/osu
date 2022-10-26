@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -110,6 +110,18 @@ namespace osu.Game.Screens.Backgrounds
                 return false;
 
             return queueNext(nextBackground);
+        }
+
+        /// <summary>
+        /// Request loading a specific background.
+        /// </summary>
+        /// <param name="background">The background to load.</param>
+        /// <returns>Whether a new background was queued for load. May return false if the current background is still valid.</returns>
+        public virtual bool Next(Background background)
+        {
+            background.Depth = currentDisplay;
+
+            return queueNext(background);
         }
 
         private bool queueNext(Background nextBackground)
