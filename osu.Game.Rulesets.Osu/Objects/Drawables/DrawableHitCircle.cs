@@ -102,8 +102,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Size = HitArea.DrawSize;
 
-            PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            PositionBindable.BindValueChanged(_ => UpdatePosition());
+            StackHeightBindable.BindValueChanged(_ => UpdatePosition());
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
 
@@ -132,6 +132,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 base.LifetimeEnd = value;
                 ApproachCircle.LifetimeEnd = value;
             }
+        }
+
+        protected virtual void UpdatePosition()
+        {
+            Position = HitObject.StackedPosition;
         }
 
         public override void Shake() => shakeContainer.Shake();
