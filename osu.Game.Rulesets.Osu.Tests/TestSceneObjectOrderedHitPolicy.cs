@@ -377,7 +377,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void addJudgementAssert(OsuHitObject hitObject, HitResult result)
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judgement is {result}",
-                () => judgementResults.Single(r => r.HitObject == hitObject).Type == result);
+                () => judgementResults.Single(r => r.HitObject == hitObject).Type, () => Is.EqualTo(result));
         }
 
         private void addJudgementAssert(string name, Func<OsuHitObject> hitObject, HitResult result)
