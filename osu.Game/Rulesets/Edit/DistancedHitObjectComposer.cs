@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,6 +17,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -36,7 +38,7 @@ namespace osu.Game.Rulesets.Edit
     {
         private const float adjust_step = 0.1f;
 
-        public Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1.0)
+        public BindableDouble DistanceSpacingMultiplier { get; } = new BindableDouble(1.0)
         {
             MinValue = 0.1,
             MaxValue = 6.0,
@@ -48,6 +50,7 @@ namespace osu.Game.Rulesets.Edit
         protected ExpandingToolboxContainer RightSideToolboxContainer { get; private set; }
 
         private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
+        private ExpandableButton currentDistanceSpacingButton;
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
@@ -82,15 +85,77 @@ namespace osu.Game.Rulesets.Edit
                         Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                         Child = new EditorToolboxGroup("snapping")
                         {
-                            Child = distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
+                            Children = new Drawable[]
                             {
-                                Current = { BindTarget = DistanceSpacingMultiplier },
-                                KeyboardStep = adjust_step,
+                                distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
+                                {
+                                    KeyboardStep = adjust_step,
+                                    // Manual binding in LoadComplete to handle one-way event flow.
+                                    Current = DistanceSpacingMultiplier.GetUnboundCopy(),
+                                },
+                                currentDistanceSpacingButton = new ExpandableButton
+                                {
+                                    Action = () =>
+                                    {
+                                        (HitObject before, HitObject after)? objects = getObjectsOnEitherSideOfCurrentTime();
+
+                                        Debug.Assert(objects != null);
+
+                                        DistanceSpacingMultiplier.Value = ReadCurrentDistanceSnap(objects.Value.before, objects.Value.after);
+                                        DistanceSnapToggle.Value = TernaryState.True;
+                                    },
+                                    RelativeSizeAxes = Axes.X,
+                                }
                             }
                         }
                     }
                 }
             });
+        }
+
+        private (HitObject before, HitObject after)? getObjectsOnEitherSideOfCurrentTime()
+        {
+            HitObject lastBefore = Playfield.HitObjectContainer.AliveObjects.LastOrDefault(h => h.HitObject.StartTime <= EditorClock.CurrentTime)?.HitObject;
+
+            if (lastBefore == null)
+                return null;
+
+            HitObject firstAfter = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime >= EditorClock.CurrentTime)?.HitObject;
+
+            if (firstAfter == null)
+                return null;
+
+            if (lastBefore == firstAfter)
+                return null;
+
+            return (lastBefore, firstAfter);
+        }
+
+        protected abstract double ReadCurrentDistanceSnap(HitObject before, HitObject after);
+
+        protected override void Update()
+        {
+            base.Update();
+
+            (HitObject before, HitObject after)? objects = getObjectsOnEitherSideOfCurrentTime();
+
+            double currentSnap = objects == null
+                ? 0
+                : ReadCurrentDistanceSnap(objects.Value.before, objects.Value.after);
+
+            if (currentSnap > DistanceSpacingMultiplier.MinValue)
+            {
+                currentDistanceSpacingButton.Enabled.Value = currentDistanceSpacingButton.Expanded.Value
+                                                             && !Precision.AlmostEquals(currentSnap, DistanceSpacingMultiplier.Value, DistanceSpacingMultiplier.Precision / 2);
+                currentDistanceSpacingButton.ContractedLabelText = $"current {currentSnap:N2}x";
+                currentDistanceSpacingButton.ExpandedLabelText = $"Use current ({currentSnap:N2}x)";
+            }
+            else
+            {
+                currentDistanceSpacingButton.Enabled.Value = false;
+                currentDistanceSpacingButton.ContractedLabelText = string.Empty;
+                currentDistanceSpacingButton.ExpandedLabelText = "Use current (unavailable)";
+            }
         }
 
         protected override void LoadComplete()
@@ -110,6 +175,14 @@ namespace osu.Game.Rulesets.Edit
 
                     EditorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
                 }, true);
+
+                // Manual binding to handle enabling distance spacing when the slider is interacted with.
+                distanceSpacingSlider.Current.BindValueChanged(spacing =>
+                {
+                    DistanceSpacingMultiplier.Value = spacing.NewValue;
+                    DistanceSnapToggle.Value = TernaryState.True;
+                });
+                DistanceSpacingMultiplier.BindValueChanged(spacing => distanceSpacingSlider.Current.Value = spacing.NewValue);
             }
         }
 
@@ -182,6 +255,7 @@ namespace osu.Game.Rulesets.Edit
             else if (action == GlobalAction.EditorDecreaseDistanceSpacing)
                 DistanceSpacingMultiplier.Value -= amount;
 
+            DistanceSnapToggle.Value = TernaryState.True;
             return true;
         }
 
