@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
         {
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS / 2);
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 new Pulp
                 {

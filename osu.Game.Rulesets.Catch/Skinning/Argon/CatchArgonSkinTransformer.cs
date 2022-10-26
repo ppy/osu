@@ -29,6 +29,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
 
                         case CatchSkinComponents.Banana:
                             return new ArgonBananaPiece();
+
+                        case CatchSkinComponents.Droplet:
+                            return new ArgonDropletPiece();
                     }
 
                     break;
