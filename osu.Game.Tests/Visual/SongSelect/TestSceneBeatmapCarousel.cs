@@ -863,52 +863,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestRandomFallbackOnNonMatchingPrevious()
-        {
-            List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
-
-            AddStep("populate maps", () =>
-            {
-                manySets.Clear();
-
-                for (int i = 0; i < 10; i++)
-                {
-                    manySets.Add(TestResources.CreateTestBeatmapSetInfo(3, new[]
-                    {
-                        // all taiko except for first
-                        rulesets.GetRuleset(i > 0 ? 1 : 0)
-                    }));
-                }
-            });
-
-            loadBeatmaps(manySets);
-
-            for (int i = 0; i < 10; i++)
-            {
-                AddStep("Reset filter", () => carousel.Filter(new FilterCriteria(), false));
-
-                AddStep("select first beatmap", () => carousel.SelectBeatmap(manySets.First().Beatmaps.First()));
-
-                AddStep("Toggle non-matching filter", () =>
-                {
-                    carousel.Filter(new FilterCriteria { SearchText = Guid.NewGuid().ToString() }, false);
-                });
-
-                AddAssert("selection lost", () => carousel.SelectedBeatmapInfo == null);
-
-                AddStep("Restore different ruleset filter", () =>
-                {
-                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.GetRuleset(1) }, false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet!.ID);
-                });
-
-                AddAssert("selection changed", () => !carousel.SelectedBeatmapInfo!.Equals(manySets.First().Beatmaps.First()));
-            }
-
-            AddAssert("Selection was random", () => eagerSelectedIDs.Count > 2);
-        }
-
-        [Test]
         public void TestFilteringByUserStarDifficulty()
         {
             BeatmapSetInfo set = null;
@@ -953,6 +907,63 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("filter to [0..]", () => carousel.Filter(new FilterCriteria { UserStarDifficulty = { Min = 0 } }));
             AddUntilStep("Wait for debounce", () => !carousel.PendingFilterTask);
             checkVisibleItemCount(true, 15);
+        }
+
+        [Test]
+        public void TestCarouselSelectsNextWhenPreviousIsFiltered()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+
+            // 10 sets that go osu! -> taiko -> catch -> osu! -> ...
+            for (int i = 0; i < 10; i++)
+            {
+                var rulesetInfo = rulesets.AvailableRulesets.ElementAt(i % 3);
+                sets.Add(TestResources.CreateTestBeatmapSetInfo(5, new[] { rulesetInfo }));
+            }
+
+            // Sort mode is important to keep the ruleset order
+            loadBeatmaps(sets, () => new FilterCriteria { Sort = SortMode.Title });
+            setSelected(1, 1);
+
+            for (int i = 1; i < 10; i++)
+            {
+                var rulesetInfo = rulesets.AvailableRulesets.ElementAt(i % 3);
+                AddStep($"Set ruleset to {rulesetInfo.ShortName}", () =>
+                {
+                    carousel.Filter(new FilterCriteria { Ruleset = rulesetInfo, Sort = SortMode.Title }, false);
+                });
+                waitForSelection(i + 1, 1);
+            }
+        }
+
+        [Test]
+        public void TestCarouselSelectsBackwardsWhenDistanceIsShorter()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+
+            // 10 sets that go taiko, osu!, osu!, osu!, taiko, osu!, osu!, osu!, ...
+            for (int i = 0; i < 10; i++)
+            {
+                var rulesetInfo = rulesets.AvailableRulesets.ElementAt(i % 4 == 0 ? 1 : 0);
+                sets.Add(TestResources.CreateTestBeatmapSetInfo(5, new[] { rulesetInfo }));
+            }
+
+            // Sort mode is important to keep the ruleset order
+            loadBeatmaps(sets, () => new FilterCriteria { Sort = SortMode.Title });
+
+            for (int i = 2; i < 10; i += 4)
+            {
+                setSelected(i, 1);
+                AddStep("Set ruleset to taiko", () =>
+                {
+                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(1), Sort = SortMode.Title }, false);
+                });
+                waitForSelection(i - 1, 1);
+                AddStep("Remove ruleset filter", () =>
+                {
+                    carousel.Filter(new FilterCriteria { Sort = SortMode.Title }, false);
+                });
+            }
         }
 
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null, int? count = null,
