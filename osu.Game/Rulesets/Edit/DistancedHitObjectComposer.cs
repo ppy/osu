@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -10,6 +12,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -20,6 +23,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -47,6 +51,10 @@ namespace osu.Game.Rulesets.Edit
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
+
+        protected readonly Bindable<TernaryState> DistanceSnapToggle = new Bindable<TernaryState>();
+
+        private bool distanceSnapMomentary;
 
         protected DistancedHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -105,13 +113,44 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
+        protected override IEnumerable<TernaryButton> CreateTernaryButtons() => base.CreateTernaryButtons().Concat(new[]
+        {
+            new TernaryButton(DistanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
+        });
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat)
+                return false;
+
+            handleToggleViaKey(e);
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            handleToggleViaKey(e);
+            base.OnKeyUp(e);
+        }
+
+        private void handleToggleViaKey(KeyboardEvent key)
+        {
+            bool altPressed = key.AltPressed;
+
+            if (altPressed != distanceSnapMomentary)
+            {
+                distanceSnapMomentary = altPressed;
+                DistanceSnapToggle.Value = DistanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+            }
+        }
+
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
                 case GlobalAction.EditorIncreaseDistanceSpacing:
                 case GlobalAction.EditorDecreaseDistanceSpacing:
-                    return adjustDistanceSpacing(e.Action, adjust_step);
+                    return AdjustDistanceSpacing(e.Action, adjust_step);
             }
 
             return false;
@@ -127,13 +166,13 @@ namespace osu.Game.Rulesets.Edit
             {
                 case GlobalAction.EditorIncreaseDistanceSpacing:
                 case GlobalAction.EditorDecreaseDistanceSpacing:
-                    return adjustDistanceSpacing(e.Action, e.ScrollAmount * adjust_step);
+                    return AdjustDistanceSpacing(e.Action, e.ScrollAmount * adjust_step);
             }
 
             return false;
         }
 
-        private bool adjustDistanceSpacing(GlobalAction action, float amount)
+        protected virtual bool AdjustDistanceSpacing(GlobalAction action, float amount)
         {
             if (DistanceSpacingMultiplier.Disabled)
                 return false;
@@ -148,7 +187,7 @@ namespace osu.Game.Rulesets.Edit
 
         public virtual float GetBeatSnapDistanceAt(HitObject referenceObject)
         {
-            return (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * referenceObject.DifficultyControlPoint.SliderVelocity / BeatSnapProvider.BeatDivisor);
+            return (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * 1 / BeatSnapProvider.BeatDivisor);
         }
 
         public virtual float DurationToDistance(HitObject referenceObject, double duration)

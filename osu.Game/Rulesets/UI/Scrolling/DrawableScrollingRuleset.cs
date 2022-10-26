@@ -158,9 +158,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // Trim unwanted sequences of timing changes
             timingChanges = timingChanges
                             // Collapse sections after the last hit object
-                            .Where(s => s.StartTime <= lastObjectTime)
+                            .Where(s => s.Time <= lastObjectTime)
                             // Collapse sections with the same start time
-                            .GroupBy(s => s.StartTime).Select(g => g.Last()).OrderBy(s => s.StartTime);
+                            .GroupBy(s => s.Time).Select(g => g.Last()).OrderBy(s => s.Time);
 
             ControlPoints.AddRange(timingChanges);
 
