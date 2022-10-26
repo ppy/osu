@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= 1.050 * lengthBonus;
 
-            return difficultyValue * Math.Pow(SpecialFunctions.Erf(400 / (Math.Sqrt(2) * estimatedDeviation)), 2.0);
+            return difficultyValue * Math.Pow(SpecialFunctions.Erf(40 / (Math.Sqrt(2) * estimatedDeviation)), 2.0);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
