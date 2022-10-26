@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
-using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
@@ -137,20 +136,34 @@ namespace osu.Game.Extensions
             return instance.OnlineID.Equals(other.OnlineID);
         }
 
-        private static readonly char[] invalid_filename_characters = Path.GetInvalidFileNameChars()
-                                                                         // Backslash is added to avoid issues when exporting to zip.
-                                                                         // See SharpCompress filename normalisation https://github.com/adamhathcock/sharpcompress/blob/a1e7c0068db814c9aa78d86a94ccd1c761af74bd/src/SharpCompress/Writers/Zip/ZipWriter.cs#L143.
-                                                                         .Append('\\')
-                                                                         .ToArray();
+        private static bool isValidFilenameChar(this char ch)
+        {
+            if (ch >= '0' && ch <= '9')
+                return true;
+
+            if (ch >= 'A' && ch <= 'Z')
+                return true;
+
+            if (ch >= 'a' && ch <= 'z')
+                return true;
+
+            return "-_()[]".Contains(ch);
+        }
 
         /// <summary>
         /// Get a valid filename for use inside a zip file. Avoids backslashes being incorrectly converted to directories.
         /// </summary>
         public static string GetValidArchiveContentFilename(this string filename)
         {
-            foreach (char c in invalid_filename_characters)
-                filename = filename.Replace(c, '_');
-            return filename;
+            char[] resultData = filename.ToCharArray();
+
+            for (int i = 0; i < resultData.Length; i++)
+            {
+                if (!isValidFilenameChar(resultData[i]))
+                    resultData[i] = '_';
+            }
+
+            return new string(resultData);
         }
     }
 }
