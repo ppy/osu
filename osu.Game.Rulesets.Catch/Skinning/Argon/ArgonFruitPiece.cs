@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
 
         private Container layers = null!;
 
+        private float rotationRandomness;
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
@@ -99,6 +101,24 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
                 foreach (var sprite in layers)
                     sprite.Colour = colour.NewValue;
             }, true);
+
+            rotationRandomness = RNG.NextSingle(0.2f, 1) * (RNG.NextBool() ? -1 : 1);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            for (int i = 0; i < layers.Count; i++)
+            {
+                layers[i].Rotation +=
+                    // Layers are ordered from largest to smallest. Smaller layers should rotate more.
+                    (i * 2)
+                    * (float)Clock.ElapsedFrameTime
+                    * 0.02f * rotationRandomness
+                    // Each layer should alternate rotation direction.
+                    * (i % 2 == 1 ? 1 : -1);
+            }
         }
     }
 }
