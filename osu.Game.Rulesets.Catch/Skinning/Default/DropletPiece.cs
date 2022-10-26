@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
     public class DropletPiece : CatchHitObjectPiece
     {
-        protected override HyperBorderPiece HyperBorderPiece { get; }
+        protected override Drawable HyperBorderPiece { get; }
 
         public DropletPiece()
         {
