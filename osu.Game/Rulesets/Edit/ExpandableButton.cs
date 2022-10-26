@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Edit
         private LocalisableString contractedLabelText;
 
         /// <summary>
-        /// The label text to display when this slider is in a contracted state.
+        /// The label text to display when this button is in a contracted state.
         /// </summary>
         public LocalisableString ContractedLabelText
         {
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Edit
         private LocalisableString expandedLabelText;
 
         /// <summary>
-        /// The label text to display when this slider is in an expanded state.
+        /// The label text to display when this button is in an expanded state.
         /// </summary>
         public LocalisableString ExpandedLabelText
         {
