@@ -23,6 +23,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
                     {
                         case CatchSkinComponents.Catcher:
                             return new ArgonCatcher();
+
+                        case CatchSkinComponents.Fruit:
+                            return new ArgonFruitPiece();
                     }
 
                     break;
