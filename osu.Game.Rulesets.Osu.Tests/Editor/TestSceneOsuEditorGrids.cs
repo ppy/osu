@@ -79,8 +79,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 AddAssert("placement blueprint at (0, 0)", () => Precision.AlmostEquals(Editor.ChildrenOfType<HitCirclePlacementBlueprint>().Single().HitObject.Position, new Vector2(0, 0)));
             else
                 AddAssert("placement blueprint at (1, 1)", () => Precision.AlmostEquals(Editor.ChildrenOfType<HitCirclePlacementBlueprint>().Single().HitObject.Position, new Vector2(1, 1)));
-
-            AddStep("choose selection tool", () => InputManager.Key(Key.Number1));
         }
 
         [Test]
