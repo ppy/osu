@@ -245,6 +245,9 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="controlPoints">The control point positions to convert.</param>
         public static Vector2[] ConvertCircleToBezierAnchors(ReadOnlySpan<Vector2> controlPoints)
         {
+            if (controlPoints.Length != 3)
+                return controlPoints.ToArray();
+
             var pr = circularArcProperties(controlPoints);
             if (!pr.IsValid)
                 return controlPoints.ToArray();
