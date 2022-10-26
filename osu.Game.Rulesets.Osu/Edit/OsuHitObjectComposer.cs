@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 // In the case of snapping to nearby objects, a time value is not provided.
                 // This matches the stable editor (which also uses current time), but with the introduction of time-snapping distance snap
-                // this could result in unexpected behaviour when distance snapping is turned on an a user attempts to place an object that is
+                // this could result in unexpected behaviour when distance snapping is turned on and a user attempts to place an object that is
                 // BOTH on a valid distance snap ring, and also at the same position as a previous object.
                 //
                 // We want to ensure that in this particular case, the time-snapping component of distance snap is still applied.
