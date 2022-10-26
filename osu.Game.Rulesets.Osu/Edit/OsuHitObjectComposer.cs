@@ -13,6 +13,7 @@ using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -120,7 +121,24 @@ namespace osu.Game.Rulesets.Osu.Edit
         public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
             if (snapType.HasFlagFast(SnapType.NearbyObjects) && snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
+            {
+                // In the case of snapping to nearby objects, a time value is not provided.
+                // This matches the stable editor (which also uses current time), but with the introduction of time-snapping distance snap
+                // this could result in unexpected behaviour when distance snapping is turned on an a user attempts to place an object that is
+                // BOTH on a valid distance snap ring, and also at the same position as a previous object.
+                //
+                // We want to ensure that in this particular case, the time-snapping component of distance snap is still applied.
+                // The easiest way to ensure this is to attempt application of distance snap after a nearby object is found, and copy over
+                // the time value if the proposed positions are roughly the same.
+                if (snapType.HasFlagFast(SnapType.Grids) && distanceSnapToggle.Value == TernaryState.True && distanceSnapGrid != null)
+                {
+                    (Vector2 distanceSnappedPosition, double distanceSnappedTime) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(snapResult.ScreenSpacePosition));
+                    if (Precision.AlmostEquals(distanceSnapGrid.ToScreenSpace(distanceSnappedPosition), snapResult.ScreenSpacePosition, 1))
+                        snapResult.Time = distanceSnappedTime;
+                }
+
                 return snapResult;
+            }
 
             SnapResult result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
 
