@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,9 +12,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
 {
     public class ArgonCatcher : CompositeDrawable
     {
-        [Resolved]
-        private Bindable<CatcherAnimationState> currentState { get; set; } = null!;
-
         [BackgroundDependencyLoader]
         private void load()
         {
