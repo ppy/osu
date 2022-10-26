@@ -26,7 +26,7 @@ namespace osu.Game.Skinning.Editor
 
         private readonly SkinEditor skinEditor;
 
-        private Bindable<FileInfo?> menuBackground;
+        private readonly Bindable<FileInfo?> menuBackground;
 
         private MenuBackgroundChooserPopover? popover;
 
@@ -41,11 +41,6 @@ namespace osu.Game.Skinning.Editor
 
             menuBackground = new Bindable<FileInfo?>();
             menuBackground.BindValueChanged(onFileSelected);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
         }
 
         private void onFileSelected(ValueChangedEvent<FileInfo?> file)

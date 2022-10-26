@@ -388,8 +388,8 @@ namespace osu.Game.Skinning.Editor
             {
                 (screen as MainMenu)?.ApplyToBackground(b =>
                 {
-                    if (b is BackgroundScreenDefault targetScreen)
-                        AddInternal(previewBackground = new MenuBackgroundPreview(targetScreen, previewTexture));
+                    if (b is BackgroundScreenDefault target)
+                        AddInternal(previewBackground = new MenuBackgroundPreview(target, previewTexture));
                 });
             });
         }
@@ -398,7 +398,7 @@ namespace osu.Game.Skinning.Editor
         {
             currentSkin.Value.SkinInfo.PerformWrite(skinInfo =>
             {
-                foreach (var file in skinInfo.Files.Where(f => f.Filename.StartsWith("menu-background.")))
+                foreach (var file in skinInfo.Files.Where(f => f.Filename.StartsWith("menu-background.", StringComparison.Ordinal)))
                     skins.DeleteFile(skinInfo, file);
             });
             realm.Run(r => r.Refresh());
@@ -410,8 +410,8 @@ namespace osu.Game.Skinning.Editor
             {
                 (screen as MainMenu)?.ApplyToBackground(b =>
                 {
-                    if (b is BackgroundScreenDefault targetScreen)
-                        AddInternal(previewBackground = new MenuBackgroundPreview(targetScreen));
+                    if (b is BackgroundScreenDefault target)
+                        AddInternal(previewBackground = new MenuBackgroundPreview(target));
                 });
             });
         }
