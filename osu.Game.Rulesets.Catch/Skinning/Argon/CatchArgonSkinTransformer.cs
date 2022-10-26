@@ -21,6 +21,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (osuComponent.Component)
                     {
+                        case CatchSkinComponents.HitExplosion:
+                            return new ArgonHitExplosion();
+
                         case CatchSkinComponents.Catcher:
                             return new ArgonCatcher();
 
