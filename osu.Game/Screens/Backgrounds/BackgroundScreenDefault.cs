@@ -1,8 +1,10 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -30,11 +32,14 @@ namespace osu.Game.Screens.Backgrounds
         private Bindable<BackgroundSource> source;
         private Bindable<IntroSequence> introSequence;
         private readonly SeasonalBackgroundLoader seasonalBackgroundLoader = new SeasonalBackgroundLoader();
+        private readonly HashSet<Drawable> lockers = new HashSet<Drawable>();
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
 
         protected virtual bool AllowStoryboardBackground => true;
+
+        public bool Locked => lockers.Any();
 
         public BackgroundScreenDefault(bool animateOnEnter = true)
             : base(animateOnEnter)
@@ -75,6 +80,24 @@ namespace osu.Game.Screens.Backgrounds
         private CancellationTokenSource cancellationTokenSource;
 
         /// <summary>
+        /// Locks the background from changing.
+        /// </summary>
+        /// <param name="locker">The drawer which is locking the background.</param>
+        public void Lock(Drawable locker)
+        {
+            lockers.Add(locker);
+        }
+
+        /// <summary>
+        /// Unlocks the background from changing.
+        /// </summary>
+        /// <param name="locker">The drawer which is unlocking the background.</param>
+        public void Unlock(Drawable locker)
+        {
+            lockers.Remove(locker);
+        }
+
+        /// <summary>
         /// Request loading the next background.
         /// </summary>
         /// <returns>Whether a new background was queued for load. May return false if the current background is still valid.</returns>
@@ -84,6 +107,14 @@ namespace osu.Game.Screens.Backgrounds
 
             // in the case that the background hasn't changed, we want to avoid cancelling any tasks that could still be loading.
             if (nextBackground == background)
+                return false;
+
+            return queueNext(nextBackground);
+        }
+
+        private bool queueNext(Background nextBackground)
+        {
+            if (Locked)
                 return false;
 
             Logger.Log("🌅 Background change queued");
