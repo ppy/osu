@@ -405,6 +405,15 @@ namespace osu.Game.Skinning.Editor
 
             if (previewBackground != null)
                 Remove(previewBackground, true);
+
+            game?.PerformFromScreen(screen =>
+            {
+                (screen as MainMenu)?.ApplyToBackground(b =>
+                {
+                    if (b is BackgroundScreenDefault targetScreen)
+                        AddInternal(previewBackground = new MenuBackgroundPreview(targetScreen));
+                });
+            });
         }
 
         public void Save()
@@ -526,6 +535,12 @@ namespace osu.Game.Skinning.Editor
 
             private bool isDisposed;
 
+            public MenuBackgroundPreview(BackgroundScreenDefault targetScreen)
+            {
+                screen = targetScreen;
+                preview = new PreviewBackground(screen.GetBackgroundFallbackTextureName());
+            }
+
             public MenuBackgroundPreview(BackgroundScreenDefault targetScreen, Texture texture)
             {
                 screen = targetScreen;
@@ -556,6 +571,11 @@ namespace osu.Game.Skinning.Editor
             {
                 private readonly Texture texture;
 
+                public PreviewBackground(string textureName)
+                    : base(textureName)
+                {
+                }
+
                 public PreviewBackground(Texture texture)
                 {
                     this.texture = texture;
@@ -565,7 +585,8 @@ namespace osu.Game.Skinning.Editor
                 {
                     base.LoadComplete();
 
-                    Sprite.Texture = texture;
+                    if (texture != null)
+                        Sprite.Texture = texture;
                 }
             }
         }

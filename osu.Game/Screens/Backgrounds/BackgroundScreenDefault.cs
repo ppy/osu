@@ -157,7 +157,11 @@ namespace osu.Game.Screens.Backgrounds
             // seasonal background loading gets highest priority.
             Background newBackground = seasonalBackgroundLoader.LoadNextBackground();
 
+#if DEBUG
+            if (newBackground == null)
+#else
             if (newBackground == null && user.Value?.IsSupporter == true)
+#endif
             {
                 switch (source.Value)
                 {
@@ -165,14 +169,14 @@ namespace osu.Game.Screens.Backgrounds
                     case BackgroundSource.BeatmapWithStoryboard:
                     {
                         if (source.Value == BackgroundSource.BeatmapWithStoryboard && AllowStoryboardBackground)
-                            newBackground = new BeatmapBackgroundWithStoryboard(beatmap.Value, getBackgroundTextureName());
-                        newBackground ??= new BeatmapBackground(beatmap.Value, getBackgroundTextureName());
+                            newBackground = new BeatmapBackgroundWithStoryboard(beatmap.Value, GetBackgroundFallbackTextureName());
+                        newBackground ??= new BeatmapBackground(beatmap.Value, GetBackgroundFallbackTextureName());
 
                         break;
                     }
 
                     case BackgroundSource.Skin:
-                        newBackground = new SkinBackground(skin.Value, getBackgroundTextureName());
+                        newBackground = new SkinBackground(skin.Value, GetBackgroundFallbackTextureName());
                         break;
                 }
             }
@@ -182,13 +186,13 @@ namespace osu.Game.Screens.Backgrounds
             if (newBackground?.Equals(background) == true)
                 return background;
 
-            newBackground ??= new Background(getBackgroundTextureName());
+            newBackground ??= new Background(GetBackgroundFallbackTextureName());
             newBackground.Depth = currentDisplay;
 
             return newBackground;
         }
 
-        private string getBackgroundTextureName()
+        public string GetBackgroundFallbackTextureName()
         {
             switch (introSequence.Value)
             {
