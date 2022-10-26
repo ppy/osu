@@ -2,14 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Rulesets.Catch.UI;
 using osuTK;
@@ -18,8 +16,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
 {
     internal class ArgonFruitPiece : CatchHitObjectPiece
     {
-        public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
-
         protected override Drawable HyperBorderPiece => hyperBorderPiece;
 
         private Drawable hyperBorderPiece = null!;
@@ -90,11 +86,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            IndexInBeatmap.BindValueChanged(index =>
-            {
-                VisualRepresentation.Value = Fruit.GetVisualRepresentation(index.NewValue);
-            }, true);
 
             AccentColour.BindValueChanged(colour =>
             {
