@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -45,10 +44,8 @@ namespace osu.Game.Online.API.Requests.Responses
         public int MaxCombo { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        [JsonProperty("rank")]
-        // ScoreRank is aligned to make 0 equal D. We still want to serialise this (even when DefaultValueHandling.Ignore is used),
-        // so set the default to an impossible value.
-        [DefaultValue(null)]
+        // ScoreRank is aligned to make 0 equal D. We still want to serialise this (even when DefaultValueHandling.Ignore is used).
+        [JsonProperty("rank", DefaultValueHandling = DefaultValueHandling.Include)]
         public ScoreRank Rank { get; set; }
 
         [JsonProperty("started_at")]
