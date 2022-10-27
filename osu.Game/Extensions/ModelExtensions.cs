@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
+using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
@@ -136,34 +137,14 @@ namespace osu.Game.Extensions
             return instance.OnlineID.Equals(other.OnlineID);
         }
 
-        private static bool isValidFilenameChar(this char ch)
-        {
-            if (ch >= '0' && ch <= '9')
-                return true;
-
-            if (ch >= 'A' && ch <= 'Z')
-                return true;
-
-            if (ch >= 'a' && ch <= 'z')
-                return true;
-
-            return "-_()[]".Contains(ch);
-        }
+        private static Regex invalid_filename_chars = new(@"(?!$)[^A-Za-z0-9_()[\] -]", RegexOptions.Compiled);
 
         /// <summary>
         /// Get a valid filename for use inside a zip file. Avoids backslashes being incorrectly converted to directories.
         /// </summary>
         public static string GetValidArchiveContentFilename(this string filename)
         {
-            char[] resultData = filename.ToCharArray();
-
-            for (int i = 0; i < resultData.Length; i++)
-            {
-                if (!isValidFilenameChar(resultData[i]))
-                    resultData[i] = '_';
-            }
-
-            return new string(resultData);
+            return invalid_filename_chars.Replace(filename, "_");
         }
     }
 }
