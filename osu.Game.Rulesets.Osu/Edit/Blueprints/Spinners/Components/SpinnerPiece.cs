@@ -16,8 +16,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 {
     public class SpinnerPiece : BlueprintPiece<Spinner>
     {
-        private readonly CircularContainer circle;
-        private readonly RingPiece ring;
+        private readonly Circle circle;
+        private readonly Circle ring;
 
         public SpinnerPiece()
         {
@@ -25,18 +25,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 
             RelativeSizeAxes = Axes.Both;
             FillMode = FillMode.Fit;
-            Size = new Vector2(1.3f);
+            Size = new Vector2(1);
 
             InternalChildren = new Drawable[]
             {
-                circle = new CircularContainer
+                circle = new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
                     Alpha = 0.5f,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
-                ring = new RingPiece()
+                ring = new Circle
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(OsuHitObject.OBJECT_RADIUS),
+                },
             };
         }
 
