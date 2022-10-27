@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2); // Star rating to pp curve
 
-            difficultyValue *= Math.Max(1.08 - Math.Pow(estimatedUR / 520, 1.8), 0);
+            difficultyValue *= Math.Pow(SpecialFunctions.Erf(300 / estimatedUR), 2);
 
             return difficultyValue;
         }
