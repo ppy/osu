@@ -119,10 +119,12 @@ namespace osu.Game.Rulesets.Mods
             private readonly IBindable<bool> isBreakTime = new BindableBool();
 
             /// <summary>
-            /// Defines the flashlight area's vector, according to a given flashlight size.
+            /// Creates a vector that is used to adjust the area that the flashlight should be displayed.
+            /// e.g on osu!mania the flashlight should be displayed on the whole playfield and the height should be scaled with the given size.
+            /// so the resulting vector should be Vector2(DrawWidth, size).
             /// </summary>
-            /// <param name="size">The flashlight size to adjust the area to.</param>
-            /// <returns>The flashlight area's vector.</returns>
+            /// <param name="size">The given flashlight size to scale the flashlight area to.</param>
+            /// <returns>A vector that defines the flashlight's area size.</returns>
             protected abstract Vector2 AdjustSize(float size);
 
             private Vector2 adjustCurrentSize() => AdjustSize(GetSize());
