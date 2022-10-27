@@ -59,6 +59,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private readonly BindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
+        private BindableList<HitObject> selectedObjects;
 
         public SliderSelectionBlueprint(Slider slider)
             : base(slider)
@@ -86,6 +87,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             pathVersion.BindValueChanged(_ => editorBeatmap?.Update(HitObject));
 
             BodyPiece.UpdateFrom(HitObject);
+
+            selectedObjects = editorBeatmap.SelectedHitObjects.GetBoundCopy();
+            selectedObjects.BindCollectionChanged((_, _) => updateVisualDefinition());
         }
 
         public override bool HandleQuickDeletion()
@@ -108,14 +112,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 BodyPiece.UpdateFrom(HitObject);
         }
 
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateVisualDefinition();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateVisualDefinition();
+            base.OnHoverLost(e);
+        }
+
         protected override void OnSelected()
         {
-            AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(HitObject, true)
-            {
-                RemoveControlPointsRequested = removeControlPoints,
-                SplitControlPointsRequested = splitControlPoints
-            });
-
+            updateVisualDefinition();
             base.OnSelected();
         }
 
@@ -123,11 +134,31 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.OnDeselected();
 
-            // throw away frame buffers on deselection.
-            ControlPointVisualiser?.Expire();
-            ControlPointVisualiser = null;
-
+            updateVisualDefinition();
             BodyPiece.RecyclePath();
+        }
+
+        private void updateVisualDefinition()
+        {
+            bool hasSingleObjectSelected = editorBeatmap.SelectedHitObjects.Count == 1;
+
+            // To reduce overhead of drawing these blueprints, only add extra detail when hovered or when only this slider is selected.
+            if (IsSelected && (hasSingleObjectSelected || IsHovered))
+            {
+                if (ControlPointVisualiser == null)
+                {
+                    AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(HitObject, true)
+                    {
+                        RemoveControlPointsRequested = removeControlPoints,
+                        SplitControlPointsRequested = splitControlPoints
+                    });
+                }
+            }
+            else
+            {
+                ControlPointVisualiser?.Expire();
+                ControlPointVisualiser = null;
+            }
         }
 
         private Vector2 rightClickPosition;
