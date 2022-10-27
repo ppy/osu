@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private readonly BindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
-        private BindableList<HitObject> selectedObjects;
+        private readonly BindableList<HitObject> selectedObjects = new BindableList<HitObject>();
 
         public SliderSelectionBlueprint(Slider slider)
             : base(slider)
@@ -88,7 +88,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             BodyPiece.UpdateFrom(HitObject);
 
-            selectedObjects = editorBeatmap.SelectedHitObjects.GetBoundCopy();
+            if (editorBeatmap != null)
+                selectedObjects.BindTo(editorBeatmap.SelectedHitObjects);
             selectedObjects.BindCollectionChanged((_, _) => updateVisualDefinition());
         }
 
@@ -104,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return true;
         }
 
-        private bool hasSingleObjectSelected => editorBeatmap == null || editorBeatmap.SelectedHitObjects.Count == 1;
+        private bool hasSingleObjectSelected => editorBeatmap == null || selectedObjects.Count == 1;
 
         protected override void Update()
         {
