@@ -104,6 +104,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return true;
         }
 
+        private bool hasSingleObjectSelected => editorBeatmap.SelectedHitObjects.Count == 1;
+
         protected override void Update()
         {
             base.Update();
@@ -115,7 +117,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override bool OnHover(HoverEvent e)
         {
             updateVisualDefinition();
-            return base.OnHover(e);
+
+            // In the case more than a single object is selected, block hover from arriving at sliders behind this one.
+            // Without doing this, the path visualisers of potentially hundreds of sliders will render, which is not only
+            // visually noisy but also functionally useless.
+            return !hasSingleObjectSelected;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
@@ -140,8 +146,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateVisualDefinition()
         {
-            bool hasSingleObjectSelected = editorBeatmap.SelectedHitObjects.Count == 1;
-
             // To reduce overhead of drawing these blueprints, only add extra detail when hovered or when only this slider is selected.
             if (IsSelected && (hasSingleObjectSelected || IsHovered))
             {
