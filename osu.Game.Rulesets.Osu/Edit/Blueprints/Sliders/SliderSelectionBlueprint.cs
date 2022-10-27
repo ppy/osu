@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return true;
         }
 
-        private bool hasSingleObjectSelected => editorBeatmap.SelectedHitObjects.Count == 1;
+        private bool hasSingleObjectSelected => editorBeatmap == null || editorBeatmap.SelectedHitObjects.Count == 1;
 
         protected override void Update()
         {
