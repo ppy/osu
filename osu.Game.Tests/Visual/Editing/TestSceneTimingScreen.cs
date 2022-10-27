@@ -67,8 +67,8 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 37560);
-            AddUntilStep("Ensure seeked to correct time", () => EditorClock.CurrentTimeAccurate == 37560);
+            AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 54670);
+            AddUntilStep("Ensure seeked to correct time", () => EditorClock.CurrentTimeAccurate == 54670);
 
             AddStep("Seek to just before next point", () => EditorClock.Seek(69000));
             AddStep("Start clock", () => EditorClock.Start());
@@ -85,8 +85,8 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 37560);
-            AddUntilStep("Ensure seeked to correct time", () => EditorClock.CurrentTimeAccurate == 37560);
+            AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 54670);
+            AddUntilStep("Ensure seeked to correct time", () => EditorClock.CurrentTimeAccurate == 54670);
 
             AddStep("Seek to later", () => EditorClock.Seek(80000));
             AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 69670);
