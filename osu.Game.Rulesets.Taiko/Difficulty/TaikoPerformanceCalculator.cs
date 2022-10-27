@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             if (totalHits == 0)
                 return double.PositiveInfinity;
-            
+
             double greatProbability = 1 - (countOk + countMiss + 1.0) / (totalHits + 1.0);
 
             if (greatProbability <= 0)
