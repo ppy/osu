@@ -27,17 +27,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public override float DefaultFlashlightSize => 200;
 
-        protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, playfield);
+        protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, Playfield);
 
-        private TaikoPlayfield playfield = null!;
+        protected TaikoPlayfield Playfield { get; private set; } = null!;
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
-            playfield = (TaikoPlayfield)drawableRuleset.Playfield;
+            Playfield = (TaikoPlayfield)drawableRuleset.Playfield;
             base.ApplyToDrawableRuleset(drawableRuleset);
         }
 
-        private class TaikoFlashlight : Flashlight
+        public class TaikoFlashlight : Flashlight
         {
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
             private readonly TaikoPlayfield taikoPlayfield;
@@ -52,9 +52,15 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 AddLayout(flashlightProperties);
             }
 
-            private float preserveFlashlightAspectRatio(float size) => size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT;
-
-            protected override Vector2 AdjustSize(float size) => new Vector2(0, preserveFlashlightAspectRatio(size));
+            /// <summary>
+            /// Returns the aspect ratio-adjusted size of the flashlight.
+            /// This ensures that the size of the flashlight remains independent of taiko-specific aspect ratio adjustments.
+            /// </summary>
+            /// <param name="size">
+            /// The size of the flashlight.
+            /// The value provided here should always come from <see cref="ModFlashlight{T}.Flashlight.GetSize"/>.
+            /// </param>
+            protected override Vector2 AdjustSize(float size) => new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
 
             protected override string FragmentShader => "CircularFlashlight";
 
@@ -67,7 +73,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
 
                     ClearTransforms(targetMember: nameof(FlashlightSize));
-                    FlashlightSize = AdjustSize(Combo.Value);
+
+                    FlashlightSize = AdjustSize(GetSize());
 
                     flashlightProperties.Validate();
                 }
