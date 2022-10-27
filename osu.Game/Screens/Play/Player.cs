@@ -66,6 +66,8 @@ namespace osu.Game.Screens.Play
 
         public override bool HideOverlaysOnEnter => true;
 
+        public override bool HideMenuCursorOnNonMouseInput => true;
+
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         // We are managing our own adjustments (see OnEntering/OnExiting).
@@ -93,6 +95,11 @@ namespace osu.Game.Screens.Play
         private readonly Bindable<bool> localUserPlaying = new Bindable<bool>();
 
         public int RestartCount;
+
+        /// <summary>
+        /// Whether the <see cref="HUDOverlay"/> is currently visible.
+        /// </summary>
+        public IBindable<bool> ShowingOverlayComponents = new Bindable<bool>();
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
@@ -1015,6 +1022,8 @@ namespace osu.Game.Screens.Play
             });
 
             HUDOverlay.IsPlaying.BindTo(localUserPlaying);
+            ShowingOverlayComponents.BindTo(HUDOverlay.ShowHud);
+
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);

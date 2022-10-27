@@ -124,16 +124,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         },
                         new Drawable[]
                         {
-                            new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
-                            {
-                                Padding = new MarginPadding { Horizontal = 15 },
-                                Text = "beat snap",
-                                RelativeSizeAxes = Axes.X,
-                                TextAnchor = Anchor.TopCentre
-                            },
-                        },
-                        new Drawable[]
-                        {
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -173,6 +163,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                 }
                             }
                         },
+                        new Drawable[]
+                        {
+                            new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
+                            {
+                                Padding = new MarginPadding { Horizontal = 15, Vertical = 8 },
+                                Text = "beat snap",
+                                RelativeSizeAxes = Axes.X,
+                                TextAnchor = Anchor.TopCentre,
+                            },
+                        },
                     },
                     RowDimensions = new[]
                     {
@@ -207,6 +207,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.Custom(beatDivisor.ValidDivisors.Value.Presets.Max());
                     break;
             }
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.ShiftPressed && e.Key >= Key.Number1 && e.Key <= Key.Number9)
+            {
+                beatDivisor.SetArbitraryDivisor(e.Key - Key.Number0);
+                return true;
+            }
+
+            return base.OnKeyDown(e);
         }
 
         internal class DivisorDisplay : OsuAnimatedButton, IHasPopover
@@ -306,17 +317,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
                 }
 
-                if (!BeatDivisor.ValidDivisors.Value.Presets.Contains(divisor))
-                {
-                    if (BeatDivisorPresetCollection.COMMON.Presets.Contains(divisor))
-                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
-                    else if (BeatDivisorPresetCollection.TRIPLETS.Presets.Contains(divisor))
-                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.TRIPLETS;
-                    else
-                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.Custom(divisor);
-                }
-
-                BeatDivisor.Value = divisor;
+                BeatDivisor.SetArbitraryDivisor(divisor);
 
                 this.HidePopover();
             }
