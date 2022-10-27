@@ -5,8 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Rulesets.Catch.UI;
@@ -25,11 +24,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
         private float rotationRandomness;
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
 
-            Texture largeTexture = getTexture("A");
+            int largeBlobSeed = RNG.Next();
 
             InternalChildren = new[]
             {
@@ -44,43 +43,50 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new Sprite
+                        new CircularBlob
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
                             Blending = BlendingParameters.Additive,
                             Alpha = 0.15f,
-                            Texture = largeTexture
+                            InnerRadius = 0.5f,
+                            Size = new Vector2(1.1f),
+                            Seed = largeBlobSeed,
                         },
-                        new Sprite
+                        new CircularBlob
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
                             Blending = BlendingParameters.Additive,
+                            InnerRadius = 0.2f,
                             Alpha = 0.5f,
-                            Texture = getTexture("B")
+                            Seed = RNG.Next(),
                         },
-                        new Sprite
+                        new CircularBlob
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
                             Blending = BlendingParameters.Additive,
-                            Texture = getTexture("C")
+                            InnerRadius = 0.05f,
+                            Seed = RNG.Next(),
                         },
                     }
                 },
-                hyperBorderPiece = new Sprite
+                hyperBorderPiece = new CircularBlob
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR,
+                    RelativeSizeAxes = Axes.Both,
                     Blending = BlendingParameters.Additive,
-                    Alpha = 0.15f,
-                    Texture = largeTexture,
+                    InnerRadius = 0.08f,
+                    Size = new Vector2(1.15f),
+                    Seed = largeBlobSeed
                 },
             };
-
-            Texture getTexture(string type) => textures.Get($"Gameplay/catch/blob-{type}{RNG.Next(1, 7)}");
         }
 
         protected override void LoadComplete()
