@@ -65,17 +65,16 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 foreach (HitObject hitObject in original.HitObjects)
                 {
                     double nextScrollSpeed = hitObject.DifficultyControlPoint.SliderVelocity;
+                    EffectControlPoint currentEffectPoint = converted.ControlPointInfo.EffectPointAt(hitObject.StartTime);
 
-                    if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed))
+                    if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed, acceptableDifference: currentEffectPoint.ScrollSpeedBindable.Precision))
                     {
-                        EffectControlPoint currentControlPoint = converted.ControlPointInfo.EffectPointAt(hitObject.StartTime);
-
-                        if (Precision.AlmostEquals(currentControlPoint.Time, hitObject.StartTime))
-                            currentControlPoint.ScrollSpeed = nextScrollSpeed;
-                        else
-                            converted.ControlPointInfo.Add(hitObject.StartTime, new EffectControlPoint { ScrollSpeed = nextScrollSpeed });
-
-                        lastScrollSpeed = nextScrollSpeed;
+                        converted.ControlPointInfo.Add(hitObject.StartTime, new EffectControlPoint
+                        {
+                            KiaiMode = currentEffectPoint.KiaiMode,
+                            OmitFirstBarLine = currentEffectPoint.OmitFirstBarLine,
+                            ScrollSpeed = lastScrollSpeed = nextScrollSpeed,
+                        });
                     }
                 }
             }
