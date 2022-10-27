@@ -107,6 +107,49 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestKeyboardNavigation()
+        {
+            pressKey(1);
+            assertBeatSnap(1);
+            assertPreset(BeatDivisorType.Common);
+
+            pressKey(2);
+            assertBeatSnap(2);
+            assertPreset(BeatDivisorType.Common);
+
+            pressKey(3);
+            assertBeatSnap(3);
+            assertPreset(BeatDivisorType.Triplets);
+
+            pressKey(4);
+            assertBeatSnap(4);
+            assertPreset(BeatDivisorType.Common);
+
+            pressKey(5);
+            assertBeatSnap(5);
+            assertPreset(BeatDivisorType.Custom, 5);
+
+            pressKey(6);
+            assertBeatSnap(6);
+            assertPreset(BeatDivisorType.Triplets);
+
+            pressKey(7);
+            assertBeatSnap(7);
+            assertPreset(BeatDivisorType.Custom, 7);
+
+            pressKey(8);
+            assertBeatSnap(8);
+            assertPreset(BeatDivisorType.Common);
+
+            void pressKey(int key) => AddStep($"press shift+{key}", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Number0 + key);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+        }
+
+        [Test]
         public void TestBeatPresetNavigation()
         {
             assertPreset(BeatDivisorType.Common);
