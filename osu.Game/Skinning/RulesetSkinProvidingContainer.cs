@@ -41,7 +41,7 @@ namespace osu.Game.Skinning
             Ruleset = ruleset;
             Beatmap = beatmap;
 
-            InternalChild = new BeatmapSkinProvidingContainer(beatmapSkin is LegacySkin ? GetRulesetTransformedSkin(beatmapSkin) : beatmapSkin)
+            InternalChild = new BeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin))
             {
                 Child = Content = new Container
                 {

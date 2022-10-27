@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
@@ -37,7 +36,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected new EditorSelectionHandler SelectionHandler => (EditorSelectionHandler)base.SelectionHandler;
 
         private PlacementBlueprint currentPlacement;
-        private InputManager inputManager;
 
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
@@ -66,8 +64,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
-
             Beatmap.HitObjectAdded += hitObjectAdded;
 
             // updates to selected are handled for us by SelectionHandler.
@@ -82,8 +78,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 kvp.Value.BindValueChanged(_ => updatePlacementSamples());
             }
         }
-
-        protected override bool AllowDeselectionDuringDrag => !EditorClock.IsRunning;
 
         protected override void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
         {
@@ -222,7 +216,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementPosition()
         {
-            var snapResult = Composer.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position);
+            var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position);
 
             // if no time was found from positional snapping, we should still quantize to the beat.
             snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
