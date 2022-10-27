@@ -40,16 +40,23 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             body.BorderColour = colours.Yellow;
         }
 
+        private int? lastVersion;
+
         public override void UpdateFrom(Slider hitObject)
         {
             base.UpdateFrom(hitObject);
 
             body.PathRadius = hitObject.Scale * OsuHitObject.OBJECT_RADIUS;
 
-            var vertices = new List<Vector2>();
-            hitObject.Path.GetPathToProgress(vertices, 0, 1);
+            if (lastVersion != hitObject.Path.Version.Value)
+            {
+                lastVersion = hitObject.Path.Version.Value;
 
-            body.SetVertices(vertices);
+                var vertices = new List<Vector2>();
+                hitObject.Path.GetPathToProgress(vertices, 0, 1);
+
+                body.SetVertices(vertices);
+            }
 
             Size = body.Size;
             OriginPosition = body.PathOffset;
