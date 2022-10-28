@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
-        private double estimatedDeviation;
+        private double? estimatedDeviation;
 
         private double effectiveMissCount;
 
@@ -91,15 +91,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= 1.050 * lengthBonus;
 
-            return difficultyValue * Math.Pow(SpecialFunctions.Erf(40 / (Math.Sqrt(2) * estimatedDeviation)), 2.0);
+            if (estimatedDeviation == null)
+                return 0;
+
+            return difficultyValue * Math.Pow(SpecialFunctions.Erf(40 / (Math.Sqrt(2) * (double)estimatedDeviation)), 2.0);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
-            if (attributes.GreatHitWindow <= 0)
+            if (attributes.GreatHitWindow <= 0 || estimatedDeviation == null)
                 return 0;
 
-            double accuracyValue = Math.Pow(7.5 / estimatedDeviation, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
+            double accuracyValue = Math.Pow(7.5 / (double)estimatedDeviation, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
@@ -110,10 +113,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return accuracyValue;
         }
 
-        private double computeEstimatedDeviation(ScoreInfo score, TaikoDifficultyAttributes attributes)
+        private double? computeEstimatedDeviation(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
             if (totalHits == 0)
-                return double.PositiveInfinity;
+                return null;
 
             double greatProbability = 1 - (countOk + countMiss + 1.0) / (totalHits + 1.0);
 
