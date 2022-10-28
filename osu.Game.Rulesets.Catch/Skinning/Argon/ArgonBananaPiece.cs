@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects;
 using osuTK;
 using osuTK.Graphics;
@@ -18,46 +19,53 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
     {
         private Container stabilisedPieceContainer = null!;
 
-        protected override Drawable BorderPiece => stabilisedPieceContainer;
+        private Drawable fadeContent = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(stabilisedPieceContainer = new Container
+            AddInternal(fadeContent = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    new Circle
+                    stabilisedPieceContainer = new Container
                     {
-                        Colour = Color4.White.Opacity(0.4f),
+                        RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Blending = BlendingParameters.Additive,
-                        Size = new Vector2(8),
-                        Scale = new Vector2(30, 1),
-                    },
-                    new Box
-                    {
-                        Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White),
-                        RelativeSizeAxes = Axes.X,
-                        Blending = BlendingParameters.Additive,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.CentreRight,
-                        Width = 1.6f,
-                        Height = 2,
-                    },
-                    new Circle
-                    {
-                        Colour = ColourInfo.GradientHorizontal(Color4.White, Color4.White.Opacity(0)),
-                        RelativeSizeAxes = Axes.X,
-                        Blending = BlendingParameters.Additive,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.CentreLeft,
-                        Width = 1.6f,
-                        Height = 2,
+                        Children = new Drawable[]
+                        {
+                            new Circle
+                            {
+                                Colour = Color4.White.Opacity(0.4f),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Blending = BlendingParameters.Additive,
+                                Size = new Vector2(8),
+                                Scale = new Vector2(25, 1),
+                            },
+                            new Box
+                            {
+                                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White.Opacity(0.8f)),
+                                RelativeSizeAxes = Axes.X,
+                                Blending = BlendingParameters.Additive,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.CentreRight,
+                                Width = 1.6f,
+                                Height = 2,
+                            },
+                            new Circle
+                            {
+                                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White.Opacity(0)),
+                                RelativeSizeAxes = Axes.X,
+                                Blending = BlendingParameters.Additive,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.CentreLeft,
+                                Width = 1.6f,
+                                Height = 2,
+                            },
+                        }
                     },
                     new Circle
                     {
@@ -88,10 +96,27 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
         {
             base.Update();
 
-            float scale = 0.5f + 0.5f * (1 / (ObjectState.DisplaySize.X / (CatchHitObject.OBJECT_RADIUS * 2)));
+            const float parent_scale_application = 0.4f;
+
+            // relative to time on screen
+            const float lens_flare_start = 0.3f;
+            const float lens_flare_end = 0.3f;
+
+            // Undo some of the parent scale being applied to make the lens flare feel a bit better..
+            float scale = parent_scale_application + (1 - parent_scale_application) * (1 / (ObjectState.DisplaySize.X / (CatchHitObject.OBJECT_RADIUS * 2)));
 
             stabilisedPieceContainer.Rotation = -ObjectState.DisplayRotation;
-            stabilisedPieceContainer.Scale = new Vector2(scale);
+            stabilisedPieceContainer.Scale = new Vector2(scale, 1);
+
+            double duration = ObjectState.HitObject.StartTime - ObjectState.DisplayStartTime;
+
+            fadeContent.Alpha = MathHelper.Clamp(
+                Interpolation.ValueAt(
+                    Time.Current, 1f, 0f,
+                    ObjectState.DisplayStartTime + duration * lens_flare_start,
+                    ObjectState.DisplayStartTime + duration * lens_flare_end,
+                    Easing.OutQuint
+                ), 0, 1);
         }
     }
 }
