@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             if (editorBeatmap != null)
                 selectedObjects.BindTo(editorBeatmap.SelectedHitObjects);
-            selectedObjects.BindCollectionChanged((_, _) => updateVisualDefinition());
+            selectedObjects.BindCollectionChanged((_, _) => updateVisualDefinition(), true);
         }
 
         public override bool HandleQuickDeletion()
