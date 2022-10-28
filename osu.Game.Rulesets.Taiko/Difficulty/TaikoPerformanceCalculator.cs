@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             if (greatProbability <= 0)
             {
-                return double.PositiveInfinity;
+                return null;
             }
 
             double deviation = attributes.GreatHitWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbability));
