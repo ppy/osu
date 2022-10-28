@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
                 layers[i].Rotation -=
                     (float)Clock.ElapsedFrameTime
                     * 0.4f * rotationRandomness
-                    // Each layer should alternate rotation direction.
+                    // Each layer should alternate rotation speed.
                     * (i % 2 == 1 ? 0.5f : 1);
             }
         }
