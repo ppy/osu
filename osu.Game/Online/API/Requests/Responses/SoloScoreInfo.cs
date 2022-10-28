@@ -44,7 +44,8 @@ namespace osu.Game.Online.API.Requests.Responses
         public int MaxCombo { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        [JsonProperty("rank")]
+        // ScoreRank is aligned to make 0 equal D. We still want to serialise this (even when DefaultValueHandling.Ignore is used).
+        [JsonProperty("rank", DefaultValueHandling = DefaultValueHandling.Include)]
         public ScoreRank Rank { get; set; }
 
         [JsonProperty("started_at")]
@@ -114,6 +115,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("has_replay")]
         public bool HasReplay { get; set; }
 
+        // These properties are calculated or not relevant to any external usage.
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeUser() => false;
         public bool ShouldSerializeBeatmap() => false;
@@ -121,6 +123,18 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool ShouldSerializePP() => false;
         public bool ShouldSerializeOnlineID() => false;
         public bool ShouldSerializeHasReplay() => false;
+
+        // These fields only need to be serialised if they hold values.
+        // Generally this is required because this model may be used by server-side components, but
+        // we don't want to bother sending these fields in score submission requests, for instance.
+        public bool ShouldSerializeEndedAt() => EndedAt != default;
+        public bool ShouldSerializeStartedAt() => StartedAt != default;
+        public bool ShouldSerializeLegacyScoreId() => LegacyScoreId != null;
+        public bool ShouldSerializeLegacyTotalScore() => LegacyTotalScore != null;
+        public bool ShouldSerializeMods() => Mods.Length > 0;
+        public bool ShouldSerializeUserID() => UserID > 0;
+        public bool ShouldSerializeBeatmapID() => BeatmapID > 0;
+        public bool ShouldSerializeBuildID() => BuildID != null;
 
         #endregion
 

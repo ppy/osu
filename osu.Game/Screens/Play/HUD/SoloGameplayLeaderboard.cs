@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Play.HUD
 
             local.TotalScore.BindTarget = scoreProcessor.TotalScore;
             local.Accuracy.BindTarget = scoreProcessor.Accuracy;
-            local.Combo.BindTarget = scoreProcessor.Combo;
+            local.Combo.BindTarget = scoreProcessor.HighestCombo;
 
             // Local score should always show lower than any existing scores in cases of ties.
             local.DisplayOrder.Value = long.MaxValue;

@@ -44,6 +44,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public virtual LocalisableString TooltipText { get; private set; }
 
+        public bool PlaySamplesOnAdjust { get; set; } = true;
+
         /// <summary>
         /// Whether to format the tooltip as a percentage or the actual value.
         /// </summary>
@@ -187,6 +189,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private void playSample(T value)
         {
+            if (!PlaySamplesOnAdjust)
+                return;
+
             if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
                 return;
 

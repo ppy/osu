@@ -141,18 +141,9 @@ namespace osu.Game.Beatmaps
             // Handle collections using permissive difficulty name to track difficulties.
             foreach (var originalBeatmap in original.Beatmaps)
             {
-                var updatedBeatmap = updated.Beatmaps.FirstOrDefault(b => b.DifficultyName == originalBeatmap.DifficultyName);
-
-                if (updatedBeatmap == null)
-                    continue;
-
-                var collections = realm.All<BeatmapCollection>().AsEnumerable().Where(c => c.BeatmapMD5Hashes.Contains(originalBeatmap.MD5Hash));
-
-                foreach (var c in collections)
-                {
-                    c.BeatmapMD5Hashes.Remove(originalBeatmap.MD5Hash);
-                    c.BeatmapMD5Hashes.Add(updatedBeatmap.MD5Hash);
-                }
+                updated.Beatmaps
+                       .FirstOrDefault(b => b.DifficultyName == originalBeatmap.DifficultyName)?
+                       .TransferCollectionReferences(realm, originalBeatmap.MD5Hash);
             }
         }
 
