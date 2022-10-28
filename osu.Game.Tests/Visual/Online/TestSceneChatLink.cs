@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Notifications.Polling;
 using osu.Game.Overlays.Chat;
 using osuTK.Graphics;
 
@@ -41,11 +42,13 @@ namespace osu.Game.Tests.Visual.Online
         {
             linkColour = colours.Blue;
 
-            var chatManager = new ChannelManager(API);
+            var chatManager = new ChannelManager(API, new PollingNotificationsClientConnector(API));
             BindableList<Channel> availableChannels = (BindableList<Channel>)chatManager.AvailableChannels;
             availableChannels.Add(new Channel { Name = "#english" });
             availableChannels.Add(new Channel { Name = "#japanese" });
             Dependencies.Cache(chatManager);
+
+            Add(chatManager);
         }
 
         [SetUp]

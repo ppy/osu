@@ -13,6 +13,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Notifications.Polling;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Chat
@@ -151,7 +152,7 @@ namespace osu.Game.Tests.Chat
 
             public ChannelManagerContainer(IAPIProvider apiProvider)
             {
-                InternalChild = ChannelManager = new ChannelManager(apiProvider);
+                InternalChild = ChannelManager = new ChannelManager(apiProvider, new PollingNotificationsClientConnector(apiProvider));
             }
         }
     }

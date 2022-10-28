@@ -15,6 +15,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Notifications.Polling;
 using osu.Game.Overlays.Chat;
 using osuTK.Input;
 
@@ -56,7 +57,9 @@ namespace osu.Game.Tests.Visual.Online
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Add(channelManager = new ChannelManager(parent.Get<IAPIProvider>()));
+            var api = parent.Get<IAPIProvider>();
+
+            Add(channelManager = new ChannelManager(api, new PollingNotificationsClientConnector(api)));
 
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 

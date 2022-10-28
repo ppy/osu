@@ -24,6 +24,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Notifications.Polling;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Listing;
@@ -59,7 +60,7 @@ namespace osu.Game.Tests.Visual.Online
                 RelativeSizeAxes = Axes.Both,
                 CachedDependencies = new (Type, object)[]
                 {
-                    (typeof(ChannelManager), channelManager = new ChannelManager(API)),
+                    (typeof(ChannelManager), channelManager = new ChannelManager(API, new PollingNotificationsClientConnector(API))),
                 },
                 Children = new Drawable[]
                 {

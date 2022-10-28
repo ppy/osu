@@ -45,7 +45,7 @@ using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications;
-using osu.Game.Online.Notifications.Polling;
+using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
@@ -757,6 +757,7 @@ namespace osu.Game
             BackButton.Receptor receptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
+            dependencies.CacheAs(notificationsClient = new WebSocketNotificationsClientConnector(API));
 
             var sessionIdleTracker = new GameIdleTracker(300000);
             sessionIdleTracker.IsIdle.BindValueChanged(idle =>
@@ -883,8 +884,7 @@ namespace osu.Game
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(notificationsClient = new PollingNotificationsClientConnector(API), AddInternal, true);
-            loadComponentSingleFile(channelManager = new ChannelManager(API), AddInternal, true);
+            loadComponentSingleFile(channelManager = new ChannelManager(API, notificationsClient), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);

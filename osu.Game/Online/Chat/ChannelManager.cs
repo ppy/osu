@@ -65,20 +65,20 @@ namespace osu.Game.Online.Chat
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
         private readonly IAPIProvider api;
+        private readonly NotificationsClientConnector connector;
 
         [Resolved]
         private UserLookupCache users { get; set; }
-
-        [Resolved]
-        private NotificationsClientConnector connector { get; set; }
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         private bool channelsInitialised;
         private ScheduledDelegate ackDelegate;
 
-        public ChannelManager(IAPIProvider api)
+        public ChannelManager(IAPIProvider api, NotificationsClientConnector connector)
         {
             this.api = api;
+            this.connector = connector;
+
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
 
@@ -602,6 +602,12 @@ namespace osu.Game.Online.Chat
             req.Failure += e => Logger.Log($"Failed to mark channel {channel} up to '{message}' as read ({e.Message})", LoggingTarget.Network);
 
             api.Queue(req);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            connector?.Dispose();
         }
     }
 

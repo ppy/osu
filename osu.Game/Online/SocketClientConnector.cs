@@ -6,13 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 
 namespace osu.Game.Online
 {
-    public abstract class SocketClientConnector : Component
+    public abstract class SocketClientConnector : IDisposable
     {
         /// <summary>
         /// Whether this is connected to the hub, use <see cref="CurrentConnection"/> to access the connection, if this is <c>true</c>.
@@ -173,11 +172,23 @@ namespace osu.Game.Online
 
         public override string ToString() => $"{ClientName} ({(IsConnected.Value ? "connected" : "not connected")})";
 
-        protected override void Dispose(bool isDisposing)
+        private bool isDisposed;
+
+        protected virtual void Dispose(bool isDisposing)
         {
-            base.Dispose(isDisposing);
+            if (isDisposed)
+                return;
+
             apiState.UnbindAll();
             cancelExistingConnect();
+
+            isDisposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
