@@ -22,7 +22,7 @@ namespace osu.Game.Skinning
             IBeatmap beatmap = GameplayState.Beatmap;
 
             double firstObject = beatmap.HitObjects[0].StartTime;
-            double offset = 0; // ?
+            double offset = beatmap.ControlPointInfo.TimingPointAt(firstObject).Time;
             double beatLengthOriginal = beatmap.ControlPointInfo.TimingPointAt(firstObject).BeatLength;
 
             if (beatLengthOriginal <= 0) beatLengthOriginal = beatmap.ControlPointInfo.TimingPointAt(0).BeatLength;
