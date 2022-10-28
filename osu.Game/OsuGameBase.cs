@@ -526,6 +526,11 @@ namespace osu.Game
         /// <remarks>Should be overriden per-platform to provide settings for platform-specific handlers.</remarks>
         public virtual SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
         {
+            // One would think that this could be moved to the `OsuGameDesktop` class, but doing so means that
+            // OsuGameTestScenes will not show any input options (as they are based on OsuGame not OsuGameDesktop).
+            //
+            // This in turn makes it hard for ruleset creators to adjust input settings while testing their ruleset
+            // within the test browser interface.
             if (RuntimeInfo.IsDesktop)
             {
                 switch (handler)
