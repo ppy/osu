@@ -85,9 +85,9 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load()
         {
-            connector.ChannelJoined += ch => joinChannel(ch);
-            connector.NewMessages += addMessages;
-            connector.PresenceReceived += () =>
+            connector.ChannelJoined += ch => Schedule(() => joinChannel(ch));
+            connector.NewMessages += msgs => Schedule(() => addMessages(msgs));
+            connector.PresenceReceived += () => Schedule(() =>
             {
                 if (!channelsInitialised)
                 {
@@ -95,7 +95,7 @@ namespace osu.Game.Online.Chat
                     // we want this to run after the first presence so we can see if the user is in any channels already.
                     initializeChannels();
                 }
-            };
+            });
 
             connector.StartChat();
 
