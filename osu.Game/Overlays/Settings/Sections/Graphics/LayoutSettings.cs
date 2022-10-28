@@ -244,7 +244,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             else
                 displayDropdown.Hide();
 
-            if (host.Window.SafeAreaPadding.Value.Total != Vector2.Zero)
+            if (host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero)
                 safeAreaConsiderationsCheckbox.Show();
             else
                 safeAreaConsiderationsCheckbox.Hide();
