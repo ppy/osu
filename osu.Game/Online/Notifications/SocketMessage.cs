@@ -9,13 +9,13 @@ namespace osu.Game.Online.Notifications
     [JsonObject(MemberSerialization.OptIn)]
     public class SocketMessage
     {
-        [JsonProperty("event")]
+        [JsonProperty(@"event")]
         public string Event { get; set; } = null!;
 
-        [JsonProperty("data")]
+        [JsonProperty(@"data")]
         public JObject? Data { get; set; }
 
-        [JsonProperty("error")]
+        [JsonProperty(@"error")]
         public string? Error { get; set; }
     }
 }

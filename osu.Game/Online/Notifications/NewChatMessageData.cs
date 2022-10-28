@@ -13,10 +13,10 @@ namespace osu.Game.Online.Notifications
     [JsonObject(MemberSerialization.OptIn)]
     public class NewChatMessageData
     {
-        [JsonProperty("messages")]
+        [JsonProperty(@"messages")]
         public List<Message> Messages { get; set; } = null!;
 
-        [JsonProperty("users")]
+        [JsonProperty(@"users")]
         private List<APIUser> users { get; set; } = null!;
 
         [OnDeserialized]
