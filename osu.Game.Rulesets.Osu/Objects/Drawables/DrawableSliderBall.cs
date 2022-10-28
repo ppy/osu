@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             // For the same reasons as above w.r.t rewinding, we shouldn't propagate to children here either.
             // ReSharper disable once RedundantArgumentDefaultValue - removing the "redundant" default value triggers BaseMethodCallWithDefaultParameter
-            base.ApplyTransformsAt(time, false);
+            base.ApplyTransformsAt(time);
         }
 
         private bool tracking;
