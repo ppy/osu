@@ -10,28 +10,28 @@ namespace osu.Game.Online.API.Requests.Responses
     [JsonObject(MemberSerialization.OptIn)]
     public class APINotification
     {
-        [JsonProperty("id")]
+        [JsonProperty(@"id")]
         public long Id { get; set; }
 
-        [JsonProperty("name")]
+        [JsonProperty(@"name")]
         public string Name { get; set; } = null!;
 
-        [JsonProperty("created_at")]
+        [JsonProperty(@"created_at")]
         public DateTimeOffset? CreatedAt { get; set; }
 
-        [JsonProperty("object_type")]
+        [JsonProperty(@"object_type")]
         public string ObjectType { get; set; } = null!;
 
-        [JsonProperty("object_id")]
+        [JsonProperty(@"object_id")]
         public string ObjectId { get; set; } = null!;
 
-        [JsonProperty("source_user_id")]
+        [JsonProperty(@"source_user_id")]
         public long? SourceUserId { get; set; }
 
-        [JsonProperty("is_read")]
+        [JsonProperty(@"is_read")]
         public bool IsRead { get; set; }
 
-        [JsonProperty("details")]
+        [JsonProperty(@"details")]
         public Dictionary<string, string>? Details { get; set; }
     }
 }

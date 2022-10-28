@@ -10,7 +10,7 @@ namespace osu.Game.Online.Notifications
     {
         public EndChatRequest()
         {
-            Event = "chat.end";
+            Event = @"chat.end";
         }
     }
 }

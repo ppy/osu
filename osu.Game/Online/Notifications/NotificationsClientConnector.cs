@@ -48,7 +48,7 @@ namespace osu.Game.Online.Notifications
             string endpoint = await tcs.Task;
 
             ClientWebSocket socket = new ClientWebSocket();
-            socket.Options.SetRequestHeader("Authorization", $"Bearer {api.AccessToken}");
+            socket.Options.SetRequestHeader(@"Authorization", @$"Bearer {api.AccessToken}");
             socket.Options.Proxy = WebRequest.DefaultWebProxy;
             if (socket.Options.Proxy != null)
                 socket.Options.Proxy.Credentials = CredentialCache.DefaultCredentials;

@@ -27,6 +27,9 @@ namespace osu.Game.Online.Notifications
             get => enableChat;
             set
             {
+                if (enableChat == value)
+                    return;
+
                 enableChat = value;
                 Task.Run(startChatIfEnabledAsync);
             }
@@ -68,7 +71,7 @@ namespace osu.Game.Online.Notifications
         {
             switch (message.Event)
             {
-                case "chat.message.new":
+                case @"chat.message.new":
                     Debug.Assert(message.Data != null);
 
                     NewChatMessageData? messageData = JsonConvert.DeserializeObject<NewChatMessageData>(message.Data.ToString());

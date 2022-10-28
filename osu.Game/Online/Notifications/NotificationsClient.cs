@@ -87,7 +87,7 @@ namespace osu.Game.Online.Notifications
         {
             try
             {
-                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnecting", CancellationToken.None).ConfigureAwait(false);
+                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, @"Disconnecting", CancellationToken.None).ConfigureAwait(false);
             }
             catch
             {

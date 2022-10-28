@@ -7,6 +7,6 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetNotificationsRequest : APIRequest<APINotificationsBundle>
     {
-        protected override string Target => "notifications";
+        protected override string Target => @"notifications";
     }
 }

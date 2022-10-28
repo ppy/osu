@@ -8,13 +8,13 @@ namespace osu.Game.Online.API.Requests.Responses
     [JsonObject(MemberSerialization.OptIn)]
     public class APINotificationsBundle
     {
-        [JsonProperty("has_more")]
+        [JsonProperty(@"has_more")]
         public bool HasMore { get; set; }
 
-        [JsonProperty("notifications")]
+        [JsonProperty(@"notifications")]
         public APINotification[] Notifications { get; set; } = null!;
 
-        [JsonProperty("notification_endpoint")]
+        [JsonProperty(@"notification_endpoint")]
         public string Endpoint { get; set; } = null!;
     }
 }
