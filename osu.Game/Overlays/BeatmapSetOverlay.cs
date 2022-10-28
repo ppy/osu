@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet;
@@ -45,25 +44,20 @@ namespace osu.Game.Overlays
             Info info;
             CommentsSection comments;
 
-            Child = new PopoverContainer
+            Child = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = new FillFlowContainer
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 20),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 20),
-                    Children = new Drawable[]
+                    info = new Info(),
+                    new ScoresContainer
                     {
-                        info = new Info(),
-                        new ScoresContainer
-                        {
-                            Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
-                        },
-                        comments = new CommentsSection()
-                    }
+                        Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
+                    },
+                    comments = new CommentsSection()
                 }
             };
 
