@@ -137,7 +137,7 @@ namespace osu.Game.Extensions
             return instance.OnlineID.Equals(other.OnlineID);
         }
 
-        private static Regex invalid_filename_chars = new(@"(?!$)[^A-Za-z0-9_()[\] -]", RegexOptions.Compiled);
+        private static Regex invalid_filename_chars = new Regex(@"(?!$)[^A-Za-z0-9_()[\]. -]", RegexOptions.Compiled);
 
         /// <summary>
         /// Get a valid filename for use inside a zip file. Avoids backslashes being incorrectly converted to directories.
