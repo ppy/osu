@@ -47,7 +47,7 @@ namespace osu.Game.Online.Notifications.WebSocket
             await base.StartChatAsync();
         }
 
-        private void runReadLoop(CancellationToken cancellationToken) => Task.Run((Func<Task>)(async () =>
+        private void runReadLoop(CancellationToken cancellationToken) => Task.Run(async () =>
         {
             byte[] buffer = new byte[1024];
             StringBuilder messageResult = new StringBuilder();
@@ -94,7 +94,7 @@ namespace osu.Game.Online.Notifications.WebSocket
                     return;
                 }
             }
-        }), cancellationToken);
+        }, cancellationToken);
 
         private async Task closeAsync()
         {
