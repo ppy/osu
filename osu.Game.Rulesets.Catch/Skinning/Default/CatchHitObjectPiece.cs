@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
         /// A part of this piece that will be faded out while falling in the playfield.
         /// </summary>
         [CanBeNull]
-        protected virtual BorderPiece BorderPiece => null;
+        protected virtual Drawable BorderPiece => null;
 
         /// <summary>
         /// A part of this piece that will be only visible when <see cref="HyperDash"/> is true.
