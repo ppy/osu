@@ -6,16 +6,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game.Database;
-using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Notifications;
 using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Online.Chat
@@ -23,7 +24,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Manages everything channel related
     /// </summary>
-    public class ChannelManager : PollingComponent, IChannelPostTarget
+    public class ChannelManager : CompositeComponent, IChannelPostTarget
     {
         /// <summary>
         /// The channels the player joins on startup
@@ -68,9 +69,12 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private UserLookupCache users { get; set; }
 
-        public readonly BindableBool HighPollRate = new BindableBool();
+        [Resolved]
+        private NotificationsClientConnector connector { get; set; }
 
-        private readonly IBindable<bool> isIdle = new BindableBool();
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private bool channelsInitialised;
+        private ScheduledDelegate ackDelegate;
 
         public ChannelManager(IAPIProvider api)
         {
@@ -78,30 +82,34 @@ namespace osu.Game.Online.Chat
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(IdleTracker idleTracker)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            HighPollRate.BindValueChanged(updatePollRate);
-            isIdle.BindValueChanged(updatePollRate, true);
-
-            if (idleTracker != null)
-                isIdle.BindTo(idleTracker.IsIdle);
-        }
-
-        private void updatePollRate(ValueChangedEvent<bool> valueChangedEvent)
-        {
-            // Polling will eventually be replaced with websocket, but let's avoid doing these background operations as much as possible for now.
-            // The only loss will be delayed PM/message highlight notifications.
-            int millisecondsBetweenPolls = HighPollRate.Value ? 1000 : 60000;
-
-            if (isIdle.Value)
-                millisecondsBetweenPolls *= 10;
-
-            if (TimeBetweenPolls.Value != millisecondsBetweenPolls)
+            connector.ChannelJoined += ch => joinChannel(ch);
+            connector.NewMessages += addMessages;
+            connector.PresenceReceived += () =>
             {
-                TimeBetweenPolls.Value = millisecondsBetweenPolls;
-                Logger.Log($"Chat is now polling every {TimeBetweenPolls.Value} ms");
-            }
+                if (!channelsInitialised)
+                {
+                    channelsInitialised = true;
+                    // we want this to run after the first presence so we can see if the user is in any channels already.
+                    initializeChannels();
+                }
+            };
+
+            connector.StartChat();
+
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(status =>
+            {
+                ackDelegate?.Cancel();
+
+                if (status.NewValue == APIState.Online)
+                {
+                    Scheduler.Add(ackDelegate = new ScheduledDelegate(() => api.Queue(new ChatAckRequest()), 0, 60000));
+                    // Todo: Handle silences.
+                }
+            }, true);
         }
 
         /// <summary>
@@ -328,7 +336,7 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        private void handleChannelMessages(IEnumerable<Message> messages)
+        private void addMessages(List<Message> messages)
         {
             var channels = JoinedChannels.ToList();
 
@@ -376,7 +384,7 @@ namespace osu.Game.Online.Chat
             var fetchInitialMsgReq = new GetMessagesRequest(channel);
             fetchInitialMsgReq.Success += messages =>
             {
-                handleChannelMessages(messages);
+                addMessages(messages);
                 channel.MessagesLoaded = true; // this will mark the channel as having received messages even if there were none.
             };
 
@@ -464,7 +472,7 @@ namespace osu.Game.Online.Chat
                             {
                                 channel.Id = resChannel.ChannelID.Value;
 
-                                handleChannelMessages(resChannel.RecentMessages);
+                                addMessages(resChannel.RecentMessages);
                                 channel.MessagesLoaded = true; // this will mark the channel as having received messages even if there were none.
                             }
                         };
@@ -572,57 +580,6 @@ namespace osu.Game.Online.Chat
 
                 return;
             }
-        }
-
-        private long lastMessageId;
-
-        private bool channelsInitialised;
-
-        protected override Task Poll()
-        {
-            if (!api.IsLoggedIn)
-                return base.Poll();
-
-            var fetchReq = new GetUpdatesRequest(lastMessageId);
-
-            var tcs = new TaskCompletionSource<bool>();
-
-            fetchReq.Success += updates =>
-            {
-                if (updates?.Presence != null)
-                {
-                    foreach (var channel in updates.Presence)
-                    {
-                        // we received this from the server so should mark the channel already joined.
-                        channel.Joined.Value = true;
-                        joinChannel(channel);
-                    }
-
-                    //todo: handle left channels
-
-                    handleChannelMessages(updates.Messages);
-
-                    foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
-                        JoinedChannels.FirstOrDefault(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
-
-                    lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
-                }
-
-                if (!channelsInitialised)
-                {
-                    channelsInitialised = true;
-                    // we want this to run after the first presence so we can see if the user is in any channels already.
-                    initializeChannels();
-                }
-
-                tcs.SetResult(true);
-            };
-
-            fetchReq.Failure += _ => tcs.SetResult(false);
-
-            api.Queue(fetchReq);
-
-            return tcs.Task;
         }
 
         /// <summary>

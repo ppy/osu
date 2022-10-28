@@ -44,6 +44,7 @@ using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Notifications;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
@@ -83,6 +84,7 @@ namespace osu.Game
         private ChatOverlay chatOverlay;
 
         private ChannelManager channelManager;
+        private NotificationsClientConnector notificationsClient;
 
         [NotNull]
         protected readonly NotificationOverlay Notifications = new NotificationOverlay();
@@ -676,6 +678,7 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
             SentryLogger.Dispose();
+            notificationsClient.Dispose();
         }
 
         protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults()
@@ -879,6 +882,7 @@ namespace osu.Game
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(notificationsClient = new NotificationsClientConnector(API), AddInternal, true);
             loadComponentSingleFile(channelManager = new ChannelManager(API), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
@@ -907,19 +911,6 @@ namespace osu.Game
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
             loadComponentSingleFile(new BackgroundBeatmapProcessor(), Add);
-
-            chatOverlay.State.BindValueChanged(_ => updateChatPollRate());
-            // Multiplayer modes need to increase poll rate temporarily.
-            API.Activity.BindValueChanged(_ => updateChatPollRate(), true);
-
-            void updateChatPollRate()
-            {
-                channelManager.HighPollRate.Value =
-                    chatOverlay.State.Value == Visibility.Visible
-                    || API.Activity.Value is UserActivity.InLobby
-                    || API.Activity.Value is UserActivity.InMultiplayerGame
-                    || API.Activity.Value is UserActivity.SpectatingMultiplayerGame;
-            }
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
