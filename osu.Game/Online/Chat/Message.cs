@@ -30,6 +30,13 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"sender")]
         public APIUser Sender;
 
+        [JsonProperty(@"sender_id")]
+        public int SenderId
+        {
+            get => Sender?.Id ?? 0;
+            set => Sender = new APIUser { Id = value };
+        }
+
         [JsonConstructor]
         public Message()
         {
