@@ -239,17 +239,17 @@ namespace osu.Game.Tournament.Screens.Editors
 
                             var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = Model.ID });
 
-                            req.Success += res =>
+                            req.Success += res => Schedule(() =>
                             {
                                 Model.Beatmap = new TournamentBeatmap(res);
                                 updatePanel();
-                            };
+                            });
 
-                            req.Failure += _ =>
+                            req.Failure += _ => Schedule(() =>
                             {
                                 Model.Beatmap = null;
                                 updatePanel();
-                            };
+                            });
 
                             API.Queue(req);
                         }, true);

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -198,6 +199,21 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         [NotNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
+
+        public IList<HitSampleInfo> CreateSlidingSamples()
+        {
+            var slidingSamples = new List<HitSampleInfo>();
+
+            var normalSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            if (normalSample != null)
+                slidingSamples.Add(normalSample.With("sliderslide"));
+
+            var whistleSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_WHISTLE);
+            if (whistleSample != null)
+                slidingSamples.Add(whistleSample.With("sliderwhistle"));
+
+            return slidingSamples;
+        }
     }
 
     public static class HitObjectExtensions

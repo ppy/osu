@@ -5,6 +5,7 @@
 
 using Markdig;
 using Markdig.Extensions.AutoLinks;
+using Markdig.Extensions.CustomContainers;
 using Markdig.Extensions.EmphasisExtras;
 using Markdig.Extensions.Footnotes;
 using Markdig.Extensions.Tables;
@@ -31,6 +32,12 @@ namespace osu.Game.Graphics.Containers.Markdown
         /// </summary>
         /// <seealso cref="AutoLinkExtension"/>
         protected virtual bool Autolinks => false;
+
+        /// <summary>
+        /// Allows this markdown container to parse custom containers (used for flags and infoboxes).
+        /// </summary>
+        /// <seealso cref="CustomContainerExtension"/>
+        protected virtual bool CustomContainers => false;
 
         public OsuMarkdownContainer()
         {
@@ -106,6 +113,9 @@ namespace osu.Game.Graphics.Containers.Markdown
 
             if (Autolinks)
                 pipeline = pipeline.UseAutoLinks();
+
+            if (CustomContainers)
+                pipeline.UseCustomContainers();
 
             return pipeline.Build();
         }

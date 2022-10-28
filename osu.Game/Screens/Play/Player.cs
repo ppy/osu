@@ -66,6 +66,8 @@ namespace osu.Game.Screens.Play
 
         public override bool HideOverlaysOnEnter => true;
 
+        public override bool HideMenuCursorOnNonMouseInput => true;
+
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         // We are managing our own adjustments (see OnEntering/OnExiting).
@@ -93,6 +95,11 @@ namespace osu.Game.Screens.Play
         private readonly Bindable<bool> localUserPlaying = new Bindable<bool>();
 
         public int RestartCount;
+
+        /// <summary>
+        /// Whether the <see cref="HUDOverlay"/> is currently visible.
+        /// </summary>
+        public IBindable<bool> ShowingOverlayComponents = new Bindable<bool>();
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
@@ -566,9 +573,6 @@ namespace osu.Game.Screens.Play
         /// </param>
         protected void PerformExit(bool showDialogFirst)
         {
-            // if an exit has been requested, cancel any pending completion (the user has shown intention to exit).
-            resultsDisplayDelegate?.Cancel();
-
             // there is a chance that an exit request occurs after the transition to results has already started.
             // even in such a case, the user has shown intent, so forcefully return to this screen (to proceed with the upwards exit process).
             if (!this.IsCurrentScreen())
@@ -602,6 +606,9 @@ namespace osu.Game.Screens.Play
                     return;
                 }
             }
+
+            // if an exit has been requested, cancel any pending completion (the user has shown intention to exit).
+            resultsDisplayDelegate?.Cancel();
 
             // The actual exit is performed if
             // - the pause / fail dialog was not requested
@@ -780,19 +787,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <remarks>
         /// A final display will only occur once all work is completed in <see cref="PrepareScoreForResultsAsync"/>. This means that even after calling this method, the results screen will never be shown until <see cref="JudgementProcessor.HasCompleted">ScoreProcessor.HasCompleted</see> becomes <see langword="true"/>.
-        ///
-        /// Calling this method multiple times will have no effect.
         /// </remarks>
         /// <param name="withDelay">Whether a minimum delay (<see cref="RESULTS_DISPLAY_DELAY"/>) should be added before the screen is displayed.</param>
         private void progressToResults(bool withDelay)
         {
-            if (resultsDisplayDelegate != null)
-                // Note that if progressToResults is called one withDelay=true and then withDelay=false, this no-delay timing will not be
-                // accounted for. shouldn't be a huge concern (a user pressing the skip button after a results progression has already been queued
-                // may take x00 more milliseconds than expected in the very rare edge case).
-                //
-                // If required we can handle this more correctly by rescheduling here.
-                return;
+            resultsDisplayDelegate?.Cancel();
 
             double delay = withDelay ? RESULTS_DISPLAY_DELAY : 0;
 
@@ -1023,6 +1022,8 @@ namespace osu.Game.Screens.Play
             });
 
             HUDOverlay.IsPlaying.BindTo(localUserPlaying);
+            ShowingOverlayComponents.BindTo(HUDOverlay.ShowHud);
+
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);

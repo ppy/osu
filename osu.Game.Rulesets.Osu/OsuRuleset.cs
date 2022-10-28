@@ -59,6 +59,7 @@ namespace osu.Game.Rulesets.Osu
         {
             new KeyBinding(InputKey.Z, OsuAction.LeftButton),
             new KeyBinding(InputKey.X, OsuAction.RightButton),
+            new KeyBinding(InputKey.C, OsuAction.Smoke),
             new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
@@ -200,7 +201,8 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModMuted(),
                         new OsuModNoScope(),
                         new MultiMod(new OsuModMagnetised(), new OsuModRepel()),
-                        new ModAdaptiveSpeed()
+                        new ModAdaptiveSpeed(),
+                        new OsuModFreezeFrame()
                     };
 
                 case ModType.System:

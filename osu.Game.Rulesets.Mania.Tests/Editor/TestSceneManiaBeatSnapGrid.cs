@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private ScrollingTestContainer.TestScrollingInfo scrollingInfo = new ScrollingTestContainer.TestScrollingInfo();
 
         [Cached(typeof(EditorBeatmap))]
-        private EditorBeatmap editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition())
+        private EditorBeatmap editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition(2))
         {
             BeatmapInfo =
             {
@@ -56,8 +56,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             {
                 Playfield = new ManiaPlayfield(new List<StageDefinition>
                 {
-                    new StageDefinition { Columns = 4 },
-                    new StageDefinition { Columns = 3 }
+                    new StageDefinition(4),
+                    new StageDefinition(3)
                 })
                 {
                     Clock = new FramedClock(new StopwatchClock())
