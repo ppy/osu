@@ -280,10 +280,7 @@ namespace osu.Game
             configRuleset = LocalConfig.GetBindable<string>(OsuSetting.Ruleset);
             uiScale = LocalConfig.GetBindable<float>(OsuSetting.UIScale);
 
-            var preferredRuleset = int.TryParse(configRuleset.Value, out int rulesetId)
-                // int parsing can be removed 20220522
-                ? RulesetStore.GetRuleset(rulesetId)
-                : RulesetStore.GetRuleset(configRuleset.Value);
+            var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
 
             try
             {
@@ -1332,6 +1329,8 @@ namespace osu.Game
             {
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
                 API.Activity.BindTo(newOsuScreen.Activity);
+
+                GlobalCursorDisplay.MenuCursor.HideCursorOnNonMouseInput = newOsuScreen.HideMenuCursorOnNonMouseInput;
 
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
