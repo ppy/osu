@@ -44,7 +44,8 @@ namespace osu.Game.Online.API.Requests.Responses
         public int MaxCombo { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        [JsonProperty("rank")]
+        // ScoreRank is aligned to make 0 equal D. We still want to serialise this (even when DefaultValueHandling.Ignore is used).
+        [JsonProperty("rank", DefaultValueHandling = DefaultValueHandling.Include)]
         public ScoreRank Rank { get; set; }
 
         [JsonProperty("started_at")]
