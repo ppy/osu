@@ -4,8 +4,11 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace osu.Game.Online.Notifications
+namespace osu.Game.Online.Notifications.WebSocket
 {
+    /// <summary>
+    /// A websocket message, sent either from the client or server.
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class SocketMessage
     {

@@ -17,7 +17,7 @@ namespace osu.Game.Online
             Connection.Closed += InvokeClosed;
         }
 
-        public override Task StartAsync(CancellationToken cancellationToken) => Connection.StartAsync(cancellationToken);
+        public override Task ConnectAsync(CancellationToken cancellationToken) => Connection.StartAsync(cancellationToken);
 
         public override async ValueTask DisposeAsync()
         {
