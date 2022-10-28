@@ -5,9 +5,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Catch.Objects;
 using osuTK;
 using osuTK.Graphics;
 
@@ -15,10 +16,14 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
 {
     internal class ArgonBananaPiece : ArgonFruitPiece
     {
+        private Container stabilisedPieceContainer = null!;
+
+        protected override Drawable BorderPiece => stabilisedPieceContainer;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(new UprightAspectMaintainingContainer
+            AddInternal(stabilisedPieceContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
@@ -44,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
                         Width = 1.6f,
                         Height = 2,
                     },
-                    new Box
+                    new Circle
                     {
                         Colour = ColourInfo.GradientHorizontal(Color4.White, Color4.White.Opacity(0)),
                         RelativeSizeAxes = Axes.X,
@@ -77,6 +82,16 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
                     },
                 }
             });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            float scale = 0.5f + 0.5f * (1 / (ObjectState.DisplaySize.X / (CatchHitObject.OBJECT_RADIUS * 2)));
+
+            stabilisedPieceContainer.Rotation = -ObjectState.DisplayRotation;
+            stabilisedPieceContainer.Scale = new Vector2(scale);
         }
     }
 }
