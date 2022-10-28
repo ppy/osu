@@ -3,8 +3,11 @@
 
 using Newtonsoft.Json;
 
-namespace osu.Game.Online.Notifications
+namespace osu.Game.Online.Notifications.WebSocket
 {
+    /// <summary>
+    /// A websocket message notifying the server that the client wants to receive chat messages.
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class StartChatRequest : SocketMessage
     {

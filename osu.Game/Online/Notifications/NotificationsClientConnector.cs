@@ -3,29 +3,27 @@
 
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.Notifications
 {
-    public class NotificationsClientConnector : SocketClientConnector
+    /// <summary>
+    /// An abstract connector or <see cref="NotificationsClient"/>s.
+    /// </summary>
+    public abstract class NotificationsClientConnector : SocketClientConnector
     {
         public event Action<Channel>? ChannelJoined;
         public event Action<List<Message>>? NewMessages;
         public event Action? PresenceReceived;
 
-        private readonly IAPIProvider api;
         private bool chatStarted;
 
-        public NotificationsClientConnector(IAPIProvider api)
+        protected NotificationsClientConnector(IAPIProvider api)
             : base(api)
         {
-            this.api = api;
         }
 
         public void StartChat()
@@ -36,30 +34,18 @@ namespace osu.Game.Online.Notifications
                 client.EnableChat = true;
         }
 
-        protected override async Task<SocketClient> BuildConnectionAsync(CancellationToken cancellationToken)
+        protected sealed override async Task<SocketClient> BuildConnectionAsync(CancellationToken cancellationToken)
         {
-            var tcs = new TaskCompletionSource<string>();
+            var client = await BuildNotificationClientAsync(cancellationToken);
 
-            var req = new GetNotificationsRequest();
-            req.Success += bundle => tcs.SetResult(bundle.Endpoint);
-            req.Failure += ex => tcs.SetException(ex);
-            api.Queue(req);
+            client.ChannelJoined = c => ChannelJoined?.Invoke(c);
+            client.NewMessages = m => NewMessages?.Invoke(m);
+            client.PresenceReceived = () => PresenceReceived?.Invoke();
+            client.EnableChat = chatStarted;
 
-            string endpoint = await tcs.Task;
-
-            ClientWebSocket socket = new ClientWebSocket();
-            socket.Options.SetRequestHeader(@"Authorization", @$"Bearer {api.AccessToken}");
-            socket.Options.Proxy = WebRequest.DefaultWebProxy;
-            if (socket.Options.Proxy != null)
-                socket.Options.Proxy.Credentials = CredentialCache.DefaultCredentials;
-
-            return new NotificationsClient(socket, endpoint, api)
-            {
-                ChannelJoined = c => ChannelJoined?.Invoke(c),
-                NewMessages = m => NewMessages?.Invoke(m),
-                PresenceReceived = () => PresenceReceived?.Invoke(),
-                EnableChat = chatStarted
-            };
+            return client;
         }
+
+        protected abstract Task<NotificationsClient> BuildNotificationClientAsync(CancellationToken cancellationToken);
     }
 }

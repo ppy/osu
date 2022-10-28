@@ -2,112 +2,95 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
-using System.Net.WebSockets;
-using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using osu.Framework.Extensions.TypeExtensions;
-using osu.Framework.Logging;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.Notifications
 {
-    public partial class NotificationsClient : SocketClient
+    /// <summary>
+    /// An abstract client which receives notification-related events (chat/notifications).
+    /// </summary>
+    public abstract class NotificationsClient : SocketClient
     {
-        private readonly ClientWebSocket socket;
-        private readonly string endpoint;
+        public Action<Channel>? ChannelJoined;
+        public Action<List<Message>>? NewMessages;
+        public Action? PresenceReceived;
+
         private readonly IAPIProvider api;
 
-        public NotificationsClient(ClientWebSocket socket, string endpoint, IAPIProvider api)
+        private bool enableChat;
+        private long lastMessageId;
+
+        protected NotificationsClient(IAPIProvider api)
         {
-            this.socket = socket;
-            this.endpoint = endpoint;
             this.api = api;
         }
 
-        public override async Task StartAsync(CancellationToken cancellationToken)
+        public bool EnableChat
         {
-            await socket.ConnectAsync(new Uri(endpoint), cancellationToken).ConfigureAwait(false);
-            await onConnectedAsync();
-            runReadLoop(cancellationToken);
-        }
-
-        private void runReadLoop(CancellationToken cancellationToken) => Task.Run((Func<Task>)(async () =>
-        {
-            byte[] buffer = new byte[1024];
-            StringBuilder messageResult = new StringBuilder();
-
-            while (!cancellationToken.IsCancellationRequested)
+            get => enableChat;
+            set
             {
-                try
-                {
-                    WebSocketReceiveResult result = await socket.ReceiveAsync(buffer, cancellationToken);
-
-                    switch (result.MessageType)
-                    {
-                        case WebSocketMessageType.Text:
-                            messageResult.Append(Encoding.UTF8.GetString(buffer[..result.Count]));
-
-                            if (result.EndOfMessage)
-                            {
-                                SocketMessage? message = JsonConvert.DeserializeObject<SocketMessage>(messageResult.ToString());
-                                messageResult.Clear();
-
-                                Debug.Assert(message != null);
-
-                                if (message.Error != null)
-                                {
-                                    Logger.Log($"{GetType().ReadableName()} error: {message.Error}", LoggingTarget.Network);
-                                    break;
-                                }
-
-                                await onMessageReceivedAsync(message);
-                            }
-
-                            break;
-
-                        case WebSocketMessageType.Binary:
-                            throw new NotImplementedException();
-
-                        case WebSocketMessageType.Close:
-                            throw new Exception("Connection closed by remote host.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    await InvokeClosed(ex);
+                if (enableChat == value)
                     return;
+
+                enableChat = value;
+
+                if (EnableChat)
+                    Task.Run(StartChatAsync);
+            }
+        }
+
+        public override async Task ConnectAsync(CancellationToken cancellationToken)
+        {
+            if (EnableChat)
+                await StartChatAsync();
+        }
+
+        protected virtual Task StartChatAsync()
+        {
+            api.Queue(CreateFetchMessagesRequest(0));
+            return Task.CompletedTask;
+        }
+
+        protected APIRequest CreateFetchMessagesRequest(long? lastMessageId = null)
+        {
+            var fetchReq = new GetUpdatesRequest(lastMessageId ?? this.lastMessageId);
+
+            fetchReq.Success += updates =>
+            {
+                if (updates?.Presence != null)
+                {
+                    foreach (var channel in updates.Presence)
+                        HandleJoinedChannel(channel);
+
+                    //todo: handle left channels
+
+                    HandleMessages(updates.Messages);
                 }
-            }
-        }), cancellationToken);
 
-        private async Task closeAsync()
-        {
-            try
-            {
-                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, @"Disconnecting", CancellationToken.None).ConfigureAwait(false);
-            }
-            catch
-            {
-                // Closure can fail if the connection is aborted. Don't really care since it's disposed anyway.
-            }
+                PresenceReceived?.Invoke();
+            };
+
+            return fetchReq;
         }
 
-        private async Task sendMessage(SocketMessage message, CancellationToken cancellationToken)
+        protected void HandleJoinedChannel(Channel channel)
         {
-            if (socket.State != WebSocketState.Open)
-                return;
-
-            await socket.SendAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)), WebSocketMessageType.Text, true, cancellationToken);
+            // we received this from the server so should mark the channel already joined.
+            channel.Joined.Value = true;
+            ChannelJoined?.Invoke(channel);
         }
 
-        public override async ValueTask DisposeAsync()
+        protected void HandleMessages(List<Message> messages)
         {
-            await base.DisposeAsync();
-            await closeAsync();
-            socket.Dispose();
+            NewMessages?.Invoke(messages);
+            lastMessageId = Math.Max(lastMessageId, messages.LastOrDefault()?.Id ?? 0);
         }
     }
 }

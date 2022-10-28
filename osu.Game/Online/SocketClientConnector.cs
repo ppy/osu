@@ -92,7 +92,7 @@ namespace osu.Game.Online
 
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        await CurrentConnection.StartAsync(cancellationToken).ConfigureAwait(false);
+                        await CurrentConnection.ConnectAsync(cancellationToken).ConfigureAwait(false);
 
                         Logger.Log($"{ClientName} connected!", LoggingTarget.Network);
                         isConnected.Value = true;

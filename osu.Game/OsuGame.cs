@@ -45,6 +45,7 @@ using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications;
+using osu.Game.Online.Notifications.Polling;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
@@ -882,7 +883,7 @@ namespace osu.Game
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(notificationsClient = new NotificationsClientConnector(API), AddInternal, true);
+            loadComponentSingleFile(notificationsClient = new PollingNotificationsClientConnector(API), AddInternal, true);
             loadComponentSingleFile(channelManager = new ChannelManager(API), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);

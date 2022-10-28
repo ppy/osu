@@ -8,8 +8,11 @@ using Newtonsoft.Json;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 
-namespace osu.Game.Online.Notifications
+namespace osu.Game.Online.Notifications.WebSocket
 {
+    /// <summary>
+    /// A websocket message sent from the server when new messages arrive.
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class NewChatMessageData
     {
