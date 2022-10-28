@@ -154,6 +154,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.SongSelectRightMouseScroll, false);
 
             SetDefault(OsuSetting.Scaling, ScalingMode.Off);
+            SetDefault(OsuSetting.SafeAreaConsiderations, true);
 
             SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
             SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
@@ -370,6 +371,7 @@ namespace osu.Game.Configuration
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
-        LastProcessedMetadataId
+        LastProcessedMetadataId,
+        SafeAreaConsiderations,
     }
 }
