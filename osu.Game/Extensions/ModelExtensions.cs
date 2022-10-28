@@ -15,6 +15,8 @@ namespace osu.Game.Extensions
 {
     public static class ModelExtensions
     {
+        private static readonly Regex invalid_filename_chars = new Regex(@"(?!$)[^A-Za-z0-9_()[\]. \-]", RegexOptions.Compiled);
+
         /// <summary>
         /// Get the relative path in osu! storage for this file.
         /// </summary>
@@ -137,14 +139,14 @@ namespace osu.Game.Extensions
             return instance.OnlineID.Equals(other.OnlineID);
         }
 
-        private static readonly Regex invalid_filename_chars = new Regex(@"(?!$)[^A-Za-z0-9_()[\]. \-]", RegexOptions.Compiled);
-
         /// <summary>
-        /// Get a valid filename for use inside a zip file. Avoids backslashes being incorrectly converted to directories.
+        /// Create a valid filename which should work across all platforms.
         /// </summary>
-        public static string GetValidArchiveContentFilename(this string filename)
-        {
-            return invalid_filename_chars.Replace(filename, "_");
-        }
+        /// <remarks>
+        /// This function replaces all characters not included in a very pessimistic list which should be compatible
+        /// across all operating systems. We are using this in place of <see cref="Path.GetInvalidFileNameChars"/> as
+        /// that function does not have per-platform considerations (and is only made to work on windows).
+        /// </remarks>
+        public static string GetValidFilename(this string filename) => invalid_filename_chars.Replace(filename, "_");
     }
 }
