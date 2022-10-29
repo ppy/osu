@@ -16,6 +16,14 @@ namespace osu.Game.Skinning
 {
     public class LegacyCountdown : CountdownOverlay
     {
+        public override bool IsEditable => true;
+
+        public LegacyCountdown()
+        {
+            // the actual size doesn't matter, but without a size it can't be modified in the skin layout editor
+            Size = new Vector2(250);
+        }
+
         protected override void LoadComplete()
         {
             IBeatmap beatmap = GameplayState.Beatmap;

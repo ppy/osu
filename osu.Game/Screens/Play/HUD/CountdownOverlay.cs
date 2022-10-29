@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class CountdownOverlay : Container, ISkinnableDrawable
     {
+        public virtual bool IsEditable => false; // todo: the default countdown is not implemented yet
+
         [Resolved]
         protected GameplayState GameplayState { get; private set; }
 
