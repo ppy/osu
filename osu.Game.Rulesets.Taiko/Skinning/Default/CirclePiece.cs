@@ -50,25 +50,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
                 background.Colour = AccentColour;
 
-                resetEdgeEffects();
+                background.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = AccentColour.Opacity(kiaiMode ? 0.5f : 1f),
+                    Radius = kiaiMode ? 32 : 8
+                };
             }
         }
 
-        private bool kiaiMode;
-
-        /// <summary>
-        /// Whether Kiai mode effects are enabled for this circle piece.
-        /// </summary>
-        public bool KiaiMode
-        {
-            get => kiaiMode;
-            set
-            {
-                kiaiMode = value;
-
-                resetEdgeEffects();
-            }
-        }
+        private static bool kiaiMode;
 
         protected override Container<Drawable> Content => content;
 
@@ -146,14 +137,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         private const float edge_alpha_kiai = 0.5f;
 
-        private void resetEdgeEffects()
+        private void fadeEdgeEffects()
         {
-            background.EdgeEffect = new EdgeEffectParameters
+            background.TweenEdgeEffectTo(new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Colour = AccentColour.Opacity(KiaiMode ? edge_alpha_kiai : 1f),
-                Radius = KiaiMode ? 32 : 8
-            };
+                Colour = AccentColour.Opacity(kiaiMode ? edge_alpha_kiai : 1f),
+                Radius = kiaiMode ? 32 : 8
+            }, 120, kiaiMode ? Easing.InQuad : Easing.OutQuad);
         }
 
         [Resolved]
@@ -162,7 +153,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (!effectPoint.KiaiMode)
+            {
+                kiaiMode = false;
+                fadeEdgeEffects();
                 return;
+            }
+            else
+            {
+                kiaiMode = true;
+                fadeEdgeEffects();
+            }
 
             if (drawableHitObject.State.Value == ArmedState.Idle)
             {
