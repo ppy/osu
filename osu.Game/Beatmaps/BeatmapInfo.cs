@@ -239,14 +239,6 @@ namespace osu.Game.Beatmaps
         #region Compatibility properties
 
         [Ignored]
-        [Obsolete("Use BeatmapInfo.Difficulty instead.")] // can be removed 20220719
-        public BeatmapDifficulty BaseDifficulty
-        {
-            get => Difficulty;
-            set => Difficulty = value;
-        }
-
-        [Ignored]
         public string? Path => File?.Filename;
 
         [Ignored]
