@@ -132,6 +132,8 @@ namespace osu.Game.Screens.Play
 
         protected HealthProcessor HealthProcessor { get; private set; }
 
+        private double gameplayStartTime { get; set; }
+
         protected DrawableRuleset DrawableRuleset { get; private set; }
 
         protected HUDOverlay HUDOverlay { get; private set; }
@@ -240,7 +242,10 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
+            CountdownTimings countdownTimings = CountdownOverlay.GetTimings(playableBeatmap);
+            gameplayStartTime = countdownTimings.UseCountdown ? countdownTimings.SkipBoundaryTime : DrawableRuleset.GameplayStartTime;
+
+            InternalChild = GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, gameplayStartTime);
 
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
@@ -443,7 +448,7 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
-                    skipIntroOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
+                    skipIntroOverlay = new SkipOverlay(gameplayStartTime)
                     {
                         RequestSkip = performUserRequestedSkip
                     },

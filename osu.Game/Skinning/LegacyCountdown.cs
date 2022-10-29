@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -20,73 +19,14 @@ namespace osu.Game.Skinning
         protected override void LoadComplete()
         {
             IBeatmap beatmap = GameplayState.Beatmap;
+            CountdownTimings timings = GetTimings(beatmap);
 
-            double firstObject = beatmap.HitObjects[0].StartTime;
-            double offset = beatmap.ControlPointInfo.TimingPointAt(firstObject).Time;
-            double beatLengthOriginal = beatmap.ControlPointInfo.TimingPointAt(firstObject).BeatLength;
-
-            if (beatLengthOriginal <= 0) beatLengthOriginal = beatmap.ControlPointInfo.TimingPointAt(0).BeatLength;
-            if (beatLengthOriginal <= 0) return;
-
-            double goTime = offset - 5;
-            double beatLength = beatLengthOriginal;
-
-            //If the bpm is too fast let's double the length just because it seems sensible.
-            if (beatLength <= 333)
-                beatLength *= 2;
-
-            switch (beatmap.BeatmapInfo.Countdown)
-            {
-                case CountdownType.DoubleSpeed:
-                    beatLength /= 2;
-                    break;
-
-                case CountdownType.HalfSpeed:
-                    beatLength *= 2;
-                    break;
-
-                case CountdownType.None:
-                    return; // skip countdown completely
-
-                case CountdownType.Normal:
-                    break; // don't do anything special
-
-                default:
-                    throw new ArgumentOutOfRangeException($"Unknown countdown type {beatmap.BeatmapInfo.Countdown}");
-            }
-
-            // Push the countdown back by the mapper's countdown offset before any other adjustments.
-            firstObject -= beatLength * beatmap.BeatmapInfo.CountdownOffset;
-
-            // Skip back until we are at a good place
-            if (goTime >= firstObject)
-            {
-                while (goTime > firstObject - beatLength)
-                    goTime -= beatLength;
-            }
-
-            int divisor = 1;
-
-            while (goTime < firstObject - beatLength / divisor)
-            {
-                goTime += beatLength;
-                double beat = ((float)(goTime - offset) / beatLengthOriginal) % 4;
-                if (beat > 1.5 && beat < 3.5)
-                    divisor = 2;
-                else
-                    divisor = 1;
-            }
-
-            goTime -= beatLength;
-
-            bool useCountdown = goTime - 4 * beatLength > 0;
+            bool useCountdown = timings.UseCountdown;
+            double goTime = timings.StartTime;
+            double beatLength = timings.BeatLength;
 
             if (useCountdown && DrawableRuleset.AllowCountdown)
             {
-                // ? these variables were already defined in the stable code, but im not sure what they do
-                // set SkipBoundary to goTime - 6 * beatLength;
-                // set CountdownTime to goTime - 3 * beatLength;
-
                 Sprite ready = createSprite(Skin.GetTexture(@"ready"), 1); // (placeholder texture)
                 Sprite count3 = createSprite(Skin.GetTexture(@"count3"));
                 Sprite count2 = createSprite(Skin.GetTexture(@"count2"));
