@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
 
             // relative to time on screen
             const float lens_flare_start = 0.3f;
-            const float lens_flare_end = 0.3f;
+            const float lens_flare_end = 0.8f;
 
             // Undo some of the parent scale being applied to make the lens flare feel a bit better..
             float scale = parent_scale_application + (1 - parent_scale_application) * (1 / (ObjectState.DisplaySize.X / (CatchHitObject.OBJECT_RADIUS * 2)));
