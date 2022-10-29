@@ -8,13 +8,22 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Tournament.Configuration
 {
-    public class TournamentStorageManager : IniConfigManager<StorageConfig>
+    public class TournamentConfigManager : IniConfigManager<StorageConfig>
     {
         protected override string Filename => "tournament.ini";
 
-        public TournamentStorageManager(Storage storage)
+        private const string default_tournament = "default";
+
+        public TournamentConfigManager(Storage storage)
             : base(storage)
         {
+        }
+
+        protected override void InitialiseDefaults()
+        {
+            base.InitialiseDefaults();
+
+            SetDefault(StorageConfig.CurrentTournament, default_tournament);
         }
     }
 
