@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             double greatProbability = 1 - (countOk + countMiss + 1.0) / (totalHits + 1.0);
 
-            if (greatProbability <= 0)
+            if (greatProbability <= 0 || greatProbability >= 1)
             {
                 return null;
             }
