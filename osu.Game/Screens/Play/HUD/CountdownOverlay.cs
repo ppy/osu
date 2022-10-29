@@ -5,13 +5,13 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.Containers;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class CountdownOverlay : BeatSyncedContainer, ISkinnableDrawable
+    public class CountdownOverlay : Container, ISkinnableDrawable
     {
         [Resolved]
         protected GameplayState GameplayState { get; private set; }

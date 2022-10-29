@@ -90,7 +90,7 @@ namespace osu.Game.Skinning
                 // set SkipBoundary to goTime - 6 * beatLength;
                 // set CountdownTime to goTime - 3 * beatLength;
 
-                Sprite ready = createSprite(Skin.GetTexture(@"count1"), 1); // (placeholder texture)
+                Sprite ready = createSprite(Skin.GetTexture(@"ready"), 1); // (placeholder texture)
                 Sprite count3 = createSprite(Skin.GetTexture(@"count3"));
                 Sprite count2 = createSprite(Skin.GetTexture(@"count2"));
                 Sprite count1 = createSprite(Skin.GetTexture(@"count1"));
@@ -140,7 +140,7 @@ namespace osu.Game.Skinning
             }
             else if (beatmap.HitObjects[0].StartTime > 6000)
             {
-                // todo: some arrow thing?
+                // todo: some arrow thing? see stable code below
                 /*
                 int loopStartTime = hitObjectManager.hitObjects[0].StartTime - hitObjectManager.PreEmpt - 900;
                 int loopCount = ARROW_LOOP_COUNT + Math.Min(2, hitObjectManager.PreEmpt / 200);
@@ -151,25 +151,17 @@ namespace osu.Game.Skinning
 
         private void scheduleAudio(double goTime, double beatLength)
         {
-            // the "ready" audio will only play if added to the skin, it does not have a default
+            // the "readys" sample will only play if added to the skin, it does not have a default
             ISample sampleReady = Skin.GetSample(new SampleInfo(@"readys"));
-            if (sampleReady != null)
-                Scheduler.AddDelayed(() => sampleReady.Play(), goTime - 5.9 * beatLength);
 
-            // if "count3s" exists, "count2s", "count1s" and "gos" will be used for the remaining count. if one is missing, that count will be skipped
-            // if "count3" does not exist, "count" will be used for all counts
+            // if "count3" does not exist, the "count" sample will be used for all counts
+            // if "count3s" does exist, "count2s", "count1s" and "gos" will be used and there will not be a fallback to "count"
             ISample sampleCount3 = Skin.GetSample(new SampleInfo(@"count3s"));
             ISample sampleCount2;
             ISample sampleCount1;
             ISample sampleGo;
 
-            if (sampleCount3 != null)
-            {
-                sampleCount2 = Skin.GetSample(new SampleInfo(@"count2s"));
-                sampleCount1 = Skin.GetSample(new SampleInfo(@"count1s"));
-                sampleGo = Skin.GetSample(new SampleInfo(@"gos"));
-            }
-            else
+            if (sampleCount3 == null)
             {
                 ISample count = Skin.GetSample(new SampleInfo(@"count"));
                 sampleCount3 = count;
@@ -177,7 +169,14 @@ namespace osu.Game.Skinning
                 sampleCount1 = count;
                 sampleGo = count;
             }
+            else
+            {
+                sampleCount2 = Skin.GetSample(new SampleInfo(@"count2s"));
+                sampleCount1 = Skin.GetSample(new SampleInfo(@"count1s"));
+                sampleGo = Skin.GetSample(new SampleInfo(@"gos"));
+            }
 
+            Scheduler.AddDelayed(() => sampleReady?.Play(), goTime - 5.9 * beatLength);
             Scheduler.AddDelayed(() => sampleCount3?.Play(), goTime - 3 * beatLength);
             Scheduler.AddDelayed(() => sampleCount2?.Play(), goTime - 2 * beatLength);
             Scheduler.AddDelayed(() => sampleCount1?.Play(), goTime - 1 * beatLength);
