@@ -21,6 +21,9 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         protected DrawableRuleset DrawableRuleset { get; private set; }
 
+        [Resolved]
+        protected Player Player { get; private set; }
+
         internal ISkinSource Skin;
 
         public CountdownOverlay()

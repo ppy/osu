@@ -113,11 +113,13 @@ namespace osu.Game.Skinning
                 sampleGo = Skin.GetSample(new SampleInfo(@"gos"));
             }
 
-            Scheduler.AddDelayed(() => sampleReady?.Play(), goTime - 5.9 * beatLength);
-            Scheduler.AddDelayed(() => sampleCount3?.Play(), goTime - 3 * beatLength);
-            Scheduler.AddDelayed(() => sampleCount2?.Play(), goTime - 2 * beatLength);
-            Scheduler.AddDelayed(() => sampleCount1?.Play(), goTime - 1 * beatLength);
-            Scheduler.AddDelayed(() => sampleGo?.Play(), goTime);
+            double offset = Player.GameplayClockContainer.StartTime;
+
+            Scheduler.AddDelayed(() => sampleReady?.Play(), goTime - 5.9 * beatLength - offset);
+            Scheduler.AddDelayed(() => sampleCount3?.Play(), goTime - 3 * beatLength - offset);
+            Scheduler.AddDelayed(() => sampleCount2?.Play(), goTime - 2 * beatLength - offset);
+            Scheduler.AddDelayed(() => sampleCount1?.Play(), goTime - 1 * beatLength - offset);
+            Scheduler.AddDelayed(() => sampleGo?.Play(), goTime - offset);
         }
 
         private Sprite createSprite(Texture texture, float scale = 1.4f)
