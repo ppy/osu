@@ -81,10 +81,7 @@ namespace osu.Game.Skinning
 
             bool useCountdown = goTime - 4 * beatLength > 0;
 
-            // in stable the countdown is active in osu, catch and mania, but since it falls behind the playfield in mania it's not added here
-            bool rulesetAllowsCountdown = GameplayState.Ruleset.ShortName is "osu" or "fruits";
-
-            if (useCountdown && rulesetAllowsCountdown)
+            if (useCountdown && DrawableRuleset.AllowCountdown)
             {
                 // ? these variables were already defined in the stable code, but im not sure what they do
                 // set SkipBoundary to goTime - 6 * beatLength;

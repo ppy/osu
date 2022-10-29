@@ -30,6 +30,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osuTK;
 
@@ -537,6 +538,11 @@ namespace osu.Game.Rulesets.UI
         /// Whether to display gameplay overlays, such as <see cref="HUDOverlay"/> and <see cref="BreakOverlay"/>.
         /// </summary>
         public virtual bool AllowGameplayOverlays => true;
+
+        /// <summary>
+        /// Whether to display the <see cref="CountdownOverlay"/>.
+        /// </summary>
+        public virtual bool AllowCountdown => true;
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.

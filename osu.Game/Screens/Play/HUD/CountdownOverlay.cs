@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.HUD
         protected GameplayState GameplayState { get; private set; }
 
         [Resolved]
-        private DrawableRuleset drawableRuleset { get; set; }
+        protected DrawableRuleset DrawableRuleset { get; private set; }
 
         internal ISkinSource Skin;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play.HUD
         private void load(ISkinSource skin)
         {
             Skin = skin;
-            Clock = drawableRuleset.FrameStableClock;
+            Clock = DrawableRuleset.FrameStableClock;
         }
 
         public bool UsesFixedAnchor { get; set; }
