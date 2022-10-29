@@ -179,6 +179,8 @@ namespace osu.Game
 
         private Bindable<string> configRuleset;
 
+        private Bindable<bool> applySafeAreaConsiderations;
+
         private Bindable<float> uiScale;
 
         private Bindable<string> configSkin;
@@ -309,6 +311,9 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
+
+            applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
+            applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All);
         }
 
         private ExternalLinkOpener externalLinkOpener;
