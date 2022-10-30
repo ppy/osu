@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -146,6 +147,41 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
             AddUntilStep("hidetarget is visible", () => hideTarget.IsPresent);
             AddAssert("key counters still hidden", () => !keyCounterFlow.IsPresent);
+        }
+
+        [Test]
+        public void TestHoldForMenuDoesWorkWhenHidden()
+        {
+            bool activated = false;
+
+            HoldForMenuButton getHoldForMenu() => hudOverlay.ChildrenOfType<HoldForMenuButton>().Single();
+
+            createNew();
+
+            AddStep("bind action", () =>
+            {
+                activated = false;
+
+                var holdForMenu = getHoldForMenu();
+
+                holdForMenu.Action += () => activated = true;
+            });
+
+            AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
+            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+
+            AddStep("attempt activate", () =>
+            {
+                InputManager.MoveMouseTo(getHoldForMenu().OfType<HoldToConfirmContainer>().Single());
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddUntilStep("activated", () => activated);
+
+            AddStep("release mouse button", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
         }
 
         [Test]
