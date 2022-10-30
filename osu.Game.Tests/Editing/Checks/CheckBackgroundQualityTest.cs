@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
@@ -131,7 +132,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             var mock = new Mock<IWorkingBeatmap>();
             mock.SetupGet(w => w.Beatmap).Returns(beatmap);
-            mock.SetupGet(w => w.Background).Returns(background);
+            mock.SetupGet(w => w.Background).Returns(background.AsNonNull());
             mock.Setup(w => w.GetStream(It.IsAny<string>())).Returns(stream);
 
             return mock;
