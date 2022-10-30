@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -26,9 +25,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneHUDOverlay : OsuManualInputManagerTestScene
     {
-        private OsuConfigManager localConfig;
+        private OsuConfigManager localConfig = null!;
 
-        private HUDOverlay hudOverlay;
+        private HUDOverlay hudOverlay = null!;
 
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
@@ -220,7 +219,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().ComponentsLoaded);
         }
 
-        private void createNew(Action<HUDOverlay> action = null)
+        private void createNew(Action<HUDOverlay>? action = null)
         {
             AddStep("create overlay", () =>
             {
@@ -239,7 +238,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override void Dispose(bool isDisposing)
         {
-            localConfig?.Dispose();
+            if (localConfig.IsNotNull())
+                localConfig.Dispose();
+
             base.Dispose(isDisposing);
         }
     }
