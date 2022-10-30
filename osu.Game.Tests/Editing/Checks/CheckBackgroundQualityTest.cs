@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Editing.Checks
             stream.Verify(x => x.Close(), Times.Once());
         }
 
-        private BeatmapVerifierContext getContext(Texture background, Stream? stream = null)
+        private BeatmapVerifierContext getContext(Texture? background, Stream? stream = null)
         {
             return new BeatmapVerifierContext(beatmap, getMockWorkingBeatmap(background, stream).Object);
         }
@@ -125,7 +125,7 @@ namespace osu.Game.Tests.Editing.Checks
         /// </summary>
         /// <param name="background">The texture of the background.</param>
         /// <param name="stream">The stream representing the background file.</param>
-        private Mock<IWorkingBeatmap> getMockWorkingBeatmap(Texture background, Stream? stream = null)
+        private Mock<IWorkingBeatmap> getMockWorkingBeatmap(Texture? background, Stream? stream = null)
         {
             stream ??= new MemoryStream(new byte[1024 * 1024]);
 

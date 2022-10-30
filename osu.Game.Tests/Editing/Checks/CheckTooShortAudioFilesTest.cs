@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Editing.Checks
             }
         }
 
-        private BeatmapVerifierContext getContext(Stream resourceStream)
+        private BeatmapVerifierContext getContext(Stream? resourceStream)
         {
             var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null, null);
             mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);
