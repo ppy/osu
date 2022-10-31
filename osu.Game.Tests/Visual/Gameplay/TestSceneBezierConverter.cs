@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -22,8 +20,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly SmoothPath controlPointDrawablePath;
         private readonly SmoothPath convertedDrawablePath;
         private readonly SmoothPath convertedControlPointDrawablePath;
-        private SliderPath path;
-        private SliderPath convertedPath;
+
+        private SliderPath path = null!;
+        private SliderPath convertedPath = null!;
 
         public TestSceneBezierConverter()
         {
@@ -58,16 +57,20 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Position = new Vector2(100, 300)
                 }
             };
+
+            resetPath();
         }
 
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public void Setup() => Schedule(resetPath);
+
+        private void resetPath()
         {
             path = new SliderPath();
             convertedPath = new SliderPath();
 
             path.Version.ValueChanged += getConvertedControlPoints;
-        });
+        }
 
         private void getConvertedControlPoints(ValueChangedEvent<int> obj)
         {
@@ -79,26 +82,30 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             base.Update();
 
-            if (path != null)
-            {
-                List<Vector2> vertices = new List<Vector2>();
-                path.GetPathToProgress(vertices, 0, 1);
+            List<Vector2> vertices = new List<Vector2>();
 
-                drawablePath.Vertices = vertices;
-                controlPointDrawablePath.Vertices = path.ControlPoints.Select(o => o.Position).ToList();
-                if (controlPointDrawablePath.Vertices.Count > 0)
-                    controlPointDrawablePath.Position = drawablePath.PositionInBoundingBox(drawablePath.Vertices[0]) - controlPointDrawablePath.PositionInBoundingBox(controlPointDrawablePath.Vertices[0]);
+            path.GetPathToProgress(vertices, 0, 1);
+
+            drawablePath.Vertices = vertices;
+            controlPointDrawablePath.Vertices = path.ControlPoints.Select(o => o.Position).ToList();
+
+            if (controlPointDrawablePath.Vertices.Count > 0)
+            {
+                controlPointDrawablePath.Position =
+                    drawablePath.PositionInBoundingBox(drawablePath.Vertices[0]) - controlPointDrawablePath.PositionInBoundingBox(controlPointDrawablePath.Vertices[0]);
             }
 
-            if (convertedPath != null)
-            {
-                List<Vector2> vertices = new List<Vector2>();
-                convertedPath.GetPathToProgress(vertices, 0, 1);
+            vertices.Clear();
 
-                convertedDrawablePath.Vertices = vertices;
-                convertedControlPointDrawablePath.Vertices = convertedPath.ControlPoints.Select(o => o.Position).ToList();
-                if (convertedControlPointDrawablePath.Vertices.Count > 0)
-                    convertedControlPointDrawablePath.Position = convertedDrawablePath.PositionInBoundingBox(convertedDrawablePath.Vertices[0]) - convertedControlPointDrawablePath.PositionInBoundingBox(convertedControlPointDrawablePath.Vertices[0]);
+            convertedPath.GetPathToProgress(vertices, 0, 1);
+
+            convertedDrawablePath.Vertices = vertices;
+            convertedControlPointDrawablePath.Vertices = convertedPath.ControlPoints.Select(o => o.Position).ToList();
+
+            if (convertedControlPointDrawablePath.Vertices.Count > 0)
+            {
+                convertedControlPointDrawablePath.Position = convertedDrawablePath.PositionInBoundingBox(convertedDrawablePath.Vertices[0])
+                                                             - convertedControlPointDrawablePath.PositionInBoundingBox(convertedControlPointDrawablePath.Vertices[0]);
             }
         }
 
