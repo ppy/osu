@@ -40,6 +40,12 @@ namespace osu.Game.Rulesets.Objects
         };
 
         public static IEnumerable<Vector2> ConvertToLegacyBezier(IList<PathControlPoint> controlPoints, Vector2 position)
+        /// <summary>
+        /// Converts a slider path to bezier control point positions compatible with the legacy osu! client.
+        /// </summary>
+        /// <param name="controlPoints">The control points of the path.</param>
+        /// <param name="position">The offset for the whole path.</param>
+        /// <returns>The list of legacy bezier control point positions.</returns>
         {
             Vector2[] vertices = new Vector2[controlPoints.Count];
             for (int i = 0; i < controlPoints.Count; i++)
@@ -90,6 +96,11 @@ namespace osu.Game.Rulesets.Objects
             return result;
         }
 
+        /// <summary>
+        /// Converts a path of control points to an identical path using only Bezier type control points.
+        /// </summary>
+        /// <param name="controlPoints">The control points of the path.</param>
+        /// <returns>The list of bezier control points.</returns>
         public static List<PathControlPoint> ConvertToModernBezier(IList<PathControlPoint> controlPoints)
         {
             Vector2[] vertices = new Vector2[controlPoints.Count];
