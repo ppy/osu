@@ -79,7 +79,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public override void ApplyTransformsAt(double time, bool propagateChildren = false)
         {
             // For the same reasons as above w.r.t rewinding, we shouldn't propagate to children here either.
-            // ReSharper disable once RedundantArgumentDefaultValue - removing the "redundant" default value triggers BaseMethodCallWithDefaultParameter
+
+            // ReSharper disable once RedundantArgumentDefaultValue
             base.ApplyTransformsAt(time, false);
         }
 
