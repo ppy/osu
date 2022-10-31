@@ -19,8 +19,6 @@ namespace osu.Game.Screens.Select
     {
         public const float HEIGHT = 50;
 
-        public const int TRANSITION_LENGTH = 300;
-
         private const float padding = 80;
 
         private readonly FillFlowContainer<FooterButton> buttons;
@@ -58,20 +56,18 @@ namespace osu.Game.Screens.Select
             Height = HEIGHT;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 backgroundColour = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One,
+                    Size = Vector2.One
                 },
                 new FillFlowContainer
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 0),
+                    //Buttons need to be larger than ideal size to hide bottom rounded corners, hence the offset on the Y axis
+                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 40),
                     RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(padding, 0),
                     Children = new Drawable[]
@@ -81,8 +77,8 @@ namespace osu.Game.Screens.Select
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(-FooterButton.SHEAR_WIDTH + 10, 0),
-                            AutoSizeAxes = Axes.Both,
+                            Spacing = new Vector2(-FooterButton.SHEAR_WIDTH + 5, 0),
+                            AutoSizeAxes = Axes.Both
                         }
                     }
                 }

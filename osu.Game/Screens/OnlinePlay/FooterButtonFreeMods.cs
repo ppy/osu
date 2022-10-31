@@ -43,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay
         {
             //TODO: no design for freemod button provided
             IconUsageBox = FontAwesome.Solid.ExpandArrowsAlt;
-            ButtonColour = Colour4.FromHex("FFCC22");
+            ButtonAccentColour = Colour4.FromHex("FFCC22");
             Text = @"Freemods";
         }
 

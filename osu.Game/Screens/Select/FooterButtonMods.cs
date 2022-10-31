@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Select
         {
             //TODO: use https://fontawesome.com/icons/arrow-right-arrow-left?s=solid&f=classic when local Fontawesome is updated
             IconUsageBox = FontAwesome.Solid.ArrowsAlt;
-            ButtonColour = Colour4.FromHex("#B2FF66");
+            ButtonAccentColour = Colour4.FromHex("#B2FF66");
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
             Text = @"Mods";

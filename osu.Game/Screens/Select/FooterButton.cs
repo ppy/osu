@@ -25,11 +25,16 @@ namespace osu.Game.Screens.Select
 {
     public abstract class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        public const float SHEAR_WIDTH = 16;
-        private const float outer_corner_radius = 10;
+        private const int outer_corner_radius = 10;
         private const int button_height = 120;
+        private const int button_width = 140;
+
+        public const float SHEAR_WIDTH = 16;
 
         protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / button_height, 0);
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         protected LocalisableString Text
         {
@@ -40,10 +45,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
-
-        protected Colour4 ButtonColour
+        protected Colour4 ButtonAccentColour
         {
             set
             {
@@ -57,123 +59,101 @@ namespace osu.Game.Screens.Select
             set => sprite.Icon = value;
         }
 
-        protected readonly Container TextContainer;
+        protected FillFlowContainer ModsContainer;
+        protected Container TextContainer;
+
         private readonly SpriteText spriteText;
+        private readonly SpriteIcon sprite;
+
+        private readonly Box backgroundColourBox;
         private readonly Box boxColour;
         private readonly Box flashLayer;
-        private readonly SpriteIcon sprite;
-        private readonly Box backgroundColourBox;
-        protected FillFlowContainer ModsContainer;
 
         protected FooterButton()
         {
             Shear = SHEAR;
-            Width = 140;
+            Width = button_width;
             Height = button_height;
-            Margin = new MarginPadding { Bottom = -40 };
+            Children = new Drawable[]
             {
-                Children = new Drawable[]
+                //This container is needed for masking elements without hiding the mod display.
+                new Container
                 {
-                    new Container
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = outer_corner_radius,
+                    EdgeEffect = new EdgeEffectParameters
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        CornerRadius = outer_corner_radius,
-                        Masking = true,
-                        EdgeEffect = new EdgeEffectParameters
+                        Type = EdgeEffectType.Shadow,
+                        Offset = new Vector2(.250f, 2),
+                        Colour = Colour4.Black.Opacity(.25f),
+                        Radius = outer_corner_radius
+                    },
+                    Children = new Drawable[]
+                    {
+                        backgroundColourBox = new Box
                         {
-                            Type = EdgeEffectType.Shadow,
-                            Offset = new Vector2(.250f, 2),
-                            Colour = Colour4.Black.Opacity(.25f),
-                            Radius = outer_corner_radius
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background3
                         },
-                        Children = new Drawable[]
+                        flashLayer = new Box
                         {
-                            backgroundColourBox = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colourProvider.Background3
-                            },
-                            flashLayer = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Colour4.White.Opacity(0.9f),
-                                Blending = BlendingParameters.Additive,
-                                Alpha = 0
-                            },
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Colour4.White.Opacity(0.9f),
+                            Blending = BlendingParameters.Additive,
+                            Alpha = 0
                         }
-                    },
-                    new Container
+                    }
+                },
+                //Elements that cant be sheared
+                new Container
+                {
+                    Shear = -SHEAR,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        Shear = -SHEAR,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        AutoSizeAxes = Axes.Both,
-                        X = -5,
-                        Children = new Drawable[]
+                        ModsContainer = new FillFlowContainer
                         {
-                            sprite = new SpriteIcon
+                            Direction = FillDirection.Horizontal,
+                            Origin = Anchor.BottomLeft
+                        },
+                        sprite = new SpriteIcon
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Position = new Vector2(-SHEAR_WIDTH * (42f / button_height), 12),
+                            Size = new Vector2(20)
+                        },
+                        TextContainer = new Container
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Position = new Vector2(-SHEAR_WIDTH * (42f / button_height), 42),
+                            AutoSizeAxes = Axes.Both,
+                            Child = spriteText = new OsuSpriteText
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Size = new Vector2(20),
-                                Margin = new MarginPadding
-                                {
-                                    Top = 12,
-                                }
-                            },
-                            new Container
+                                Font = OsuFont.TorusAlternate.With(size: 16),
+                                AlwaysPresent = true
+                            }
+                        },
+                        new Container
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.Centre,
+                            Position = new Vector2(-SHEAR_WIDTH * (80f / button_height), -40),
+                            Height = 6,
+                            CornerRadius = 3,
+                            Masking = true,
+                            RelativeSizeAxes = Axes.X,
+                            Width = 120f / button_width,
+                            Child = boxColour = new Box
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-
-                                Children = new Drawable[]
-                                {
-                                    TextContainer = new Container
-                                    {
-                                        Padding = new MarginPadding { Top = 40 },
-                                        Colour = Colour4.White,
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        AutoSizeAxes = Axes.Both,
-                                        Child = spriteText = new OsuSpriteText
-                                        {
-                                            Font = OsuFont.TorusAlternate.With(size: 16),
-                                            AlwaysPresent = true,
-                                            Anchor = Anchor.TopCentre,
-                                            Origin = Anchor.TopCentre
-                                        }
-                                    },
-                                    ModsContainer = new FillFlowContainer
-                                    {
-                                        Margin = new MarginPadding { Top = -40 },
-                                        Direction = FillDirection.Horizontal
-                                    }
-                                }
-                            },
-                            new Container
-                            {
-                                X = -5,
-                                Masking = true,
-                                CornerRadius = 3,
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                AutoSizeAxes = Axes.Both,
-                                Margin = new MarginPadding { Top = 77 },
-                                Children = new Drawable[]
-                                {
-                                    boxColour = new Box
-                                    {
-                                        Height = 6,
-                                        Width = 120,
-                                        Origin = Anchor.Centre,
-                                        Anchor = Anchor.Centre,
-                                    }
-                                }
-                            },
+                                RelativeSizeAxes = Axes.Both
+                            }
                         }
-                    },
-                };
-            }
+                    }
+                }
+            };
         }
 
         protected Action Hovered;
