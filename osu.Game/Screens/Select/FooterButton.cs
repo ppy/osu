@@ -114,8 +114,10 @@ namespace osu.Game.Screens.Select
                     {
                         ModsContainer = new FillFlowContainer
                         {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Direction = FillDirection.Horizontal,
-                            Origin = Anchor.BottomLeft
+                            Y = -40
                         },
                         sprite = new SpriteIcon
                         {
