@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        public const double PERFORMANCE_BASE_MULTIPLIER = 1.14;
+        public const double PERFORMANCE_BASE_MULTIPLIER = 1.12;
 
         private double accuracy;
         private int scoreMaxCombo;
@@ -220,10 +220,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
                                (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
 
-            // Scale the flashlight value with accuracy _slightly_.
-            flashlightValue *= 0.5 + accuracy / 2.0;
-            // It is important to also consider accuracy difficulty when doing that.
-            flashlightValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
+            // Scale the flashlight value with deviation
+            flashlightValue *= SpecialFunctions.Erf(50 / (Math.Sqrt(2) * deviation));
 
             return flashlightValue;
         }
