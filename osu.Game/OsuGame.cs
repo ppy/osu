@@ -182,6 +182,8 @@ namespace osu.Game
 
         private Bindable<string> configRuleset;
 
+        private Bindable<bool> applySafeAreaConsiderations;
+
         private Bindable<float> uiScale;
 
         private Bindable<string> configSkin;
@@ -283,10 +285,7 @@ namespace osu.Game
             configRuleset = LocalConfig.GetBindable<string>(OsuSetting.Ruleset);
             uiScale = LocalConfig.GetBindable<float>(OsuSetting.UIScale);
 
-            var preferredRuleset = int.TryParse(configRuleset.Value, out int rulesetId)
-                // int parsing can be removed 20220522
-                ? RulesetStore.GetRuleset(rulesetId)
-                : RulesetStore.GetRuleset(configRuleset.Value);
+            var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
 
             try
             {
@@ -315,6 +314,9 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
+
+            applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
+            applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All);
         }
 
         private ExternalLinkOpener externalLinkOpener;

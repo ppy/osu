@@ -141,6 +141,8 @@ namespace osu.Game.Overlays.Toolbar
                                 Name = "Right buttons",
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
                                 Children = new Drawable[]
                                 {
                                     new Box
