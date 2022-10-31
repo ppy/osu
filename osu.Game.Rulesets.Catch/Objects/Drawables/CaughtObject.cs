@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public float DisplayRotation => Rotation;
 
+        public double DisplayStartTime => HitObject.StartTime;
+
         /// <summary>
         /// Whether this hit object should stay on the catcher plate when the object is caught by the catcher.
         /// </summary>
