@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics;
-using MathNet.Numerics.RootFinding;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Difficulty;
@@ -140,7 +139,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= sliderNerfFactor;
             }
 
-            // Scale aim value with deviation
             aimValue *= SpecialFunctions.Erf(50 / (Math.Sqrt(2) * deviation));
 
             return aimValue;
@@ -191,9 +189,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax) || totalSuccessfulHits == 0)
                 return 0.0;
 
-            // This formula is based on the previous accuracy formula to keep values similar, but it caps SS pp.
-            // Eventually, this should be changed to a power law to make SS pp uncapped.
-            double accuracyValue = 763.087 * Math.Exp(-0.230237 * deviation);
+            double accuracyValue = 95 * Math.Pow(8 / deviation, 1.5);
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
@@ -203,8 +199,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
-
-            accuracyValue *= 1 - (double)countMiss / totalHits;
 
             return accuracyValue;
         }
@@ -263,7 +257,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (totalSuccessfulHits == 0)
                 return double.PositiveInfinity;
 
-            // Create a new track to properly calculate the hit windows of 100s and 50s.
+            // Create a new track to properly calculate the hit windows of 50s.
             var track = new TrackVirtual(10000);
             score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             double clockRate = track.Rate;
@@ -271,62 +265,55 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double hitWindow300 = 80 - 6 * attributes.OverallDifficulty;
             double hitWindow50 = (200 - 10 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
 
-            double root2 = Math.Sqrt(2);
+            int greatCountOnCircles = attributes.HitCircleCount - countOk - countMeh - countMiss;
 
-            int greatCountOnCircles = Math.Max(0, attributes.HitCircleCount - countOk - countMeh - countMiss);
-            int inaccuracies = Math.Min(countOk + countMeh, attributes.HitCircleCount) + 1; // Add one 100 to process SS scores.
-            int slidersHit = Math.Max(0, attributes.SliderCount - countMiss);
+            // The probability that a player hits a circle is unknown, but we can estimate it to be
+            // the number of greats on circles divided by the number of circles, and then add one
+            // to the number of circles as a bias correction / bayesian prior.
+            double greatProbabilityCircle = Math.Max(0, greatCountOnCircles / (attributes.HitCircleCount + 1.0));
+            double greatProbabilitySlider;
 
-            double erfPrime(double x) => 2 / Math.Sqrt(Math.PI) * Math.Exp(-x * x); // Derivative of erf(x).
-
-            // To find the deviation, we have to maximize the log-likelihood function,
-            // which is the same as finding the zero of the derivative of the log-likelihood function.
-            double logLikelihoodGradient(double u)
+            if (greatCountOnCircles < 0)
             {
-                double t1 = -hitWindow50 * slidersHit * erfPrime(hitWindow50 / (root2 * u)) / SpecialFunctions.Erf(hitWindow50 / (root2 * u));
-                double t2 = -hitWindow300 * greatCountOnCircles * erfPrime(hitWindow300 / (root2 * u)) / SpecialFunctions.Erf(hitWindow300 / (root2 * u));
-                double t4 = inaccuracies * (-hitWindow50 * erfPrime(hitWindow50 / (root2 * u)) + hitWindow300 * erfPrime(hitWindow300 / (root2 * u))) / (SpecialFunctions.Erfc(hitWindow300 / (root2 * u)) - SpecialFunctions.Erfc(hitWindow50 / (root2 * u)));
-                return (t1 + t2 + t4) / (root2 * u * u);
+                int nonCircleMisses = -greatCountOnCircles;
+                greatProbabilitySlider = Math.Max(0, (attributes.SliderCount - nonCircleMisses) / (attributes.SliderCount + 1.0));
+            }
+            else
+            {
+                greatProbabilitySlider = attributes.SliderCount / (attributes.SliderCount + 1.0);
             }
 
-            return Brent.FindRootExpand(logLikelihoodGradient, 3, 20, 1e-6, expandFactor: 2);
+            if (greatProbabilityCircle == 0 && greatProbabilitySlider == 0)
+                return double.PositiveInfinity;
+
+            double deviationOnCircles = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbabilityCircle));
+            double deviationOnSliders = hitWindow50 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbabilitySlider));
+
+            return Math.Min(deviationOnCircles, deviationOnSliders);
         }
 
         /// <summary>
         /// Does the same as <see cref="calculateDeviation"/>, but only for notes and inaccuracies that are relevant to speed difficulty.
-        /// Treats all difficulty speed notes as circles, so this method can sometimes return a lower deviation than <see cref="calculateDeviation"/>.
+        /// Treats all difficult speed notes as circles, so this method can sometimes return a lower deviation than <see cref="calculateDeviation"/>.
+        /// This is fine though, since this method is only used to scale speed pp.
         /// </summary>
         private double calculateSpeedDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             if (totalSuccessfulHits == 0)
                 return double.PositiveInfinity;
 
-            var track = new TrackVirtual(10000);
-            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            double clockRate = track.Rate;
-
             double hitWindow300 = 80 - 6 * attributes.OverallDifficulty;
-            double hitWindow50 = (200 - 10 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
-            double root2 = Math.Sqrt(2);
 
             double relevantTotalDiff = totalHits - attributes.SpeedNoteCount;
             double relevantCountGreat = Math.Max(0, countGreat - relevantTotalDiff);
-            double relevantCountOk = Math.Max(0, countOk - Math.Max(0, relevantTotalDiff - countGreat)) + 1;
-            double relevantCountMeh = Math.Max(0, countMeh - Math.Max(0, relevantTotalDiff - countGreat - countOk));
 
-            // Derivative of erf(x)
-            double erfPrime(double x) => 2 / Math.Sqrt(Math.PI) * Math.Exp(-x * x);
+            if (relevantCountGreat == 0)
+                return double.PositiveInfinity;
 
-            // Let f(x) = erf(x). To find the deviation, we have to maximize the log-likelihood function,
-            // which is the same as finding the zero of the derivative of the log-likelihood function.
-            double logLikelihoodGradient(double u)
-            {
-                double t1 = -hitWindow300 * relevantCountGreat * erfPrime(hitWindow300 / (root2 * u)) / SpecialFunctions.Erf(hitWindow300 / (root2 * u));
-                double t2 = (relevantCountOk + relevantCountMeh) * (-hitWindow50 * erfPrime(hitWindow50 / (root2 * u)) + hitWindow300 * erfPrime(hitWindow300 / (root2 * u))) / (SpecialFunctions.Erfc(hitWindow300 / (root2 * u)) - SpecialFunctions.Erfc(hitWindow50 / (root2 * u)));
-                return (t1 + t2) / (root2 * u * u);
-            }
+            double greatProbability = relevantCountGreat / (attributes.SpeedNoteCount + 1);
+            double deviationOnSpeedCircles = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbability));
 
-            return Brent.FindRootExpand(logLikelihoodGradient, 3, 20, 1e-6, expandFactor: 2);
+            return deviationOnSpeedCircles;
         }
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
