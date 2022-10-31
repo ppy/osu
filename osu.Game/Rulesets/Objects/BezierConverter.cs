@@ -39,13 +39,13 @@ namespace osu.Game.Rulesets.Objects
                 new[] { new Vector2d(1, 0), new Vector2d(1, 1.2447058f), new Vector2d(-0.8526471f, 2.118367f), new Vector2d(-2.6211002f, 7.854936e-06f), new Vector2d(-0.8526448f, -2.118357f), new Vector2d(1, -1.2447058f), new Vector2d(1, 0) })
         };
 
-        public static IEnumerable<Vector2> ConvertToLegacyBezier(IList<PathControlPoint> controlPoints, Vector2 position)
         /// <summary>
         /// Converts a slider path to bezier control point positions compatible with the legacy osu! client.
         /// </summary>
         /// <param name="controlPoints">The control points of the path.</param>
         /// <param name="position">The offset for the whole path.</param>
         /// <returns>The list of legacy bezier control point positions.</returns>
+        public static List<Vector2> ConvertToLegacyBezier(IList<PathControlPoint> controlPoints, Vector2 position)
         {
             Vector2[] vertices = new Vector2[controlPoints.Count];
             for (int i = 0; i < controlPoints.Count; i++)
