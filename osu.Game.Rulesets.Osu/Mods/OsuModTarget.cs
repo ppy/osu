@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => OsuIcon.ModTarget;
         public override LocalisableString Description => @"Practice keeping up with the beat of the song.";
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier => 0.1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
         {
