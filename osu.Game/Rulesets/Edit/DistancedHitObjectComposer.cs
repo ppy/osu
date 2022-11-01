@@ -259,9 +259,9 @@ namespace osu.Game.Rulesets.Edit
             return true;
         }
 
-        public virtual float GetBeatSnapDistanceAt(HitObject referenceObject)
+        public virtual float GetBeatSnapDistanceAt(HitObject referenceObject, bool useReferenceSliderVelocity = true)
         {
-            return (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * 1 / BeatSnapProvider.BeatDivisor);
+            return (float)(100 * (useReferenceSliderVelocity ? referenceObject.DifficultyControlPoint.SliderVelocity : 1) * EditorBeatmap.Difficulty.SliderMultiplier * 1 / BeatSnapProvider.BeatDivisor);
         }
 
         public virtual float DurationToDistance(HitObject referenceObject, double duration)
@@ -273,7 +273,7 @@ namespace osu.Game.Rulesets.Edit
         public virtual double DistanceToDuration(HitObject referenceObject, float distance)
         {
             double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
-            return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength;
+            return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength * referenceObject.DifficultyControlPoint.SliderVelocity;
         }
 
         public virtual double FindSnappedDuration(HitObject referenceObject, float distance)
