@@ -155,7 +155,7 @@ namespace osu.Game
 
         protected Storage Storage { get; set; }
 
-        protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
+        public Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
