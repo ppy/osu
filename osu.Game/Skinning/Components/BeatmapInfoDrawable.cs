@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -24,7 +25,7 @@ namespace osu.Game.Skinning.Components
         public Bindable<BeatmapInfo> Type { get; } = new Bindable<BeatmapInfo>(BeatmapInfo.StarRating);
 
         [Resolved]
-        private OsuGameBase mGameBase { get; set; }
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
 
         private readonly OsuSpriteText text;
 
@@ -55,70 +56,70 @@ namespace osu.Game.Skinning.Components
             switch (type.NewValue)
             {
                 case BeatmapInfo.CircleSize:
-                    mGameBase.Beatmap.BindValueChanged(bm =>
+                    beatmap.BindValueChanged(bm =>
                     {
                         text.Current.Value = bm.NewValue.BeatmapInfo.Difficulty.CircleSize.ToString("F2");
                     }, true);
                     break;
 
                 case BeatmapInfo.HPDrain:
-                    mGameBase.Beatmap.BindValueChanged(bm =>
+                    beatmap.BindValueChanged(bm =>
                     {
                         text.Current.Value = bm.NewValue.BeatmapInfo.Difficulty.DrainRate.ToString("F2");
                     }, true);
                     break;
 
                 case BeatmapInfo.Accuracy:
-                    mGameBase.Beatmap.BindValueChanged(bm =>
+                    beatmap.BindValueChanged(bm =>
                     {
                         text.Current.Value = bm.NewValue.BeatmapInfo.Difficulty.OverallDifficulty.ToString("F2");
                     }, true);
                     break;
 
                 case BeatmapInfo.ApproachRate:
-                    mGameBase.Beatmap.BindValueChanged(bm =>
+                    beatmap.BindValueChanged(bm =>
                     {
                         text.Current.Value = bm.NewValue.BeatmapInfo.Difficulty.ApproachRate.ToString("F2");
                     }, true);
                     break;
 
                 case BeatmapInfo.StarRating:
-                    mGameBase.Beatmap.BindValueChanged(bm =>
+                    beatmap.BindValueChanged(bm =>
                     {
                         text.Current.Value = bm.NewValue.BeatmapInfo.StarRating.ToString("F2");
                     }, true);
                     break;
 
                 case BeatmapInfo.Song:
-                    mGameBase.Beatmap.BindValueChanged(bm =>
+                    beatmap.BindValueChanged(bm =>
                     {
                         text.Current.Value = bm.NewValue.BeatmapInfo.Metadata.Title;
                     }, true);
                     break;
 
                 case BeatmapInfo.Artist:
-                    mGameBase.Beatmap.BindValueChanged(bm =>
+                    beatmap.BindValueChanged(bm =>
                     {
                         text.Current.Value = bm.NewValue.BeatmapInfo.Metadata.Artist;
                     }, true);
                     break;
 
                 case BeatmapInfo.Difficulty:
-                    mGameBase.Beatmap.BindValueChanged(bm =>
+                    beatmap.BindValueChanged(bm =>
                     {
                         text.Current.Value = bm.NewValue.BeatmapInfo.DifficultyName;
                     }, true);
                     break;
 
                 case BeatmapInfo.Mapper:
-                    mGameBase.Beatmap.BindValueChanged(bm =>
+                    beatmap.BindValueChanged(bm =>
                     {
                         text.Current.Value = bm.NewValue.BeatmapInfo.Metadata.Author.Username;
                     }, true);
                     break;
 
                 case BeatmapInfo.Length:
-                    mGameBase.Beatmap.BindValueChanged(bm =>
+                    beatmap.BindValueChanged(bm =>
                     {
                         const long ms_to_s = 1000;
                         double length = bm.NewValue.BeatmapInfo.Length;
@@ -153,7 +154,7 @@ namespace osu.Game.Skinning.Components
                     break;
 
                 case BeatmapInfo.BPM:
-                    mGameBase.Beatmap.BindValueChanged(bm =>
+                    beatmap.BindValueChanged(bm =>
                     {
                         text.Current.Value = bm.NewValue.BeatmapInfo.BPM.ToString("F2");
                     }, true);
