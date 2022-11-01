@@ -266,6 +266,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     updateState(ArmedState.Miss, true);
                 else
                     updateState(ArmedState.Idle, true);
+
+                // Combo colour may have been applied via a bindable flow while no object entry was attached.
+                // Update here to ensure we're in a good state.
+                UpdateComboColour();
             }
         }
 
