@@ -20,6 +20,41 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectDirectory => new TranslatableString(getKey(@"select_directory"), @"Select directory");
 
         /// <summary>
+        /// "Migration in progress"
+        /// </summary>
+        public static LocalisableString MigrationInProgress => new TranslatableString(getKey(@"migration_in_progress"), @"Migration in progress");
+
+        /// <summary>
+        /// "This could take a few minutes depending on the speed of your disk(s)."
+        /// </summary>
+        public static LocalisableString MigrationDescription => new TranslatableString(getKey(@"migration_description"), @"This could take a few minutes depending on the speed of your disk(s).");
+
+        /// <summary>
+        /// "Please avoid interacting with the game!"
+        /// </summary>
+        public static LocalisableString ProhibitedInteractDuringMigration => new TranslatableString(getKey(@"prohibited_interact_during_migration"), @"Please avoid interacting with the game!");
+
+        /// <summary>
+        /// "Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up."
+        /// </summary>
+        public static LocalisableString FailedCleanupNotification => new TranslatableString(getKey(@"failed_cleanup_notification"), @"Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up.");
+
+        /// <summary>
+        /// "Please select a new location"
+        /// </summary>
+        public static LocalisableString SelectNewLocation => new TranslatableString(getKey(@"select_new_location"), @"Please select a new location");
+
+        /// <summary>
+        /// "The target directory already seems to have an osu! install. Use that data instead?"
+        /// </summary>
+        public static LocalisableString TargetDirectoryAlreadyInstalledOsu => new TranslatableString(getKey(@"target_directory_already_installed_osu"), @"The target directory already seems to have an osu! install. Use that data instead?");
+
+        /// <summary>
+        /// "To complete this operation, osu! will close. Please open it again to use the new data location."
+        /// </summary>
+        public static LocalisableString RestartAndReOpenRequiredForCompletion => new TranslatableString(getKey(@"restart_and_re_open_required_for_completion"), @"To complete this operation, osu! will close. Please open it again to use the new data location.");
+
+        /// <summary>
         /// "Import beatmaps from stable"
         /// </summary>
         public static LocalisableString ImportBeatmapsFromStable => new TranslatableString(getKey(@"import_beatmaps_from_stable"), @"Import beatmaps from stable");
@@ -83,6 +118,26 @@ namespace osu.Game.Localisation
         /// "Restore all recently deleted mod presets"
         /// </summary>
         public static LocalisableString RestoreAllRecentlyDeletedModPresets => new TranslatableString(getKey(@"restore_all_recently_deleted_mod_presets"), @"Restore all recently deleted mod presets");
+
+        /// <summary>
+        /// "Deleted all collections!"
+        /// </summary>
+        public static LocalisableString DeletedAllCollections => new TranslatableString(getKey(@"deleted_all_collections"), @"Deleted all collections!");
+
+        /// <summary>
+        /// "Deleted all mod presets!"
+        /// </summary>
+        public static LocalisableString DeletedAllModPresets => new TranslatableString(getKey(@"deleted_all_mod_presets"), @"Deleted all mod presets!");
+
+        /// <summary>
+        /// "Restored all deleted mod presets!"
+        /// </summary>
+        public static LocalisableString RestoredAllDeletedModPresets => new TranslatableString(getKey(@"restored_all_deleted_mod_presets"), @"Restored all deleted mod presets!");
+
+        /// <summary>
+        /// "Please select your osu!stable install location"
+        /// </summary>
+        public static LocalisableString StableDirectorySelectHeader => new TranslatableString(getKey(@"stable_directory_select_header"), @"Please select your osu!stable install location");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

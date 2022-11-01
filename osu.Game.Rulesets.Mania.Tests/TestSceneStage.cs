@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var specialAction = ManiaAction.Special1;
 
-            var stage = new Stage(0, new StageDefinition { Columns = 2 }, ref action, ref specialAction);
+            var stage = new Stage(0, new StageDefinition(2), ref action, ref specialAction);
             stages.Add(stage);
 
             return new ScrollingTestContainer(direction)

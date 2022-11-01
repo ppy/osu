@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 },
                 new SettingsButton
                 {
-                    Text = DebugSettingsStrings.CompactRealm,
+                    Text = "Compact realm",
                     Action = () =>
                     {
                         // Blocking operations implicitly causes a Compact().

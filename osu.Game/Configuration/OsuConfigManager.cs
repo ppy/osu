@@ -118,16 +118,14 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Prefer24HourTime, CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
 
             // Gameplay
-            SetDefault(OsuSetting.PositionalHitsounds, true); // replaced by level setting below, can be removed 20220703.
             SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
-            SetDefault(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
+            SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
-            SetDefault(OsuSetting.ShowProgressGraph, true);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
@@ -154,6 +152,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.SongSelectRightMouseScroll, false);
 
             SetDefault(OsuSetting.Scaling, ScalingMode.Off);
+            SetDefault(OsuSetting.SafeAreaConsiderations, true);
 
             SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
             SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
@@ -206,14 +205,11 @@ namespace osu.Game.Configuration
             if (!int.TryParse(pieces[0], out int year)) return;
             if (!int.TryParse(pieces[1], out int monthDay)) return;
 
+            // ReSharper disable once UnusedVariable
             int combined = (year * 10000) + monthDay;
 
-            if (combined < 20220103)
-            {
-                var positionalHitsoundsEnabled = GetBindable<bool>(OsuSetting.PositionalHitsounds);
-                if (!positionalHitsoundsEnabled.Value)
-                    SetValue(OsuSetting.PositionalHitsoundsLevel, 0);
-            }
+            // migrations can be added here using a condition like:
+            // if (combined < 20220103) { performMigration() }
         }
 
         public override TrackedSettings CreateTrackedSettings()
@@ -299,14 +295,11 @@ namespace osu.Game.Configuration
         ShowStoryboard,
         KeyOverlay,
         GameplayLeaderboard,
-        PositionalHitsounds,
         PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,
         FloatingComments,
         HUDVisibilityMode,
 
-        // This has been migrated to the component itself. can be removed 20221027.
-        ShowProgressGraph,
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
         MouseDisableButtons,
@@ -375,6 +368,7 @@ namespace osu.Game.Configuration
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,
         NormaliseComboColourBrightness,
-        ComboColourBrightness
+        SafeAreaConsiderations,
+        ComboColourBrightness,
     }
 }

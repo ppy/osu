@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class SkinSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Skins";
+        protected override LocalisableString Header => CommonStrings.Skins;
 
         private SettingsButton importSkinsButton = null!;
         private SettingsButton deleteSkinsButton = null!;
