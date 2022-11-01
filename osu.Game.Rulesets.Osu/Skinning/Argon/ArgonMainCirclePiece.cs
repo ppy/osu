@@ -121,11 +121,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
                 flash.Colour = colour.NewValue;
 
-                updateStateTransforms(drawableObject, drawableObject.State.Value);
+                // Accent colour may be changed many times during a paused gameplay state.
+                // Schedule the change to avoid transforms piling up.
+                Scheduler.AddOnce(updateStateTransforms);
             }, true);
 
             drawableObject.ApplyCustomUpdateState += updateStateTransforms;
         }
+
+        private void updateStateTransforms() => updateStateTransforms(drawableObject, drawableObject.State.Value);
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
