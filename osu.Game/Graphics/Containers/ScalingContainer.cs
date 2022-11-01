@@ -29,6 +29,7 @@ namespace osu.Game.Graphics.Containers
         private Bindable<float> sizeY;
         private Bindable<float> posX;
         private Bindable<float> posY;
+        private Bindable<bool> applySafeAreaPadding;
 
         private Bindable<MarginPadding> safeAreaPadding;
 
@@ -132,6 +133,9 @@ namespace osu.Game.Graphics.Containers
             posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
             posY.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
+            applySafeAreaPadding = config.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
+            applySafeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
+
             safeAreaPadding = safeArea.SafeAreaPadding.GetBoundCopy();
             safeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
         }
@@ -192,7 +196,7 @@ namespace osu.Game.Graphics.Containers
             bool requiresMasking = targetRect.Size != Vector2.One
                                    // For the top level scaling container, for now we apply masking if safe areas are in use.
                                    // In the future this can likely be removed as more of the actual UI supports overflowing into the safe areas.
-                                   || (targetMode == ScalingMode.Everything && safeAreaPadding.Value.Total != Vector2.Zero);
+                                   || (targetMode == ScalingMode.Everything && (applySafeAreaPadding.Value && safeAreaPadding.Value.Total != Vector2.Zero));
 
             if (requiresMasking)
                 sizableContainer.Masking = true;
@@ -224,6 +228,9 @@ namespace osu.Game.Graphics.Containers
 
             [Resolved]
             private ISafeArea safeArea { get; set; }
+
+            [Resolved]
+            private OsuConfigManager config { get; set; }
 
             private readonly bool confineHostCursor;
             private readonly LayoutValue cursorRectCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
@@ -259,7 +266,7 @@ namespace osu.Game.Graphics.Containers
             {
                 if (host.Window == null) return;
 
-                bool coversWholeScreen = Size == Vector2.One && safeArea.SafeAreaPadding.Value.Total == Vector2.Zero;
+                bool coversWholeScreen = Size == Vector2.One && (!config.Get<bool>(OsuSetting.SafeAreaConsiderations) || safeArea.SafeAreaPadding.Value.Total == Vector2.Zero);
                 host.Window.CursorConfineRect = coversWholeScreen ? null : ToScreenSpace(DrawRectangle).AABBFloat;
             }
         }
