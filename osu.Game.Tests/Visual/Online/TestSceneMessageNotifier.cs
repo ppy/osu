@@ -16,7 +16,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
-using osu.Game.Online.Notifications.Polling;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osuTK.Input;
@@ -251,7 +250,7 @@ namespace osu.Game.Tests.Visual.Online
             public TestContainer(IAPIProvider api, Channel[] channels)
             {
                 this.channels = channels;
-                ChannelManager = new ChannelManager(api, new PollingNotificationsClientConnector(api));
+                ChannelManager = new ChannelManager(api, api.GetNotificationsConnector());
             }
 
             [BackgroundDependencyLoader]

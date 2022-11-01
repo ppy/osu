@@ -45,7 +45,6 @@ using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications;
-using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
@@ -759,7 +758,7 @@ namespace osu.Game
             BackButton.Receptor receptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
-            dependencies.CacheAs(notificationsClient = new WebSocketNotificationsClientConnector(API));
+            dependencies.CacheAs(notificationsClient = API.GetNotificationsConnector());
 
             var sessionIdleTracker = new GameIdleTracker(300000);
             sessionIdleTracker.IsIdle.BindValueChanged(idle =>
