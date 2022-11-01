@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Text;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -16,9 +15,6 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Skinning.Components
 {
-    /// <summary>
-    /// Intended to be a test bed for skinning. May be removed at some point in the future.
-    /// </summary>
     [UsedImplicitly]
     public class BeatmapInfoDrawable : Container, ISkinnableDrawable
     {
@@ -47,12 +43,6 @@ namespace osu.Game.Skinning.Components
                 }
             };
         }
-
-        // [BackgroundDependencyLoader]
-        // private void load(WorkingBeatmap beatmap)
-        // {
-        //     this.beatmap = beatmap;
-        // }
 
         protected override void LoadComplete()
         {
@@ -176,7 +166,7 @@ namespace osu.Game.Skinning.Components
     {
         CircleSize,
         HPDrain,
-        Accuracy, //OD?
+        Accuracy,
         ApproachRate,
         StarRating,
         Song,
