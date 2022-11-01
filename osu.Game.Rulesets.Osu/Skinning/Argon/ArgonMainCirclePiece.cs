@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         // This is to give it a bomb-like effect, with the border "triggering" its animation when getting close.
                         using (BeginDelayedSequence(flash_in_duration / 12))
                         {
-                            outerGradient.ResizeTo(outerGradient.Size * shrink_size, resize_duration, Easing.OutElasticHalf);
+                            outerGradient.ResizeTo(OUTER_GRADIENT_SIZE * shrink_size, resize_duration, Easing.OutElasticHalf);
                             outerGradient
                                 .FadeColour(Color4.White, 80)
                                 .Then()
