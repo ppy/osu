@@ -273,7 +273,7 @@ namespace osu.Game.Rulesets.Edit
         public virtual double DistanceToDuration(HitObject referenceObject, float distance)
         {
             double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
-            return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength * referenceObject.DifficultyControlPoint.SliderVelocity;
+            return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength;
         }
 
         public virtual double FindSnappedDuration(HitObject referenceObject, float distance)
