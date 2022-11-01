@@ -355,6 +355,14 @@ namespace osu.Game.Beatmaps.Formats
 
             switch (type)
             {
+                case LegacyEventType.Sprite:
+                    // Generally, the background is the first thing defined in a beatmap file.
+                    // In some older beatmaps, it is not present and replaced by a storyboard-level background instead.
+                    // Allow the first sprite (by file order) to act as the background in such cases.
+                    if (string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
+                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[3]);
+                    break;
+
                 case LegacyEventType.Background:
                     beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
                     break;
@@ -427,8 +435,10 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
+            int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
+
 #pragma warning disable 618
-            addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
+            addControlPoint(time, new LegacyDifficultyControlPoint(onlineRulesetID, beatLength)
 #pragma warning restore 618
             {
                 SliderVelocity = speedMultiplier,
@@ -439,8 +449,6 @@ namespace osu.Game.Beatmaps.Formats
                 KiaiMode = kiaiMode,
                 OmitFirstBarLine = omitFirstBarSignature,
             };
-
-            int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
             // osu!taiko and osu!mania use effect points rather than difficulty points for scroll speed adjustments.
             if (onlineRulesetID == 1 || onlineRulesetID == 3)

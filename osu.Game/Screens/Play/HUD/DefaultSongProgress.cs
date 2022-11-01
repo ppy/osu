@@ -9,7 +9,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -44,12 +43,6 @@ namespace osu.Game.Screens.Play.HUD
 
         [Resolved]
         private DrawableRuleset? drawableRuleset { get; set; }
-
-        [Resolved]
-        private OsuConfigManager config { get; set; } = null!;
-
-        [Resolved]
-        private SkinManager skinManager { get; set; } = null!;
 
         public DefaultSongProgress()
         {
@@ -100,47 +93,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             AllowSeeking.BindValueChanged(_ => updateBarVisibility(), true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
-
-            migrateSettingFromConfig();
-        }
-
-        /// <summary>
-        /// This setting has been migrated to a per-component level.
-        /// Only take the value from the config if it is in a non-default state (then reset it to default so it only applies once).
-        ///
-        /// Can be removed 20221027.
-        /// </summary>
-        private void migrateSettingFromConfig()
-        {
-            Bindable<bool> configShowGraph = config.GetBindable<bool>(OsuSetting.ShowProgressGraph);
-
-            if (!configShowGraph.IsDefault)
-            {
-                ShowGraph.Value = configShowGraph.Value;
-
-                // This is pretty ugly, but the only way to make this stick...
-                var skinnableTarget = this.FindClosestParent<ISkinnableTarget>();
-
-                if (skinnableTarget != null)
-                {
-                    // If the skin is not mutable, a mutable instance will be created, causing this migration logic to run again on the correct skin.
-                    // Therefore we want to avoid resetting the config value on this invocation.
-                    if (skinManager.EnsureMutableSkin())
-                        return;
-
-                    // If `EnsureMutableSkin` actually changed the skin, default layout may take a frame to apply.
-                    // See `SkinnableTargetComponentsContainer`'s use of ScheduleAfterChildren.
-                    ScheduleAfterChildren(() =>
-                    {
-                        var skin = skinManager.CurrentSkin.Value;
-                        skin.UpdateDrawableTarget(skinnableTarget);
-
-                        skinManager.Save(skin);
-                    });
-
-                    configShowGraph.SetDefault();
-                }
-            }
         }
 
         protected override void PopIn()

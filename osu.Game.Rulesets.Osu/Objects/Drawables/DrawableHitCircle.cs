@@ -102,8 +102,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Size = HitArea.DrawSize;
 
-            PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            PositionBindable.BindValueChanged(_ => UpdatePosition());
+            StackHeightBindable.BindValueChanged(_ => UpdatePosition());
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
 
@@ -132,6 +132,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 base.LifetimeEnd = value;
                 ApproachCircle.LifetimeEnd = value;
             }
+        }
+
+        protected virtual void UpdatePosition()
+        {
+            Position = HitObject.StackedPosition;
         }
 
         public override void Shake() => shakeContainer.Shake();
@@ -204,12 +209,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // todo: temporary / arbitrary, used for lifetime optimisation.
             this.Delay(800).FadeOut();
 
-            // in the case of an early state change, the fade should be expedited to the current point in time.
-            if (HitStateUpdateTime < HitObject.StartTime)
-                ApproachCircle.FadeOut(50);
-
             switch (state)
             {
+                default:
+                    ApproachCircle.FadeOut();
+                    break;
+
                 case ArmedState.Idle:
                     HitArea.HitAction = null;
                     break;

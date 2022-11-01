@@ -294,15 +294,38 @@ namespace osu.Game.Database
                 // Log output here will be missing a valid hash in non-batch imports.
                 LogForModel(item, $@"Beginning import from {archive?.Name ?? "unknown"}...");
 
+                List<RealmNamedFileUsage> files = new List<RealmNamedFileUsage>();
+
+                if (archive != null)
+                {
+                    // Import files to the disk store.
+                    // We intentionally delay adding to realm to avoid blocking on a write during disk operations.
+                    foreach (var filenames in getShortenedFilenames(archive))
+                    {
+                        using (Stream s = archive.GetStream(filenames.original))
+                            files.Add(new RealmNamedFileUsage(Files.Add(s, realm, false), filenames.shortened));
+                    }
+                }
+
+                using (var transaction = realm.BeginWrite())
+                {
+                    // Add all files to realm in one go.
+                    // This is done ahead of the main transaction to ensure we can correctly cleanup the files, even if the import fails.
+                    foreach (var file in files)
+                    {
+                        if (!file.File.IsManaged)
+                            realm.Add(file.File, true);
+                    }
+
+                    transaction.Commit();
+                }
+
+                item.Files.AddRange(files);
+                item.Hash = ComputeHash(item);
+
                 // TODO: do we want to make the transaction this local? not 100% sure, will need further investigation.
                 using (var transaction = realm.BeginWrite())
                 {
-                    if (archive != null)
-                        // TODO: look into rollback of file additions (or delayed commit).
-                        item.Files.AddRange(createFileInfos(archive, Files, realm));
-
-                    item.Hash = ComputeHash(item);
-
                     // TODO: we may want to run this outside of the transaction.
                     Populate(item, archive, realm, cancellationToken);
 
@@ -424,16 +447,6 @@ namespace osu.Game.Database
         private List<RealmNamedFileUsage> createFileInfos(ArchiveReader reader, RealmFileStore files, Realm realm)
         {
             var fileInfos = new List<RealmNamedFileUsage>();
-
-            // import files to manager
-            foreach (var filenames in getShortenedFilenames(reader))
-            {
-                using (Stream s = reader.GetStream(filenames.original))
-                {
-                    var item = new RealmNamedFileUsage(files.Add(s, realm), filenames.shortened);
-                    fileInfos.Add(item);
-                }
-            }
 
             return fileInfos;
         }
