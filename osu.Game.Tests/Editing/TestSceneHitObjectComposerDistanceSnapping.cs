@@ -125,6 +125,9 @@ namespace osu.Game.Tests.Editing
             assertSnapDistance(base_distance * slider_velocity, referenceObject, true);
             assertSnappedDistance(base_distance * slider_velocity + 10, base_distance * slider_velocity, referenceObject);
             assertSnappedDuration(base_distance * slider_velocity + 10, 1000, referenceObject);
+
+            assertDistanceToDuration(base_distance * slider_velocity, 1000, referenceObject);
+            assertDurationToDistance(1000, base_distance * slider_velocity, referenceObject);
         }
 
         [Test]
