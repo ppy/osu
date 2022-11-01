@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             IBindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
 
-            public float GetBeatSnapDistanceAt(HitObject referenceObject) => beat_snap_distance;
+            public float GetBeatSnapDistanceAt(HitObject referenceObject, bool useReferenceSliderVelocity = true) => beat_snap_distance;
 
             public float DurationToDistance(HitObject referenceObject, double duration) => (float)duration;
 
