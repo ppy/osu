@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Editing
         {
             AddStep($"set slider multiplier = {multiplier}", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = multiplier);
 
-            assertSnapDistance(100 * multiplier);
+            assertSnapDistance(100 * multiplier, null, true);
         }
 
         [TestCase(1)]
@@ -79,7 +79,20 @@ namespace osu.Game.Tests.Editing
                 {
                     SliderVelocity = multiplier
                 }
-            });
+            }, false);
+        }
+
+        [TestCase(1)]
+        [TestCase(2)]
+        public void TestSpeedMultiplierDoesChangeDistanceSnap(float multiplier)
+        {
+            assertSnapDistance(100 * multiplier, new HitObject
+            {
+                DifficultyControlPoint = new DifficultyControlPoint
+                {
+                    SliderVelocity = multiplier
+                }
+            }, true);
         }
 
         [TestCase(1)]
@@ -88,7 +101,7 @@ namespace osu.Game.Tests.Editing
         {
             AddStep($"set divisor = {divisor}", () => BeatDivisor.Value = divisor);
 
-            assertSnapDistance(100f / divisor);
+            assertSnapDistance(100f / divisor, null, true);
         }
 
         [Test]
@@ -197,8 +210,8 @@ namespace osu.Game.Tests.Editing
             assertSnappedDistance(400, 400);
         }
 
-        private void assertSnapDistance(float expectedDistance, HitObject? hitObject = null)
-            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(hitObject ?? new HitObject()), () => Is.EqualTo(expectedDistance));
+        private void assertSnapDistance(float expectedDistance, HitObject? refereneObject, bool includeSliderVelocity)
+            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(refereneObject ?? new HitObject(), includeSliderVelocity), () => Is.EqualTo(expectedDistance));
 
         private void assertDurationToDistance(double duration, float expectedDistance)
             => AddAssert($"duration = {duration} -> distance = {expectedDistance}", () => composer.DurationToDistance(new HitObject(), duration) == expectedDistance);
