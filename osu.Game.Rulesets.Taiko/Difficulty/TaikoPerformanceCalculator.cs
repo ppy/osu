@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 Difficulty = difficultyValue,
                 Accuracy = accuracyValue,
                 EffectiveMissCount = effectiveMissCount,
-                EstimatedUR = estimatedDeviation * 10,
+                EstimatedUr = estimatedDeviation * 10,
                 Total = totalValue
             };
         }
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (estimatedDeviation == null)
                 return 0;
 
-            return difficultyValue * Math.Pow(SpecialFunctions.Erf(40 / (Math.Sqrt(2) * (double)estimatedDeviation)), 2.0);
+            return difficultyValue * Math.Pow(SpecialFunctions.Erf(40 / (Math.Sqrt(2) * estimatedDeviation.Value)), 2.0);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (attributes.GreatHitWindow <= 0 || estimatedDeviation == null)
                 return 0;
 
-            double accuracyValue = Math.Pow(7.5 / (double)estimatedDeviation, 1.1) * Math.Pow(attributes.StarRating / 2.7, 0.8) * 100.0;
+            double accuracyValue = Math.Pow(7.5 / estimatedDeviation.Value, 1.1) * Math.Pow(attributes.StarRating / 2.7, 0.8) * 100.0;
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             double greatProbability = 1 - (countOk + countMiss + 1.0) / (totalHits + 1.0);
 
-            if (greatProbability <= 0 || greatProbability >= 1)
+            if (greatProbability is <= 0 or >= 1)
             {
                 return null;
             }
