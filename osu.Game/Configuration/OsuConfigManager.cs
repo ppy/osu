@@ -121,7 +121,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
             SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
-            SetDefault(OsuSetting.EditorDim, 0.25f);
+            SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 1f, 0.25f);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
