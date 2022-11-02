@@ -22,7 +22,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                     switch (catchComponent.Component)
                     {
                         case TaikoSkinComponents.CentreHit:
-                            return Drawable.Empty();
+                            return new ArgonCentreCirclePiece();
+
+                        case TaikoSkinComponents.RimHit:
+                            return new ArgonRimCirclePiece();
                     }
 
                     break;
