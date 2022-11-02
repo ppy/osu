@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 beatmapColorsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapColours },
                 comboColourNormalisationSliderBar = new PlayerSliderBar<float>
                 {
-                    LabelText = "Combo colour normalisation",
+                    LabelText = GraphicsSettingsStrings.ComboColourNormalisation,
                     DisplayAsPercentage = true,
                 },
             };

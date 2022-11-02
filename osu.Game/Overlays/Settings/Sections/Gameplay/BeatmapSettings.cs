@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "Combo colour normalisation",
+                    LabelText = GraphicsSettingsStrings.ComboColourNormalisation,
                     Current = comboColourNormalisation,
                     DisplayAsPercentage = true,
                 }
