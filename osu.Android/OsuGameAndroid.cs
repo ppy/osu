@@ -5,8 +5,6 @@
 
 using System;
 using Android.App;
-using Android.Content;
-using Android.OS;
 using osu.Framework.Allocation;
 using osu.Framework.Android.Input;
 using osu.Framework.Input.Handlers;
@@ -15,6 +13,7 @@ using osu.Game;
 using osu.Game.Overlays.Settings;
 using osu.Game.Updater;
 using osu.Game.Utils;
+using Xamarin.Essentials;
 
 namespace osu.Android
 {
@@ -106,43 +105,9 @@ namespace osu.Android
 
         private class AndroidBatteryInfo : BatteryInfo
         {
-            // Code copied from Xamarin.Essentials
+            public override double? ChargeLevel => Battery.ChargeLevel;
 
-            // Mono debugger crashes on loading Realms
-            // when any other monoandroid dependency present.
-            // https://github.com/dotnet/runtime/issues/67140
-
-            public override double? ChargeLevel
-            {
-                get
-                {
-                    using (IntentFilter filter = new IntentFilter(Intent.ActionBatteryChanged))
-                    using (Intent battery = Application.Context.RegisterReceiver(null, filter))
-                    {
-                        int level = battery.GetIntExtra(BatteryManager.ExtraLevel, -1);
-                        int scale = battery.GetIntExtra(BatteryManager.ExtraScale, -1);
-
-                        if (level < 0 || scale <= 0)
-                        {
-                            return 1.0;
-                        }
-
-                        return (double)level / scale;
-                    }
-                }
-            }
-
-            public override bool OnBattery
-            {
-                get
-                {
-                    using (IntentFilter filter = new IntentFilter(Intent.ActionBatteryChanged))
-                    using (Intent battery = Application.Context.RegisterReceiver(null, filter))
-                    {
-                        return battery.GetIntExtra(BatteryManager.ExtraPlugged, -1) == 0;
-                    }
-                }
-            }
+            public override bool OnBattery => Battery.PowerSource == BatteryPowerSource.Battery;
         }
     }
 }
