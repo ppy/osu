@@ -13,7 +13,7 @@
   </ItemGroup>
   <ItemGroup Label="Transitive Dependencies">
     <!-- SQLite fails to load without this package. -->
-    <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.0.7" />
+    <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.2" />
   </ItemGroup>
   <PropertyGroup>
     <!-- Fody does not handle Android build well, and warns when unchanged.
