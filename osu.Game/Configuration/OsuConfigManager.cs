@@ -172,7 +172,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
-            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
+            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
         }
