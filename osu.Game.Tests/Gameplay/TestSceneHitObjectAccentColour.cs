@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
@@ -25,10 +27,20 @@ namespace osu.Game.Tests.Gameplay
     [HeadlessTest]
     public class TestSceneHitObjectAccentColour : OsuTestScene
     {
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         private Container skinContainer;
 
         [SetUp]
-        public void Setup() => Schedule(() => Child = skinContainer = new SkinProvidingContainer(new TestSkin()));
+        public void Setup()
+        {
+            Schedule(() =>
+            {
+                config.SetValue(OsuSetting.ComboColourNormalisationAmount, 0f);
+                Child = skinContainer = new SkinProvidingContainer(new TestSkin());
+            });
+        }
 
         [Test]
         public void TestChangeComboIndexBeforeLoad()
