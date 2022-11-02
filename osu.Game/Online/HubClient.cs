@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace osu.Game.Online
 {
-    public class HubClient : SocketClient
+    public class HubClient : PersistentEndpointClient
     {
         public readonly HubConnection Connection;
 

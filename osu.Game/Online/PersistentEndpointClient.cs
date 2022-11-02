@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Online
 {
-    public abstract class SocketClient : IAsyncDisposable
+    public abstract class PersistentEndpointClient : IAsyncDisposable
     {
         public event Func<Exception?, Task>? Closed;
 

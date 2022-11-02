@@ -13,7 +13,7 @@ namespace osu.Game.Online.Notifications
     /// <summary>
     /// An abstract connector or <see cref="NotificationsClient"/>s.
     /// </summary>
-    public abstract class NotificationsClientConnector : SocketClientConnector
+    public abstract class NotificationsClientConnector : PersistentEndpointClientConnector
     {
         public event Action<Channel>? ChannelJoined;
         public event Action<List<Message>>? NewMessages;
@@ -34,7 +34,7 @@ namespace osu.Game.Online.Notifications
                 client.EnableChat = true;
         }
 
-        protected sealed override async Task<SocketClient> BuildConnectionAsync(CancellationToken cancellationToken)
+        protected sealed override async Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken)
         {
             var client = await BuildNotificationClientAsync(cancellationToken);
 

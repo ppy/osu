@@ -14,7 +14,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online
 {
-    public class HubClientConnector : SocketClientConnector, IHubClientConnector
+    public class HubClientConnector : PersistentEndpointClientConnector, IHubClientConnector
     {
         public const string SERVER_SHUTDOWN_MESSAGE = "Server is shutting down.";
 
@@ -51,7 +51,7 @@ namespace osu.Game.Online
             this.preferMessagePack = preferMessagePack;
         }
 
-        protected override Task<SocketClient> BuildConnectionAsync(CancellationToken cancellationToken)
+        protected override Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken)
         {
             var builder = new HubConnectionBuilder()
                 .WithUrl(endpoint, options =>
@@ -91,7 +91,7 @@ namespace osu.Game.Online
 
             ConfigureConnection?.Invoke(newConnection);
 
-            return Task.FromResult((SocketClient)new HubClient(newConnection));
+            return Task.FromResult((PersistentEndpointClient)new HubClient(newConnection));
         }
 
         protected override string ClientName { get; }
