@@ -74,6 +74,9 @@ namespace osu.Game.Online.Chat
         private bool channelsInitialised;
         private ScheduledDelegate ackDelegate;
 
+        private long lastMessageId;
+        private uint? lastSilenceId;
+
         public ChannelManager(IAPIProvider api, NotificationsClientConnector connector)
         {
             this.api = api;
@@ -106,8 +109,7 @@ namespace osu.Game.Online.Chat
 
                 if (status.NewValue == APIState.Online)
                 {
-                    Scheduler.Add(ackDelegate = new ScheduledDelegate(() => api.Queue(new ChatAckRequest()), 0, 60000));
-                    // Todo: Handle silences.
+                    Scheduler.Add(ackDelegate = new ScheduledDelegate(SendAck, 0, 60000));
                 }
             }, true);
         }
@@ -342,6 +344,8 @@ namespace osu.Game.Online.Chat
 
             foreach (var group in messages.GroupBy(m => m.ChannelId))
                 channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
+
+            lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
         }
 
         private void initializeChannels()
@@ -389,6 +393,32 @@ namespace osu.Game.Online.Chat
             };
 
             api.Queue(fetchInitialMsgReq);
+        }
+
+        /// <summary>
+        /// Sends an acknowledgement request to the API.
+        /// This marks the user as online to receive messages from public channels, while also returning a list of silenced users.
+        /// It needs to be called at least once every 10 minutes.
+        /// </summary>
+        public void SendAck()
+        {
+            var req = new ChatAckRequest
+            {
+                SinceMessageId = lastMessageId,
+                SinceSilenceId = lastSilenceId
+            };
+
+            req.Success += ack =>
+            {
+                foreach (var silence in ack.Silences)
+                {
+                    foreach (var channel in JoinedChannels)
+                        channel.RemoveMessagesFromUser(silence.UserId);
+                    lastSilenceId = Math.Max(lastSilenceId ?? 0, silence.Id);
+                }
+            };
+
+            api.Queue(req);
         }
 
         /// <summary>
