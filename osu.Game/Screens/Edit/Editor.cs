@@ -637,7 +637,7 @@ namespace osu.Game.Screens.Edit
             ApplyToBackground(b =>
             {
                 b.IgnoreUserSettings.Value = true;
-                b.DimAmount.Value = editorBackgroundDim.Value;
+                b.DimWhenUserSettingsIgnored.Value = editorBackgroundDim.Value;
                 b.BlurAmount.Value = 0;
             });
         }
@@ -668,7 +668,7 @@ namespace osu.Game.Screens.Edit
             ApplyToBackground(b =>
             {
                 //b.DimAmount.UnbindAll();
-                b.DimAmount.Value = 0;
+                b.DimWhenUserSettingsIgnored.Value = 0;
             });
             resetTrack();
 

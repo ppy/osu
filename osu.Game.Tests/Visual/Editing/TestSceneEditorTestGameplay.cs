@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Editing
                 // this test cares about checking the background belonging to the editor specifically, so check that using reference equality
                 // (as `.Equals()` cannot discern between the two, as they technically share the same database GUID).
                 var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single(b => ReferenceEquals(b.Beatmap.BeatmapInfo, EditorBeatmap.BeatmapInfo));
-                return background.DimAmount.Value == editorDim.Value && background.BlurAmount.Value == 0;
+                return background.DimWhenUserSettingsIgnored.Value == editorDim.Value && background.BlurAmount.Value == 0;
             });
             AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
         }
@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.Editing
                 // this test cares about checking the background belonging to the editor specifically, so check that using reference equality
                 // (as `.Equals()` cannot discern between the two, as they technically share the same database GUID).
                 var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single(b => ReferenceEquals(b.Beatmap.BeatmapInfo, EditorBeatmap.BeatmapInfo));
-                return background.DimAmount.Value == editorDim.Value && background.BlurAmount.Value == 0;
+                return background.DimWhenUserSettingsIgnored.Value == editorDim.Value && background.BlurAmount.Value == 0;
             });
 
             AddStep("start track", () => EditorClock.Start());
