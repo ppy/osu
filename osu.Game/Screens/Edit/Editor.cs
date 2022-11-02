@@ -667,9 +667,9 @@ namespace osu.Game.Screens.Edit
 
             ApplyToBackground(b =>
             {
-                //b.DimAmount.UnbindAll();
                 b.DimWhenUserSettingsIgnored.Value = 0;
             });
+
             resetTrack();
 
             refetchBeatmap();
