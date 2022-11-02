@@ -49,7 +49,7 @@ namespace osu.Game.Tournament.Components
 
                     if (manager == null)
                     {
-                        AddInternal(manager = new ChannelManager(api, new WebSocketNotificationsClientConnector(api)));
+                        AddInternal(manager = new ChannelManager(api, api.GetNotificationsConnector()));
                         Channel.BindTo(manager.CurrentChannel);
                     }
 
