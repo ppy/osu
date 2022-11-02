@@ -32,16 +32,15 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModTarget : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>,
-                                IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride,
-                                IHasSeed, IHidesApproachCircles
+    public class OsuModTargetPractice : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>,
+                                        IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride, IHasSeed, IHidesApproachCircles
     {
-        public override string Name => "Target";
+        public override string Name => "Target Practice";
         public override string Acronym => "TP";
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => OsuIcon.ModTarget;
         public override LocalisableString Description => @"Practice keeping up with the beat of the song.";
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier => 0.1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
         {

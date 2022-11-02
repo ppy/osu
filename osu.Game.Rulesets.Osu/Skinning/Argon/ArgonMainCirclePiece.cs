@@ -121,11 +121,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
                 flash.Colour = colour.NewValue;
 
-                updateStateTransforms(drawableObject, drawableObject.State.Value);
+                // Accent colour may be changed many times during a paused gameplay state.
+                // Schedule the change to avoid transforms piling up.
+                Scheduler.AddOnce(updateStateTransforms);
             }, true);
 
             drawableObject.ApplyCustomUpdateState += updateStateTransforms;
         }
+
+        private void updateStateTransforms() => updateStateTransforms(drawableObject, drawableObject.State.Value);
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
@@ -171,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         // This is to give it a bomb-like effect, with the border "triggering" its animation when getting close.
                         using (BeginDelayedSequence(flash_in_duration / 12))
                         {
-                            outerGradient.ResizeTo(outerGradient.Size * shrink_size, resize_duration, Easing.OutElasticHalf);
+                            outerGradient.ResizeTo(OUTER_GRADIENT_SIZE * shrink_size, resize_duration, Easing.OutElasticHalf);
                             outerGradient
                                 .FadeColour(Color4.White, 80)
                                 .Then()

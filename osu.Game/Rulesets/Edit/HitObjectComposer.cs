@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.ShiftPressed)
                 return false;
 
             if (checkLeftToggleFromKey(e.Key, out int leftIndex))
