@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -46,13 +44,13 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public bool ContentDisplayed { get; private set; }
 
-        protected Bindable<double> UserDimLevel { get; private set; }
+        protected Bindable<double> UserDimLevel { get; private set; } = null!;
 
         public Bindable<float> DimAmount { get; set; } = new Bindable<float>();
 
-        protected Bindable<bool> LightenDuringBreaks { get; private set; }
+        protected Bindable<bool> LightenDuringBreaks { get; private set; } = null!;
 
-        protected Bindable<bool> ShowStoryboard { get; private set; }
+        protected Bindable<bool> ShowStoryboard { get; private set; } = null!;
 
         private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
 
