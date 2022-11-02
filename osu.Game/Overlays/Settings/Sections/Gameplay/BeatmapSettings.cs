@@ -17,13 +17,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         protected override LocalisableString Header => GameplaySettingsStrings.BeatmapHeader;
 
         private readonly BindableFloat comboColourBrightness = new BindableFloat();
-        private readonly BindableBool normaliseComboColourBrightness = new BindableBool();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.ComboColourBrightness, comboColourBrightness);
-            config.BindWith(OsuSetting.NormaliseComboColourBrightness, normaliseComboColourBrightness);
 
             Children = new Drawable[]
             {
@@ -47,11 +45,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GraphicsSettingsStrings.StoryboardVideo,
                     Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
                 },
-                new SettingsCheckbox
-                {
-                    LabelText = "Normalise combo colour brightness",
-                    Current = normaliseComboColourBrightness
-                },
                 new SettingsSlider<float>
                 {
                     LabelText = "Combo colour brightness",
@@ -59,13 +52,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     DisplayAsPercentage = true,
                 }
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            normaliseComboColourBrightness.BindValueChanged(normalise => comboColourBrightness.Disabled = !normalise.NewValue, true);
         }
     }
 }

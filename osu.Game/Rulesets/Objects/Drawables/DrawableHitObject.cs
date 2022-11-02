@@ -15,6 +15,7 @@ using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -174,7 +175,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load(OsuConfigManager config, ISkinSource skinSource)
         {
             config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
-            config.BindWith(OsuSetting.NormaliseComboColourBrightness, normaliseComboColourBrightness);
             config.BindWith(OsuSetting.ComboColourBrightness, comboColourBrightness);
 
             // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
@@ -522,8 +522,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Color4 colour = combo.GetComboColour(CurrentSkin);
 
             // Normalise the combo colour to the given brightness level.
-            if (normaliseComboColourBrightness.Value)
-                colour = new HSPAColour(colour) { P = comboColourBrightness.Value }.ToColor4();
+            if (comboColourBrightness.Value != 0)
+            {
+                float pAdjust = 0.6f + 0.4f * comboColourBrightness.Value;
+
+                colour = Interpolation.ValueAt(Math.Abs(comboColourBrightness.Value), colour, new HSPAColour(colour) { P = pAdjust }.ToColor4(), 0, 1, Easing.Out);
+            }
 
             AccentColour.Value = colour;
         }
