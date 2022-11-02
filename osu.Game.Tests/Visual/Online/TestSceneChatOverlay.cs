@@ -42,6 +42,7 @@ namespace osu.Game.Tests.Visual.Online
         private readonly APIUser testUser = new APIUser { Username = "test user", Id = 5071479 };
 
         private Channel[] testChannels;
+        private Message[] initialMessages;
 
         private Channel testChannel1 => testChannels[0];
         private Channel testChannel2 => testChannels[1];
@@ -49,10 +50,14 @@ namespace osu.Game.Tests.Visual.Online
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        private int currentMessageId;
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            currentMessageId = 0;
             testChannels = Enumerable.Range(1, 10).Select(createPublicChannel).ToArray();
+            initialMessages = testChannels.SelectMany(createChannelMessages).ToArray();
 
             Child = new DependencyProvidingContainer
             {
@@ -99,7 +104,7 @@ namespace osu.Game.Tests.Visual.Online
                             return true;
 
                         case GetMessagesRequest getMessages:
-                            getMessages.TriggerSuccess(createChannelMessages(getMessages.Channel));
+                            getMessages.TriggerSuccess(initialMessages.ToList());
                             return true;
 
                         case GetUserRequest getUser:
@@ -546,7 +551,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private List<Message> createChannelMessages(Channel channel)
         {
-            var message = new Message
+            var message = new Message(currentMessageId++)
             {
                 ChannelId = channel.Id,
                 Content = $"Hello, this is a message in {channel.Name}",
