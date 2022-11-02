@@ -15,7 +15,7 @@ namespace osu.Game.Online.Notifications
     /// <summary>
     /// An abstract client which receives notification-related events (chat/notifications).
     /// </summary>
-    public abstract class NotificationsClient : SocketClient
+    public abstract class NotificationsClient : PersistentEndpointClient
     {
         public Action<Channel>? ChannelJoined;
         public Action<List<Message>>? NewMessages;
