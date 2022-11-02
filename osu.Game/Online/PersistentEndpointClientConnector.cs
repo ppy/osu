@@ -14,7 +14,7 @@ namespace osu.Game.Online
     public abstract class PersistentEndpointClientConnector : IDisposable
     {
         /// <summary>
-        /// Whether this is connected to the hub, use <see cref="CurrentConnection"/> to access the connection, if this is <c>true</c>.
+        /// Whether the managed connection is currently connected. When <c>true</c> use <see cref="CurrentConnection"/> to access the connection.
         /// </summary>
         public IBindable<bool> IsConnected => isConnected;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Online
         private CancellationTokenSource connectCancelSource = new CancellationTokenSource();
 
         /// <summary>
-        /// Constructs a new <see cref="HubClientConnector"/>.
+        /// Constructs a new <see cref="PersistentEndpointClientConnector"/>.
         /// </summary>
         /// <param name="api"> An API provider used to react to connection state changes.</param>
         protected PersistentEndpointClientConnector(IAPIProvider api)
@@ -126,6 +126,10 @@ namespace osu.Game.Online
             await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Creates a new <see cref="PersistentEndpointClient"/>.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to stop the process.</param>
         protected abstract Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken);
 
         private async Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)
