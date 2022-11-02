@@ -183,7 +183,7 @@ namespace osu.Game.Tests.Visual.Online
                     if (request is not CommentDeleteRequest req)
                         return false;
 
-                    req.TriggerFailure(new Exception());
+                    req.TriggerFailure(new InvalidOperationException());
                     delete = true;
                     return false;
                 };

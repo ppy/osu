@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                     if (testRequest.Progress >= 0.5f)
                     {
-                        testRequest.TriggerFailure(new Exception());
+                        testRequest.TriggerFailure(new InvalidOperationException());
                         return true;
                     }
                 }
