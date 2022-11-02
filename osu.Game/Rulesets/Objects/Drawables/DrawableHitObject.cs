@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load(OsuConfigManager config, ISkinSource skinSource)
         {
             config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
-            config.BindWith(OsuSetting.ComboColourBrightness, comboColourBrightness);
+            config.BindWith(OsuSetting.ComboColourNormalisation, comboColourBrightness);
 
             // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
             base.AddInternal(Samples = new PausableSkinnableSound());
@@ -524,9 +524,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // Normalise the combo colour to the given brightness level.
             if (comboColourBrightness.Value != 0)
             {
-                float pAdjust = 0.6f + 0.4f * comboColourBrightness.Value;
-
-                colour = Interpolation.ValueAt(Math.Abs(comboColourBrightness.Value), colour, new HSPAColour(colour) { P = pAdjust }.ToColor4(), 0, 1, Easing.Out);
+                colour = Interpolation.ValueAt(Math.Abs(comboColourBrightness.Value), colour, new HSPAColour(colour) { P = 0.6f }.ToColor4(), 0, 1);
             }
 
             AccentColour.Value = colour;

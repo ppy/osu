@@ -16,12 +16,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
     {
         protected override LocalisableString Header => GameplaySettingsStrings.BeatmapHeader;
 
-        private readonly BindableFloat comboColourBrightness = new BindableFloat();
+        private readonly BindableFloat comboColourNormalisation = new BindableFloat();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.ComboColourBrightness, comboColourBrightness);
+            config.BindWith(OsuSetting.ComboColourNormalisation, comboColourNormalisation);
 
             Children = new Drawable[]
             {
@@ -47,8 +47,8 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "Combo colour brightness",
-                    Current = comboColourBrightness,
+                    LabelText = "Combo colour normalisation",
+                    Current = comboColourNormalisation,
                     DisplayAsPercentage = true,
                 }
             };
