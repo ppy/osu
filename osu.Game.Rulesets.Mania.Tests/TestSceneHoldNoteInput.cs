@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             assertHeadJudgement(HitResult.Miss);
             assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Miss);
-            assertNoteJudgement(HitResult.IgnoreHit);
+            assertNoteJudgement(HitResult.IgnoreMiss);
         }
 
         /// <summary>

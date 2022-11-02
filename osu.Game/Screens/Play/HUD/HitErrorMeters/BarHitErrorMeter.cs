@@ -279,6 +279,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             switch (style)
             {
                 case LabelStyles.None:
+                    labelEarly.Clear();
+                    labelLate.Clear();
                     break;
 
                 case LabelStyles.Icons:
