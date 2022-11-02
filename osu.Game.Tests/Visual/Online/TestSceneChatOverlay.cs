@@ -40,6 +40,7 @@ namespace osu.Game.Tests.Visual.Online
         private ChannelManager channelManager;
 
         private readonly APIUser testUser = new APIUser { Username = "test user", Id = 5071479 };
+        private readonly APIUser testUser1 = new APIUser { Username = "test user", Id = 5071480 };
 
         private Channel[] testChannels;
         private Message[] initialMessages;
@@ -498,6 +499,35 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
             waitForChannel1Visible();
+        }
+
+        [Test]
+        public void TestRemoveMessages()
+        {
+            AddStep("Show overlay with channel", () =>
+            {
+                chatOverlay.Show();
+                channelManager.CurrentChannel.Value = channelManager.JoinChannel(testChannel1);
+            });
+
+            AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
+            waitForChannel1Visible();
+
+            AddStep("Send message from another user", () =>
+            {
+                testChannel1.AddNewMessages(new Message
+                {
+                    ChannelId = testChannel1.Id,
+                    Content = "Message from another user",
+                    Timestamp = DateTimeOffset.Now,
+                    Sender = testUser1,
+                });
+            });
+
+            AddStep("Remove messages from other user", () =>
+            {
+                testChannel1.RemoveMessagesFromUser(testUser.Id);
+            });
         }
 
         private void joinTestChannel(int i)
