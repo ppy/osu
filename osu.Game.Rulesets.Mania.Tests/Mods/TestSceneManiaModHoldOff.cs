@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -87,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
         private static ManiaBeatmap createRawBeatmap()
         {
-            var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 1 });
+            var beatmap = new ManiaBeatmap(new StageDefinition(1));
             beatmap.ControlPointInfo.Add(0.0, new TimingControlPoint { BeatLength = 1000 }); // Set BPM to 60
 
             // Add test hit objects

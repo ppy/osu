@@ -100,6 +100,11 @@ namespace osu.Game.Overlays
 
         private void onPathChanged(ValueChangedEvent<string> e)
         {
+            // the path could change as a result of redirecting to a newer location of the same page.
+            // we already have the correct wiki data, so we can safely return here.
+            if (e.NewValue == wikiData.Value?.Path)
+                return;
+
             cancellationToken?.Cancel();
             request?.Cancel();
 
@@ -121,6 +126,7 @@ namespace osu.Game.Overlays
         private void onSuccess(APIWikiPage response)
         {
             wikiData.Value = response;
+            path.Value = response.Path;
 
             if (response.Layout == index_path)
             {

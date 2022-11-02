@@ -194,7 +194,28 @@ namespace osu.Game.Rulesets.Osu.Utils
         private static Vector2 clampSliderToPlayfield(WorkingObject workingObject)
         {
             var slider = (Slider)workingObject.HitObject;
-            var possibleMovementBounds = calculatePossibleMovementBounds(slider);
+            var possibleMovementBounds = CalculatePossibleMovementBounds(slider);
+
+            // The slider rotation applied in computeModifiedPosition might make it impossible to fit the slider into the playfield
+            // For example, a long horizontal slider will be off-screen when rotated by 90 degrees
+            // In this case, limit the rotation to either 0 or 180 degrees
+            if (possibleMovementBounds.Width < 0 || possibleMovementBounds.Height < 0)
+            {
+                float currentRotation = getSliderRotation(slider);
+                float diff1 = getAngleDifference(workingObject.RotationOriginal, currentRotation);
+                float diff2 = getAngleDifference(workingObject.RotationOriginal + MathF.PI, currentRotation);
+
+                if (diff1 < diff2)
+                {
+                    RotateSlider(slider, workingObject.RotationOriginal - getSliderRotation(slider));
+                }
+                else
+                {
+                    RotateSlider(slider, workingObject.RotationOriginal + MathF.PI - getSliderRotation(slider));
+                }
+
+                possibleMovementBounds = CalculatePossibleMovementBounds(slider);
+            }
 
             var previousPosition = workingObject.PositionModified;
 
@@ -239,10 +260,12 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Calculates a <see cref="RectangleF"/> which contains all of the possible movements of the slider (in relative X/Y coordinates)
         /// such that the entire slider is inside the playfield.
         /// </summary>
+        /// <param name="slider">The <see cref="Slider"/> for which to calculate a movement bounding box.</param>
+        /// <returns>A <see cref="RectangleF"/> which contains all of the possible movements of the slider such that the entire slider is inside the playfield.</returns>
         /// <remarks>
         /// If the slider is larger than the playfield, the returned <see cref="RectangleF"/> may have negative width/height.
         /// </remarks>
-        private static RectangleF calculatePossibleMovementBounds(Slider slider)
+        public static RectangleF CalculatePossibleMovementBounds(Slider slider)
         {
             var pathPositions = new List<Vector2>();
             slider.Path.GetPathToProgress(pathPositions, 0, 1);
@@ -353,6 +376,18 @@ namespace osu.Game.Rulesets.Osu.Utils
             return MathF.Atan2(endPositionVector.Y, endPositionVector.X);
         }
 
+        /// <summary>
+        /// Get the absolute difference between 2 angles measured in Radians.
+        /// </summary>
+        /// <param name="angle1">The first angle</param>
+        /// <param name="angle2">The second angle</param>
+        /// <returns>The absolute difference with interval <c>[0, MathF.PI)</c></returns>
+        private static float getAngleDifference(float angle1, float angle2)
+        {
+            float diff = MathF.Abs(angle1 - angle2) % (MathF.PI * 2);
+            return MathF.Min(diff, MathF.PI * 2 - diff);
+        }
+
         public class ObjectPositionInfo
         {
             /// <summary>
@@ -395,6 +430,7 @@ namespace osu.Game.Rulesets.Osu.Utils
 
         private class WorkingObject
         {
+            public float RotationOriginal { get; }
             public Vector2 PositionOriginal { get; }
             public Vector2 PositionModified { get; set; }
             public Vector2 EndPositionModified { get; set; }
@@ -405,6 +441,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             public WorkingObject(ObjectPositionInfo positionInfo)
             {
                 PositionInfo = positionInfo;
+                RotationOriginal = HitObject is Slider slider ? getSliderRotation(slider) : 0;
                 PositionModified = PositionOriginal = HitObject.Position;
                 EndPositionModified = HitObject.EndPosition;
             }

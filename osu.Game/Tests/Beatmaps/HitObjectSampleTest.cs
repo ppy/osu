@@ -12,8 +12,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -38,6 +40,9 @@ namespace osu.Game.Tests.Beatmaps
 
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         private readonly SkinInfo userSkinInfo = new SkinInfo();
 
@@ -123,6 +128,7 @@ namespace osu.Game.Tests.Beatmaps
 
         #region IResourceStorageProvider
 
+        public IRenderer Renderer => host.Renderer;
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => userSkinResourceStore;
         public new IResourceStore<byte[]> Resources => base.Resources;
@@ -212,6 +218,7 @@ namespace osu.Game.Tests.Beatmaps
 
             protected internal override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, this);
 
+            public IRenderer Renderer => resources.Renderer;
             public AudioManager AudioManager => resources.AudioManager;
 
             public IResourceStore<byte[]> Files { get; }

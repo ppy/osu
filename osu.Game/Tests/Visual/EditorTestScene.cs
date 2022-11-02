@@ -110,6 +110,8 @@ namespace osu.Game.Tests.Visual
 
             public new void Paste() => base.Paste();
 
+            public new void Clone() => base.Clone();
+
             public new void SwitchToDifficulty(BeatmapInfo beatmapInfo) => base.SwitchToDifficulty(beatmapInfo);
 
             public new void CreateNewDifficulty(RulesetInfo rulesetInfo) => base.CreateNewDifficulty(rulesetInfo);
@@ -139,7 +141,7 @@ namespace osu.Game.Tests.Visual
             public WorkingBeatmap TestBeatmap;
 
             public TestBeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host, WorkingBeatmap defaultBeatmap)
-                : base(storage, realm, rulesets, api, audioManager, resources, host, defaultBeatmap)
+                : base(storage, realm, api, audioManager, resources, host, defaultBeatmap)
             {
             }
 

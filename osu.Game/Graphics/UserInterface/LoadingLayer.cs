@@ -20,6 +20,8 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class LoadingLayer : LoadingSpinner
     {
+        private readonly bool blockInput;
+
         [CanBeNull]
         protected Box BackgroundDimLayer { get; }
 
@@ -28,9 +30,11 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         /// <param name="dimBackground">Whether the full background area should be dimmed while loading.</param>
         /// <param name="withBox">Whether the spinner should have a surrounding black box for visibility.</param>
-        public LoadingLayer(bool dimBackground = false, bool withBox = true)
+        /// <param name="blockInput">Whether to block input of components behind the loading layer.</param>
+        public LoadingLayer(bool dimBackground = false, bool withBox = true, bool blockInput = true)
             : base(withBox)
         {
+            this.blockInput = blockInput;
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(1);
 
@@ -52,6 +56,9 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool Handle(UIEvent e)
         {
+            if (!blockInput)
+                return false;
+
             switch (e)
             {
                 // blocking scroll can cause weird behaviour when this layer is used within a ScrollContainer.
@@ -83,7 +90,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
-            MainContents.Size = new Vector2(Math.Clamp(Math.Min(DrawWidth, DrawHeight) * 0.25f, 30, 100));
+            MainContents.Size = new Vector2(Math.Clamp(Math.Min(DrawWidth, DrawHeight) * 0.25f, 20, 100));
         }
     }
 }

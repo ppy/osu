@@ -1,14 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osu.Game.Extensions;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards.Drawables;
 
@@ -90,12 +86,12 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod> mods = null) =>
+        public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
             new DrawableStoryboard(this, mods);
 
-        public Texture GetTextureFromPath(string path, TextureStore textureStore)
+        public Texture? GetTextureFromPath(string path, TextureStore textureStore)
         {
-            string storyboardPath = BeatmapInfo.BeatmapSet?.Files.FirstOrDefault(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
+            string? storyboardPath = BeatmapInfo.BeatmapSet?.GetPathForFile(path);
 
             if (!string.IsNullOrEmpty(storyboardPath))
                 return textureStore.Get(storyboardPath);

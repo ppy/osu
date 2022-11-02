@@ -9,11 +9,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>, IEquatable<ControlPoint>
+    public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>, IEquatable<ControlPoint>, IControlPoint
     {
-        /// <summary>
-        /// The time at which the control point takes effect.
-        /// </summary>
         [JsonIgnore]
         public double Time { get; set; }
 

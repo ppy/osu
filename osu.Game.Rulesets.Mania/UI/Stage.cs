@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -12,6 +13,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -19,7 +21,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -28,6 +29,9 @@ namespace osu.Game.Rulesets.Mania.UI
     /// </summary>
     public class Stage : ScrollingPlayfield
     {
+        [Cached]
+        public readonly StageDefinition Definition;
+
         public const float COLUMN_SPACING = 1;
 
         public const float HIT_TARGET_POSITION = 110;
@@ -40,13 +44,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Drawable barLineContainer;
 
-        private readonly Dictionary<ColumnType, Color4> columnColours = new Dictionary<ColumnType, Color4>
-        {
-            { ColumnType.Even, new Color4(6, 84, 0, 255) },
-            { ColumnType.Odd, new Color4(94, 0, 57, 255) },
-            { ColumnType.Special, new Color4(0, 48, 63, 255) }
-        };
-
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Columns.Any(c => c.ReceivePositionalInputAt(screenSpacePos));
 
         private readonly int firstColumnIndex;
@@ -54,6 +51,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public Stage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
         {
             this.firstColumnIndex = firstColumnIndex;
+            Definition = definition;
 
             Name = "Stage";
 
@@ -75,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageBackground, stageDefinition: definition), _ => new DefaultStageBackground())
+                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageBackground), _ => new DefaultStageBackground())
                         {
                             RelativeSizeAxes = Axes.Both
                         },
@@ -100,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 RelativeSizeAxes = Axes.Y,
                             }
                         },
-                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageForeground, stageDefinition: definition), _ => null)
+                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageForeground), _ => null)
                         {
                             RelativeSizeAxes = Axes.Both
                         },
@@ -118,21 +116,50 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < definition.Columns; i++)
             {
-                var columnType = definition.GetTypeOfColumn(i);
+                bool isSpecial = definition.IsSpecialColumn(i);
 
-                var column = new Column(firstColumnIndex + i)
+                var column = new Column(firstColumnIndex + i, isSpecial)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 1,
-                    ColumnType = columnType,
-                    AccentColour = columnColours[columnType],
-                    Action = { Value = columnType == ColumnType.Special ? specialColumnStartAction++ : normalColumnStartAction++ }
+                    Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
                 };
 
                 topLevelContainer.Add(column.TopLevelContainer.CreateProxy());
                 columnFlow.SetContentForColumn(i, column);
                 AddNested(column);
             }
+        }
+
+        private ISkinSource currentSkin;
+
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource skin)
+        {
+            currentSkin = skin;
+
+            skin.SourceChanged += onSkinChanged;
+            onSkinChanged();
+        }
+
+        private void onSkinChanged()
+        {
+            float paddingTop = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.StagePaddingTop))?.Value ?? 0;
+            float paddingBottom = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.StagePaddingBottom))?.Value ?? 0;
+
+            Padding = new MarginPadding
+            {
+                Top = paddingTop,
+                Bottom = paddingBottom,
+            };
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (currentSkin != null)
+                currentSkin.SourceChanged -= onSkinChanged;
         }
 
         protected override void LoadComplete()

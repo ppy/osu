@@ -97,7 +97,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 backgroundLayer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Y,
                     CornerRadius = corner_radius,
                     Masking = true,
                     BorderThickness = 2,
@@ -128,10 +128,12 @@ namespace osu.Game.Graphics.UserInterface
             if (width != null)
             {
                 Width = width.Value;
+                backgroundLayer.RelativeSizeAxes = Axes.Both;
             }
             else
             {
                 AutoSizeAxes = Axes.X;
+                backgroundLayer.AutoSizeAxes = Axes.X;
                 text.Margin = new MarginPadding { Horizontal = 15 };
             }
         }

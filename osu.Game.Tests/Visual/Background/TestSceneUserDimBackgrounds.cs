@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Background
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
             Dependencies.Cache(Realm);
 
@@ -244,7 +244,10 @@ namespace osu.Game.Tests.Visual.Background
         public void TestResumeFromPlayer()
         {
             performFullSetup();
-            AddStep("Move mouse to Visual Settings", () => InputManager.MoveMouseTo(playerLoader.VisualSettingsPos));
+            AddStep("Move mouse to Visual Settings location", () => InputManager.MoveMouseTo(playerLoader.ScreenSpaceDrawQuad.TopRight
+                                                                                             + new Vector2(-playerLoader.VisualSettingsPos.ScreenSpaceDrawQuad.Width,
+                                                                                                 playerLoader.VisualSettingsPos.ScreenSpaceDrawQuad.Height / 2
+                                                                                             )));
             AddStep("Resume PlayerLoader", () => player.Restart());
             AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));

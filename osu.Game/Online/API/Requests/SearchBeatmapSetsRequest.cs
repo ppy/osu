@@ -5,7 +5,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.IO.Network;
 using osu.Game.Extensions;
@@ -86,7 +85,7 @@ namespace osu.Game.Online.API.Requests
                 req.AddParameter("q", query);
 
             if (General != null && General.Any())
-                req.AddParameter("c", string.Join('.', General.Select(e => e.ToString().Underscore())));
+                req.AddParameter("c", string.Join('.', General.Select(e => e.ToString().ToSnakeCase())));
 
             if (ruleset.OnlineID >= 0)
                 req.AddParameter("m", ruleset.OnlineID.ToString());

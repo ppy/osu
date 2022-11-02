@@ -4,12 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
@@ -32,9 +31,6 @@ namespace osu.Game.Skinning
             this.skinResources = skinResources;
 
             modelManager = new ModelManager<SkinInfo>(storage, realm);
-
-            // can be removed 20220420.
-            populateMissingHashes();
         }
 
         public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
@@ -49,7 +45,7 @@ namespace osu.Game.Skinning
 
         protected override void Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
-            var skinInfoFile = model.Files.SingleOrDefault(f => f.Filename == skin_info_file);
+            var skinInfoFile = model.GetFile(skin_info_file);
 
             if (skinInfoFile != null)
             {
@@ -129,7 +125,7 @@ namespace osu.Game.Skinning
                 authorLine,
             };
 
-            var existingFile = item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase));
+            var existingFile = item.GetFile(@"skin.ini");
 
             if (existingFile == null)
             {
@@ -157,18 +153,6 @@ namespace osu.Game.Skinning
                     }
 
                     modelManager.ReplaceFile(existingFile, stream, realm);
-
-                    // can be removed 20220502.
-                    if (!ensureIniWasUpdated(item))
-                    {
-                        Logger.Log($"Skin {item}'s skin.ini had issues and has been removed. Please report this and provide the problematic skin.", LoggingTarget.Database, LogLevel.Important);
-
-                        var existingIni = item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase));
-                        if (existingIni != null)
-                            item.Files.Remove(existingIni);
-
-                        writeNewSkinIni();
-                    }
                 }
             }
 
@@ -193,44 +177,15 @@ namespace osu.Game.Skinning
             }
         }
 
-        private bool ensureIniWasUpdated(SkinInfo item)
-        {
-            // This is a final consistency check to ensure that hash computation doesn't enter an infinite loop.
-            // With other changes to the surrounding code this should never be hit, but until we are 101% sure that there
-            // are no other cases let's avoid a hard startup crash by bailing and alerting.
-
-            var instance = createInstance(item);
-
-            return instance.Configuration.SkinInfo.Name == item.Name;
-        }
-
-        private void populateMissingHashes()
-        {
-            Realm.Run(realm =>
-            {
-                var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => !i.Protected && string.IsNullOrEmpty(i.Hash)).ToArray();
-
-                foreach (SkinInfo skin in skinsWithoutHashes)
-                {
-                    try
-                    {
-                        realm.Write(_ => skin.Hash = ComputeHash(skin));
-                    }
-                    catch (Exception e)
-                    {
-                        modelManager.Delete(skin);
-                        Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
-                    }
-                }
-            });
-        }
-
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);
 
         public void Save(Skin skin)
         {
             skin.SkinInfo.PerformWrite(s =>
             {
+                // Update for safety
+                s.InstantiationInfo = skin.GetType().GetInvariantInstantiationInfo();
+
                 // Serialise out the SkinInfo itself.
                 string skinInfoJson = JsonConvert.SerializeObject(s, new JsonSerializerSettings { Formatting = Formatting.Indented });
 
@@ -248,7 +203,7 @@ namespace osu.Game.Skinning
                     {
                         string filename = @$"{drawableInfo.Key}.json";
 
-                        var oldFile = s.Files.FirstOrDefault(f => f.Filename == filename);
+                        var oldFile = s.GetFile(filename);
 
                         if (oldFile != null)
                             modelManager.ReplaceFile(oldFile, streamContent, s.Realm);

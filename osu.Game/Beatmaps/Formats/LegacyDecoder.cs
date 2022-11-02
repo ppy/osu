@@ -79,7 +79,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (section)
             {
                 case Section.Colours:
-                    HandleColours(output, line);
+                    HandleColours(output, line, false);
                     return;
             }
         }
@@ -93,7 +93,7 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        protected void HandleColours<TModel>(TModel output, string line)
+        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
         {
             var pair = SplitKeyVal(line);
 
@@ -108,7 +108,7 @@ namespace osu.Game.Beatmaps.Formats
 
             try
             {
-                byte alpha = split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
+                byte alpha = allowAlpha && split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
                 colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), alpha);
             }
             catch
@@ -168,11 +168,22 @@ namespace osu.Game.Beatmaps.Formats
             /// </summary>
             public double BpmMultiplier { get; private set; }
 
-            public LegacyDifficultyControlPoint(double beatLength)
+            /// <summary>
+            /// Whether or not slider ticks should be generated at this control point.
+            /// This exists for backwards compatibility with maps that abuse NaN slider velocity behavior on osu!stable (e.g. /b/2628991).
+            /// </summary>
+            public bool GenerateTicks { get; private set; } = true;
+
+            public LegacyDifficultyControlPoint(int rulesetId, double beatLength)
                 : this()
             {
                 // Note: In stable, the division occurs on floats, but with compiler optimisations turned on actually seems to occur on doubles via some .NET black magic (possibly inlining?).
-                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
+                if (rulesetId == 1 || rulesetId == 3)
+                    BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
+                else
+                    BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 1000) / 100.0 : 1;
+
+                GenerateTicks = !double.IsNaN(beatLength);
             }
 
             public LegacyDifficultyControlPoint()
@@ -180,11 +191,16 @@ namespace osu.Game.Beatmaps.Formats
                 SliderVelocityBindable.Precision = double.Epsilon;
             }
 
+            public override bool IsRedundant(ControlPoint? existing)
+                => base.IsRedundant(existing)
+                   && GenerateTicks == ((existing as LegacyDifficultyControlPoint)?.GenerateTicks ?? true);
+
             public override void CopyFrom(ControlPoint other)
             {
                 base.CopyFrom(other);
 
                 BpmMultiplier = ((LegacyDifficultyControlPoint)other).BpmMultiplier;
+                GenerateTicks = ((LegacyDifficultyControlPoint)other).GenerateTicks;
             }
 
             public override bool Equals(ControlPoint? other)
@@ -193,10 +209,11 @@ namespace osu.Game.Beatmaps.Formats
 
             public bool Equals(LegacyDifficultyControlPoint? other)
                 => base.Equals(other)
-                   && BpmMultiplier == other.BpmMultiplier;
+                   && BpmMultiplier == other.BpmMultiplier
+                   && GenerateTicks == other.GenerateTicks;
 
-            // ReSharper disable once NonReadonlyMemberInGetHashCode
-            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), BpmMultiplier);
+            // ReSharper disable twice NonReadonlyMemberInGetHashCode
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), BpmMultiplier, GenerateTicks);
         }
 
         internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>

@@ -90,6 +90,8 @@ namespace osu.Game.Screens.Menu
 
         private const double early_activation = 60;
 
+        private const float triangles_paused_velocity = 0.5f;
+
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
         public OsuLogo()
@@ -111,7 +113,7 @@ namespace osu.Game.Screens.Menu
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        logoBounceContainer = new DragContainer
+                        logoBounceContainer = new Container
                         {
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
@@ -319,6 +321,11 @@ namespace osu.Game.Screens.Menu
                     .FadeTo(visualizer_default_alpha * 1.8f * amplitudeAdjust, early_activation, Easing.Out).Then()
                     .FadeTo(visualizer_default_alpha, beatLength);
             }
+
+            this.Delay(early_activation).Schedule(() =>
+            {
+                triangles.Velocity += amplitudeAdjust * (effectPoint.KiaiMode ? 6 : 3);
+            });
         }
 
         public void PlayIntro()
@@ -340,22 +347,17 @@ namespace osu.Game.Screens.Menu
             base.Update();
 
             const float scale_adjust_cutoff = 0.4f;
-            const float velocity_adjust_cutoff = 0.98f;
-            const float paused_velocity = 0.5f;
 
             if (musicController.CurrentTrack.IsRunning)
             {
                 float maxAmplitude = lastBeatIndex >= 0 ? musicController.CurrentTrack.CurrentAmplitudes.Maximum : 0;
                 logoAmplitudeContainer.Scale = new Vector2((float)Interpolation.Damp(logoAmplitudeContainer.Scale.X, 1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 0.9f, Time.Elapsed));
 
-                if (maxAmplitude > velocity_adjust_cutoff)
-                    triangles.Velocity = 1 + Math.Max(0, maxAmplitude - velocity_adjust_cutoff) * 50;
-                else
-                    triangles.Velocity = (float)Interpolation.Damp(triangles.Velocity, 1, 0.995f, Time.Elapsed);
+                triangles.Velocity = (float)Interpolation.Damp(triangles.Velocity, triangles_paused_velocity * (IsKiaiTime ? 4 : 2), 0.995f, Time.Elapsed);
             }
             else
             {
-                triangles.Velocity = paused_velocity;
+                triangles.Velocity = (float)Interpolation.Damp(triangles.Velocity, triangles_paused_velocity, 0.9f, Time.Elapsed);
             }
         }
 
@@ -405,27 +407,24 @@ namespace osu.Game.Screens.Menu
             impactContainer.ScaleTo(1.12f, 250);
         }
 
-        private class DragContainer : Container
+        public override bool DragBlocksClick => false;
+
+        protected override bool OnDragStart(DragStartEvent e) => true;
+
+        protected override void OnDrag(DragEvent e)
         {
-            public override bool DragBlocksClick => false;
+            Vector2 change = e.MousePosition - e.MouseDownPosition;
 
-            protected override bool OnDragStart(DragStartEvent e) => true;
+            // Diminish the drag distance as we go further to simulate "rubber band" feeling.
+            change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.6f) / change.Length;
 
-            protected override void OnDrag(DragEvent e)
-            {
-                Vector2 change = e.MousePosition - e.MouseDownPosition;
+            logoBounceContainer.MoveTo(change);
+        }
 
-                // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-                change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.6f) / change.Length;
-
-                this.MoveTo(change);
-            }
-
-            protected override void OnDragEnd(DragEndEvent e)
-            {
-                this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-                base.OnDragEnd(e);
-            }
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            logoBounceContainer.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
+            base.OnDragEnd(e);
         }
     }
 }

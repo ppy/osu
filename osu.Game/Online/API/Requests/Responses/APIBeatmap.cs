@@ -81,6 +81,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"max_combo")]
         public int? MaxCombo { get; set; }
 
+        [JsonProperty(@"last_updated")]
+        public DateTimeOffset LastUpdated { get; set; }
+
         public double BPM { get; set; }
 
         #region Implementation of IBeatmapInfo
@@ -108,7 +111,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public bool Equals(IBeatmapInfo? other) => other is APIBeatmap b && this.MatchesOnlineID(b);
 
-        private class APIRuleset : IRulesetInfo
+        public class APIRuleset : IRulesetInfo
         {
             public int OnlineID { get; set; } = -1;
 

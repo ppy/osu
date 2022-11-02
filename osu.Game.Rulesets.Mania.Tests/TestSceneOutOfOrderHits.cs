@@ -76,8 +76,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             performTest(objects, new List<ReplayFrame>());
 
-            addJudgementAssert(objects[0], HitResult.IgnoreHit);
-            addJudgementAssert(objects[1], HitResult.IgnoreHit);
+            addJudgementAssert(objects[0], HitResult.IgnoreMiss);
+            addJudgementAssert(objects[1], HitResult.IgnoreMiss);
         }
 
         [Test]
@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             AddStep("load player", () =>
             {
-                Beatmap.Value = CreateWorkingBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 })
+                Beatmap.Value = CreateWorkingBeatmap(new ManiaBeatmap(new StageDefinition(4))
                 {
                     HitObjects = hitObjects,
                     BeatmapInfo =

@@ -42,9 +42,9 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
 
-        public Action<BeatmapSetInfo>? ProcessBeatmap { private get; set; }
+        public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
 
-        public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
+        public BeatmapManager(Storage storage, RealmAccess realm, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
                               WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
             : base(storage, realm)
         {
@@ -62,7 +62,7 @@ namespace osu.Game.Beatmaps
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm);
-            beatmapImporter.ProcessBeatmap = obj => ProcessBeatmap?.Invoke(obj);
+            beatmapImporter.ProcessBeatmap = args => ProcessBeatmap?.Invoke(args);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
@@ -94,6 +94,7 @@ namespace osu.Game.Beatmaps
 
             var beatmapSet = new BeatmapSetInfo
             {
+                DateAdded = DateTimeOffset.UtcNow,
                 Beatmaps =
                 {
                     new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata)
@@ -164,8 +165,7 @@ namespace osu.Game.Beatmaps
             // clear the hash, as that's what is used to match .osu files with their corresponding realm beatmaps.
             newBeatmapInfo.Hash = string.Empty;
             // clear online properties.
-            newBeatmapInfo.OnlineID = -1;
-            newBeatmapInfo.Status = BeatmapOnlineStatus.None;
+            newBeatmapInfo.ResetOnlineInfo();
 
             return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
         }
@@ -301,7 +301,7 @@ namespace osu.Game.Beatmaps
                 stream.Seek(0, SeekOrigin.Begin);
 
                 // AddFile generally handles updating/replacing files, but this is a case where the filename may have also changed so let's delete for simplicity.
-                var existingFileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase));
+                var existingFileInfo = beatmapInfo.Path != null ? setInfo.GetFile(beatmapInfo.Path) : null;
                 string targetFilename = createBeatmapFilenameFromMetadata(beatmapInfo);
 
                 // ensure that two difficulties from the set don't point at the same beatmap file.
@@ -311,12 +311,17 @@ namespace osu.Game.Beatmaps
                 if (existingFileInfo != null)
                     DeleteFile(setInfo, existingFileInfo);
 
+                string oldMd5Hash = beatmapInfo.MD5Hash;
+
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
+                beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
+                beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
+
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
-                setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
+                updateHashAndMarkDirty(setInfo);
 
                 Realm.Write(r =>
                 {
@@ -324,7 +329,9 @@ namespace osu.Game.Beatmaps
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
 
-                    ProcessBeatmap?.Invoke(liveBeatmapSet);
+                    beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
+
+                    ProcessBeatmap?.Invoke((liveBeatmapSet, false));
                 });
             }
 
@@ -333,7 +340,7 @@ namespace osu.Game.Beatmaps
             static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
             {
                 var metadata = beatmapInfo.Metadata;
-                return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
+                return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidFilename();
             }
         }
 
@@ -356,6 +363,33 @@ namespace osu.Game.Beatmaps
                     items = items.Where(filter);
 
                 Delete(items.ToList(), silent);
+            });
+        }
+
+        /// <summary>
+        /// Delete a beatmap difficulty immediately.
+        /// </summary>
+        /// <remarks>
+        /// There's no undoing this operation, as we don't have a soft-deletion flag on <see cref="BeatmapInfo"/>.
+        /// This may be a future consideration if there's a user requirement for undeleting support.
+        /// </remarks>
+        public void DeleteDifficultyImmediately(BeatmapInfo beatmapInfo)
+        {
+            Realm.Write(r =>
+            {
+                if (!beatmapInfo.IsManaged)
+                    beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+
+                Debug.Assert(beatmapInfo.BeatmapSet != null);
+                Debug.Assert(beatmapInfo.File != null);
+
+                var setInfo = beatmapInfo.BeatmapSet;
+
+                DeleteFile(setInfo, beatmapInfo.File);
+                setInfo.Beatmaps.Remove(beatmapInfo);
+
+                updateHashAndMarkDirty(setInfo);
+                workingBeatmapCache.Invalidate(setInfo);
             });
         }
 
@@ -409,6 +443,15 @@ namespace osu.Game.Beatmaps
             Realm.Run(r => Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
 
+        public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
+            beatmapImporter.ImportAsUpdate(notification, importTask, original);
+
+        private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
+        {
+            setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
+            setInfo.Status = BeatmapOnlineStatus.LocallyModified;
+        }
+
         #region Implementation of ICanAcceptFiles
 
         public Task Import(params string[] paths) => beatmapImporter.Import(paths);
@@ -439,12 +482,15 @@ namespace osu.Game.Beatmaps
         {
             if (beatmapInfo != null)
             {
-                // Detached sets don't come with files.
-                // If we seem to be missing files, now is a good time to re-fetch.
-                if (refetch || beatmapInfo.IsManaged || beatmapInfo.BeatmapSet?.Files.Count == 0)
-                {
+                if (refetch)
                     workingBeatmapCache.Invalidate(beatmapInfo);
 
+                // Detached beatmapsets don't come with files as an optimisation (see `RealmObjectExtensions.beatmap_set_mapper`).
+                // If we seem to be missing files, now is a good time to re-fetch.
+                bool missingFiles = beatmapInfo.BeatmapSet?.Files.Count == 0;
+
+                if (refetch || beatmapInfo.IsManaged || missingFiles)
+                {
                     Guid id = beatmapInfo.ID;
                     beatmapInfo = Realm.Run(r => r.Find<BeatmapInfo>(id)?.Detach()) ?? beatmapInfo;
                 }

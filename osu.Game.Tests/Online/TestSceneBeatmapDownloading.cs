@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Online
         {
             AddStep("download beatmap", () => beatmaps.Download(test_db_model));
 
-            AddStep("cancel download from request", () => beatmaps.GetExistingDownload(test_db_model).Cancel());
+            AddStep("cancel download from request", () => beatmaps.GetExistingDownload(test_db_model)!.Cancel());
 
             AddUntilStep("is removed from download list", () => beatmaps.GetExistingDownload(test_db_model) == null);
             AddAssert("is notification cancelled", () => recentNotification.State == ProgressNotificationState.Cancelled);
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Online
         {
             AddStep("download beatmap", () => beatmaps.Download(test_db_model));
 
-            AddStep("cancel download from notification", () => recentNotification.Close());
+            AddStep("cancel download from notification", () => recentNotification.Close(true));
 
             AddUntilStep("is removed from download list", () => beatmaps.GetExistingDownload(test_db_model) == null);
             AddAssert("is notification cancelled", () => recentNotification.State == ProgressNotificationState.Cancelled);

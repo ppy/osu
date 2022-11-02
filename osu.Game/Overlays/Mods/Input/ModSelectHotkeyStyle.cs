@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods.Input
 {
@@ -15,6 +17,7 @@ namespace osu.Game.Overlays.Mods.Input
         /// Individual letters in a row trigger the mods in a sequential fashion.
         /// Uses <see cref="SequentialModHotkeyHandler"/>.
         /// </summary>
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.SequentialHotkeyStyle))]
         Sequential,
 
         /// <summary>
@@ -22,6 +25,7 @@ namespace osu.Game.Overlays.Mods.Input
         /// One keybinding can toggle between what used to be <see cref="MultiMod"/>s on stable,
         /// and some mods in a column may not have any hotkeys at all.
         /// </summary>
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.ClassicHotkeyStyle))]
         Classic
     }
 }

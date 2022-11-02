@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,8 +28,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void TestSpinnerAutoCompleted()
         {
-            DrawableSpinner spinner = null;
-            JudgementResult lastResult = null;
+            DrawableSpinner? spinner = null;
+            JudgementResult? lastResult = null;
 
             CreateModTest(new ModTestData
             {
@@ -63,11 +61,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [TestCase(null)]
         [TestCase(typeof(OsuModDoubleTime))]
         [TestCase(typeof(OsuModHalfTime))]
-        public void TestSpinRateUnaffectedByMods(Type additionalModType)
+        public void TestSpinRateUnaffectedByMods(Type? additionalModType)
         {
             var mods = new List<Mod> { new OsuModSpunOut() };
             if (additionalModType != null)
-                mods.Add((Mod)Activator.CreateInstance(additionalModType));
+                mods.Add((Mod)Activator.CreateInstance(additionalModType)!);
 
             CreateModTest(new ModTestData
             {
@@ -96,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void TestSpinnerGetsNoBonusScore()
         {
-            DrawableSpinner spinner = null;
+            DrawableSpinner? spinner = null;
             List<JudgementResult> results = new List<JudgementResult>();
 
             CreateModTest(new ModTestData

@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, LocalisationManager localisation)
         {
             Children = new Drawable[]
             {
@@ -110,11 +110,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                             {
                                 t.NewLine();
-                                t.AddText("If your tablet is not detected, please read ");
-                                t.AddLink("this FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
+                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedBindableString(TabletSettingsStrings.NoTabletDetectedDescription(RuntimeInfo.OS == RuntimeInfo.Platform.Windows
                                     ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
-                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux");
-                                t.AddText(" for troubleshooting steps.");
+                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux")).Value);
+                                t.AddLinks(formattedSource.Text, formattedSource.Links);
                             }
                         }),
                     }
@@ -215,21 +214,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             rotation.BindTo(tabletHandler.Rotation);
 
             areaOffset.BindTo(tabletHandler.AreaOffset);
-            areaOffset.BindValueChanged(val =>
+            areaOffset.BindValueChanged(val => Schedule(() =>
             {
                 offsetX.Value = val.NewValue.X;
                 offsetY.Value = val.NewValue.Y;
-            }, true);
+            }), true);
 
             offsetX.BindValueChanged(val => areaOffset.Value = new Vector2(val.NewValue, areaOffset.Value.Y));
             offsetY.BindValueChanged(val => areaOffset.Value = new Vector2(areaOffset.Value.X, val.NewValue));
 
             areaSize.BindTo(tabletHandler.AreaSize);
-            areaSize.BindValueChanged(val =>
+            areaSize.BindValueChanged(val => Schedule(() =>
             {
                 sizeX.Value = val.NewValue.X;
                 sizeY.Value = val.NewValue.Y;
-            }, true);
+            }), true);
 
             sizeX.BindValueChanged(val =>
             {
@@ -255,7 +254,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             });
 
             tablet.BindTo(tabletHandler.Tablet);
-            tablet.BindValueChanged(val =>
+            tablet.BindValueChanged(val => Schedule(() =>
             {
                 Scheduler.AddOnce(updateVisibility);
 
@@ -274,7 +273,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 sizeY.Default = sizeY.MaxValue = tab.Size.Y;
 
                 areaSize.Default = new Vector2(sizeX.Default, sizeY.Default);
-            }, true);
+            }), true);
         }
 
         private void updateVisibility()

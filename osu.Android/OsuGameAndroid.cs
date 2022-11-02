@@ -96,6 +96,9 @@ namespace osu.Android
                 case AndroidMouseHandler mh:
                     return new AndroidMouseSettings(mh);
 
+                case AndroidJoystickHandler jh:
+                    return new AndroidJoystickSettings(jh);
+
                 default:
                     return base.CreateSettingsSubsectionFor(handler);
             }
@@ -109,7 +112,7 @@ namespace osu.Android
             // when any other monoandroid dependency present.
             // https://github.com/dotnet/runtime/issues/67140
 
-            public override double ChargeLevel
+            public override double? ChargeLevel
             {
                 get
                 {
@@ -129,14 +132,14 @@ namespace osu.Android
                 }
             }
 
-            public override bool IsCharging
+            public override bool OnBattery
             {
                 get
                 {
                     using (IntentFilter filter = new IntentFilter(Intent.ActionBatteryChanged))
                     using (Intent battery = Application.Context.RegisterReceiver(null, filter))
                     {
-                        return battery.GetIntExtra(BatteryManager.ExtraPlugged, -1) != 0;
+                        return battery.GetIntExtra(BatteryManager.ExtraPlugged, -1) == 0;
                     }
                 }
             }

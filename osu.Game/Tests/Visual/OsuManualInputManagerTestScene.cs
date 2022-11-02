@@ -36,21 +36,31 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected virtual bool CreateNestedActionContainer => true;
 
+        /// <summary>
+        /// Whether a menu cursor controlled by the manual input manager should be displayed.
+        /// True by default, but is disabled for <see cref="OsuGameTestScene"/>s as they provide their own global cursor.
+        /// </summary>
+        protected virtual bool DisplayCursorForManualInput => true;
+
         protected OsuManualInputManagerTestScene()
         {
-            MenuCursorContainer cursorContainer;
+            var mainContent = content = new Container { RelativeSizeAxes = Axes.Both };
 
-            CompositeDrawable mainContent = cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
-
-            cursorContainer.Child = content = new OsuTooltipContainer(cursorContainer.Cursor)
+            if (DisplayCursorForManualInput)
             {
-                RelativeSizeAxes = Axes.Both
-            };
+                var cursorDisplay = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both };
+
+                cursorDisplay.Add(new OsuTooltipContainer(cursorDisplay.MenuCursor)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = mainContent
+                });
+
+                mainContent = cursorDisplay;
+            }
 
             if (CreateNestedActionContainer)
-            {
                 mainContent = new GlobalActionContainer(null).WithChild(mainContent);
-            }
 
             base.Content.AddRange(new Drawable[]
             {

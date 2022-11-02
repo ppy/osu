@@ -1,10 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -23,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// The user readable description of this mod.
         /// </summary>
-        string Description { get; }
+        LocalisableString Description { get; }
 
         /// <summary>
         /// The type of this mod.

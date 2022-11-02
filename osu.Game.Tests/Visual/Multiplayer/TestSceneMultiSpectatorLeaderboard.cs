@@ -22,8 +22,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private MultiSpectatorLeaderboard leaderboard;
 
         [SetUpSteps]
-        public new void SetUpSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
             AddStep("reset", () =>
             {
                 leaderboard?.RemoveAndDisposeImmediately();
@@ -118,6 +120,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             => AddStep($"set user {userId} time {time}", () => clocks[userId].CurrentTime = time);
 
         private void assertCombo(int userId, int expectedCombo)
-            => AddUntilStep($"player {userId} has {expectedCombo} combo", () => this.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId).Combo.Value == expectedCombo);
+            => AddUntilStep($"player {userId} has {expectedCombo} combo", () => this.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.OnlineID == userId).Combo.Value == expectedCombo);
     }
 }

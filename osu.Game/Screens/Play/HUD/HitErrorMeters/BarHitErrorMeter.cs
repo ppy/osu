@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -44,8 +45,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         public Bindable<LabelStyles> LabelStyle { get; } = new Bindable<LabelStyles>(LabelStyles.Icons);
 
         private SpriteIcon arrow;
-        private Drawable labelEarly;
-        private Drawable labelLate;
+        private UprightAspectMaintainingContainer labelEarly;
+        private UprightAspectMaintainingContainer labelLate;
 
         private Container colourBarsEarly;
         private Container colourBarsLate;
@@ -121,6 +122,20 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
                                 Width = judgement_line_width,
+                            },
+                            labelEarly = new UprightAspectMaintainingContainer
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.Centre,
+                                Y = -10,
+                            },
+                            labelLate = new UprightAspectMaintainingContainer
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.Centre,
+                                Y = 10,
                             },
                         }
                     },
@@ -261,57 +276,41 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             const float icon_size = 14;
 
-            labelEarly?.Expire();
-            labelEarly = null;
-
-            labelLate?.Expire();
-            labelLate = null;
-
             switch (style)
             {
                 case LabelStyles.None:
+                    labelEarly.Clear();
+                    labelLate.Clear();
                     break;
 
                 case LabelStyles.Icons:
-                    labelEarly = new SpriteIcon
+                    labelEarly.Child = new SpriteIcon
                     {
-                        Y = -10,
                         Size = new Vector2(icon_size),
                         Icon = FontAwesome.Solid.ShippingFast,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.Centre,
                     };
 
-                    labelLate = new SpriteIcon
+                    labelLate.Child = new SpriteIcon
                     {
-                        Y = 10,
                         Size = new Vector2(icon_size),
                         Icon = FontAwesome.Solid.Bicycle,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.Centre,
                     };
 
                     break;
 
                 case LabelStyles.Text:
-                    labelEarly = new OsuSpriteText
+                    labelEarly.Child = new OsuSpriteText
                     {
-                        Y = -10,
                         Text = "Early",
                         Font = OsuFont.Default.With(size: 10),
                         Height = 12,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.Centre,
                     };
 
-                    labelLate = new OsuSpriteText
+                    labelLate.Child = new OsuSpriteText
                     {
-                        Y = 10,
                         Text = "Late",
                         Font = OsuFont.Default.With(size: 10),
                         Height = 12,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.Centre,
                     };
 
                     break;
@@ -320,26 +319,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                     throw new ArgumentOutOfRangeException(nameof(style), style, null);
             }
 
-            if (labelEarly != null)
-            {
-                colourBars.Add(labelEarly);
-                labelEarly.FadeInFromZero(500);
-            }
-
-            if (labelLate != null)
-            {
-                colourBars.Add(labelLate);
-                labelLate.FadeInFromZero(500);
-            }
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // undo any layout rotation to display icons in the correct orientation
-            if (labelEarly != null) labelEarly.Rotation = -Rotation;
-            if (labelLate != null) labelLate.Rotation = -Rotation;
+            labelEarly.FadeInFromZero(500);
+            labelLate.FadeInFromZero(500);
         }
 
         private void createColourBars((HitResult result, double length)[] windows)
