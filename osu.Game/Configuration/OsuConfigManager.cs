@@ -175,7 +175,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
-            SetDefault(OsuSetting.ComboColourBrightness, 0f, -1f, 1f, 1f);
+            SetDefault(OsuSetting.ComboColourNormalisation, 0.2f, 0f, 1f, 0.01f);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -367,6 +367,6 @@ namespace osu.Game.Configuration
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,
         SafeAreaConsiderations,
-        ComboColourBrightness,
+        ComboColourNormalisation,
     }
 }
