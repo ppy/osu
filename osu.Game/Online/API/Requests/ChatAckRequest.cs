@@ -9,10 +9,16 @@ namespace osu.Game.Online.API.Requests
 {
     public class ChatAckRequest : APIRequest<ChatAckResponse>
     {
+        public long SinceMessageId;
+        public uint? SinceSilenceId;
+
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
             req.Method = HttpMethod.Post;
+            req.AddParameter(@"since", SinceMessageId.ToString());
+            if (SinceSilenceId != null)
+                req.AddParameter(@"history_since", SinceSilenceId.Value.ToString());
             return req;
         }
 
