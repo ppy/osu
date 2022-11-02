@@ -43,6 +43,9 @@ namespace osu.Game.Screens.Backgrounds
         /// </summary>
         public readonly Bindable<float> BlurAmount = new BindableFloat();
 
+        /// <summary>
+        /// The amount of dim to be override if <see cref="IgnoreUserSettings"/> is true.
+        /// </summary>
         public readonly Bindable<float> DimAmount = new Bindable<float>();
 
         internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
