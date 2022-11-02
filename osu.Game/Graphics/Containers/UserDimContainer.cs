@@ -46,6 +46,9 @@ namespace osu.Game.Graphics.Containers
 
         protected Bindable<double> UserDimLevel { get; private set; } = null!;
 
+        /// <summary>
+        /// The amount of dim to be override if <see cref="IgnoreUserSettings"/> is true.
+        /// </summary>
         public Bindable<float> DimAmount { get; set; } = new Bindable<float>();
 
         protected Bindable<bool> LightenDuringBreaks { get; private set; } = null!;
