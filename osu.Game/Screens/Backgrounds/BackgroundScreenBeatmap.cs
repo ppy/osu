@@ -44,9 +44,9 @@ namespace osu.Game.Screens.Backgrounds
         public readonly Bindable<float> BlurAmount = new BindableFloat();
 
         /// <summary>
-        /// The amount of dim to be override if <see cref="IgnoreUserSettings"/> is true.
+        /// The amount of dim to be used when <see cref="IgnoreUserSettings"/> is <c>true</c>.
         /// </summary>
-        public readonly Bindable<float> DimAmount = new Bindable<float>();
+        public readonly Bindable<float> DimWhenUserSettingsIgnored = new Bindable<float>();
 
         internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Backgrounds
             dimmable.IgnoreUserSettings.BindTo(IgnoreUserSettings);
             dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
-            dimmable.DimAmount.BindTo(DimAmount);
+            dimmable.DimWhenUserSettingsIgnored.BindTo(DimWhenUserSettingsIgnored);
 
             StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
