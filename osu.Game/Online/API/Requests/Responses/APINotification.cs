@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -32,6 +32,6 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool IsRead { get; set; }
 
         [JsonProperty(@"details")]
-        public Dictionary<string, string>? Details { get; set; }
+        public JObject? Details { get; set; }
     }
 }
