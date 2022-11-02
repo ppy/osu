@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load(OsuConfigManager config, ISkinSource skinSource)
         {
             config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
-            config.BindWith(OsuSetting.ComboColourNormalisation, comboColourBrightness);
+            config.BindWith(OsuSetting.ComboColourNormalisationAmount, comboColourBrightness);
 
             // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
             base.AddInternal(Samples = new PausableSkinnableSound());

@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.ComboColourNormalisation, comboColourNormalisation);
+            config.BindWith(OsuSetting.ComboColourNormalisationAmount, comboColourNormalisation);
 
             Children = new Drawable[]
             {
