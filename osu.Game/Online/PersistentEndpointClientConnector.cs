@@ -12,7 +12,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online
 {
-    public abstract class SocketClientConnector : Component
+    public abstract class PersistentEndpointClientConnector : Component
     {
         /// <summary>
         /// Whether this is connected to the hub, use <see cref="CurrentConnection"/> to access the connection, if this is <c>true</c>.
@@ -22,7 +22,7 @@ namespace osu.Game.Online
         /// <summary>
         /// The current connection opened by this connector.
         /// </summary>
-        public SocketClient? CurrentConnection { get; private set; }
+        public PersistentEndpointClient? CurrentConnection { get; private set; }
 
         private readonly Bindable<bool> isConnected = new Bindable<bool>();
         private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
@@ -34,7 +34,7 @@ namespace osu.Game.Online
         /// Constructs a new <see cref="HubClientConnector"/>.
         /// </summary>
         /// <param name="api"> An API provider used to react to connection state changes.</param>
-        protected SocketClientConnector(IAPIProvider api)
+        protected PersistentEndpointClientConnector(IAPIProvider api)
         {
             apiState.BindTo(api.State);
             apiState.BindValueChanged(_ => Task.Run(connectIfPossible), true);
@@ -124,7 +124,7 @@ namespace osu.Game.Online
             await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
         }
 
-        protected abstract Task<SocketClient> BuildConnectionAsync(CancellationToken cancellationToken);
+        protected abstract Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken);
 
         private async Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)
         {
