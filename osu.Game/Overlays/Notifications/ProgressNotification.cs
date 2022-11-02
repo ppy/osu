@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.Notifications
                 return;
 
             // Thread-safe barrier, as this may be called by a web request and also scheduled to the update thread at the same time.
-            if (Interlocked.Increment(ref completionSent) == 0)
+            if (Interlocked.Exchange(ref completionSent, 1) == 0)
                 return;
 
             CompletionTarget.Invoke(CreateCompletionNotification());
