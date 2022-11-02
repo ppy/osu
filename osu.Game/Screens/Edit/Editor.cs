@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Edit
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
-        private Bindable<float> editorDim;
+        private Bindable<float> editorBackgroundDim;
 
         public Editor(EditorLoader loader = null)
         {
@@ -261,7 +261,7 @@ namespace osu.Game.Screens.Edit
             OsuMenuItem undoMenuItem;
             OsuMenuItem redoMenuItem;
 
-            editorDim = config.GetBindable<float>(OsuSetting.EditorDim);
+            editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -314,7 +314,7 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
-                                            new BackgroundDimMenuItem(editorDim),
+                                            new BackgroundDimMenuItem(editorBackgroundDim),
                                         }
                                     }
                                 }
@@ -335,7 +335,7 @@ namespace osu.Game.Screens.Edit
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
-            editorDim.BindValueChanged(_ => dimBackground());
+            editorBackgroundDim.BindValueChanged(_ => dimBackground());
         }
 
         [Resolved]
@@ -632,7 +632,7 @@ namespace osu.Game.Screens.Edit
             ApplyToBackground(b =>
             {
                 b.IgnoreUserSettings.Value = true;
-                b.DimAmount.Value = editorDim.Value;
+                b.DimAmount.Value = editorBackgroundDim.Value;
                 b.BlurAmount.Value = 0;
             });
         }
