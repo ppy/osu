@@ -12,12 +12,9 @@ namespace osu.Game.Online.Notifications.Polling
     /// </summary>
     public class PollingNotificationsClient : NotificationsClient
     {
-        private readonly IAPIProvider api;
-
         public PollingNotificationsClient(IAPIProvider api)
             : base(api)
         {
-            this.api = api;
         }
 
         public override Task ConnectAsync(CancellationToken cancellationToken)
@@ -26,7 +23,7 @@ namespace osu.Game.Online.Notifications.Polling
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    await api.PerformAsync(CreateFetchMessagesRequest());
+                    await API.PerformAsync(CreateFetchMessagesRequest());
                     await Task.Delay(1000, cancellationToken);
                 }
             }, cancellationToken);

@@ -23,11 +23,12 @@ namespace osu.Game.Online
         /// </summary>
         public SocketClient? CurrentConnection { get; private set; }
 
+        protected readonly IAPIProvider API;
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         private readonly Bindable<bool> isConnected = new Bindable<bool>();
         private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
         private CancellationTokenSource connectCancelSource = new CancellationTokenSource();
-
-        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         /// <summary>
         /// Constructs a new <see cref="HubClientConnector"/>.
@@ -35,6 +36,8 @@ namespace osu.Game.Online
         /// <param name="api"> An API provider used to react to connection state changes.</param>
         protected SocketClientConnector(IAPIProvider api)
         {
+            API = api;
+
             apiState.BindTo(api.State);
             apiState.BindValueChanged(_ => Task.Run(connectIfPossible), true);
         }

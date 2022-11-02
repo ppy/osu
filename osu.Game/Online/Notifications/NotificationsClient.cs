@@ -21,14 +21,14 @@ namespace osu.Game.Online.Notifications
         public Action<List<Message>>? NewMessages;
         public Action? PresenceReceived;
 
-        private readonly IAPIProvider api;
+        protected readonly IAPIProvider API;
 
         private bool enableChat;
         private long lastMessageId;
 
         protected NotificationsClient(IAPIProvider api)
         {
-            this.api = api;
+            API = api;
         }
 
         public bool EnableChat
@@ -54,7 +54,7 @@ namespace osu.Game.Online.Notifications
 
         protected virtual Task StartChatAsync()
         {
-            api.Queue(CreateFetchMessagesRequest(0));
+            API.Queue(CreateFetchMessagesRequest(0));
             return Task.CompletedTask;
         }
 

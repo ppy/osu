@@ -12,15 +12,12 @@ namespace osu.Game.Online.Notifications.Polling
     /// </summary>
     public class PollingNotificationsClientConnector : NotificationsClientConnector
     {
-        private readonly IAPIProvider api;
-
         public PollingNotificationsClientConnector(IAPIProvider api)
             : base(api)
         {
-            this.api = api;
         }
 
         protected override Task<NotificationsClient> BuildNotificationClientAsync(CancellationToken cancellationToken)
-            => Task.FromResult((NotificationsClient)new PollingNotificationsClient(api));
+            => Task.FromResult((NotificationsClient)new PollingNotificationsClient(API));
     }
 }
