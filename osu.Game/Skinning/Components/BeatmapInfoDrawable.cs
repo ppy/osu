@@ -184,7 +184,7 @@ namespace osu.Game.Skinning.Components
                     {
                         string title = bm.NewValue.BeatmapInfo.Metadata.Title;
                         //todo: no Song Title localisation?
-                        labelText = TooltipText = "Song Title";
+                        labelText = TooltipText = EditorSetupStrings.Title;
                         value = title;
                         updateLabel();
                     }, true);
@@ -194,8 +194,7 @@ namespace osu.Game.Skinning.Components
                     beatmap.BindValueChanged(bm =>
                     {
                         string artist = bm.NewValue.BeatmapInfo.Metadata.Artist;
-                        //todo: Localize Artist
-                        labelText = "Artist";
+                        labelText = EditorSetupStrings.Artist;
                         TooltipText = BeatmapsetsStrings.ShowDetailsByArtist(artist);
                         value = artist;
                         updateLabel();
@@ -206,8 +205,7 @@ namespace osu.Game.Skinning.Components
                     beatmap.BindValueChanged(bm =>
                     {
                         string diff = bm.NewValue.BeatmapInfo.DifficultyName;
-                        //todo: no Difficulty name localisation?
-                        labelText = TooltipText = "Difficulty";
+                        labelText = TooltipText = EditorSetupStrings.DifficultyHeader;
                         text.Current.Value = diff;
                         updateLabel();
                     }, true);
@@ -218,7 +216,7 @@ namespace osu.Game.Skinning.Components
                     {
                         string mapper = bm.NewValue.BeatmapInfo.Metadata.Author.Username;
                         //todo: is there a good alternative, to ShowDetailsMappedBy?
-                        labelText = "Mapper";
+                        labelText = AccountsStrings.NotificationsOptionsMapping;
                         TooltipText = BeatmapsetsStrings.ShowDetailsMappedBy(mapper);
                         value = mapper;
                         updateLabel();
@@ -228,7 +226,7 @@ namespace osu.Game.Skinning.Components
                 case BeatmapInfo.Length:
                     beatmap.BindValueChanged(bm =>
                     {
-                        labelText = TooltipText = BeatmapsetsStrings.ShowStatsTotalLength(TimeSpan.FromMilliseconds(bm.NewValue.BeatmapInfo.Length).ToFormattedDuration());
+                        labelText = TooltipText = ArtistStrings.TracklistLength;
                         value = TimeSpan.FromMilliseconds(bm.NewValue.BeatmapInfo.Length).ToFormattedDuration();
                         updateLabel();
                     }, true);
@@ -239,8 +237,7 @@ namespace osu.Game.Skinning.Components
                     {
                         BeatmapOnlineStatus status = bm.NewValue.BeatmapInfo.Status;
                         //todo: no Localizasion for None Beatmap Online Status
-                        //todo: no Localization for Status?
-                        labelText = "Status";
+                        labelText = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault;
 
                         switch (status)
                         {
