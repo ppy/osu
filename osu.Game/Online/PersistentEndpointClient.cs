@@ -13,7 +13,7 @@ namespace osu.Game.Online
 
         protected Task InvokeClosed(Exception? exception) => Closed?.Invoke(exception) ?? Task.CompletedTask;
 
-        public abstract Task StartAsync(CancellationToken cancellationToken);
+        public abstract Task ConnectAsync(CancellationToken cancellationToken);
 
         public virtual ValueTask DisposeAsync()
         {
