@@ -137,8 +137,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkRequestCount(0);
         }
 
-        private void checkRequestCount(int expected) =>
-            AddAssert($"request count is {expected}", () => requestCount == expected);
+        private void checkRequestCount(int expected)
+        {
+            AddAssert($"skip count is {expected}", () => skip.SkipCount, () => Is.EqualTo(expected));
+            AddAssert($"request count is {expected}", () => requestCount, () => Is.EqualTo(expected));
+        }
 
         private class TestSkipOverlay : SkipOverlay
         {

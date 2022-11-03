@@ -27,6 +27,11 @@ namespace osu.Game.Screens.Play
 {
     public class SkipOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
+        /// <summary>
+        /// The total number of successful skips performed by this overlay.
+        /// </summary>
+        public int SkipCount { get; private set; }
+
         private readonly double startTime;
 
         public Action RequestSkip;
@@ -124,7 +129,11 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            button.Action = () => RequestSkip?.Invoke();
+            button.Action = () =>
+            {
+                SkipCount++;
+                RequestSkip?.Invoke();
+            };
 
             fadeContainer.TriggerShow();
 
