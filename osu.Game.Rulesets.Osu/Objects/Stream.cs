@@ -7,11 +7,12 @@ using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Stream : OsuHitObject, IHasDuration
+    public class Stream : OsuHitObject, IHasPath
     {
         public double EndTime => StreamPath.ControlPoints.Count > 0 ? StreamPath.ControlPoints.Last().Time : StartTime;
 
@@ -34,6 +35,10 @@ namespace osu.Game.Rulesets.Osu.Objects
                 streamPath.ControlPoints.AddRange(value.ControlPoints.Select(c => new StreamControlPoint(c.Time, c.Count, c.Ratio)));
             }
         }
+
+        public SliderPath Path => StreamPath.Path;
+
+        public double Distance => StreamPath.Path.Distance;
 
         public override Vector2 Position
         {
