@@ -5,10 +5,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -87,6 +87,9 @@ namespace osu.Game.Skinning
             this.skin = skin;
             this.ruleset = ruleset;
             this.beatmap = beatmap;
+
+            if (ruleset != null)
+                Debug.Assert(beatmap != null);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -118,10 +121,19 @@ namespace osu.Game.Skinning
         {
             ISkin transformedSkin;
 
-            yield return transformedSkin = ruleset == null ? skin : skin.WithRulesetTransformer(ruleset, beatmap.AsNonNull());
+            yield return transformedSkin = getTransformedSkin(skin);
 
             if (transformedSkin is LegacySkinTransformer legacySkin && legacySkin.IsProvidingLegacyResources)
-                yield return ruleset == null ? skins.DefaultClassicSkin : skins.DefaultClassicSkin.WithRulesetTransformer(ruleset, beatmap.AsNonNull());
+                yield return getTransformedSkin(skins.DefaultClassicSkin);
+        }
+
+        private ISkin getTransformedSkin(ISkin skin)
+        {
+            if (ruleset == null)
+                return skin;
+
+            Debug.Assert(beatmap != null);
+            return skin.WithRulesetTransformer(ruleset, beatmap);
         }
     }
 }
