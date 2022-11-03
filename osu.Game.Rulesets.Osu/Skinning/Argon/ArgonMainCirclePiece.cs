@@ -108,19 +108,28 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         {
             base.LoadComplete();
 
-            accentColour.BindValueChanged(colour =>
-            {
-                outerFill.Colour = innerFill.Colour = colour.NewValue.Darken(4);
-                outerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.1f));
-                innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
-                flash.Colour = colour.NewValue;
-            }, true);
-
             indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
 
+            accentColour.BindValueChanged(colour =>
+            {
+                // A colour transform is applied.
+                // Without removing transforms first, when it is rewound it may apply an old colour.
+                outerGradient.ClearTransforms(targetMember: nameof(Colour));
+                outerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.1f));
+
+                outerFill.Colour = innerFill.Colour = colour.NewValue.Darken(4);
+                innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
+                flash.Colour = colour.NewValue;
+
+                // Accent colour may be changed many times during a paused gameplay state.
+                // Schedule the change to avoid transforms piling up.
+                Scheduler.AddOnce(updateStateTransforms);
+            }, true);
+
             drawableObject.ApplyCustomUpdateState += updateStateTransforms;
-            updateStateTransforms(drawableObject, drawableObject.State.Value);
         }
+
+        private void updateStateTransforms() => updateStateTransforms(drawableObject, drawableObject.State.Value);
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
@@ -166,18 +175,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         // This is to give it a bomb-like effect, with the border "triggering" its animation when getting close.
                         using (BeginDelayedSequence(flash_in_duration / 12))
                         {
-                            outerGradient.ResizeTo(outerGradient.Size * shrink_size, resize_duration, Easing.OutElasticHalf);
+                            outerGradient.ResizeTo(OUTER_GRADIENT_SIZE * shrink_size, resize_duration, Easing.OutElasticHalf);
                             outerGradient
                                 .FadeColour(Color4.White, 80)
                                 .Then()
                                 .FadeOut(flash_in_duration);
                         }
 
-                        // The flash layer starts white to give the wanted brightness, but is almost immediately
-                        // recoloured to the accent colour. This would more correctly be done with two layers (one for the initial flash)
-                        // but works well enough with the colour fade.
                         flash.FadeTo(1, flash_in_duration, Easing.OutQuint);
-                        flash.FlashColour(accentColour.Value, fade_out_time, Easing.OutQuint);
 
                         this.FadeOut(fade_out_time, Easing.OutQuad);
                         break;

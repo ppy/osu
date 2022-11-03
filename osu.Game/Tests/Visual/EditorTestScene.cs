@@ -110,6 +110,8 @@ namespace osu.Game.Tests.Visual
 
             public new void Paste() => base.Paste();
 
+            public new void Clone() => base.Clone();
+
             public new void SwitchToDifficulty(BeatmapInfo beatmapInfo) => base.SwitchToDifficulty(beatmapInfo);
 
             public new void CreateNewDifficulty(RulesetInfo rulesetInfo) => base.CreateNewDifficulty(rulesetInfo);

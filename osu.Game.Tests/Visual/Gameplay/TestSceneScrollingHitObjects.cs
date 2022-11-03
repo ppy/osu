@@ -214,7 +214,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void addControlPoints(IList<MultiplierControlPoint> controlPoints, double sequenceStartTime)
         {
-            controlPoints.ForEach(point => point.StartTime += sequenceStartTime);
+            controlPoints.ForEach(point => point.Time += sequenceStartTime);
 
             scrollContainers.ForEach(container =>
             {
@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             foreach (var playfield in playfields)
             {
                 foreach (var controlPoint in controlPoints)
-                    playfield.Add(createDrawablePoint(playfield, controlPoint.StartTime));
+                    playfield.Add(createDrawablePoint(playfield, controlPoint.Time));
             }
         }
 
