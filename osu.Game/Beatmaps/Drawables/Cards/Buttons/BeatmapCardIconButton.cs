@@ -74,6 +74,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 CornerRadius = BeatmapCard.CORNER_RADIUS,
+                Scale = new Vector2(0.8f),
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Children = new Drawable[]
@@ -88,6 +89,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
+                        Scale = new Vector2(1.2f),
                     },
                 }
             });
@@ -127,7 +129,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             bool isHovered = IsHovered && Enabled.Value;
 
             hover.FadeTo(isHovered ? 1f : 0f, 500, Easing.OutQuint);
-            Icon.ScaleTo(isHovered ? 1.2f : 1, 500, Easing.OutQuint);
+            content.ScaleTo(isHovered ? 1 : 0.8f, 500, Easing.OutQuint);
             Icon.FadeColour(isHovered ? HoverColour : IdleColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
