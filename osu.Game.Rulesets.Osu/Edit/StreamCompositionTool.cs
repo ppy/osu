@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
-using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Streams;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -18,6 +18,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles);
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new SliderPlacementBlueprint();
+        public override PlacementBlueprint CreatePlacementBlueprint() => new StreamPlacementBlueprint();
     }
 }

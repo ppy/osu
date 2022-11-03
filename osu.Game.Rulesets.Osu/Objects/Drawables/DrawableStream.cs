@@ -14,9 +14,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public new Stream HitObject => (Stream)base.HitObject;
 
         private Container<DrawableHitCircle> hitCircleContainer = null!;
-        private int depthIndex = 0;
+        private int depthIndex;
 
-        public DrawableStream(Stream s)
+        public DrawableStream()
+            : this(null)
+        {
+        }
+
+        public DrawableStream(Stream? s = null)
             : base(s)
         {
         }
