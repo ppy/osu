@@ -59,6 +59,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private readonly BindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
+        private readonly BindableList<HitObject> selectedObjects = new BindableList<HitObject>();
 
         public SliderSelectionBlueprint(Slider slider)
             : base(slider)
@@ -86,6 +87,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             pathVersion.BindValueChanged(_ => editorBeatmap?.Update(HitObject));
 
             BodyPiece.UpdateFrom(HitObject);
+
+            if (editorBeatmap != null)
+                selectedObjects.BindTo(editorBeatmap.SelectedHitObjects);
+            selectedObjects.BindCollectionChanged((_, _) => updateVisualDefinition(), true);
         }
 
         public override bool HandleQuickDeletion()
@@ -100,6 +105,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return true;
         }
 
+        private bool hasSingleObjectSelected => selectedObjects.Count == 1;
+
         protected override void Update()
         {
             base.Update();
@@ -108,14 +115,25 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 BodyPiece.UpdateFrom(HitObject);
         }
 
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateVisualDefinition();
+
+            // In the case more than a single object is selected, block hover from arriving at sliders behind this one.
+            // Without doing this, the path visualisers of potentially hundreds of sliders will render, which is not only
+            // visually noisy but also functionally useless.
+            return !hasSingleObjectSelected;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateVisualDefinition();
+            base.OnHoverLost(e);
+        }
+
         protected override void OnSelected()
         {
-            AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(HitObject, true)
-            {
-                RemoveControlPointsRequested = removeControlPoints,
-                SplitControlPointsRequested = splitControlPoints
-            });
-
+            updateVisualDefinition();
             base.OnSelected();
         }
 
@@ -123,11 +141,29 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.OnDeselected();
 
-            // throw away frame buffers on deselection.
-            ControlPointVisualiser?.Expire();
-            ControlPointVisualiser = null;
-
+            updateVisualDefinition();
             BodyPiece.RecyclePath();
+        }
+
+        private void updateVisualDefinition()
+        {
+            // To reduce overhead of drawing these blueprints, only add extra detail when hovered or when only this slider is selected.
+            if (IsSelected && (hasSingleObjectSelected || IsHovered))
+            {
+                if (ControlPointVisualiser == null)
+                {
+                    AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(HitObject, true)
+                    {
+                        RemoveControlPointsRequested = removeControlPoints,
+                        SplitControlPointsRequested = splitControlPoints
+                    });
+                }
+            }
+            else
+            {
+                ControlPointVisualiser?.Expire();
+                ControlPointVisualiser = null;
+            }
         }
 
         private Vector2 rightClickPosition;

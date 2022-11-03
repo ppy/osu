@@ -7,6 +7,7 @@ using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osuTK.Graphics;
@@ -26,13 +27,13 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
         /// A part of this piece that will be faded out while falling in the playfield.
         /// </summary>
         [CanBeNull]
-        protected virtual BorderPiece BorderPiece => null;
+        protected virtual Drawable BorderPiece => null;
 
         /// <summary>
         /// A part of this piece that will be only visible when <see cref="HyperDash"/> is true.
         /// </summary>
         [CanBeNull]
-        protected virtual HyperBorderPiece HyperBorderPiece => null;
+        protected virtual Drawable HyperBorderPiece => null;
 
         protected override void LoadComplete()
         {

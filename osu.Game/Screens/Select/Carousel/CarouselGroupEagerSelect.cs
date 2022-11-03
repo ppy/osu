@@ -108,10 +108,35 @@ namespace osu.Game.Screens.Select.Carousel
             PerformSelection();
         }
 
+        /// <summary>
+        /// Finds the item this group would select next if it attempted selection
+        /// </summary>
+        /// <returns>An unfiltered item nearest to the last selected one or null if all items are filtered</returns>
         protected virtual CarouselItem GetNextToSelect()
         {
-            return Items.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value) ??
-                   Items.Reverse().Skip(Items.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value);
+            if (Items.Count == 0)
+                return null;
+
+            int forwardsIndex = lastSelectedIndex;
+            int backwardsIndex = Math.Min(lastSelectedIndex, Items.Count - 1);
+
+            while (true)
+            {
+                bool hasBackwards = backwardsIndex >= 0 && backwardsIndex < Items.Count;
+                bool hasForwards = forwardsIndex < Items.Count;
+
+                if (!hasBackwards && !hasForwards)
+                    return null;
+
+                if (hasForwards && !Items[forwardsIndex].Filtered.Value)
+                    return Items[forwardsIndex];
+
+                if (hasBackwards && !Items[backwardsIndex].Filtered.Value)
+                    return Items[backwardsIndex];
+
+                forwardsIndex++;
+                backwardsIndex--;
+            }
         }
 
         protected virtual void PerformSelection()

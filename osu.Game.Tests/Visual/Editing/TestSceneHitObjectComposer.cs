@@ -148,10 +148,6 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
-
-            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
-
-            AddAssert("circle placed", () => editorBeatmap.HitObjects.Count == 1);
         }
 
         [Test]
@@ -165,10 +161,11 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("hold alt", () => InputManager.PressKey(Key.LAlt));
 
             AddStep("scroll mouse 5 steps", () => InputManager.ScrollVerticalBy(5));
-            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
 
             AddStep("release alt", () => InputManager.ReleaseKey(Key.LAlt));
             AddStep("release ctrl", () => InputManager.ReleaseKey(Key.LControl));
+
+            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
         }
 
         public class EditorBeatmapContainer : Container
