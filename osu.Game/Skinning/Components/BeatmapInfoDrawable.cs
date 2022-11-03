@@ -83,17 +83,18 @@ namespace osu.Game.Skinning.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Type.BindValueChanged(update, true);
-            ShowLabel.BindValueChanged(ignored => updateLabel());
-            ValueBeforeLabel.BindValueChanged(ignored => updateLabel());
-            LabelPrefix.BindValueChanged(ignored => updateLabel());
-            ShowLabelPrefix.BindValueChanged(ignored => updateLabel());
-            LabelSuffix.BindValueChanged(ignored => updateLabel());
-            ShowLabelSuffix.BindValueChanged(ignored => updateLabel());
-            ValuePrefix.BindValueChanged(ignored => updateLabel());
-            ShowValuePrefix.BindValueChanged(ignored => updateLabel());
-            ValueSuffix.BindValueChanged(ignored => updateLabel());
-            ShowValueSuffix.BindValueChanged(ignored => updateLabel());
+            Type.BindValueChanged(_ => updateBeatmapContent());
+            beatmap.BindValueChanged(_ => updateBeatmapContent(), true);
+            ShowLabel.BindValueChanged(_ => updateLabel());
+            ValueBeforeLabel.BindValueChanged(_ => updateLabel());
+            LabelPrefix.BindValueChanged(_ => updateLabel());
+            ShowLabelPrefix.BindValueChanged(_ => updateLabel());
+            LabelSuffix.BindValueChanged(_ => updateLabel());
+            ShowLabelSuffix.BindValueChanged(_ => updateLabel());
+            ValuePrefix.BindValueChanged(_ => updateLabel());
+            ShowValuePrefix.BindValueChanged(_ => updateLabel());
+            ValueSuffix.BindValueChanged(_ => updateLabel());
+            ShowValueSuffix.BindValueChanged(_ => updateLabel());
         }
 
         private LocalisableString getLabelText()
@@ -125,174 +126,124 @@ namespace osu.Game.Skinning.Components
             Height = text.Height;
         }
 
-        private void update(ValueChangedEvent<BeatmapInfo> type)
+        private void updateBeatmapContent()
         {
-            switch (type.NewValue)
+            switch (Type.Value)
             {
                 case BeatmapInfo.CircleSize:
-                    beatmap.BindValueChanged(bm =>
-                    {
-                        double cs = bm.NewValue.BeatmapInfo.Difficulty.CircleSize;
-                        labelText = TooltipText = BeatmapsetsStrings.ShowStatsCs;
-                        value = cs.ToString("F2");
-                        updateLabel();
-                    }, true);
+                    double cs = beatmap.Value.BeatmapInfo.Difficulty.CircleSize;
+                    labelText = TooltipText = BeatmapsetsStrings.ShowStatsCs;
+                    value = cs.ToString("F2");
                     break;
 
                 case BeatmapInfo.HPDrain:
-                    beatmap.BindValueChanged(bm =>
-                    {
-                        double hp = bm.NewValue.BeatmapInfo.Difficulty.DrainRate;
-                        labelText = TooltipText = BeatmapsetsStrings.ShowStatsDrain;
-                        value = hp.ToString("F2");
-                        updateLabel();
-                    }, true);
+                    double hp = beatmap.Value.BeatmapInfo.Difficulty.DrainRate;
+                    labelText = TooltipText = BeatmapsetsStrings.ShowStatsDrain;
+                    value = hp.ToString("F2");
                     break;
 
                 case BeatmapInfo.Accuracy:
-                    beatmap.BindValueChanged(bm =>
-                    {
-                        double od = bm.NewValue.BeatmapInfo.Difficulty.OverallDifficulty;
-                        labelText = TooltipText = BeatmapsetsStrings.ShowStatsAccuracy;
-                        value = od.ToString("F2");
-                        updateLabel();
-                    }, true);
+                    double od = beatmap.Value.BeatmapInfo.Difficulty.OverallDifficulty;
+                    labelText = TooltipText = BeatmapsetsStrings.ShowStatsAccuracy;
+                    value = od.ToString("F2");
                     break;
 
                 case BeatmapInfo.ApproachRate:
-                    beatmap.BindValueChanged(bm =>
-                    {
-                        double ar = bm.NewValue.BeatmapInfo.Difficulty.ApproachRate;
-                        labelText = TooltipText = BeatmapsetsStrings.ShowStatsAr;
-                        value = ar.ToString("F2");
-                        updateLabel();
-                    }, true);
+                    double ar = beatmap.Value.BeatmapInfo.Difficulty.ApproachRate;
+                    labelText = TooltipText = BeatmapsetsStrings.ShowStatsAr;
+                    value = ar.ToString("F2");
                     break;
 
                 case BeatmapInfo.StarRating:
-                    beatmap.BindValueChanged(bm =>
-                    {
-                        double sr = bm.NewValue.BeatmapInfo.StarRating;
-                        labelText = TooltipText = BeatmapsetsStrings.ShowStatsStars;
-                        value = sr.ToString("F2");
-                        updateLabel();
-                    }, true);
+                    double sr = beatmap.Value.BeatmapInfo.StarRating;
+                    labelText = TooltipText = BeatmapsetsStrings.ShowStatsStars;
+                    value = sr.ToString("F2");
                     break;
 
                 case BeatmapInfo.Song:
-                    beatmap.BindValueChanged(bm =>
-                    {
-                        string title = bm.NewValue.BeatmapInfo.Metadata.Title;
-                        //todo: no Song Title localisation?
-                        labelText = TooltipText = EditorSetupStrings.Title;
-                        value = title;
-                        updateLabel();
-                    }, true);
+                    string title = beatmap.Value.BeatmapInfo.Metadata.Title;
+                    labelText = TooltipText = EditorSetupStrings.Title;
+                    value = title;
                     break;
 
                 case BeatmapInfo.Artist:
-                    beatmap.BindValueChanged(bm =>
-                    {
-                        string artist = bm.NewValue.BeatmapInfo.Metadata.Artist;
-                        labelText = EditorSetupStrings.Artist;
-                        TooltipText = BeatmapsetsStrings.ShowDetailsByArtist(artist);
-                        value = artist;
-                        updateLabel();
-                    }, true);
+                    string artist = beatmap.Value.BeatmapInfo.Metadata.Artist;
+                    labelText = EditorSetupStrings.Artist;
+                    TooltipText = BeatmapsetsStrings.ShowDetailsByArtist(artist);
+                    value = artist;
                     break;
 
                 case BeatmapInfo.Difficulty:
-                    beatmap.BindValueChanged(bm =>
-                    {
-                        string diff = bm.NewValue.BeatmapInfo.DifficultyName;
-                        labelText = TooltipText = EditorSetupStrings.DifficultyHeader;
-                        text.Current.Value = diff;
-                        updateLabel();
-                    }, true);
+                    string diff = beatmap.Value.BeatmapInfo.DifficultyName;
+                    labelText = TooltipText = EditorSetupStrings.DifficultyHeader;
+                    text.Current.Value = diff;
                     break;
 
                 case BeatmapInfo.Mapper:
-                    beatmap.BindValueChanged(bm =>
-                    {
-                        string mapper = bm.NewValue.BeatmapInfo.Metadata.Author.Username;
-                        //todo: is there a good alternative, to ShowDetailsMappedBy?
-                        labelText = AccountsStrings.NotificationsOptionsMapping;
-                        TooltipText = BeatmapsetsStrings.ShowDetailsMappedBy(mapper);
-                        value = mapper;
-                        updateLabel();
-                    }, true);
+                    string mapper = beatmap.Value.BeatmapInfo.Metadata.Author.Username;
+                    //todo: is there a good alternative, to NotificationsOptionsMapping?
+                    labelText = AccountsStrings.NotificationsOptionsMapping;
+                    TooltipText = BeatmapsetsStrings.ShowDetailsMappedBy(mapper);
+                    value = mapper;
                     break;
 
                 case BeatmapInfo.Length:
-                    beatmap.BindValueChanged(bm =>
-                    {
-                        labelText = TooltipText = ArtistStrings.TracklistLength;
-                        value = TimeSpan.FromMilliseconds(bm.NewValue.BeatmapInfo.Length).ToFormattedDuration();
-                        updateLabel();
-                    }, true);
+                    labelText = TooltipText = ArtistStrings.TracklistLength;
+                    value = TimeSpan.FromMilliseconds(beatmap.Value.BeatmapInfo.Length).ToFormattedDuration();
                     break;
 
                 case BeatmapInfo.Status:
-                    beatmap.BindValueChanged(bm =>
+                    BeatmapOnlineStatus status = beatmap.Value.BeatmapInfo.Status;
+                    TooltipText = labelText = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault;
+
+                    switch (status)
                     {
-                        BeatmapOnlineStatus status = bm.NewValue.BeatmapInfo.Status;
-                        //todo: no Localizasion for None Beatmap Online Status
-                        labelText = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault;
+                        case BeatmapOnlineStatus.Approved:
+                            value = BeatmapsetsStrings.ShowStatusApproved;
+                            break;
 
-                        switch (status)
-                        {
-                            case BeatmapOnlineStatus.Approved:
-                                value = BeatmapsetsStrings.ShowStatusApproved;
-                                //todo: is this correct?
-                                TooltipText = BeatmapsetsStrings.ShowDetailsDateApproved(bm.NewValue.BeatmapSetInfo.DateRanked.ToString());
-                                break;
+                        case BeatmapOnlineStatus.Graveyard:
+                            value = BeatmapsetsStrings.ShowStatusGraveyard;
+                            break;
 
-                            case BeatmapOnlineStatus.Graveyard:
-                                value = BeatmapsetsStrings.ShowStatusGraveyard;
-                                break;
+                        case BeatmapOnlineStatus.Loved:
+                            value = BeatmapsetsStrings.ShowStatusLoved;
+                            break;
 
-                            case BeatmapOnlineStatus.Loved:
-                                value = BeatmapsetsStrings.ShowStatusLoved;
-                                break;
+                        case BeatmapOnlineStatus.None:
+                            value = "None";
+                            break;
 
-                            case BeatmapOnlineStatus.None:
-                                value = "None";
-                                break;
+                        case BeatmapOnlineStatus.Pending:
+                            value = BeatmapsetsStrings.ShowStatusPending;
+                            break;
 
-                            case BeatmapOnlineStatus.Pending:
-                                value = BeatmapsetsStrings.ShowStatusPending;
-                                break;
+                        case BeatmapOnlineStatus.Qualified:
+                            value = BeatmapsetsStrings.ShowStatusQualified;
+                            break;
 
-                            case BeatmapOnlineStatus.Qualified:
-                                value = BeatmapsetsStrings.ShowStatusQualified;
-                                break;
+                        case BeatmapOnlineStatus.Ranked:
+                            value = BeatmapsetsStrings.ShowStatusRanked;
+                            break;
 
-                            case BeatmapOnlineStatus.Ranked:
-                                value = BeatmapsetsStrings.ShowStatusRanked;
-                                break;
+                        case BeatmapOnlineStatus.LocallyModified:
+                            value = SongSelectStrings.LocallyModified;
+                            break;
 
-                            case BeatmapOnlineStatus.LocallyModified:
-                                value = SongSelectStrings.LocallyModified;
-                                break;
+                        case BeatmapOnlineStatus.WIP:
+                            value = BeatmapsetsStrings.ShowStatusWip;
+                            break;
+                    }
 
-                            case BeatmapOnlineStatus.WIP:
-                                value = BeatmapsetsStrings.ShowStatusWip;
-                                break;
-                        }
-
-                        updateLabel();
-                    }, true);
                     break;
 
                 case BeatmapInfo.BPM:
-                    beatmap.BindValueChanged(bm =>
-                    {
-                        labelText = TooltipText = BeatmapsetsStrings.ShowStatsBpm;
-                        value = bm.NewValue.BeatmapInfo.BPM.ToString("F2");
-                        updateLabel();
-                    }, true);
+                    labelText = TooltipText = BeatmapsetsStrings.ShowStatsBpm;
+                    value = beatmap.Value.BeatmapInfo.BPM.ToString("F2");
                     break;
             }
+
+            updateLabel();
         }
     }
 
