@@ -209,6 +209,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.ShiftPressed && e.Key >= Key.Number1 && e.Key <= Key.Number9)
+            {
+                beatDivisor.SetArbitraryDivisor(e.Key - Key.Number0);
+                return true;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
         internal class DivisorDisplay : OsuAnimatedButton, IHasPopover
         {
             public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
@@ -306,17 +317,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
                 }
 
-                if (!BeatDivisor.ValidDivisors.Value.Presets.Contains(divisor))
-                {
-                    if (BeatDivisorPresetCollection.COMMON.Presets.Contains(divisor))
-                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
-                    else if (BeatDivisorPresetCollection.TRIPLETS.Presets.Contains(divisor))
-                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.TRIPLETS;
-                    else
-                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.Custom(divisor);
-                }
-
-                BeatDivisor.Value = divisor;
+                BeatDivisor.SetArbitraryDivisor(divisor);
 
                 this.HidePopover();
             }

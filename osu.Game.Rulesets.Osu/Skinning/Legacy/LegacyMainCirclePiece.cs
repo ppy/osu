@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             InternalChildren = new[]
             {
-                CircleSprite = new KiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
+                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = OverlaySprite = new KiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
+                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
