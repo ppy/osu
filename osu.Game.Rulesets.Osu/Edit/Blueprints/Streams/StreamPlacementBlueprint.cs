@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Streams.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osuTK;
@@ -23,11 +24,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
     {
         public new Stream HitObject => (Stream)base.HitObject;
 
+        private StreamPiece streamPiece = null!;
         private PathControlPointVisualiser<Stream> controlPointVisualiser = null!;
 
         private InputManager inputManager = null!;
 
-        private SliderPlacementState state;
+        private StreamPlacementState state;
         private PathControlPoint segmentStart;
         private PathControlPoint? cursor;
         private int currentSegmentLength;
@@ -51,10 +53,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
         {
             InternalChildren = new Drawable[]
             {
+                streamPiece = new StreamPiece(),
                 controlPointVisualiser = new PathControlPointVisualiser<Stream>(HitObject, false)
             };
 
-            setState(SliderPlacementState.Initial);
+            setState(StreamPlacementState.Initial);
         }
 
         protected override void LoadComplete()
@@ -72,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
             switch (state)
             {
-                case SliderPlacementState.Initial:
+                case StreamPlacementState.Initial:
                     BeginPlacement();
 
                     var nearestDifficultyPoint = editorBeatmap.HitObjects
@@ -87,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
                     ApplyDefaultsToHitObject();
                     break;
 
-                case SliderPlacementState.Body:
+                case StreamPlacementState.Body:
                     updateCursor();
                     break;
             }
@@ -100,11 +103,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
             switch (state)
             {
-                case SliderPlacementState.Initial:
+                case StreamPlacementState.Initial:
                     beginCurve();
                     break;
 
-                case SliderPlacementState.Body:
+                case StreamPlacementState.Body:
                     if (canPlaceNewControlPoint(out var lastPoint))
                     {
                         // Place a new point by detatching the current cursor.
@@ -130,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (state == SliderPlacementState.Body && e.Button == MouseButton.Right)
+            if (state == StreamPlacementState.Body && e.Button == MouseButton.Right)
                 endCurve();
             base.OnMouseUp(e);
         }
@@ -138,19 +141,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
         private void beginCurve()
         {
             BeginPlacement(commitStart: true);
-            setState(SliderPlacementState.Body);
+            setState(StreamPlacementState.Body);
         }
 
         private void endCurve()
         {
-            updateSlider();
+            updateStream();
             EndPlacement(HitObject.Path.HasValidLength);
         }
 
         protected override void Update()
         {
             base.Update();
-            updateSlider();
+            updateStream();
 
             // Maintain the path type in case it got defaulted to bezier at some point during the drag.
             updatePathType();
@@ -220,17 +223,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
             return lastPiece.IsHovered != true;
         }
 
-        private void updateSlider()
+        private void updateStream()
         {
-            HitObject.Path.ExpectedDistance.Value = snapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
+            //HitObject.Path.ExpectedDistance.Value = snapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
+            streamPiece.UpdateFrom(HitObject);
         }
 
-        private void setState(SliderPlacementState newState)
+        private void setState(StreamPlacementState newState)
         {
             state = newState;
         }
 
-        private enum SliderPlacementState
+        private enum StreamPlacementState
         {
             Initial,
             Body,
