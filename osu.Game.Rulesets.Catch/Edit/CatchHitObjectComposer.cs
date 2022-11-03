@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -10,7 +11,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -23,7 +23,6 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -34,8 +33,6 @@ namespace osu.Game.Rulesets.Catch.Edit
         private const float distance_snap_radius = 50;
 
         private CatchDistanceSnapGrid distanceSnapGrid;
-
-        private readonly Bindable<TernaryState> distanceSnapToggle = new Bindable<TernaryState>();
 
         private InputManager inputManager;
 
@@ -81,6 +78,19 @@ namespace osu.Game.Rulesets.Catch.Edit
             inputManager = GetContainingInputManager();
         }
 
+        protected override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
+        {
+            // osu!catch's distance snap implementation is limited, in that a custom spacing cannot be specified.
+            // Therefore this functionality is not currently used.
+            //
+            // The implementation below is probably correct but should be checked if/when exposed via controls.
+
+            float expectedDistance = DurationToDistance(before, after.StartTime - before.GetEndTime());
+            float actualDistance = Math.Abs(((CatchHitObject)before).EffectiveX - ((CatchHitObject)after).EffectiveX);
+
+            return actualDistance / expectedDistance;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -119,11 +129,6 @@ namespace osu.Game.Rulesets.Catch.Edit
             new JuiceStreamCompositionTool(),
             new BananaShowerCompositionTool()
         };
-
-        protected override IEnumerable<TernaryButton> CreateTernaryButtons() => base.CreateTernaryButtons().Concat(new[]
-        {
-            new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
-        });
 
         public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
@@ -196,7 +201,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         private void updateDistanceSnapGrid()
         {
-            if (distanceSnapToggle.Value != TernaryState.True)
+            if (DistanceSnapToggle.Value != TernaryState.True)
             {
                 distanceSnapGrid.Hide();
                 return;

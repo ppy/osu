@@ -25,8 +25,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             TimeRange = { Value = 5000 },
         };
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void DrumrollTest()
         {
             AddStep("Drum roll", () => SetContents(_ =>
             {

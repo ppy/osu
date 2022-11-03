@@ -1,17 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -26,9 +26,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneHUDOverlay : OsuManualInputManagerTestScene
     {
-        private OsuConfigManager localConfig;
+        private OsuConfigManager localConfig = null!;
 
-        private HUDOverlay hudOverlay;
+        private HUDOverlay hudOverlay = null!;
 
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
@@ -150,6 +150,41 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestHoldForMenuDoesWorkWhenHidden()
+        {
+            bool activated = false;
+
+            HoldForMenuButton getHoldForMenu() => hudOverlay.ChildrenOfType<HoldForMenuButton>().Single();
+
+            createNew();
+
+            AddStep("bind action", () =>
+            {
+                activated = false;
+
+                var holdForMenu = getHoldForMenu();
+
+                holdForMenu.Action += () => activated = true;
+            });
+
+            AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
+            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+
+            AddStep("attempt activate", () =>
+            {
+                InputManager.MoveMouseTo(getHoldForMenu().OfType<HoldToConfirmContainer>().Single());
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddUntilStep("activated", () => activated);
+
+            AddStep("release mouse button", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+        }
+
+        [Test]
         public void TestInputDoesntWorkWhenHUDHidden()
         {
             SongProgressBar getSongProgress() => hudOverlay.ChildrenOfType<SongProgressBar>().Single();
@@ -220,7 +255,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().ComponentsLoaded);
         }
 
-        private void createNew(Action<HUDOverlay> action = null)
+        private void createNew(Action<HUDOverlay>? action = null)
         {
             AddStep("create overlay", () =>
             {
@@ -239,7 +274,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override void Dispose(bool isDisposing)
         {
-            localConfig?.Dispose();
+            if (localConfig.IsNotNull())
+                localConfig.Dispose();
+
             base.Dispose(isDisposing);
         }
     }
