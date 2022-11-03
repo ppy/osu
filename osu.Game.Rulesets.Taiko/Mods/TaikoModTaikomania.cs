@@ -1,5 +1,8 @@
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -8,16 +11,33 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModTaikomania : Mod, IApplicableToDrawableHitObject
+    public class TaikoModTaikomania : Mod, IApplicableToDrawableHitObject, IApplicableToBeatmap
     {
         public override string Name => "Taikomania";
         public override string Acronym => "TM";
-        public override LocalisableString Description => @"Color confused? Moves dons and kats apart.";
+        public override LocalisableString Description => @"Colour confused? Split dons and kats apart vertically.";
         public override ModType Type => ModType.Fun;
         public override double ScoreMultiplier => 0.5;
 
-        private Vector2 CentreShift = new Vector2(0, -40);
-        private Vector2 RimShift = new Vector2(0, 40);
+        [SettingSource("Split amount", "How far notes are split apart", 0)]
+        public BindableFloat SplitAmount { get; } = new BindableFloat(40f)
+        {
+            Precision = 1f,
+            MinValue = 10f,
+            MaxValue = 40f,
+        };
+        
+        [SettingSource("Dons on top?", "Or on the bottom?", 1)]
+        public BindableBool CentreOnTop { get; } = new BindableBool(true);
+
+        private Vector2 CentreShift;
+        private Vector2 RimShift;
+
+        public void ApplyToBeatmap(IBeatmap beatmap)
+        {
+            CentreShift = new Vector2(0, SplitAmount.Value * (CentreOnTop.Value ? -1 : 1));
+            RimShift = new Vector2(0, SplitAmount.Value * (CentreOnTop.Value ? 1 : -1));
+        }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
