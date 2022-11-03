@@ -115,6 +115,7 @@ namespace osu.Game.Overlays
         {
             filterControl.Search(query);
             Show();
+            ScrollFlow.ScrollToStart();
         }
 
         protected override BeatmapListingHeader CreateHeader() => new BeatmapListingHeader();
