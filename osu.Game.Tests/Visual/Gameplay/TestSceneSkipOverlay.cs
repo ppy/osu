@@ -94,6 +94,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestAutomaticSkipActuatesOnce()
+        {
+            createTest();
+            AddStep("start automated skip", () => skip.SkipWhenReady());
+            AddUntilStep("wait for button disabled", () => !skip.IsButtonVisible);
+            checkRequestCount(1);
+        }
+
+        [Test]
         public void TestClickOnlyActuatesOnce()
         {
             createTest();
@@ -108,6 +117,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             checkRequestCount(1);
+        }
+
+        [Test]
+        public void TestAutomaticSkipActuatesMultipleTimes()
+        {
+            createTest();
+            AddStep("set increment lower", () => increment = 3000);
+            AddStep("start automated skip", () => skip.SkipWhenReady());
+            AddUntilStep("wait for button disabled", () => !skip.IsButtonVisible);
+            checkRequestCount(2);
         }
 
         [Test]
