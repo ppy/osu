@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
@@ -38,6 +39,7 @@ namespace osu.Game.Overlays.Comments
             private readonly Box background;
 
             public CancelButton()
+                : base(HoverSampleSet.Button)
             {
                 AutoSizeAxes = Axes.Both;
                 Child = new CircularContainer
