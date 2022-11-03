@@ -18,7 +18,6 @@ using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Handlers;
@@ -358,13 +357,9 @@ namespace osu.Game
                     (GlobalCursorDisplay = new GlobalCursorDisplay
                     {
                         RelativeSizeAxes = Axes.Both
-                    }).WithChild(new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
+                    }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = content = new PopoverContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
+                        RelativeSizeAxes = Axes.Both
                     }),
                     // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
                     globalBindings = new GlobalActionContainer(this)
