@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK.Graphics;
@@ -24,8 +23,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         private DrawableSpinner spinner = null!;
 
+        private CircularProgress background = null!;
+
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableHitObject, OsuColour colours)
+        private void load(DrawableHitObject drawableHitObject)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             InternalChildren = new Drawable[]
             {
-                new CircularProgress
+                background = new CircularProgress
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -59,8 +60,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         {
             base.Update();
 
-            fill.Alpha = (float)Interpolation.DampContinuously(fill.Alpha, spinner.Progress > 0 ? 1 : 0, 120f, (float)Math.Abs(Time.Elapsed));
-            fill.Current.Value = (float)Interpolation.DampContinuously(fill.Current.Value, arc_fill * spinner.Progress, 120f, (float)Math.Abs(Time.Elapsed));
+            background.Alpha = spinner.Progress >= 1 ? 0 : 1;
+
+            fill.Alpha = (float)Interpolation.DampContinuously(fill.Alpha, spinner.Progress > 0 && spinner.Progress < 1 ? 1 : 0, 40f, (float)Math.Abs(Time.Elapsed));
+            fill.Current.Value = (float)Interpolation.DampContinuously(fill.Current.Value, spinner.Progress >= 1 ? 0 : arc_fill * spinner.Progress, 40f, (float)Math.Abs(Time.Elapsed));
+
             fill.Rotation = (float)(90 - fill.Current.Value * 180);
         }
     }
