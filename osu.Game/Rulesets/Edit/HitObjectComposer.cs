@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Edit
 
             InternalChildren = new Drawable[]
             {
-                new Container
+                PlayfieldContentContainer = new Container
                 {
                     Name = "Content",
                     RelativeSizeAxes = Axes.Both,
@@ -165,6 +165,15 @@ namespace osu.Game.Rulesets.Edit
 
             EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
         }
+
+        /// <summary>
+        /// Houses all content relevant to the playfield.
+        /// </summary>
+        /// <remarks>
+        /// Generally implementations should not be adding to this directly.
+        /// Use <see cref="LayerBelowRuleset"/> or <see cref="BlueprintContainer"/> instead.
+        /// </remarks>
+        protected Container PlayfieldContentContainer { get; private set; }
 
         protected override void LoadComplete()
         {
@@ -229,7 +238,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.ShiftPressed)
                 return false;
 
             if (checkLeftToggleFromKey(e.Key, out int leftIndex))
