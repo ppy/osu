@@ -41,12 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
                 Children = new[]
                 {
-                    new CircularContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        Children = new[] { new Box { RelativeSizeAxes = Axes.Both } }
-                    }
+                    new Circle { RelativeSizeAxes = Axes.Both }
                 };
             }
         }

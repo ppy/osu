@@ -25,10 +25,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string displayName = null) => new OsuBreadcrumbDisplayDirectory(directory, displayName);
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public OsuDirectorySelectorBreadcrumbDisplay()
         {
-            Height = 50;
+            Padding = new MarginPadding(15);
         }
 
         private class OsuBreadcrumbDisplayComputer : OsuBreadcrumbDisplayDirectory

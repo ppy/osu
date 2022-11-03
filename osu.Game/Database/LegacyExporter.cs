@@ -37,7 +37,7 @@ namespace osu.Game.Database
         /// <param name="item">The item to export.</param>
         public void Export(TModel item)
         {
-            string filename = $"{item.GetDisplayString().GetValidArchiveContentFilename()}{FileExtension}";
+            string filename = $"{item.GetDisplayString().GetValidFilename()}{FileExtension}";
 
             using (var stream = exportStorage.CreateFileSafely(filename))
                 ExportModelTo(item, stream);

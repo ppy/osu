@@ -6,7 +6,6 @@
 using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -43,18 +42,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            PositionBindable.BindValueChanged(_ => updatePosition());
-            pathVersion.BindValueChanged(_ => updatePosition());
-        }
-
         protected override void OnFree()
         {
             base.OnFree();
 
             pathVersion.UnbindFrom(DrawableSlider.PathVersion);
+        }
+
+        protected override void UpdatePosition()
+        {
+            // Slider head is always drawn at (0,0).
         }
 
         protected override void OnApply()
@@ -99,12 +96,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.Shake();
             DrawableSlider.Shake();
-        }
-
-        private void updatePosition()
-        {
-            if (Slider != null)
-                Position = HitObject.Position - Slider.Position;
         }
     }
 }
