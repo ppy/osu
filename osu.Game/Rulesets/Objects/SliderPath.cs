@@ -316,6 +316,10 @@ namespace osu.Game.Rulesets.Objects
                     {
                         cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
                         calculatedPath.RemoveAt(pathEndIndex--);
+
+                        // Shorten the last segment to the expected distance
+                        if (segmentEnds.Count > 0)
+                            segmentEnds[^1]--;
                     }
                 }
 
