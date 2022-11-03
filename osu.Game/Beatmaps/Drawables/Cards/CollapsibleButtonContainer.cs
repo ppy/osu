@@ -95,7 +95,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Child = buttons = new Container<BeatmapCardIconButton>
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding(3),
+                        // Padding of 4 avoids touching the card borders when in the expanded (ie. showing difficulties) state.
+                        // Left override allows the buttons to visually be wider and look better.
+                        Padding = new MarginPadding(4) { Left = 2 },
                         Children = new BeatmapCardIconButton[]
                         {
                             new FavouriteButton(beatmapSet)
