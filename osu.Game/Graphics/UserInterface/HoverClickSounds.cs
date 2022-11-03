@@ -21,9 +21,11 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class HoverClickSounds : HoverSounds
     {
+        public Bindable<bool> Enabled = new Bindable<bool>(true);
+
         private Sample sampleClick;
         private Sample sampleClickDisabled;
-        public Bindable<bool> Enabled = new Bindable<bool>(true);
+
         private readonly MouseButton[] buttons;
 
         /// <summary>

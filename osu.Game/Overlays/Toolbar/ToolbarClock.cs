@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.Toolbar
             base.OnHoverLost(e);
         }
 
-        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet) { Enabled = { Value = true } };
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
 
         private void cycleDisplayMode()
         {
