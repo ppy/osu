@@ -1,3 +1,6 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -26,17 +29,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
             MinValue = 10f,
             MaxValue = 40f,
         };
-        
+
         [SettingSource("Dons on top?", "Or on the bottom?", 1)]
         public BindableBool CentreOnTop { get; } = new BindableBool(true);
 
-        private Vector2 CentreShift;
-        private Vector2 RimShift;
+        private Vector2 centreShift;
+        private Vector2 rimShift;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            CentreShift = new Vector2(0, SplitAmount.Value * (CentreOnTop.Value ? -1 : 1));
-            RimShift = new Vector2(0, SplitAmount.Value * (CentreOnTop.Value ? 1 : -1));
+            centreShift = new Vector2(0, SplitAmount.Value * (CentreOnTop.Value ? -1 : 1));
+            rimShift = new Vector2(0, SplitAmount.Value * (CentreOnTop.Value ? 1 : -1));
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
@@ -50,10 +53,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
                         switch (((DrawableHit)o).HitObject.Type)
                         {
                             case HitType.Centre:
-                                drawable.MoveToOffset(CentreShift);
+                                drawable.MoveToOffset(centreShift);
                                 break;
+
                             case HitType.Rim:
-                                drawable.MoveToOffset(RimShift);
+                                drawable.MoveToOffset(rimShift);
                                 break;
                         }
                     }
