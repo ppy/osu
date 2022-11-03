@@ -46,6 +46,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public bool PlaySamplesOnAdjust { get; set; } = true;
 
+        private readonly HoverClickSounds hoverClickSounds;
+
         /// <summary>
         /// Whether to format the tooltip as a percentage or the actual value.
         /// </summary>
@@ -127,7 +129,7 @@ namespace osu.Game.Graphics.UserInterface
                         Current = { Value = true }
                     },
                 },
-                new HoverClickSounds()
+                hoverClickSounds = new HoverClickSounds()
             };
 
             Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
@@ -152,6 +154,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
             CurrentNumber.BindValueChanged(current => TooltipText = getTooltipText(current.NewValue), true);
+            Current.DisabledChanged += disabled => hoverClickSounds.Enabled.Value = !disabled;
         }
 
         protected override bool OnHover(HoverEvent e)
