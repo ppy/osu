@@ -65,6 +65,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     spin = new Sprite
                     {
+                        Alpha = 0,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-spin"),
@@ -82,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     },
                     bonusCounter = new LegacySpriteText(LegacyFont.Score)
                     {
-                        Alpha = 0f,
+                        Alpha = 0,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.Centre,
                         Scale = new Vector2(SPRITE_SCALE),
@@ -178,6 +179,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         spmBackground.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
                         spmCounter.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
                     }
+
+                    using (BeginAbsoluteSequence(d.HitObject.StartTime - d.HitObject.TimeFadeIn / 2))
+                        spin.FadeInFromZero(d.HitObject.TimeFadeIn / 2);
 
                     using (BeginAbsoluteSequence(d.HitObject.StartTime))
                         ApproachCircle?.ScaleTo(SPRITE_SCALE * 0.1f, d.HitObject.Duration);

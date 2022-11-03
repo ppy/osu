@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
@@ -16,7 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public class TaikoLegacyPlayfieldBackgroundRight : BeatSyncedContainer
     {
-        private Sprite kiai;
+        private Sprite kiai = null!;
 
         private bool kiaiDisplayed;
 

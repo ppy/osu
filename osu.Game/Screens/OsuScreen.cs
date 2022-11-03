@@ -40,10 +40,9 @@ namespace osu.Game.Screens
 
         public virtual bool AllowExternalScreenChange => false;
 
-        /// <summary>
-        /// Whether all overlays should be hidden when this screen is entered or resumed.
-        /// </summary>
         public virtual bool HideOverlaysOnEnter => false;
+
+        public virtual bool HideMenuCursorOnNonMouseInput => false;
 
         /// <summary>
         /// The initial overlay activation mode to use when this screen is entered for the first time.

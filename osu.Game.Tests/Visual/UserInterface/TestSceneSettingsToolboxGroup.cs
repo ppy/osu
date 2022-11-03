@@ -5,12 +5,14 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -20,11 +22,17 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private SettingsToolboxGroup group;
 
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
             Child = group = new SettingsToolboxGroup("example")
             {
+                Scale = new Vector2(3),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 Children = new Drawable[]
                 {
                     new RoundedButton
