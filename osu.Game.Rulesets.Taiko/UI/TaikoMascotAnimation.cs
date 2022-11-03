@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             [BackgroundDependencyLoader]
             private void load(ISkinSource source)
             {
-                ISkin skin = source.FindProvider(s => getAnimationFrame(s, state, 0) != null);
+                ISkin? skin = source.FindProvider(s => getAnimationFrame(s, state, 0) != null);
 
                 if (skin == null) return;
 
