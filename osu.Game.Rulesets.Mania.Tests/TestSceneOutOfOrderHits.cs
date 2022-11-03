@@ -76,8 +76,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             performTest(objects, new List<ReplayFrame>());
 
-            addJudgementAssert(objects[0], HitResult.IgnoreHit);
-            addJudgementAssert(objects[1], HitResult.IgnoreHit);
+            addJudgementAssert(objects[0], HitResult.IgnoreMiss);
+            addJudgementAssert(objects[1], HitResult.IgnoreMiss);
         }
 
         [Test]

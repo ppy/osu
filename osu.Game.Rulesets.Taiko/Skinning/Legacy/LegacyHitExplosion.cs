@@ -1,9 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
@@ -17,8 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     {
         private readonly Drawable sprite;
 
-        [CanBeNull]
-        private readonly Drawable strongSprite;
+        private readonly Drawable? strongSprite;
 
         /// <summary>
         /// Creates a new legacy hit explosion.
@@ -29,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         /// </remarks>
         /// <param name="sprite">The normal legacy explosion sprite.</param>
         /// <param name="strongSprite">The strong legacy explosion sprite.</param>
-        public LegacyHitExplosion(Drawable sprite, [CanBeNull] Drawable strongSprite = null)
+        public LegacyHitExplosion(Drawable sprite, Drawable? strongSprite = null)
         {
             this.sprite = sprite;
             this.strongSprite = strongSprite;

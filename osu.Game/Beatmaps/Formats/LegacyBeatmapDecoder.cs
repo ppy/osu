@@ -435,8 +435,10 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
+            int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
+
 #pragma warning disable 618
-            addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
+            addControlPoint(time, new LegacyDifficultyControlPoint(onlineRulesetID, beatLength)
 #pragma warning restore 618
             {
                 SliderVelocity = speedMultiplier,
@@ -447,8 +449,6 @@ namespace osu.Game.Beatmaps.Formats
                 KiaiMode = kiaiMode,
                 OmitFirstBarLine = omitFirstBarSignature,
             };
-
-            int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
             // osu!taiko and osu!mania use effect points rather than difficulty points for scroll speed adjustments.
             if (onlineRulesetID == 1 || onlineRulesetID == 3)
