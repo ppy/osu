@@ -78,16 +78,16 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                 Anchor = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    Icon = new SpriteIcon
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                    },
                     hover = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White.Opacity(0.1f),
                         Blending = BlendingParameters.Additive,
+                    },
+                    Icon = new SpriteIcon
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
                     },
                 }
             });
