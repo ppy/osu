@@ -1,10 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,6 +10,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -29,10 +27,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private double? secondHitTime;
 
-        [CanBeNull]
-        public DrawableHitObject JudgedObject;
+        public DrawableHitObject? JudgedObject;
 
-        private SkinnableDrawable skinnable;
+        private SkinnableDrawable skinnable = null!;
 
         /// <summary>
         /// This constructor only exists to meet the <c>new()</c> type constraint of <see cref="DrawablePool{T}"/>.
@@ -62,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             skinnable.OnSkinChanged += runAnimation;
         }
 
-        public void Apply([CanBeNull] DrawableHitObject drawableHitObject)
+        public void Apply(DrawableHitObject? drawableHitObject)
         {
             JudgedObject = drawableHitObject;
             secondHitTime = null;
