@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -138,6 +137,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
         }
 
+        private float trackingElementInterpolation;
+
         protected override void Update()
         {
             base.Update();
@@ -157,11 +158,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             }
             else
             {
-                fill.Alpha = (float)Interpolation.Damp(fill.Alpha, drawableSpinner.RotationTracker.Tracking ? tracking_alpha : idle_alpha, 0.98f, (float)Math.Abs(Clock.ElapsedFrameTime));
-            }
+                trackingElementInterpolation =
+                    (float)Interpolation.Damp(trackingElementInterpolation, drawableSpinner.RotationTracker.Tracking ? 1 : 0, 0.985f, (float)Math.Abs(Clock.ElapsedFrameTime));
 
-            if (centre.Width == idle_centre_size && drawableSpinner.Result?.TimeStarted != null)
-                updateCentrePieceSize();
+                fill.Alpha = trackingElementInterpolation * (tracking_alpha - idle_alpha) + idle_alpha;
+                centre.Size = new Vector2(trackingElementInterpolation * (tracking_centre_size - idle_centre_size) + idle_centre_size);
+            }
 
             const float initial_fill_scale = 0.1f;
             float targetScale = initial_fill_scale + (0.98f - initial_fill_scale) * drawableSpinner.Progress;
@@ -221,19 +223,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     }
                 }
             }
-
-            if (drawableSpinner.Result?.TimeStarted != null)
-                updateCentrePieceSize();
-        }
-
-        private void updateCentrePieceSize()
-        {
-            Debug.Assert(drawableSpinner.Result?.TimeStarted != null);
-
-            Spinner spinner = drawableSpinner.HitObject;
-
-            using (BeginAbsoluteSequence(drawableSpinner.Result.TimeStarted.Value))
-                centre.ResizeTo(new Vector2(tracking_centre_size), spinner.TimePreempt / 2, Easing.OutQuint);
         }
 
         protected override void Dispose(bool isDisposing)
