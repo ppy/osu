@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
         private StreamPlacementState state;
         private PathControlPoint segmentStart;
         private PathControlPoint? cursor;
+        private StreamControlPoint streamSegmentStart;
+        private StreamControlPoint? streamCursor;
         private int currentSegmentLength;
 
         [Resolved(CanBeNull = true)]
@@ -43,8 +45,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
             RelativeSizeAxes = Axes.Both;
 
             HitObject.Path.ControlPoints.Add(segmentStart = new PathControlPoint(Vector2.Zero, PathType.Linear));
-            HitObject.StreamPath.ControlPoints.Add(new StreamControlPoint());
-            HitObject.StreamPath.ControlPoints.Add(new StreamControlPoint(1000, 8));
+            HitObject.StreamPath.ControlPoints.Add(streamSegmentStart = new StreamControlPoint());
             currentSegmentLength = 1;
         }
 
@@ -92,6 +93,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
                 case StreamPlacementState.Body:
                     updateCursor();
+                    updateStreamCursor();
                     break;
             }
         }
@@ -118,6 +120,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
                     {
                         // Transform the last point into a new segment.
                         Debug.Assert(lastPoint != null);
+
+                        if (lastPoint.Type == null)
+                        {
+                            updateStreamCursor();
+                            streamSegmentStart = streamCursor!;
+                            streamCursor = null;
+                        }
 
                         segmentStart = lastPoint;
                         segmentStart.Type = PathType.Linear;
@@ -221,6 +230,24 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
             lastPoint = last;
             return lastPiece.IsHovered != true;
+        }
+
+        private void updateStreamCursor()
+        {
+            if (canPlaceNewControlPoint(out var lastPoint) || lastPoint!.Type == null)
+            {
+                // The cursor does not overlap a previous non-inherit control point, so a valid new segment can be added.
+                if (streamCursor == null)
+                {
+                    HitObject.StreamPath.ControlPoints.Add(streamCursor = new StreamControlPoint(1000, 8));
+                }
+            }
+            else if (streamCursor != null)
+            {
+                // The cursor overlaps a previous non-inherit control point, so it's removed.
+                HitObject.StreamPath.ControlPoints.Remove(streamCursor);
+                streamCursor = null;
+            }
         }
 
         private void updateStream()
