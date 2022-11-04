@@ -134,6 +134,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
+        [Test]
+        public void TestComplex()
+        {
+            AddStep("create path", () =>
+            {
+                path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(100, 0)));
+                path.ControlPoints.AddRange(createSegment(PathType.Bezier, new Vector2(100, 0), new Vector2(150, 30), new Vector2(100, 100)));
+                path.ControlPoints.AddRange(createSegment(PathType.PerfectCurve, new Vector2(100, 100), new Vector2(25, 50), Vector2.Zero));
+            });
+        }
+
         [TestCase(0, 100)]
         [TestCase(1, 100)]
         [TestCase(5, 100)]
