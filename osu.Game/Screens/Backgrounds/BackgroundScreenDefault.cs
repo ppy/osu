@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private void displayNext(Background newBackground)
         {
-            background?.FadeOut(800, Easing.InOutSine);
+            background?.FadeOut(800, Easing.OutQuint);
             background?.Expire();
 
             AddInternal(background = newBackground);
