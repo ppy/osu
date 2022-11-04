@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Backgrounds
             nextTask = Scheduler.AddDelayed(() =>
             {
                 LoadComponentAsync(nextBackground, displayNext, cancellationTokenSource.Token);
-            }, 100);
+            }, 500);
 
             return true;
         }
