@@ -110,8 +110,6 @@ namespace osu.Game.Online.Chat
                 }
             });
 
-            connector.StartChat();
-
             apiState.BindTo(api.State);
             apiState.BindValueChanged(status =>
             {

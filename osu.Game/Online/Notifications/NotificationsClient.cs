@@ -23,7 +23,6 @@ namespace osu.Game.Online.Notifications
 
         protected readonly IAPIProvider API;
 
-        private bool enableChat;
         private long lastMessageId;
 
         protected NotificationsClient(IAPIProvider api)
@@ -31,28 +30,7 @@ namespace osu.Game.Online.Notifications
             API = api;
         }
 
-        public bool EnableChat
-        {
-            get => enableChat;
-            set
-            {
-                if (enableChat == value)
-                    return;
-
-                enableChat = value;
-
-                if (EnableChat)
-                    Task.Run(StartChatAsync);
-            }
-        }
-
-        public override async Task ConnectAsync(CancellationToken cancellationToken)
-        {
-            if (EnableChat)
-                await StartChatAsync();
-        }
-
-        protected virtual Task StartChatAsync()
+        public override Task ConnectAsync(CancellationToken cancellationToken)
         {
             API.Queue(CreateFetchMessagesRequest(0));
             return Task.CompletedTask;
