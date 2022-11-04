@@ -105,8 +105,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return true;
         }
 
-        private bool hasSingleObjectSelected => selectedObjects.Count == 1;
-
         protected override void Update()
         {
             base.Update();
@@ -145,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void updateVisualDefinition()
         {
             // To reduce overhead of drawing these blueprints, only add extra detail when hovered or when only this slider is selected.
-            if (IsSelected && selectedObjects.Count == 1)
+            if (IsSelected && selectedObjects.Count < 2)
             {
                 if (ControlPointVisualiser == null)
                 {
