@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Chat
 
             public ChannelManagerContainer(IAPIProvider apiProvider)
             {
-                InternalChild = ChannelManager = new ChannelManager(apiProvider, apiProvider.GetNotificationsConnector());
+                InternalChild = ChannelManager = new ChannelManager(apiProvider);
             }
         }
     }
