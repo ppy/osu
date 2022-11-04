@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateVisualDefinition()
         {
-            // To reduce overhead of drawing these blueprints, only add extra detail when hovered or when only this slider is selected.
+            // To reduce overhead of drawing these blueprints, only add extra detail when only this slider is selected.
             if (IsSelected && selectedObjects.Count < 2)
             {
                 if (ControlPointVisualiser == null)
