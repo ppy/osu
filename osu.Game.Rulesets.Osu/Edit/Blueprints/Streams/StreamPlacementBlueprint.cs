@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -147,6 +148,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
             base.OnMouseUp(e);
         }
 
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            if (!e.ShiftPressed || streamCursor == null)
+                return base.OnScroll(e);
+
+            streamCursor.Ratio = MathHelper.Clamp(streamCursor.Ratio + e.ScrollDelta.X * 0.1f, 0, 100);
+
+            return true;
+        }
+
         private void beginCurve()
         {
             BeginPlacement(commitStart: true);
@@ -241,6 +252,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
                 {
                     HitObject.StreamPath.ControlPoints.Add(streamCursor = new StreamControlPoint(1000, 8));
                 }
+
+                double time = EditorClock.CurrentTime;
+                streamCursor.Time = time - HitObject.StartTime;
+                streamCursor.Count = (int)Math.Round((streamCursor.Time - streamSegmentStart.Time) / editorBeatmap.GetBeatLengthAtTime(time));
             }
             else if (streamCursor != null)
             {
