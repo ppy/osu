@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Online
                 RelativeSizeAxes = Axes.Both,
                 CachedDependencies = new (Type, object)[]
                 {
-                    (typeof(ChannelManager), channelManager = new ChannelManager(API, API.GetNotificationsConnector())),
+                    (typeof(ChannelManager), channelManager = new ChannelManager(API)),
                 },
                 Children = new Drawable[]
                 {

@@ -74,10 +74,11 @@ namespace osu.Game.Online.Chat
         private bool channelsInitialised;
         private ScheduledDelegate ackDelegate;
 
-        public ChannelManager(IAPIProvider api, NotificationsClientConnector connector)
+        public ChannelManager(IAPIProvider api)
         {
             this.api = api;
-            this.connector = connector;
+
+            connector = api.GetNotificationsConnector();
 
             CurrentChannel.ValueChanged += currentChannelChanged;
         }

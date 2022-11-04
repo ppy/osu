@@ -48,7 +48,7 @@ namespace osu.Game.Tournament.Components
 
                     if (manager == null)
                     {
-                        AddInternal(manager = new ChannelManager(api, api.GetNotificationsConnector()));
+                        AddInternal(manager = new ChannelManager(api));
                         Channel.BindTo(manager.CurrentChannel);
                     }
 
