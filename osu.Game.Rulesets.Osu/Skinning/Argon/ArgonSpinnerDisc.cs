@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
@@ -51,6 +50,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private Container centre = null!;
         private CircularContainer fill = null!;
 
+        private Container ticksContainer = null!;
+        private ArgonSpinnerTicks ticks = null!;
+
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject)
         {
@@ -69,41 +71,85 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        fill = new CircularContainer
+                        new Container
                         {
-                            Name = @"Fill",
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            EdgeEffect = new EdgeEffectParameters
+                            Padding = new MarginPadding(8f),
+                            Children = new[]
                             {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Colour4.FromHex("FC618F").Opacity(1f),
-                                Radius = 40,
+                                fill = new CircularContainer
+                                {
+                                    Name = @"Fill",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Masking = true,
+                                    EdgeEffect = new EdgeEffectParameters
+                                    {
+                                        Type = EdgeEffectType.Shadow,
+                                        Colour = Colour4.FromHex("FC618F").Opacity(1f),
+                                        Radius = 40,
+                                    },
+                                    Child = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0f,
+                                        AlwaysPresent = true,
+                                    }
+                                },
+                                ticksContainer = new Container
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = ticks = new ArgonSpinnerTicks(),
+                                }
                             },
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0f,
-                                AlwaysPresent = true,
-                            }
                         },
-                        new CircularContainer
+                        new Container
                         {
                             Name = @"Ring",
                             Masking = true,
-                            BorderColour = Color4.White,
-                            BorderThickness = 5,
                             RelativeSizeAxes = Axes.Both,
-                            Child = new Box
+                            Padding = new MarginPadding(8f),
+                            Children = new[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0,
-                                AlwaysPresent = true,
+                                new ArgonSpinnerRingArc
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Name = "Top Arc",
+                                },
+                                new ArgonSpinnerRingArc
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Name = "Bottom Arc",
+                                    Scale = new Vector2(1, -1),
+                                },
                             }
                         },
-                        new ArgonSpinnerTicks(),
+                        new Container
+                        {
+                            Name = @"Sides",
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new[]
+                            {
+                                new ArgonSpinnerProgressArc
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Name = "Left Bar"
+                                },
+                                new ArgonSpinnerProgressArc
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Name = "Right Bar",
+                                    Scale = new Vector2(-1, 1),
+                                },
+                            }
+                        },
                     }
                 },
                 centre = new Container
@@ -169,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             float targetScale = initial_fill_scale + (0.98f - initial_fill_scale) * drawableSpinner.Progress;
 
             fill.Scale = new Vector2((float)Interpolation.Lerp(fill.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
-            disc.Rotation = drawableSpinner.RotationTracker.Rotation;
+            ticks.Rotation = drawableSpinner.RotationTracker.Rotation;
         }
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
@@ -182,34 +228,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
             {
                 this.ScaleTo(initial_scale);
-                this.RotateTo(0);
+                ticksContainer.RotateTo(0);
+                centre.ScaleTo(0);
+                disc.ScaleTo(0);
 
                 using (BeginDelayedSequence(spinner.TimePreempt / 2))
                 {
                     // constant ambient rotation to give the spinner "spinning" character.
-                    this.RotateTo((float)(25 * spinner.Duration / 2000), spinner.TimePreempt + spinner.Duration);
+                    ticksContainer.RotateTo((float)(25 * spinner.Duration / 2000), spinner.TimePreempt + spinner.Duration);
                 }
-
-                using (BeginDelayedSequence(spinner.TimePreempt + spinner.Duration + drawableHitObject.Result.TimeOffset))
-                {
-                    switch (state)
-                    {
-                        case ArmedState.Hit:
-                            this.ScaleTo(initial_scale * 1.2f, 320, Easing.Out);
-                            this.RotateTo(Rotation + 180, 320);
-                            break;
-
-                        case ArmedState.Miss:
-                            this.ScaleTo(initial_scale * 0.8f, 320, Easing.In);
-                            break;
-                    }
-                }
-            }
-
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
-            {
-                centre.ScaleTo(0);
-                disc.ScaleTo(0);
 
                 using (BeginDelayedSequence(spinner.TimePreempt / 2))
                 {
@@ -220,6 +247,21 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     {
                         centre.ScaleTo(0.8f, spinner.TimePreempt / 2, Easing.OutQuint);
                         disc.ScaleTo(1, spinner.TimePreempt / 2, Easing.OutQuint);
+                    }
+                }
+
+                using (BeginDelayedSequence(spinner.TimePreempt + spinner.Duration + drawableHitObject.Result.TimeOffset))
+                {
+                    switch (state)
+                    {
+                        case ArmedState.Hit:
+                            disc.ScaleTo(initial_scale * 1.2f, 320, Easing.Out);
+                            ticksContainer.RotateTo(ticksContainer.Rotation + 180, 320);
+                            break;
+
+                        case ArmedState.Miss:
+                            disc.ScaleTo(initial_scale * 0.8f, 320, Easing.In);
+                            break;
                     }
                 }
             }
