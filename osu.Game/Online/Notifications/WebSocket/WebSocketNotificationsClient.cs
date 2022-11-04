@@ -22,27 +22,22 @@ namespace osu.Game.Online.Notifications.WebSocket
     {
         private readonly ClientWebSocket socket;
         private readonly string endpoint;
-        private readonly IAPIProvider api;
 
         public WebSocketNotificationsClient(ClientWebSocket socket, string endpoint, IAPIProvider api)
             : base(api)
         {
             this.socket = socket;
             this.endpoint = endpoint;
-            this.api = api;
         }
 
         public override async Task ConnectAsync(CancellationToken cancellationToken)
         {
             await socket.ConnectAsync(new Uri(endpoint), cancellationToken).ConfigureAwait(false);
-            runReadLoop(cancellationToken);
-            await base.ConnectAsync(cancellationToken);
-        }
-
-        protected override async Task StartChatAsync()
-        {
             await sendMessage(new StartChatRequest(), CancellationToken.None);
-            await base.StartChatAsync();
+
+            runReadLoop(cancellationToken);
+
+            await base.ConnectAsync(cancellationToken);
         }
 
         private void runReadLoop(CancellationToken cancellationToken) => Task.Run(async () =>

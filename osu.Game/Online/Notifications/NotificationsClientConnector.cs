@@ -19,19 +19,9 @@ namespace osu.Game.Online.Notifications
         public event Action<List<Message>>? NewMessages;
         public event Action? PresenceReceived;
 
-        private bool chatStarted;
-
         protected NotificationsClientConnector(IAPIProvider api)
             : base(api)
         {
-        }
-
-        public void StartChat()
-        {
-            chatStarted = true;
-
-            if (CurrentConnection is NotificationsClient client)
-                client.EnableChat = true;
         }
 
         protected sealed override async Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken)
@@ -41,7 +31,6 @@ namespace osu.Game.Online.Notifications
             client.ChannelJoined = c => ChannelJoined?.Invoke(c);
             client.NewMessages = m => NewMessages?.Invoke(m);
             client.PresenceReceived = () => PresenceReceived?.Invoke();
-            client.EnableChat = chatStarted;
 
             return client;
         }
