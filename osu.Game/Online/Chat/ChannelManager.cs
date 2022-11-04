@@ -85,8 +85,21 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load()
         {
-            connector.ChannelJoined += ch => Schedule(() => joinChannel(ch));
+            connector.ChannelJoined += ch => Schedule(() =>
+            {
+                var localChannel = getChannel(ch);
+
+                if (localChannel != ch)
+                {
+                    localChannel.Joined.Value = true;
+                    localChannel.Id = ch.Id;
+                }
+
+                joinChannel(localChannel);
+            });
+
             connector.NewMessages += msgs => Schedule(() => addMessages(msgs));
+
             connector.PresenceReceived += () => Schedule(() =>
             {
                 if (!channelsInitialised)
@@ -189,7 +202,8 @@ namespace osu.Game.Online.Chat
                     Timestamp = DateTimeOffset.Now,
                     ChannelId = target.Id,
                     IsAction = isAction,
-                    Content = text
+                    Content = text,
+                    Uuid = Guid.NewGuid().ToString()
                 };
 
                 target.AddLocalEcho(message);
@@ -199,13 +213,7 @@ namespace osu.Game.Online.Chat
                 {
                     var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(target.Users.First(), message);
 
-                    createNewPrivateMessageRequest.Success += createRes =>
-                    {
-                        target.Id = createRes.ChannelID;
-                        target.ReplaceMessage(message, createRes.Message);
-                        dequeueAndRun();
-                    };
-
+                    createNewPrivateMessageRequest.Success += _ => dequeueAndRun();
                     createNewPrivateMessageRequest.Failure += exception =>
                     {
                         handlePostException(exception);
@@ -219,12 +227,7 @@ namespace osu.Game.Online.Chat
 
                 var req = new PostMessageRequest(message);
 
-                req.Success += m =>
-                {
-                    target.ReplaceMessage(message, m);
-                    dequeueAndRun();
-                };
-
+                req.Success += m => dequeueAndRun();
                 req.Failure += exception =>
                 {
                     handlePostException(exception);
@@ -403,7 +406,20 @@ namespace osu.Game.Online.Chat
         {
             Channel found = null;
 
-            bool lookupCondition(Channel ch) => lookup.Id > 0 ? ch.Id == lookup.Id : lookup.Name == ch.Name;
+            bool lookupCondition(Channel ch)
+            {
+                // If both channels have an id, use that.
+                if (lookup.Id > 0 && ch.Id > 0)
+                    return ch.Id == lookup.Id;
+
+                // In the case that the local echo is received in a new channel (i.e. one that does not yet have an ID),
+                // then we need to check for any existing channel with the message containing the same message matched by UUID.
+                if (lookup.Messages.Count > 0 && ch.Messages.Any(m => m.Uuid == lookup.Messages.Last().Uuid))
+                    return true;
+
+                // As a last resort, fallback to matching by name.
+                return lookup.Name == ch.Name;
+            }
 
             var available = AvailableChannels.FirstOrDefault(lookupCondition);
             if (available != null)

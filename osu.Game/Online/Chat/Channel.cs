@@ -134,6 +134,14 @@ namespace osu.Game.Online.Chat
         /// <param name="messages"></param>
         public void AddNewMessages(params Message[] messages)
         {
+            foreach (var m in messages)
+            {
+                LocalEchoMessage localEcho = pendingMessages.FirstOrDefault(local => local.Uuid == m.Uuid);
+
+                if (localEcho != null)
+                    ReplaceMessage(localEcho, m);
+            }
+
             messages = messages.Except(Messages).ToArray();
 
             if (messages.Length == 0) return;
