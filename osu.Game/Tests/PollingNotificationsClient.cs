@@ -4,8 +4,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Game.Online.API;
+using osu.Game.Online.Notifications;
 
-namespace osu.Game.Online.Notifications.Polling
+namespace osu.Game.Tests
 {
     /// <summary>
     /// A notifications client which polls for new messages every second.
