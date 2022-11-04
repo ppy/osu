@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 effectiveMissCount = Math.Max(1.0, 1000.0 / totalSuccessfulHits) * countMiss;
 
             // TODO: The detection of rulesets is temporary until the leftover old skills have been reworked.
-            bool taikoSpecificBeatmap = score.BeatmapInfo.Ruleset.OnlineID == 1;
+            bool isConvert = score.BeatmapInfo.Ruleset.OnlineID != 1;
 
             double multiplier = 1.13;
 
@@ -54,8 +54,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModEasy))
                 multiplier *= 0.975;
 
-            double difficultyValue = computeDifficultyValue(score, taikoAttributes, taikoSpecificBeatmap);
-            double accuracyValue = computeAccuracyValue(score, taikoAttributes, taikoSpecificBeatmap);
+            double difficultyValue = computeDifficultyValue(score, taikoAttributes, isConvert);
+            double accuracyValue = computeAccuracyValue(score, taikoAttributes, isConvert);
             double totalValue =
                 Math.Pow(
                     Math.Pow(difficultyValue, 1.1) +
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             };
         }
 
-        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool taikoSpecificBeatmap)
+        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
             double difficultyValue = Math.Pow(5 * Math.Max(1.0, attributes.StarRating / 0.115) - 4.0, 2.25) / 1150.0;
 
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModEasy))
                 difficultyValue *= 0.985;
 
-            if (score.Mods.Any(m => m is ModHidden) && taikoSpecificBeatmap)
+            if (score.Mods.Any(m => m is ModHidden) && !isConvert)
                 difficultyValue *= 1.025;
 
             if (score.Mods.Any(m => m is ModHardRock))
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return difficultyValue * Math.Pow(accuracy, 2.0);
         }
 
-        private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool taikoSpecificBeatmap)
+        private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
             if (attributes.GreatHitWindow <= 0)
                 return 0;
@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             accuracyValue *= lengthBonus;
 
             // Slight HDFL Bonus for accuracy. A clamp is used to prevent against negative values.
-            if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden) && taikoSpecificBeatmap)
+            if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden) && !isConvert)
                 accuracyValue *= Math.Max(1.0, 1.1 * lengthBonus);
 
             return accuracyValue;
