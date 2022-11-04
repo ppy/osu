@@ -72,6 +72,7 @@ namespace osu.Game.Skinning.Editor
 
         private EditorSidebar componentsSidebar;
         private EditorSidebar settingsSidebar;
+        private EditorSidebar layerSidebar;
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
@@ -174,7 +175,29 @@ namespace osu.Game.Skinning.Editor
                                             Depth = float.MaxValue,
                                             RelativeSizeAxes = Axes.Both,
                                         },
-                                        settingsSidebar = new EditorSidebar(),
+                                        // settingsSidebar = new EditorSidebar(),
+                                        // layerSidebar = new EditorSidebar()
+                                        new GridContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Y,
+                                            Width = EditorSidebar.WIDTH,
+                                            RowDimensions = new[]
+                                            {
+                                                new Dimension(),
+                                                new Dimension(),
+                                            },
+                                            Content = new[]
+                                            {
+                                                new Drawable[]
+                                                {
+                                                    settingsSidebar = new EditorSidebar(),
+                                                },
+                                                new Drawable[]
+                                                {
+                                                    layerSidebar = new EditorSidebar()
+                                                }
+                                            },
+                                        }
                                     }
                                 }
                             }
@@ -182,6 +205,8 @@ namespace osu.Game.Skinning.Editor
                     }
                 }
             };
+
+            layerSidebar.Add(new EditorSidebarSection(@"Layer Editor"));
         }
 
         protected override void LoadComplete()
