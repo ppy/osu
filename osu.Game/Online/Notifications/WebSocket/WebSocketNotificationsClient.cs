@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -126,12 +124,10 @@ namespace osu.Game.Online.Notifications.WebSocket
                     NewChatMessageData? messageData = JsonConvert.DeserializeObject<NewChatMessageData>(message.Data.ToString());
                     Debug.Assert(messageData != null);
 
-                    List<Message> messages = messageData.Messages.Where(m => m.Sender.OnlineID != api.LocalUser.Value.OnlineID).ToList();
+                    foreach (var msg in messageData.Messages)
+                        HandleJoinedChannel(new Channel(msg.Sender) { Id = msg.ChannelId, Messages = { msg } });
 
-                    foreach (var msg in messages)
-                        HandleJoinedChannel(new Channel(msg.Sender) { Id = msg.ChannelId });
-
-                    HandleMessages(messages);
+                    HandleMessages(messageData.Messages);
                     break;
             }
 
