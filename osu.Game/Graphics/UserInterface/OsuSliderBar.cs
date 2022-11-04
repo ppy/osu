@@ -159,7 +159,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateGlow();
+            if (!Current.Disabled)
+                updateGlow();
             return base.OnHover(e);
         }
 
