@@ -29,6 +29,7 @@ namespace osu.Game.Online
         private readonly Bindable<bool> isConnected = new Bindable<bool>();
         private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
         private CancellationTokenSource connectCancelSource = new CancellationTokenSource();
+        private bool started;
 
         /// <summary>
         /// Constructs a new <see cref="PersistentEndpointClientConnector"/>.
@@ -37,9 +38,19 @@ namespace osu.Game.Online
         protected PersistentEndpointClientConnector(IAPIProvider api)
         {
             API = api;
-
             apiState.BindTo(api.State);
+        }
+
+        /// <summary>
+        /// Attempts to connect and begins processing messages from the remote endpoint.
+        /// </summary>
+        public void Start()
+        {
+            if (started)
+                return;
+
             apiState.BindValueChanged(_ => Task.Run(connectIfPossible), true);
+            started = true;
         }
 
         public Task Reconnect()

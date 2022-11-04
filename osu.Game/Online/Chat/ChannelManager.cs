@@ -111,6 +111,8 @@ namespace osu.Game.Online.Chat
                 }
             });
 
+            connector.Start();
+
             apiState.BindTo(api.State);
             apiState.BindValueChanged(_ => performChatAckRequest(), true);
         }
