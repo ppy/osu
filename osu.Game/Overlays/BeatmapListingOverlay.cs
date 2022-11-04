@@ -180,6 +180,8 @@ namespace osu.Game.Overlays
                 // new results may contain beatmaps from a previous page,
                 // this is dodgy but matches web behaviour for now.
                 // see: https://github.com/ppy/osu-web/issues/9270
+                // todo: replace custom equality compraer with ExceptBy in net6.0
+                // newCards = newCards.ExceptBy(foundContent.Select(c => c.BeatmapSet.OnlineID), c => c.BeatmapSet.OnlineID);
                 newCards = newCards.Except(foundContent, BeatmapCardEqualityComparer.Default);
 
                 panelLoadTask = LoadComponentsAsync(newCards, loaded =>
