@@ -72,7 +72,7 @@ namespace osu.Game.Online.Chat
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         private bool channelsInitialised;
-        private ScheduledDelegate ackDelegate;
+        private ScheduledDelegate scheduledAck;
 
         public ChannelManager(IAPIProvider api)
         {
@@ -112,16 +112,28 @@ namespace osu.Game.Online.Chat
             });
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(status =>
-            {
-                ackDelegate?.Cancel();
+            apiState.BindValueChanged(_ => performChatAckRequest(), true);
+        }
 
-                if (status.NewValue == APIState.Online)
-                {
-                    Scheduler.Add(ackDelegate = new ScheduledDelegate(() => api.Queue(new ChatAckRequest()), 0, 60000));
-                    // Todo: Handle silences.
-                }
-            }, true);
+        private void performChatAckRequest()
+        {
+            if (apiState.Value != APIState.Online)
+                return;
+
+            scheduledAck?.Cancel();
+
+            var req = new ChatAckRequest();
+            req.Success += _ => scheduleNextRequest();
+            req.Failure += _ => scheduleNextRequest();
+            api.Queue(req);
+
+            // Todo: Handle silences.
+
+            void scheduleNextRequest()
+            {
+                scheduledAck?.Cancel();
+                scheduledAck = Scheduler.AddDelayed(performChatAckRequest, 60000);
+            }
         }
 
         /// <summary>
