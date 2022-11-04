@@ -113,6 +113,15 @@ namespace osu.Game.Online.Notifications.WebSocket
         {
             switch (message.Event)
             {
+                case @"chat.channel.join":
+                    Debug.Assert(message.Data != null);
+
+                    Channel? joinedChannel = JsonConvert.DeserializeObject<Channel>(message.Data.ToString());
+                    Debug.Assert(joinedChannel != null);
+
+                    HandleJoinedChannel(joinedChannel);
+                    break;
+
                 case @"chat.message.new":
                     Debug.Assert(message.Data != null);
 
