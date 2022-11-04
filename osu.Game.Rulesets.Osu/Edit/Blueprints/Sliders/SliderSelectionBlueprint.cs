@@ -119,10 +119,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             updateVisualDefinition();
 
-            // In the case more than a single object is selected, block hover from arriving at sliders behind this one.
-            // Without doing this, the path visualisers of potentially hundreds of sliders will render, which is not only
-            // visually noisy but also functionally useless.
-            return !hasSingleObjectSelected;
+            return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
@@ -148,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void updateVisualDefinition()
         {
             // To reduce overhead of drawing these blueprints, only add extra detail when hovered or when only this slider is selected.
-            if (IsSelected && (hasSingleObjectSelected || IsHovered))
+            if (IsSelected && selectedObjects.Count == 1)
             {
                 if (ControlPointVisualiser == null)
                 {
