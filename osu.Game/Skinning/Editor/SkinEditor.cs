@@ -340,10 +340,12 @@ namespace osu.Game.Skinning.Editor
         private void populateSettings()
         {
             settingsSidebar.Clear();
+            layerSidebarList.Select(false);
 
             foreach (var component in SelectedComponents.OfType<Drawable>())
             {
                 settingsSidebar.Add(new SkinSettingsToolbox(component));
+                layerSidebarList.Select(component);
             }
         }
 

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -68,5 +69,62 @@ namespace osu.Game.Screens.Edit.List
         }
 
         public virtual Drawable GetDrawableListItem() => Container;
+
+        public bool Select(Drawable drawable, bool value = true)
+        {
+            if (!elements.ContainsKey(drawable)) return false;
+
+            elements[drawable].Select(value);
+            return true;
+        }
+
+        public bool Select(IDrawableListItem drawableListItem, bool value = true)
+        {
+            if (Equals(drawableListItem))
+            {
+                Select(value);
+                return true;
+            }
+
+            foreach (var listItem in elements.Values)
+            {
+                if (listItem.Select(drawableListItem, value))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public virtual void Select(bool value)
+        {
+            foreach (var listItem in elements.Values)
+            {
+                listItem.Select(value);
+            }
+        }
+
+        public bool Equals(IDrawableListItem other)
+        {
+            if (other is DrawableList item) return Equals(item);
+
+            return false;
+        }
+
+        protected bool Equals(DrawableList other)
+        {
+            //If all elements of the two Lists are the same, we conclude that we are the same object.
+            foreach (var key in elements.Keys)
+            {
+                if (!other.elements.ContainsKey(key)) return false;
+                if (!elements[key].Equals(other.elements[key])) return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(elements, Container);
+        }
     }
 }

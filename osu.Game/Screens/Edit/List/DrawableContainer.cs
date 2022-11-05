@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
@@ -12,6 +13,7 @@ namespace osu.Game.Screens.Edit.List
     public class DrawableContainer : DrawableList
     {
         private readonly OsuCheckbox button;
+        private readonly Box box;
         private readonly Container<Drawable> gridContainer;
         private readonly BindableBool enabled = new BindableBool(true);
 
@@ -25,6 +27,10 @@ namespace osu.Game.Screens.Edit.List
                 Spacing = new Vector2(2),
                 Children = new Drawable[]
                 {
+                    box = new Box
+                    {
+                        Colour = new Colour4(255, 255, 0, 0.25f),
+                    },
                     button = new OsuCheckbox
                     {
                         LabelText = @"SkinnableContainer",
@@ -60,6 +66,24 @@ namespace osu.Game.Screens.Edit.List
             else Hide();
 
             if (setValue) enabled.Value = value;
+        }
+
+        public override void Select(bool value)
+        {
+            if (value)
+            {
+                box.Show();
+                box.Width = button.Width;
+                box.Height = button.Height;
+            }
+            else
+            {
+                box.Hide();
+                box.Width = button.Width;
+                box.Height = button.Height;
+            }
+
+            base.Select(value);
         }
 
         public void Hide() => Container.Hide();
