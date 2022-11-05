@@ -75,7 +75,7 @@ namespace osu.Game.Skinning.Editor
         private EditorSidebar settingsSidebar;
         private EditorSidebar layerSidebar;
         private EditorSidebarSection layerSidebarSection;
-        private DrawableList layerSidebarList;
+        private DrawableContainer layerSidebarList;
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
@@ -210,7 +210,7 @@ namespace osu.Game.Skinning.Editor
             };
 
             layerSidebar.Add(layerSidebarSection = new EditorSidebarSection(@"Layer Editor"));
-            layerSidebarList = new DrawableList();
+            layerSidebarList = new DrawableContainer();
             layerSidebarSection.Clear();
             layerSidebarSection.Child = layerSidebarList.GetDrawableListItem();
         }
