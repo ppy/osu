@@ -9,3 +9,9 @@ $SLN="osu.sln"
 dotnet remove $CSPROJ package ppy.osu.Framework;
 dotnet sln $SLN add ../osu-framework/osu.Framework/osu.Framework.csproj ../osu-framework/osu.Framework.NativeLibs/osu.Framework.NativeLibs.csproj;
 dotnet add $CSPROJ reference ../osu-framework/osu.Framework/osu.Framework.csproj
+
+$SLNF=Get-Content "osu.Desktop.slnf" | ConvertFrom-Json
+$TMP=New-TemporaryFile
+$SLNF.solution.projects += ("../osu-framework/osu.Framework/osu.Framework.csproj", "../osu-framework/osu.Framework.NativeLibs/osu.Framework.NativeLibs.csproj")
+ConvertTo-Json $SLNF | Out-File $TMP -Encoding UTF8
+Move-Item -Path $TMP -Destination "osu.Desktop.slnf" -Force
