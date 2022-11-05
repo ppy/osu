@@ -32,6 +32,16 @@ namespace osu.Game.Screens.Edit.List
             addInternal(drawableListItem.GetDrawableListItem(), drawableListItem);
         }
 
+        public void AddRange(IEnumerable<object> drawables)
+        {
+            var iter = drawables.GetEnumerator();
+
+            while (iter.MoveNext())
+                Add(iter.Current as Drawable);
+
+            iter.Dispose();
+        }
+
         public void Add(Drawable? drawable)
         {
             if (drawable is null) return;

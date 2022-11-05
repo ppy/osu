@@ -178,8 +178,6 @@ namespace osu.Game.Skinning.Editor
                                             Depth = float.MaxValue,
                                             RelativeSizeAxes = Axes.Both,
                                         },
-                                        // settingsSidebar = new EditorSidebar(),
-                                        // layerSidebar = new EditorSidebar()
                                         new GridContainer
                                         {
                                             RelativeSizeAxes = Axes.Y,
@@ -213,6 +211,11 @@ namespace osu.Game.Skinning.Editor
             layerSidebarList = new DrawableContainer();
             layerSidebarSection.Clear();
             layerSidebarSection.Child = layerSidebarList.GetDrawableListItem();
+        }
+
+        public void LoadDrawables(IEnumerable<ISkinnableDrawable> skinnableDrawables)
+        {
+            layerSidebarList.AddRange(skinnableDrawables);
         }
 
         protected override void LoadComplete()
@@ -341,7 +344,6 @@ namespace osu.Game.Skinning.Editor
             foreach (var component in SelectedComponents.OfType<Drawable>())
             {
                 settingsSidebar.Add(new SkinSettingsToolbox(component));
-                layerSidebarList.Add(component);
             }
         }
 

@@ -54,6 +54,7 @@ namespace osu.Game.Skinning.Editor
             foreach (var targetContainer in targetContainers)
             {
                 var bindableList = new BindableList<ISkinnableDrawable> { BindTarget = targetContainer.Components };
+                editor.LoadDrawables(bindableList);
                 bindableList.BindCollectionChanged(componentsChanged, true);
 
                 targetComponents.Add(bindableList);
