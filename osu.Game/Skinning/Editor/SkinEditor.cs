@@ -28,6 +28,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.Edit.List;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -73,6 +74,8 @@ namespace osu.Game.Skinning.Editor
         private EditorSidebar componentsSidebar;
         private EditorSidebar settingsSidebar;
         private EditorSidebar layerSidebar;
+        private EditorSidebarSection layerSidebarSection;
+        private DrawableList layerSidebarList;
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
@@ -206,7 +209,10 @@ namespace osu.Game.Skinning.Editor
                 }
             };
 
-            layerSidebar.Add(new EditorSidebarSection(@"Layer Editor"));
+            layerSidebar.Add(layerSidebarSection = new EditorSidebarSection(@"Layer Editor"));
+            layerSidebarList = new DrawableList();
+            layerSidebarSection.Clear();
+            layerSidebarSection.Child = layerSidebarList.GetDrawableListItem();
         }
 
         protected override void LoadComplete()
@@ -321,6 +327,7 @@ namespace osu.Game.Skinning.Editor
                 drawableComponent.Y = targetContainer.DrawSize.Y / 2;
             }
 
+            layerSidebarList.Add(drawableComponent);
             targetContainer.Add(component);
 
             SelectedComponents.Clear();
@@ -332,7 +339,10 @@ namespace osu.Game.Skinning.Editor
             settingsSidebar.Clear();
 
             foreach (var component in SelectedComponents.OfType<Drawable>())
+            {
                 settingsSidebar.Add(new SkinSettingsToolbox(component));
+                layerSidebarList.Add(component);
+            }
         }
 
         private IEnumerable<ISkinnableTarget> availableTargets => targetScreen.ChildrenOfType<ISkinnableTarget>();
@@ -397,7 +407,10 @@ namespace osu.Game.Skinning.Editor
         public void DeleteItems(ISkinnableDrawable[] items)
         {
             foreach (var item in items)
+            {
                 availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
+                layerSidebarList.Remove((Drawable)item);
+            }
         }
 
         #region Drag & drop import handling
