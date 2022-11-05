@@ -5,7 +5,6 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
@@ -42,7 +41,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             var mock = new Mock<IWorkingBeatmap>();
             mock.SetupGet(w => w.Beatmap).Returns(beatmap);
-            mock.SetupGet(w => w.Track).Returns(default(Track?).AsNonNull());
+            mock.SetupGet(w => w.Track).Returns((Track)null!);
 
             Assert.That(check.Run(new BeatmapVerifierContext(beatmap, mock.Object)), Is.Empty);
         }
