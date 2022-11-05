@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
@@ -73,7 +72,7 @@ namespace osu.Game.Tests.Editing.Checks
         private BeatmapVerifierContext getContextMissing()
         {
             var mockWorkingBeatmap = new Mock<IWorkingBeatmap>();
-            mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns(default(Stream?).AsNonNull());
+            mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns((Stream)null!);
 
             return new BeatmapVerifierContext(beatmap, mockWorkingBeatmap.Object);
         }
