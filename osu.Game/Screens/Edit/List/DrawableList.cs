@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.List
@@ -12,57 +11,21 @@ namespace osu.Game.Screens.Edit.List
     public class DrawableList : IDrawableListItem
     {
         private readonly Dictionary<Drawable, IDrawableListItem> elements = new Dictionary<Drawable, IDrawableListItem>();
-        private readonly DrawableListItem item;
-        private readonly OsuSpriteText text;
-        private readonly GridContainer gridContainer;
-        private readonly Container<Drawable> container;
+        protected readonly Container<Drawable> Container;
 
         public DrawableList()
         {
-            gridContainer = new GridContainer
+            Container = new FillFlowContainer
             {
-                AutoSizeAxes = Axes.Both,
-                ColumnDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(GridSizeMode.AutoSize)
-                },
-                RowDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension()
-                },
-                Content = new[]
-                {
-                    new Drawable[]
-                    {
-                        text = new OsuSpriteText
-                        {
-                            Text = @"v",
-                            Padding = new MarginPadding
-                            {
-                                Right = 5
-                            },
-                        },
-                        item = new DrawableListItem(new Container(), @"SkinnableContainer"),
-                    },
-                    new Drawable?[]
-                    {
-                        null,
-                        container = new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(15),
-                        }
-                    }
-                }
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(15),
             };
         }
 
         public void Add(DrawableListItem drawableListItem) => Add((IDrawableListItem)drawableListItem);
-        public void Add(DrawableList drawableList) => Add((IDrawableListItem)drawableList);
+        public void Add(DrawableContainer drawableList) => Add((IDrawableListItem)drawableList);
 
         internal void Add(IDrawableListItem drawableListItem)
         {
@@ -81,36 +44,19 @@ namespace osu.Game.Screens.Edit.List
             if (elements.ContainsKey(drawable)) return;
 
             elements.Add(drawable, listItem);
-            container.Add(elements[drawable].GetDrawableListItem());
+            Container.Add(elements[drawable].GetDrawableListItem());
         }
 
         public bool Remove(Drawable drawable) => RemoveInternal(drawable, false);
 
         protected bool RemoveInternal(Drawable drawable, bool disposeImmediately)
         {
-            bool remove = container.Remove(elements[drawable].GetDrawableListItem(), disposeImmediately);
+            bool remove = Container.Remove(elements[drawable].GetDrawableListItem(), disposeImmediately);
             elements.Remove(drawable);
             if (disposeImmediately) drawable.Dispose();
             return remove;
         }
 
-        // private void recalculateGrid()
-        // {
-        //     // gridContainer.Content = elements.Select(e => new Drawable[]
-        //     // {
-        //     //     new DrawableListItem(e)
-        //     // }).ToArray();
-        //     scrollContainer.Content[0] = elements.ToArray();
-        //     Dimension[] dim = new Dimension[elements.Count];
-        //
-        //     for (int i = 0; i < dim.Length; i++)
-        //     {
-        //         dim[i] = new Dimension(GridSizeMode.Absolute);
-        //     }
-        //
-        //     scrollContainer.RowDimensions = dim;
-        //     scrollContainer.Invalidate();
-        // }
-        public Drawable GetDrawableListItem() => gridContainer;
+        public virtual Drawable GetDrawableListItem() => Container;
     }
 }
