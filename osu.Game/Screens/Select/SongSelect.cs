@@ -502,8 +502,6 @@ namespace osu.Game.Screens.Select
 
                 if (transferRulesetValue())
                 {
-                    Mods.Value = Array.Empty<Mod>();
-
                     // transferRulesetValue() may trigger a re-filter. If the current selection does not match the new ruleset, we want to switch away from it.
                     // The default logic on WorkingBeatmap change is to switch to a matching ruleset (see workingBeatmapChanged()), but we don't want that here.
                     // We perform an early selection attempt and clear out the beatmap selection to avoid a second ruleset change (revert).

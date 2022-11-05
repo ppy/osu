@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly Bindable<Track> track = new Bindable<Track>();
 
-        public double TrackLength => track.Value?.Length ?? 60000;
+        public double TrackLength => track.Value?.IsLoaded == true ? track.Value.Length : 60000;
 
         public ControlPointInfo ControlPointInfo => Beatmap.ControlPointInfo;
 
