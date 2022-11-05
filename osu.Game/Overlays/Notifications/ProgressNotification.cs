@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private bool completionSent;
+        private int completionSent;
 
         /// <summary>
         /// Attempt to post a completion notification.
@@ -162,11 +162,11 @@ namespace osu.Game.Overlays.Notifications
             if (CompletionTarget == null)
                 return;
 
-            if (completionSent)
+            // Thread-safe barrier, as this may be called by a web request and also scheduled to the update thread at the same time.
+            if (Interlocked.Exchange(ref completionSent, 1) == 1)
                 return;
 
             CompletionTarget.Invoke(CreateCompletionNotification());
-            completionSent = true;
 
             Close(false);
         }
