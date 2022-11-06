@@ -172,7 +172,7 @@ namespace osu.Game.Graphics.UserInterface
             if (filled.NewValue)
             {
                 main.ResizeWidthTo(1, duration, Easing.OutElasticHalf);
-                main.TransformTo(nameof(BorderThickness), filled.NewValue ? 8.5f : border_width, duration, Easing.OutElasticHalf);
+                main.TransformTo(nameof(BorderThickness), 8.5f, duration, Easing.OutElasticHalf);
             }
             else
             {
