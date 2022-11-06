@@ -91,12 +91,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
             switch (currentCombo.Value)
             {
-                case > 150:
+                case >= 150:
                     enableAnimations = true;
                     Divisor = 4;
                     break;
 
-                case > 50:
+                case >= 50:
                     enableAnimations = true;
                     Divisor = 2;
                     break;

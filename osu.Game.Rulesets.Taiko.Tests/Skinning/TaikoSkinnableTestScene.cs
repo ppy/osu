@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using osu.Framework.Allocation;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
@@ -10,5 +12,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
     public abstract class TaikoSkinnableTestScene : SkinnableTestScene
     {
         protected override Ruleset CreateRulesetForSkinProvider() => new TaikoRuleset();
+
+        [Cached]
+        protected readonly ScoreProcessor ScoreProcessor = new ScoreProcessor(new TaikoRuleset());
     }
 }
