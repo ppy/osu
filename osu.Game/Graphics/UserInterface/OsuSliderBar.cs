@@ -162,8 +162,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (!Current.Disabled)
-                updateGlow();
+            updateGlow();
             return base.OnHover(e);
         }
 
@@ -184,7 +183,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateGlow()
         {
-            Nub.Glowing = IsHovered || IsDragged;
+            Nub.Glowing = !Current.Disabled && (IsHovered || IsDragged);
         }
 
         protected override void OnUserChange(T value)
