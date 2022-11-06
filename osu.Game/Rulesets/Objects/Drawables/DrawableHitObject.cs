@@ -130,7 +130,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
 
         private readonly Bindable<float> positionalHitsoundsLevel = new Bindable<float>();
-        private readonly Bindable<bool> normaliseComboColourBrightness = new Bindable<bool>();
         private readonly Bindable<float> comboColourBrightness = new Bindable<float>();
         private readonly Bindable<int> comboIndexWithOffsetsBindable = new Bindable<int>();
 
@@ -197,7 +196,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             comboIndexBindable.BindValueChanged(_ => UpdateComboColour());
             comboIndexWithOffsetsBindable.BindValueChanged(_ => UpdateComboColour(), true);
 
-            normaliseComboColourBrightness.BindValueChanged(_ => UpdateComboColour());
             comboColourBrightness.BindValueChanged(_ => UpdateComboColour());
 
             // Apply transforms
