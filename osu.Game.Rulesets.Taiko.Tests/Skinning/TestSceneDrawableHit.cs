@@ -43,6 +43,26 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             }));
         }
 
+        [Test]
+        public void TestHitAnimationSlow()
+        {
+            AddStep("Reset combo", () => ScoreProcessor.Combo.Value = 0);
+
+            AddRepeatStep("Increase combo", () => ScoreProcessor.Combo.Value++, 50);
+
+            TestHits();
+        }
+
+        [Test]
+        public void TestHitAnimationFast()
+        {
+            AddStep("Reset combo", () => ScoreProcessor.Combo.Value = 0);
+
+            AddRepeatStep("Increase combo", () => ScoreProcessor.Combo.Value++, 150);
+
+            TestHits();
+        }
+
         private Hit createHitAtCurrentTime(bool strong = false, bool rim = false)
         {
             var hit = new Hit
