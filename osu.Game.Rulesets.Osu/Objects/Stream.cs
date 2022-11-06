@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 streamPath.Path = value.Path;
                 streamPath.ControlPoints.Clear();
-                streamPath.ControlPoints.AddRange(value.ControlPoints.Select(c => new StreamControlPoint(c.Time, c.Count, c.Ratio)));
+                streamPath.ControlPoints.AddRange(value.ControlPoints.Select(c => new StreamControlPoint(c.Time, c.Count, c.Acceleration, c.Exponential)));
             }
         }
 

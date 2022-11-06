@@ -46,22 +46,42 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        private double ratio = 1;
+        private double acceleration;
 
         /// <summary>
-        /// The distance ratio of this segment.
-        /// Greater than 1 for accelerating, less than 1 for decelerating.
+        /// The acceleration factor of this segment.
+        /// Greater than 0 for accelerating, less than 0 for decelerating.
         /// </summary>
         [JsonProperty]
-        public double Ratio
+        public double Acceleration
         {
-            get => ratio;
+            get => acceleration;
             set
             {
-                if (value == ratio)
+                if (value == acceleration)
                     return;
 
-                ratio = value;
+                acceleration = value;
+                Changed?.Invoke();
+            }
+        }
+
+        private bool exponential;
+
+        /// <summary>
+        /// The acceleration type of this segment.
+        /// False for quadratic, true for exponential.
+        /// </summary>
+        [JsonProperty]
+        public bool Exponential
+        {
+            get => exponential;
+            set
+            {
+                if (value == exponential)
+                    return;
+
+                exponential = value;
                 Changed?.Invoke();
             }
         }
@@ -83,15 +103,17 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         /// <param name="time">The initial time.</param>
         /// <param name="count">The initial count.</param>
-        /// <param name="ratio">The initial ratio.</param>
-        public StreamControlPoint(double time, int count, double ratio = 1)
+        /// <param name="acceleration">The initial acceleration.</param>
+        /// <param name="exponential">The initial acceleration type.</param>
+        public StreamControlPoint(double time, int count, double acceleration = 0, bool exponential = false)
             : this()
         {
             Time = time;
             Count = count;
-            Ratio = ratio;
+            Acceleration = acceleration;
+            Exponential = exponential;
         }
 
-        public bool Equals(StreamControlPoint other) => Time == other.Time && Count == other.Count && Ratio == other.Ratio;
+        public bool Equals(StreamControlPoint other) => Time == other.Time && Count == other.Count && Acceleration == other.Acceleration && Exponential == other.Exponential;
     }
 }

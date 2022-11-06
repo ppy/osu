@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
             if (!e.ShiftPressed || streamCursor == null)
                 return base.OnScroll(e);
 
-            streamCursor.Ratio = MathHelper.Clamp(streamCursor.Ratio + e.ScrollDelta.X * 0.1f, 0, 100);
+            streamCursor.Acceleration += e.ScrollDelta.X * 0.5d;
 
             return true;
         }
