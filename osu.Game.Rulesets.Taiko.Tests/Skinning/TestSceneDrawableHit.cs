@@ -30,23 +30,24 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 Origin = Anchor.Centre,
             }));
 
-            AddStep("Rim hit", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime())
+            AddStep("Rim hit", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime(rim: true))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
 
-            AddStep("Rim hit (strong)", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime(true))
+            AddStep("Rim hit (strong)", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime(true, true))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
         }
 
-        private Hit createHitAtCurrentTime(bool strong = false)
+        private Hit createHitAtCurrentTime(bool strong = false, bool rim = false)
         {
             var hit = new Hit
             {
+                Type = rim ? HitType.Rim : HitType.Centre,
                 IsStrong = strong,
                 StartTime = Time.Current + 3000,
             };

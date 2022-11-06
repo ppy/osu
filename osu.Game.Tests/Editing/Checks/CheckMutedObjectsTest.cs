@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -21,8 +19,8 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckMutedObjectsTest
     {
-        private CheckMutedObjects check;
-        private ControlPointInfo cpi;
+        private CheckMutedObjects check = null!;
+        private ControlPointInfo cpi = null!;
 
         private const int volume_regular = 50;
         private const int volume_low = 15;
