@@ -11,6 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         public DefaultJudgementPiece(HitResult result)
             : base(result)
         {
+            RelativePositionAxes = Axes.Both;
         }
 
         public override void PlayAnimation()
@@ -18,15 +19,17 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             if (Result != HitResult.Miss)
             {
                 this
-                    .MoveToY(0)
-                    .MoveToY(-100, 500);
+                    .MoveToY(-0.6f)
+                    .MoveToY(-1.5f, 500);
 
                 JudgementText
                     .ScaleTo(0.9f)
                     .ScaleTo(1, 500, Easing.OutElastic);
-            }
 
-            base.PlayAnimation();
+                this.FadeOutFromOne(800, Easing.OutQuint);
+            }
+            else
+                base.PlayAnimation();
         }
     }
 }

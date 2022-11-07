@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 using DefaultJudgementPiece = osu.Game.Rulesets.Taiko.Skinning.Default.DefaultJudgementPiece;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -13,6 +14,15 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     public class DrawableTaikoJudgement : DrawableJudgement
     {
+        public DrawableTaikoJudgement()
+        {
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
+            RelativeSizeAxes = Axes.Both;
+            Size = Vector2.One;
+        }
+
         protected override Drawable CreateDefaultJudgement(HitResult result) => new DefaultJudgementPiece(result);
     }
 }
