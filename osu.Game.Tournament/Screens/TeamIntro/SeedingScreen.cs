@@ -70,16 +70,16 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             currentTeam.BindValueChanged(teamChanged, true);
         }
 
-        private void teamChanged(ValueChangedEvent<TournamentTeam> team) => Scheduler.AddOnce(() =>
-        {
-            if (team.NewValue == null)
-            {
-                mainContainer.Clear();
-                return;
-            }
+        private void teamChanged(ValueChangedEvent<TournamentTeam> team) => updateTeamDisplay();
 
-            showTeam(team.NewValue);
-        });
+        public override void Show()
+        {
+            base.Show();
+
+            // Changes could have been made on editor screen.
+            // Rather than trying to track all the possibilities (teams / players / scores) just force a full refresh.
+            updateTeamDisplay();
+        }
 
         protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
         {
@@ -91,14 +91,20 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             currentTeam.Value = match.NewValue.Team1.Value;
         }
 
-        private void showTeam(TournamentTeam team)
+        private void updateTeamDisplay() => Scheduler.AddOnce(() =>
         {
+            if (currentTeam.Value == null)
+            {
+                mainContainer.Clear();
+                return;
+            }
+
             mainContainer.Children = new Drawable[]
             {
-                new LeftInfo(team) { Position = new Vector2(55, 150), },
-                new RightInfo(team) { Position = new Vector2(500, 150), },
+                new LeftInfo(currentTeam.Value) { Position = new Vector2(55, 150), },
+                new RightInfo(currentTeam.Value) { Position = new Vector2(500, 150), },
             };
-        }
+        });
 
         private class RightInfo : CompositeDrawable
         {
