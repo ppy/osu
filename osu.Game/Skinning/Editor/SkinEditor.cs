@@ -26,6 +26,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.List;
@@ -73,9 +74,7 @@ namespace osu.Game.Skinning.Editor
 
         private EditorSidebar componentsSidebar;
         private EditorSidebar settingsSidebar;
-        private EditorSidebar layerSidebar;
-        private EditorSidebarSection layerSidebarSection;
-        private DrawableContainer layerSidebarList;
+        public DrawableContainer<SelectionBlueprint<ISkinnableDrawable>> LayerSidebarList;
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
@@ -92,6 +91,9 @@ namespace osu.Game.Skinning.Editor
         [BackgroundDependencyLoader]
         private void load()
         {
+            EditorSidebar layerSidebar;
+            EditorSidebarSection layerSidebarSection;
+
             RelativeSizeAxes = Axes.Both;
 
             InternalChild = new OsuContextMenuContainer
@@ -208,14 +210,8 @@ namespace osu.Game.Skinning.Editor
             };
 
             layerSidebar.Add(layerSidebarSection = new EditorSidebarSection(@"Layer Editor"));
-            layerSidebarList = new DrawableContainer();
             layerSidebarSection.Clear();
-            layerSidebarSection.Child = layerSidebarList.GetDrawableListItem();
-        }
-
-        public void LoadDrawables(IEnumerable<ISkinnableDrawable> skinnableDrawables)
-        {
-            layerSidebarList.AddRange(skinnableDrawables);
+            layerSidebarSection.Child = LayerSidebarList = new DrawableContainer<SelectionBlueprint<ISkinnableDrawable>>();
         }
 
         protected override void LoadComplete()
@@ -274,8 +270,9 @@ namespace osu.Game.Skinning.Editor
 
             void loadBlueprintContainer()
             {
-                content.Child = new SkinBlueprintContainer(targetScreen);
-
+                SkinBlueprintContainer blueprintContainer = new SkinBlueprintContainer(targetScreen);
+                content.Child = blueprintContainer;
+                LayerSidebarList.AddRange(blueprintContainer.SelectionBlueprints.Children);
                 componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)
                 {
                     RequestPlacement = placeComponent
@@ -330,7 +327,6 @@ namespace osu.Game.Skinning.Editor
                 drawableComponent.Y = targetContainer.DrawSize.Y / 2;
             }
 
-            layerSidebarList.Add(drawableComponent);
             targetContainer.Add(component);
 
             SelectedComponents.Clear();
@@ -340,12 +336,10 @@ namespace osu.Game.Skinning.Editor
         private void populateSettings()
         {
             settingsSidebar.Clear();
-            layerSidebarList.Select(false);
 
             foreach (var component in SelectedComponents.OfType<Drawable>())
             {
                 settingsSidebar.Add(new SkinSettingsToolbox(component));
-                layerSidebarList.Select(component);
             }
         }
 
@@ -413,7 +407,6 @@ namespace osu.Game.Skinning.Editor
             foreach (var item in items)
             {
                 availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
-                layerSidebarList.Remove((Drawable)item);
             }
         }
 

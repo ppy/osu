@@ -54,11 +54,22 @@ namespace osu.Game.Skinning.Editor
             foreach (var targetContainer in targetContainers)
             {
                 var bindableList = new BindableList<ISkinnableDrawable> { BindTarget = targetContainer.Components };
-                editor.LoadDrawables(bindableList);
                 bindableList.BindCollectionChanged(componentsChanged, true);
 
                 targetComponents.Add(bindableList);
             }
+        }
+
+        protected override void OnBlueprintAdded(SelectionBlueprint<ISkinnableDrawable> item)
+        {
+            base.OnBlueprintAdded(item);
+            editor.LayerSidebarList.Add(item);
+        }
+
+        protected override void OnBlueprintRemoved(SelectionBlueprint<ISkinnableDrawable> item)
+        {
+            base.OnBlueprintRemoved(item);
+            editor.LayerSidebarList.Remove(item);
         }
 
         private void componentsChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>

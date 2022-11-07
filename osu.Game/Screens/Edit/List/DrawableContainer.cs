@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,16 +12,22 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public class DrawableContainer : DrawableList
+    public class DrawableContainer<T> : CompositeDrawable, IDrawableListItem<T>
+        where T : Drawable
     {
+        public event Action<SelectionState> SelectAll;
+
         private readonly OsuCheckbox button;
         private readonly Box box;
-        private readonly Container<Drawable> gridContainer;
-        private readonly BindableBool enabled = new BindableBool(true);
+        private readonly BindableBool enabled = new BindableBool();
+        private readonly DrawableList<T> list = new DrawableList<T>();
 
         public DrawableContainer()
         {
-            gridContainer = new FillFlowContainer
+            SelectAll = ((IDrawableListItem<T>)list).SelectableOnStateChanged;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -38,6 +46,7 @@ namespace osu.Game.Screens.Edit.List
                     },
                     new GridContainer
                     {
+                        AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         ColumnDimensions = new[]
                         {
@@ -49,26 +58,32 @@ namespace osu.Game.Screens.Edit.List
                             new Drawable?[]
                             {
                                 null,
-                                Container
+                                list,
                             }
                         }
                     }
                 }
             };
             enabled.BindValueChanged(v => SetShown(v.NewValue), true);
+            Select(false);
         }
+
+        public void SelectableOnStateChanged(SelectionState obj) =>
+            ((IDrawableListItem<T>)list).SelectableOnStateChanged(obj);
 
         public void Toggle() => SetShown(!enabled.Value, true);
 
         public void SetShown(bool value, bool setValue = false)
         {
-            if (value) Show();
-            else Hide();
+            if (value) list.Show();
+            else list.Hide();
 
             if (setValue) enabled.Value = value;
         }
 
-        public override void Select(bool value)
+        public void UpdateText() => list.UpdateText();
+
+        public void Select(bool value)
         {
             if (value)
             {
@@ -83,13 +98,18 @@ namespace osu.Game.Screens.Edit.List
                 box.Height = button.Height;
             }
 
-            base.Select(value);
+            list.Select(value);
         }
 
-        public void Hide() => Container.Hide();
+        public void AddRange(IEnumerable<T>? drawables) => list.AddRange(drawables);
+        public void Add(DrawableListItem<T> drawableListItem) => list.Add(drawableListItem);
+        public void Add(DrawableContainer<T> container) => list.Add(container);
+        public void Add(DrawableList<T> list) => list.Add(list);
+        public void Add(T? item) => list.Add(item);
+        public void Remove(T? item) => list.Remove(item);
 
-        public void Show() => Container.Show();
+        public void SelectInternal(bool value) => list.SelectInternal(value);
 
-        public override Drawable GetDrawableListItem() => gridContainer;
+        public Drawable GetDrawableListItem() => this;
     }
 }

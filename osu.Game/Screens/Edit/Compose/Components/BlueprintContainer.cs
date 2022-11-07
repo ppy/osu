@@ -285,7 +285,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (SelectionHandler.SelectedItems.Contains(item))
                 blueprint.Select();
 
-            OnBlueprintAdded(blueprint.Item);
+            OnBlueprintAdded(blueprint);
         }
 
         protected void RemoveBlueprintFor(T item)
@@ -302,14 +302,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (movementBlueprints?.Contains(blueprint) == true)
                 finishSelectionMovement();
 
-            OnBlueprintRemoved(blueprint.Item);
+            OnBlueprintRemoved(blueprint);
         }
 
         /// <summary>
         /// Called after an item's blueprint has been added.
         /// </summary>
         /// <param name="item">The item for which the blueprint has been added.</param>
-        protected virtual void OnBlueprintAdded(T item)
+        protected virtual void OnBlueprintAdded(SelectionBlueprint<T> item)
         {
         }
 
@@ -317,7 +317,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Called after an item's blueprint has been removed.
         /// </summary>
         /// <param name="item">The item for which the blueprint has been removed.</param>
-        protected virtual void OnBlueprintRemoved(T item)
+        protected virtual void OnBlueprintRemoved(SelectionBlueprint<T> item)
         {
         }
 

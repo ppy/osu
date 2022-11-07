@@ -5,94 +5,132 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public class DrawableList : IDrawableListItem
+    public class DrawableList<T> : CompositeDrawable, IDrawableListItem<T>
+        where T : Drawable
     {
-        private readonly Dictionary<Drawable, IDrawableListItem> elements = new Dictionary<Drawable, IDrawableListItem>();
+        public event Action<SelectionState> SelectAll;
+        private readonly Dictionary<T, DrawableListItem<T>> elements = new Dictionary<T, DrawableListItem<T>>();
+        private readonly List<IDrawableListItem<T>> containers = new List<IDrawableListItem<T>>();
         protected readonly Container<Drawable> Container;
 
         public DrawableList()
         {
-            Container = new FillFlowContainer
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            InternalChild = Container = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(15),
+                Spacing = new Vector2(2.5f),
             };
+            SelectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
         }
 
-        public void Add(DrawableListItem drawableListItem) => Add((IDrawableListItem)drawableListItem);
-        public void Add(DrawableContainer drawableList) => Add((IDrawableListItem)drawableList);
-
-        internal void Add(IDrawableListItem drawableListItem)
+        protected override bool OnClick(ClickEvent e)
         {
-            addInternal(drawableListItem.GetDrawableListItem(), drawableListItem);
+            if (e.Button == MouseButton.Left)
+                SelectAll.Invoke(SelectionState.NotSelected);
+            base.OnClick(e);
+            return e.Button == MouseButton.Left;
         }
 
-        public void AddRange(IEnumerable<object> drawables)
+        public void Add(DrawableListItem<T> drawableListItem)
         {
+            if (drawableListItem.t is not null) addInternal(drawableListItem.t, drawableListItem);
+        }
+
+        public void Add(DrawableContainer<T> container) => AddContainer(container);
+        public void Add(DrawableList<T> list) => AddContainer(list);
+
+        internal void AddContainer(IDrawableListItem<T> drawableList)
+        {
+            if (containers.Contains(drawableList)) return;
+
+            containers.Add(drawableList);
+            Container.Add(drawableList.GetDrawableListItem());
+        }
+
+        internal void Add(IDrawableListItem<T> drawableListItem)
+        {
+            if (drawableListItem is DrawableListItem<T> item) Add(item);
+            //this should also catch DrawableContainer
+            else if (drawableListItem is DrawableList<T> list) AddContainer(list);
+            else if (drawableListItem is DrawableContainer<T> container) AddContainer(container);
+            //and there should be no other implementors, because IDrawableListItem is internal?
+        }
+
+        public void AddRange(IEnumerable<T>? drawables)
+        {
+            if (drawables is null) return;
+
             var iter = drawables.GetEnumerator();
 
             while (iter.MoveNext())
-                Add(iter.Current as Drawable);
+            {
+                if (iter.Current is T t) Add(t);
+                if (iter.Current is IDrawableListItem<T> item) Add(item);
+            }
 
             iter.Dispose();
         }
 
-        public void Add(Drawable? drawable)
+        public void Add(T? drawable)
         {
             if (drawable is null) return;
 
-            addInternal(drawable, new DrawableListItem(drawable));
+            addInternal(drawable, new DrawableListItem<T>(drawable));
         }
 
-        private void addInternal(Drawable drawable, IDrawableListItem listItem)
+        private void addInternal(T drawable, DrawableListItem<T> listItem)
         {
             if (elements.ContainsKey(drawable)) return;
 
             elements.Add(drawable, listItem);
+            listItem.SelectAll += SelectAll.Invoke;
             Container.Add(elements[drawable].GetDrawableListItem());
         }
 
-        public bool Remove(Drawable drawable) => RemoveInternal(drawable, false);
+        public bool Remove(T? drawable) => RemoveInternal(drawable, false);
 
-        protected bool RemoveInternal(Drawable drawable, bool disposeImmediately)
+        protected bool RemoveInternal(T? drawable, bool disposeImmediately)
         {
+            if (drawable is null || !elements.ContainsKey(drawable)) return false;
+
             bool remove = Container.Remove(elements[drawable].GetDrawableListItem(), disposeImmediately);
             elements.Remove(drawable);
             if (disposeImmediately) drawable.Dispose();
             return remove;
         }
 
-        public virtual Drawable GetDrawableListItem() => Container;
+        public virtual Drawable GetDrawableListItem() => this;
 
-        public bool Select(Drawable drawable, bool value = true)
+        public void UpdateText()
+        {
+            foreach (DrawableListItem<T> items in elements.Values)
+            {
+                items.UpdateText();
+            }
+
+            foreach (IDrawableListItem<T> container in containers)
+            {
+                container.UpdateText();
+            }
+        }
+
+        public bool Select(T drawable, bool value = true)
         {
             if (!elements.ContainsKey(drawable)) return false;
 
             elements[drawable].Select(value);
             return true;
-        }
-
-        public bool Select(IDrawableListItem drawableListItem, bool value = true)
-        {
-            if (Equals(drawableListItem))
-            {
-                Select(value);
-                return true;
-            }
-
-            foreach (var listItem in elements.Values)
-            {
-                if (listItem.Select(drawableListItem, value))
-                    return true;
-            }
-
-            return false;
         }
 
         public virtual void Select(bool value)
@@ -103,28 +141,6 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        public bool Equals(IDrawableListItem other)
-        {
-            if (other is DrawableList item) return Equals(item);
-
-            return false;
-        }
-
-        protected bool Equals(DrawableList other)
-        {
-            //If all elements of the two Lists are the same, we conclude that we are the same object.
-            foreach (var key in elements.Keys)
-            {
-                if (!other.elements.ContainsKey(key)) return false;
-                if (!elements[key].Equals(other.elements[key])) return false;
-            }
-
-            return true;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(elements, Container);
-        }
+        public void SelectInternal(bool value) => Select(value);
     }
 }

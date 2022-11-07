@@ -3,46 +3,42 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public interface IDrawableListItem : IEquatable<IDrawableListItem>
+    internal interface IDrawableListItem<T>
+        where T : Drawable
     {
+        event Action<SelectionState> SelectAll;
         public Drawable GetDrawableListItem();
 
-        /// <summary>
-        /// This selects the current item, if it matches drawableListItem.
-        /// This method exists so Elements in Lists can be correctly selected.
-        /// </summary>
-        /// <param name="drawableListItem">item to be selected or deselected</param>
-        /// <param name="value">if the item should be selected or deselected</param>
-        /// <returns>if the provided item was selected</returns>
-        public virtual bool Select(IDrawableListItem drawableListItem, bool value = true)
-        {
-            bool equals = Equals(drawableListItem);
-
-            if (equals) Select(value);
-            return equals;
-        }
+        public void UpdateText();
 
         /// <summary>
-        /// This selects the current item, if it matches drawableListItem.
-        /// This method exists so Drawables can be selected.
-        /// </summary>
-        /// <param name="drawableListItem">item to be selected or deselected</param>
-        /// <param name="value">if the item should be selected or deselected</param>
-        /// <returns>if the provided item was selected</returns>
-        public virtual bool Select(object drawableListItem, bool value = true)
-        {
-            if (drawableListItem is IDrawableListItem item) return Select(item, value);
-
-            return false;
-        }
-
-        /// <summary>
-        /// Selects or Deselects this element
+        /// Selects or Deselects this element. This will also update the referenced item, that is connected to this element.
         /// </summary>
         /// <param name="value">if this List Item should be selected or not</param>
         public void Select(bool value);
+
+        public void SelectableOnStateChanged(SelectionState obj)
+        {
+            switch (obj)
+            {
+                case SelectionState.Selected:
+                    SelectInternal(true);
+                    return;
+
+                case SelectionState.NotSelected:
+                    SelectInternal(false);
+                    return;
+            }
+        }
+
+        /// <summary>
+        /// Selects or Deselects this element. This will not update the referenced item, in order to prevent call cycles.
+        /// </summary>
+        /// <param name="value">if this List Item should be selected or not</param>
+        public void SelectInternal(bool value);
     }
 }
