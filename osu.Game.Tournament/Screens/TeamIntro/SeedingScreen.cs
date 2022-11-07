@@ -26,6 +26,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
         private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
 
+        private TourneyButton showFirstTeamButton;
+        private TourneyButton showSecondTeamButton;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -46,13 +49,13 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 {
                     Children = new Drawable[]
                     {
-                        new TourneyButton
+                        showFirstTeamButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Show first team",
                             Action = () => currentTeam.Value = CurrentMatch.Value.Team1.Value,
                         },
-                        new TourneyButton
+                        showSecondTeamButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Show second team",
@@ -86,7 +89,14 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             base.CurrentMatchChanged(match);
 
             if (match.NewValue == null)
+            {
+                showFirstTeamButton.Enabled.Value = false;
+                showSecondTeamButton.Enabled.Value = false;
                 return;
+            }
+
+            showFirstTeamButton.Enabled.Value = true;
+            showSecondTeamButton.Enabled.Value = true;
 
             currentTeam.Value = match.NewValue.Team1.Value;
         }
