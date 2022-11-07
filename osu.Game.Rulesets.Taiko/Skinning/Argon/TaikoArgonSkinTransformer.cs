@@ -32,6 +32,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
                         case TaikoSkinComponents.PlayfieldBackgroundRight:
                             return new ArgonPlayfieldBackgroundRight();
+
+                        case TaikoSkinComponents.HitTarget:
+                            return new ArgonHitTarget();
                     }
 
                     break;
