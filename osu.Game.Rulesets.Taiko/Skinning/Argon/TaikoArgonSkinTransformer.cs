@@ -35,6 +35,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
                         case TaikoSkinComponents.HitTarget:
                             return new ArgonHitTarget();
+
+                        case TaikoSkinComponents.BarLine:
+                            return new ArgonBarLine();
                     }
 
                     break;
