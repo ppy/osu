@@ -123,7 +123,7 @@ namespace osu.Game.Online.Notifications.WebSocket
                     Channel? joinedChannel = JsonConvert.DeserializeObject<Channel>(message.Data.ToString());
                     Debug.Assert(joinedChannel != null);
 
-                    HandleJoinedChannel(joinedChannel);
+                    HandleChannelJoined(joinedChannel);
                     break;
 
                 case @"chat.channel.part":
@@ -142,7 +142,7 @@ namespace osu.Game.Online.Notifications.WebSocket
                     Debug.Assert(messageData != null);
 
                     foreach (var msg in messageData.Messages)
-                        HandleJoinedChannel(await getChannel(msg.ChannelId));
+                        HandleChannelJoined(await getChannel(msg.ChannelId));
 
                     HandleMessages(messageData.Messages);
                     break;

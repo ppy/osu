@@ -46,7 +46,7 @@ namespace osu.Game.Online.Notifications
                 if (updates?.Presence != null)
                 {
                     foreach (var channel in updates.Presence)
-                        HandleJoinedChannel(channel);
+                        HandleChannelJoined(channel);
 
                     //todo: handle left channels
 
@@ -59,7 +59,7 @@ namespace osu.Game.Online.Notifications
             return fetchReq;
         }
 
-        protected void HandleJoinedChannel(Channel channel)
+        protected void HandleChannelJoined(Channel channel)
         {
             channel.Joined.Value = true;
             ChannelJoined?.Invoke(channel);
