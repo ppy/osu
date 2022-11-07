@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Chat
             updateMessageContent();
             FinishTransforms(true);
 
-            prefer24HourTime.BindValueChanged(_ => updateTimestamp(), true);
+            prefer24HourTime.BindValueChanged(_ => updateTimestamp());
         }
 
         /// <summary>
