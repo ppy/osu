@@ -48,8 +48,6 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float Spacing => 15;
 
-        protected virtual float TimestampWidth => 60;
-
         protected virtual float UsernameWidth => 130;
 
         private Color4 usernameColour;
@@ -93,38 +91,31 @@ namespace osu.Game.Overlays.Chat
                 RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                 ColumnDimensions = new[]
                 {
-                    new Dimension(GridSizeMode.Absolute, TimestampWidth + Spacing + UsernameWidth + Spacing),
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension(GridSizeMode.Absolute, Spacing + UsernameWidth + Spacing),
                     new Dimension(),
                 },
                 Content = new[]
                 {
                     new Drawable[]
                     {
-                        new Container
+                        timestamp = new OsuSpriteText
                         {
-                            RelativeSizeAxes = Axes.X,
+                            Shadow = false,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
+                            Colour = colourProvider?.Background1 ?? Colour4.White,
+                            AlwaysPresent = true,
+                        },
+                        new MessageSender(message.Sender)
+                        {
+                            Width = UsernameWidth,
                             AutoSizeAxes = Axes.Y,
-                            Children = new Drawable[]
-                            {
-                                timestamp = new OsuSpriteText
-                                {
-                                    Shadow = false,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
-                                    MaxWidth = TimestampWidth,
-                                    Colour = colourProvider?.Background1 ?? Colour4.White,
-                                },
-                                new MessageSender(message.Sender)
-                                {
-                                    Width = UsernameWidth,
-                                    AutoSizeAxes = Axes.Y,
-                                    Origin = Anchor.TopRight,
-                                    Anchor = Anchor.TopRight,
-                                    Child = createUsername(),
-                                    Margin = new MarginPadding { Horizontal = Spacing },
-                                },
-                            },
+                            Origin = Anchor.TopRight,
+                            Anchor = Anchor.TopRight,
+                            Child = createUsername(),
+                            Margin = new MarginPadding { Horizontal = Spacing },
                         },
                         ContentFlow = new LinkFlowContainer(t =>
                         {
