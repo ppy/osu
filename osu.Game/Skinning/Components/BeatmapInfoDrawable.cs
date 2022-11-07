@@ -64,6 +64,7 @@ namespace osu.Game.Skinning.Components
 
         public BeatmapInfoDrawable()
         {
+            AutoSizeAxes = Axes.Both;
             InternalChildren = new Drawable[]
             {
                 text = new OsuSpriteText
@@ -104,8 +105,6 @@ namespace osu.Game.Skinning.Components
             }
 
             text.Text = newText;
-            Width = text.Width;
-            Height = text.Height;
         }
 
         public void UpdateBeatmapContent(WorkingBeatmap workingBeatmap)
