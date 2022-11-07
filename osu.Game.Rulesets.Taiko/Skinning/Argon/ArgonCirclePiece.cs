@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
     public abstract class ArgonCirclePiece : BeatSyncedContainer
     {
+        public const float ICON_SIZE = 20 / 70f;
+
         private const double pre_beat_transition_time = 80;
 
         private const float flash_opacity = 0.3f;

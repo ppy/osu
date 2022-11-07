@@ -41,6 +41,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
                         case TaikoSkinComponents.DrumRollBody:
                             return new ArgonElongatedCirclePiece();
+
+                        case TaikoSkinComponents.DrumRollTick:
+                            return new ArgonTickPiece();
                     }
 
                     break;

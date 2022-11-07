@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 Icon = FontAwesome.Solid.AngleLeft,
-                Size = new Vector2(20 / 70f),
+                Size = new Vector2(ICON_SIZE),
                 Scale = new Vector2(0.8f, 1)
             });
         }
