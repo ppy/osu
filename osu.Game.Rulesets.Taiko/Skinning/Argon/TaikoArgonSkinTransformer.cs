@@ -26,6 +26,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
                         case TaikoSkinComponents.RimHit:
                             return new ArgonRimCirclePiece();
+
+                        case TaikoSkinComponents.PlayfieldBackgroundLeft:
+                            return new ArgonPlayfieldBackgroundLeft();
+
+                        case TaikoSkinComponents.PlayfieldBackgroundRight:
+                            return new ArgonPlayfieldBackgroundRight();
                     }
 
                     break;
