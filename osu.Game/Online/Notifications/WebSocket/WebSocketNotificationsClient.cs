@@ -69,13 +69,14 @@ namespace osu.Game.Online.Notifications.WebSocket
                                     break;
                                 }
 
+                                Logger.Log($"{GetType().ReadableName()} handling event: {message.Event}");
                                 await onMessageReceivedAsync(message);
                             }
 
                             break;
 
                         case WebSocketMessageType.Binary:
-                            throw new NotImplementedException();
+                            throw new NotImplementedException("Binary message type not supported.");
 
                         case WebSocketMessageType.Close:
                             throw new Exception("Connection closed by remote host.");
