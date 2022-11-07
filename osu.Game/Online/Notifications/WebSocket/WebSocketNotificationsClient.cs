@@ -122,6 +122,15 @@ namespace osu.Game.Online.Notifications.WebSocket
                     HandleJoinedChannel(joinedChannel);
                     break;
 
+                case @"chat.channel.part":
+                    Debug.Assert(message.Data != null);
+
+                    Channel? partedChannel = JsonConvert.DeserializeObject<Channel>(message.Data.ToString());
+                    Debug.Assert(partedChannel != null);
+
+                    HandleChannelParted(partedChannel);
+                    break;
+
                 case @"chat.message.new":
                     Debug.Assert(message.Data != null);
 

@@ -99,6 +99,8 @@ namespace osu.Game.Online.Chat
                 joinChannel(localChannel);
             });
 
+            connector.ChannelParted += ch => Schedule(() => LeaveChannel(getChannel(ch)));
+
             connector.NewMessages += msgs => Schedule(() => addMessages(msgs));
 
             connector.PresenceReceived += () => Schedule(() =>
