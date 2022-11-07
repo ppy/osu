@@ -119,6 +119,7 @@ namespace osu.Game.Online.Notifications.WebSocket
                     Channel? joinedChannel = JsonConvert.DeserializeObject<Channel>(message.Data.ToString());
                     Debug.Assert(joinedChannel != null);
 
+                    joinedChannel.Joined.Value = true;
                     HandleJoinedChannel(joinedChannel);
                     break;
 
@@ -138,7 +139,7 @@ namespace osu.Game.Online.Notifications.WebSocket
                     Debug.Assert(messageData != null);
 
                     foreach (var msg in messageData.Messages)
-                        HandleJoinedChannel(new Channel(msg.Sender) { Id = msg.ChannelId, Messages = { msg } });
+                        HandleJoinedChannel(new Channel { Id = msg.ChannelId });
 
                     HandleMessages(messageData.Messages);
                     break;
