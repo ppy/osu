@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
@@ -74,6 +75,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         public void AnimateSecondHit()
         {
+            this.ResizeTo(new Vector2(TaikoStrongableHitObject.STRONG_SCALE), 50);
         }
     }
 }
