@@ -86,17 +86,7 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load()
         {
-            connector.ChannelJoined += ch => Schedule(() =>
-            {
-                if (ch.Joined.Value)
-                    JoinChannel(ch);
-                else
-                {
-                    var req = new GetChannelRequest(ch.Id);
-                    req.Success += response => JoinChannel(response.Channel);
-                    api.Queue(req);
-                }
-            });
+            connector.ChannelJoined += ch => Schedule(() => joinChannel(ch));
 
             connector.ChannelParted += ch => Schedule(() => LeaveChannel(getChannel(ch)));
 
@@ -445,6 +435,12 @@ namespace osu.Game.Online.Chat
                 var foundSelf = found.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
                 if (foundSelf != null)
                     found.Users.Remove(foundSelf);
+            }
+            else
+            {
+                found.Id = lookup.Id;
+                found.Name = lookup.Name;
+                found.LastMessageId = Math.Max(found.LastMessageId ?? 0, lookup.LastMessageId ?? 0);
             }
 
             if (joined == null && addToJoined) joinedChannels.Add(found);

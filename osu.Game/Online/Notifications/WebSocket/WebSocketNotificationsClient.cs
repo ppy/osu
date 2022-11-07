@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
@@ -11,6 +12,7 @@ using Newtonsoft.Json;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.Notifications.WebSocket
@@ -22,6 +24,7 @@ namespace osu.Game.Online.Notifications.WebSocket
     {
         private readonly ClientWebSocket socket;
         private readonly string endpoint;
+        private readonly ConcurrentDictionary<long, Channel> channelsMap = new ConcurrentDictionary<long, Channel>();
 
         public WebSocketNotificationsClient(ClientWebSocket socket, string endpoint, IAPIProvider api)
             : base(api)
@@ -110,7 +113,7 @@ namespace osu.Game.Online.Notifications.WebSocket
             await socket.SendAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)), WebSocketMessageType.Text, true, cancellationToken);
         }
 
-        private Task onMessageReceivedAsync(SocketMessage message)
+        private async Task onMessageReceivedAsync(SocketMessage message)
         {
             switch (message.Event)
             {
@@ -120,7 +123,6 @@ namespace osu.Game.Online.Notifications.WebSocket
                     Channel? joinedChannel = JsonConvert.DeserializeObject<Channel>(message.Data.ToString());
                     Debug.Assert(joinedChannel != null);
 
-                    joinedChannel.Joined.Value = true;
                     HandleJoinedChannel(joinedChannel);
                     break;
 
@@ -140,13 +142,32 @@ namespace osu.Game.Online.Notifications.WebSocket
                     Debug.Assert(messageData != null);
 
                     foreach (var msg in messageData.Messages)
-                        HandleJoinedChannel(new Channel { Id = msg.ChannelId });
+                        HandleJoinedChannel(await getChannel(msg.ChannelId));
 
                     HandleMessages(messageData.Messages);
                     break;
             }
+        }
 
-            return Task.CompletedTask;
+        private async Task<Channel> getChannel(long channelId)
+        {
+            if (channelsMap.TryGetValue(channelId, out Channel channel))
+                return channel;
+
+            var tsc = new TaskCompletionSource<Channel>();
+            var req = new GetChannelRequest(channelId);
+
+            req.Success += response =>
+            {
+                channelsMap[channelId] = response.Channel;
+                tsc.SetResult(response.Channel);
+            };
+
+            req.Failure += ex => tsc.SetException(ex);
+
+            API.Queue(req);
+
+            return await tsc.Task;
         }
 
         public override async ValueTask DisposeAsync()
