@@ -67,11 +67,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 c.Origin = Anchor.Centre;
             }
 
-            // when LegacyCirclePiece is used in places without a score processor (e.g. editor), fallback to 0 combo.
             if (scoreProcessor != null)
                 currentCombo.BindTo(scoreProcessor.Combo);
-            else
-                currentCombo.Value = 0;
         }
 
         protected override void LoadComplete()
