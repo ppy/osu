@@ -18,6 +18,7 @@ namespace osu.Game.Online.Notifications
     public abstract class NotificationsClient : PersistentEndpointClient
     {
         public Action<Channel>? ChannelJoined;
+        public Action<Channel>? ChannelParted;
         public Action<List<Message>>? NewMessages;
         public Action? PresenceReceived;
 
@@ -64,6 +65,8 @@ namespace osu.Game.Online.Notifications
             channel.Joined.Value = true;
             ChannelJoined?.Invoke(channel);
         }
+
+        protected void HandleChannelParted(Channel channel) => ChannelParted?.Invoke(channel);
 
         protected void HandleMessages(List<Message> messages)
         {
