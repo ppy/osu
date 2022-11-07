@@ -88,15 +88,14 @@ namespace osu.Game.Online.Chat
         {
             connector.ChannelJoined += ch => Schedule(() =>
             {
-                var localChannel = getChannel(ch);
-
-                if (localChannel != ch)
+                if (ch.Joined.Value)
+                    JoinChannel(ch);
+                else
                 {
-                    localChannel.Joined.Value = true;
-                    localChannel.Id = ch.Id;
+                    var req = new GetChannelRequest(ch.Id);
+                    req.Success += response => JoinChannel(response.Channel);
+                    api.Queue(req);
                 }
-
-                joinChannel(localChannel);
             });
 
             connector.ChannelParted += ch => Schedule(() => LeaveChannel(getChannel(ch)));
@@ -421,20 +420,7 @@ namespace osu.Game.Online.Chat
         {
             Channel found = null;
 
-            bool lookupCondition(Channel ch)
-            {
-                // If both channels have an id, use that.
-                if (lookup.Id > 0 && ch.Id > 0)
-                    return ch.Id == lookup.Id;
-
-                // In the case that the local echo is received in a new channel (i.e. one that does not yet have an ID),
-                // then we need to check for any existing channel with the message containing the same message matched by UUID.
-                if (lookup.Messages.Count > 0 && ch.Messages.Any(m => m.Uuid == lookup.Messages.Last().Uuid))
-                    return true;
-
-                // As a last resort, fallback to matching by name.
-                return lookup.Name == ch.Name;
-            }
+            bool lookupCondition(Channel ch) => lookup.Id > 0 ? ch.Id == lookup.Id : ch.Name == lookup.Name;
 
             var available = AvailableChannels.FirstOrDefault(lookupCondition);
             if (available != null)
