@@ -633,14 +633,32 @@ namespace osu.Game.Screens.Select
             transferRulesetValue();
 
             ModSelect.SelectedMods.UnbindFrom(selectedMods);
+
+            playExitingTransition();
+            base.OnSuspending(e);
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            if (base.OnExiting(e))
+                return true;
+
+            playExitingTransition();
+            return false;
+        }
+
+        private void playExitingTransition()
+        {
             ModSelect.Hide();
 
             BeatmapOptions.Hide();
 
+            Carousel.AllowSelection = false;
+
             endLooping();
 
-            FilterControl.MoveToY(-120, 250, Easing.OutQuint);
-            FilterControl.FadeOut(100);
+            FilterControl.MoveToY(-120, 500, Easing.OutQuint);
+            FilterControl.FadeOut(200, Easing.OutQuint);
 
             LeftArea.MoveToX(-150, 1800, Easing.OutQuint);
             LeftArea.FadeOut(200, Easing.OutQuint);
@@ -650,24 +668,6 @@ namespace osu.Game.Screens.Select
             this.FadeOut(400, Easing.OutQuint);
 
             FilterControl.Deactivate();
-            base.OnSuspending(e);
-        }
-
-        public override bool OnExiting(ScreenExitEvent e)
-        {
-            if (base.OnExiting(e))
-                return true;
-
-            beatmapInfoWedge.Hide();
-            ModSelect.Hide();
-
-            this.FadeOut(100);
-
-            FilterControl.Deactivate();
-
-            endLooping();
-
-            return false;
         }
 
         private bool isHandlingLooping;
