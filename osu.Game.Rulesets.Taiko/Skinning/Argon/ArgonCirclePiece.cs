@@ -7,11 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
@@ -84,15 +82,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                         }
                     },
                 },
-                new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.Solid.AngleLeft,
-                    Size = new Vector2(20 / 70f),
-                    Scale = new Vector2(0.8f, 1)
-                }
             });
         }
 
