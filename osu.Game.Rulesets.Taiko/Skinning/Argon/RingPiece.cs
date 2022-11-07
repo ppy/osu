@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         protected override void Update()
         {
             base.Update();
-            BorderThickness = relativeBorderThickness * DrawSize.X;
+            BorderThickness = relativeBorderThickness * DrawSize.Y;
         }
     }
 }
