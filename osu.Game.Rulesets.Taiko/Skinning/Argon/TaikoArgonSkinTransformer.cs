@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
@@ -17,6 +18,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         {
             switch (component)
             {
+                case GameplaySkinComponent<HitResult> resultComponent:
+                    return new ArgonJudgementPiece(resultComponent.Component);
+
                 case TaikoSkinComponent catchComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (catchComponent.Component)
