@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             }
         }
 
-        private static bool kiaiMode;
+        private bool kiaiMode;
 
         protected override Container<Drawable> Content => content;
 
