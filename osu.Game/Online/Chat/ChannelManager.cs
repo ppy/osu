@@ -420,7 +420,13 @@ namespace osu.Game.Online.Chat
         {
             Channel found = null;
 
-            bool lookupCondition(Channel ch) => lookup.Id > 0 ? ch.Id == lookup.Id : ch.Name == lookup.Name;
+            bool lookupCondition(Channel ch)
+            {
+                if (ch.Id > 0 && lookup.Id > 0)
+                    return ch.Id == lookup.Id;
+
+                return ch.Name == lookup.Name;
+            }
 
             var available = AvailableChannels.FirstOrDefault(lookupCondition);
             if (available != null)
