@@ -736,7 +736,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
     {
         public new TObject HitObject => (TObject)base.HitObject;
 
-        protected DrawableHitObject(TObject hitObject)
+        protected DrawableHitObject([CanBeNull] TObject hitObject)
             : base(hitObject)
         {
         }
