@@ -6,6 +6,7 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
@@ -27,7 +28,7 @@ using osu.Game.Skinning;
 namespace osu.Game.Configuration
 {
     [ExcludeFromDynamicCompile]
-    public class OsuConfigManager : IniConfigManager<OsuSetting>
+    public class OsuConfigManager : IniConfigManager<OsuSetting>, IGameplaySettings
     {
         public OsuConfigManager(Storage storage)
             : base(storage)
@@ -276,6 +277,9 @@ namespace osu.Game.Configuration
         public Func<Guid, string> LookupSkinName { private get; set; } = _ => @"unknown";
 
         public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; } = _ => @"unknown";
+
+        IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => GetOriginalBindable<float>(OsuSetting.ComboColourNormalisationAmount);
+        IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => GetOriginalBindable<float>(OsuSetting.PositionalHitsoundsLevel);
     }
 
     // IMPORTANT: These are used in user configuration files.
