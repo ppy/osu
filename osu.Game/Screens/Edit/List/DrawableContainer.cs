@@ -1,23 +1,30 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public class DrawableContainer<T> : ADrawableListItem<T>
+    public class DrawableContainer<T> : CompositeDrawable, IDrawableListItem<T>
         where T : Drawable
     {
-        private readonly BindableBool enabled = new BindableBool(true);
+        public event Action<SelectionState> SelectAll;
+
+        private readonly OsuCheckbox button;
+        private readonly Box box;
+        private readonly BindableBool enabled = new BindableBool();
         private readonly DrawableList<T> list = new DrawableList<T>();
 
         public DrawableContainer()
         {
+            SelectAll = ((IDrawableListItem<T>)list).SelectableOnStateChanged;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             InternalChild = new FillFlowContainer
@@ -28,8 +35,11 @@ namespace osu.Game.Screens.Edit.List
                 Spacing = new Vector2(2),
                 Children = new Drawable[]
                 {
-                    SelectionBox,
-                    new OsuCheckbox
+                    box = new Box
+                    {
+                        Colour = new Colour4(255, 255, 0, 0.25f),
+                    },
+                    button = new OsuCheckbox
                     {
                         LabelText = @"SkinnableContainer",
                         Current = enabled
@@ -54,10 +64,12 @@ namespace osu.Game.Screens.Edit.List
                     }
                 }
             };
-
             enabled.BindValueChanged(v => SetShown(v.NewValue), true);
             Select(false);
         }
+
+        public void SelectableOnStateChanged(SelectionState obj) =>
+            ((IDrawableListItem<T>)list).SelectableOnStateChanged(obj);
 
         public void Toggle() => SetShown(!enabled.Value, true);
 
@@ -69,11 +81,23 @@ namespace osu.Game.Screens.Edit.List
             if (setValue) enabled.Value = value;
         }
 
-        public override void UpdateText() => list.UpdateText();
+        public void UpdateText() => list.UpdateText();
 
-        public override void Select(bool value)
+        public void Select(bool value)
         {
-            base.SelectInternal(value);
+            if (value)
+            {
+                box.Show();
+                box.Width = button.Width;
+                box.Height = button.Height;
+            }
+            else
+            {
+                box.Hide();
+                box.Width = button.Width;
+                box.Height = button.Height;
+            }
+
             list.Select(value);
         }
 
@@ -83,12 +107,9 @@ namespace osu.Game.Screens.Edit.List
         public void Add(DrawableList<T> list) => list.Add(list);
         public void Add(T? item) => list.Add(item);
         public void Remove(T? item) => list.Remove(item);
-        public bool Select(T drawable, bool select) => list.Select(drawable, select);
 
-        public override void SelectInternal(bool value)
-        {
-            base.SelectInternal(value);
-            list.SelectInternal(value);
-        }
+        public void SelectInternal(bool value) => list.SelectInternal(value);
+
+        public Drawable GetDrawableListItem() => this;
     }
 }

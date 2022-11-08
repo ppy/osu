@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,11 +12,12 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public class DrawableList<T> : ADrawableListItem<T>
+    public class DrawableList<T> : CompositeDrawable, IDrawableListItem<T>
         where T : Drawable
     {
+        public event Action<SelectionState> SelectAll;
         private readonly Dictionary<T, DrawableListItem<T>> elements = new Dictionary<T, DrawableListItem<T>>();
-        private readonly List<ADrawableListItem<T>> containers = new List<ADrawableListItem<T>>();
+        private readonly List<IDrawableListItem<T>> containers = new List<IDrawableListItem<T>>();
         protected readonly Container<Drawable> Container;
 
         public DrawableList()
@@ -29,6 +31,7 @@ namespace osu.Game.Screens.Edit.List
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(2.5f),
             };
+            SelectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -47,32 +50,36 @@ namespace osu.Game.Screens.Edit.List
         public void Add(DrawableContainer<T> container) => AddContainer(container);
         public void Add(DrawableList<T> list) => AddContainer(list);
 
-        internal void AddContainer(ADrawableListItem<T> drawableList)
+        internal void AddContainer(IDrawableListItem<T> drawableList)
         {
             if (containers.Contains(drawableList)) return;
 
             containers.Add(drawableList);
-            Container.Add(drawableList);
+            Container.Add(drawableList.GetDrawableListItem());
         }
 
-        internal void Add(ADrawableListItem<T> drawableListItem)
+        internal void Add(IDrawableListItem<T> drawableListItem)
         {
             if (drawableListItem is DrawableListItem<T> item) Add(item);
+            //this should also catch DrawableContainer
             else if (drawableListItem is DrawableList<T> list) AddContainer(list);
             else if (drawableListItem is DrawableContainer<T> container) AddContainer(container);
-            //this else is here, so if anyone decides to extend ADrawableListItem in the future, this will at least display their item.
-            else AddContainer(drawableListItem);
+            //and there should be no other implementors, because IDrawableListItem is internal?
         }
 
         public void AddRange(IEnumerable<T>? drawables)
         {
             if (drawables is null) return;
 
-            foreach (T drawable in drawables)
+            var iter = drawables.GetEnumerator();
+
+            while (iter.MoveNext())
             {
-                if (drawable is T t) Add(t);
-                else if (drawable is ADrawableListItem<T> item) Add(item);
+                if (iter.Current is T t) Add(t);
+                if (iter.Current is IDrawableListItem<T> item) Add(item);
             }
+
+            iter.Dispose();
         }
 
         public void Add(T? drawable)
@@ -87,8 +94,8 @@ namespace osu.Game.Screens.Edit.List
             if (elements.ContainsKey(drawable)) return;
 
             elements.Add(drawable, listItem);
-            listItem.SelectAll = SelectAll;
-            Container.Add(elements[drawable]);
+            listItem.SelectAll += SelectAll.Invoke;
+            Container.Add(elements[drawable].GetDrawableListItem());
         }
 
         public bool Remove(T? drawable) => RemoveInternal(drawable, false);
@@ -97,26 +104,22 @@ namespace osu.Game.Screens.Edit.List
         {
             if (drawable is null || !elements.ContainsKey(drawable)) return false;
 
-            bool remove = Container.Remove(elements[drawable], disposeImmediately);
+            bool remove = Container.Remove(elements[drawable].GetDrawableListItem(), disposeImmediately);
             elements.Remove(drawable);
             if (disposeImmediately) drawable.Dispose();
             return remove;
         }
 
-        public override void Show()
-        {
-            UpdateText();
-            base.Show();
-        }
+        public virtual Drawable GetDrawableListItem() => this;
 
-        public override void UpdateText()
+        public void UpdateText()
         {
             foreach (DrawableListItem<T> items in elements.Values)
             {
                 items.UpdateText();
             }
 
-            foreach (ADrawableListItem<T> container in containers)
+            foreach (IDrawableListItem<T> container in containers)
             {
                 container.UpdateText();
             }
@@ -124,22 +127,20 @@ namespace osu.Game.Screens.Edit.List
 
         public bool Select(T drawable, bool value = true)
         {
-            if (!elements.ContainsKey(drawable) || !EnableSelection) return false;
+            if (!elements.ContainsKey(drawable)) return false;
 
             elements[drawable].Select(value);
             return true;
         }
 
-        public override void Select(bool value)
+        public virtual void Select(bool value)
         {
-            if (!EnableSelection) return;
-
             foreach (var listItem in elements.Values)
             {
                 listItem.Select(value);
             }
         }
 
-        public override void SelectInternal(bool value) => Select(value);
+        public void SelectInternal(bool value) => Select(value);
     }
 }
