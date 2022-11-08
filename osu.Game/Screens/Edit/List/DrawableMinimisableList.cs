@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public class DrawableContainer<T> : CompositeDrawable, IDrawableListItem<T>
+    public class DrawableMinimisableList<T> : CompositeDrawable, IDrawableListItem<T>
         where T : Drawable
     {
         private Action<SelectionState> selectAll;
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.List
         private readonly BindableBool enabled = new BindableBool();
         private readonly DrawableList<T> list = new DrawableList<T>();
 
-        public DrawableContainer()
+        public DrawableMinimisableList()
         {
             selectAll = ((IDrawableListItem<T>)list).SelectableOnStateChanged;
             RelativeSizeAxes = Axes.X;
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Edit.List
 
         public void AddRange(IEnumerable<T>? drawables) => list.AddRange(drawables);
         public void Add(DrawableListItem<T> drawableListItem) => list.Add(drawableListItem);
-        public void Add(DrawableContainer<T> container) => list.Add(container);
+        public void Add(DrawableMinimisableList<T> minimisableList) => list.Add(minimisableList);
         public void Add(DrawableList<T> list) => list.Add(list);
         public void Add(T? item) => list.Add(item);
         public void Remove(T? item) => list.Remove(item);

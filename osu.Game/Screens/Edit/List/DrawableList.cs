@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.List
             if (drawableListItem.t is not null) addInternal(drawableListItem.t, drawableListItem);
         }
 
-        public void Add(DrawableContainer<T> container) => AddContainer(container);
+        public void Add(DrawableMinimisableList<T> minimisableList) => AddContainer(minimisableList);
         public void Add(DrawableList<T> list) => AddContainer(list);
 
         internal void AddContainer(IDrawableListItem<T> drawableList)
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Edit.List
             if (drawableListItem is DrawableListItem<T> item) Add(item);
             //this should also catch DrawableContainer
             else if (drawableListItem is DrawableList<T> list) AddContainer(list);
-            else if (drawableListItem is DrawableContainer<T> container) AddContainer(container);
+            else if (drawableListItem is DrawableMinimisableList<T> container) AddContainer(container);
             //and there should be no other implementors, because IDrawableListItem is internal?
             else AddContainer(drawableListItem);
         }

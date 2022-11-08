@@ -74,7 +74,7 @@ namespace osu.Game.Skinning.Editor
 
         private EditorSidebar componentsSidebar;
         private EditorSidebar settingsSidebar;
-        public DrawableContainer<SelectionBlueprint<ISkinnableDrawable>> LayerSidebarList;
+        public DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> LayerSidebarList;
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
@@ -211,7 +211,7 @@ namespace osu.Game.Skinning.Editor
 
             layerSidebar.Add(layerSidebarSection = new EditorSidebarSection(@"Layer Editor"));
             layerSidebarSection.Clear();
-            layerSidebarSection.Child = LayerSidebarList = new DrawableContainer<SelectionBlueprint<ISkinnableDrawable>>();
+            layerSidebarSection.Child = LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>();
         }
 
         protected override void LoadComplete()
