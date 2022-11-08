@@ -59,7 +59,8 @@ namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
     [Cached]
-    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
+    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider,
+                          IGameplaySettings
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -98,6 +99,9 @@ namespace osu.Game.Screens.Edit
 
         [Resolved(canBeNull: true)]
         private INotificationOverlay notifications { get; set; }
+
+        [Resolved]
+        private IGameplaySettings globalGameplaySettings { get; set; }
 
         public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
@@ -1031,5 +1035,11 @@ namespace osu.Game.Screens.Edit
             {
             }
         }
+
+        // Combo colour normalisation should not be applied in the editor.
+        IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => new Bindable<float>();
+
+        // Arguable.
+        IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => globalGameplaySettings.PositionalHitsoundsLevel;
     }
 }
