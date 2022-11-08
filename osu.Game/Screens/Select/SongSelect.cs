@@ -89,6 +89,8 @@ namespace osu.Game.Screens.Select
 
         protected BeatmapCarousel Carousel { get; private set; }
 
+        private ParallaxContainer wedgeBackground;
+
         protected Container LeftArea { get; private set; }
 
         private BeatmapInfoWedge beatmapInfoWedge;
@@ -165,10 +167,12 @@ namespace osu.Game.Screens.Select
                             {
                                 new Drawable[]
                                 {
-                                    new ParallaxContainer
+                                    wedgeBackground = new ParallaxContainer
                                     {
                                         ParallaxAmount = 0.005f,
                                         RelativeSizeAxes = Axes.Both,
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
                                         Child = new WedgeBackground
                                         {
                                             RelativeSizeAxes = Axes.Both,
@@ -609,9 +613,15 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            this.FadeIn(250);
+            LeftArea.MoveToX(0, 400, Easing.OutQuint);
+            LeftArea.FadeIn(100, Easing.OutQuint);
 
-            this.ScaleTo(1, 250, Easing.OutSine);
+            FilterControl.MoveToY(0, 400, Easing.OutQuint);
+            FilterControl.FadeIn(100, Easing.OutQuint);
+
+            this.FadeIn(250, Easing.OutQuint);
+
+            wedgeBackground.ScaleTo(1, 500, Easing.OutQuint);
 
             FilterControl.Activate();
         }
@@ -623,17 +633,8 @@ namespace osu.Game.Screens.Select
             transferRulesetValue();
 
             ModSelect.SelectedMods.UnbindFrom(selectedMods);
-            ModSelect.Hide();
 
-            BeatmapOptions.Hide();
-
-            endLooping();
-
-            this.ScaleTo(1.1f, 250, Easing.InSine);
-
-            this.FadeOut(250);
-
-            FilterControl.Deactivate();
+            playExitingTransition();
             base.OnSuspending(e);
         }
 
@@ -642,16 +643,31 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(e))
                 return true;
 
-            beatmapInfoWedge.Hide();
+            playExitingTransition();
+            return false;
+        }
+
+        private void playExitingTransition()
+        {
             ModSelect.Hide();
 
-            this.FadeOut(100);
+            BeatmapOptions.Hide();
 
-            FilterControl.Deactivate();
+            Carousel.AllowSelection = false;
 
             endLooping();
 
-            return false;
+            FilterControl.MoveToY(-120, 500, Easing.OutQuint);
+            FilterControl.FadeOut(200, Easing.OutQuint);
+
+            LeftArea.MoveToX(-150, 1800, Easing.OutQuint);
+            LeftArea.FadeOut(200, Easing.OutQuint);
+
+            wedgeBackground.ScaleTo(2.4f, 400, Easing.OutQuint);
+
+            this.FadeOut(400, Easing.OutQuint);
+
+            FilterControl.Deactivate();
         }
 
         private bool isHandlingLooping;
