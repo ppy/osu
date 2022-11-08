@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -89,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             [BackgroundDependencyLoader]
             private void load(ISkinSource source)
             {
-                ISkin skin = source.FindProvider(s => getAnimationFrame(s, state, 0) != null);
+                ISkin? skin = source.FindProvider(s => getAnimationFrame(s, state, 0) != null);
 
                 if (skin == null) return;
 
@@ -120,7 +118,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             [BackgroundDependencyLoader]
             private void load(ISkinSource source)
             {
-                ISkin skin = source.FindProvider(s => getAnimationFrame(s, TaikoMascotAnimationState.Clear, 0) != null);
+                ISkin? skin = source.FindProvider(s => getAnimationFrame(s, TaikoMascotAnimationState.Clear, 0) != null);
 
                 if (skin == null) return;
 
@@ -137,7 +135,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        private static Texture getAnimationFrame(ISkin skin, TaikoMascotAnimationState state, int frameIndex)
+        private static Texture? getAnimationFrame(ISkin skin, TaikoMascotAnimationState state, int frameIndex)
         {
             var texture = skin.GetTexture($"pippidon{state.ToString().ToLowerInvariant()}{frameIndex}");
 

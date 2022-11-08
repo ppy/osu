@@ -10,10 +10,12 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -37,14 +39,20 @@ namespace osu.Game.Tests.Visual.Online
 
         private CommentsContainer commentsContainer = null!;
 
+        private readonly ManualResetEventSlim requestLock = new ManualResetEventSlim();
+
         [BackgroundDependencyLoader]
         private void load()
         {
             base.Content.AddRange(new Drawable[]
             {
-                content = new OsuScrollContainer
+                new PopoverContainer
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Child = content = new OsuScrollContainer
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }
                 },
                 dialogOverlay
             });
@@ -80,8 +88,6 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private readonly ManualResetEventSlim deletionPerformed = new ManualResetEventSlim();
-
         [Test]
         public void TestDeletion()
         {
@@ -105,7 +111,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Setup request handling", () =>
             {
-                deletionPerformed.Reset();
+                requestLock.Reset();
 
                 dummyAPI.HandleRequest = request =>
                 {
@@ -138,7 +144,7 @@ namespace osu.Game.Tests.Visual.Online
 
                     Task.Run(() =>
                     {
-                        deletionPerformed.Wait(10000);
+                        requestLock.Wait(10000);
                         req.TriggerSuccess(cb);
                     });
 
@@ -149,7 +155,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddAssert("Loading spinner shown", () => commentsContainer.ChildrenOfType<LoadingSpinner>().Any(d => d.IsPresent));
 
-            AddStep("Complete request", () => deletionPerformed.Set());
+            AddStep("Complete request", () => requestLock.Set());
 
             AddUntilStep("Comment is deleted locally", () => this.ChildrenOfType<DrawableComment>().Single(x => x.Comment.Id == 1).WasDeleted);
         }
@@ -202,6 +208,74 @@ namespace osu.Game.Tests.Visual.Online
             {
                 return ourComment.ChildrenOfType<LinkFlowContainer>().Single(x => x.Name == @"Actions buttons").IsPresent;
             });
+        }
+
+        [Test]
+        public void TestReport()
+        {
+            const string report_text = "I don't like this comment";
+            DrawableComment? targetComment = null;
+            CommentReportRequest? request = null;
+
+            addTestComments();
+            AddUntilStep("Comment exists", () =>
+            {
+                var comments = this.ChildrenOfType<DrawableComment>();
+                targetComment = comments.SingleOrDefault(x => x.Comment.Id == 2);
+                return targetComment != null;
+            });
+            AddStep("Setup request handling", () =>
+            {
+                requestLock.Reset();
+
+                dummyAPI.HandleRequest = r =>
+                {
+                    if (!(r is CommentReportRequest req))
+                        return false;
+
+                    Task.Run(() =>
+                    {
+                        request = req;
+                        requestLock.Wait(10000);
+                        req.TriggerSuccess();
+                    });
+
+                    return true;
+                };
+            });
+            AddStep("Click the button", () =>
+            {
+                var btn = targetComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "Report");
+                InputManager.MoveMouseTo(btn);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("Try to report", () =>
+            {
+                var btn = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                InputManager.MoveMouseTo(btn);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddWaitStep("Wait", 3);
+            AddAssert("Nothing happened", () => this.ChildrenOfType<ReportCommentPopover>().Any());
+            AddStep("Set report data", () =>
+            {
+                var field = this.ChildrenOfType<OsuTextBox>().Single();
+                field.Current.Value = report_text;
+                var reason = this.ChildrenOfType<OsuEnumDropdown<CommentReportReason>>().Single();
+                reason.Current.Value = CommentReportReason.Other;
+            });
+            AddStep("Try to report", () =>
+            {
+                var btn = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                InputManager.MoveMouseTo(btn);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddWaitStep("Wait", 3);
+            AddAssert("Overlay closed", () => !this.ChildrenOfType<ReportCommentPopover>().Any());
+            AddAssert("Loading spinner shown", () => targetComment.ChildrenOfType<LoadingSpinner>().Any(d => d.IsPresent));
+            AddStep("Complete request", () => requestLock.Set());
+            AddUntilStep("Request sent", () => request != null);
+            AddAssert("Request is correct", () => request != null && request.CommentID == 2 && request.Comment == report_text && request.Reason == CommentReportReason.Other);
         }
 
         private void addTestComments()
