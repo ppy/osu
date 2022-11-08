@@ -121,7 +121,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
             SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
-            SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 1f, 0.25f);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
@@ -172,6 +171,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
+            SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 0.75f, 0.25f);
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
