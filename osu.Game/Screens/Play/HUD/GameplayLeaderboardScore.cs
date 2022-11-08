@@ -72,10 +72,8 @@ namespace osu.Game.Screens.Play.HUD
 
                 scorePosition = value;
 
-                if (scorePosition.HasValue)
-                    positionText.Text = $"#{scorePosition.Value.FormatRank()}";
+                positionText.Text = scorePosition.HasValue ? $"#{scorePosition.Value.FormatRank()}" : "#?";
 
-                positionText.FadeTo(scorePosition.HasValue ? 1 : 0);
                 updateState();
             }
         }
