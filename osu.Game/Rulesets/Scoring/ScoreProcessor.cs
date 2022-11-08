@@ -341,13 +341,13 @@ namespace osu.Game.Rulesets.Scoring
                 case ScoringMode.Standardised:
                     double accuracyScore = accuracyPortion * accuracyRatio;
                     double comboScore = comboPortion * comboRatio;
-                    return (long)((max_score * (accuracyScore + comboScore) + bonusScore) * scoreMultiplier);
+                    return (long)Math.Round((max_score * (accuracyScore + comboScore) + bonusScore) * scoreMultiplier);
 
                 case ScoringMode.Classic:
                     // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
                     // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
                     double scaledStandardised = ComputeScore(ScoringMode.Standardised, accuracyRatio, comboRatio, bonusScore, totalBasicHitObjects) / max_score;
-                    return (long)(Math.Pow(scaledStandardised * Math.Max(1, totalBasicHitObjects), 2) * ClassicScoreMultiplier);
+                    return (long)Math.Round(Math.Pow(scaledStandardised * Math.Max(1, totalBasicHitObjects), 2) * ClassicScoreMultiplier);
             }
         }
 
