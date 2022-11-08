@@ -17,21 +17,18 @@ namespace osu.Game.Screens.Edit.List
 {
     //todo: rework this, to be simpler.
     //I should probably just implement IStateful<SelectionState>
-    public class DrawableListItem<T> : CompositeDrawable, IDrawableListItem<T>
+    public class DrawableListItem<T> : RearrangeableListItem<T>, IRearrangableListItem<T>
         where T : Drawable
     {
         private readonly OsuSpriteText text = new OsuSpriteText();
         private readonly Box box;
-        protected readonly WeakReference<T> DrawableReference;
         private bool selected;
         private Action<SelectionState> selectAll;
 
-        public T? t => getTarget();
-
         internal DrawableListItem(T d, LocalisableString name)
+            : base(d)
         {
             selectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
-            DrawableReference = new WeakReference<T>(d);
             text.Text = name;
             AutoSizeAxes = Axes.Both;
 
@@ -93,7 +90,7 @@ namespace osu.Game.Screens.Edit.List
 
         private void toggleSelection()
         {
-            if (t is IStateful<SelectionState> stateful)
+            if (Model is IStateful<SelectionState> stateful)
             {
                 switch (stateful.State)
                 {
@@ -119,19 +116,12 @@ namespace osu.Game.Screens.Edit.List
         }
 
         public Drawable GetDrawableListItem() => this;
-
-        private T? getTarget()
-        {
-            T? target;
-            DrawableReference.TryGetTarget(out target);
-            return target;
-        }
+        public RearrangeableListItem<T> GetRearrangeableListItem() => this;
 
         public void UpdateItem()
         {
-            if (t is not null)
-                updateText(t);
-            if (t is IStateful<SelectionState> selectable)
+            updateText(Model);
+            if (Model is IStateful<SelectionState> selectable)
                 ((IDrawableListItem<T>)this).SelectableOnStateChanged(selectable.State);
         }
 
@@ -143,7 +133,7 @@ namespace osu.Game.Screens.Edit.List
 
         public void Select(bool value)
         {
-            if (t is IStateful<SelectionState> selectable)
+            if (Model is IStateful<SelectionState> selectable)
                 selectable.State = value ? SelectionState.Selected : SelectionState.NotSelected;
 
             SelectInternal(value);

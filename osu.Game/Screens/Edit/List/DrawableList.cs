@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public class DrawableList<T> : CompositeDrawable, IDrawableListItem<T>
+    public class DrawableList<T> : RearrangeableListContainer<T>, IDrawableListItem<T>
         where T : Drawable
     {
         protected Action<SelectionState> SelectAll;
@@ -23,22 +24,13 @@ namespace osu.Game.Screens.Edit.List
             set => SelectAll = value;
         }
 
-        private readonly Dictionary<T, DrawableListItem<T>> elements = new Dictionary<T, DrawableListItem<T>>();
-        private readonly List<IDrawableListItem<T>> containers = new List<IDrawableListItem<T>>();
-        protected readonly Container<Drawable> Container;
-
         public DrawableList()
         {
             SelectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            InternalChild = Container = new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(2.5f),
-            };
+            //todo: compute this somehow add runtime
+            Height = 100f;
+            ListContainer.Spacing = new Vector2(2.5f);
             SelectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
         }
 
@@ -50,41 +42,13 @@ namespace osu.Game.Screens.Edit.List
             return e.Button == MouseButton.Left;
         }
 
-        public void Add(DrawableListItem<T> drawableListItem)
-        {
-            if (drawableListItem.t is not null) addInternal(drawableListItem.t, drawableListItem);
-        }
-
-        public void Add(DrawableMinimisableList<T> minimisableList) => AddContainer(minimisableList);
-        public void Add(DrawableList<T> list) => AddContainer(list);
-
-        internal void AddContainer(IDrawableListItem<T> drawableList)
-        {
-            if (containers.Contains(drawableList)) return;
-
-            drawableList.SelectAll = SelectAll;
-            containers.Add(drawableList);
-            Container.Add(drawableList.GetDrawableListItem());
-        }
-
-        internal void Add(IDrawableListItem<T> drawableListItem)
-        {
-            if (drawableListItem is DrawableListItem<T> item) Add(item);
-            //this should also catch DrawableContainer
-            else if (drawableListItem is DrawableList<T> list) AddContainer(list);
-            else if (drawableListItem is DrawableMinimisableList<T> container) AddContainer(container);
-            //and there should be no other implementors, because IDrawableListItem is internal?
-            else AddContainer(drawableListItem);
-        }
-
         public void AddRange(IEnumerable<T>? drawables)
         {
             if (drawables is null) return;
 
             foreach (T drawable in drawables)
             {
-                if (drawable is T t) Add(t);
-                if (drawable is IDrawableListItem<T> item) Add(item);
+                Add(drawable);
             }
         }
 
@@ -92,26 +56,23 @@ namespace osu.Game.Screens.Edit.List
         {
             if (drawable is null) return;
 
-            addInternal(drawable, new DrawableListItem<T>(drawable));
+            addInternal(drawable);
         }
 
-        private void addInternal(T drawable, DrawableListItem<T> listItem)
+        private void addInternal(T drawable)
         {
-            if (elements.ContainsKey(drawable)) return;
+            if (Items.Contains(drawable)) return;
 
-            elements.Add(drawable, listItem);
-            listItem.SelectAll = SelectAll;
-            Container.Add(elements[drawable].GetDrawableListItem());
+            Items.Add(drawable);
         }
 
         public bool Remove(T? drawable) => RemoveInternal(drawable, false);
 
         protected bool RemoveInternal(T? drawable, bool disposeImmediately)
         {
-            if (drawable is null || !elements.ContainsKey(drawable)) return false;
+            if (drawable is null || !Items.Contains(drawable)) return false;
 
-            bool remove = Container.Remove(elements[drawable].GetDrawableListItem(), disposeImmediately);
-            elements.Remove(drawable);
+            bool remove = Items.Remove(drawable);
             if (disposeImmediately) drawable.Dispose();
             return remove;
         }
@@ -120,35 +81,57 @@ namespace osu.Game.Screens.Edit.List
 
         public void UpdateItem()
         {
-            foreach (DrawableListItem<T> items in elements.Values)
+            foreach (var item in ItemMap.Values)
             {
-                items.UpdateItem();
-                items.SelectAll = SelectAll;
+                if (item is IRearrangableListItem<T> rearrangableItem)
+                {
+                    rearrangableItem.UpdateItem();
+                    rearrangableItem.SelectAll = SelectAll;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Selects obj, if it can be cast to a IRearrangableListItem.
+        /// </summary>
+        /// <param name="obj">the object to call Select on</param>
+        /// <param name="value">The value to pass to the Select call of IRearrangableListItem</param>
+        /// <returns>If Select was actually called</returns>
+        private static bool select(object obj, bool value)
+        {
+            if (obj is IRearrangableListItem<T> item)
+            {
+                item.Select(value);
+                return true;
             }
 
-            foreach (IDrawableListItem<T> container in containers)
-            {
-                container.UpdateItem();
-                container.SelectAll = SelectAll;
-            }
+            return false;
         }
 
         public bool Select(T drawable, bool value = true)
         {
-            if (!elements.ContainsKey(drawable)) return false;
+            if (!ItemMap.ContainsKey(drawable)) return false;
 
-            elements[drawable].Select(value);
-            return true;
+            return select(ItemMap[drawable], value);
         }
 
         public virtual void Select(bool value)
         {
-            foreach (var listItem in elements.Values)
+            foreach (var listItem in ItemMap.Values)
             {
-                listItem.Select(value);
+                select(listItem, value);
             }
         }
 
         public void SelectInternal(bool value) => Select(value);
+
+        protected override ScrollContainer<Drawable> CreateScrollContainer() => new OsuScrollContainer();
+
+        protected override RearrangeableListItem<T> CreateDrawable(T item)
+        {
+            var drawable = new DrawableListItem<T>(item);
+            drawable.SelectAll = SelectAll;
+            return drawable.GetRearrangeableListItem();
+        }
     }
 }

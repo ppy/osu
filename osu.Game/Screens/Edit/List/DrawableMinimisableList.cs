@@ -26,11 +26,11 @@ namespace osu.Game.Screens.Edit.List
         private readonly OsuCheckbox button;
         private readonly Box box;
         private readonly BindableBool enabled = new BindableBool();
-        private readonly DrawableList<T> list = new DrawableList<T>();
+        public readonly DrawableList<T> List = new DrawableList<T>();
 
         public DrawableMinimisableList()
         {
-            selectAll = ((IDrawableListItem<T>)list).SelectableOnStateChanged;
+            selectAll = ((IDrawableListItem<T>)List).SelectableOnStateChanged;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             InternalChild = new FillFlowContainer
@@ -41,38 +41,31 @@ namespace osu.Game.Screens.Edit.List
                 Spacing = new Vector2(2),
                 Children = new Drawable[]
                 {
-                    box = new Box
+                    new Container
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Width = 1f,
-                        Height = 1f,
-                        Colour = new Colour4(255, 255, 0, 0.25f),
-                    },
-                    button = new OsuCheckbox
-                    {
-                        LabelText = @"SkinnableContainer",
-                        Current = enabled
-                    },
-                    new GridContainer
-                    {
-                        AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
-                        ColumnDimensions = new[]
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
                         {
-                            new Dimension(GridSizeMode.Absolute, 10),
-                            new Dimension()
-                        },
-                        Content = new[]
-                        {
-                            new Drawable?[]
+                            box = new Box
                             {
-                                null,
-                                list,
-                            }
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 1f,
+                                Height = 1f,
+                                Colour = new Colour4(255, 255, 0, 0.25f),
+                            },
+                            button = new OsuCheckbox
+                            {
+                                LabelText = @"SkinnableContainer",
+                                Current = enabled
+                            },
                         }
-                    }
+                    },
+                    List
                 }
             };
+            List.X = 10f;
+            List.RelativeAnchorPosition = new Vector2(0.05f, 0);
 
             if (!((IDrawableListItem<T>)this).EnableSelection)
             {
@@ -86,39 +79,40 @@ namespace osu.Game.Screens.Edit.List
         }
 
         public void SelectableOnStateChanged(SelectionState obj) =>
-            ((IDrawableListItem<T>)list).SelectableOnStateChanged(obj);
+            ((IDrawableListItem<T>)List).SelectableOnStateChanged(obj);
 
         public void Toggle() => SetShown(!enabled.Value, true);
 
         public void SetShown(bool value, bool setValue = false)
         {
-            if (value) list.Show();
-            else list.Hide();
+            if (value) List.Show();
+            else List.Hide();
 
             if (setValue) enabled.Value = value;
         }
 
         public void UpdateItem()
         {
-            list.UpdateItem();
-            ((IDrawableListItem<T>)list).SelectAll = selectAll;
+            List.UpdateItem();
+            ((IDrawableListItem<T>)List).SelectAll = selectAll;
         }
 
         public void Select(bool value)
         {
             if (value) box.Show();
             else box.Hide();
-            list.Select(value);
+            List.Select(value);
         }
 
-        public void AddRange(IEnumerable<T>? drawables) => list.AddRange(drawables);
-        public void Add(DrawableListItem<T> drawableListItem) => list.Add(drawableListItem);
-        public void Add(DrawableMinimisableList<T> minimisableList) => list.Add(minimisableList);
-        public void Add(DrawableList<T> list) => list.Add(list);
-        public void Add(T? item) => list.Add(item);
-        public void Remove(T? item) => list.Remove(item);
+        public void AddRange(IEnumerable<T>? drawables) => List.AddRange(drawables);
 
-        public void SelectInternal(bool value) => list.SelectInternal(value);
+        // public void Add(DrawableListItem<T> drawableListItem) => List.Add(drawableListItem);
+        // public void Add(DrawableMinimisableList<T> minimisableList) => List.Add(minimisableList);
+        // public void Add(DrawableList<T> list) => list.Add(list);
+        public void Add(T? item) => List.Add(item);
+        public void Remove(T? item) => List.Remove(item);
+
+        public void SelectInternal(bool value) => List.SelectInternal(value);
 
         public Drawable GetDrawableListItem() => this;
     }

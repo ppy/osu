@@ -9,8 +9,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.List
 {
-    internal interface IDrawableListItem<T>
-        where T : Drawable
+    public interface IDrawableListItem<T>
     {
         public Action<SelectionState> SelectAll { get; set; }
         public bool EnableSelection => typeof(T).GetInterfaces().Contains(typeof(IStateful<SelectionState>));
