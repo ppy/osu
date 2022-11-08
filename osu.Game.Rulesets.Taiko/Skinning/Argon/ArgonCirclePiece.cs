@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
@@ -33,17 +32,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             set
             {
                 accentColour = value;
+
                 ring.Colour = AccentColour.MultiplyAlpha(0.5f);
                 ring2.Colour = AccentColour;
             }
         }
 
-        /// <summary>
-        /// Whether Kiai mode effects are enabled for this circle piece.
-        /// </summary>
-        public bool KiaiMode { get; set; }
+        [Resolved]
+        private DrawableHitObject drawableHitObject { get; set; } = null!;
 
-        public Box FlashBox;
+        private readonly Drawable flash;
 
         private readonly RingPiece ring;
         private readonly RingPiece ring2;
@@ -59,36 +57,43 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0, 22, 30, 190)
+                    Colour = new Color4(0, 0, 0, 190)
                 },
                 ring = new RingPiece(20 / 70f),
                 ring2 = new RingPiece(5 / 70f),
-                new CircularContainer
+                flash = new Circle
                 {
                     Name = "Flash layer",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Children = new[]
-                    {
-                        FlashBox = new Box
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.White,
-                            Blending = BlendingParameters.Additive,
-                            Alpha = 0,
-                            AlwaysPresent = true
-                        }
-                    },
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
                 },
             });
         }
 
-        [Resolved]
-        private DrawableHitObject drawableHitObject { get; set; } = null!;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            drawableHitObject.ApplyCustomUpdateState += updateStateTransforms;
+            updateStateTransforms(drawableHitObject, drawableHitObject.State.Value);
+        }
+
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
+        {
+            switch (state)
+            {
+                case ArmedState.Hit:
+                    using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime))
+                    {
+                        flash.FadeTo(0.9f).FadeOut(500, Easing.OutQuint);
+                    }
+
+                    break;
+            }
+        }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
@@ -97,7 +102,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
             if (drawableHitObject.State.Value == ArmedState.Idle)
             {
-                FlashBox
+                flash
                     .FadeTo(flash_opacity)
                     .Then()
                     .FadeOut(timingPoint.BeatLength * 0.75, Easing.OutSine);
