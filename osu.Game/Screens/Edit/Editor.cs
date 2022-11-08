@@ -176,6 +176,7 @@ namespace osu.Game.Screens.Edit
         private OnScreenDisplay onScreenDisplay { get; set; }
 
         private Bindable<float> editorBackgroundDim;
+        private Bindable<bool> editorHitMarkers;
 
         public Editor(EditorLoader loader = null)
         {
@@ -262,6 +263,7 @@ namespace osu.Game.Screens.Edit
             OsuMenuItem redoMenuItem;
 
             editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
+            editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -316,6 +318,10 @@ namespace osu.Game.Screens.Edit
                                         {
                                             new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
                                             new BackgroundDimMenuItem(editorBackgroundDim),
+                                            new ToggleMenuItem("Show hit markers")
+                                            {
+                                                State = { BindTarget = editorHitMarkers },
+                                            }
                                         }
                                     }
                                 }
