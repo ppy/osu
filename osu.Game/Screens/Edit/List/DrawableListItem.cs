@@ -24,11 +24,13 @@ namespace osu.Game.Screens.Edit.List
         private readonly Box box;
         protected readonly WeakReference<T> DrawableReference;
         private bool selected;
+        private Action<SelectionState> selectAll;
 
         public T? t => getTarget();
 
         internal DrawableListItem(T d, LocalisableString name)
         {
+            selectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
             DrawableReference = new WeakReference<T>(d);
             text.Text = name;
             AutoSizeAxes = Axes.Both;
@@ -37,11 +39,13 @@ namespace osu.Game.Screens.Edit.List
             {
                 box = new Box
                 {
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 1f,
+                    Height = 1f,
                     Colour = new Colour4(255, 255, 0, 0.25f),
                 },
                 text
             };
-            box.Hide();
             updateText(d);
 
             if (d is IStateful<SelectionState> selectable)
@@ -49,6 +53,14 @@ namespace osu.Game.Screens.Edit.List
                 selectable.StateChanged += ((IDrawableListItem<T>)this).SelectableOnStateChanged;
                 ((IDrawableListItem<T>)this).SelectableOnStateChanged(selectable.State);
             }
+
+            if (!((IDrawableListItem<T>)this).EnableSelection)
+            {
+                box.RemoveAndDisposeImmediately();
+                box = new Box();
+            }
+
+            box.Hide();
         }
 
         public DrawableListItem(T d)
@@ -58,8 +70,6 @@ namespace osu.Game.Screens.Edit.List
         {
         }
 
-        public event Action<SelectionState>? SelectAll;
-
         //imitate the existing SelectionHandler implementation
         //todo: might want to rework this, to just use the SelectionHandler if possible
         protected override bool OnClick(ClickEvent e)
@@ -67,32 +77,18 @@ namespace osu.Game.Screens.Edit.List
             Logger.Log("OnClick handler for DrawableListItem triggered");
 
             // while holding control, we only want to add to selection, not replace an existing selection.
-            if (e.ControlPressed && e.Button == MouseButton.Left && !selected)
+            if (e.ControlPressed && e.Button == MouseButton.Left)
             {
                 toggleSelection();
             }
             else
             {
-                SelectAll?.Invoke(SelectionState.NotSelected);
+                selectAll(SelectionState.NotSelected);
                 Select(true);
             }
 
             base.OnClick(e);
             return true;
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            Logger.Log("OnMouseDown handler for DrawableListItem triggered");
-
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            Logger.Log("OnMouseUp handler for DrawableListItem triggered");
-
-            base.OnMouseUp(e);
         }
 
         private void toggleSelection()
@@ -116,6 +112,12 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
+        public Action<SelectionState> SelectAll
+        {
+            get => selectAll;
+            set => selectAll = value;
+        }
+
         public Drawable GetDrawableListItem() => this;
 
         private T? getTarget()
@@ -125,18 +127,18 @@ namespace osu.Game.Screens.Edit.List
             return target;
         }
 
-        public void UpdateText()
+        public void UpdateItem()
         {
             if (t is not null)
                 updateText(t);
+            if (t is IStateful<SelectionState> selectable)
+                ((IDrawableListItem<T>)this).SelectableOnStateChanged(selectable.State);
         }
 
         private void updateText(T target)
         {
             //Set the text to the target's name, if set. Else try and get the name of the class that defined T
             text.Text = target.Name.Equals(string.Empty) ? (target.GetType().DeclaringType ?? target.GetType()).Name : target.Name;
-            box.Width = text.Width;
-            box.Height = text.Height;
         }
 
         public void Select(bool value)
@@ -153,15 +155,11 @@ namespace osu.Game.Screens.Edit.List
             {
                 selected = true;
                 box.Show();
-                box.Width = text.Width;
-                box.Height = text.Height;
             }
             else
             {
                 selected = false;
                 box.Hide();
-                box.Width = text.Width;
-                box.Height = text.Height;
             }
         }
     }

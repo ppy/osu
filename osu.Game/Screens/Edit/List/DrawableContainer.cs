@@ -15,7 +15,13 @@ namespace osu.Game.Screens.Edit.List
     public class DrawableContainer<T> : CompositeDrawable, IDrawableListItem<T>
         where T : Drawable
     {
-        public event Action<SelectionState> SelectAll;
+        private Action<SelectionState> selectAll;
+
+        Action<SelectionState> IDrawableListItem<T>.SelectAll
+        {
+            get => selectAll;
+            set => selectAll = value;
+        }
 
         private readonly OsuCheckbox button;
         private readonly Box box;
@@ -24,7 +30,7 @@ namespace osu.Game.Screens.Edit.List
 
         public DrawableContainer()
         {
-            SelectAll = ((IDrawableListItem<T>)list).SelectableOnStateChanged;
+            selectAll = ((IDrawableListItem<T>)list).SelectableOnStateChanged;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             InternalChild = new FillFlowContainer
@@ -37,6 +43,9 @@ namespace osu.Game.Screens.Edit.List
                 {
                     box = new Box
                     {
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 1f,
+                        Height = 1f,
                         Colour = new Colour4(255, 255, 0, 0.25f),
                     },
                     button = new OsuCheckbox
@@ -64,6 +73,14 @@ namespace osu.Game.Screens.Edit.List
                     }
                 }
             };
+
+            if (!((IDrawableListItem<T>)this).EnableSelection)
+            {
+                box.RemoveAndDisposeImmediately();
+                box = new Box();
+            }
+
+            box.Hide();
             enabled.BindValueChanged(v => SetShown(v.NewValue), true);
             Select(false);
         }
@@ -81,23 +98,16 @@ namespace osu.Game.Screens.Edit.List
             if (setValue) enabled.Value = value;
         }
 
-        public void UpdateText() => list.UpdateText();
+        public void UpdateItem()
+        {
+            list.UpdateItem();
+            ((IDrawableListItem<T>)list).SelectAll = selectAll;
+        }
 
         public void Select(bool value)
         {
-            if (value)
-            {
-                box.Show();
-                box.Width = button.Width;
-                box.Height = button.Height;
-            }
-            else
-            {
-                box.Hide();
-                box.Width = button.Width;
-                box.Height = button.Height;
-            }
-
+            if (value) box.Show();
+            else box.Hide();
             list.Select(value);
         }
 

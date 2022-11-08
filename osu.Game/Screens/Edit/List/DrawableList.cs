@@ -15,13 +15,21 @@ namespace osu.Game.Screens.Edit.List
     public class DrawableList<T> : CompositeDrawable, IDrawableListItem<T>
         where T : Drawable
     {
-        public event Action<SelectionState> SelectAll;
+        protected Action<SelectionState> SelectAll;
+
+        Action<SelectionState> IDrawableListItem<T>.SelectAll
+        {
+            get => SelectAll;
+            set => SelectAll = value;
+        }
+
         private readonly Dictionary<T, DrawableListItem<T>> elements = new Dictionary<T, DrawableListItem<T>>();
         private readonly List<IDrawableListItem<T>> containers = new List<IDrawableListItem<T>>();
         protected readonly Container<Drawable> Container;
 
         public DrawableList()
         {
+            SelectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             InternalChild = Container = new FillFlowContainer
@@ -37,7 +45,7 @@ namespace osu.Game.Screens.Edit.List
         protected override bool OnClick(ClickEvent e)
         {
             if (e.Button == MouseButton.Left)
-                SelectAll.Invoke(SelectionState.NotSelected);
+                SelectAll(SelectionState.NotSelected);
             base.OnClick(e);
             return e.Button == MouseButton.Left;
         }
@@ -54,6 +62,7 @@ namespace osu.Game.Screens.Edit.List
         {
             if (containers.Contains(drawableList)) return;
 
+            drawableList.SelectAll = SelectAll;
             containers.Add(drawableList);
             Container.Add(drawableList.GetDrawableListItem());
         }
@@ -65,21 +74,18 @@ namespace osu.Game.Screens.Edit.List
             else if (drawableListItem is DrawableList<T> list) AddContainer(list);
             else if (drawableListItem is DrawableContainer<T> container) AddContainer(container);
             //and there should be no other implementors, because IDrawableListItem is internal?
+            else AddContainer(drawableListItem);
         }
 
         public void AddRange(IEnumerable<T>? drawables)
         {
             if (drawables is null) return;
 
-            var iter = drawables.GetEnumerator();
-
-            while (iter.MoveNext())
+            foreach (T drawable in drawables)
             {
-                if (iter.Current is T t) Add(t);
-                if (iter.Current is IDrawableListItem<T> item) Add(item);
+                if (drawable is T t) Add(t);
+                if (drawable is IDrawableListItem<T> item) Add(item);
             }
-
-            iter.Dispose();
         }
 
         public void Add(T? drawable)
@@ -94,7 +100,7 @@ namespace osu.Game.Screens.Edit.List
             if (elements.ContainsKey(drawable)) return;
 
             elements.Add(drawable, listItem);
-            listItem.SelectAll += SelectAll.Invoke;
+            listItem.SelectAll = SelectAll;
             Container.Add(elements[drawable].GetDrawableListItem());
         }
 
@@ -112,16 +118,18 @@ namespace osu.Game.Screens.Edit.List
 
         public virtual Drawable GetDrawableListItem() => this;
 
-        public void UpdateText()
+        public void UpdateItem()
         {
             foreach (DrawableListItem<T> items in elements.Values)
             {
-                items.UpdateText();
+                items.UpdateItem();
+                items.SelectAll = SelectAll;
             }
 
             foreach (IDrawableListItem<T> container in containers)
             {
-                container.UpdateText();
+                container.UpdateItem();
+                container.SelectAll = SelectAll;
             }
         }
 

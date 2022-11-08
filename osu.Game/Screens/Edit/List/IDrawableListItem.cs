@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -10,10 +12,11 @@ namespace osu.Game.Screens.Edit.List
     internal interface IDrawableListItem<T>
         where T : Drawable
     {
-        event Action<SelectionState> SelectAll;
+        public Action<SelectionState> SelectAll { get; set; }
+        public bool EnableSelection => typeof(T).GetInterfaces().Contains(typeof(IStateful<SelectionState>));
         public Drawable GetDrawableListItem();
 
-        public void UpdateText();
+        public void UpdateItem();
 
         /// <summary>
         /// Selects or Deselects this element. This will also update the referenced item, that is connected to this element.
