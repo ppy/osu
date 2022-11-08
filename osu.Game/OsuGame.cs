@@ -1006,6 +1006,9 @@ namespace osu.Game
             if (overlay.IsPresent)
                 return;
 
+            Settings.Hide();
+            Notifications.Hide();
+
             // Show above all other overlays.
             if (overlay.IsLoaded)
                 overlayContent.ChangeChildDepth(overlay, (float)-Clock.CurrentTime);
