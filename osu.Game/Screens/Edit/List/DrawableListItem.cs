@@ -4,8 +4,6 @@
 using System;
 using osu.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -17,37 +15,33 @@ namespace osu.Game.Screens.Edit.List
 {
     //todo: rework this, to be simpler.
     //I should probably just implement IStateful<SelectionState>
-    public class DrawableListItem<T> : CompositeDrawable, IDrawableListItem<T>
+    public class DrawableListItem<T> : ADrawableListItem<T>
         where T : Drawable
     {
-        private readonly OsuSpriteText text = new OsuSpriteText();
-        private readonly Box box;
+        private readonly OsuSpriteText text;
         protected readonly WeakReference<T> DrawableReference;
-        private bool selected;
-
         public T? t => getTarget();
 
         internal DrawableListItem(T d, LocalisableString name)
         {
             DrawableReference = new WeakReference<T>(d);
-            text.Text = name;
             AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
-                box = new Box
+                SelectionBox,
+                text = new OsuSpriteText
                 {
-                    Colour = new Colour4(255, 255, 0, 0.25f),
-                },
-                text
+                    Text = name,
+                }
             };
-            box.Hide();
+
             updateText(d);
 
             if (d is IStateful<SelectionState> selectable)
             {
-                selectable.StateChanged += ((IDrawableListItem<T>)this).SelectableOnStateChanged;
-                ((IDrawableListItem<T>)this).SelectableOnStateChanged(selectable.State);
+                selectable.StateChanged += SelectableOnStateChanged;
+                SelectableOnStateChanged(selectable.State);
             }
         }
 
@@ -58,8 +52,6 @@ namespace osu.Game.Screens.Edit.List
         {
         }
 
-        public event Action<SelectionState>? SelectAll;
-
         //imitate the existing SelectionHandler implementation
         //todo: might want to rework this, to just use the SelectionHandler if possible
         protected override bool OnClick(ClickEvent e)
@@ -67,7 +59,7 @@ namespace osu.Game.Screens.Edit.List
             Logger.Log("OnClick handler for DrawableListItem triggered");
 
             // while holding control, we only want to add to selection, not replace an existing selection.
-            if (e.ControlPressed && e.Button == MouseButton.Left && !selected)
+            if (e.ControlPressed && e.Button == MouseButton.Left && !Selected)
             {
                 toggleSelection();
             }
@@ -79,20 +71,6 @@ namespace osu.Game.Screens.Edit.List
 
             base.OnClick(e);
             return true;
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            Logger.Log("OnMouseDown handler for DrawableListItem triggered");
-
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            Logger.Log("OnMouseUp handler for DrawableListItem triggered");
-
-            base.OnMouseUp(e);
         }
 
         private void toggleSelection()
@@ -112,11 +90,9 @@ namespace osu.Game.Screens.Edit.List
             }
             else
             {
-                Select(!selected);
+                Select(!Selected);
             }
         }
-
-        public Drawable GetDrawableListItem() => this;
 
         private T? getTarget()
         {
@@ -125,44 +101,29 @@ namespace osu.Game.Screens.Edit.List
             return target;
         }
 
-        public void UpdateText()
+        public override void UpdateText()
         {
             if (t is not null)
                 updateText(t);
+
+            if (t is IStateful<SelectionState> stateful)
+                SelectableOnStateChanged(stateful.State);
         }
 
         private void updateText(T target)
         {
             //Set the text to the target's name, if set. Else try and get the name of the class that defined T
             text.Text = target.Name.Equals(string.Empty) ? (target.GetType().DeclaringType ?? target.GetType()).Name : target.Name;
-            box.Width = text.Width;
-            box.Height = text.Height;
         }
 
-        public void Select(bool value)
+        public override void Select(bool value)
         {
+            if (!EnableSelection) return;
+
             if (t is IStateful<SelectionState> selectable)
                 selectable.State = value ? SelectionState.Selected : SelectionState.NotSelected;
 
             SelectInternal(value);
-        }
-
-        public void SelectInternal(bool value)
-        {
-            if (value)
-            {
-                selected = true;
-                box.Show();
-                box.Width = text.Width;
-                box.Height = text.Height;
-            }
-            else
-            {
-                selected = false;
-                box.Hide();
-                box.Width = text.Width;
-                box.Height = text.Height;
-            }
         }
     }
 }
