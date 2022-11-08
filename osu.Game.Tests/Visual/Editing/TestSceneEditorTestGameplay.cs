@@ -7,10 +7,12 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -21,7 +23,6 @@ using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Play;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps.IO;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -39,6 +40,14 @@ namespace osu.Game.Tests.Visual.Editing
         private BeatmapManager beatmaps { get; set; }
 
         private BeatmapSetInfo importedBeatmapSet;
+
+        private Bindable<float> editorDim;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            editorDim = config.GetBindable<float>(OsuSetting.EditorDim);
+        }
 
         public override void SetUpSteps()
         {
@@ -77,7 +86,7 @@ namespace osu.Game.Tests.Visual.Editing
                 // this test cares about checking the background belonging to the editor specifically, so check that using reference equality
                 // (as `.Equals()` cannot discern between the two, as they technically share the same database GUID).
                 var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single(b => ReferenceEquals(b.Beatmap.BeatmapInfo, EditorBeatmap.BeatmapInfo));
-                return background.Colour == Color4.DarkGray && background.BlurAmount.Value == 0;
+                return background.DimWhenUserSettingsIgnored.Value == editorDim.Value && background.BlurAmount.Value == 0;
             });
             AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
         }
@@ -110,7 +119,7 @@ namespace osu.Game.Tests.Visual.Editing
                 // this test cares about checking the background belonging to the editor specifically, so check that using reference equality
                 // (as `.Equals()` cannot discern between the two, as they technically share the same database GUID).
                 var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single(b => ReferenceEquals(b.Beatmap.BeatmapInfo, EditorBeatmap.BeatmapInfo));
-                return background.Colour == Color4.DarkGray && background.BlurAmount.Value == 0;
+                return background.DimWhenUserSettingsIgnored.Value == editorDim.Value && background.BlurAmount.Value == 0;
             });
 
             AddStep("start track", () => EditorClock.Start());

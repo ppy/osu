@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -46,15 +44,20 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public bool ContentDisplayed { get; private set; }
 
-        protected Bindable<double> UserDimLevel { get; private set; }
+        protected Bindable<double> UserDimLevel { get; private set; } = null!;
 
-        protected Bindable<bool> LightenDuringBreaks { get; private set; }
+        /// <summary>
+        /// The amount of dim to be used when <see cref="IgnoreUserSettings"/> is <c>true</c>.
+        /// </summary>
+        public Bindable<float> DimWhenUserSettingsIgnored { get; set; } = new Bindable<float>();
 
-        protected Bindable<bool> ShowStoryboard { get; private set; }
+        protected Bindable<bool> LightenDuringBreaks { get; private set; } = null!;
+
+        protected Bindable<bool> ShowStoryboard { get; private set; } = null!;
 
         private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
 
-        protected float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : 0, 0);
+        protected float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : DimWhenUserSettingsIgnored.Value, 0);
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -76,6 +79,7 @@ namespace osu.Game.Graphics.Containers
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             UserDimLevel.ValueChanged += _ => UpdateVisuals();
+            DimWhenUserSettingsIgnored.ValueChanged += _ => UpdateVisuals();
             LightenDuringBreaks.ValueChanged += _ => UpdateVisuals();
             IsBreakTime.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
