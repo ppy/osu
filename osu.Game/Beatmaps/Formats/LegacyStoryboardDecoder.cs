@@ -79,6 +79,8 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(string line)
         {
+            decodeVariables(ref line);
+
             int depth = 0;
 
             foreach (char c in line)
@@ -90,8 +92,6 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             line = line.Substring(depth);
-
-            decodeVariables(ref line);
 
             string[] split = line.Split(',');
 
