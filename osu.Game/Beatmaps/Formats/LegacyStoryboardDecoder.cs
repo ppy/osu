@@ -349,7 +349,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleVariables(string line)
         {
-            var pair = SplitKeyVal(line, '=');
+            var pair = SplitKeyVal(line, '=', false);
             variables[pair.Key] = pair.Value;
         }
 
