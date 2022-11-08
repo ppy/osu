@@ -78,12 +78,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             switch (Result)
             {
                 default:
-                    JudgementText.MoveToY(-0.2f)
-                                 .MoveToY(-0.8f, duration, Easing.OutQuint);
+                    JudgementText.MoveToY(-0.6f)
+                                 .MoveToY(-1.0f, duration, Easing.OutQuint);
 
                     JudgementText
                         .ScaleTo(Vector2.One)
-                        .ScaleTo(new Vector2(1.8f), duration, Easing.OutQuint);
+                        .ScaleTo(new Vector2(1.4f), duration, Easing.OutQuint);
                     break;
 
                 case HitResult.Miss:
