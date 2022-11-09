@@ -154,11 +154,11 @@ namespace osu.Game.Skinning
             DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSkinnableInfo().ToArray();
         }
 
-        public virtual Drawable? GetDrawableComponent(ISkinComponent component)
+        public virtual Drawable? GetDrawableComponent(ISkinLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
-                case SkinnableTargetComponent target:
+                case SkinnableTargetLookup target:
                     if (!DrawableComponentInfo.TryGetValue(target.Target, out var skinnableInfo))
                         return null;
 

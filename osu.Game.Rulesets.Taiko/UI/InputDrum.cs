@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             Children = new Drawable[]
             {
-                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.InputDrum), _ => new DefaultInputDrum())
+                new SkinnableDrawable(new TaikoSkinLookup(TaikoSkinComponents.InputDrum), _ => new DefaultInputDrum())
                 {
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,

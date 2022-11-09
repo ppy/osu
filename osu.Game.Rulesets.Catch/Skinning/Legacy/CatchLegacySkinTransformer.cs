@@ -25,14 +25,14 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinLookup lookup)
         {
-            if (component is SkinnableTargetComponent targetComponent)
+            if (lookup is SkinnableTargetLookup targetComponent)
             {
                 switch (targetComponent.Target)
                 {
                     case SkinnableTarget.MainHUDComponents:
-                        var components = base.GetDrawableComponent(component) as SkinnableTargetComponentsContainer;
+                        var components = base.GetDrawableComponent(lookup) as SkinnableTargetComponentsContainer;
 
                         if (providesComboCounter && components != null)
                         {
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 }
             }
 
-            if (component is CatchSkinComponent catchSkinComponent)
+            if (lookup is CatchSkinLookup catchSkinComponent)
             {
                 switch (catchSkinComponent.Component)
                 {
@@ -95,11 +95,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                         return null;
 
                     default:
-                        throw new UnsupportedSkinComponentException(component);
+                        throw new UnsupportedSkinComponentException(lookup);
                 }
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
 
         private bool hasOldStyleCatcherSprite() =>
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     {
                         case CatchSkinConfiguration.FlipCatcherPlate:
                             // Don't flip catcher plate contents if the catcher is provided by this legacy skin.
-                            if (GetDrawableComponent(new CatchSkinComponent(CatchSkinComponents.Catcher)) != null)
+                            if (GetDrawableComponent(new CatchSkinLookup(CatchSkinComponents.Catcher)) != null)
                                 return (IBindable<TValue>)new Bindable<bool>();
 
                             break;

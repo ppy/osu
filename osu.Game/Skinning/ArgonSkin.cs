@@ -81,14 +81,14 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinLookup lookup)
         {
-            if (base.GetDrawableComponent(component) is Drawable c)
+            if (base.GetDrawableComponent(lookup) is Drawable c)
                 return c;
 
-            switch (component)
+            switch (lookup)
             {
-                case SkinnableTargetComponent target:
+                case SkinnableTargetLookup target:
                     switch (target.Target)
                     {
                         case SkinnableTarget.SongSelect:
@@ -178,14 +178,14 @@ namespace osu.Game.Skinning
                     return null;
             }
 
-            switch (component.LookupName)
+            switch (lookup.LookupName)
             {
                 // Temporary until default skin has a valid hit lighting.
                 case @"lighting":
                     return Drawable.Empty();
             }
 
-            if (GetTexture(component.LookupName) is Texture t)
+            if (GetTexture(lookup.LookupName) is Texture t)
                 return new Sprite { Texture = t };
 
             return null;

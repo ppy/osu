@@ -3,13 +3,13 @@
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableTargetComponent : ISkinComponent
+    public class SkinnableTargetLookup : ISkinLookup
     {
         public readonly SkinnableTarget Target;
 
         public string LookupName => Target.ToString();
 
-        public SkinnableTargetComponent(SkinnableTarget target)
+        public SkinnableTargetLookup(SkinnableTarget target)
         {
             Target = target;
         }

@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly IBindable<bool> showCombo = new BindableBool(true);
 
         public CatchComboDisplay()
-            : base(new CatchSkinComponent(CatchSkinComponents.CatchComboCounter), _ => Empty())
+            : base(new CatchSkinLookup(CatchSkinComponents.CatchComboCounter), _ => Empty())
         {
         }
 

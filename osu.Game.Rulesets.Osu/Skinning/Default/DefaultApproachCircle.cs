@@ -35,9 +35,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             accentColour.BindValueChanged(colour => Colour = colour.NewValue, true);
         }
 
-        protected override Drawable CreateDefault(ISkinComponent component)
+        protected override Drawable CreateDefault(ISkinLookup lookup)
         {
-            var drawable = base.CreateDefault(component);
+            var drawable = base.CreateDefault(lookup);
 
             // Although this is a non-legacy component, osu-resources currently stores approach circle as a legacy-like texture.
             // See LegacyApproachCircle for documentation as to why this is required.
