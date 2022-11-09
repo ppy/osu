@@ -309,9 +309,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 // if lock is applied (or the specified values were out of range) aim to adjust the axis the user was not adjusting to conform.
                 if (sizeChanged == sizeX)
-                    sizeY.Value = (int)Math.Round(areaSize.Value.X / aspectRatio.Value);
+                    sizeY.Value = getHeight(areaSize.Value.X, aspectRatio.Value);
                 else
-                    sizeX.Value = (int)Math.Round(areaSize.Value.Y * aspectRatio.Value);
+                    sizeX.Value = getWidth(areaSize.Value.Y, aspectRatio.Value);
             }
             finally
             {
@@ -325,12 +325,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             aspectLock.Value = false;
 
-            int proposedHeight = (int)Math.Round(sizeX.Value / aspectRatio);
+            int proposedHeight = getHeight(sizeX.Value, aspectRatio);
 
             if (proposedHeight < sizeY.MaxValue)
                 sizeY.Value = proposedHeight;
             else
-                sizeX.Value = (int)Math.Round(sizeY.Value * aspectRatio);
+                sizeX.Value = getWidth(sizeY.Value, aspectRatio);
 
             updateAspectRatio();
 
@@ -341,5 +341,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private void updateAspectRatio() => aspectRatio.Value = currentAspectRatio;
 
         private float currentAspectRatio => sizeX.Value / sizeY.Value;
+
+        private static int getHeight(float width, float aspectRatio) => (int)Math.Round(width / aspectRatio);
+
+        private static int getWidth(float height, float aspectRatio) => (int)Math.Round(height * aspectRatio);
     }
 }
