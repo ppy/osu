@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,7 +57,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
         }
 
-        private IEnumerable<Issue> getVolumeIssues(HitObject hitObject, HitObject sampledHitObject = null)
+        private IEnumerable<Issue> getVolumeIssues(HitObject hitObject, HitObject? sampledHitObject = null)
         {
             sampledHitObject ??= hitObject;
             if (!sampledHitObject.Samples.Any())
@@ -74,7 +72,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (edgeType == EdgeType.None)
                 yield break;
 
-            string postfix = hitObject is IHasDuration ? edgeType.ToString().ToLowerInvariant() : null;
+            string postfix = hitObject is IHasDuration ? edgeType.ToString().ToLowerInvariant() : string.Empty;
 
             if (maxVolume <= muted_threshold)
             {
