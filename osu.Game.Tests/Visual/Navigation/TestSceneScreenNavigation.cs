@@ -518,7 +518,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             ChangelogOverlay getChangelogOverlay() => Game.ChildrenOfType<ChangelogOverlay>().FirstOrDefault();
 
-            AddUntilStep("Wait for options to load", () => Game.Notifications.IsLoaded);
+            AddUntilStep("Wait for notifications to load", () => Game.Notifications.IsLoaded);
             AddStep("Show notifications", () => Game.Notifications.Show());
             AddUntilStep("wait for notifications shown", () => Game.Notifications.IsPresent && Game.Notifications.State.Value == Visibility.Visible);
             AddStep("Show changelog listing", () => Game.ShowChangelogListing());
@@ -535,7 +535,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             ChangelogOverlay getChangelogOverlay() => Game.ChildrenOfType<ChangelogOverlay>().FirstOrDefault();
 
-            AddUntilStep("Wait for options to load", () => Game.Settings.IsLoaded);
+            AddUntilStep("Wait for settings to load", () => Game.Settings.IsLoaded);
             AddStep("Show settings", () => Game.Settings.Show());
             AddUntilStep("wait for settings shown", () => Game.Settings.IsPresent && Game.Settings.State.Value == Visibility.Visible);
             AddStep("Show changelog listing", () => Game.ShowChangelogListing());
