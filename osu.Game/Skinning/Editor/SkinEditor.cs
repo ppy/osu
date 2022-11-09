@@ -212,6 +212,7 @@ namespace osu.Game.Skinning.Editor
             layerSidebar.Add(layerSidebarSection = new EditorSidebarSection(@"Layer Editor"));
             layerSidebarSection.Clear();
             layerSidebarSection.Child = LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>();
+            LayerSidebarList.GetName = t => ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)LayerSidebarList).GetDefaultText((Drawable)t.Item);
         }
 
         protected override void LoadComplete()

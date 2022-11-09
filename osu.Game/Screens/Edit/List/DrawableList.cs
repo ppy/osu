@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -16,17 +17,35 @@ namespace osu.Game.Screens.Edit.List
     public class DrawableList<T> : RearrangeableListContainer<T>, IDrawableListItem<T>
         where T : Drawable
     {
-        protected Action<SelectionState> SelectAll;
+        private Action<SelectionState> selectAll;
 
-        Action<SelectionState> IDrawableListItem<T>.SelectAll
+        public Action<SelectionState> SelectAll
         {
-            get => SelectAll;
-            set => SelectAll = value;
+            get => selectAll;
+            set
+            {
+                selectAll = value;
+                UpdateItem();
+            }
+        }
+
+        private Func<T, LocalisableString> getName;
+
+        public Func<T, LocalisableString> GetName
+        {
+            get => getName;
+            set
+            {
+                getName = value;
+                UpdateItem();
+            }
         }
 
         public DrawableList()
         {
-            SelectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
+            getName = ((IDrawableListItem<T>)this).GetDefaultText;
+            selectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
+
             RelativeSizeAxes = Axes.X;
             //todo: compute this somehow add runtime
             Height = 100f;
@@ -85,8 +104,9 @@ namespace osu.Game.Screens.Edit.List
             {
                 if (item is IRearrangableListItem<T> rearrangableItem)
                 {
+                    rearrangableItem.SelectAll = selectAll;
+                    rearrangableItem.GetName = getName;
                     rearrangableItem.UpdateItem();
-                    rearrangableItem.SelectAll = SelectAll;
                 }
             }
         }

@@ -25,9 +25,28 @@ namespace osu.Game.Screens.Edit.List
         private bool selected;
         private Action<SelectionState> selectAll;
 
+        public Action<SelectionState> SelectAll
+        {
+            get => selectAll;
+            set => selectAll = value;
+        }
+
+        private Func<T, LocalisableString> getName;
+
+        public Func<T, LocalisableString> GetName
+        {
+            get => getName;
+            set
+            {
+                getName = value;
+                UpdateItem();
+            }
+        }
+
         internal DrawableListItem(T d, LocalisableString name)
             : base(d)
         {
+            getName = ((IDrawableListItem<T>)this).GetDefaultText;
             selectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
             text.Text = name;
             AutoSizeAxes = Axes.Both;
@@ -109,12 +128,6 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        public Action<SelectionState> SelectAll
-        {
-            get => selectAll;
-            set => selectAll = value;
-        }
-
         public Drawable GetDrawableListItem() => this;
         public RearrangeableListItem<T> GetRearrangeableListItem() => this;
 
@@ -128,7 +141,7 @@ namespace osu.Game.Screens.Edit.List
         private void updateText(T target)
         {
             //Set the text to the target's name, if set. Else try and get the name of the class that defined T
-            text.Text = target.Name.Equals(string.Empty) ? (target.GetType().DeclaringType ?? target.GetType()).Name : target.Name;
+            text.Text = getName(target);
         }
 
         public void Select(bool value)

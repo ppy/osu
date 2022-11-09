@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.List
@@ -12,6 +14,7 @@ namespace osu.Game.Screens.Edit.List
     public interface IDrawableListItem<T>
     {
         public Action<SelectionState> SelectAll { get; set; }
+        public Func<T, LocalisableString> GetName { get; set; }
         public bool EnableSelection => typeof(T).GetInterfaces().Contains(typeof(IStateful<SelectionState>));
         public Drawable GetDrawableListItem();
 
@@ -35,6 +38,12 @@ namespace osu.Game.Screens.Edit.List
                     SelectInternal(false);
                     return;
             }
+        }
+
+        public LocalisableString GetDefaultText(Drawable target)
+        {
+            Logger.Log("GetDefaultText with" + target + " target.");
+            return target.Name.Equals(string.Empty) ? (target.GetType().DeclaringType ?? target.GetType()).Name : target.Name;
         }
 
         /// <summary>

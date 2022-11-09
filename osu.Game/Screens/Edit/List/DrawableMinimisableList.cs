@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
@@ -17,10 +18,26 @@ namespace osu.Game.Screens.Edit.List
     {
         private Action<SelectionState> selectAll;
 
-        Action<SelectionState> IDrawableListItem<T>.SelectAll
+        public Action<SelectionState> SelectAll
         {
             get => selectAll;
-            set => selectAll = value;
+            set
+            {
+                selectAll = value;
+                List.SelectAll = value;
+            }
+        }
+
+        private Func<T, LocalisableString> getName;
+
+        public Func<T, LocalisableString> GetName
+        {
+            get => getName;
+            set
+            {
+                getName = value;
+                List.GetName = value;
+            }
         }
 
         private readonly OsuCheckbox button;
@@ -30,7 +47,9 @@ namespace osu.Game.Screens.Edit.List
 
         public DrawableMinimisableList()
         {
+            getName = ((IDrawableListItem<T>)this).GetDefaultText;
             selectAll = ((IDrawableListItem<T>)List).SelectableOnStateChanged;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             InternalChild = new FillFlowContainer
@@ -87,14 +106,15 @@ namespace osu.Game.Screens.Edit.List
         {
             if (value) List.Show();
             else List.Hide();
-
+            UpdateItem();
             if (setValue) enabled.Value = value;
         }
 
         public void UpdateItem()
         {
+            List.GetName = GetName;
+            List.SelectAll = SelectAll;
             List.UpdateItem();
-            ((IDrawableListItem<T>)List).SelectAll = selectAll;
         }
 
         public void Select(bool value)
