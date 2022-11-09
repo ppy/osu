@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Threading;
@@ -13,7 +11,7 @@ namespace osu.Game.Skinning
 {
     public class SkinnableTargetContainer : SkinReloadableDrawable, ISkinnableTarget
     {
-        private SkinnableTargetComponentsContainer content;
+        private SkinnableTargetComponentsContainer? content;
 
         public SkinnableTarget Target { get; }
 
@@ -25,7 +23,7 @@ namespace osu.Game.Skinning
 
         public bool ComponentsLoaded { get; private set; }
 
-        private CancellationTokenSource cancellationSource;
+        private CancellationTokenSource? cancellationSource;
 
         public SkinnableTargetContainer(SkinnableTarget target)
         {
