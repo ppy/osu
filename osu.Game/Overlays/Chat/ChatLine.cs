@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -48,8 +50,6 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float Spacing => 15;
 
-        protected virtual float TimestampWidth => 60;
-
         protected virtual float UsernameWidth => 130;
 
         private Color4 usernameColour;
@@ -61,6 +61,8 @@ namespace osu.Game.Overlays.Chat
         private OsuSpriteText username = null!;
 
         private Container? highlight;
+
+        private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
 
         private bool senderHasColour => !string.IsNullOrEmpty(message.Sender.Colour);
 
@@ -80,7 +82,7 @@ namespace osu.Game.Overlays.Chat
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider? colourProvider)
+        private void load(OverlayColourProvider? colourProvider, OsuConfigManager configManager)
         {
             usernameColour = senderHasColour
                 ? Color4Extensions.FromHex(message.Sender.Colour)
@@ -93,38 +95,31 @@ namespace osu.Game.Overlays.Chat
                 RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                 ColumnDimensions = new[]
                 {
-                    new Dimension(GridSizeMode.Absolute, TimestampWidth + Spacing + UsernameWidth + Spacing),
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension(GridSizeMode.Absolute, Spacing + UsernameWidth + Spacing),
                     new Dimension(),
                 },
                 Content = new[]
                 {
                     new Drawable[]
                     {
-                        new Container
+                        timestamp = new OsuSpriteText
                         {
-                            RelativeSizeAxes = Axes.X,
+                            Shadow = false,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
+                            Colour = colourProvider?.Background1 ?? Colour4.White,
+                            AlwaysPresent = true,
+                        },
+                        new MessageSender(message.Sender)
+                        {
+                            Width = UsernameWidth,
                             AutoSizeAxes = Axes.Y,
-                            Children = new Drawable[]
-                            {
-                                timestamp = new OsuSpriteText
-                                {
-                                    Shadow = false,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
-                                    MaxWidth = TimestampWidth,
-                                    Colour = colourProvider?.Background1 ?? Colour4.White,
-                                },
-                                new MessageSender(message.Sender)
-                                {
-                                    Width = UsernameWidth,
-                                    AutoSizeAxes = Axes.Y,
-                                    Origin = Anchor.TopRight,
-                                    Anchor = Anchor.TopRight,
-                                    Child = createUsername(),
-                                    Margin = new MarginPadding { Horizontal = Spacing },
-                                },
-                            },
+                            Origin = Anchor.TopRight,
+                            Anchor = Anchor.TopRight,
+                            Child = createUsername(),
+                            Margin = new MarginPadding { Horizontal = Spacing },
                         },
                         ContentFlow = new LinkFlowContainer(t =>
                         {
@@ -139,6 +134,8 @@ namespace osu.Game.Overlays.Chat
                     },
                 }
             };
+
+            configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
         }
 
         protected override void LoadComplete()
@@ -147,6 +144,8 @@ namespace osu.Game.Overlays.Chat
 
             updateMessageContent();
             FinishTransforms(true);
+
+            prefer24HourTime.BindValueChanged(_ => updateTimestamp());
         }
 
         /// <summary>
@@ -176,7 +175,7 @@ namespace osu.Game.Overlays.Chat
             this.FadeTo(message is LocalEchoMessage ? 0.4f : 1.0f, 500, Easing.OutQuint);
             timestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
 
-            timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
+            updateTimestamp();
             username.Text = $@"{message.Sender.Username}";
 
             // remove non-existent channels from the link list
@@ -184,6 +183,13 @@ namespace osu.Game.Overlays.Chat
 
             ContentFlow.Clear();
             ContentFlow.AddLinks(message.DisplayContent, message.Links);
+        }
+
+        private void updateTimestamp()
+        {
+            timestamp.Text = prefer24HourTime.Value
+                ? $@"{message.Timestamp.LocalDateTime:HH:mm:ss}"
+                : $@"{message.Timestamp.LocalDateTime:hh:mm:ss tt}";
         }
 
         private Drawable createUsername()
