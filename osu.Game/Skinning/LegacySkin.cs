@@ -329,10 +329,10 @@ namespace osu.Game.Skinning
 
             switch (lookup)
             {
-                case SkinnableTargetLookup target:
-                    switch (target.Target)
+                case GlobalSkinLookup target:
+                    switch (target.Lookup)
                     {
-                        case SkinnableTarget.MainHUDComponents:
+                        case GlobalSkinLookup.LookupType.MainHUDComponents:
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();

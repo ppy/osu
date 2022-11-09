@@ -5,12 +5,17 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
+using osu.Game.Configuration;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
     /// Denotes a drawable which, as a drawable, can be adjusted via skinning specifications.
     /// </summary>
+    /// <remarks>
+    /// Attaching this interface to any <see cref="IDrawable"/> will make it serialisable to skin settings.
+    /// Adding <see cref="SettingSourceAttribute"/> annotated bindables will also serialise these settings alongside each instance.
+    /// </remarks>
     public interface ISkinnableDrawable : IDrawable
     {
         /// <summary>
