@@ -74,6 +74,7 @@ namespace osu.Game.Skinning.Editor
 
         private EditorSidebar componentsSidebar;
         private EditorSidebar settingsSidebar;
+        private EditorSidebarSection layerSidebarSection;
         public DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> LayerSidebarList;
 
         [Resolved(canBeNull: true)]
@@ -92,7 +93,6 @@ namespace osu.Game.Skinning.Editor
         private void load()
         {
             EditorSidebar layerSidebar;
-            EditorSidebarSection layerSidebarSection;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -211,9 +211,14 @@ namespace osu.Game.Skinning.Editor
 
             layerSidebar.Add(layerSidebarSection = new EditorSidebarSection(@"Layer Editor"));
             layerSidebarSection.Clear();
+            InitLayerEditor();
+        }
+
+        private void InitLayerEditor()
+        {
             layerSidebarSection.Child = LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>();
             LayerSidebarList.GetName = t => ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)LayerSidebarList).GetDefaultText((Drawable)t.Item);
-            LayerSidebarList.OnDragAction = (_, _) =>
+            LayerSidebarList.OnDragAction = () =>
             {
                 foreach (var listItem in LayerSidebarList.List.Items)
                 {
@@ -232,6 +237,7 @@ namespace osu.Game.Skinning.Editor
                     }
                 }
             };
+            LayerSidebarList.OnDragAction();
         }
 
         protected override void LoadComplete()

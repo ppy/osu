@@ -59,6 +59,7 @@ namespace osu.Game.Extensions
             component.Scale = info.Scale;
             component.Anchor = info.Anchor;
             component.Origin = info.Origin;
+            component.Depth = info.Depth;
 
             if (component is ISkinnableDrawable skinnable)
             {

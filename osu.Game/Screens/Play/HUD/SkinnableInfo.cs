@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public Anchor Origin { get; set; }
 
+        public float Depth { get; set; }
+
         /// <inheritdoc cref="ISkinnableDrawable.UsesFixedAnchor"/>
         public bool UsesFixedAnchor { get; set; }
 
@@ -61,6 +63,7 @@ namespace osu.Game.Screens.Play.HUD
             Scale = component.Scale;
             Anchor = component.Anchor;
             Origin = component.Origin;
+            Depth = component.Depth;
 
             if (component is ISkinnableDrawable skinnable)
                 UsesFixedAnchor = skinnable.UsesFixedAnchor;

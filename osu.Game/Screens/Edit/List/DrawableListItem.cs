@@ -24,9 +24,9 @@ namespace osu.Game.Screens.Edit.List
         private readonly Box box;
         private bool selected;
         private Action<SelectionState> selectAll;
-        private Action<RearrangeableListItem<T>, MouseButtonEvent> onDragAction { get; set; }
+        private Action onDragAction { get; set; }
 
-        public Action<RearrangeableListItem<T>, MouseButtonEvent> OnDragAction
+        public Action OnDragAction
         {
             get => onDragAction;
             set => onDragAction = value;
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.List
         {
             getName = ((IDrawableListItem<T>)this).GetDefaultText;
             selectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
-            onDragAction = (_, _) => { };
+            onDragAction = () => { };
             text.Text = name;
             AutoSizeAxes = Axes.Both;
 
@@ -183,13 +183,13 @@ namespace osu.Game.Screens.Edit.List
 
         protected override void OnDrag(DragEvent e)
         {
-            onDragAction(this, e);
+            onDragAction();
             base.OnDrag(e);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            onDragAction(this, e);
+            onDragAction();
             base.OnDragEnd(e);
         }
     }

@@ -5,8 +5,6 @@ using System;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface;
@@ -17,7 +15,7 @@ namespace osu.Game.Screens.Edit.List
     {
         public Action<SelectionState> SelectAll { get; set; }
         public Func<T, LocalisableString> GetName { get; set; }
-        public Action<RearrangeableListItem<T>, MouseButtonEvent> OnDragAction { get; set; }
+        public Action OnDragAction { get; set; }
         public bool EnableSelection => typeof(T).GetInterfaces().Contains(typeof(IStateful<SelectionState>));
         public Drawable GetDrawableListItem();
 

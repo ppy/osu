@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -17,9 +16,9 @@ namespace osu.Game.Screens.Edit.List
     public class DrawableMinimisableList<T> : CompositeDrawable, IDrawableListItem<T>
         where T : Drawable
     {
-        private Action<RearrangeableListItem<T>, MouseButtonEvent> onDragAction { get; set; }
+        private Action onDragAction { get; set; }
 
-        public Action<RearrangeableListItem<T>, MouseButtonEvent> OnDragAction
+        public Action OnDragAction
         {
             get => onDragAction;
             set
@@ -62,7 +61,7 @@ namespace osu.Game.Screens.Edit.List
         {
             getName = ((IDrawableListItem<T>)this).GetDefaultText;
             selectAll = ((IDrawableListItem<T>)List).SelectableOnStateChanged;
-            onDragAction = (_, _) => { };
+            onDragAction = () => { };
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
