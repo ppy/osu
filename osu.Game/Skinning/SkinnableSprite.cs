@@ -55,10 +55,10 @@ namespace osu.Game.Skinning
 
         protected override Drawable CreateDefault(ISkinComponentLookup lookup)
         {
-            var texture = textures.Get(lookup.LookupName);
+            var texture = textures.Get(((SpriteComponentLookup)lookup).LookupName);
 
             if (texture == null)
-                return new SpriteNotFound(lookup.LookupName);
+                return new SpriteNotFound(((SpriteComponentLookup)lookup).LookupName);
 
             return new Sprite { Texture = texture };
         }

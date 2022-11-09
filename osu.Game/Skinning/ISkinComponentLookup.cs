@@ -16,6 +16,5 @@ namespace osu.Game.Skinning
     /// </remarks>
     public interface ISkinComponentLookup
     {
-        string LookupName { get; }
     }
 }
