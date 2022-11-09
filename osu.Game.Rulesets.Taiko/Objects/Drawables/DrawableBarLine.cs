@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             AddRangeInternal(new Drawable[]
             {
-                line = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.BarLine), _ => new Box
+                line = new SkinnableDrawable(new TaikoSkinLookup(TaikoSkinComponents.BarLine), _ => new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     EdgeSmoothness = new Vector2(0.5f, 0),

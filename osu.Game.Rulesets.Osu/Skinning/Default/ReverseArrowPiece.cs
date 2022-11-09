@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
-            Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
+            Child = new SkinnableDrawable(new OsuSkinLookup(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
             {
                 RelativeSizeAxes = Axes.Both,
                 Blending = BlendingParameters.Additive,

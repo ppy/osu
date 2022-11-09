@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoExplosionKiai), _ => new DefaultKiaiHitExplosion(hitType));
+            Child = skinnable = new SkinnableDrawable(new TaikoSkinLookup(TaikoSkinComponents.TaikoExplosionKiai), _ => new DefaultKiaiHitExplosion(hitType));
         }
     }
 }

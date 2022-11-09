@@ -39,7 +39,7 @@ namespace osu.Game.Skinning
             components.Clear();
             ComponentsLoaded = false;
 
-            content = CurrentSkin.GetDrawableComponent(new SkinnableTargetComponent(Target)) as SkinnableTargetComponentsContainer;
+            content = CurrentSkin.GetDrawableComponent(new SkinnableTargetLookup(Target)) as SkinnableTargetComponentsContainer;
 
             cancellationSource?.Cancel();
             cancellationSource = null;

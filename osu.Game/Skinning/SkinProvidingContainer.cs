@@ -28,7 +28,7 @@ namespace osu.Game.Skinning
         /// </summary>
         protected virtual bool AllowFallingBackToParent => true;
 
-        protected virtual bool AllowDrawableLookup(ISkinComponent component) => true;
+        protected virtual bool AllowDrawableLookup(ISkinLookup lookup) => true;
 
         protected virtual bool AllowTextureLookup(string componentName) => true;
 
@@ -107,19 +107,19 @@ namespace osu.Game.Skinning
             }
         }
 
-        public Drawable? GetDrawableComponent(ISkinComponent component)
+        public Drawable? GetDrawableComponent(ISkinLookup lookup)
         {
             foreach (var (_, lookupWrapper) in skinSources)
             {
                 Drawable? sourceDrawable;
-                if ((sourceDrawable = lookupWrapper.GetDrawableComponent(component)) != null)
+                if ((sourceDrawable = lookupWrapper.GetDrawableComponent(lookup)) != null)
                     return sourceDrawable;
             }
 
             if (!AllowFallingBackToParent)
                 return null;
 
-            return ParentSource?.GetDrawableComponent(component);
+            return ParentSource?.GetDrawableComponent(lookup);
         }
 
         public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
@@ -238,10 +238,10 @@ namespace osu.Game.Skinning
                 this.provider = provider;
             }
 
-            public Drawable? GetDrawableComponent(ISkinComponent component)
+            public Drawable? GetDrawableComponent(ISkinLookup lookup)
             {
-                if (provider.AllowDrawableLookup(component))
-                    return skin.GetDrawableComponent(component);
+                if (provider.AllowDrawableLookup(lookup))
+                    return skin.GetDrawableComponent(lookup);
 
                 return null;
             }

@@ -43,9 +43,9 @@ namespace osu.Game.Skinning
             return new RealmBackedResourceStore<BeatmapSetInfo>(beatmapInfo.BeatmapSet.ToLive(resources.RealmAccess), resources.Files, resources.RealmAccess);
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinLookup lookup)
         {
-            if (component is SkinnableTargetComponent targetComponent)
+            if (lookup is SkinnableTargetLookup targetComponent)
             {
                 switch (targetComponent.Target)
                 {
@@ -59,7 +59,7 @@ namespace osu.Game.Skinning
                 }
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
 
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)

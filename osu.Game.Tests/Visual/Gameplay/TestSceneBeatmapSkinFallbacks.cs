@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             var actualInfo = actualComponentsContainer.CreateSkinnableInfo();
 
-            var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource.GetDrawableComponent(new SkinnableTargetComponent(target));
+            var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource.GetDrawableComponent(new SkinnableTargetLookup(target));
             if (expectedComponentsContainer == null)
                 return false;
 

@@ -34,42 +34,42 @@ namespace osu.Game.Skinning
         private ISkinSource source { get; set; } = null!;
 
         public SkinnableSprite(string textureName, ConfineMode confineMode = ConfineMode.NoScaling)
-            : base(new SpriteComponent(textureName), confineMode)
+            : base(new SpriteLookup(textureName), confineMode)
         {
             SpriteName.Value = textureName;
         }
 
         public SkinnableSprite()
-            : base(new SpriteComponent(string.Empty), ConfineMode.NoScaling)
+            : base(new SpriteLookup(string.Empty), ConfineMode.NoScaling)
         {
             RelativeSizeAxes = Axes.None;
             AutoSizeAxes = Axes.Both;
 
             SpriteName.BindValueChanged(name =>
             {
-                ((SpriteComponent)Component).LookupName = name.NewValue ?? string.Empty;
+                ((SpriteLookup)Lookup).LookupName = name.NewValue ?? string.Empty;
                 if (IsLoaded)
                     SkinChanged(CurrentSkin);
             });
         }
 
-        protected override Drawable CreateDefault(ISkinComponent component)
+        protected override Drawable CreateDefault(ISkinLookup lookup)
         {
-            var texture = textures.Get(component.LookupName);
+            var texture = textures.Get(lookup.LookupName);
 
             if (texture == null)
-                return new SpriteNotFound(component.LookupName);
+                return new SpriteNotFound(lookup.LookupName);
 
             return new Sprite { Texture = texture };
         }
 
         public bool UsesFixedAnchor { get; set; }
 
-        internal class SpriteComponent : ISkinComponent
+        internal class SpriteLookup : ISkinLookup
         {
             public string LookupName { get; set; }
 
-            public SpriteComponent(string textureName)
+            public SpriteLookup(string textureName)
             {
                 LookupName = textureName;
             }
