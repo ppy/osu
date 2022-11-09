@@ -857,17 +857,7 @@ namespace osu.Game.Database
 
                     if (legacyCollectionImporter.GetAvailableCount(storage).GetResultSafely() > 0)
                     {
-                        legacyCollectionImporter.ImportFromStorage(storage).ContinueWith(task =>
-                        {
-                            if (task.Exception != null)
-                            {
-                                // can be removed 20221027 (just for initial safety).
-                                Logger.Error(task.Exception.InnerException, "Collections could not be migrated to realm. Please provide your \"collection.db\" to the dev team.");
-                                return;
-                            }
-
-                            storage.Move("collection.db", "collection.db.migrated");
-                        });
+                        legacyCollectionImporter.ImportFromStorage(storage).ContinueWith(_ => storage.Move("collection.db", "collection.db.migrated"));
                     }
 
                     break;

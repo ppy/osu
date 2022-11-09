@@ -83,15 +83,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double combinedRating = combined.DifficultyValue() * difficulty_multiplier;
             double starRating = rescale(combinedRating * 1.4);
 
-            // TODO: This is temporary measure as we don't detect abuse of multiple-input playstyles of converts within the current system.
-            if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0)
-            {
-                starRating *= 0.925;
-                // For maps with low colour variance and high stamina requirement, multiple inputs are more likely to be abused.
-                if (colourRating < 2 && staminaRating > 8)
-                    starRating *= 0.80;
-            }
-
             HitWindows hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 

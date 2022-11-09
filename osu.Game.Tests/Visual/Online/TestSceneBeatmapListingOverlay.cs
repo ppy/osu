@@ -198,13 +198,13 @@ namespace osu.Game.Tests.Visual.Online
                 beatmapSet = CreateAPIBeatmapSet(Ruleset.Value);
                 beatmapSet.Title = "last beatmap of first page";
 
-                fetchFor(getManyBeatmaps(49).Append(beatmapSet).ToArray(), true);
+                fetchFor(getManyBeatmaps(49).Append(new APIBeatmapSet { Title = "last beatmap of first page", OnlineID = beatmapSet.OnlineID }).ToArray(), true);
             });
             AddUntilStep("wait for loaded", () => this.ChildrenOfType<BeatmapCard>().Count() == 50);
 
-            AddStep("set next page", () => setSearchResponse(getManyBeatmaps(49).Prepend(beatmapSet).ToArray(), false));
+            AddStep("set next page", () => setSearchResponse(getManyBeatmaps(49).Prepend(new APIBeatmapSet { Title = "this shouldn't show up", OnlineID = beatmapSet.OnlineID }).ToArray(), false));
             AddStep("scroll to end", () => overlay.ChildrenOfType<OverlayScrollContainer>().Single().ScrollToEnd());
-            AddUntilStep("wait for loaded", () => this.ChildrenOfType<BeatmapCard>().Count() == 99);
+            AddUntilStep("wait for loaded", () => this.ChildrenOfType<BeatmapCard>().Count() >= 99);
 
             AddAssert("beatmap not duplicated", () => overlay.ChildrenOfType<BeatmapCard>().Count(c => c.BeatmapSet.Equals(beatmapSet)) == 1);
         }

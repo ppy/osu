@@ -1,10 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -21,24 +18,43 @@ using osuTK;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class MenuCursor : CursorContainer
+    public class MenuCursorContainer : CursorContainer
     {
         private readonly IBindable<bool> screenshotCursorVisibility = new Bindable<bool>(true);
         public override bool IsPresent => screenshotCursorVisibility.Value && base.IsPresent;
 
+        private bool hideCursorOnNonMouseInput;
+
+        public bool HideCursorOnNonMouseInput
+        {
+            get => hideCursorOnNonMouseInput;
+            set
+            {
+                if (hideCursorOnNonMouseInput == value)
+                    return;
+
+                hideCursorOnNonMouseInput = value;
+                updateState();
+            }
+        }
+
         protected override Drawable CreateCursor() => activeCursor = new Cursor();
 
-        private Cursor activeCursor;
+        private Cursor activeCursor = null!;
 
-        private Bindable<bool> cursorRotate;
         private DragRotationState dragRotationState;
         private Vector2 positionMouseDown;
-
-        private Sample tapSample;
         private Vector2 lastMovePosition;
 
-        [BackgroundDependencyLoader(true)]
-        private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager, AudioManager audio)
+        private Bindable<bool> cursorRotate = null!;
+        private Sample tapSample = null!;
+
+        private MouseInputDetector mouseInputDetector = null!;
+
+        private bool visible;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config, ScreenshotManager? screenshotManager, AudioManager audio)
         {
             cursorRotate = config.GetBindable<bool>(OsuSetting.CursorRotation);
 
@@ -46,6 +62,70 @@ namespace osu.Game.Graphics.Cursor
                 screenshotCursorVisibility.BindTo(screenshotManager.CursorVisibility);
 
             tapSample = audio.Samples.Get(@"UI/cursor-tap");
+
+            Add(mouseInputDetector = new MouseInputDetector());
+        }
+
+        [Resolved]
+        private OsuGame? game { get; set; }
+
+        private readonly IBindable<bool> lastInputWasMouse = new BindableBool();
+        private readonly IBindable<bool> gameActive = new BindableBool(true);
+        private readonly IBindable<bool> gameIdle = new BindableBool();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            lastInputWasMouse.BindTo(mouseInputDetector.LastInputWasMouseSource);
+            lastInputWasMouse.BindValueChanged(_ => updateState(), true);
+
+            if (game != null)
+            {
+                gameIdle.BindTo(game.IsIdle);
+                gameIdle.BindValueChanged(_ => updateState());
+
+                gameActive.BindTo(game.IsActive);
+                gameActive.BindValueChanged(_ => updateState());
+            }
+        }
+
+        protected override void UpdateState(ValueChangedEvent<Visibility> state) => updateState();
+
+        private void updateState()
+        {
+            bool combinedVisibility = getCursorVisibility();
+
+            if (visible == combinedVisibility)
+                return;
+
+            visible = combinedVisibility;
+
+            if (visible)
+                PopIn();
+            else
+                PopOut();
+        }
+
+        private bool getCursorVisibility()
+        {
+            // do not display when explicitly set to hidden state.
+            if (State.Value == Visibility.Hidden)
+                return false;
+
+            // only hide cursor when game is focused, otherwise it should always be displayed.
+            if (gameActive.Value)
+            {
+                // do not display when last input is not mouse.
+                if (hideCursorOnNonMouseInput && !lastInputWasMouse.Value)
+                    return false;
+
+                // do not display when game is idle.
+                if (gameIdle.Value)
+                    return false;
+            }
+
+            return true;
         }
 
         protected override void Update()
@@ -163,11 +243,11 @@ namespace osu.Game.Graphics.Cursor
 
         public class Cursor : Container
         {
-            private Container cursorContainer;
-            private Bindable<float> cursorScale;
+            private Container cursorContainer = null!;
+            private Bindable<float> cursorScale = null!;
             private const float base_scale = 0.15f;
 
-            public Sprite AdditiveLayer;
+            public Sprite AdditiveLayer = null!;
 
             public Cursor()
             {
@@ -201,6 +281,40 @@ namespace osu.Game.Graphics.Cursor
 
                 cursorScale = config.GetBindable<float>(OsuSetting.MenuCursorSize);
                 cursorScale.BindValueChanged(scale => cursorContainer.Scale = new Vector2(scale.NewValue * base_scale), true);
+            }
+        }
+
+        private class MouseInputDetector : Component
+        {
+            /// <summary>
+            /// Whether the last input applied to the game is sourced from mouse.
+            /// </summary>
+            public IBindable<bool> LastInputWasMouseSource => lastInputWasMouseSource;
+
+            private readonly Bindable<bool> lastInputWasMouseSource = new Bindable<bool>();
+
+            public MouseInputDetector()
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            protected override bool Handle(UIEvent e)
+            {
+                switch (e)
+                {
+                    case MouseDownEvent:
+                    case MouseMoveEvent:
+                        lastInputWasMouseSource.Value = true;
+                        return false;
+
+                    case KeyDownEvent keyDown when !keyDown.Repeat:
+                    case JoystickPressEvent:
+                    case MidiDownEvent:
+                        lastInputWasMouseSource.Value = false;
+                        return false;
+                }
+
+                return false;
             }
         }
 
