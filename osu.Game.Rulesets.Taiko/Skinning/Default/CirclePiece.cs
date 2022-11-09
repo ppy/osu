@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
@@ -35,6 +33,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         private const double pre_beat_transition_time = 80;
 
         private const float flash_opacity = 0.3f;
+
+        [Resolved]
+        private DrawableHitObject drawableHitObject { get; set; } = null!;
 
         private Color4 accentColour;
 
@@ -155,9 +156,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                 Radius = KiaiMode ? 32 : 8
             };
         }
-
-        [Resolved]
-        private DrawableHitObject drawableHitObject { get; set; }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
