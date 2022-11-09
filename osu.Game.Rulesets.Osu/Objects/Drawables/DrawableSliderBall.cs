@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Children = new[]
             {
-                new SkinnableDrawable(new OsuSkinLookup(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle())
+                new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle())
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Masking = true
                 },
-                ball = new SkinnableDrawable(new OsuSkinLookup(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall())
+                ball = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

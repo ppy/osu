@@ -28,7 +28,7 @@ namespace osu.Game.Skinning
         /// </summary>
         protected virtual bool AllowFallingBackToParent => true;
 
-        protected virtual bool AllowDrawableLookup(ISkinLookup lookup) => true;
+        protected virtual bool AllowDrawableLookup(ISkinComponentLookup lookup) => true;
 
         protected virtual bool AllowTextureLookup(string componentName) => true;
 
@@ -107,7 +107,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public Drawable? GetDrawableComponent(ISkinLookup lookup)
+        public Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
             foreach (var (_, lookupWrapper) in skinSources)
             {
@@ -238,7 +238,7 @@ namespace osu.Game.Skinning
                 this.provider = provider;
             }
 
-            public Drawable? GetDrawableComponent(ISkinLookup lookup)
+            public Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
             {
                 if (provider.AllowDrawableLookup(lookup))
                     return skin.GetDrawableComponent(lookup);

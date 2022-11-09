@@ -43,7 +43,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        protected override bool AllowDrawableLookup(ISkinLookup lookup)
+        protected override bool AllowDrawableLookup(ISkinComponentLookup lookup)
         {
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");

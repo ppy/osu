@@ -19,7 +19,7 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="lookup">The requested component.</param>
         /// <returns>A drawable representation for the requested component, or null if unavailable.</returns>
-        Drawable? GetDrawableComponent(ISkinLookup lookup);
+        Drawable? GetDrawableComponent(ISkinComponentLookup lookup);
 
         /// <summary>
         /// Retrieve a <see cref="Texture"/>.

@@ -59,17 +59,17 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Drawable? GetDrawableComponent(ISkinLookup lookup)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
             if (base.GetDrawableComponent(lookup) is Drawable c)
                 return c;
 
             switch (lookup)
             {
-                case GlobalSkinLookup target:
+                case GlobalSkinComponentLookup target:
                     switch (target.Lookup)
                     {
-                        case GlobalSkinLookup.LookupType.SongSelect:
+                        case GlobalSkinComponentLookup.LookupType.SongSelect:
                             var songSelectComponents = new SkinnableTargetComponentsContainer(_ =>
                             {
                                 // do stuff when we need to.
@@ -77,7 +77,7 @@ namespace osu.Game.Skinning
 
                             return songSelectComponents;
 
-                        case GlobalSkinLookup.LookupType.MainHUDComponents:
+                        case GlobalSkinComponentLookup.LookupType.MainHUDComponents:
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
                                 var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();

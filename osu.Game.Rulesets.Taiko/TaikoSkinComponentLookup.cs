@@ -5,9 +5,9 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko
 {
-    public class TaikoSkinLookup : GameplaySkinLookup<TaikoSkinComponents>
+    public class TaikoSkinComponentLookup : GameplaySkinComponentLookup<TaikoSkinComponents>
     {
-        public TaikoSkinLookup(TaikoSkinComponents component)
+        public TaikoSkinComponentLookup(TaikoSkinComponents component)
             : base(component)
         {
         }

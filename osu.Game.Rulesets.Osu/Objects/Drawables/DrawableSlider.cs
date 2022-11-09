@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        Body = new SkinnableDrawable(new OsuSkinLookup(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
+                        Body = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
                         tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
                         tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                         repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },

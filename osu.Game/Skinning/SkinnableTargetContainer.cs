@@ -13,7 +13,7 @@ namespace osu.Game.Skinning
     {
         private SkinnableTargetComponentsContainer? content;
 
-        public GlobalSkinLookup.LookupType Target { get; }
+        public GlobalSkinComponentLookup.LookupType Target { get; }
 
         public IBindableList<ISkinnableDrawable> Components => components;
 
@@ -25,7 +25,7 @@ namespace osu.Game.Skinning
 
         private CancellationTokenSource? cancellationSource;
 
-        public SkinnableTargetContainer(GlobalSkinLookup.LookupType target)
+        public SkinnableTargetContainer(GlobalSkinComponentLookup.LookupType target)
         {
             Target = target;
         }
@@ -39,7 +39,7 @@ namespace osu.Game.Skinning
             components.Clear();
             ComponentsLoaded = false;
 
-            content = CurrentSkin.GetDrawableComponent(new GlobalSkinLookup(Target)) as SkinnableTargetComponentsContainer;
+            content = CurrentSkin.GetDrawableComponent(new GlobalSkinComponentLookup(Target)) as SkinnableTargetComponentsContainer;
 
             cancellationSource?.Cancel();
             cancellationSource = null;

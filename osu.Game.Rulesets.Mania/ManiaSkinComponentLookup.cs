@@ -5,13 +5,13 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania
 {
-    public class ManiaSkinLookup : GameplaySkinLookup<ManiaSkinComponents>
+    public class ManiaSkinComponentLookup : GameplaySkinComponentLookup<ManiaSkinComponents>
     {
         /// <summary>
-        /// Creates a new <see cref="ManiaSkinLookup"/>.
+        /// Creates a new <see cref="ManiaSkinComponentLookup"/>.
         /// </summary>
         /// <param name="component">The component.</param>
-        public ManiaSkinLookup(ManiaSkinComponents component)
+        public ManiaSkinComponentLookup(ManiaSkinComponents component)
             : base(component)
         {
         }

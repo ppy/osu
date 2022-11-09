@@ -3,16 +3,16 @@
 
 using osu.Game.Skinning;
 
-namespace osu.Game.Rulesets.Catch
+namespace osu.Game.Rulesets.Osu
 {
-    public class CatchSkinLookup : GameplaySkinLookup<CatchSkinComponents>
+    public class OsuSkinComponentLookup : GameplaySkinComponentLookup<OsuSkinComponents>
     {
-        public CatchSkinLookup(CatchSkinComponents component)
+        public OsuSkinComponentLookup(OsuSkinComponents component)
             : base(component)
         {
         }
 
-        protected override string RulesetPrefix => "catch"; // todo: use CatchRuleset.SHORT_NAME;
+        protected override string RulesetPrefix => OsuRuleset.SHORT_NAME;
 
         protected override string ComponentName => Component.ToString().ToLowerInvariant();
     }

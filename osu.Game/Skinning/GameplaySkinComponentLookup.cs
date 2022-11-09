@@ -5,12 +5,12 @@ using System.Linq;
 
 namespace osu.Game.Skinning
 {
-    public class GameplaySkinLookup<T> : ISkinLookup
+    public class GameplaySkinComponentLookup<T> : ISkinComponentLookup
         where T : notnull
     {
         public readonly T Component;
 
-        public GameplaySkinLookup(T component)
+        public GameplaySkinComponentLookup(T component)
         {
             Component = component;
         }

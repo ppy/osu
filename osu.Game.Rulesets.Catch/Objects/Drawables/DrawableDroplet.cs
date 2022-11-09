@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         private void load()
         {
             ScalingContainer.Child = new SkinnableDrawable(
-                new CatchSkinLookup(CatchSkinComponents.Droplet),
+                new CatchSkinComponentLookup(CatchSkinComponents.Droplet),
                 _ => new DropletPiece());
         }
 

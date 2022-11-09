@@ -11,10 +11,10 @@ namespace osu.Game.Skinning
     /// to scope particular lookup variations. Using this, a ruleset or skin implementation could make its own lookup
     /// type to scope away from more global contexts.
     ///
-    /// More commonly, a ruleset could make use of <see cref="GameplaySkinLookup{T}"/> to do a simple lookup based on
+    /// More commonly, a ruleset could make use of <see cref="GameplaySkinComponentLookup{T}"/> to do a simple lookup based on
     /// a provided enum.
     /// </remarks>
-    public interface ISkinLookup
+    public interface ISkinComponentLookup
     {
         string LookupName { get; }
     }

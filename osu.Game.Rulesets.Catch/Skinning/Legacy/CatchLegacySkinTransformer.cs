@@ -25,13 +25,13 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
         }
 
-        public override Drawable? GetDrawableComponent(ISkinLookup lookup)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is GlobalSkinLookup targetComponent)
+            if (lookup is GlobalSkinComponentLookup targetComponent)
             {
                 switch (targetComponent.Lookup)
                 {
-                    case GlobalSkinLookup.LookupType.MainHUDComponents:
+                    case GlobalSkinComponentLookup.LookupType.MainHUDComponents:
                         var components = base.GetDrawableComponent(lookup) as SkinnableTargetComponentsContainer;
 
                         if (providesComboCounter && components != null)
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 }
             }
 
-            if (lookup is CatchSkinLookup catchSkinComponent)
+            if (lookup is CatchSkinComponentLookup catchSkinComponent)
             {
                 switch (catchSkinComponent.Component)
                 {
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     {
                         case CatchSkinConfiguration.FlipCatcherPlate:
                             // Don't flip catcher plate contents if the catcher is provided by this legacy skin.
-                            if (GetDrawableComponent(new CatchSkinLookup(CatchSkinComponents.Catcher)) != null)
+                            if (GetDrawableComponent(new CatchSkinComponentLookup(CatchSkinComponents.Catcher)) != null)
                                 return (IBindable<TValue>)new Bindable<bool>();
 
                             break;
