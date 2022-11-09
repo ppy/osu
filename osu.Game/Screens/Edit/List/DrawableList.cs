@@ -17,6 +17,18 @@ namespace osu.Game.Screens.Edit.List
     public class DrawableList<T> : RearrangeableListContainer<T>, IDrawableListItem<T>
         where T : Drawable
     {
+        private Action<RearrangeableListItem<T>, MouseButtonEvent> onDragAction { get; set; }
+
+        public Action<RearrangeableListItem<T>, MouseButtonEvent> OnDragAction
+        {
+            get => onDragAction;
+            set
+            {
+                onDragAction = value;
+                UpdateItem();
+            }
+        }
+
         private Action<SelectionState> selectAll;
 
         public Action<SelectionState> SelectAll
@@ -45,6 +57,7 @@ namespace osu.Game.Screens.Edit.List
         {
             getName = ((IDrawableListItem<T>)this).GetDefaultText;
             selectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
+            onDragAction = (_, _) => { };
 
             RelativeSizeAxes = Axes.X;
             //todo: compute this somehow add runtime
@@ -106,6 +119,7 @@ namespace osu.Game.Screens.Edit.List
                 {
                     rearrangableItem.SelectAll = selectAll;
                     rearrangableItem.GetName = getName;
+                    rearrangableItem.OnDragAction = OnDragAction;
                     rearrangableItem.UpdateItem();
                 }
             }

@@ -213,6 +213,25 @@ namespace osu.Game.Skinning.Editor
             layerSidebarSection.Clear();
             layerSidebarSection.Child = LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>();
             LayerSidebarList.GetName = t => ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)LayerSidebarList).GetDefaultText((Drawable)t.Item);
+            LayerSidebarList.OnDragAction = (_, _) =>
+            {
+                foreach (var listItem in LayerSidebarList.List.Items)
+                {
+                    int depth = LayerSidebarList.List.Items.IndexOf(listItem);
+
+                    if (listItem.Item.Parent is Container<Drawable> container)
+                    {
+                        container.ChangeChildDepth((Drawable)listItem.Item, depth);
+                        container.Invalidate();
+                    }
+
+                    if (listItem.Parent is Container<Drawable> containerM)
+                    {
+                        containerM.ChangeChildDepth(listItem, depth);
+                        containerM.Invalidate();
+                    }
+                }
+            };
         }
 
         protected override void LoadComplete()
