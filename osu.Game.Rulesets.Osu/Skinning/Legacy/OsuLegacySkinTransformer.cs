@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -30,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             hasHitCircle = new Lazy<bool>(() => GetTexture("hitcircle") != null);
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponent component)
         {
             if (component is OsuSkinComponent osuComponent)
             {
@@ -145,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             return base.GetDrawableComponent(component);
         }
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
             {

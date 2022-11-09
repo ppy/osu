@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
@@ -19,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     public class ReverseArrowPiece : BeatSyncedContainer
     {
         [Resolved]
-        private DrawableHitObject drawableRepeat { get; set; }
+        private DrawableHitObject drawableRepeat { get; set; } = null!;
 
         public ReverseArrowPiece()
         {
