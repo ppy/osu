@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             accentColour.BindValueChanged(colour => Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
         }
 
-        protected override Drawable CreateDefault(ISkinLookup lookup)
+        protected override Drawable CreateDefault(ISkinComponentLookup lookup)
         {
             var drawable = base.CreateDefault(lookup);
 

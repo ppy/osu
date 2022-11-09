@@ -81,12 +81,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                CirclePiece = new SkinnableDrawable(new OsuSkinLookup(CirclePieceComponent), _ => new MainCirclePiece())
+                                CirclePiece = new SkinnableDrawable(new OsuSkinComponentLookup(CirclePieceComponent), _ => new MainCirclePiece())
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                 },
-                                ApproachCircle = new ProxyableSkinnableDrawable(new OsuSkinLookup(OsuSkinComponents.ApproachCircle), _ => new DefaultApproachCircle())
+                                ApproachCircle = new ProxyableSkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.ApproachCircle), _ => new DefaultApproachCircle())
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             public override bool RemoveWhenNotAlive => false;
 
-            public ProxyableSkinnableDrawable(ISkinLookup lookup, Func<ISkinLookup, Drawable> defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
+            public ProxyableSkinnableDrawable(ISkinComponentLookup lookup, Func<ISkinComponentLookup, Drawable> defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
                 : base(lookup, defaultImplementation, confineMode)
             {
             }

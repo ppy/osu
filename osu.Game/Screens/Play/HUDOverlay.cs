@@ -391,7 +391,7 @@ namespace osu.Game.Screens.Play
             private OsuConfigManager config { get; set; }
 
             public MainComponentsContainer()
-                : base(GlobalSkinLookup.LookupType.MainHUDComponents)
+                : base(GlobalSkinComponentLookup.LookupType.MainHUDComponents)
             {
                 RelativeSizeAxes = Axes.Both;
             }

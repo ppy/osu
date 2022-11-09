@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         headContainer = new Container<DrawableHoldNoteHead> { RelativeSizeAxes = Axes.Both }
                     }
                 },
-                bodyPiece = new SkinnableDrawable(new ManiaSkinLookup(ManiaSkinComponents.HoldNoteBody), _ => new DefaultBodyPiece
+                bodyPiece = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.HoldNoteBody), _ => new DefaultBodyPiece
                 {
                     RelativeSizeAxes = Axes.Both,
                 })

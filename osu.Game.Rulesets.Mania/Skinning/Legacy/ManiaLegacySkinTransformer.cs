@@ -74,14 +74,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             });
         }
 
-        public override Drawable GetDrawableComponent(ISkinLookup lookup)
+        public override Drawable GetDrawableComponent(ISkinComponentLookup lookup)
         {
             switch (lookup)
             {
-                case GameplaySkinLookup<HitResult> resultComponent:
+                case GameplaySkinComponentLookup<HitResult> resultComponent:
                     return getResult(resultComponent.Component);
 
-                case ManiaSkinLookup maniaComponent:
+                case ManiaSkinComponentLookup maniaComponent:
                     if (!isLegacySkin.Value || !hasKeyTexture.Value)
                         return null;
 

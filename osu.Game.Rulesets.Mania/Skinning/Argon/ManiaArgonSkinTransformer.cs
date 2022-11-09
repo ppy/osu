@@ -22,14 +22,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             this.beatmap = (ManiaBeatmap)beatmap;
         }
 
-        public override Drawable? GetDrawableComponent(ISkinLookup lookup)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
             switch (lookup)
             {
-                case GameplaySkinLookup<HitResult> resultComponent:
+                case GameplaySkinComponentLookup<HitResult> resultComponent:
                     return new ArgonJudgementPiece(resultComponent.Component);
 
-                case ManiaSkinLookup maniaComponent:
+                case ManiaSkinComponentLookup maniaComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (maniaComponent.Component)
                     {

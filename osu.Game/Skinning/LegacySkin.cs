@@ -322,17 +322,17 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Drawable? GetDrawableComponent(ISkinLookup lookup)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
             if (base.GetDrawableComponent(lookup) is Drawable c)
                 return c;
 
             switch (lookup)
             {
-                case GlobalSkinLookup target:
+                case GlobalSkinComponentLookup target:
                     switch (target.Lookup)
                     {
-                        case GlobalSkinLookup.LookupType.MainHUDComponents:
+                        case GlobalSkinComponentLookup.LookupType.MainHUDComponents:
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
@@ -379,7 +379,7 @@ namespace osu.Game.Skinning
 
                     return null;
 
-                case GameplaySkinLookup<HitResult> resultComponent:
+                case GameplaySkinComponentLookup<HitResult> resultComponent:
 
                     // kind of wasteful that we throw this away, but should do for now.
                     if (getJudgementAnimation(resultComponent.Component) != null)
@@ -397,7 +397,7 @@ namespace osu.Game.Skinning
 
                     return null;
 
-                case SkinnableSprite.SpriteLookup sprite:
+                case SkinnableSprite.SpriteComponentLookup sprite:
                     return this.GetAnimation(sprite.LookupName, false, false);
             }
 

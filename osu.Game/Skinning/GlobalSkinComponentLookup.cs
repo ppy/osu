@@ -3,13 +3,13 @@
 
 namespace osu.Game.Skinning
 {
-    public class GlobalSkinLookup : ISkinLookup
+    public class GlobalSkinComponentLookup : ISkinComponentLookup
     {
         public readonly LookupType Lookup;
 
         public string LookupName => Lookup.ToString();
 
-        public GlobalSkinLookup(LookupType lookup)
+        public GlobalSkinComponentLookup(LookupType lookup)
         {
             Lookup = lookup;
         }

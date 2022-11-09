@@ -37,8 +37,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public override bool RemoveWhenNotAlive => true;
 
-        protected CaughtObject(CatchSkinComponents skinComponent, Func<ISkinLookup, Drawable> defaultImplementation)
-            : base(new CatchSkinLookup(skinComponent), defaultImplementation)
+        protected CaughtObject(CatchSkinComponents skinComponent, Func<ISkinComponentLookup, Drawable> defaultImplementation)
+            : base(new CatchSkinComponentLookup(skinComponent), defaultImplementation)
         {
             Origin = Anchor.Centre;
 

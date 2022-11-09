@@ -27,16 +27,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             hasExplosion = new Lazy<bool>(() => GetTexture(getHitName(TaikoSkinComponents.TaikoExplosionGreat)) != null);
         }
 
-        public override Drawable? GetDrawableComponent(ISkinLookup lookup)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is GameplaySkinLookup<HitResult>)
+            if (lookup is GameplaySkinComponentLookup<HitResult>)
             {
                 // if a taiko skin is providing explosion sprites, hide the judgements completely
                 if (hasExplosion.Value)
                     return Drawable.Empty().With(d => d.Expire());
             }
 
-            if (lookup is TaikoSkinLookup taikoComponent)
+            if (lookup is TaikoSkinComponentLookup taikoComponent)
             {
                 switch (taikoComponent.Component)
                 {

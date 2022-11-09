@@ -28,9 +28,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             hasHitCircle = new Lazy<bool>(() => GetTexture("hitcircle") != null);
         }
 
-        public override Drawable? GetDrawableComponent(ISkinLookup lookup)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is OsuSkinLookup osuComponent)
+            if (lookup is OsuSkinComponentLookup osuComponent)
             {
                 switch (osuComponent.Component)
                 {

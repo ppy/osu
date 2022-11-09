@@ -13,11 +13,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
         {
         }
 
-        public override Drawable? GetDrawableComponent(ISkinLookup lookup)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
             switch (lookup)
             {
-                case CatchSkinLookup catchComponent:
+                case CatchSkinComponentLookup catchComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (catchComponent.Component)
                     {

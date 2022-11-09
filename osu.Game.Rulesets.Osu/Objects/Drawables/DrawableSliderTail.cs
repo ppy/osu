@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Children = new Drawable[]
                     {
                         // no default for this; only visible in legacy skins.
-                        CirclePiece = new SkinnableDrawable(new OsuSkinLookup(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
                     }
                 },
             });

@@ -18,7 +18,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// The definition of this target.
         /// </summary>
-        GlobalSkinLookup.LookupType Target { get; }
+        GlobalSkinComponentLookup.LookupType Target { get; }
 
         /// <summary>
         /// A bindable list of components which are being tracked by this skinnable target.
