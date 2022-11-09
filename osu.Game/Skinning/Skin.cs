@@ -37,9 +37,9 @@ namespace osu.Game.Skinning
 
         public SkinConfiguration Configuration { get; set; }
 
-        public IDictionary<SkinnableTarget, SkinnableInfo[]> DrawableComponentInfo => drawableComponentInfo;
+        public IDictionary<GlobalSkinLookup.LookupType, SkinnableInfo[]> DrawableComponentInfo => drawableComponentInfo;
 
-        private readonly Dictionary<SkinnableTarget, SkinnableInfo[]> drawableComponentInfo = new Dictionary<SkinnableTarget, SkinnableInfo[]>();
+        private readonly Dictionary<GlobalSkinLookup.LookupType, SkinnableInfo[]> drawableComponentInfo = new Dictionary<GlobalSkinLookup.LookupType, SkinnableInfo[]>();
 
         public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
@@ -97,7 +97,7 @@ namespace osu.Game.Skinning
                 Configuration = new SkinConfiguration();
 
             // skininfo files may be null for default skin.
-            foreach (SkinnableTarget skinnableTarget in Enum.GetValues(typeof(SkinnableTarget)))
+            foreach (GlobalSkinLookup.LookupType skinnableTarget in Enum.GetValues(typeof(GlobalSkinLookup.LookupType)))
             {
                 string filename = $"{skinnableTarget}.json";
 
@@ -158,8 +158,8 @@ namespace osu.Game.Skinning
         {
             switch (lookup)
             {
-                case SkinnableTargetLookup target:
-                    if (!DrawableComponentInfo.TryGetValue(target.Target, out var skinnableInfo))
+                case GlobalSkinLookup target:
+                    if (!DrawableComponentInfo.TryGetValue(target.Lookup, out var skinnableInfo))
                         return null;
 
                     var components = new List<Drawable>();
