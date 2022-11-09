@@ -7,8 +7,6 @@ namespace osu.Game.Skinning
     {
         public readonly LookupType Lookup;
 
-        public string LookupName => Lookup.ToString();
-
         public GlobalSkinComponentLookup(LookupType lookup)
         {
             Lookup = lookup;

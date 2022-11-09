@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
@@ -88,6 +87,16 @@ namespace osu.Game.Skinning
 
             switch (lookup)
             {
+                case SkinnableSprite.SpriteComponentLookup spriteLookup:
+                    switch (spriteLookup.LookupName)
+                    {
+                        // Temporary until default skin has a valid hit lighting.
+                        case @"lighting":
+                            return Drawable.Empty();
+                    }
+
+                    break;
+
                 case GlobalSkinComponentLookup globalLookup:
                     switch (globalLookup.Lookup)
                     {
@@ -177,16 +186,6 @@ namespace osu.Game.Skinning
 
                     return null;
             }
-
-            switch (lookup.LookupName)
-            {
-                // Temporary until default skin has a valid hit lighting.
-                case @"lighting":
-                    return Drawable.Empty();
-            }
-
-            if (GetTexture(lookup.LookupName) is Texture t)
-                return new Sprite { Texture = t };
 
             return null;
         }
