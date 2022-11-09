@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Play.HUD
                 orderedByScore[i].ScorePosition = i + 1;
             }
 
-            // change displayed potision to '#?' when there are 50 already submitted scores and tracked score is last
+            // change displayed potision to '-' when there are 50 already submitted scores and tracked score is last
             if (TrackedScore?.ScorePosition == Flow.Count && Flow.Count == 51)
                 TrackedScore.ScorePosition = null;
 
