@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -47,9 +45,9 @@ namespace osu.Game.Skinning
             this.resources = resources;
         }
 
-        public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Textures?.Get(componentName, wrapModeS, wrapModeT);
+        public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Textures?.Get(componentName, wrapModeS, wrapModeT);
 
-        public override ISample GetSample(ISampleInfo sampleInfo)
+        public override ISample? GetSample(ISampleInfo sampleInfo)
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
@@ -61,7 +59,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponent component)
         {
             if (base.GetDrawableComponent(component) is Drawable c)
                 return c;
@@ -171,7 +169,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             // todo: this code is pulled from LegacySkin and should not exist.
             // will likely change based on how databased storage of skin configuration goes.
@@ -181,7 +179,7 @@ namespace osu.Game.Skinning
                     switch (global)
                     {
                         case GlobalSkinColours.ComboColours:
-                            return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(Configuration.ComboColours));
+                            return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>?>(Configuration.ComboColours));
                     }
 
                     break;

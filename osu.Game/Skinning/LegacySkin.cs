@@ -9,6 +9,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -379,12 +380,13 @@ namespace osu.Game.Skinning
                     return null;
 
                 case GameplaySkinComponent<HitResult> resultComponent:
-                    // TODO: this should be inside the judgement pieces.
-                    Func<Drawable?> createDrawable = () => getJudgementAnimation(resultComponent.Component);
 
                     // kind of wasteful that we throw this away, but should do for now.
-                    if (createDrawable() != null)
+                    if (getJudgementAnimation(resultComponent.Component) != null)
                     {
+                        // TODO: this should be inside the judgement pieces.
+                        Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component).AsNonNull();
+
                         var particle = getParticleTexture(resultComponent.Component);
 
                         if (particle != null)
