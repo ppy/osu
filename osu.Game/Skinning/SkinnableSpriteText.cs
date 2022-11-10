@@ -9,8 +9,8 @@ namespace osu.Game.Skinning
 {
     public class SkinnableSpriteText : SkinnableDrawable, IHasText
     {
-        public SkinnableSpriteText(ISkinComponent component, Func<ISkinComponent, SpriteText> defaultImplementation, ConfineMode confineMode = ConfineMode.NoScaling)
-            : base(component, defaultImplementation, confineMode)
+        public SkinnableSpriteText(ISkinComponentLookup lookup, Func<ISkinComponentLookup, SpriteText> defaultImplementation, ConfineMode confineMode = ConfineMode.NoScaling)
+            : base(lookup, defaultImplementation, confineMode)
         {
         }
 

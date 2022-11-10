@@ -90,8 +90,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         protected override SkinnableDrawable CreateMainPiece() => HitObject.Type == HitType.Centre
-            ? new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.CentreHit), _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit)
-            : new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.RimHit), _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
+            ? new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.CentreHit), _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit)
+            : new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.RimHit), _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
 
         public override IEnumerable<HitSampleInfo> GetSamples()
         {

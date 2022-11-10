@@ -31,25 +31,25 @@ namespace osu.Game.Skinning
             set => base.AutoSizeAxes = value;
         }
 
-        protected readonly ISkinComponent Component;
+        protected readonly ISkinComponentLookup ComponentLookup;
 
         private readonly ConfineMode confineMode;
 
         /// <summary>
         /// Create a new skinnable drawable.
         /// </summary>
-        /// <param name="component">The namespace-complete resource name for this skinnable element.</param>
+        /// <param name="lookup">The namespace-complete resource name for this skinnable element.</param>
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
         /// <param name="confineMode">How (if at all) the <see cref="Drawable"/> should be resize to fit within our own bounds.</param>
-        public SkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable>? defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
-            : this(component, confineMode)
+        public SkinnableDrawable(ISkinComponentLookup lookup, Func<ISkinComponentLookup, Drawable>? defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
+            : this(lookup, confineMode)
         {
             createDefault = defaultImplementation;
         }
 
-        protected SkinnableDrawable(ISkinComponent component, ConfineMode confineMode = ConfineMode.NoScaling)
+        protected SkinnableDrawable(ISkinComponentLookup lookup, ConfineMode confineMode = ConfineMode.NoScaling)
         {
-            Component = component;
+            ComponentLookup = lookup;
             this.confineMode = confineMode;
 
             RelativeSizeAxes = Axes.Both;
@@ -60,13 +60,13 @@ namespace osu.Game.Skinning
         /// </summary>
         public void ResetAnimation() => (Drawable as IFramedAnimation)?.GotoFrame(0);
 
-        private readonly Func<ISkinComponent, Drawable>? createDefault;
+        private readonly Func<ISkinComponentLookup, Drawable>? createDefault;
 
         private readonly Cached scaling = new Cached();
 
         private bool isDefault;
 
-        protected virtual Drawable CreateDefault(ISkinComponent component) => createDefault?.Invoke(component) ?? Empty();
+        protected virtual Drawable CreateDefault(ISkinComponentLookup lookup) => createDefault?.Invoke(lookup) ?? Empty();
 
         /// <summary>
         /// Whether to apply size restrictions (specified via <see cref="confineMode"/>) to the default implementation.
@@ -75,11 +75,11 @@ namespace osu.Game.Skinning
 
         protected override void SkinChanged(ISkinSource skin)
         {
-            var retrieved = skin.GetDrawableComponent(Component);
+            var retrieved = skin.GetDrawableComponent(ComponentLookup);
 
             if (retrieved == null)
             {
-                Drawable = CreateDefault(Component);
+                Drawable = CreateDefault(ComponentLookup);
                 isDefault = true;
             }
             else

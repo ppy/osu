@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             Origin = Anchor.Centre;
 
-            InternalChild = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.FollowPoint), _ => new CircularContainer
+            InternalChild = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.FollowPoint), _ => new CircularContainer
             {
                 Masking = true,
                 AutoSizeAxes = Axes.Both,

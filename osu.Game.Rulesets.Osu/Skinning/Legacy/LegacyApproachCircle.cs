@@ -35,9 +35,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             accentColour.BindValueChanged(colour => Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
         }
 
-        protected override Drawable CreateDefault(ISkinComponent component)
+        protected override Drawable CreateDefault(ISkinComponentLookup lookup)
         {
-            var drawable = base.CreateDefault(component);
+            var drawable = base.CreateDefault(lookup);
 
             // account for the sprite being used for the default approach circle being taken from stable,
             // when hitcircles have 5px padding on each size. this should be removed if we update the sprite.

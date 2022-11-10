@@ -28,17 +28,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             hasHitCircle = new Lazy<bool>(() => GetTexture("hitcircle") != null);
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (component is OsuSkinComponent osuComponent)
+            if (lookup is OsuSkinComponentLookup osuComponent)
             {
                 switch (osuComponent.Component)
                 {
                     case OsuSkinComponents.FollowPoint:
-                        return this.GetAnimation(component.LookupName, true, true, true, startAtCurrentTime: false);
+                        return this.GetAnimation("followpoint", true, true, true, startAtCurrentTime: false);
 
                     case OsuSkinComponents.SliderScorePoint:
-                        return this.GetAnimation(component.LookupName, false, false);
+                        return this.GetAnimation("sliderscorepoint", false, false);
 
                     case OsuSkinComponents.SliderFollowCircle:
                         var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true);
@@ -136,11 +136,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return new LegacyApproachCircle();
 
                     default:
-                        throw new UnsupportedSkinComponentException(component);
+                        throw new UnsupportedSkinComponentException(lookup);
                 }
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
 
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)

@@ -3,16 +3,16 @@
 
 using osu.Game.Skinning;
 
-namespace osu.Game.Rulesets.Taiko
+namespace osu.Game.Rulesets.Osu
 {
-    public class TaikoSkinComponent : GameplaySkinComponent<TaikoSkinComponents>
+    public class OsuSkinComponentLookup : GameplaySkinComponentLookup<OsuSkinComponents>
     {
-        public TaikoSkinComponent(TaikoSkinComponents component)
+        public OsuSkinComponentLookup(OsuSkinComponents component)
             : base(component)
         {
         }
 
-        protected override string RulesetPrefix => TaikoRuleset.SHORT_NAME;
+        protected override string RulesetPrefix => OsuRuleset.SHORT_NAME;
 
         protected override string ComponentName => Component.ToString().ToLowerInvariant();
     }

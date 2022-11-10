@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             AutoSizeAxes = Axes.Both;
 
-            string lookupName = new OsuSkinComponent(OsuSkinComponents.ReverseArrow).LookupName;
+            string lookupName = new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow).LookupName;
 
             var skin = skinSource.FindProvider(s => s.GetTexture(lookupName) != null);
             InternalChild = skin?.GetAnimation(lookupName, true, true) ?? Empty();
