@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
@@ -18,14 +16,14 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 
         public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
 
-        protected override BorderPiece BorderPiece { get; }
-        protected override HyperBorderPiece HyperBorderPiece { get; }
+        protected override Drawable BorderPiece { get; }
+        protected override Drawable HyperBorderPiece { get; }
 
         public FruitPiece()
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 new FruitPulpFormation
                 {

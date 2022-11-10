@@ -32,13 +32,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollTick),
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick),
             _ => new TickPiece
             {
                 Filled = HitObject.FirstTick
             });
 
-        protected override double MaximumJudgementOffset => HitObject.HitWindow;
+        public override double MaximumJudgementOffset => HitObject.HitWindow;
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {

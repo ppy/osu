@@ -197,18 +197,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Applies a hit object to be represented by this <see cref="DrawableHitObject"/>.
-        /// </summary>
-        [Obsolete("Use either overload of Apply that takes a single argument of type HitObject or HitObjectLifetimeEntry")] // Can be removed 20211021.
-        public void Apply([NotNull] HitObject hitObject, [CanBeNull] HitObjectLifetimeEntry lifetimeEntry)
-        {
-            if (lifetimeEntry != null)
-                Apply(lifetimeEntry);
-            else
-                Apply(hitObject);
-        }
-
-        /// <summary>
         /// Applies a new <see cref="HitObject"/> to be represented by this <see cref="DrawableHitObject"/>.
         /// A new <see cref="HitObjectLifetimeEntry"/> is automatically created and applied to this <see cref="DrawableHitObject"/>.
         /// </summary>
@@ -278,6 +266,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     updateState(ArmedState.Miss, true);
                 else
                     updateState(ArmedState.Idle, true);
+
+                // Combo colour may have been applied via a bindable flow while no object entry was attached.
+                // Update here to ensure we're in a good state.
+                UpdateComboColour();
             }
         }
 
@@ -651,7 +643,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <remarks>
         /// This does not affect the time offset provided to invocations of <see cref="CheckForResult"/>.
         /// </remarks>
-        protected virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
+        public virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
 
         /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as

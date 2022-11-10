@@ -39,7 +39,7 @@ namespace osu.Game.Configuration
         {
             // UI/selection defaults
             SetDefault(OsuSetting.Ruleset, string.Empty);
-            SetDefault(OsuSetting.Skin, SkinInfo.TRIANGLES_SKIN.ToString());
+            SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
             SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
@@ -118,16 +118,14 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Prefer24HourTime, CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
 
             // Gameplay
-            SetDefault(OsuSetting.PositionalHitsounds, true); // replaced by level setting below, can be removed 20220703.
             SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
-            SetDefault(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
+            SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
-            SetDefault(OsuSetting.ShowProgressGraph, true);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
@@ -154,6 +152,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.SongSelectRightMouseScroll, false);
 
             SetDefault(OsuSetting.Scaling, ScalingMode.Off);
+            SetDefault(OsuSetting.SafeAreaConsiderations, true);
 
             SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
             SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
@@ -172,7 +171,9 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
-            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
+            SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 0.75f, 0.25f);
+            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
+            SetDefault(OsuSetting.EditorShowHitMarkers, true);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
         }
@@ -203,14 +204,11 @@ namespace osu.Game.Configuration
             if (!int.TryParse(pieces[0], out int year)) return;
             if (!int.TryParse(pieces[1], out int monthDay)) return;
 
+            // ReSharper disable once UnusedVariable
             int combined = (year * 10000) + monthDay;
 
-            if (combined < 20220103)
-            {
-                var positionalHitsoundsEnabled = GetBindable<bool>(OsuSetting.PositionalHitsounds);
-                if (!positionalHitsoundsEnabled.Value)
-                    SetValue(OsuSetting.PositionalHitsoundsLevel, 0);
-            }
+            // migrations can be added here using a condition like:
+            // if (combined < 20220103) { performMigration() }
         }
 
         public override TrackedSettings CreateTrackedSettings()
@@ -292,18 +290,16 @@ namespace osu.Game.Configuration
         GameplayCursorDuringTouch,
         DimLevel,
         BlurLevel,
+        EditorDim,
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
         GameplayLeaderboard,
-        PositionalHitsounds,
         PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,
         FloatingComments,
         HUDVisibilityMode,
 
-        // This has been migrated to the component itself. can be removed 20221027.
-        ShowProgressGraph,
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
         MouseDisableButtons,
@@ -370,6 +366,8 @@ namespace osu.Game.Configuration
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
-        LastProcessedMetadataId
+        LastProcessedMetadataId,
+        SafeAreaConsiderations,
+        EditorShowHitMarkers
     }
 }

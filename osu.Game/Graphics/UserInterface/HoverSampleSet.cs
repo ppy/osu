@@ -15,6 +15,9 @@ namespace osu.Game.Graphics.UserInterface
         [Description("button")]
         Button,
 
+        [Description("button-sidebar")]
+        ButtonSidebar,
+
         [Description("toolbar")]
         Toolbar,
 

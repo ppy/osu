@@ -11,27 +11,19 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition, IHasAccentColour
+    public class DrawableSliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
     {
         public const float FOLLOW_AREA = 2.4f;
 
         public Func<OsuAction?> GetInitialHitAction;
-
-        public Color4 AccentColour
-        {
-            get => ball.Colour;
-            set => ball.Colour = value;
-        }
 
         private Drawable followCircleReceptor;
         private DrawableSlider drawableSlider;
@@ -48,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Children = new[]
             {
-                new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle())
+                new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle())
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -61,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Masking = true
                 },
-                ball = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall())
+                ball = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -87,7 +79,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public override void ApplyTransformsAt(double time, bool propagateChildren = false)
         {
             // For the same reasons as above w.r.t rewinding, we shouldn't propagate to children here either.
-            // ReSharper disable once RedundantArgumentDefaultValue - removing the "redundant" default value triggers BaseMethodCallWithDefaultParameter
+
+            // ReSharper disable once RedundantArgumentDefaultValue
             base.ApplyTransformsAt(time, false);
         }
 
@@ -186,17 +179,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Vector2? lastPosition;
 
+        private bool rewinding;
+
         public void UpdateProgress(double completionProgress)
         {
             Position = drawableSlider.HitObject.CurvePositionAt(completionProgress);
 
             var diff = lastPosition.HasValue ? lastPosition.Value - Position : Position - drawableSlider.HitObject.CurvePositionAt(completionProgress + 0.01f);
 
+            if (Clock.ElapsedFrameTime != 0)
+                rewinding = Clock.ElapsedFrameTime < 0;
+
             // Ensure the value is substantially high enough to allow for Atan2 to get a valid angle.
             if (diff.LengthFast < 0.01f)
                 return;
 
-            ball.Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
+            ball.Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI) + (rewinding ? 180 : 0);
             lastPosition = Position;
         }
     }

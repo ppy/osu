@@ -70,6 +70,7 @@ namespace osu.Game
     /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
     /// for initial components that are generally retrieved via DI.
     /// </summary>
+    [Cached(typeof(OsuGame))]
     public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
     {
         /// <summary>
@@ -137,6 +138,11 @@ namespace osu.Game
         private IdleTracker idleTracker;
 
         /// <summary>
+        /// Whether the user is currently in an idle state.
+        /// </summary>
+        public IBindable<bool> IsIdle => idleTracker.IsIdle;
+
+        /// <summary>
         /// Whether overlays should be able to be opened game-wide. Value is sourced from the current active screen.
         /// </summary>
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
@@ -172,6 +178,8 @@ namespace osu.Game
         private IntroScreen introScreen;
 
         private Bindable<string> configRuleset;
+
+        private Bindable<bool> applySafeAreaConsiderations;
 
         private Bindable<float> uiScale;
 
@@ -266,8 +274,6 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            dependencies.CacheAs(this);
-
             SentryLogger.AttachUser(API.LocalUser);
 
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
@@ -276,10 +282,7 @@ namespace osu.Game
             configRuleset = LocalConfig.GetBindable<string>(OsuSetting.Ruleset);
             uiScale = LocalConfig.GetBindable<float>(OsuSetting.UIScale);
 
-            var preferredRuleset = int.TryParse(configRuleset.Value, out int rulesetId)
-                // int parsing can be removed 20220522
-                ? RulesetStore.GetRuleset(rulesetId)
-                : RulesetStore.GetRuleset(configRuleset.Value);
+            var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
 
             try
             {
@@ -308,6 +311,9 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
+
+            applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
+            applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -561,9 +567,20 @@ namespace osu.Game
                 return;
             }
 
+            // This should be able to be performed from song select, but that is disabled for now
+            // due to the weird decoupled ruleset logic (which can cause a crash in certain filter scenarios).
+            //
+            // As a special case, if the beatmap and ruleset already match, allow immediately displaying the score from song select.
+            // This is guaranteed to not crash, and feels better from a user's perspective (ie. if they are clicking a score in the
+            // song select leaderboard).
+            IEnumerable<Type> validScreens =
+                Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap) && Ruleset.Value.Equals(databasedScore.ScoreInfo.Ruleset)
+                    ? new[] { typeof(SongSelect) }
+                    : Array.Empty<Type>();
+
             PerformFromScreen(screen =>
             {
-                Logger.Log($"{nameof(PresentScore)} updating beatmap ({databasedBeatmap}) and ruleset ({databasedScore.ScoreInfo.Ruleset} to match score");
+                Logger.Log($"{nameof(PresentScore)} updating beatmap ({databasedBeatmap}) and ruleset ({databasedScore.ScoreInfo.Ruleset}) to match score");
 
                 Ruleset.Value = databasedScore.ScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
@@ -578,7 +595,7 @@ namespace osu.Game
                         screen.Push(new SoloResultsScreen(databasedScore.ScoreInfo, false));
                         break;
                 }
-            }, validScreens: new[] { typeof(PlaySongSelect) });
+            }, validScreens: validScreens);
         }
 
         public override Task Import(params ImportTask[] imports)
@@ -985,6 +1002,9 @@ namespace osu.Game
         {
             otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
 
+            Settings.Hide();
+            Notifications.Hide();
+
             // Partially visible so leave it at the current depth.
             if (overlay.IsPresent)
                 return;
@@ -1317,6 +1337,8 @@ namespace osu.Game
             {
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
                 API.Activity.BindTo(newOsuScreen.Activity);
+
+                GlobalCursorDisplay.MenuCursor.HideCursorOnNonMouseInput = newOsuScreen.HideMenuCursorOnNonMouseInput;
 
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
