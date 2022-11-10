@@ -194,6 +194,8 @@ namespace osu.Game
 
         private RealmAccess realm;
 
+        protected SafeAreaContainer SafeAreaContainer { get; private set; }
+
         /// <summary>
         /// For now, this is used as a source specifically for beat synced components.
         /// Going forward, it could potentially be used as the single source-of-truth for beatmap timing.
@@ -346,7 +348,7 @@ namespace osu.Game
 
             GlobalActionContainer globalBindings;
 
-            base.Content.Add(new SafeAreaContainer
+            base.Content.Add(SafeAreaContainer = new SafeAreaContainer
             {
                 SafeAreaOverrideEdges = SafeAreaOverrideEdges,
                 RelativeSizeAxes = Axes.Both,
@@ -614,10 +616,15 @@ namespace osu.Game
                 return;
             }
 
+            var previouslySelectedMods = SelectedMods.Value.ToArray();
+
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
 
             AvailableMods.Value = dict;
+
+            if (!SelectedMods.Disabled)
+                SelectedMods.Value = previouslySelectedMods.Select(m => instance.CreateModFromAcronym(m.Acronym)).Where(m => m != null).ToArray();
 
             void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
         }

@@ -179,6 +179,8 @@ namespace osu.Game
 
         private Bindable<string> configRuleset;
 
+        private Bindable<bool> applySafeAreaConsiderations;
+
         private Bindable<float> uiScale;
 
         private Bindable<string> configSkin;
@@ -309,6 +311,9 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
+
+            applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
+            applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -996,6 +1001,9 @@ namespace osu.Game
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
         {
             otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+
+            Settings.Hide();
+            Notifications.Hide();
 
             // Partially visible so leave it at the current depth.
             if (overlay.IsPresent)

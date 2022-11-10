@@ -20,6 +20,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
@@ -50,6 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private SettingsDropdown<Size> resolutionDropdown = null!;
         private SettingsDropdown<Display> displayDropdown = null!;
         private SettingsDropdown<WindowMode> windowModeDropdown = null!;
+        private SettingsCheckbox safeAreaConsiderationsCheckbox = null!;
 
         private Bindable<float> scalingPositionX = null!;
         private Bindable<float> scalingPositionY = null!;
@@ -100,6 +102,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     ShowsDefaultIndicator = false,
                     ItemSource = resolutions,
                     Current = sizeFullscreen
+                },
+                safeAreaConsiderationsCheckbox = new SettingsCheckbox
+                {
+                    LabelText = "Shrink game to avoid cameras and notches",
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations),
                 },
                 new SettingsSlider<float, UIScaleSlider>
                 {
@@ -166,7 +173,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             windowModeDropdown.Current.BindValueChanged(_ =>
             {
-                updateDisplayModeDropdowns();
+                updateDisplaySettingsVisibility();
                 updateScreenModeWarning();
             }, true);
 
@@ -191,7 +198,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                                                 .Distinct());
                 }
 
-                updateDisplayModeDropdowns();
+                updateDisplaySettingsVisibility();
             }), true);
 
             scalingMode.BindValueChanged(_ =>
@@ -221,11 +228,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             Scheduler.AddOnce(d =>
             {
                 displayDropdown.Items = d;
-                updateDisplayModeDropdowns();
+                updateDisplaySettingsVisibility();
             }, displays);
         }
 
-        private void updateDisplayModeDropdowns()
+        private void updateDisplaySettingsVisibility()
         {
             if (resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen)
                 resolutionDropdown.Show();
@@ -236,6 +243,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 displayDropdown.Show();
             else
                 displayDropdown.Hide();
+
+            if (host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero)
+                safeAreaConsiderationsCheckbox.Show();
+            else
+                safeAreaConsiderationsCheckbox.Hide();
         }
 
         private void updateScreenModeWarning()

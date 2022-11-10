@@ -39,9 +39,16 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public float BottomScoringElementsHeight { get; private set; }
 
-        // HUD uses AlwaysVisible on child components so they can be in an updated state for next display.
-        // Without blocking input, this would also allow them to be interacted with in such a state.
-        public override bool PropagatePositionalInputSubTree => ShowHud.Value;
+        protected override bool ShouldBeConsideredForInput(Drawable child)
+        {
+            // HUD uses AlwaysVisible on child components so they can be in an updated state for next display.
+            // Without blocking input, this would also allow them to be interacted with in such a state.
+            if (ShowHud.Value)
+                return base.ShouldBeConsideredForInput(child);
+
+            // hold to quit button should always be interactive.
+            return child == bottomRightElements;
+        }
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly ModDisplay ModDisplay;
@@ -384,7 +391,7 @@ namespace osu.Game.Screens.Play
             private OsuConfigManager config { get; set; }
 
             public MainComponentsContainer()
-                : base(SkinnableTarget.MainHUDComponents)
+                : base(GlobalSkinComponentLookup.LookupType.MainHUDComponents)
             {
                 RelativeSizeAxes = Axes.Both;
             }

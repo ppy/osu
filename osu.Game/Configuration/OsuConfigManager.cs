@@ -152,6 +152,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.SongSelectRightMouseScroll, false);
 
             SetDefault(OsuSetting.Scaling, ScalingMode.Off);
+            SetDefault(OsuSetting.SafeAreaConsiderations, true);
 
             SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
             SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
@@ -170,7 +171,9 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
-            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
+            SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 0.75f, 0.25f);
+            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
+            SetDefault(OsuSetting.EditorShowHitMarkers, true);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
         }
@@ -287,6 +290,7 @@ namespace osu.Game.Configuration
         GameplayCursorDuringTouch,
         DimLevel,
         BlurLevel,
+        EditorDim,
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
@@ -362,6 +366,8 @@ namespace osu.Game.Configuration
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
-        LastProcessedMetadataId
+        LastProcessedMetadataId,
+        SafeAreaConsiderations,
+        EditorShowHitMarkers
     }
 }

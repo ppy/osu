@@ -196,9 +196,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
 
-                float initialZoom = (float)(defaultTimelineZoom * (editorBeatmap.BeatmapInfo.TimelineZoom == 0 ? 1 : editorBeatmap.BeatmapInfo.TimelineZoom));
                 float minimumZoom = getZoomLevelForVisibleMilliseconds(10000);
                 float maximumZoom = getZoomLevelForVisibleMilliseconds(500);
+
+                float initialZoom = (float)Math.Clamp(defaultTimelineZoom * (editorBeatmap.BeatmapInfo.TimelineZoom == 0 ? 1 : editorBeatmap.BeatmapInfo.TimelineZoom), minimumZoom, maximumZoom);
 
                 SetupZoom(initialZoom, minimumZoom, maximumZoom);
 
@@ -250,7 +251,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void seekTrackToCurrent()
         {
-            double target = Current / Content.DrawWidth * editorClock.TrackLength;
+            double target = TimeAtPosition(Current);
             editorClock.Seek(Math.Min(editorClock.TrackLength, target));
         }
 
@@ -264,7 +265,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (handlingDragInput)
                 editorClock.Stop();
 
-            ScrollTo((float)(editorClock.CurrentTime / editorClock.TrackLength) * Content.DrawWidth, false);
+            float position = PositionAtTime(editorClock.CurrentTime);
+            ScrollTo(position, false);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
