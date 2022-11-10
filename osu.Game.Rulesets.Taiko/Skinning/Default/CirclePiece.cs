@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             {
                 case ArmedState.Hit:
                     using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime))
-                        flashBox?.FadeTo(0.9f).FadeOut(300);
+                        flashBox.FadeTo(0.9f).FadeOut(300);
                     break;
             }
         }
