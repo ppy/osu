@@ -308,7 +308,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(255, 177, 140, 255),
                     new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
                 };
-                Assert.AreEqual(expectedColors.Length, comboColors.Count);
+                Assert.AreEqual(expectedColors.Length, comboColors?.Count);
                 for (int i = 0; i < expectedColors.Length; i++)
                     Assert.AreEqual(expectedColors[i], comboColors[i]);
             }
