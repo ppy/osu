@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         private readonly Container background;
 
-        public Box FlashBox;
+        private readonly Box flashBox;
 
         protected CirclePiece()
         {
@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                     Masking = true,
                     Children = new[]
                     {
-                        FlashBox = new Box
+                        flashBox = new Box
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -145,6 +145,25 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             });
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            drawableHitObject.ApplyCustomUpdateState += updateStateTransforms;
+            updateStateTransforms(drawableHitObject, drawableHitObject.State.Value);
+        }
+
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
+        {
+            switch (state)
+            {
+                case ArmedState.Hit:
+                    using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime))
+                        flashBox?.FadeTo(0.9f).FadeOut(300);
+                    break;
+            }
+        }
+
         private const float edge_alpha_kiai = 0.5f;
 
         private void resetEdgeEffects()
@@ -164,7 +183,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
             if (drawableHitObject.State.Value == ArmedState.Idle)
             {
-                FlashBox
+                flashBox
                     .FadeTo(flash_opacity)
                     .Then()
                     .FadeOut(timingPoint.BeatLength * 0.75, Easing.OutSine);
