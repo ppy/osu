@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -27,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponent component)
         {
             if (component is SkinnableTargetComponent targetComponent)
             {
@@ -112,12 +110,12 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             GetTexture(@"fruit-catcher-idle") != null
             || GetTexture(@"fruit-catcher-idle-0") != null;
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
             {
                 case CatchSkinColour colour:
-                    var result = (Bindable<Color4>)base.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                    var result = (Bindable<Color4>?)base.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
                     if (result == null)
                         return null;
 
