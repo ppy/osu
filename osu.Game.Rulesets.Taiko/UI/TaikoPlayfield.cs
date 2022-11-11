@@ -60,8 +60,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </remarks>
         private BarLinePlayfield barLinePlayfield;
 
-        private Container playfieldContent;
-        private Container playfieldOverlay;
+        private Container barLineContent;
+        private Container hitObjectContent;
+        private Container overlayContent;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -76,7 +77,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             InternalChildren = new[]
             {
-                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundRight), _ => new PlayfieldBackgroundRight()),
+                new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.PlayfieldBackgroundRight), _ => new PlayfieldBackgroundRight()),
                 new Container
                 {
                     Name = "Left overlay",
@@ -85,11 +86,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                     BorderColour = colours.Gray0,
                     Children = new[]
                     {
-                        new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundLeft), _ => new PlayfieldBackgroundLeft()),
+                        new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.PlayfieldBackgroundLeft), _ => new PlayfieldBackgroundLeft()),
                         inputDrum.CreateProxy(),
                     }
                 },
-                mascot = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Mascot), _ => Empty())
+                mascot = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Mascot), _ => Empty())
                 {
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.TopLeft,
@@ -115,28 +116,26 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                HitTarget = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.HitTarget), _ => new TaikoHitTarget())
+                                HitTarget = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.HitTarget), _ => new TaikoHitTarget())
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 }
                             }
                         },
-                        new Container
+                        barLineContent = new Container
+                        {
+                            Name = "Bar line content",
+                            RelativeSizeAxes = Axes.Both,
+                            Child = barLinePlayfield = new BarLinePlayfield(),
+                        },
+                        hitObjectContent = new Container
                         {
                             Name = "Masked hit objects content",
                             RelativeSizeAxes = Axes.Both,
                             Masking = true,
-                            Child = playfieldContent = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Children = new Drawable[]
-                                {
-                                    barLinePlayfield = new BarLinePlayfield(),
-                                    HitObjectContainer,
-                                }
-                            }
+                            Child = HitObjectContainer,
                         },
-                        playfieldOverlay = new Container
+                        overlayContent = new Container
                         {
                             Name = "Elements after hit objects",
                             RelativeSizeAxes = Axes.Both,
@@ -218,8 +217,9 @@ namespace osu.Game.Rulesets.Taiko.UI
             // Padding is required to be updated for elements which are based on "absolute" X sized elements.
             // This is basically allowing for correct alignment as relative pieces move around them.
             rightArea.Padding = new MarginPadding { Left = inputDrum.Width };
-            playfieldContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
-            playfieldOverlay.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
+            barLineContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
+            hitObjectContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
+            overlayContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
 
             mascot.Scale = new Vector2(DrawHeight / DEFAULT_HEIGHT);
         }
