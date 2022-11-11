@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollTick),
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick),
             _ => new TickPiece
             {
                 Filled = HitObject.FirstTick

@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             public bool FlipCatcherPlate { get; set; }
 
             public TestSkin()
-                : base(null)
+                : base(null!)
             {
             }
 
