@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             // Generate nested hit circles
             foreach ((Vector2 pos, double time) in StreamPath.GetStreamPath())
             {
-                AddNested(new HitCircle
+                AddNested(new StreamHitCircle
                 {
                     StartTime = StartTime + time,
                     Position = Position + pos
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             int i = 0;
 
-            foreach (var hitCircle in NestedHitObjects.OfType<HitCircle>())
+            foreach (var hitCircle in NestedHitObjects.OfType<StreamHitCircle>())
             {
                 hitCircle.Samples = i < HitCircleSamples.Count ? HitCircleSamples[i] : Samples;
                 i++;

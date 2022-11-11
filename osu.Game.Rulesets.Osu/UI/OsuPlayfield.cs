@@ -148,6 +148,7 @@ namespace osu.Game.Rulesets.Osu.UI
             RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 200);
 
             RegisterPool<Stream, DrawableStream>(20, 100);
+            RegisterPool<StreamHitCircle, DrawableStreamHitCircle>(20, 100);
         }
 
         protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
