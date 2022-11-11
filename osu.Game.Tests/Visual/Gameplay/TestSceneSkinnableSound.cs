@@ -142,7 +142,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => SamplePlaybackDisabled;
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => source?.GetDrawableComponent(component);
+            public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => source?.GetDrawableComponent(lookup);
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => source?.GetTexture(componentName, wrapModeS, wrapModeT);
             public ISample GetSample(ISampleInfo sampleInfo) => source?.GetSample(sampleInfo);
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source?.GetConfig<TLookup, TValue>(lookup);

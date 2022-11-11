@@ -149,11 +149,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 this.identifier = identifier;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent component)
+            public Drawable GetDrawableComponent(ISkinComponentLookup lookup)
             {
                 if (!enabled) return null;
 
-                if (component is OsuSkinComponent osuComponent && osuComponent.Component == OsuSkinComponents.SliderBody)
+                if (lookup is OsuSkinComponentLookup osuComponent && osuComponent.Component == OsuSkinComponents.SliderBody)
                     return null;
 
                 return new OsuSpriteText

@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RelativeSizeAxes = Axes.Y;
             Width = tracker_width;
 
-            AddInternal(new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.BarLine), _ => new DefaultBarLine())
+            AddInternal(new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.BarLine), _ => new DefaultBarLine())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

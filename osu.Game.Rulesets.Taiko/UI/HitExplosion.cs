@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = skinnable = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(result)), _ => new DefaultHitExplosion(result));
+            InternalChild = skinnable = new SkinnableDrawable(new TaikoSkinComponentLookup(getComponentName(result)), _ => new DefaultHitExplosion(result));
             skinnable.OnSkinChanged += runAnimation;
         }
 
