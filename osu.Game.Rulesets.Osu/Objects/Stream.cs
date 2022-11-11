@@ -78,9 +78,12 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public IEnumerable<HitCircle> ToHitCircles()
         {
+            var positions = StreamPath.GetStreamPath();
             int i = 0;
+            int j = 0;
+            int k = 1;
 
-            foreach ((Vector2 pos, double time) in StreamPath.GetStreamPath())
+            foreach ((Vector2 pos, double time) in positions)
             {
                 var samplePoint = (SampleControlPoint)SampleControlPoint.DeepClone();
                 samplePoint.Time = time;
@@ -89,10 +92,15 @@ namespace osu.Game.Rulesets.Osu.Objects
                 {
                     StartTime = StartTime + time,
                     Position = Position + pos,
-                    NewCombo = i == 0 && NewCombo,
+                    NewCombo = j == 0 && i != positions.Count - 1 && NewCombo,
                     SampleControlPoint = samplePoint,
                     Samples = getNestedSample(i++).Select(o => o.With()).ToList()
                 };
+
+                if (k >= StreamPath.ControlPoints.Count || ++j < StreamPath.ControlPoints[k].Count) continue;
+
+                j = 0;
+                k++;
             }
         }
 
