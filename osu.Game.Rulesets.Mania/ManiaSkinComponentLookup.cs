@@ -1,19 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania
 {
-    public class ManiaSkinComponent : GameplaySkinComponent<ManiaSkinComponents>
+    public class ManiaSkinComponentLookup : GameplaySkinComponentLookup<ManiaSkinComponents>
     {
         /// <summary>
-        /// Creates a new <see cref="ManiaSkinComponent"/>.
+        /// Creates a new <see cref="ManiaSkinComponentLookup"/>.
         /// </summary>
         /// <param name="component">The component.</param>
-        public ManiaSkinComponent(ManiaSkinComponents component)
+        public ManiaSkinComponentLookup(ManiaSkinComponents component)
             : base(component)
         {
         }

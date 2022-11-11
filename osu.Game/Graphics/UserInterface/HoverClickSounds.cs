@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
@@ -20,7 +21,11 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class HoverClickSounds : HoverSounds
     {
+        public Bindable<bool> Enabled = new Bindable<bool>(true);
+
         private Sample sampleClick;
+        private Sample sampleClickDisabled;
+
         private readonly MouseButton[] buttons;
 
         /// <summary>
@@ -41,11 +46,24 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (buttons.Contains(e.Button) && Contains(e.ScreenSpaceMousePosition))
             {
-                sampleClick.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
-                sampleClick.Play();
+                var channel = Enabled.Value ? sampleClick?.GetChannel() : sampleClickDisabled?.GetChannel();
+
+                if (channel != null)
+                {
+                    channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
+                    channel.Play();
+                }
             }
 
             return base.OnClick(e);
+        }
+
+        public override void PlayHoverSample()
+        {
+            if (!Enabled.Value)
+                return;
+
+            base.PlayHoverSample();
         }
 
         [BackgroundDependencyLoader]
@@ -53,6 +71,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             sampleClick = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select")
                           ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
+
+            sampleClickDisabled = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select-disabled")
+                                  ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select-disabled");
         }
     }
 }

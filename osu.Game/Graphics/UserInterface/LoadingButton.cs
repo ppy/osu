@@ -41,6 +41,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly LoadingSpinner loading;
 
         protected LoadingButton()
+            : base(HoverSampleSet.Button)
         {
             Add(loading = new LoadingSpinner
             {
