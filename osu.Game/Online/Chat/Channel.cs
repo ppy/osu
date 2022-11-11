@@ -179,6 +179,10 @@ namespace osu.Game.Online.Chat
                 throw new InvalidOperationException("Attempted to add the same message again");
 
             Messages.Add(final);
+
+            if (final.Id > LastMessageId)
+                LastMessageId = final.Id;
+
             PendingMessageResolved?.Invoke(echo, final);
         }
 
