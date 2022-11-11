@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private readonly IBindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly T hitObject;
         private readonly bool allowSelection;
+        private readonly bool snapDuration;
 
         private InputManager inputManager;
 
@@ -48,10 +49,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider snapProvider { get; set; }
 
-        public PathControlPointVisualiser(T hitObject, bool allowSelection)
+        public PathControlPointVisualiser(T hitObject, bool allowSelection, bool snapDuration = true)
         {
             this.hitObject = hitObject;
             this.allowSelection = allowSelection;
+            this.snapDuration = snapDuration;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -316,7 +318,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
 
             // Snap the path to the current beat divisor before checking length validity.
-            hitObject.SnapTo(snapProvider);
+            if (snapDuration)
+                hitObject.SnapTo(snapProvider);
 
             if (!hitObject.Path.HasValidLength)
             {
@@ -326,7 +329,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 hitObject.Position = oldPosition;
                 hitObject.StartTime = oldStartTime;
                 // Snap the path length again to undo the invalid length.
-                hitObject.SnapTo(snapProvider);
+                if (snapDuration)
+                    hitObject.SnapTo(snapProvider);
                 return;
             }
 

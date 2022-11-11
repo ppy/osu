@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
             {
                 if (ControlPointVisualiser == null)
                 {
-                    AddInternal(ControlPointVisualiser = new PathControlPointVisualiser<Stream>(HitObject, true)
+                    AddInternal(ControlPointVisualiser = new PathControlPointVisualiser<Stream>(HitObject, true, false)
                     {
                         RemoveControlPointsRequested = removeControlPoints
                     });
@@ -233,8 +233,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
             // Move the control points from the insertion index onwards to make room for the insertion
             controlPoints.Insert(insertionIndex, pathControlPoint);
 
-            HitObject.SnapTo(snapProvider);
-
             return pathControlPoint;
         }
 
@@ -253,9 +251,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
                 controlPoints.Remove(c);
             }
-
-            // Snap the slider to the current beat divisor before checking length validity.
-            HitObject.SnapTo(snapProvider);
 
             // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
             if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
