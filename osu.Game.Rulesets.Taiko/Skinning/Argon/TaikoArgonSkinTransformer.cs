@@ -21,9 +21,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 case GameplaySkinComponentLookup<HitResult> resultComponent:
                     return new ArgonJudgementPiece(resultComponent.Component);
 
-                case TaikoSkinComponentLookup catchComponent:
+                case TaikoSkinComponentLookup taikoComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
-                    switch (catchComponent.Component)
+                    switch (taikoComponent.Component)
                     {
                         case TaikoSkinComponents.CentreHit:
                             return new ArgonCentreCirclePiece();
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                         case TaikoSkinComponents.TaikoExplosionGreat:
                         case TaikoSkinComponents.TaikoExplosionMiss:
                         case TaikoSkinComponents.TaikoExplosionOk:
-                            return new ArgonHitExplosion(catchComponent.Component);
+                            return new ArgonHitExplosion(taikoComponent.Component);
                     }
 
                     break;
