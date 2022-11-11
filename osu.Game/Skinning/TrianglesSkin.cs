@@ -1,15 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
@@ -47,9 +44,9 @@ namespace osu.Game.Skinning
             this.resources = resources;
         }
 
-        public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Textures?.Get(componentName, wrapModeS, wrapModeT);
+        public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Textures?.Get(componentName, wrapModeS, wrapModeT);
 
-        public override ISample GetSample(ISampleInfo sampleInfo)
+        public override ISample? GetSample(ISampleInfo sampleInfo)
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
@@ -61,17 +58,27 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (base.GetDrawableComponent(component) is Drawable c)
+            if (base.GetDrawableComponent(lookup) is Drawable c)
                 return c;
 
-            switch (component)
+            switch (lookup)
             {
-                case SkinnableTargetComponent target:
-                    switch (target.Target)
+                case SkinnableSprite.SpriteComponentLookup spriteLookup:
+                    switch (spriteLookup.LookupName)
                     {
-                        case SkinnableTarget.SongSelect:
+                        // Temporary until default skin has a valid hit lighting.
+                        case @"lighting":
+                            return Drawable.Empty();
+                    }
+
+                    break;
+
+                case GlobalSkinComponentLookup target:
+                    switch (target.Lookup)
+                    {
+                        case GlobalSkinComponentLookup.LookupType.SongSelect:
                             var songSelectComponents = new SkinnableTargetComponentsContainer(_ =>
                             {
                                 // do stuff when we need to.
@@ -79,7 +86,7 @@ namespace osu.Game.Skinning
 
                             return songSelectComponents;
 
-                        case SkinnableTarget.MainHUDComponents:
+                        case GlobalSkinComponentLookup.LookupType.MainHUDComponents:
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
                                 var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
@@ -158,20 +165,10 @@ namespace osu.Game.Skinning
                     return null;
             }
 
-            switch (component.LookupName)
-            {
-                // Temporary until default skin has a valid hit lighting.
-                case @"lighting":
-                    return Drawable.Empty();
-            }
-
-            if (GetTexture(component.LookupName) is Texture t)
-                return new Sprite { Texture = t };
-
             return null;
         }
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             // todo: this code is pulled from LegacySkin and should not exist.
             // will likely change based on how databased storage of skin configuration goes.
@@ -181,7 +178,7 @@ namespace osu.Game.Skinning
                     switch (global)
                     {
                         case GlobalSkinColours.ComboColours:
-                            return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(Configuration.ComboColours));
+                            return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>?>(Configuration.ComboColours));
                     }
 
                     break;

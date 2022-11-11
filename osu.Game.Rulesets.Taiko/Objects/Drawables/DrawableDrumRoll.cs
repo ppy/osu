@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return base.CreateNestedHitObject(hitObject);
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollBody),
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollBody),
             _ => new ElongatedCirclePiece());
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;

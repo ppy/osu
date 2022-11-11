@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -14,7 +12,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Skinning.Default
+namespace osu.Game.Rulesets.Osu.Skinning
 {
     /// <summary>
     /// A <see cref="SliderBody"/> which changes its curve depending on the snaking progress.
@@ -55,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         /// </summary>
         private Vector2 snakedPathOffset;
 
-        private DrawableSlider drawableSlider;
+        private DrawableSlider drawableSlider = null!;
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject)
@@ -67,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         public void UpdateProgress(double completionProgress)
         {
-            if (drawableSlider?.HitObject == null)
+            if (drawableSlider.HitObject == null)
                 return;
 
             Slider slider = drawableSlider.HitObject;
@@ -96,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         public void Refresh()
         {
-            if (drawableSlider?.HitObject == null)
+            if (drawableSlider.HitObject == null)
                 return;
 
             // Generate the entire curve

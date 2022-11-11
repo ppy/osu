@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             rulesetConfig?.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
 
-            AddInternal(headPiece = new SkinnableDrawable(new ManiaSkinComponent(Component), _ => new DefaultNotePiece())
+            AddInternal(headPiece = new SkinnableDrawable(new ManiaSkinComponentLookup(Component), _ => new DefaultNotePiece())
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y
