@@ -280,25 +280,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
             changeHandler?.BeginChange();
 
-            int i = 0;
-
-            foreach ((Vector2 pos, double time) in HitObject.StreamPath.GetStreamPath())
-            {
-                var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
-                samplePoint.Time = time;
-
-                editorBeatmap.Add(new HitCircle
-                {
-                    StartTime = HitObject.StartTime + time,
-                    Position = HitObject.Position + pos,
-                    NewCombo = i == 0 && HitObject.NewCombo,
-                    SampleControlPoint = samplePoint,
-                    Samples = i < HitObject.HitCircleSamples.Count ? HitObject.HitCircleSamples[i] : HitObject.Samples
-                });
-
-                i++;
-            }
-
+            editorBeatmap.AddRange(HitObject.ToHitCircles());
             editorBeatmap.Remove(HitObject);
 
             changeHandler?.EndChange();

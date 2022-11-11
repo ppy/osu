@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -75,6 +76,26 @@ namespace osu.Game.Rulesets.Osu.Objects
             UpdateNestedSamples();
         }
 
+        public IEnumerable<HitCircle> ToHitCircles()
+        {
+            int i = 0;
+
+            foreach ((Vector2 pos, double time) in StreamPath.GetStreamPath())
+            {
+                var samplePoint = (SampleControlPoint)SampleControlPoint.DeepClone();
+                samplePoint.Time = time;
+
+                yield return new HitCircle
+                {
+                    StartTime = StartTime + time,
+                    Position = Position + pos,
+                    NewCombo = i == 0 && NewCombo,
+                    SampleControlPoint = samplePoint,
+                    Samples = getNestedSample(i++).Select(o => o.With()).ToList()
+                };
+            }
+        }
+
         private void updateNestedPositions()
         {
         }
@@ -85,9 +106,13 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             foreach (var hitCircle in NestedHitObjects.OfType<StreamHitCircle>())
             {
-                hitCircle.Samples = i < HitCircleSamples.Count ? HitCircleSamples[i] : Samples;
-                i++;
+                hitCircle.Samples = getNestedSample(i++);
             }
+        }
+
+        private IList<HitSampleInfo> getNestedSample(int i)
+        {
+            return i < HitCircleSamples.Count ? HitCircleSamples[i] : Samples;
         }
     }
 }
