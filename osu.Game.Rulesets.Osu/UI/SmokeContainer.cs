@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             if (e.Action == OsuAction.Smoke)
             {
-                AddInternal(currentSegmentSkinnable = new SmokeSkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorSmoke), _ => new DefaultSmokeSegment()));
+                AddInternal(currentSegmentSkinnable = new SmokeSkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorSmoke), _ => new DefaultSmokeSegment()));
 
                 // Add initial position immediately.
                 addPosition();
@@ -68,8 +68,8 @@ namespace osu.Game.Rulesets.Osu.UI
             public override double LifetimeStart => Drawable.LifetimeStart;
             public override double LifetimeEnd => Drawable.LifetimeEnd;
 
-            public SmokeSkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable>? defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
-                : base(component, defaultImplementation, confineMode)
+            public SmokeSkinnableDrawable(ISkinComponentLookup lookup, Func<ISkinComponentLookup, Drawable>? defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
+                : base(lookup, defaultImplementation, confineMode)
             {
             }
         }

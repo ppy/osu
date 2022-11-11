@@ -1002,6 +1002,9 @@ namespace osu.Game
         {
             otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
 
+            Settings.Hide();
+            Notifications.Hide();
+
             // Partially visible so leave it at the current depth.
             if (overlay.IsPresent)
                 return;
