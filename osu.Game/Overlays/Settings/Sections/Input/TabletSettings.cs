@@ -325,7 +325,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             aspectLock.Value = false;
 
-            int proposedHeight = getHeight(sizeX.Value, aspectRatio);
+            float proposedHeight = getHeight(sizeX.Value, aspectRatio);
 
             if (proposedHeight < sizeY.MaxValue)
                 sizeY.Value = proposedHeight;
@@ -342,8 +342,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private float currentAspectRatio => sizeX.Value / sizeY.Value;
 
-        private static int getHeight(float width, float aspectRatio) => (int)Math.Round(width / aspectRatio);
+        private static float getHeight(float width, float aspectRatio) => (float)Math.Round(width / aspectRatio);
 
-        private static int getWidth(float height, float aspectRatio) => (int)Math.Round(height * aspectRatio);
+        private static float getWidth(float height, float aspectRatio) => (float)Math.Round(height * aspectRatio);
     }
 }
