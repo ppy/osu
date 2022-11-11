@@ -1,13 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -19,6 +16,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams.Components
     public class StreamPiece : BlueprintPiece<Stream>
     {
         private readonly Container<RingPiece> circles;
+
+        private Vector2 streamOffset = Vector2.Zero;
+        public Vector2 PathStartLocation => streamOffset;
 
         public StreamPiece()
         {
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams.Components
 
             // Calculate the correct bounding box
             var boundingBox = DrawableStream.GetVertexBounds(positions.Select(o => o.Item1), hitObject.Scale * OsuHitObject.OBJECT_RADIUS);
-            var streamOffset = positions.Count == 0 ? Vector2.Zero : positions[0].Item1 - boundingBox.TopLeft;
+            streamOffset = positions.Count == 0 ? Vector2.Zero : positions[0].Item1 - boundingBox.TopLeft;
 
             circles.Size = boundingBox.Size;
             Size = boundingBox.Size;
