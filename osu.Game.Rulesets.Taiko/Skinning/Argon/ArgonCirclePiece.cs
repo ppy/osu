@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
             EarlyActivationMilliseconds = pre_beat_transition_time;
 
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
                 new Circle
                 {
