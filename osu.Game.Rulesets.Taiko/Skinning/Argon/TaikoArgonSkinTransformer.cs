@@ -14,14 +14,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         {
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup component)
         {
             switch (component)
             {
-                case GameplaySkinComponent<HitResult> resultComponent:
+                case GameplaySkinComponentLookup<HitResult> resultComponent:
                     return new ArgonJudgementPiece(resultComponent.Component);
 
-                case TaikoSkinComponent catchComponent:
+                case TaikoSkinComponentLookup catchComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (catchComponent.Component)
                     {
