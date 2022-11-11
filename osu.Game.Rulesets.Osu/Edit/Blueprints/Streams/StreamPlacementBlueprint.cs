@@ -168,6 +168,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
         {
             updateStream();
             EndPlacement(HitObject.Path.HasValidLength);
+            editorBeatmap.SelectedHitObjects.Add(HitObject);
         }
 
         protected override void Update()
