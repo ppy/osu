@@ -55,6 +55,14 @@ namespace osu.Game.Tests.Chat
                         case MarkChannelAsReadRequest markRead:
                             handleMarkChannelAsReadRequest(markRead);
                             return true;
+
+                        case GetUpdatesRequest updatesRequest:
+                            updatesRequest.TriggerSuccess(new GetUpdatesResponse
+                            {
+                                Messages = sentMessages.ToList(),
+                                Presence = new List<Channel>()
+                            });
+                            return true;
                     }
 
                     return false;
@@ -95,6 +103,7 @@ namespace osu.Game.Tests.Chat
             });
 
             AddStep("post message", () => channelManager.PostMessage("Something interesting"));
+            AddUntilStep("message postesd", () => !channel.Messages.Any(m => m is LocalMessage));
 
             AddStep("post /help command", () => channelManager.PostCommand("help", channel));
             AddStep("post /me command with no action", () => channelManager.PostCommand("me", channel));
@@ -115,7 +124,8 @@ namespace osu.Game.Tests.Chat
                 Content = request.Message.Content,
                 Links = request.Message.Links,
                 Timestamp = request.Message.Timestamp,
-                Sender = request.Message.Sender
+                Sender = request.Message.Sender,
+                Uuid = request.Message.Uuid
             };
 
             sentMessages.Add(message);
