@@ -125,11 +125,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 usableAreaContainer.ResizeTo(val.NewValue, 100, Easing.OutQuint);
 
-                int x = (int)val.NewValue.X;
-                int y = (int)val.NewValue.Y;
+                int x = (int)Math.Round(val.NewValue.X);
+                int y = (int)Math.Round(val.NewValue.Y);
                 int commonDivider = greatestCommonDivider(x, y);
 
-                usableAreaText.Text = $"{(float)x / commonDivider}:{(float)y / commonDivider}";
+                usableAreaText.Text = $"{x / commonDivider}:{y / commonDivider}";
                 checkBounds();
             }, true);
 
@@ -212,17 +212,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.Update();
 
-            if (!(tablet.Value?.Size is Vector2 size))
-                return;
+            if (tablet.Value?.Size is Vector2 size)
+            {
+                float maxDimension = size.LengthFast;
 
-            float maxDimension = size.LengthFast;
+                float fitX = maxDimension / (DrawWidth - Padding.Left - Padding.Right);
+                float fitY = maxDimension / DrawHeight;
 
-            float fitX = maxDimension / (DrawWidth - Padding.Left - Padding.Right);
-            float fitY = maxDimension / DrawHeight;
+                float adjust = MathF.Max(fitX, fitY);
 
-            float adjust = MathF.Max(fitX, fitY);
-
-            tabletContainer.Scale = new Vector2(1 / adjust);
+                tabletContainer.Scale = new Vector2(1 / adjust);
+            }
         }
     }
 }
