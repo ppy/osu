@@ -130,14 +130,20 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
+        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':', bool shouldTrim = true)
         {
             string[] split = line.Split(separator, 2);
 
+            if (shouldTrim)
+            {
+                for (int i = 0; i < split.Length; i++)
+                    split[i] = split[i].Trim();
+            }
+
             return new KeyValuePair<string, string>
             (
-                split[0].Trim(),
-                split.Length > 1 ? split[1].Trim() : string.Empty
+                split[0],
+                split.Length > 1 ? split[1] : string.Empty
             );
         }
 
