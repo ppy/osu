@@ -146,7 +146,8 @@ namespace osu.Game.Tests.Skins
             AddStep("Disallow default colours fallback in beatmap skin", () => beatmapSource.Configuration.AllowDefaultComboColoursFallback = false);
 
             AddAssert("Check retrieved combo colours from user skin", () =>
-                requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(userSource.Configuration.ComboColours) ?? false);
+                userSource.Configuration.ComboColours != null &&
+                (requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(userSource.Configuration.ComboColours) ?? false));
         }
 
         [Test]
@@ -220,7 +221,7 @@ namespace osu.Game.Tests.Skins
                 this.skin = skin;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => skin.GetDrawableComponent(component);
+            public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => skin.GetDrawableComponent(lookup);
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => skin.GetTexture(componentName, wrapModeS, wrapModeT);
 

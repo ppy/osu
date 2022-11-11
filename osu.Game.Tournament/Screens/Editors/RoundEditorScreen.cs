@@ -256,7 +256,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         mods.BindValueChanged(modString => Model.Mods = modString.NewValue);
                     }
 
-                    private void updatePanel()
+                    private void updatePanel() => Schedule(() =>
                     {
                         drawableContainer.Clear();
 
@@ -269,7 +269,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 300
                             };
                         }
-                    }
+                    });
                 }
             }
         }

@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking, IHasMainCirclePiece
+    public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
     {
         public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
 
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Children = new Drawable[]
                 {
                     // no default for this; only visible in legacy skins.
-                    CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
+                    CirclePiece = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
