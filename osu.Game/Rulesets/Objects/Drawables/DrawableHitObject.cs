@@ -15,8 +15,10 @@ using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Objects.Types;
@@ -127,7 +129,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private readonly BindableList<HitSampleInfo> samplesBindable = new BindableList<HitSampleInfo>();
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
 
-        private readonly Bindable<float> positionalHitsoundsLevel = new Bindable<float>();
+        private readonly IBindable<float> positionalHitsoundsLevel = new Bindable<float>();
+        private readonly IBindable<float> comboColourBrightness = new Bindable<float>();
         private readonly Bindable<int> comboIndexWithOffsetsBindable = new Bindable<int>();
 
         protected override bool RequiresChildrenUpdate => true;
@@ -168,9 +171,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, ISkinSource skinSource)
+        private void load(IGameplaySettings gameplaySettings, ISkinSource skinSource)
         {
-            config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
+            positionalHitsoundsLevel.BindTo(gameplaySettings.PositionalHitsoundsLevel);
+            comboColourBrightness.BindTo(gameplaySettings.ComboColourNormalisationAmount);
 
             // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
             base.AddInternal(Samples = new PausableSkinnableSound());
@@ -191,6 +195,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             comboIndexBindable.BindValueChanged(_ => UpdateComboColour());
             comboIndexWithOffsetsBindable.BindValueChanged(_ => UpdateComboColour(), true);
+
+            comboColourBrightness.BindValueChanged(_ => UpdateComboColour());
 
             // Apply transforms
             updateState(State.Value, true);
@@ -511,7 +517,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (!(HitObject is IHasComboInformation combo)) return;
 
-            AccentColour.Value = combo.GetComboColour(CurrentSkin);
+            Color4 colour = combo.GetComboColour(CurrentSkin);
+
+            // Normalise the combo colour to the given brightness level.
+            if (comboColourBrightness.Value != 0)
+            {
+                colour = Interpolation.ValueAt(Math.Abs(comboColourBrightness.Value), colour, new HSPAColour(colour) { P = 0.6f }.ToColor4(), 0, 1);
+            }
+
+            AccentColour.Value = colour;
         }
 
         /// <summary>
@@ -736,7 +750,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
     {
         public new TObject HitObject => (TObject)base.HitObject;
 
-        protected DrawableHitObject(TObject hitObject)
+        protected DrawableHitObject([CanBeNull] TObject hitObject)
             : base(hitObject)
         {
         }

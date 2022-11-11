@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -24,7 +22,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         public readonly Bindable<JudgementResult> LastResult;
 
         private readonly Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation> animations;
-        private TaikoMascotAnimation currentAnimation;
+
+        private TaikoMascotAnimation? currentAnimation;
 
         private bool lastObjectHit = true;
         private bool kiaiMode;
@@ -40,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayState gameplayState)
+        private void load(GameplayState? gameplayState)
         {
             InternalChildren = new[]
             {

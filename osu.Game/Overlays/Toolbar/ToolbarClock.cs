@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
@@ -122,6 +123,8 @@ namespace osu.Game.Overlays.Toolbar
 
             base.OnHoverLost(e);
         }
+
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
 
         private void cycleDisplayMode()
         {
