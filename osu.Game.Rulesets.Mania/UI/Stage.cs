@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageBackground), _ => new DefaultStageBackground())
+                        new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.StageBackground), _ => new DefaultStageBackground())
                         {
                             RelativeSizeAxes = Axes.Both
                         },
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 RelativeSizeAxes = Axes.Y,
                             }
                         },
-                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageForeground), _ => null)
+                        new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.StageForeground), _ => null)
                         {
                             RelativeSizeAxes = Axes.Both
                         },
