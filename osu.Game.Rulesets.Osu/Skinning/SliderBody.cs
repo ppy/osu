@@ -8,10 +8,11 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Skinning.Default
+namespace osu.Game.Rulesets.Osu.Skinning
 {
     public abstract class SliderBody : CompositeDrawable
     {
