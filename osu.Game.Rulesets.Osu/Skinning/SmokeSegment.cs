@@ -245,18 +245,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 texture ??= renderer.WhitePixel;
                 RectangleF textureRect = texture.GetTextureRect();
 
-                var shader = GetAppropriateShader(renderer);
-
                 renderer.SetBlend(BlendingParameters.Additive);
                 renderer.PushLocalMatrix(DrawInfo.Matrix);
 
-                shader.Bind();
+                TextureShader.Bind();
                 texture.Bind();
 
                 for (int i = 0; i < points.Count; i++)
                     drawPointQuad(points[i], textureRect, i + firstVisiblePointIndex);
 
-                shader.Unbind();
+                TextureShader.Unbind();
                 renderer.PopLocalMatrix();
             }
 
