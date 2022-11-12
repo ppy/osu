@@ -108,15 +108,7 @@ namespace osu.Game.Online.Chat
             connector.Start();
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(_ => performChatAckRequest(), true);
-        }
-
-        private void performChatAckRequest()
-        {
-            if (apiState.Value != APIState.Online)
-                return;
-
-            SendAck();
+            apiState.BindValueChanged(_ => SendAck(), true);
         }
 
         /// <summary>
@@ -397,6 +389,9 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public void SendAck()
         {
+            if (apiState.Value != APIState.Online)
+                return;
+
             var req = new ChatAckRequest
             {
                 SinceMessageId = lastMessageId,
@@ -421,7 +416,7 @@ namespace osu.Game.Online.Chat
             void scheduleNextRequest()
             {
                 scheduledAck?.Cancel();
-                scheduledAck = Scheduler.AddDelayed(performChatAckRequest, 60000);
+                scheduledAck = Scheduler.AddDelayed(SendAck, 60000);
             }
         }
 
