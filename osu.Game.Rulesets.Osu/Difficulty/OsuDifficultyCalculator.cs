@@ -56,6 +56,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedRating = 0.0;
                 flashlightRating *= 0.7;
             }
+            else if (mods.Any(h => h is OsuModAutopilot))
+            {
+                speedRating *= 0.9;
+                aimRating = 0.0;
+                flashlightRating *= 0.4;
+            }
 
             double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
             double baseSpeedPerformance = Math.Pow(5 * Math.Max(1, speedRating / 0.0675) - 4, 3) / 100000;
