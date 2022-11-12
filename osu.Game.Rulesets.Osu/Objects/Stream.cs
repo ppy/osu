@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class Stream : OsuHitObject, IHasPath
     {
-        public double EndTime => StreamPath.ControlPoints.Count > 0 ? StreamPath.ControlPoints.Last().Time : StartTime;
+        public double EndTime => StreamPath.ControlPoints.Count > 0 ? StartTime + StreamPath.ControlPoints.Last().Time : StartTime;
 
         [JsonIgnore]
         public double Duration
