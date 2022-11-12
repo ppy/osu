@@ -72,15 +72,16 @@ namespace osu.Game.Online.Chat
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         private bool channelsInitialised;
-        private ScheduledDelegate ackDelegate;
+        private ScheduledDelegate scheduledAck;
 
         private long lastMessageId;
         private uint? lastSilenceId;
 
-        public ChannelManager(IAPIProvider api, NotificationsClientConnector connector)
+        public ChannelManager(IAPIProvider api)
         {
             this.api = api;
-            this.connector = connector;
+
+            connector = api.GetNotificationsConnector();
 
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
@@ -89,7 +90,11 @@ namespace osu.Game.Online.Chat
         private void load()
         {
             connector.ChannelJoined += ch => Schedule(() => joinChannel(ch));
+
+            connector.ChannelParted += ch => Schedule(() => LeaveChannel(getChannel(ch)));
+
             connector.NewMessages += msgs => Schedule(() => addMessages(msgs));
+
             connector.PresenceReceived += () => Schedule(() =>
             {
                 if (!channelsInitialised)
@@ -100,18 +105,31 @@ namespace osu.Game.Online.Chat
                 }
             });
 
-            connector.StartChat();
+            connector.Start();
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(status =>
-            {
-                ackDelegate?.Cancel();
+            apiState.BindValueChanged(_ => performChatAckRequest(), true);
+        }
 
-                if (status.NewValue == APIState.Online)
-                {
-                    Scheduler.Add(ackDelegate = new ScheduledDelegate(SendAck, 0, 60000));
-                }
-            }, true);
+        private void performChatAckRequest()
+        {
+            if (apiState.Value != APIState.Online)
+                return;
+
+            scheduledAck?.Cancel();
+
+            var req = new ChatAckRequest();
+            req.Success += _ => scheduleNextRequest();
+            req.Failure += _ => scheduleNextRequest();
+            api.Queue(req);
+
+            // Todo: Handle silences.
+
+            void scheduleNextRequest()
+            {
+                scheduledAck?.Cancel();
+                scheduledAck = Scheduler.AddDelayed(performChatAckRequest, 60000);
+            }
         }
 
         /// <summary>
@@ -191,7 +209,8 @@ namespace osu.Game.Online.Chat
                     Timestamp = DateTimeOffset.Now,
                     ChannelId = target.Id,
                     IsAction = isAction,
-                    Content = text
+                    Content = text,
+                    Uuid = Guid.NewGuid().ToString()
                 };
 
                 target.AddLocalEcho(message);
@@ -201,13 +220,7 @@ namespace osu.Game.Online.Chat
                 {
                     var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(target.Users.First(), message);
 
-                    createNewPrivateMessageRequest.Success += createRes =>
-                    {
-                        target.Id = createRes.ChannelID;
-                        target.ReplaceMessage(message, createRes.Message);
-                        dequeueAndRun();
-                    };
-
+                    createNewPrivateMessageRequest.Success += _ => dequeueAndRun();
                     createNewPrivateMessageRequest.Failure += exception =>
                     {
                         handlePostException(exception);
@@ -221,12 +234,7 @@ namespace osu.Game.Online.Chat
 
                 var req = new PostMessageRequest(message);
 
-                req.Success += m =>
-                {
-                    target.ReplaceMessage(message, m);
-                    dequeueAndRun();
-                };
-
+                req.Success += m => dequeueAndRun();
                 req.Failure += exception =>
                 {
                     handlePostException(exception);
@@ -433,7 +441,13 @@ namespace osu.Game.Online.Chat
         {
             Channel found = null;
 
-            bool lookupCondition(Channel ch) => lookup.Id > 0 ? ch.Id == lookup.Id : lookup.Name == ch.Name;
+            bool lookupCondition(Channel ch)
+            {
+                if (ch.Id > 0 && lookup.Id > 0)
+                    return ch.Id == lookup.Id;
+
+                return ch.Name == lookup.Name;
+            }
 
             var available = AvailableChannels.FirstOrDefault(lookupCondition);
             if (available != null)
@@ -452,6 +466,12 @@ namespace osu.Game.Online.Chat
                 var foundSelf = found.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
                 if (foundSelf != null)
                     found.Users.Remove(foundSelf);
+            }
+            else
+            {
+                found.Id = lookup.Id;
+                found.Name = lookup.Name;
+                found.LastMessageId = Math.Max(found.LastMessageId ?? 0, lookup.LastMessageId ?? 0);
             }
 
             if (joined == null && addToJoined) joinedChannels.Add(found);

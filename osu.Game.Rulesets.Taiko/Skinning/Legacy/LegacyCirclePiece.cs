@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
@@ -19,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
     {
-        private Drawable backgroundLayer;
+        private Drawable backgroundLayer = null!;
 
         // required for editor blueprints (not sure why these circle pieces are zero size).
         public override Quad ScreenSpaceDrawQuad => backgroundLayer.ScreenSpaceDrawQuad;
@@ -32,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, DrawableHitObject drawableHitObject)
         {
-            Drawable getDrawableFor(string lookup)
+            Drawable? getDrawableFor(string lookup)
             {
                 const string normal_hit = "taikohit";
                 const string big_hit = "taikobig";

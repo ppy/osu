@@ -18,12 +18,12 @@ namespace osu.Game.Online.Notifications
     public abstract class NotificationsClient : PersistentEndpointClient
     {
         public Action<Channel>? ChannelJoined;
+        public Action<Channel>? ChannelParted;
         public Action<List<Message>>? NewMessages;
         public Action? PresenceReceived;
 
         protected readonly IAPIProvider API;
 
-        private bool enableChat;
         private long lastMessageId;
 
         protected NotificationsClient(IAPIProvider api)
@@ -31,28 +31,7 @@ namespace osu.Game.Online.Notifications
             API = api;
         }
 
-        public bool EnableChat
-        {
-            get => enableChat;
-            set
-            {
-                if (enableChat == value)
-                    return;
-
-                enableChat = value;
-
-                if (EnableChat)
-                    Task.Run(StartChatAsync);
-            }
-        }
-
-        public override async Task ConnectAsync(CancellationToken cancellationToken)
-        {
-            if (EnableChat)
-                await StartChatAsync();
-        }
-
-        protected virtual Task StartChatAsync()
+        public override Task ConnectAsync(CancellationToken cancellationToken)
         {
             API.Queue(CreateFetchMessagesRequest(0));
             return Task.CompletedTask;
@@ -67,7 +46,7 @@ namespace osu.Game.Online.Notifications
                 if (updates?.Presence != null)
                 {
                     foreach (var channel in updates.Presence)
-                        HandleJoinedChannel(channel);
+                        HandleChannelJoined(channel);
 
                     //todo: handle left channels
 
@@ -80,12 +59,13 @@ namespace osu.Game.Online.Notifications
             return fetchReq;
         }
 
-        protected void HandleJoinedChannel(Channel channel)
+        protected void HandleChannelJoined(Channel channel)
         {
-            // we received this from the server so should mark the channel already joined.
             channel.Joined.Value = true;
             ChannelJoined?.Invoke(channel);
         }
+
+        protected void HandleChannelParted(Channel channel) => ChannelParted?.Invoke(channel);
 
         protected void HandleMessages(List<Message> messages)
         {

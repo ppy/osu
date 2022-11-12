@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             private bool allow = true;
 
-            protected override bool AllowDrawableLookup(ISkinComponent component) => allow;
+            protected override bool AllowDrawableLookup(ISkinComponentLookup lookup) => allow;
 
             public void Disable()
             {
@@ -182,8 +182,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public new Drawable Drawable => base.Drawable;
 
-            public ExposedSkinnableDrawable(string name, Func<ISkinComponent, Drawable> defaultImplementation, ConfineMode confineMode = ConfineMode.ScaleToFit)
-                : base(new TestSkinComponent(name), defaultImplementation, confineMode)
+            public ExposedSkinnableDrawable(string name, Func<ISkinComponentLookup, Drawable> defaultImplementation, ConfineMode confineMode = ConfineMode.ScaleToFit)
+                : base(new TestSkinComponentLookup(name), defaultImplementation, confineMode)
             {
             }
         }
@@ -251,8 +251,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new Drawable Drawable => base.Drawable;
             public int SkinChangedCount { get; private set; }
 
-            public SkinConsumer(string name, Func<ISkinComponent, Drawable> defaultImplementation)
-                : base(new TestSkinComponent(name), defaultImplementation)
+            public SkinConsumer(string name, Func<ISkinComponentLookup, Drawable> defaultImplementation)
+                : base(new TestSkinComponentLookup(name), defaultImplementation)
             {
             }
 
@@ -288,8 +288,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 this.size = size;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent componentName) =>
-                componentName.LookupName == "available"
+            public Drawable GetDrawableComponent(ISkinComponentLookup componentLookupName) =>
+                (componentLookupName as TestSkinComponentLookup)?.LookupName == "available"
                     ? new DrawWidthBox
                     {
                         Colour = Color4.Yellow,
@@ -306,7 +306,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class SecondarySource : ISkin
         {
-            public Drawable GetDrawableComponent(ISkinComponent componentName) => new SecondarySourceBox();
+            public Drawable GetDrawableComponent(ISkinComponentLookup componentLookupName) => new SecondarySourceBox();
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
@@ -318,7 +318,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(ISkinSource))]
         private class SkinSourceContainer : Container, ISkinSource
         {
-            public Drawable GetDrawableComponent(ISkinComponent componentName) => new BaseSourceBox();
+            public Drawable GetDrawableComponent(ISkinComponentLookup componentLookupName) => new BaseSourceBox();
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
@@ -337,9 +337,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class TestSkinComponent : ISkinComponent
+        private class TestSkinComponentLookup : ISkinComponentLookup
         {
-            public TestSkinComponent(string name)
+            public TestSkinComponentLookup(string name)
             {
                 LookupName = name;
             }

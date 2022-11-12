@@ -16,22 +16,13 @@ namespace osu.Game.Online.Notifications
     public abstract class NotificationsClientConnector : PersistentEndpointClientConnector
     {
         public event Action<Channel>? ChannelJoined;
+        public event Action<Channel>? ChannelParted;
         public event Action<List<Message>>? NewMessages;
         public event Action? PresenceReceived;
-
-        private bool chatStarted;
 
         protected NotificationsClientConnector(IAPIProvider api)
             : base(api)
         {
-        }
-
-        public void StartChat()
-        {
-            chatStarted = true;
-
-            if (CurrentConnection is NotificationsClient client)
-                client.EnableChat = true;
         }
 
         protected sealed override async Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken)
@@ -39,9 +30,9 @@ namespace osu.Game.Online.Notifications
             var client = await BuildNotificationClientAsync(cancellationToken);
 
             client.ChannelJoined = c => ChannelJoined?.Invoke(c);
+            client.ChannelParted = c => ChannelParted?.Invoke(c);
             client.NewMessages = m => NewMessages?.Invoke(m);
             client.PresenceReceived = () => PresenceReceived?.Invoke();
-            client.EnableChat = chatStarted;
 
             return client;
         }

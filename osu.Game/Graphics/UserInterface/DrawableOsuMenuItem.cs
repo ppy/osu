@@ -24,6 +24,7 @@ namespace osu.Game.Graphics.UserInterface
         private const int transition_length = 80;
 
         private TextContainer text;
+        private HoverClickSounds hoverClickSounds;
 
         public DrawableOsuMenuItem(MenuItem item)
             : base(item)
@@ -36,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
             BackgroundColour = Color4.Transparent;
             BackgroundColourHover = Color4Extensions.FromHex(@"172023");
 
-            AddInternal(new HoverClickSounds());
+            AddInternal(hoverClickSounds = new HoverClickSounds());
 
             updateTextColour();
 
@@ -76,6 +77,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateState()
         {
+            hoverClickSounds.Enabled.Value = !Item.Action.Disabled;
             Alpha = Item.Action.Disabled ? 0.2f : 1;
 
             if (IsHovered && !Item.Action.Disabled)

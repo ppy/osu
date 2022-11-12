@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             var api = parent.Get<IAPIProvider>();
 
-            Add(channelManager = new ChannelManager(api, api.GetNotificationsConnector()));
+            Add(channelManager = new ChannelManager(api));
 
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
