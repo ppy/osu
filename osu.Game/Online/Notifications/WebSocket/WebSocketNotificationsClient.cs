@@ -2,9 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -13,6 +12,7 @@ using Newtonsoft.Json;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.Notifications.WebSocket
@@ -24,27 +24,23 @@ namespace osu.Game.Online.Notifications.WebSocket
     {
         private readonly ClientWebSocket socket;
         private readonly string endpoint;
-        private readonly IAPIProvider api;
+        private readonly ConcurrentDictionary<long, Channel> channelsMap = new ConcurrentDictionary<long, Channel>();
 
         public WebSocketNotificationsClient(ClientWebSocket socket, string endpoint, IAPIProvider api)
             : base(api)
         {
             this.socket = socket;
             this.endpoint = endpoint;
-            this.api = api;
         }
 
         public override async Task ConnectAsync(CancellationToken cancellationToken)
         {
             await socket.ConnectAsync(new Uri(endpoint), cancellationToken).ConfigureAwait(false);
-            runReadLoop(cancellationToken);
-            await base.ConnectAsync(cancellationToken);
-        }
-
-        protected override async Task StartChatAsync()
-        {
             await sendMessage(new StartChatRequest(), CancellationToken.None);
-            await base.StartChatAsync();
+
+            runReadLoop(cancellationToken);
+
+            await base.ConnectAsync(cancellationToken);
         }
 
         private void runReadLoop(CancellationToken cancellationToken) => Task.Run(async () =>
@@ -76,13 +72,14 @@ namespace osu.Game.Online.Notifications.WebSocket
                                     break;
                                 }
 
+                                Logger.Log($"{GetType().ReadableName()} handling event: {message.Event}");
                                 await onMessageReceivedAsync(message);
                             }
 
                             break;
 
                         case WebSocketMessageType.Binary:
-                            throw new NotImplementedException();
+                            throw new NotImplementedException("Binary message type not supported.");
 
                         case WebSocketMessageType.Close:
                             throw new Exception("Connection closed by remote host.");
@@ -116,26 +113,61 @@ namespace osu.Game.Online.Notifications.WebSocket
             await socket.SendAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)), WebSocketMessageType.Text, true, cancellationToken);
         }
 
-        private Task onMessageReceivedAsync(SocketMessage message)
+        private async Task onMessageReceivedAsync(SocketMessage message)
         {
             switch (message.Event)
             {
+                case @"chat.channel.join":
+                    Debug.Assert(message.Data != null);
+
+                    Channel? joinedChannel = JsonConvert.DeserializeObject<Channel>(message.Data.ToString());
+                    Debug.Assert(joinedChannel != null);
+
+                    HandleChannelJoined(joinedChannel);
+                    break;
+
+                case @"chat.channel.part":
+                    Debug.Assert(message.Data != null);
+
+                    Channel? partedChannel = JsonConvert.DeserializeObject<Channel>(message.Data.ToString());
+                    Debug.Assert(partedChannel != null);
+
+                    HandleChannelParted(partedChannel);
+                    break;
+
                 case @"chat.message.new":
                     Debug.Assert(message.Data != null);
 
                     NewChatMessageData? messageData = JsonConvert.DeserializeObject<NewChatMessageData>(message.Data.ToString());
                     Debug.Assert(messageData != null);
 
-                    List<Message> messages = messageData.Messages.Where(m => m.Sender.OnlineID != api.LocalUser.Value.OnlineID).ToList();
+                    foreach (var msg in messageData.Messages)
+                        HandleChannelJoined(await getChannel(msg.ChannelId));
 
-                    foreach (var msg in messages)
-                        HandleJoinedChannel(new Channel(msg.Sender) { Id = msg.ChannelId });
-
-                    HandleMessages(messages);
+                    HandleMessages(messageData.Messages);
                     break;
             }
+        }
 
-            return Task.CompletedTask;
+        private async Task<Channel> getChannel(long channelId)
+        {
+            if (channelsMap.TryGetValue(channelId, out Channel channel))
+                return channel;
+
+            var tsc = new TaskCompletionSource<Channel>();
+            var req = new GetChannelRequest(channelId);
+
+            req.Success += response =>
+            {
+                channelsMap[channelId] = response.Channel;
+                tsc.SetResult(response.Channel);
+            };
+
+            req.Failure += ex => tsc.SetException(ex);
+
+            API.Queue(req);
+
+            return await tsc.Task;
         }
 
         public override async ValueTask DisposeAsync()

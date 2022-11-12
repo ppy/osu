@@ -250,7 +250,7 @@ namespace osu.Game.Tests.Visual.Online
             public TestContainer(IAPIProvider api, Channel[] channels)
             {
                 this.channels = channels;
-                ChannelManager = new ChannelManager(api, api.GetNotificationsConnector());
+                ChannelManager = new ChannelManager(api);
             }
 
             [BackgroundDependencyLoader]

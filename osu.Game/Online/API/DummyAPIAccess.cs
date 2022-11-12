@@ -10,7 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Notifications;
-using osu.Game.Online.Notifications.Polling;
+using osu.Game.Tests;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API

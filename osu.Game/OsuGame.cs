@@ -44,7 +44,6 @@ using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
-using osu.Game.Online.Notifications;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
@@ -84,7 +83,6 @@ namespace osu.Game
         private ChatOverlay chatOverlay;
 
         private ChannelManager channelManager;
-        private NotificationsClientConnector notificationsClient;
 
         [NotNull]
         protected readonly NotificationOverlay Notifications = new NotificationOverlay();
@@ -315,7 +313,7 @@ namespace osu.Game
             Beatmap.BindValueChanged(beatmapChanged, true);
 
             applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
-            applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All);
+            applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -680,7 +678,6 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
             SentryLogger.Dispose();
-            notificationsClient.Dispose();
         }
 
         protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults()
@@ -758,7 +755,6 @@ namespace osu.Game
             BackButton.Receptor receptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
-            dependencies.CacheAs(notificationsClient = API.GetNotificationsConnector());
 
             var sessionIdleTracker = new GameIdleTracker(300000);
             sessionIdleTracker.IsIdle.BindValueChanged(idle =>
@@ -885,7 +881,7 @@ namespace osu.Game
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(channelManager = new ChannelManager(API, notificationsClient), AddInternal, true);
+            loadComponentSingleFile(channelManager = new ChannelManager(API), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
@@ -992,6 +988,9 @@ namespace osu.Game
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
         {
             otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+
+            Settings.Hide();
+            Notifications.Hide();
 
             // Partially visible so leave it at the current depth.
             if (overlay.IsPresent)

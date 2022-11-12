@@ -1,9 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,19 +9,20 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.UI;
+using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Taiko.UI
+namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
     internal class DefaultHitExplosion : CircularContainer, IAnimatableHitExplosion
     {
         private readonly HitResult result;
 
-        [CanBeNull]
-        private Box body;
+        private Box? body;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         public DefaultHitExplosion(HitResult result)
         {
@@ -58,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             updateColour();
         }
 
-        private void updateColour([CanBeNull] DrawableHitObject judgedObject = null)
+        private void updateColour(DrawableHitObject? judgedObject = null)
         {
             if (body == null)
                 return;
@@ -77,6 +75,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public void AnimateSecondHit()
         {
+            this.ResizeTo(new Vector2(TaikoStrongableHitObject.STRONG_SCALE), 50);
         }
     }
 }

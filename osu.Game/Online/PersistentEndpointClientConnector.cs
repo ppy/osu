@@ -14,7 +14,7 @@ namespace osu.Game.Online
     public abstract class PersistentEndpointClientConnector : IDisposable
     {
         /// <summary>
-        /// Whether this is connected to the hub, use <see cref="CurrentConnection"/> to access the connection, if this is <c>true</c>.
+        /// Whether the managed connection is currently connected. When <c>true</c> use <see cref="CurrentConnection"/> to access the connection.
         /// </summary>
         public IBindable<bool> IsConnected => isConnected;
 
@@ -29,17 +29,28 @@ namespace osu.Game.Online
         private readonly Bindable<bool> isConnected = new Bindable<bool>();
         private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
         private CancellationTokenSource connectCancelSource = new CancellationTokenSource();
+        private bool started;
 
         /// <summary>
-        /// Constructs a new <see cref="HubClientConnector"/>.
+        /// Constructs a new <see cref="PersistentEndpointClientConnector"/>.
         /// </summary>
         /// <param name="api"> An API provider used to react to connection state changes.</param>
         protected PersistentEndpointClientConnector(IAPIProvider api)
         {
             API = api;
-
             apiState.BindTo(api.State);
+        }
+
+        /// <summary>
+        /// Attempts to connect and begins processing messages from the remote endpoint.
+        /// </summary>
+        public void Start()
+        {
+            if (started)
+                return;
+
             apiState.BindValueChanged(_ => Task.Run(connectIfPossible), true);
+            started = true;
         }
 
         public Task Reconnect()
@@ -126,6 +137,10 @@ namespace osu.Game.Online
             await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Creates a new <see cref="PersistentEndpointClient"/>.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to stop the process.</param>
         protected abstract Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken);
 
         private async Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)

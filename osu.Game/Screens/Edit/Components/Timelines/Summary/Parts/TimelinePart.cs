@@ -57,15 +57,13 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
         private void updateRelativeChildSize()
         {
-            // the track may not be loaded completely (only has a length once it is).
-            if (!beatmap.Value.Track.IsLoaded)
-            {
-                content.RelativeChildSize = Vector2.One;
-                Schedule(updateRelativeChildSize);
-                return;
-            }
+            // If the track is not loaded, assign a default sane length otherwise relative positioning becomes meaningless.
+            double trackLength = beatmap.Value.Track.IsLoaded ? beatmap.Value.Track.Length : 60000;
+            content.RelativeChildSize = new Vector2((float)Math.Max(1, trackLength), 1);
 
-            content.RelativeChildSize = new Vector2((float)Math.Max(1, beatmap.Value.Track.Length), 1);
+            // The track may not be loaded completely (only has a length once it is).
+            if (!beatmap.Value.Track.IsLoaded)
+                Schedule(updateRelativeChildSize);
         }
 
         protected virtual void LoadBeatmap(EditorBeatmap beatmap)

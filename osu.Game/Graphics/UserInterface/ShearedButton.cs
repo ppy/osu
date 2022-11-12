@@ -138,7 +138,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet) { Enabled = { BindTarget = Enabled } };
 
         protected override void LoadComplete()
         {
