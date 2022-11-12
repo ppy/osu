@@ -49,7 +49,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private const float max_rotation = 0.25f;
 
         public IShader? TextureShader { get; private set; }
-        public IShader? RoundedTextureShader { get; private set; }
 
         protected Texture? Texture { get; set; }
 
@@ -69,7 +68,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
-            RoundedTextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
         }
 
