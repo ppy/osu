@@ -4,8 +4,12 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
@@ -24,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>and how easily they can be cheesed.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -60,6 +64,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
             double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
+            if (mods.Any(h => h is OsuModAutopilot))
+                distance = 0;
 
             return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness / strainTime;
         }
