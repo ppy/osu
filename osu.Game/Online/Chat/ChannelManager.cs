@@ -116,20 +116,7 @@ namespace osu.Game.Online.Chat
             if (apiState.Value != APIState.Online)
                 return;
 
-            scheduledAck?.Cancel();
-
-            var req = new ChatAckRequest();
-            req.Success += _ => scheduleNextRequest();
-            req.Failure += _ => scheduleNextRequest();
-            api.Queue(req);
-
-            // Todo: Handle silences.
-
-            void scheduleNextRequest()
-            {
-                scheduledAck?.Cancel();
-                scheduledAck = Scheduler.AddDelayed(performChatAckRequest, 60000);
-            }
+            SendAck();
         }
 
         /// <summary>
@@ -416,6 +403,7 @@ namespace osu.Game.Online.Chat
                 SinceSilenceId = lastSilenceId
             };
 
+            req.Failure += _ => scheduleNextRequest();
             req.Success += ack =>
             {
                 foreach (var silence in ack.Silences)
@@ -424,9 +412,17 @@ namespace osu.Game.Online.Chat
                         channel.RemoveMessagesFromUser(silence.UserId);
                     lastSilenceId = Math.Max(lastSilenceId ?? 0, silence.Id);
                 }
+
+                scheduleNextRequest();
             };
 
             api.Queue(req);
+
+            void scheduleNextRequest()
+            {
+                scheduledAck?.Cancel();
+                scheduledAck = Scheduler.AddDelayed(performChatAckRequest, 60000);
+            }
         }
 
         /// <summary>
