@@ -133,6 +133,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void OnApply()
         {
             base.OnApply();
+
+            // TODO: THIS CANNOT BE HERE, it makes pooling pointless (see https://github.com/ppy/osu/issues/21072).
             RecreatePieces();
         }
 

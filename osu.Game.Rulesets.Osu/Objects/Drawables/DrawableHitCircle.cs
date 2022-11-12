@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableOsuHitObject, IHasMainCirclePiece, IHasApproachCircle
+    public class DrawableHitCircle : DrawableOsuHitObject, IHasApproachCircle
     {
         public OsuAction? HitAction => HitArea.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
@@ -81,12 +81,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                CirclePiece = new SkinnableDrawable(new OsuSkinComponent(CirclePieceComponent), _ => new MainCirclePiece())
+                                CirclePiece = new SkinnableDrawable(new OsuSkinComponentLookup(CirclePieceComponent), _ => new MainCirclePiece())
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                 },
-                                ApproachCircle = new ProxyableSkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ApproachCircle), _ => new DefaultApproachCircle())
+                                ApproachCircle = new ProxyableSkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.ApproachCircle), _ => new DefaultApproachCircle())
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -278,8 +278,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             public override bool RemoveWhenNotAlive => false;
 
-            public ProxyableSkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
-                : base(component, defaultImplementation, confineMode)
+            public ProxyableSkinnableDrawable(ISkinComponentLookup lookup, Func<ISkinComponentLookup, Drawable> defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
+                : base(lookup, defaultImplementation, confineMode)
             {
             }
         }
