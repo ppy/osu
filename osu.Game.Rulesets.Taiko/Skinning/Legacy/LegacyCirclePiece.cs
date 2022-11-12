@@ -11,8 +11,8 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -37,8 +37,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             RelativeSizeAxes = Axes.Both;
         }
 
+        [Resolved]
+        private GameplayState? gameplayState { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, DrawableHitObject drawableHitObject, ScoreProcessor? scoreProcessor)
+        private void load(ISkinSource skin, DrawableHitObject drawableHitObject)
         {
             Drawable? getDrawableFor(string lookup)
             {
@@ -67,8 +70,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 c.Origin = Anchor.Centre;
             }
 
-            if (scoreProcessor != null)
-                currentCombo.BindTo(scoreProcessor.Combo);
+            if (gameplayState != null)
+                currentCombo.BindTo(gameplayState.ScoreProcessor.Combo);
         }
 
         protected override void LoadComplete()
