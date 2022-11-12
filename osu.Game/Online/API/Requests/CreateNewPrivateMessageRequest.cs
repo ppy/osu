@@ -28,6 +28,7 @@ namespace osu.Game.Online.API.Requests
             req.AddParameter(@"target_id", user.Id.ToString());
             req.AddParameter(@"message", message.Content);
             req.AddParameter(@"is_action", message.IsAction.ToString().ToLowerInvariant());
+            req.AddParameter(@"uuid", message.Uuid);
             return req;
         }
 
