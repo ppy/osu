@@ -21,7 +21,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double Duration
         {
             get => EndTime - StartTime;
-            set => throw new System.NotSupportedException($"Adjust via {nameof(StreamPath)} instead"); // can be implemented if/when needed.
+            set
+            {
+                if (StreamPath.ControlPoints.Count > 0)
+                    StreamPath.ControlPoints.Last().Time = value;
+            }
         }
 
         private readonly StreamPath streamPath = new StreamPath();
