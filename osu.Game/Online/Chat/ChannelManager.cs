@@ -393,7 +393,7 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// Sends an acknowledgement request to the API.
         /// This marks the user as online to receive messages from public channels, while also returning a list of silenced users.
-        /// It needs to be called at least once every 10 minutes.
+        /// It needs to be called at least once every 10 minutes to remain visibly marked as online.
         /// </summary>
         public void SendAck()
         {
