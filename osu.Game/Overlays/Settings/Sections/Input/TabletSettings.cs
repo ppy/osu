@@ -342,8 +342,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private float currentAspectRatio => sizeX.Value / sizeY.Value;
 
-        private static float getHeight(float width, float aspectRatio) => MathF.Round(width / aspectRatio);
+        private static float getHeight(float width, float aspectRatio) => width / aspectRatio;
 
-        private static float getWidth(float height, float aspectRatio) => MathF.Round(height * aspectRatio);
+        private static float getWidth(float height, float aspectRatio) => height * aspectRatio;
     }
 }

@@ -212,17 +212,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.Update();
 
-            if (tablet.Value?.Size is Vector2 size)
-            {
-                float maxDimension = size.LengthFast;
+            if (!(tablet.Value?.Size is Vector2 size))
+                return;
 
-                float fitX = maxDimension / (DrawWidth - Padding.Left - Padding.Right);
-                float fitY = maxDimension / DrawHeight;
+            float maxDimension = size.LengthFast;
 
-                float adjust = MathF.Max(fitX, fitY);
+            float fitX = maxDimension / (DrawWidth - Padding.Left - Padding.Right);
+            float fitY = maxDimension / DrawHeight;
 
-                tabletContainer.Scale = new Vector2(1 / adjust);
-            }
+            float adjust = MathF.Max(fitX, fitY);
+
+            tabletContainer.Scale = new Vector2(1 / adjust);
         }
     }
 }
