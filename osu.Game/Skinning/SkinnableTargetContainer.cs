@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Threading;
@@ -13,9 +11,9 @@ namespace osu.Game.Skinning
 {
     public class SkinnableTargetContainer : SkinReloadableDrawable, ISkinnableTarget
     {
-        private SkinnableTargetComponentsContainer content;
+        private SkinnableTargetComponentsContainer? content;
 
-        public SkinnableTarget Target { get; }
+        public GlobalSkinComponentLookup.LookupType Target { get; }
 
         public IBindableList<ISkinnableDrawable> Components => components;
 
@@ -25,9 +23,9 @@ namespace osu.Game.Skinning
 
         public bool ComponentsLoaded { get; private set; }
 
-        private CancellationTokenSource cancellationSource;
+        private CancellationTokenSource? cancellationSource;
 
-        public SkinnableTargetContainer(SkinnableTarget target)
+        public SkinnableTargetContainer(GlobalSkinComponentLookup.LookupType target)
         {
             Target = target;
         }
@@ -41,7 +39,7 @@ namespace osu.Game.Skinning
             components.Clear();
             ComponentsLoaded = false;
 
-            content = CurrentSkin.GetDrawableComponent(new SkinnableTargetComponent(Target)) as SkinnableTargetComponentsContainer;
+            content = CurrentSkin.GetDrawableComponent(new GlobalSkinComponentLookup(Target)) as SkinnableTargetComponentsContainer;
 
             cancellationSource?.Cancel();
             cancellationSource = null;
