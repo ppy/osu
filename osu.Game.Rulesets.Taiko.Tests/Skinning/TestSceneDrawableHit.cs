@@ -4,17 +4,23 @@
 #nullable disable
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Screens.Play;
+using osu.Game.Tests.Gameplay;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
     public class TestSceneDrawableHit : TaikoSkinnableTestScene
     {
+        [Cached]
+        private GameplayState gameplayState = TestGameplayState.Create(new TaikoRuleset());
+
         [Test]
         public void TestHits()
         {
@@ -46,9 +52,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [Test]
         public void TestHitAnimationSlow()
         {
-            AddStep("Reset combo", () => ScoreProcessor.Combo.Value = 0);
+            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
 
-            AddRepeatStep("Increase combo", () => ScoreProcessor.Combo.Value++, 50);
+            AddRepeatStep("Increase combo", () => gameplayState.ScoreProcessor.Combo.Value++, 50);
 
             TestHits();
         }
@@ -56,9 +62,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [Test]
         public void TestHitAnimationFast()
         {
-            AddStep("Reset combo", () => ScoreProcessor.Combo.Value = 0);
+            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
 
-            AddRepeatStep("Increase combo", () => ScoreProcessor.Combo.Value++, 150);
+            AddRepeatStep("Increase combo", () => gameplayState.ScoreProcessor.Combo.Value++, 150);
 
             TestHits();
         }
