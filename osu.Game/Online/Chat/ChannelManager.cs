@@ -74,7 +74,7 @@ namespace osu.Game.Online.Chat
         private bool channelsInitialised;
         private ScheduledDelegate scheduledAck;
 
-        private long lastMessageId;
+        private long? lastSilenceMessageId;
         private uint? lastSilenceId;
 
         public ChannelManager(IAPIProvider api)
@@ -332,7 +332,7 @@ namespace osu.Game.Online.Chat
             foreach (var group in messages.GroupBy(m => m.ChannelId))
                 channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
-            lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
+            lastSilenceMessageId ??= messages.LastOrDefault()?.Id;
         }
 
         private void initializeChannels()
@@ -394,7 +394,7 @@ namespace osu.Game.Online.Chat
 
             var req = new ChatAckRequest
             {
-                SinceMessageId = lastMessageId,
+                SinceMessageId = lastSilenceMessageId,
                 SinceSilenceId = lastSilenceId
             };
 
