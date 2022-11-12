@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private Drawable backgroundLayer = null!;
         private Drawable? foregroundLayer;
 
-        private Bindable<int> currentCombo { get; } = new BindableInt { MinValue = 0 };
+        private Bindable<int> currentCombo { get; } = new BindableInt();
 
         private bool enableAnimations;
         private int animationFrame;
@@ -86,23 +86,21 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             foreach (var c in InternalChildren)
                 c.Scale = new Vector2(DrawHeight / 128);
 
-            switch (currentCombo.Value)
+            if (currentCombo.Value >= 150)
             {
-                case >= 150:
-                    enableAnimations = true;
-                    Divisor = 4;
-                    break;
-
-                case >= 50:
-                    enableAnimations = true;
-                    Divisor = 2;
-                    break;
-
-                default:
-                    enableAnimations = false;
-                    (foregroundLayer as IFramedAnimation)?.GotoFrame(0);
-                    Divisor = 2;
-                    break;
+                enableAnimations = true;
+                Divisor = 4;
+            }
+            else if (currentCombo.Value >= 50)
+            {
+                enableAnimations = true;
+                Divisor = 2;
+            }
+            else
+            {
+                enableAnimations = false;
+                (foregroundLayer as IFramedAnimation)?.GotoFrame(0);
+                Divisor = 2;
             }
         }
 
