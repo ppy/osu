@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osuTK.Graphics;
@@ -120,17 +119,20 @@ namespace osu.Game.Online.Chat
             AddInternal(drawableChannel);
         }
 
-        public class ChatTextBox : FocusedTextBox
+        public class ChatTextBox : ChatRecentTextBox
         {
             protected override bool OnKeyDown(KeyDownEvent e)
             {
                 // Chat text boxes are generally used in places where they retain focus, but shouldn't block interaction with other
                 // elements on the same screen.
-                switch (e.Key)
+                if (!HoldFocus)
                 {
-                    case Key.Up:
-                    case Key.Down:
-                        return false;
+                    switch (e.Key)
+                    {
+                        case Key.Up:
+                        case Key.Down:
+                            return false;
+                    }
                 }
 
                 return base.OnKeyDown(e);
