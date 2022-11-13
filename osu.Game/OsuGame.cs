@@ -910,19 +910,6 @@ namespace osu.Game
 
             loadComponentSingleFile(new BackgroundBeatmapProcessor(), Add);
 
-            chatOverlay.State.BindValueChanged(_ => updateChatPollRate());
-            // Multiplayer modes need to increase poll rate temporarily.
-            API.Activity.BindValueChanged(_ => updateChatPollRate(), true);
-
-            void updateChatPollRate()
-            {
-                channelManager.HighPollRate.Value =
-                    chatOverlay.State.Value == Visibility.Visible
-                    || API.Activity.Value is UserActivity.InLobby
-                    || API.Activity.Value is UserActivity.InMultiplayerGame
-                    || API.Activity.Value is UserActivity.SpectatingMultiplayerGame;
-            }
-
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());

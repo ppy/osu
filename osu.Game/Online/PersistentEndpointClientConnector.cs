@@ -23,11 +23,13 @@ namespace osu.Game.Online
         /// </summary>
         public PersistentEndpointClient? CurrentConnection { get; private set; }
 
+        protected readonly IAPIProvider API;
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         private readonly Bindable<bool> isConnected = new Bindable<bool>();
         private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
         private CancellationTokenSource connectCancelSource = new CancellationTokenSource();
-
-        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private bool started;
 
         /// <summary>
         /// Constructs a new <see cref="PersistentEndpointClientConnector"/>.
@@ -35,8 +37,20 @@ namespace osu.Game.Online
         /// <param name="api"> An API provider used to react to connection state changes.</param>
         protected PersistentEndpointClientConnector(IAPIProvider api)
         {
+            API = api;
             apiState.BindTo(api.State);
+        }
+
+        /// <summary>
+        /// Attempts to connect and begins processing messages from the remote endpoint.
+        /// </summary>
+        public void Start()
+        {
+            if (started)
+                return;
+
             apiState.BindValueChanged(_ => Task.Run(connectIfPossible), true);
+            started = true;
         }
 
         public Task Reconnect()
