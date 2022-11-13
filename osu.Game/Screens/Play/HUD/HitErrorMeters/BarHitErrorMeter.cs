@@ -11,6 +11,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
@@ -23,6 +24,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
+    [Cached]
     public class BarHitErrorMeter : HitErrorMeter
     {
         private const int judgement_line_width = 14;
@@ -43,6 +45,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         [SettingSource("Label style", "How to show early/late extremities")]
         public Bindable<LabelStyles> LabelStyle { get; } = new Bindable<LabelStyles>(LabelStyles.Icons);
+
+        private readonly DrawablePool<JudgementLine> judgementLinePool = new DrawablePool<JudgementLine>(50, 100);
 
         private SpriteIcon arrow;
         private UprightAspectMaintainingContainer labelEarly;
@@ -88,6 +92,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 Margin = new MarginPadding(2),
                 Children = new Drawable[]
                 {
+                    judgementLinePool,
                     colourBars = new Container
                     {
                         Name = "colour axis",
@@ -403,11 +408,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 }
             }
 
-            judgementsContainer.Add(new JudgementLine
+            judgementLinePool.Get(drawableJudgement =>
             {
-                JudgementLineThickness = { BindTarget = JudgementLineThickness },
-                Y = getRelativeJudgementPosition(judgement.TimeOffset),
-                Colour = GetColourForHitResult(judgement.Type),
+                drawableJudgement.Y = getRelativeJudgementPosition(judgement.TimeOffset);
+                drawableJudgement.Colour = GetColourForHitResult(judgement.Type);
+
+                judgementsContainer.Add(drawableJudgement);
             });
 
             arrow.MoveToY(
@@ -417,7 +423,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private float getRelativeJudgementPosition(double value) => Math.Clamp((float)((value / maxHitWindow) + 1) / 2, 0, 1);
 
-        internal class JudgementLine : CompositeDrawable
+        internal class JudgementLine : PoolableDrawable
         {
             public readonly BindableNumber<float> JudgementLineThickness = new BindableFloat();
 
@@ -437,17 +443,26 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 };
             }
 
+            [Resolved]
+            private BarHitErrorMeter barHitErrorMeter { get; set; }
+
             protected override void LoadComplete()
             {
+                base.LoadComplete();
+
+                JudgementLineThickness.BindTo(barHitErrorMeter.JudgementLineThickness);
+                JudgementLineThickness.BindValueChanged(thickness => Height = thickness.NewValue, true);
+            }
+
+            protected override void PrepareForUse()
+            {
+                base.PrepareForUse();
+
                 const int judgement_fade_in_duration = 100;
                 const int judgement_fade_out_duration = 5000;
 
-                base.LoadComplete();
-
                 Alpha = 0;
                 Width = 0;
-
-                JudgementLineThickness.BindValueChanged(thickness => Height = thickness.NewValue, true);
 
                 this
                     .FadeTo(0.6f, judgement_fade_in_duration, Easing.OutQuint)
