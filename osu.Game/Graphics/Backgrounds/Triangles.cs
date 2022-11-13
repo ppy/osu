@@ -103,7 +103,7 @@ namespace osu.Game.Graphics.Backgrounds
         private void load(IRenderer renderer, ShaderManager shaders)
         {
             texture = renderer.WhitePixel;
-            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
         }
 
         protected override void LoadComplete()

@@ -158,6 +158,10 @@ namespace osu.Game.Skinning
         {
             switch (lookup)
             {
+                // This fallback is important for user skins which use SkinnableSprites.
+                case SkinnableSprite.SpriteComponentLookup sprite:
+                    return this.GetAnimation(sprite.LookupName, false, false);
+
                 case GlobalSkinComponentLookup target:
                     if (!DrawableComponentInfo.TryGetValue(target.Lookup, out var skinnableInfo))
                         return null;
