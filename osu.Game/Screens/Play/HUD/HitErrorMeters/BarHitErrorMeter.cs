@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -27,8 +25,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
     [Cached]
     public class BarHitErrorMeter : HitErrorMeter
     {
-        private const int judgement_line_width = 14;
-
         [SettingSource("Judgement line thickness", "How thick the individual lines should be.")]
         public BindableNumber<float> JudgementLineThickness { get; } = new BindableNumber<float>(4)
         {
@@ -46,30 +42,33 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [SettingSource("Label style", "How to show early/late extremities")]
         public Bindable<LabelStyles> LabelStyle { get; } = new Bindable<LabelStyles>(LabelStyles.Icons);
 
-        private readonly DrawablePool<JudgementLine> judgementLinePool = new DrawablePool<JudgementLine>(50, 100);
+        private const int judgement_line_width = 14;
 
-        private SpriteIcon arrow;
-        private UprightAspectMaintainingContainer labelEarly;
-        private UprightAspectMaintainingContainer labelLate;
+        private const int max_concurrent_judgements = 50;
 
-        private Container colourBarsEarly;
-        private Container colourBarsLate;
-
-        private Container judgementsContainer;
+        private const int centre_marker_size = 8;
 
         private double maxHitWindow;
 
         private double floatingAverage;
-        private Container colourBars;
-        private Container arrowContainer;
 
-        private (HitResult result, double length)[] hitWindows;
+        private readonly DrawablePool<JudgementLine> judgementLinePool = new DrawablePool<JudgementLine>(50, 100);
 
-        private const int max_concurrent_judgements = 50;
+        private SpriteIcon arrow = null!;
+        private UprightAspectMaintainingContainer labelEarly = null!;
+        private UprightAspectMaintainingContainer labelLate = null!;
 
-        private Drawable[] centreMarkerDrawables;
+        private Container colourBarsEarly = null!;
+        private Container colourBarsLate = null!;
 
-        private const int centre_marker_size = 8;
+        private Container judgementsContainer = null!;
+
+        private Container colourBars = null!;
+        private Container arrowContainer = null!;
+
+        private (HitResult result, double length)[] hitWindows = null!;
+
+        private Drawable[]? centreMarkerDrawables;
 
         public BarHitErrorMeter()
         {
@@ -427,6 +426,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             public readonly BindableNumber<float> JudgementLineThickness = new BindableFloat();
 
+            [Resolved]
+            private BarHitErrorMeter barHitErrorMeter { get; set; } = null!;
+
             public JudgementLine()
             {
                 RelativeSizeAxes = Axes.X;
@@ -442,9 +444,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                     RelativeSizeAxes = Axes.Both,
                 };
             }
-
-            [Resolved]
-            private BarHitErrorMeter barHitErrorMeter { get; set; }
 
             protected override void LoadComplete()
             {
