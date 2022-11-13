@@ -396,9 +396,6 @@ namespace osu.Game.Skinning
                     }
 
                     return null;
-
-                case SkinnableSprite.SpriteComponentLookup sprite:
-                    return this.GetAnimation(sprite.LookupName, false, false);
             }
 
             return null;
