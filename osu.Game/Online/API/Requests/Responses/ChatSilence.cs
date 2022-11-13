@@ -12,6 +12,6 @@ namespace osu.Game.Online.API.Requests.Responses
         public uint Id { get; set; }
 
         [JsonProperty("user_id")]
-        public uint UserId { get; set; }
+        public int UserId { get; set; }
     }
 }
