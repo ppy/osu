@@ -67,14 +67,25 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.CreateNestedHitObjects(cancellationToken);
 
+            var positions = StreamPath.GetStreamPath();
+            int i = 0;
+            int j = 0;
+            int k = 1;
+
             // Generate nested hit circles
             foreach ((Vector2 pos, double time) in StreamPath.GetStreamPath())
             {
                 AddNested(new StreamHitCircle
                 {
                     StartTime = StartTime + time,
-                    Position = Position + pos
+                    Position = Position + pos,
+                    NewCombo = j == 0 && ++i != positions.Count && NewCombo
                 });
+
+                if (k >= StreamPath.ControlPoints.Count || ++j < StreamPath.ControlPoints[k].Count) continue;
+
+                j = 0;
+                k++;
             }
 
             UpdateNestedSamples();
