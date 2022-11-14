@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (hitObject)
             {
                 case DrawableStreamHitCircle hitCircle:
+                    hitCircle.Depth = hitCircleContainer.Count;
                     hitCircleContainer.Add(hitCircle);
                     vertexBoundsCache.Invalidate();
                     break;
