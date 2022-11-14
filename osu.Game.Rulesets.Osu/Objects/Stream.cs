@@ -6,14 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
-using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Stream : OsuHitObject, IHasPath
+    public class Stream : OsuHitObject, IHasPath, IHasMultipleComboInformation
     {
         public double EndTime => StreamPath.ControlPoints.Count > 0 ? StartTime + StreamPath.ControlPoints.Last().Time : StartTime;
 
@@ -51,41 +50,45 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 base.Position = value;
-                updateNestedPositions();
+                updateState();
             }
         }
 
-        public IList<IList<HitSampleInfo>> HitCircleSamples { get; set; } = new List<IList<HitSampleInfo>>();
+        public override bool NewCombo
+        {
+            get => base.NewCombo;
+            set
+            {
+                base.NewCombo = value;
+                updateState();
+            }
+        }
+
+        public IList<StreamHitCircleState> HitCircleStates { get; set; } = new List<StreamHitCircleState>();
 
         public Stream()
         {
             SamplesBindable.CollectionChanged += (_, _) => UpdateNestedSamples();
-            StreamPath.Version.ValueChanged += _ => updateNestedPositions();
+            StreamPath.Version.ValueChanged += _ => updateState();
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
             base.CreateNestedHitObjects(cancellationToken);
 
-            var positions = StreamPath.GetStreamPath();
-            int i = 0;
-            int j = 0;
-            int k = 1;
-
-            // Generate nested hit circles
-            foreach ((Vector2 pos, double time) in StreamPath.GetStreamPath())
+            foreach (var state in HitCircleStates)
             {
-                AddNested(new StreamHitCircle
-                {
-                    StartTime = StartTime + time,
-                    Position = Position + pos,
-                    NewCombo = j == 0 && ++i != positions.Count && NewCombo
-                });
+                var h = new StreamHitCircle();
+                h.StartTimeBindable.BindTo(state.StartTimeBindable);
+                h.PositionBindable.BindTo(state.PositionBindable);
+                h.NewComboBindable.BindTo(state.NewComboBindable);
+                h.ComboOffsetBindable.BindTo(state.ComboOffsetBindable);
+                h.IndexInCurrentComboBindable.BindTo(state.IndexInCurrentComboBindable);
+                h.ComboIndexBindable.BindTo(state.ComboIndexBindable);
+                h.ComboIndexWithOffsetsBindable.BindTo(state.ComboIndexWithOffsetsBindable);
+                h.LastInComboBindable.BindTo(state.LastInComboBindable);
 
-                if (k >= StreamPath.ControlPoints.Count || ++j < StreamPath.ControlPoints[k].Count) continue;
-
-                j = 0;
-                k++;
+                AddNested(h);
             }
 
             UpdateNestedSamples();
@@ -93,34 +96,49 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public IEnumerable<HitCircle> ToHitCircles()
         {
+            return HitCircleStates.Select(state => new HitCircle
+            {
+                Samples = state.Samples.Select(o => o.With()).ToList(),
+                SampleControlPoint = (SampleControlPoint)state.SampleControlPoint.DeepClone(),
+                StartTime = state.StartTime,
+                Position = state.Position,
+                NewCombo = state.NewCombo,
+                ComboOffset = state.ComboOffset
+            }).ToList(); // Exhaust the states first because the states could change while adding hit circles to the beatmap
+        }
+
+        private void updateState()
+        {
             var positions = StreamPath.GetStreamPath();
-            int i = 0;
-            int j = 0;
-            int k = 1;
+            int i = 0; // index in stream
+            int j = 0; // index in stream control segment
+            int k = 1; // stream control point
 
             foreach ((Vector2 pos, double time) in positions)
             {
                 var samplePoint = (SampleControlPoint)SampleControlPoint.DeepClone();
-                samplePoint.Time = time;
+                samplePoint.Time = StartTime + time;
 
-                yield return new HitCircle
-                {
-                    StartTime = StartTime + time,
-                    Position = Position + pos,
-                    NewCombo = j == 0 && i != positions.Count - 1 && NewCombo,
-                    SampleControlPoint = samplePoint,
-                    Samples = getNestedSample(i++).Select(o => o.With()).ToList()
-                };
+                if (i == HitCircleStates.Count)
+                    HitCircleStates.Add(createHitCircleState());
+
+                var state = HitCircleStates[i];
+                state.StartTime = StartTime + time;
+                state.Position = Position + pos;
+                state.NewCombo = j == 0 && i != positions.Count - 1 && NewCombo;
+                i++;
 
                 if (k >= StreamPath.ControlPoints.Count || ++j < StreamPath.ControlPoints[k].Count) continue;
 
                 j = 0;
                 k++;
             }
-        }
 
-        private void updateNestedPositions()
-        {
+            // Remove additional states
+            for (int l = HitCircleStates.Count - 1; l >= i; l--)
+            {
+                HitCircleStates.RemoveAt(l);
+            }
         }
 
         protected void UpdateNestedSamples()
@@ -129,13 +147,26 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             foreach (var hitCircle in NestedHitObjects.OfType<StreamHitCircle>())
             {
-                hitCircle.Samples = getNestedSample(i++);
+                var state = getNestedState(i++);
+
+                hitCircle.Samples = state.Samples;
+                hitCircle.SampleControlPoint = state.SampleControlPoint;
             }
         }
 
-        private IList<HitSampleInfo> getNestedSample(int i)
+        private StreamHitCircleState getNestedState(int i)
         {
-            return i < HitCircleSamples.Count ? HitCircleSamples[i] : Samples;
+            return i < HitCircleStates.Count ? HitCircleStates[i] : createHitCircleState();
+        }
+
+        private StreamHitCircleState createHitCircleState()
+        {
+            return new StreamHitCircleState(Samples.Select(o => o.With()).ToList(), (SampleControlPoint)SampleControlPoint.DeepClone());
+        }
+
+        public IEnumerable<IHasComboInformation> GetComboObjects()
+        {
+            return HitCircleStates;
         }
     }
 }
