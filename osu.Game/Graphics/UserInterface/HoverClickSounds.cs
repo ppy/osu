@@ -58,6 +58,14 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnClick(e);
         }
 
+        public override void PlayHoverSample()
+        {
+            if (!Enabled.Value)
+                return;
+
+            base.PlayHoverSample();
+        }
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {

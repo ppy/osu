@@ -58,7 +58,8 @@ namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
     [Cached]
-    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
+    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider,
+                          IGameplaySettings
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -97,6 +98,9 @@ namespace osu.Game.Screens.Edit
 
         [Resolved(canBeNull: true)]
         private INotificationOverlay notifications { get; set; }
+
+        [Resolved]
+        private IGameplaySettings globalGameplaySettings { get; set; }
 
         public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
@@ -176,6 +180,7 @@ namespace osu.Game.Screens.Edit
         private OnScreenDisplay onScreenDisplay { get; set; }
 
         private Bindable<float> editorBackgroundDim;
+        private Bindable<bool> editorHitMarkers;
 
         public Editor(EditorLoader loader = null)
         {
@@ -234,7 +239,7 @@ namespace osu.Game.Screens.Edit
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo));
             dependencies.CacheAs(editorBeatmap);
 
-            editorBeatmap.UpdateInProgress.BindValueChanged(updateInProgress);
+            editorBeatmap.UpdateInProgress.BindValueChanged(_ => updateSampleDisabledState());
 
             canSave = editorBeatmap.BeatmapInfo.Ruleset.CreateInstance() is ILegacyRuleset;
 
@@ -262,6 +267,7 @@ namespace osu.Game.Screens.Edit
             OsuMenuItem redoMenuItem;
 
             editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
+            editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -316,6 +322,10 @@ namespace osu.Game.Screens.Edit
                                         {
                                             new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
                                             new BackgroundDimMenuItem(editorBackgroundDim),
+                                            new ToggleMenuItem("Show hit markers")
+                                            {
+                                                State = { BindTarget = editorHitMarkers },
+                                            }
                                         }
                                     }
                                 }
@@ -659,7 +669,7 @@ namespace osu.Game.Screens.Edit
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
-                    samplePlaybackDisabled.Value = true;
+                    updateSampleDisabledState();
                     dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave, cancelExit));
                     return true;
                 }
@@ -728,27 +738,6 @@ namespace osu.Game.Screens.Edit
             ExitConfirmed = true;
             this.Exit();
         }
-
-        #region Mute from update application
-
-        private ScheduledDelegate temporaryMuteRestorationDelegate;
-        private bool temporaryMuteFromUpdateInProgress;
-
-        private void updateInProgress(ValueChangedEvent<bool> obj)
-        {
-            temporaryMuteFromUpdateInProgress = true;
-            updateSampleDisabledState();
-
-            // Debounce is arbitrarily high enough to avoid flip-flopping the value each other frame.
-            temporaryMuteRestorationDelegate?.Cancel();
-            temporaryMuteRestorationDelegate = Scheduler.AddDelayed(() =>
-            {
-                temporaryMuteFromUpdateInProgress = false;
-                updateSampleDisabledState();
-            }, 50);
-        }
-
-        #endregion
 
         #region Clipboard support
 
@@ -883,11 +872,28 @@ namespace osu.Game.Screens.Edit
             }
         }
 
+        [CanBeNull]
+        private ScheduledDelegate playbackDisabledDebounce;
+
         private void updateSampleDisabledState()
         {
-            samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value
-                                           || currentScreen is not ComposeScreen
-                                           || temporaryMuteFromUpdateInProgress;
+            bool shouldDisableSamples = clock.SeekingOrStopped.Value
+                                        || currentScreen is not ComposeScreen
+                                        || editorBeatmap.UpdateInProgress.Value
+                                        || dialogOverlay?.CurrentDialog != null;
+
+            playbackDisabledDebounce?.Cancel();
+
+            if (shouldDisableSamples)
+            {
+                samplePlaybackDisabled.Value = true;
+            }
+            else
+            {
+                // Debounce re-enabling arbitrarily high enough to avoid flip-flopping during beatmap updates
+                // or rapid user seeks.
+                playbackDisabledDebounce = Scheduler.AddDelayed(() => samplePlaybackDisabled.Value = false, 50);
+            }
         }
 
         private void seek(UIEvent e, int direction)
@@ -1039,5 +1045,11 @@ namespace osu.Game.Screens.Edit
             {
             }
         }
+
+        // Combo colour normalisation should not be applied in the editor.
+        IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => new Bindable<float>();
+
+        // Arguable.
+        IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => globalGameplaySettings.PositionalHitsoundsLevel;
     }
 }

@@ -378,7 +378,7 @@ namespace osu.Game.Skinning.Editor
 
         private ISkinnableTarget getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private ISkinnableTarget getTarget(SkinnableTarget target)
+        private ISkinnableTarget getTarget(GlobalSkinComponentLookup.LookupType target)
         {
             return availableTargets.FirstOrDefault(c => c.Target == target);
         }

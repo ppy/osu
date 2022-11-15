@@ -1,12 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
@@ -20,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public class LegacyBodyPiece : LegacyManiaColumnElement
     {
-        private DrawableHoldNote holdNote;
+        private DrawableHoldNote holdNote = null!;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<bool> isHitting = new Bindable<bool>();
@@ -31,14 +29,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         /// </summary>
         private readonly Bindable<double?> missFadeTime = new Bindable<double?>();
 
-        [CanBeNull]
-        private Drawable bodySprite;
+        private Drawable? bodySprite;
 
-        [CanBeNull]
-        private Drawable lightContainer;
+        private Drawable? lightContainer;
 
-        [CanBeNull]
-        private Drawable light;
+        private Drawable? light;
 
         public LegacyBodyPiece()
         {
@@ -214,7 +209,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             base.Dispose(isDisposing);
 
-            if (holdNote != null)
+            if (holdNote.IsNotNull())
                 holdNote.ApplyCustomUpdateState -= applyCustomUpdateState;
 
             lightContainer?.Expire();

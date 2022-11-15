@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
-                new SkinnableTargetContainer(SkinnableTarget.SongSelect)
+                new SkinnableTargetContainer(GlobalSkinComponentLookup.LookupType.SongSelect)
                 {
                     RelativeSizeAxes = Axes.Both,
                 },

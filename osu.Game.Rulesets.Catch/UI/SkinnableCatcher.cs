@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public readonly Bindable<CatcherAnimationState> AnimationState = new Bindable<CatcherAnimationState>();
 
         public SkinnableCatcher()
-            : base(new CatchSkinComponent(CatchSkinComponents.Catcher), _ => new DefaultCatcher())
+            : base(new CatchSkinComponentLookup(CatchSkinComponents.Catcher), _ => new DefaultCatcher())
         {
             Anchor = Anchor.TopCentre;
             // Sets the origin roughly to the centre of the catcher's plate to allow for correct scaling.
