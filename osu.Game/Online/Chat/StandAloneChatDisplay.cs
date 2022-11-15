@@ -120,7 +120,7 @@ namespace osu.Game.Online.Chat
             AddInternal(drawableChannel);
         }
 
-        public class ChatTextBox : MessageHistoryTextBox
+        public class ChatTextBox : HistoryTextBox
         {
             protected override bool OnKeyDown(KeyDownEvent e)
             {

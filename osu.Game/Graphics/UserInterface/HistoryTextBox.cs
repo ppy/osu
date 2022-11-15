@@ -7,56 +7,52 @@ using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class MessageHistoryTextBox : FocusedTextBox
+    public class HistoryTextBox : FocusedTextBox
     {
         private readonly List<string> messageHistory = new List<string>();
 
-        private int messageIndex = -1;
+        public IReadOnlyList<string> MessageHistory => messageHistory;
+
+        private int historyIndex = -1;
 
         private string originalMessage = string.Empty;
 
-        public MessageHistoryTextBox()
+        public HistoryTextBox()
         {
             Current.ValueChanged += text =>
             {
                 if (string.IsNullOrEmpty(text.NewValue))
-                    messageIndex = -1;
+                    historyIndex = -1;
             };
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            /* Behavior:
-             * add when on last element -> last element stays
-             * subtract when on first element -> sets to original text
-             * reset indexing when Text is set to Empty
-             */
-
             switch (e.Key)
             {
                 case Key.Up:
-                    if (messageIndex == -1)
+                    if (historyIndex == -1)
                         originalMessage = Text;
 
-                    if (messageIndex == messageHistory.Count - 1)
+                    if (historyIndex == messageHistory.Count - 1)
                         return true;
 
-                    Text = messageHistory[++messageIndex];
+                    Text = messageHistory[++historyIndex];
 
                     return true;
 
                 case Key.Down:
-                    if (messageIndex == -1)
+                    if (historyIndex == -1)
                         return true;
 
-                    if (messageIndex == 0)
+                    if (historyIndex == 0)
                     {
-                        messageIndex = -1;
+                        historyIndex = -1;
                         Text = originalMessage;
                         return true;
                     }
 
-                    Text = messageHistory[--messageIndex];
+                    Text = messageHistory[--historyIndex];
 
                     return true;
             }
@@ -69,7 +65,7 @@ namespace osu.Game.Graphics.UserInterface
             if (!string.IsNullOrEmpty(Text))
                 messageHistory.Insert(0, Text);
 
-            messageIndex = -1;
+            historyIndex = -1;
 
             base.Commit();
         }
