@@ -168,6 +168,9 @@ namespace osu.Game.Screens.Edit.List
         {
             var drawable = new DrawableListItem<T>(item);
             drawable.SelectAll = SelectAll;
+            drawable.GetName = getName;
+            drawable.OnDragAction = OnDragAction;
+            // drawable.UpdateItem();
             return drawable.GetRearrangeableListItem();
         }
     }
