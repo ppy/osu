@@ -37,6 +37,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Tests.Resources;
+using osu.Game.Screens.Select.Options;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -1055,6 +1056,24 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("mod overlay hidden", () => songSelect!.ModSelect.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestBeatmapOptionsButtonDisable()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+
+            AddAssert("delete option enabled", () => songSelect!.DeleteOptionButton.Disabled == false);
+            AddAssert("clear option enabled", () => songSelect!.ClearOptionButton.Disabled == false);
+            AddAssert("edit option enabled", () => songSelect!.EditOptionButton?.Disabled == false);
+
+            AddStep("delete all beatmaps", () => manager.Delete());
+
+            AddAssert("delete option disabled", () => songSelect!.DeleteOptionButton.Disabled == true);
+            AddAssert("clear option disabled", () => songSelect!.ClearOptionButton.Disabled == true);
+            AddAssert("edit option disabled", () => songSelect!.EditOptionButton?.Disabled == true);
+        }
+
         private void waitForInitialSelection()
         {
             AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
@@ -1141,6 +1160,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             public IWorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
             public new ModSelectOverlay ModSelect => base.ModSelect;
+
+            public BeatmapOptionsButton DeleteOptionButton => base.deleteOptionButton;
+
+            public BeatmapOptionsButton ClearOptionButton => base.clearOptionButton;
+
+            public BeatmapOptionsButton? EditOptionButton => base.editOptionButton;
 
             public new void PresentScore(ScoreInfo score) => base.PresentScore(score);
 
