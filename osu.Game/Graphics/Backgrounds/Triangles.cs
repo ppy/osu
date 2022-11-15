@@ -187,11 +187,25 @@ namespace osu.Game.Graphics.Backgrounds
         {
             TriangleParticle particle = CreateTriangle();
 
-            particle.Position = new Vector2(nextRandom(), randomY ? nextRandom() : 1);
+            particle.Position = getRandomPosition(randomY, particle.Scale);
             particle.ColourShade = nextRandom();
             particle.Colour = CreateTriangleShade(particle.ColourShade);
 
             return particle;
+        }
+
+        private Vector2 getRandomPosition(bool randomY, float scale)
+        {
+            float y = 1;
+
+            if (randomY)
+            {
+                // since triangles are drawn from the top - allow them to be positioned a bit above the screen
+                float maxOffset = triangle_size * scale * 0.866f / DrawHeight;
+                y = Interpolation.ValueAt(nextRandom(), -maxOffset, 1f, 0f, 1f);
+            }
+
+            return new Vector2(nextRandom(), y);
         }
 
         /// <summary>
