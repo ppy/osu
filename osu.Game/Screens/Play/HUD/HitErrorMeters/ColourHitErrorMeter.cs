@@ -102,9 +102,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 {
                     shape.Colour = colour;
                     Add(shape);
-                });
 
-                removeExtraJudgements();
+                    removeExtraJudgements();
+                });
             }
 
             private void removeExtraJudgements()
@@ -167,15 +167,18 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             {
                 base.PrepareForUse();
 
-                IsRemoved = false;
-
-                this.FadeIn()
+                this.FadeInFromZero(animation_duration, Easing.OutQuint)
                     // On pool re-use, start flow animation from (0,0).
                     .MoveTo(Vector2.Zero);
 
-                content.FadeInFromZero(animation_duration, Easing.OutQuint)
-                       .MoveToY(-DrawSize.Y)
+                content.MoveToY(-DrawSize.Y)
                        .MoveToY(0, animation_duration, Easing.OutQuint);
+            }
+
+            protected override void FreeAfterUse()
+            {
+                base.FreeAfterUse();
+                IsRemoved = false;
             }
 
             public void Remove()
