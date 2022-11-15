@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit.List
 
         private readonly OsuCheckbox button;
         private readonly Box box;
-        private readonly BindableBool enabled = new BindableBool();
+        public BindableBool Enabled { get; } = new BindableBool();
         public readonly DrawableList<T> List = new DrawableList<T>();
 
         public DrawableMinimisableList()
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Edit.List
                             button = new OsuCheckbox
                             {
                                 LabelText = @"SkinnableContainer",
-                                Current = enabled
+                                Current = Enabled
                             },
                         }
                     },
@@ -106,21 +106,21 @@ namespace osu.Game.Screens.Edit.List
             }
 
             box.Hide();
-            enabled.BindValueChanged(v => SetShown(v.NewValue), true);
+            Enabled.BindValueChanged(v => SetShown(v.NewValue), true);
             Select(false);
         }
 
         public void SelectableOnStateChanged(SelectionState obj) =>
             ((IDrawableListItem<T>)List).SelectableOnStateChanged(obj);
 
-        public void Toggle() => SetShown(!enabled.Value, true);
+        public void Toggle() => SetShown(!Enabled.Value, true);
 
         public void SetShown(bool value, bool setValue = false)
         {
             if (value) List.Show();
             else List.Hide();
             UpdateItem();
-            if (setValue) enabled.Value = value;
+            if (setValue) Enabled.Value = value;
         }
 
         public void UpdateItem()

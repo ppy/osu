@@ -298,6 +298,11 @@ namespace osu.Game.Skinning.Editor
             {
                 SkinBlueprintContainer blueprintContainer = new SkinBlueprintContainer(targetScreen);
                 content.Child = blueprintContainer;
+
+                bool open = LayerSidebarList.Enabled.Value;
+                InitLayerEditor();
+                LayerSidebarList.Enabled.Value = open;
+
                 LayerSidebarList.AddRange(blueprintContainer.SelectionBlueprints.Children);
                 componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)
                 {
