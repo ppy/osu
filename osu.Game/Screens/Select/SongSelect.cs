@@ -116,6 +116,10 @@ namespace osu.Game.Screens.Select
 
         private double audioFeedbackLastPlaybackTime;
 
+        protected BeatmapOptionsButton deleteOptionButton;
+
+        protected BeatmapOptionsButton clearOptionButton;
+
         [CanBeNull]
         private IDisposable modSelectOverlayRegistration;
 
@@ -285,9 +289,9 @@ namespace osu.Game.Screens.Select
                     Footer.AddButton(button, overlay);
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
-                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
-                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
+                deleteOptionButton = BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
+                clearOptionButton = BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
             }
 
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
@@ -412,7 +416,13 @@ namespace osu.Game.Screens.Select
         private void updateCarouselSelection(ValueChangedEvent<WorkingBeatmap> e = null)
         {
             var beatmap = e?.NewValue ?? Beatmap.Value;
-            if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
+
+            if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen())
+            {
+                OnBeatmapOptionsButtonDisabledChanged(true);
+                return;
+            }
+            OnBeatmapOptionsButtonDisabledChanged(false);
 
             Logger.Log($"Song select working beatmap updated to {beatmap}");
 
@@ -645,6 +655,12 @@ namespace osu.Game.Screens.Select
 
             playExitingTransition();
             return false;
+        }
+
+        protected virtual void OnBeatmapOptionsButtonDisabledChanged(bool disabled)
+        {
+            deleteOptionButton.Disabled = disabled;
+            clearOptionButton.Disabled = disabled;
         }
 
         private void playExitingTransition()
