@@ -177,7 +177,9 @@ namespace osu.Game.Graphics.Backgrounds
 
             AimCount = (int)Math.Min(max_triangles, DrawWidth * DrawHeight * 0.002f / (TriangleScale * TriangleScale) * SpawnRatio);
 
-            for (int i = 0; i < AimCount - parts.Count; i++)
+            int currentCount = parts.Count;
+
+            for (int i = 0; i < AimCount - currentCount; i++)
                 parts.Add(createTriangle(randomY));
         }
 
