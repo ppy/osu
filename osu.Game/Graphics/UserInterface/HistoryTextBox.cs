@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Input.Events;
 using osuTK.Input;
@@ -9,21 +10,37 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class HistoryTextBox : FocusedTextBox
     {
-        private readonly List<string> messageHistory = new List<string>();
+        private readonly int historyLimit;
+
+        private readonly List<string> messageHistory;
 
         public IReadOnlyList<string> MessageHistory => messageHistory;
 
-        private int historyIndex;
+        private int startIndex;
 
         private string originalMessage = string.Empty;
+        private int nullIndex => -1;
+        private int historyIndex = -1;
+        private int endIndex => (messageHistory.Count + startIndex - 1) % Math.Max(1, messageHistory.Count);
 
-        public HistoryTextBox()
+        public HistoryTextBox(int historyLimit = 100)
         {
+            this.historyLimit = historyLimit;
+            messageHistory = new List<string>(historyLimit);
+
             Current.ValueChanged += text =>
             {
                 if (string.IsNullOrEmpty(text.NewValue))
-                    historyIndex = messageHistory.Count;
+                    historyIndex = nullIndex;
             };
+        }
+
+        public string GetOldMessage(int index)
+        {
+            if (index < 0 || index >= messageHistory.Count)
+                throw new ArgumentOutOfRangeException();
+
+            return messageHistory[(startIndex + index) % messageHistory.Count];
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -31,28 +48,33 @@ namespace osu.Game.Graphics.UserInterface
             switch (e.Key)
             {
                 case Key.Up:
-                    if (historyIndex == messageHistory.Count)
+                    if (historyIndex == nullIndex)
+                    {
+                        historyIndex = endIndex;
                         originalMessage = Text;
+                    }
 
-                    if (historyIndex == 0)
+                    if (historyIndex == startIndex)
                         return true;
 
-                    Text = messageHistory[--historyIndex];
+                    historyIndex = (historyLimit + historyIndex - 1) % historyLimit;
+                    Text = messageHistory[historyIndex];
 
                     return true;
 
                 case Key.Down:
-                    if (historyIndex == messageHistory.Count)
+                    if (historyIndex == nullIndex)
                         return true;
 
-                    if (historyIndex == messageHistory.Count - 1)
+                    if (historyIndex == endIndex)
                     {
-                        historyIndex = messageHistory.Count;
+                        historyIndex = nullIndex;
                         Text = originalMessage;
                         return true;
                     }
 
-                    Text = messageHistory[++historyIndex];
+                    historyIndex = (historyIndex + 1) % historyLimit;
+                    Text = messageHistory[historyIndex];
 
                     return true;
             }
@@ -63,9 +85,18 @@ namespace osu.Game.Graphics.UserInterface
         protected override void Commit()
         {
             if (!string.IsNullOrEmpty(Text))
-                messageHistory.Add(Text);
+            {
+                if (messageHistory.Count == historyLimit)
+                {
+                    messageHistory[startIndex++] = Text;
+                }
+                else
+                {
+                    messageHistory.Add(Text);
+                }
+            }
 
-            historyIndex = messageHistory.Count;
+            historyIndex = nullIndex;
 
             base.Commit();
         }

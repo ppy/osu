@@ -8,7 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.Chat;
+using osu.Game.Graphics.UserInterface;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneChatManipulation : OsuManualInputManagerTestScene
     {
-        private ChatTextBox box;
+        private HistoryTextBox box;
         private OsuSpriteText text;
 
         [SetUp]
@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Children = new Drawable[]
                 {
-                    box = new ChatTextBox
+                    box = new HistoryTextBox(5)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -54,6 +54,75 @@ namespace osu.Game.Tests.Visual.Online
 
                 box.TakeFocus();
             });
+        }
+
+        [Test]
+        public void TestEmptyHistory()
+        {
+            const string temp = "Temp message";
+            AddStep("Set text", () => box.Text = temp);
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Text is the same", () => box.Text == temp);
+
+            AddStep("Move Up", () => InputManager.Key(Key.Up));
+            AddAssert("Text is the same", () => box.Text == temp);
+        }
+
+        [Test]
+        public void TestPartialHistory()
+        {
+            addMessages(2);
+
+            const string temp = "Temp message";
+            AddStep("Set text", () => box.Text = temp);
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Text is the same", () => box.Text == temp);
+
+            AddRepeatStep("Move Up", () => InputManager.Key(Key.Up), 2);
+            AddAssert("Same as 1st message", () => box.Text == "Message 1");
+
+            AddStep("Move Up", () => InputManager.Key(Key.Up));
+            AddAssert("Text is the same", () => box.Text == "Message 1");
+
+            AddRepeatStep("Move down", () => InputManager.Key(Key.Down), 2);
+            AddAssert("Same as temp message", () => box.Text == temp);
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Text is the same", () => box.Text == temp);
+        }
+
+        [Test]
+        public void TestFullHistory()
+        {
+            addMessages(5);
+            AddAssert("History saved as <1-5>", () =>
+                Enumerable.Range(1, 5).Select(number => $"Message {number}").SequenceEqual(box.MessageHistory));
+
+            const string temp = "Temp message";
+            AddStep("Set text", () => box.Text = temp);
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Text is the same", () => box.Text == temp);
+
+            addMessages(2);
+            AddAssert("Overwrote history to <3-7>", () =>
+                Enumerable.Range(3, 5).Select(number => $"Message {number}").SequenceEqual(box.MessageHistory));
+
+            AddStep("Set text", () => box.Text = temp);
+
+            AddRepeatStep("Move Up", () => InputManager.Key(Key.Up), 5);
+            AddAssert("Same as 3rd message", () => box.Text == "Message 3");
+
+            AddStep("Move Up", () => InputManager.Key(Key.Up));
+            AddAssert("Text is the same", () => box.Text == "Message 3");
+
+            AddRepeatStep("Move down", () => InputManager.Key(Key.Down), 4);
+            AddAssert("Same as previous message", () => box.Text == "Message 7");
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Same as temp message", () => box.Text == temp);
         }
 
         [Test]
