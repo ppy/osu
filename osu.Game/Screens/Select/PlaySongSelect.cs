@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select.Options;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Input;
@@ -33,10 +34,12 @@ namespace osu.Game.Screens.Select
 
         private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
 
+        protected BeatmapOptionsButton? editOptionButton;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
+            editOptionButton = BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
         }
 
         protected void PresentScore(ScoreInfo score) =>
@@ -141,6 +144,13 @@ namespace osu.Game.Screens.Select
                 Mods.Value = modsAtGameplayStart;
                 playerLoader = null;
             }
+        }
+
+        protected override void OnBeatmapOptionsButtonDisabledChanged(bool disabled)
+        {
+            base.OnBeatmapOptionsButtonDisabledChanged(disabled);
+
+            if (editOptionButton != null) editOptionButton.Disabled = disabled;
         }
     }
 }
