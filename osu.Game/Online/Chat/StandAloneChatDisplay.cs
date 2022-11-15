@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osuTK.Graphics;
@@ -119,7 +120,7 @@ namespace osu.Game.Online.Chat
             AddInternal(drawableChannel);
         }
 
-        public class ChatTextBox : ChatRecentTextBox
+        public class ChatTextBox : MessageHistoryTextBox
         {
             protected override bool OnKeyDown(KeyDownEvent e)
             {
