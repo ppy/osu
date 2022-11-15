@@ -53,13 +53,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                 background.EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = AccentColour.Opacity(kiaiMode ? 0.5f : 1f),
+                    Colour = AccentColour.Opacity(kiaiMode ? edge_alpha_kiai : 1f),
                     Radius = kiaiMode ? 32 : 8
                 };
             }
         }
 
         private bool kiaiMode;
+
+        private int firstKiaiBeatIndex = -1;
 
         protected override Container<Drawable> Content => content;
 
@@ -137,7 +139,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         private const float edge_alpha_kiai = 0.5f;
 
-        private void fadeEdgeEffects()
+        private void adjustEdgeEffects()
         {
             background.TweenEdgeEffectTo(new EdgeEffectParameters
             {
@@ -155,14 +157,17 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             if (!effectPoint.KiaiMode)
             {
                 kiaiMode = false;
-                fadeEdgeEffects();
+                adjustEdgeEffects();
+
+                firstKiaiBeatIndex = -1;
                 return;
             }
-            else
-            {
-                kiaiMode = true;
-                fadeEdgeEffects();
-            }
+
+            kiaiMode = true;
+            adjustEdgeEffects();
+
+            if (firstKiaiBeatIndex == -1)
+                firstKiaiBeatIndex = beatIndex;
 
             if (drawableHitObject.State.Value == ArmedState.Idle)
             {
@@ -172,7 +177,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                     .FadeOut(timingPoint.BeatLength * 0.75, Easing.OutSine);
             }
 
-            if (beatIndex % timingPoint.TimeSignature.Numerator != 0)
+            // fades are disabled on the first kiai beat so as to avoid interfering with the ongoing adjustEdgeEffects tween
+            if (beatIndex % timingPoint.TimeSignature.Numerator != 0 || beatIndex == firstKiaiBeatIndex)
                 return;
 
             double duration = timingPoint.BeatLength * 2;
