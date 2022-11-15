@@ -169,7 +169,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
                 IsRemoved = false;
 
-                this.FadeIn();
+                this.FadeIn()
+                    // On pool re-use, start flow animation from (0,0).
+                    .MoveTo(Vector2.Zero);
 
                 content.FadeInFromZero(animation_duration, Easing.OutQuint)
                        .MoveToY(-DrawSize.Y)
