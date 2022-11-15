@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private double floatingAverage;
 
-        private readonly DrawablePool<JudgementLine> judgementLinePool = new DrawablePool<JudgementLine>(50, 100);
+        private readonly DrawablePool<JudgementLine> judgementLinePool = new DrawablePool<JudgementLine>(50);
 
         private SpriteIcon arrow = null!;
         private UprightAspectMaintainingContainer labelEarly = null!;
