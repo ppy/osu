@@ -27,6 +27,11 @@ namespace osu.Game.Graphics.Backgrounds
         private const float base_velocity = 50;
 
         /// <summary>
+        /// sqrt(3) / 2
+        /// </summary>
+        private const float equilateral_triangle_ratio = 0.866f;
+
+        /// <summary>
         /// How many screen-space pixels are smoothed over.
         /// Same behavior as Sprite's EdgeSmoothness.
         /// </summary>
@@ -149,7 +154,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 parts[i] = newParticle;
 
-                float bottomPos = parts[i].Position.Y + triangle_size * parts[i].Scale * 0.866f / DrawHeight;
+                float bottomPos = parts[i].Position.Y + triangle_size * parts[i].Scale * equilateral_triangle_ratio / DrawHeight;
                 if (bottomPos < 0)
                     parts.RemoveAt(i);
             }
@@ -201,7 +206,7 @@ namespace osu.Game.Graphics.Backgrounds
             if (randomY)
             {
                 // since triangles are drawn from the top - allow them to be positioned a bit above the screen
-                float maxOffset = triangle_size * scale * 0.866f / DrawHeight;
+                float maxOffset = triangle_size * scale * equilateral_triangle_ratio / DrawHeight;
                 y = Interpolation.ValueAt(nextRandom(), -maxOffset, 1f, 0f, 1f);
             }
 
@@ -290,7 +295,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 foreach (TriangleParticle particle in parts)
                 {
-                    var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
+                    var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * equilateral_triangle_ratio);
 
                     var triangle = new Triangle(
                         Vector2Extensions.Transform(particle.Position * size, DrawInfo.Matrix),
