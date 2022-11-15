@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select.Options
         /// <param name="colour">Colour of the button.</param>
         /// <param name="icon">Icon of the button.</param>
         /// <param name="action">Binding the button does.</param>
-        public void AddButton(LocalisableString firstLine, string secondLine, IconUsage icon, Color4 colour, Action action)
+        public BeatmapOptionsButton AddButton(LocalisableString firstLine, string secondLine, IconUsage icon, Color4 colour, Action action)
         {
             var button = new BeatmapOptionsButton
             {
@@ -82,6 +82,8 @@ namespace osu.Game.Screens.Select.Options
             };
 
             buttonsContainer.Add(button);
+
+            return button;
         }
 
         protected override void PopIn()
