@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public IReadOnlyList<string> MessageHistory => messageHistory;
 
-        private int historyIndex = -1;
+        private int historyIndex;
 
         private string originalMessage = string.Empty;
 
@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
             Current.ValueChanged += text =>
             {
                 if (string.IsNullOrEmpty(text.NewValue))
-                    historyIndex = -1;
+                    historyIndex = messageHistory.Count;
             };
         }
 
@@ -31,28 +31,28 @@ namespace osu.Game.Graphics.UserInterface
             switch (e.Key)
             {
                 case Key.Up:
-                    if (historyIndex == -1)
+                    if (historyIndex == messageHistory.Count)
                         originalMessage = Text;
 
-                    if (historyIndex == messageHistory.Count - 1)
+                    if (historyIndex == 0)
                         return true;
 
-                    Text = messageHistory[++historyIndex];
+                    Text = messageHistory[--historyIndex];
 
                     return true;
 
                 case Key.Down:
-                    if (historyIndex == -1)
+                    if (historyIndex == messageHistory.Count)
                         return true;
 
-                    if (historyIndex == 0)
+                    if (historyIndex == messageHistory.Count - 1)
                     {
-                        historyIndex = -1;
+                        historyIndex = messageHistory.Count;
                         Text = originalMessage;
                         return true;
                     }
 
-                    Text = messageHistory[--historyIndex];
+                    Text = messageHistory[++historyIndex];
 
                     return true;
             }
@@ -63,9 +63,9 @@ namespace osu.Game.Graphics.UserInterface
         protected override void Commit()
         {
             if (!string.IsNullOrEmpty(Text))
-                messageHistory.Insert(0, Text);
+                messageHistory.Add(Text);
 
-            historyIndex = -1;
+            historyIndex = messageHistory.Count;
 
             base.Commit();
         }
