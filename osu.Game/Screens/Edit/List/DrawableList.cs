@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.List
         {
             foreach (var item in ItemMap.Values)
             {
-                if (item is IRearrangableListItem<T> rearrangableItem)
+                if (item is IRearrangableDrawableListItem<T> rearrangableItem)
                 {
                     rearrangableItem.SelectAll = selectAll;
                     rearrangableItem.GetName = getName;
@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Edit.List
         /// <returns>If Select was actually called</returns>
         private static bool select(object obj, bool value)
         {
-            if (obj is IRearrangableListItem<T> item)
+            if (obj is IRearrangableDrawableListItem<T> item)
             {
                 item.Select(value);
                 return true;

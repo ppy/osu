@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public interface IRearrangableListItem<T> : IDrawableListItem<T>
+    public interface IRearrangableDrawableListItem<T> : IDrawableListItem<T>
     {
         public RearrangeableListItem<T> GetRearrangeableListItem();
     }
