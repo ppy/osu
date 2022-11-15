@@ -3,18 +3,26 @@
 
 using System.Collections.Generic;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.UserInterface;
 using osuTK.Input;
 
-namespace osu.Game.Overlays.Chat
+namespace osu.Game.Graphics.UserInterface
 {
-    public class ChatRecentTextBox : FocusedTextBox
+    public class MessageHistoryTextBox : FocusedTextBox
     {
         private readonly List<string> messageHistory = new List<string>();
 
         private int messageIndex = -1;
 
         private string originalMessage = string.Empty;
+
+        public MessageHistoryTextBox()
+        {
+            Current.ValueChanged += text =>
+            {
+                if (string.IsNullOrEmpty(text.NewValue))
+                    messageIndex = -1;
+            };
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -53,12 +61,7 @@ namespace osu.Game.Overlays.Chat
                     return true;
             }
 
-            bool onKeyDown = base.OnKeyDown(e);
-
-            if (string.IsNullOrEmpty(Text))
-                messageIndex = -1;
-
-            return onKeyDown;
+            return base.OnKeyDown(e);
         }
 
         protected override void Commit()
