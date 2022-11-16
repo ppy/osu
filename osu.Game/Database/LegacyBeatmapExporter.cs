@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 
 namespace osu.Game.Database
 {
@@ -12,8 +11,8 @@ namespace osu.Game.Database
     {
         protected override string FileExtension => ".osz";
 
-        public LegacyBeatmapExporter(Storage storage)
-            : base(storage)
+        public LegacyBeatmapExporter(Storage storage, INotificationOverlay? notificationOverlay)
+            : base(storage, notificationOverlay)
         {
         }
     }

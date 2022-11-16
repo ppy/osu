@@ -93,6 +93,9 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private Storage storage { get; set; }
 
+        [Resolved]
+        private INotificationOverlay notificationOverlay { get; set; }
+
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
@@ -938,7 +941,7 @@ namespace osu.Game.Screens.Edit
         private void exportBeatmap()
         {
             Save();
-            new LegacyBeatmapExporter(storage).Export(Beatmap.Value.BeatmapSetInfo);
+            new LegacyBeatmapExporter(storage, notificationOverlay).Export(Beatmap.Value.BeatmapSetInfo);
         }
 
         /// <summary>

@@ -15,6 +15,7 @@ using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Overlays;
 using osu.Game.Skinning;
 using SharpCompress.Archives.Zip;
 
@@ -122,7 +123,7 @@ namespace osu.Game.Tests.Skins.IO
 
             import1.PerformRead(s =>
             {
-                new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportModelTo(s, exportStream);
+                new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<INotificationOverlay>()).ExportModelTo(s, exportStream);
             });
 
             string exportFilename = import1.GetDisplayString();
@@ -204,7 +205,7 @@ namespace osu.Game.Tests.Skins.IO
                 Assert.IsFalse(s.Protected);
                 Assert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
 
-                new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportModelTo(s, exportStream);
+                new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<INotificationOverlay>()).ExportModelTo(s, exportStream);
 
                 Assert.Greater(exportStream.Length, 0);
             });
@@ -239,7 +240,7 @@ namespace osu.Game.Tests.Skins.IO
                 Assert.IsFalse(s.Protected);
                 Assert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
 
-                new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportModelTo(s, exportStream);
+                new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<INotificationOverlay>()).ExportModelTo(s, exportStream);
 
                 Assert.Greater(exportStream.Length, 0);
             });
