@@ -12,6 +12,8 @@ namespace osu.Game.Tests.Visual.Background
 {
     public class TestSceneTrianglesV2Background : OsuTestScene
     {
+        private readonly TrianglesV2 triangles;
+
         public TestSceneTrianglesV2Background()
         {
             AddRange(new Drawable[]
@@ -25,10 +27,10 @@ namespace osu.Game.Tests.Visual.Background
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(200),
+                    Size = new Vector2(500),
                     Masking = true,
                     CornerRadius = 40,
-                    Child = new TrianglesV2
+                    Child = triangles = new TrianglesV2
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -38,6 +40,13 @@ namespace osu.Game.Tests.Visual.Background
                     }
                 }
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddSliderStep("Spawn ratio", 0f, 2f, 1f, s => triangles.SpawnRatio = s);
         }
     }
 }

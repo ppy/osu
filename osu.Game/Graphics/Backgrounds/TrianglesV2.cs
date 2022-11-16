@@ -52,10 +52,16 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         protected virtual bool CreateNewTriangles => true;
 
+        private readonly BindableFloat spawnRatio = new BindableFloat(1f);
+
         /// <summary>
         /// The amount of triangles we want compared to the default distribution.
         /// </summary>
-        protected virtual float SpawnRatio => 1;
+        public float SpawnRatio
+        {
+            get => spawnRatio.Value;
+            set => spawnRatio.Value = value;
+        }
 
         /// <summary>
         /// The relative velocity of the triangles. Default is 1.
@@ -94,7 +100,7 @@ namespace osu.Game.Graphics.Backgrounds
             colourTop.BindValueChanged(_ => updateTexture());
             colourBottom.BindValueChanged(_ => updateTexture(), true);
 
-            addTriangles(true);
+            spawnRatio.BindValueChanged(_ => Reset(), true);
         }
 
         private void updateTexture()
@@ -166,7 +172,7 @@ namespace osu.Game.Graphics.Backgrounds
             // Limited by the maximum size of QuadVertexBuffer for safety.
             const int max_triangles = ushort.MaxValue / (IRenderer.VERTICES_PER_QUAD + 2);
 
-            AimCount = (int)Math.Min(max_triangles, DrawWidth * DrawHeight * 0.001f * SpawnRatio);
+            AimCount = (int)Math.Min(max_triangles, DrawWidth * DrawHeight * 0.0005f * SpawnRatio);
 
             int currentCount = parts.Count;
 
