@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             public IEnumerable<string> HandledExtensions { get; } = new[] { string.Empty };
 
-            private readonly Bindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
+            private readonly Bindable<DirectoryInfo?> currentDirectory = new Bindable<DirectoryInfo?>();
 
             [Resolved(canBeNull: true)] // Can't really be null but required to handle potential of disposal before DI completes.
             private OsuGameBase? game { get; set; }
@@ -206,7 +206,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     currentDirectory.Value = new DirectoryInfo(fullPath);
             }
 
-            private void onDirectorySelected(ValueChangedEvent<DirectoryInfo> directory)
+            private void onDirectorySelected(ValueChangedEvent<DirectoryInfo?> directory)
             {
                 if (directory.NewValue == null)
                 {
@@ -247,7 +247,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             private class DirectoryChooserPopover : OsuPopover
             {
-                public DirectoryChooserPopover(Bindable<DirectoryInfo> currentDirectory)
+                public DirectoryChooserPopover(Bindable<DirectoryInfo?> currentDirectory)
                 {
                     Child = new Container
                     {

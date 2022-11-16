@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class BeatmapOffsetControl : CompositeDrawable
     {
-        public Bindable<ScoreInfo> ReferenceScore { get; } = new Bindable<ScoreInfo>();
+        public Bindable<ScoreInfo?> ReferenceScore { get; } = new Bindable<ScoreInfo?>();
 
         public BindableDouble Current { get; } = new BindableDouble
         {
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
         }
 
-        private void scoreChanged(ValueChangedEvent<ScoreInfo> score)
+        private void scoreChanged(ValueChangedEvent<ScoreInfo?> score)
         {
             referenceScoreContainer.Clear();
 

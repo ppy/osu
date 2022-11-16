@@ -64,7 +64,7 @@ namespace osu.Game.Overlays
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         [Cached]
-        private readonly Bindable<Channel> currentChannel = new Bindable<Channel>();
+        private readonly Bindable<Channel?> currentChannel = new Bindable<Channel?>();
 
         private readonly IBindableList<Channel> availableChannels = new BindableList<Channel>();
         private readonly IBindableList<Channel> joinedChannels = new BindableList<Channel>();
@@ -293,7 +293,7 @@ namespace osu.Game.Overlays
             base.OnFocus(e);
         }
 
-        private void currentChannelChanged(ValueChangedEvent<Channel> channel)
+        private void currentChannelChanged(ValueChangedEvent<Channel?> channel)
         {
             Channel? newChannel = channel.NewValue;
 
@@ -402,7 +402,7 @@ namespace osu.Game.Overlays
         {
             List<Channel> overlayChannels = channelList.Channels.ToList();
 
-            if (overlayChannels.Count < 2)
+            if (overlayChannels.Count < 2 || currentChannel.Value == null)
                 return;
 
             int currentIndex = overlayChannels.IndexOf(currentChannel.Value);
