@@ -40,6 +40,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider? snapProvider { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler? changeHandler { get; set; }
+
         public StreamPlacementBlueprint()
             : base(new Stream())
         {
@@ -160,6 +163,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
         private void beginCurve()
         {
+            changeHandler?.BeginChange();
             BeginPlacement(commitStart: true);
             setState(StreamPlacementState.Body);
         }

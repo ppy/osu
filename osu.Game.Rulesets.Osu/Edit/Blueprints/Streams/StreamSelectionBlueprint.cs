@@ -79,7 +79,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
             // TODO: Remove this when streams can be saved.
             // Convert the stream to an actual stream on deselection so we're not left with a Stream object which can't be saved.
-            Deselected += _ => convertToStream();
+            Deselected += _ =>
+            {
+                convertToStream();
+                changeHandler?.EndChange();
+            };
         }
 
         public override bool HandleQuickDeletion()
