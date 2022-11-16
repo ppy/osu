@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Select.Options
         private readonly OsuSpriteText secondLine;
         private readonly Container box;
 
-        private const float disabledAlpha = 0.5f;
+        private const float disabled_alpha = 0.5f;
 
         private bool disabled;
 
@@ -44,9 +44,9 @@ namespace osu.Game.Screens.Select.Options
 
                 if (disabled)
                 {
-                    firstLine.Alpha = disabledAlpha;
-                    secondLine.Alpha = disabledAlpha;
-                    iconText.Alpha = disabledAlpha;
+                    firstLine.Alpha = disabled_alpha;
+                    secondLine.Alpha = disabled_alpha;
+                    iconText.Alpha = disabled_alpha;
                     return;
                 }
 
