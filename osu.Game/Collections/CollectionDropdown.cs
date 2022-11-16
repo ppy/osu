@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -100,7 +101,7 @@ namespace osu.Game.Collections
         private void selectionChanged(ValueChangedEvent<CollectionFilterMenuItem> filter)
         {
             // May be null during .Clear().
-            if (filter.NewValue == null)
+            if (filter.NewValue.IsNull())
                 return;
 
             // Never select the manage collection filter - rollback to the previous filter.
@@ -112,7 +113,7 @@ namespace osu.Game.Collections
                 return;
             }
 
-            var newCollection = filter.NewValue?.Collection;
+            var newCollection = filter.NewValue.Collection;
 
             // This dropdown be weird.
             // We only care about filtering if the actual collection has changed.
