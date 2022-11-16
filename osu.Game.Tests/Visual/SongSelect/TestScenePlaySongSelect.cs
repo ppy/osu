@@ -1063,14 +1063,14 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             addRulesetImportStep(0);
 
-            AddAssert("delete option enabled", () => songSelect!.DeleteOptionButton.Disabled == false);
-            AddAssert("clear option enabled", () => songSelect!.ClearOptionButton.Disabled == false);
+            AddAssert("delete option enabled", () => !songSelect!.DeleteOptionButton.Disabled);
+            AddAssert("clear option enabled", () => !songSelect!.ClearOptionButton.Disabled);
             AddAssert("edit option enabled", () => songSelect!.EditOptionButton?.Disabled == false);
 
             AddStep("delete all beatmaps", () => manager.Delete());
 
-            AddAssert("delete option disabled", () => songSelect!.DeleteOptionButton.Disabled == true);
-            AddAssert("clear option disabled", () => songSelect!.ClearOptionButton.Disabled == true);
+            AddAssert("delete option disabled", () => songSelect!.DeleteOptionButton.Disabled);
+            AddAssert("clear option disabled", () => songSelect!.ClearOptionButton.Disabled);
             AddAssert("edit option disabled", () => songSelect!.EditOptionButton?.Disabled == true);
         }
 
