@@ -1161,11 +1161,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             public new BeatmapCarousel Carousel => base.Carousel;
             public new ModSelectOverlay ModSelect => base.ModSelect;
 
-            public BeatmapOptionsButton DeleteOptionButton => base.deleteOptionButton;
+            public new BeatmapOptionsButton DeleteOptionButton => base.DeleteOptionButton;
 
-            public BeatmapOptionsButton ClearOptionButton => base.clearOptionButton;
+            public new BeatmapOptionsButton ClearOptionButton => base.ClearOptionButton;
 
-            public BeatmapOptionsButton? EditOptionButton => base.editOptionButton;
+            public new BeatmapOptionsButton? EditOptionButton => base.EditOptionButton;
 
             public new void PresentScore(ScoreInfo score) => base.PresentScore(score);
 

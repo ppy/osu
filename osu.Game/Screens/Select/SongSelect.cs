@@ -116,9 +116,9 @@ namespace osu.Game.Screens.Select
 
         private double audioFeedbackLastPlaybackTime;
 
-        protected BeatmapOptionsButton deleteOptionButton;
+        protected BeatmapOptionsButton DeleteOptionButton;
 
-        protected BeatmapOptionsButton clearOptionButton;
+        protected BeatmapOptionsButton ClearOptionButton;
 
         [CanBeNull]
         private IDisposable modSelectOverlayRegistration;
@@ -290,8 +290,8 @@ namespace osu.Game.Screens.Select
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
-                deleteOptionButton = BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
-                clearOptionButton = BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
+                DeleteOptionButton = BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
+                ClearOptionButton = BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
             }
 
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
@@ -659,8 +659,8 @@ namespace osu.Game.Screens.Select
 
         protected virtual void OnBeatmapOptionsButtonDisabledChanged(bool disabled)
         {
-            deleteOptionButton.Disabled = disabled;
-            clearOptionButton.Disabled = disabled;
+            DeleteOptionButton.Disabled = disabled;
+            ClearOptionButton.Disabled = disabled;
         }
 
         private void playExitingTransition()
