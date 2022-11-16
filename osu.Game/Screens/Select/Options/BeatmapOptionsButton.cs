@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Select.Options
         private readonly OsuSpriteText secondLine;
         private readonly Container box;
 
-        private readonly float disabledAlpha = 0.5f;
+        private const float disabledAlpha = 0.5f;
 
         private bool disabled;
 
