@@ -1,12 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.IO;
 using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 
 namespace osu.Game.Database
@@ -15,8 +15,8 @@ namespace osu.Game.Database
     {
         protected override string FileExtension => ".osr";
 
-        public LegacyScoreExporter(Storage storage)
-            : base(storage)
+        public LegacyScoreExporter(Storage storage, INotificationOverlay? notificationOverlay)
+            : base(storage, notificationOverlay)
         {
         }
 
@@ -28,6 +28,9 @@ namespace osu.Game.Database
 
             using (var inputStream = UserFileStorage.GetStream(file.File.GetStoragePath()))
                 inputStream.CopyTo(outputStream);
+
+            Notification.State = ProgressNotificationState.Completed;
+            outputStream.Dispose();
         }
     }
 }

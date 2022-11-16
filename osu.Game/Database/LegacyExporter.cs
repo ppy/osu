@@ -1,11 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.IO;
+using System.Threading.Tasks;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Database
@@ -25,10 +26,17 @@ namespace osu.Game.Database
 
         private readonly Storage exportStorage;
 
-        protected LegacyExporter(Storage storage)
+        private readonly INotificationOverlay? notificationOverlay;
+
+        protected ProgressNotification Notification = null!;
+
+        private string filename = null!;
+
+        protected LegacyExporter(Storage storage, INotificationOverlay? notificationOverlay)
         {
             exportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
+            this.notificationOverlay = notificationOverlay;
         }
 
         /// <summary>
@@ -37,12 +45,25 @@ namespace osu.Game.Database
         /// <param name="item">The item to export.</param>
         public void Export(TModel item)
         {
-            string filename = $"{item.GetDisplayString().GetValidFilename()}{FileExtension}";
+            filename = $"{item.GetDisplayString().GetValidFilename()}{FileExtension}";
 
-            using (var stream = exportStorage.CreateFileSafely(filename))
-                ExportModelTo(item, stream);
+            Stream stream = exportStorage.CreateFileSafely(filename);
 
-            exportStorage.PresentFileExternally(filename);
+            Notification = new ProgressNotification
+            {
+                State = ProgressNotificationState.Active,
+                Text = "Exporting...",
+                CompletionText = "Export completed"
+            };
+            Notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
+            Notification.CancelRequested += () =>
+            {
+                stream.Dispose();
+                return true;
+            };
+
+            ExportModelTo(item, stream);
+            notificationOverlay?.Post(Notification);
         }
 
         /// <summary>
@@ -57,7 +78,24 @@ namespace osu.Game.Database
                 foreach (var file in model.Files)
                     archive.AddEntry(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
 
-                archive.SaveTo(outputStream);
+                Task.Factory.StartNew(() =>
+                {
+                    archive.SaveTo(outputStream);
+                }, Notification.CancellationToken).ContinueWith(t =>
+                {
+                    if (t.IsCompletedSuccessfully)
+                    {
+                        outputStream.Dispose();
+                        Notification.State = ProgressNotificationState.Completed;
+                    }
+                    else
+                    {
+                        if (Notification.State == ProgressNotificationState.Cancelled) return;
+
+                        Notification.State = ProgressNotificationState.Cancelled;
+                        Notification.Text = "Export Failed";
+                    }
+                });
             }
         }
     }

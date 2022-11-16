@@ -173,11 +173,6 @@ namespace osu.Game.Database
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
 
-#if DEBUG
-            if (!DebugUtils.IsNUnitRunning)
-                applyFilenameSchemaSuffix(ref Filename);
-#endif
-
             string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
 
             // Attempt to recover a newer database version if available.
