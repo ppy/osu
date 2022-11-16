@@ -27,6 +27,11 @@ namespace osu.Game.Graphics.Backgrounds
         private const float base_velocity = 50;
         private const int texture_height = 128;
 
+        /// <summary>
+        /// sqrt(3) / 2
+        /// </summary>
+        private const float equilateral_triangle_ratio = 0.866f;
+
         private readonly Bindable<Color4> colourTop = new Bindable<Color4>(Color4.White);
         private readonly Bindable<Color4> colourBottom = new Bindable<Color4>(Color4.Black);
 
@@ -52,7 +57,13 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         protected virtual float SpawnRatio => 1;
 
-        private float triangleScale = 1;
+        private readonly BindableFloat triangleScale = new BindableFloat(1f);
+
+        public float TriangleScale
+        {
+            get => triangleScale.Value;
+            set => triangleScale.Value = value;
+        }
 
         /// <summary>
         /// The relative velocity of the triangles. Default is 1.
@@ -91,7 +102,7 @@ namespace osu.Game.Graphics.Backgrounds
             colourTop.BindValueChanged(_ => updateTexture());
             colourBottom.BindValueChanged(_ => updateTexture(), true);
 
-            addTriangles(true);
+            triangleScale.BindValueChanged(_ => Reset(), true);
         }
 
         private void updateTexture()
@@ -116,23 +127,6 @@ namespace osu.Game.Graphics.Backgrounds
             Invalidate(Invalidation.DrawNode);
         }
 
-        public float TriangleScale
-        {
-            get => triangleScale;
-            set
-            {
-                float change = value / triangleScale;
-                triangleScale = value;
-
-                for (int i = 0; i < parts.Count; i++)
-                {
-                    TriangleParticle newParticle = parts[i];
-                    newParticle.Scale *= change;
-                    parts[i] = newParticle;
-                }
-            }
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -146,7 +140,7 @@ namespace osu.Game.Graphics.Backgrounds
             // Since position is relative, the velocity needs to scale inversely with DrawHeight.
             // Since we will later multiply by the scale of individual triangles we normalize by
             // dividing by triangleScale.
-            float movedDistance = -elapsedSeconds * Velocity * base_velocity / (DrawHeight * triangleScale);
+            float movedDistance = -elapsedSeconds * Velocity * base_velocity / (DrawHeight * TriangleScale);
 
             for (int i = 0; i < parts.Count; i++)
             {
@@ -157,7 +151,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 parts[i] = newParticle;
 
-                float bottomPos = parts[i].Position.Y + triangle_size * parts[i].Scale * 0.866f / DrawHeight;
+                float bottomPos = parts[i].Position.Y + triangle_size * parts[i].Scale * equilateral_triangle_ratio / DrawHeight;
                 if (bottomPos < 0)
                     parts.RemoveAt(i);
             }
@@ -183,9 +177,11 @@ namespace osu.Game.Graphics.Backgrounds
             // Limited by the maximum size of QuadVertexBuffer for safety.
             const int max_triangles = ushort.MaxValue / (IRenderer.VERTICES_PER_QUAD + 2);
 
-            AimCount = (int)Math.Min(max_triangles, DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
+            AimCount = (int)Math.Min(max_triangles, DrawWidth * DrawHeight * 0.002f / (TriangleScale * TriangleScale) * SpawnRatio);
 
-            for (int i = 0; i < AimCount - parts.Count; i++)
+            int currentCount = parts.Count;
+
+            for (int i = 0; i < AimCount - currentCount; i++)
                 parts.Add(createTriangle(randomY));
         }
 
@@ -193,7 +189,16 @@ namespace osu.Game.Graphics.Backgrounds
         {
             TriangleParticle particle = CreateTriangle();
 
-            particle.Position = new Vector2(nextRandom(), randomY ? nextRandom() : 1);
+            float y = 1;
+
+            if (randomY)
+            {
+                // since triangles are drawn from the top - allow them to be positioned a bit above the screen
+                float maxOffset = triangle_size * particle.Scale * equilateral_triangle_ratio / DrawHeight;
+                y = Interpolation.ValueAt(nextRandom(), -maxOffset, 1f, 0f, 1f);
+            }
+
+            particle.Position = new Vector2(nextRandom(), y);
 
             return particle;
         }
@@ -210,7 +215,7 @@ namespace osu.Game.Graphics.Backgrounds
             float u1 = 1 - nextRandom(); //uniform(0,1] random floats
             float u2 = 1 - nextRandom();
             float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); // random normal(0,1)
-            float scale = Math.Max(triangleScale * (mean + std_dev * randStdNormal), 0.1f); // random normal(mean,stdDev^2)
+            float scale = Math.Max(TriangleScale * (mean + std_dev * randStdNormal), 0.1f); // random normal(mean,stdDev^2)
 
             return new TriangleParticle { Scale = scale };
         }
@@ -262,7 +267,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 foreach (TriangleParticle particle in parts)
                 {
-                    var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
+                    var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * equilateral_triangle_ratio);
 
                     Vector2 topLeft = particle.Position * size + new Vector2(-offset.X, 0f);
                     Vector2 topRight = particle.Position * size + new Vector2(offset.X, 0);
