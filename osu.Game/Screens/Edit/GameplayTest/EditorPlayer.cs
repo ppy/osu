@@ -2,16 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Edit.GameplayTest
 {
-    public class EditorPlayer : Player, IGameplaySettings
+    public class EditorPlayer : Player
     {
         private readonly Editor editor;
         private readonly EditorState editorState;
@@ -19,21 +17,11 @@ namespace osu.Game.Screens.Edit.GameplayTest
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
-        private OsuConfigManager config = null!;
-
         public EditorPlayer(Editor editor)
             : base(new PlayerConfiguration { ShowResults = false })
         {
             this.editor = editor;
             editorState = editor.GetState();
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            // needs to be populated before BDL to work correctly.
-            config = parent.Get<OsuConfigManager>();
-
-            return base.CreateChildDependencies(parent);
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
@@ -84,9 +72,5 @@ namespace osu.Game.Screens.Edit.GameplayTest
             editor.RestoreState(editorState);
             return base.OnExiting(e);
         }
-
-        // Editor overrides but we actually want to use game-wide settings here.
-        public IBindable<float> ComboColourNormalisationAmount => ((IGameplaySettings)config).ComboColourNormalisationAmount;
-        public IBindable<float> PositionalHitsoundsLevel => ((IGameplaySettings)config).PositionalHitsoundsLevel;
     }
 }
