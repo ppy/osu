@@ -422,6 +422,7 @@ namespace osu.Game.Screens.Select
                 OnBeatmapOptionsButtonDisabledChanged(true);
                 return;
             }
+
             OnBeatmapOptionsButtonDisabledChanged(false);
 
             Logger.Log($"Song select working beatmap updated to {beatmap}");
