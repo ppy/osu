@@ -1,43 +1,40 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osuTK;
-using osuTK.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Framework.Graphics;
+using osuTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Tests.Visual.Background
 {
     public class TestSceneTrianglesBackground : OsuTestScene
     {
+        private readonly Triangles triangles;
+
         public TestSceneTrianglesBackground()
         {
-            AddRange(new Drawable[]
+            Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Gray
+                    Colour = Color4.Black
                 },
-                new Container
+                triangles = new Triangles
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(200),
-                    Masking = true,
-                    CornerRadius = 40,
-                    Child = new TrianglesV2
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        ColourTop = Color4.Red,
-                        ColourBottom = Color4.Orange
-                    }
+                    RelativeSizeAxes = Axes.Both,
+                    ColourLight = Color4.White,
+                    ColourDark = Color4.Gray
                 }
-            });
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddSliderStep("Triangle scale", 0f, 10f, 1f, s => triangles.TriangleScale = s);
         }
     }
 }
