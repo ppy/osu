@@ -21,7 +21,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Handlers;
+using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Midi;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -46,6 +50,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
+using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -62,6 +67,7 @@ namespace osu.Game
     /// Unlike <see cref="OsuGame"/>, this class will not load any kind of UI, allowing it to be used
     /// for provide dependencies to test cases without interfering with them.
     /// </summary>
+    [Cached(typeof(OsuGameBase))]
     public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
         public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv" };
@@ -188,6 +194,8 @@ namespace osu.Game
 
         private RealmAccess realm;
 
+        protected SafeAreaContainer SafeAreaContainer { get; private set; }
+
         /// <summary>
         /// For now, this is used as a source specifically for beat synced components.
         /// Going forward, it could potentially be used as the single source-of-truth for beatmap timing.
@@ -253,8 +261,8 @@ namespace osu.Game
             largeStore.AddTextureSource(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
 
-            dependencies.CacheAs(this);
             dependencies.CacheAs(LocalConfig);
+            dependencies.CacheAs<IGameplaySettings>(LocalConfig);
 
             InitialiseFonts();
 
@@ -341,7 +349,7 @@ namespace osu.Game
 
             GlobalActionContainer globalBindings;
 
-            base.Content.Add(new SafeAreaContainer
+            base.Content.Add(SafeAreaContainer = new SafeAreaContainer
             {
                 SafeAreaOverrideEdges = SafeAreaOverrideEdges,
                 RelativeSizeAxes = Axes.Both,
@@ -521,6 +529,29 @@ namespace osu.Game
         /// <remarks>Should be overriden per-platform to provide settings for platform-specific handlers.</remarks>
         public virtual SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
         {
+            // One would think that this could be moved to the `OsuGameDesktop` class, but doing so means that
+            // OsuGameTestScenes will not show any input options (as they are based on OsuGame not OsuGameDesktop).
+            //
+            // This in turn makes it hard for ruleset creators to adjust input settings while testing their ruleset
+            // within the test browser interface.
+            if (RuntimeInfo.IsDesktop)
+            {
+                switch (handler)
+                {
+                    case ITabletHandler th:
+                        return new TabletSettings(th);
+
+                    case MouseHandler mh:
+                        return new MouseSettings(mh);
+
+                    case JoystickHandler jh:
+                        return new JoystickSettings(jh);
+
+                    case TouchHandler:
+                        return new InputSection.HandlerSection(handler);
+                }
+            }
+
             switch (handler)
             {
                 case MidiHandler:
@@ -586,10 +617,15 @@ namespace osu.Game
                 return;
             }
 
+            var previouslySelectedMods = SelectedMods.Value.ToArray();
+
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
 
             AvailableMods.Value = dict;
+
+            if (!SelectedMods.Disabled)
+                SelectedMods.Value = previouslySelectedMods.Select(m => instance.CreateModFromAcronym(m.Acronym)).Where(m => m != null).ToArray();
 
             void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
         }

@@ -770,6 +770,26 @@ namespace osu.Game.Screens.Select
             {
                 updateItem(item);
 
+                if (!item.Item.Filtered.Value)
+                {
+                    bool isSelected = item.Item.State.Value == CarouselItemState.Selected;
+
+                    // Cheap way of doing animations when entering / exiting song select.
+                    const double half_time = 50;
+                    const float panel_x_offset_when_inactive = 200;
+
+                    if (isSelected || AllowSelection)
+                    {
+                        item.Alpha = (float)Interpolation.DampContinuously(item.Alpha, 1, half_time, Clock.ElapsedFrameTime);
+                        item.X = (float)Interpolation.DampContinuously(item.X, 0, half_time, Clock.ElapsedFrameTime);
+                    }
+                    else
+                    {
+                        item.Alpha = (float)Interpolation.DampContinuously(item.Alpha, 0, half_time, Clock.ElapsedFrameTime);
+                        item.X = (float)Interpolation.DampContinuously(item.X, panel_x_offset_when_inactive, half_time, Clock.ElapsedFrameTime);
+                    }
+                }
+
                 if (item is DrawableCarouselBeatmapSet set)
                 {
                     foreach (var diff in set.DrawableBeatmaps)
@@ -1048,7 +1068,7 @@ namespace osu.Game.Screens.Select
 
             protected override void PerformSelection()
             {
-                if (LastSelected == null || LastSelected.Filtered.Value)
+                if (LastSelected == null)
                     carousel?.SelectNextRandom();
                 else
                     base.PerformSelection();

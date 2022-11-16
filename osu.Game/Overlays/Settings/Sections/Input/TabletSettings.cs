@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -72,7 +73,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, LocalisationManager localisation)
         {
             Children = new Drawable[]
             {
@@ -110,11 +111,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                             {
                                 t.NewLine();
-                                t.AddText("If your tablet is not detected, please read ");
-                                t.AddLink("this FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
+                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedBindableString(TabletSettingsStrings.NoTabletDetectedDescription(RuntimeInfo.OS == RuntimeInfo.Platform.Windows
                                     ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
-                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux");
-                                t.AddText(" for troubleshooting steps.");
+                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux")).Value);
+                                t.AddLinks(formattedSource.Text, formattedSource.Links);
                             }
                         }),
                     }
@@ -309,9 +309,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 // if lock is applied (or the specified values were out of range) aim to adjust the axis the user was not adjusting to conform.
                 if (sizeChanged == sizeX)
-                    sizeY.Value = (int)(areaSize.Value.X / aspectRatio.Value);
+                    sizeY.Value = getHeight(areaSize.Value.X, aspectRatio.Value);
                 else
-                    sizeX.Value = (int)(areaSize.Value.Y * aspectRatio.Value);
+                    sizeX.Value = getWidth(areaSize.Value.Y, aspectRatio.Value);
             }
             finally
             {
@@ -325,12 +325,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             aspectLock.Value = false;
 
-            int proposedHeight = (int)(sizeX.Value / aspectRatio);
+            int proposedHeight = getHeight(sizeX.Value, aspectRatio);
 
             if (proposedHeight < sizeY.MaxValue)
                 sizeY.Value = proposedHeight;
             else
-                sizeX.Value = (int)(sizeY.Value * aspectRatio);
+                sizeX.Value = getWidth(sizeY.Value, aspectRatio);
 
             updateAspectRatio();
 
@@ -341,5 +341,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private void updateAspectRatio() => aspectRatio.Value = currentAspectRatio;
 
         private float currentAspectRatio => sizeX.Value / sizeY.Value;
+
+        private static int getHeight(float width, float aspectRatio) => (int)Math.Round(width / aspectRatio);
+
+        private static int getWidth(float height, float aspectRatio) => (int)Math.Round(height * aspectRatio);
     }
 }

@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon { get; } = FontAwesome.Regular.Circle;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles) };
+        public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles), typeof(OsuModFreezeFrame) };
 
         public BindableBool IsDisabled { get; } = new BindableBool();
 

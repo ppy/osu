@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -19,12 +20,27 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         private int currentCombo;
 
-        [CanBeNull]
-        public ICatchComboCounter ComboCounter => Drawable as ICatchComboCounter;
+        public ICatchComboCounter? ComboCounter => Drawable as ICatchComboCounter;
+
+        private readonly IBindable<bool> showCombo = new BindableBool(true);
 
         public CatchComboDisplay()
-            : base(new CatchSkinComponent(CatchSkinComponents.CatchComboCounter), _ => Empty())
+            : base(new CatchSkinComponentLookup(CatchSkinComponents.CatchComboCounter), _ => Empty())
         {
+        }
+
+        [Resolved(canBeNull: true)]
+        private Player? player { get; set; }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (player != null)
+            {
+                showCombo.BindTo(player.ShowingOverlayComponents);
+                showCombo.BindValueChanged(s => this.FadeTo(s.NewValue ? 1 : 0, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING), true);
+            }
         }
 
         protected override void SkinChanged(ISkinSource skin)

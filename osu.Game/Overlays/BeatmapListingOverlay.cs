@@ -115,6 +115,7 @@ namespace osu.Game.Overlays
         {
             filterControl.Search(query);
             Show();
+            ScrollFlow.ScrollToStart();
         }
 
         protected override BeatmapListingHeader CreateHeader() => new BeatmapListingHeader();
@@ -179,7 +180,9 @@ namespace osu.Game.Overlays
                 // new results may contain beatmaps from a previous page,
                 // this is dodgy but matches web behaviour for now.
                 // see: https://github.com/ppy/osu-web/issues/9270
-                newCards = newCards.Except(foundContent);
+                // todo: replace custom equality compraer with ExceptBy in net6.0
+                // newCards = newCards.ExceptBy(foundContent.Select(c => c.BeatmapSet.OnlineID), c => c.BeatmapSet.OnlineID);
+                newCards = newCards.Except(foundContent, BeatmapCardEqualityComparer.Default);
 
                 panelLoadTask = LoadComponentsAsync(newCards, loaded =>
                 {
@@ -392,6 +395,22 @@ namespace osu.Game.Overlays
 
             if (shouldShowMore)
                 filterControl.FetchNextPage();
+        }
+
+        private class BeatmapCardEqualityComparer : IEqualityComparer<BeatmapCard>
+        {
+            public static BeatmapCardEqualityComparer Default { get; } = new BeatmapCardEqualityComparer();
+
+            public bool Equals(BeatmapCard x, BeatmapCard y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (ReferenceEquals(x, null)) return false;
+                if (ReferenceEquals(y, null)) return false;
+
+                return x.BeatmapSet.Equals(y.BeatmapSet);
+            }
+
+            public int GetHashCode(BeatmapCard obj) => obj.BeatmapSet.GetHashCode();
         }
     }
 }

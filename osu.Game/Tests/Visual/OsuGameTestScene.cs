@@ -17,6 +17,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -41,6 +42,8 @@ namespace osu.Game.Tests.Visual
         protected override bool UseFreshStoragePerRun => true;
 
         protected override bool CreateNestedActionContainer => false;
+
+        protected override bool DisplayCursorForManualInput => false;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -118,6 +121,8 @@ namespace osu.Game.Tests.Visual
             public new ScreenStack ScreenStack => base.ScreenStack;
 
             public RealmAccess Realm => Dependencies.Get<RealmAccess>();
+
+            public new GlobalCursorDisplay GlobalCursorDisplay => base.GlobalCursorDisplay;
 
             public new BackButton BackButton => base.BackButton;
 

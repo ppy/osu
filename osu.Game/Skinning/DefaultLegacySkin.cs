@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.IO.Stores;
@@ -45,6 +43,8 @@ namespace osu.Game.Skinning
                 new Color4(18, 124, 255, 255),
                 new Color4(242, 24, 57, 255)
             };
+
+            Configuration.ConfigDictionary[nameof(SkinConfiguration.LegacySetting.AllowSliderBallTint)] = @"true";
 
             Configuration.LegacyVersion = 2.7m;
         }

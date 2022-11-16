@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public readonly IBindable<double> SpinsPerMinute = new BindableDouble();
 
-        private const double fade_out_duration = 160;
+        private const double fade_out_duration = 240;
 
         public DrawableSpinner()
             : this(null)
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinner()),
+                        Body = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinner()),
                         RotationTracker = new SpinnerRotationTracker(this)
                     }
                 },
