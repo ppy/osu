@@ -2,17 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Platform;
-using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {
-    public class LegacySkinExporter : LegacyExporter<SkinInfo>
+    public class LegacySkinExporter : LegacyModelExporter<SkinInfo>
     {
         protected override string FileExtension => ".osk";
 
-        public LegacySkinExporter(Storage storage, INotificationOverlay? notificationOverlay)
-            : base(storage, notificationOverlay)
+        public LegacySkinExporter(Storage storage, RealmAccess realm, ProgressNotification notification)
+            : base(storage, realm, notification)
         {
         }
     }

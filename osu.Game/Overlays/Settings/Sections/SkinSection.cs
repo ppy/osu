@@ -141,16 +141,14 @@ namespace osu.Game.Overlays.Settings.Sections
             [Resolved]
             private Storage storage { get; set; }
 
-            [CanBeNull]
-            private INotificationOverlay notificationOverlay;
+            [Resolved]
+            private LegacyExportManager exporter { get; set; }
 
             private Bindable<Skin> currentSkin;
 
             [BackgroundDependencyLoader]
-            private void load(INotificationOverlay notificationOverlay)
+            private void load()
             {
-                this.notificationOverlay = notificationOverlay;
-
                 Text = SkinSettingsStrings.ExportSkinButton;
                 Action = export;
             }
@@ -167,7 +165,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 try
                 {
-                    currentSkin.Value.SkinInfo.PerformRead(s => new LegacySkinExporter(storage, notificationOverlay).Export(s));
+                    currentSkin.Value.SkinInfo.PerformRead(s => exporter.ExportAsync(s));
                 }
                 catch (Exception e)
                 {

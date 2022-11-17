@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -76,7 +77,7 @@ namespace osu.Game.Online.Leaderboards
         private Storage storage { get; set; }
 
         [Resolved]
-        private INotificationOverlay notificationOverlay { get; set; }
+        private LegacyExportManager exporter { get; set; }
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
         public virtual ScoreInfo TooltipContent => Score;
@@ -430,7 +431,7 @@ namespace osu.Game.Online.Leaderboards
 
                 if (Score.Files.Count > 0)
                 {
-                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage, notificationOverlay).Export(Score)));
+                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => Task.Run(() => exporter.ExportAsync(Score))));
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
                 }
 

@@ -121,9 +121,9 @@ namespace osu.Game.Tests.Skins.IO
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "custom.osk"));
             assertCorrectMetadata(import1, "name 1 [custom]", "author 1", osu);
 
-            import1.PerformRead(s =>
+            import1.PerformRead(async s =>
             {
-                new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<INotificationOverlay>()).ExportModelTo(s, exportStream);
+                await new LegacyExportManager().ExportAsync(s, exportStream);
             });
 
             string exportFilename = import1.GetDisplayString();

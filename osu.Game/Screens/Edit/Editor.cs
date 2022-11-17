@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -92,9 +93,6 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private Storage storage { get; set; }
-
-        [Resolved]
-        private INotificationOverlay notificationOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
@@ -184,6 +182,9 @@ namespace osu.Game.Screens.Edit
 
         private Bindable<float> editorBackgroundDim;
         private Bindable<bool> editorHitMarkers;
+
+        [Resolved]
+        private LegacyExportManager exporter { get; set; }
 
         public Editor(EditorLoader loader = null)
         {
@@ -941,7 +942,7 @@ namespace osu.Game.Screens.Edit
         private void exportBeatmap()
         {
             Save();
-            new LegacyBeatmapExporter(storage, notificationOverlay).Export(Beatmap.Value.BeatmapSetInfo);
+            Task.Run(() => exporter.ExportAsync(Beatmap.Value.BeatmapSetInfo));
         }
 
         /// <summary>

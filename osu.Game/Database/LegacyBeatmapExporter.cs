@@ -3,16 +3,16 @@
 
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Database
 {
-    public class LegacyBeatmapExporter : LegacyExporter<BeatmapSetInfo>
+    public class LegacyBeatmapExporter : LegacyModelExporter<BeatmapSetInfo>
     {
         protected override string FileExtension => ".osz";
 
-        public LegacyBeatmapExporter(Storage storage, INotificationOverlay? notificationOverlay)
-            : base(storage, notificationOverlay)
+        public LegacyBeatmapExporter(Storage storage, RealmAccess realm, ProgressNotification notification)
+            : base(storage, realm, notification)
         {
         }
     }
