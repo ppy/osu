@@ -37,7 +37,6 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Tests.Resources;
-using osu.Game.Screens.Select.Options;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -1057,14 +1056,15 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestBeatmapOptionsButtonDisable()
+        public void TestBeatmapOptionsDisabled()
         {
             createSongSelect();
 
             addRulesetImportStep(0);
 
+            AddAssert("options enabled", () => songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
             AddStep("delete all beatmaps", () => manager.Delete());
-
+            AddAssert("options disabled", () => !songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
         }
 
         private void waitForInitialSelection()
@@ -1153,12 +1153,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             public IWorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
             public new ModSelectOverlay ModSelect => base.ModSelect;
-
-            public new BeatmapOptionsButton DeleteOptionButton => base.DeleteOptionButton;
-
-            public new BeatmapOptionsButton ClearOptionButton => base.ClearOptionButton;
-
-            public new BeatmapOptionsButton? EditOptionButton => base.EditOptionButton;
 
             public new void PresentScore(ScoreInfo score) => base.PresentScore(score);
 
