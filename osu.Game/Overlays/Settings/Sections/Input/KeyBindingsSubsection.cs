@@ -19,6 +19,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public abstract class KeyBindingsSubsection : SettingsSubsection
     {
+        /// <summary>
+        /// After a successful binding, automatically select the next binding row to make quickly
+        /// binding a large set of keys easier on the user.
+        /// </summary>
+        protected virtual bool AutoAdvanceTarget => false;
+
         protected IEnumerable<Framework.Input.Bindings.KeyBinding> Defaults;
 
         public RulesetInfo Ruleset { get; protected set; }
@@ -49,7 +55,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => b.ActionInt.Equals(intKey)).ToList())
                 {
                     AllowMainMouseButtons = Ruleset != null,
-                    Defaults = defaultGroup.Select(d => d.KeyCombination)
+                    Defaults = defaultGroup.Select(d => d.KeyCombination),
+                    BindingFinalised = bindingCompleted
                 });
             }
 
@@ -57,6 +64,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 Action = () => Children.OfType<KeyBindingRow>().ForEach(k => k.RestoreDefaults())
             });
+        }
+
+        private void bindingCompleted(KeyBindingRow sender)
+        {
+            if (AutoAdvanceTarget)
+            {
+                var next = Children.SkipWhile(c => c != sender).Skip(1).FirstOrDefault();
+                if (next != null)
+                    GetContainingInputManager().ChangeFocus(next);
+            }
         }
     }
 

@@ -33,6 +33,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class KeyBindingRow : Container, IFilterable
     {
+        /// <summary>
+        /// Invoked when binding of this row finalises with a change being written.
+        /// </summary>
+        public Action<KeyBindingRow> BindingFinalised { get; set; }
+
         private readonly object action;
         private readonly IEnumerable<RealmKeyBinding> bindings;
 
@@ -153,7 +158,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                     Spacing = new Vector2(5),
                                     Children = new Drawable[]
                                     {
-                                        new CancelButton { Action = finalise },
+                                        new CancelButton { Action = () => finalise(false) },
                                         new ClearButton { Action = clear },
                                     },
                                 },
@@ -240,7 +245,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
 
             if (bindTarget.IsHovered)
-                finalise();
+                finalise(false);
             // prevent updating bind target before clear button's action
             else if (!cancelAndClearButtons.Any(b => b.IsHovered))
                 updateBindTarget();
@@ -377,10 +382,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 return;
 
             bindTarget.UpdateKeyCombination(InputKey.None);
-            finalise();
+            finalise(false);
         }
 
-        private void finalise()
+        private void finalise(bool changedKey = true)
         {
             if (bindTarget != null)
             {
@@ -393,6 +398,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     // schedule to ensure we don't instantly get focus back on next OnMouseClick (see AcceptFocus impl.)
                     bindTarget = null;
+                    if (changedKey)
+                        BindingFinalised?.Invoke(this);
                 });
             }
 
@@ -417,7 +424,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected override void OnFocusLost(FocusLostEvent e)
         {
-            finalise();
+            finalise(false);
             base.OnFocusLost(e);
         }
 
