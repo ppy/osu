@@ -34,12 +34,10 @@ namespace osu.Game.Screens.Select
 
         private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
 
-        protected BeatmapOptionsButton? EditOptionButton;
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            EditOptionButton = BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
+            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
         }
 
         protected void PresentScore(ScoreInfo score) =>
@@ -144,13 +142,6 @@ namespace osu.Game.Screens.Select
                 Mods.Value = modsAtGameplayStart;
                 playerLoader = null;
             }
-        }
-
-        protected override void OnBeatmapOptionsButtonDisabledChanged(bool disabled)
-        {
-            base.OnBeatmapOptionsButtonDisabledChanged(disabled);
-
-            if (EditOptionButton != null) EditOptionButton.Disabled = disabled;
         }
     }
 }

@@ -116,10 +116,6 @@ namespace osu.Game.Screens.Select
 
         private double audioFeedbackLastPlaybackTime;
 
-        protected BeatmapOptionsButton DeleteOptionButton;
-
-        protected BeatmapOptionsButton ClearOptionButton;
-
         [CanBeNull]
         private IDisposable modSelectOverlayRegistration;
 
@@ -290,8 +286,8 @@ namespace osu.Game.Screens.Select
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
-                DeleteOptionButton = BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
-                ClearOptionButton = BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
+                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
+                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
             }
 
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
@@ -416,14 +412,6 @@ namespace osu.Game.Screens.Select
         private void updateCarouselSelection(ValueChangedEvent<WorkingBeatmap> e = null)
         {
             var beatmap = e?.NewValue ?? Beatmap.Value;
-
-            if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen())
-            {
-                OnBeatmapOptionsButtonDisabledChanged(true);
-                return;
-            }
-
-            OnBeatmapOptionsButtonDisabledChanged(false);
 
             Logger.Log($"Song select working beatmap updated to {beatmap}");
 
@@ -656,12 +644,6 @@ namespace osu.Game.Screens.Select
 
             playExitingTransition();
             return false;
-        }
-
-        protected virtual void OnBeatmapOptionsButtonDisabledChanged(bool disabled)
-        {
-            DeleteOptionButton.Disabled = disabled;
-            ClearOptionButton.Disabled = disabled;
         }
 
         private void playExitingTransition()

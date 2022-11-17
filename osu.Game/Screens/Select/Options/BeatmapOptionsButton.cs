@@ -33,29 +33,6 @@ namespace osu.Game.Screens.Select.Options
 
         private const float disabled_alpha = 0.5f;
 
-        private bool disabled;
-
-        public bool Disabled
-        {
-            get => disabled;
-            set
-            {
-                disabled = value;
-
-                if (disabled)
-                {
-                    firstLine.Alpha = disabled_alpha;
-                    secondLine.Alpha = disabled_alpha;
-                    iconText.Alpha = disabled_alpha;
-                    return;
-                }
-
-                firstLine.Alpha = 1;
-                secondLine.Alpha = 1;
-                iconText.Alpha = 1;
-            }
-        }
-
         public Color4 ButtonColour
         {
             get => background.Colour;
@@ -82,24 +59,18 @@ namespace osu.Game.Screens.Select.Options
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (disabled) return true;
-
             flash.FadeTo(0.1f, 1000, Easing.OutQuint);
             return base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (disabled) return;
-
             flash.FadeTo(0, 1000, Easing.OutQuint);
             base.OnMouseUp(e);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (disabled) return true;
-
             flash.ClearTransforms();
             flash.Alpha = 0.9f;
             flash.FadeOut(800, Easing.OutExpo);
