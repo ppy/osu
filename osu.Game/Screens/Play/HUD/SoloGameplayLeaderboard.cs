@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play.HUD
             this.trackingUser = trackingUser;
         }
 
-        private PlayBeatmapDetailArea.TabType scoresType;
+        private Bindable<PlayBeatmapDetailArea.TabType> scoresType = new Bindable<PlayBeatmapDetailArea.TabType>();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Play.HUD
             config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
 
             // a way to differentiate scores taken from online ranking to local scores
-            scoresType = config.Get<PlayBeatmapDetailArea.TabType>(OsuSetting.BeatmapDetailTab);
+            scoresType = config.GetBindable<PlayBeatmapDetailArea.TabType>(OsuSetting.BeatmapDetailTab);
         }
 
         protected override void LoadComplete()
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.sort();
 
-            if (scoresType != PlayBeatmapDetailArea.TabType.Local)
+            if (scoresType.Value != PlayBeatmapDetailArea.TabType.Local)
             {
                 // change displayed potision to '-' when there are 50 already submitted scores and tracked score is last
                 if (TrackedScore?.ScorePosition == Flow.Count && Flow.Count > max_online_scores)
