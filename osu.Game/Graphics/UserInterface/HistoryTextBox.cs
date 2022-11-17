@@ -12,27 +12,27 @@ namespace osu.Game.Graphics.UserInterface
     public class HistoryTextBox : FocusedTextBox
     {
         private readonly int historyLimit;
-
-        private bool everythingSelected;
-
-        public int HistoryLength => messageHistory.Count;
-
         private readonly List<string> messageHistory;
 
         public IReadOnlyList<string> MessageHistory =>
             Enumerable.Range(0, HistoryLength).Select(GetOldMessage).ToList();
 
-        private string originalMessage = string.Empty;
-
-        private int historyIndex = -1;
+        public int HistoryLength => messageHistory.Count;
 
         private int startIndex;
+        private int selectedIndex = -1;
+
+        private string originalMessage = string.Empty;
+        private bool everythingSelected;
 
         private int getNormalizedIndex(int index) =>
             (HistoryLength + startIndex - index - 1) % HistoryLength;
 
         public HistoryTextBox(int historyLimit = 100)
         {
+            if (historyLimit <= 0)
+                throw new ArgumentOutOfRangeException();
+
             this.historyLimit = historyLimit;
             messageHistory = new List<string>(historyLimit);
 
@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 if (string.IsNullOrEmpty(text.NewValue) || everythingSelected)
                 {
-                    historyIndex = -1;
+                    selectedIndex = -1;
                     everythingSelected = false;
                 }
             };
@@ -66,28 +66,28 @@ namespace osu.Game.Graphics.UserInterface
             switch (e.Key)
             {
                 case Key.Up:
-                    if (historyIndex == HistoryLength - 1)
+                    if (selectedIndex == HistoryLength - 1)
                         return true;
 
-                    if (historyIndex == -1)
+                    if (selectedIndex == -1)
                         originalMessage = Text;
 
-                    Text = messageHistory[getNormalizedIndex(++historyIndex)];
+                    Text = messageHistory[getNormalizedIndex(++selectedIndex)];
 
                     return true;
 
                 case Key.Down:
-                    if (historyIndex == -1)
+                    if (selectedIndex == -1)
                         return true;
 
-                    if (historyIndex == 0)
+                    if (selectedIndex == 0)
                     {
-                        historyIndex = -1;
+                        selectedIndex = -1;
                         Text = originalMessage;
                         return true;
                     }
 
-                    Text = messageHistory[getNormalizedIndex(--historyIndex)];
+                    Text = messageHistory[getNormalizedIndex(--selectedIndex)];
 
                     return true;
             }
@@ -110,7 +110,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            historyIndex = -1;
+            selectedIndex = -1;
 
             base.Commit();
         }

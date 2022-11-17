@@ -12,15 +12,17 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.Online
+namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneChatManipulation : OsuManualInputManagerTestScene
+    public class TestSceneHistoryTextBox : OsuManualInputManagerTestScene
     {
-        private HistoryTextBox box;
-        private OsuSpriteText text;
+        private const string temp = "Temp message";
 
         private int messageCounter;
+
+        private HistoryTextBox box;
+        private OsuSpriteText text;
 
         [SetUp]
         public void SetUp()
@@ -49,6 +51,9 @@ namespace osu.Game.Tests.Visual.Online
 
                 box.OnCommit += (_, __) =>
                 {
+                    if (string.IsNullOrEmpty(box.Text))
+                        return;
+
                     text.Text = $"{nameof(box.OnCommit)}: {box.Text}";
                     box.Text = string.Empty;
                     box.TakeFocus();
@@ -64,7 +69,6 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestEmptyHistory()
         {
-            const string temp = "Temp message";
             AddStep("Set text", () => box.Text = temp);
 
             AddStep("Move down", () => InputManager.Key(Key.Down));
@@ -78,8 +82,6 @@ namespace osu.Game.Tests.Visual.Online
         public void TestPartialHistory()
         {
             addMessages(2);
-
-            const string temp = "Temp message";
             AddStep("Set text", () => box.Text = temp);
 
             AddStep("Move down", () => InputManager.Key(Key.Down));
@@ -102,20 +104,17 @@ namespace osu.Game.Tests.Visual.Online
         public void TestFullHistory()
         {
             addMessages(5);
+            AddStep("Set text", () => box.Text = temp);
             AddAssert("History saved as <5-1>", () =>
                 Enumerable.Range(0, 5).Select(number => $"Message {5 - number}").SequenceEqual(box.MessageHistory));
-
-            const string temp = "Temp message";
-            AddStep("Set text", () => box.Text = temp);
 
             AddStep("Move down", () => InputManager.Key(Key.Down));
             AddAssert("Text is the same", () => box.Text == temp);
 
             addMessages(2);
+            AddStep("Set text", () => box.Text = temp);
             AddAssert("Overrode history to <7-3>", () =>
                 Enumerable.Range(0, 5).Select(number => $"Message {7 - number}").SequenceEqual(box.MessageHistory));
-
-            AddStep("Set text", () => box.Text = temp);
 
             AddRepeatStep("Move Up", () => InputManager.Key(Key.Up), 5);
             AddAssert("Same as 3rd message", () => box.Text == "Message 3");
