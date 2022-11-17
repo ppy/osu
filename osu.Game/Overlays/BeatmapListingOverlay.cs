@@ -41,11 +41,8 @@ namespace osu.Game.Overlays
 
         private IBindable<APIUser> apiUser;
 
-        private Drawable currentContent;
         private Container panelTarget;
         private FillFlowContainer<BeatmapCard> foundContent;
-        private NotFoundDrawable notFoundContent;
-        private SupporterRequiredDrawable supporterRequiredContent;
         private BeatmapListingFilterControl filterControl;
 
         public BeatmapListingOverlay()
@@ -86,11 +83,6 @@ namespace osu.Game.Overlays
                                 RelativeSizeAxes = Axes.X,
                                 Masking = true,
                                 Padding = new MarginPadding { Horizontal = 20 },
-                                Children = new Drawable[]
-                                {
-                                    notFoundContent = new NotFoundDrawable(),
-                                    supporterRequiredContent = new SupporterRequiredDrawable(),
-                                }
                             }
                         },
                     },
@@ -107,7 +99,7 @@ namespace osu.Game.Overlays
             apiUser.BindValueChanged(_ => Schedule(() =>
             {
                 if (api.IsLoggedIn)
-                    addContentToResultsArea(Drawable.Empty());
+                    replaceResultsAreaContent(Drawable.Empty());
             }));
         }
 
@@ -155,8 +147,9 @@ namespace osu.Game.Overlays
 
             if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.SupporterOnlyFilters)
             {
-                supporterRequiredContent.UpdateText(searchResult.SupporterOnlyFiltersUsed);
-                addContentToResultsArea(supporterRequiredContent);
+                var supporterOnly = new SupporterRequiredDrawable();
+                supporterOnly.UpdateText(searchResult.SupporterOnlyFiltersUsed);
+                replaceResultsAreaContent(supporterOnly);
                 return;
             }
 
@@ -167,13 +160,13 @@ namespace osu.Game.Overlays
                 //No matches case
                 if (!newCards.Any())
                 {
-                    addContentToResultsArea(notFoundContent);
+                    replaceResultsAreaContent(new NotFoundDrawable());
                     return;
                 }
 
                 var content = createCardContainerFor(newCards);
 
-                panelLoadTask = LoadComponentAsync(foundContent = content, addContentToResultsArea, (cancellationToken = new CancellationTokenSource()).Token);
+                panelLoadTask = LoadComponentAsync(foundContent = content, replaceResultsAreaContent, (cancellationToken = new CancellationTokenSource()).Token);
             }
             else
             {
@@ -221,35 +214,15 @@ namespace osu.Game.Overlays
             return content;
         }
 
-        private void addContentToResultsArea(Drawable content)
+        private void replaceResultsAreaContent(Drawable content)
         {
             Loading.Hide();
             lastFetchDisplayedTime = Time.Current;
 
-            if (content == currentContent)
-                return;
-
-            var lastContent = currentContent;
-
-            if (lastContent != null)
-            {
-                lastContent.FadeOut();
-                if (!isPlaceholderContent(lastContent))
-                    lastContent.Expire();
-            }
-
-            if (!content.IsAlive)
-                panelTarget.Add(content);
+            panelTarget.Child = content;
 
             content.FadeInFromZero();
-            currentContent = content;
         }
-
-        /// <summary>
-        /// Whether <paramref name="drawable"/> is a static placeholder reused multiple times by this overlay.
-        /// </summary>
-        private bool isPlaceholderContent(Drawable drawable)
-            => drawable == notFoundContent || drawable == supporterRequiredContent;
 
         private void onCardSizeChanged()
         {
