@@ -31,8 +31,6 @@ namespace osu.Game.Screens.Select.Options
         private readonly OsuSpriteText secondLine;
         private readonly Container box;
 
-        private const float disabled_alpha = 0.5f;
-
         public Color4 ButtonColour
         {
             get => background.Colour;
