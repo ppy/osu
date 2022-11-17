@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Select;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play.HUD
@@ -16,6 +17,7 @@ namespace osu.Game.Screens.Play.HUD
     public class SoloGameplayLeaderboard : GameplayLeaderboard
     {
         private const int duration = 100;
+        private const int max_online_scores = 50; // BAD!
 
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
         private readonly IUser trackingUser;
@@ -42,10 +44,15 @@ namespace osu.Game.Screens.Play.HUD
             this.trackingUser = trackingUser;
         }
 
+        private PlayBeatmapDetailArea.TabType scoresType;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
+
+            // a way to differentiate scores taken from online ranking to local scores
+            scoresType = config.Get<PlayBeatmapDetailArea.TabType>(OsuSetting.BeatmapDetailTab);
         }
 
         protected override void LoadComplete()
@@ -91,6 +98,18 @@ namespace osu.Game.Screens.Play.HUD
 
             // Local score should always show lower than any existing scores in cases of ties.
             local.DisplayOrder.Value = long.MaxValue;
+        }
+
+        protected override void sort()
+        {
+            base.sort();
+
+            if (scoresType != PlayBeatmapDetailArea.TabType.Local)
+            {
+                // change displayed potision to '-' when there are 50 already submitted scores and tracked score is last
+                if (TrackedScore?.ScorePosition == Flow.Count && Flow.Count > max_online_scores)
+                    TrackedScore.ScorePosition = null;
+            }
         }
 
         private void updateVisibility() =>

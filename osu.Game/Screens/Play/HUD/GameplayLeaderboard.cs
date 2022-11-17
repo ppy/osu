@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void sort()
+        protected virtual void sort()
         {
             if (sorting.IsValid)
                 return;
@@ -173,10 +173,6 @@ namespace osu.Game.Screens.Play.HUD
                 Flow.SetLayoutPosition(orderedByScore[i], i);
                 orderedByScore[i].ScorePosition = i + 1;
             }
-
-            // change displayed potision to '-' when there are 50 already submitted scores and tracked score is last
-            if (TrackedScore?.ScorePosition == Flow.Count && Flow.Count == 51)
-                TrackedScore.ScorePosition = null;
 
             sorting.Validate();
         }
