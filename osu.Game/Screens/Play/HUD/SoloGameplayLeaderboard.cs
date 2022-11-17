@@ -39,12 +39,12 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public readonly Bindable<bool> AlwaysVisible = new Bindable<bool>(true);
 
+        private Bindable<PlayBeatmapDetailArea.TabType> scoresType = new Bindable<PlayBeatmapDetailArea.TabType>();
+
         public SoloGameplayLeaderboard(IUser trackingUser)
         {
             this.trackingUser = trackingUser;
         }
-
-        private Bindable<PlayBeatmapDetailArea.TabType> scoresType = new Bindable<PlayBeatmapDetailArea.TabType>();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
