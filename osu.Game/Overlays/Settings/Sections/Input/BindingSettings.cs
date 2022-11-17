@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
@@ -12,6 +14,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     public class BindingSettings : SettingsSubsection
     {
         protected override LocalisableString Header => BindingSettingsStrings.ShortcutAndGameplayBindings;
+
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "keybindings" });
 
         public BindingSettings(KeyBindingPanel keyConfig)
         {
