@@ -127,6 +127,9 @@ namespace osu.Game
         private readonly LegacyImportManager legacyImportManager = new LegacyImportManager();
 
         [Cached]
+        private readonly LegacyExportManager legacyExportManager = new LegacyExportManager();
+
+        [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
         protected SentryLogger SentryLogger;
@@ -868,6 +871,7 @@ namespace osu.Game
             }), rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(legacyImportManager, Add);
+            loadComponentSingleFile(legacyExportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 
