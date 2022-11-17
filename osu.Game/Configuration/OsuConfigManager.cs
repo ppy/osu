@@ -5,7 +5,7 @@
 
 using System;
 using System.Diagnostics;
-using System.Globalization;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
@@ -27,7 +27,7 @@ using osu.Game.Skinning;
 namespace osu.Game.Configuration
 {
     [ExcludeFromDynamicCompile]
-    public class OsuConfigManager : IniConfigManager<OsuSetting>
+    public class OsuConfigManager : IniConfigManager<OsuSetting>, IGameplaySettings
     {
         public OsuConfigManager(Storage storage)
             : base(storage)
@@ -115,7 +115,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MenuParallax, true);
 
             // See https://stackoverflow.com/a/63307411 for default sourcing.
-            SetDefault(OsuSetting.Prefer24HourTime, CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
+            SetDefault(OsuSetting.Prefer24HourTime, !CultureInfoHelper.SystemCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
 
             // Gameplay
             SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
@@ -171,9 +171,13 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
-            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
+            SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 0.75f, 0.25f);
+            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
+            SetDefault(OsuSetting.EditorShowHitMarkers, true);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
+
+            SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -274,6 +278,9 @@ namespace osu.Game.Configuration
         public Func<Guid, string> LookupSkinName { private get; set; } = _ => @"unknown";
 
         public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; } = _ => @"unknown";
+
+        IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => GetOriginalBindable<float>(OsuSetting.ComboColourNormalisationAmount);
+        IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => GetOriginalBindable<float>(OsuSetting.PositionalHitsoundsLevel);
     }
 
     // IMPORTANT: These are used in user configuration files.
@@ -288,6 +295,7 @@ namespace osu.Game.Configuration
         GameplayCursorDuringTouch,
         DimLevel,
         BlurLevel,
+        EditorDim,
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
@@ -360,10 +368,12 @@ namespace osu.Game.Configuration
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
         EditorWaveformOpacity,
+        EditorShowHitMarkers,
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,
         SafeAreaConsiderations,
+        ComboColourNormalisationAmount,
     }
 }

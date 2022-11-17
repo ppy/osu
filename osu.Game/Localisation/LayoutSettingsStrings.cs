@@ -15,14 +15,14 @@ namespace osu.Game.Localisation
         public static LocalisableString CheckingForFullscreenCapabilities => new TranslatableString(getKey(@"checking_for_fullscreen_capabilities"), @"Checking for fullscreen capabilities...");
 
         /// <summary>
-        /// "osu! is running exclusive fullscreen, guaranteeing low latency!"
+        /// "osu! is running in exclusive fullscreen, guaranteeing low latency!"
         /// </summary>
-        public static LocalisableString OsuIsRunningExclusiveFullscreen => new TranslatableString(getKey(@"osu_is_running_exclusive_fullscreen"), @"osu! is running exclusive fullscreen, guaranteeing low latency!");
+        public static LocalisableString OsuIsRunningExclusiveFullscreen => new TranslatableString(getKey(@"osu_is_running_exclusive_fullscreen"), @"osu! is running in exclusive fullscreen, guaranteeing low latency!");
 
         /// <summary>
-        /// "Unable to run exclusive fullscreen. You&#39;ll still experience some input latency."
+        /// "Unable to run in exclusive fullscreen. You may experience some input latency."
         /// </summary>
-        public static LocalisableString UnableToRunExclusiveFullscreen => new TranslatableString(getKey(@"unable_to_run_exclusive_fullscreen"), @"Unable to run exclusive fullscreen. You'll still experience some input latency.");
+        public static LocalisableString UnableToRunExclusiveFullscreen => new TranslatableString(getKey(@"unable_to_run_exclusive_fullscreen"), @"Unable to run in exclusive fullscreen. You may experience some input latency.");
 
         /// <summary>
         /// "Using fullscreen on macOS makes interacting with the menu bar and spaces no longer work, and may lead to freezes if a system dialog is presented. Using borderless is recommended."
