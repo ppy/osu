@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax) || totalSuccessfulHits == 0)
                 return 0.0;
 
-            double accuracyValue = 95 * Math.Pow(8 / deviation, 1.5);
+            double accuracyValue = 477.793 * Math.Exp(-0.197612 * deviation);
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
