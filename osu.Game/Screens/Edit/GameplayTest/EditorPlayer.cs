@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -17,7 +15,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
         private readonly EditorState editorState;
 
         [Resolved]
-        private MusicController musicController { get; set; }
+        private MusicController musicController { get; set; } = null!;
 
         public EditorPlayer(Editor editor)
             : base(new PlayerConfiguration { ShowResults = false })
