@@ -47,6 +47,16 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double Distance => StreamPath.Path.Distance;
 
+        public override Vector2 Position
+        {
+            get => base.Position;
+            set
+            {
+                base.Position = value;
+                updateState();
+            }
+        }
+
         public override bool NewCombo
         {
             get => base.NewCombo;
