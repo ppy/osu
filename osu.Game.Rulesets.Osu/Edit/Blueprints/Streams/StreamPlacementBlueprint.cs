@@ -163,7 +163,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
         private void beginCurve()
         {
-            changeHandler?.BeginChange();
             BeginPlacement(commitStart: true);
             setState(StreamPlacementState.Body);
         }

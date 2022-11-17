@@ -291,7 +291,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
             editorBeatmap.Remove(HitObject);
 
             changeHandler?.EndChange();
-            changeHandler?.EndChange();
         }
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]

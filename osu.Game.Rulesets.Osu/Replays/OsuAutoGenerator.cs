@@ -75,15 +75,30 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
-                OsuHitObject h = Beatmap.HitObjects[i];
+                OsuHitObject hitObject = Beatmap.HitObjects[i];
 
-                if (DelayedMovements && i > 0)
+                if (hitObject is Stream stream)
                 {
-                    OsuHitObject prev = Beatmap.HitObjects[i - 1];
-                    addDelayedMovements(h, prev);
+                    foreach (var streamHitCircle in stream.ToHitCircles())
+                    {
+                        handleHitObject(streamHitCircle);
+                    }
+                }
+                else
+                {
+                    handleHitObject(hitObject);
                 }
 
-                addHitObjectReplay(h);
+                void handleHitObject(OsuHitObject h)
+                {
+                    if (DelayedMovements && i > 0)
+                    {
+                        OsuHitObject prev = Beatmap.HitObjects[i - 1];
+                        addDelayedMovements(h, prev);
+                    }
+
+                    addHitObjectReplay(h);
+                }
             }
 
             return Replay;
