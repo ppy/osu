@@ -50,13 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                 accentColour = value;
 
                 background.Colour = AccentColour;
-
-                background.EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Colour = AccentColour.Opacity(kiaiMode ? edge_alpha_kiai : 1f),
-                    Radius = kiaiMode ? 32 : 8
-                };
+                background.EdgeEffect = getCurrentEdgeEffectParameters();
             }
         }
 
@@ -164,12 +158,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         private void adjustEdgeEffects()
         {
-            background.TweenEdgeEffectTo(new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = AccentColour.Opacity(kiaiMode ? edge_alpha_kiai : 1f),
-                Radius = kiaiMode ? 32 : 8
-            }, 120, kiaiMode ? Easing.InQuad : Easing.OutQuad);
+            background.TweenEdgeEffectTo(getCurrentEdgeEffectParameters(), 120, kiaiMode ? Easing.InQuad : Easing.OutQuad);
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
@@ -208,5 +197,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                 .Then()
                 .FadeEdgeEffectTo(edge_alpha_kiai, duration, Easing.OutQuint);
         }
+
+        private EdgeEffectParameters getCurrentEdgeEffectParameters() => new EdgeEffectParameters
+        {
+            Type = EdgeEffectType.Glow,
+            Colour = AccentColour.Opacity(kiaiMode ? edge_alpha_kiai : 1f),
+            Radius = kiaiMode ? 32 : 8
+        };
     }
 }
