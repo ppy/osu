@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -58,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams.Components
             }
 
             // Calculate the correct bounding box
-            var boundingBox = DrawableStream.GetVertexBounds(positions.Select(o => o.Item1), hitObject.Scale * OsuHitObject.OBJECT_RADIUS);
+            var boundingBox = getVertexBounds(positions.Select(o => o.Item1), hitObject.Scale * OsuHitObject.OBJECT_RADIUS);
             streamOffset = positions.Count == 0 ? Vector2.Zero : positions[0].Item1 - boundingBox.TopLeft;
 
             circles.Size = boundingBox.Size;
@@ -72,6 +75,24 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams.Components
                 circle.Position = positions[i].Item1 + streamOffset;
                 circle.Scale = new Vector2(hitObject.Scale);
             }
+        }
+
+        private static RectangleF getVertexBounds(IEnumerable<Vector2> vertices, float radius)
+        {
+            float minX = 0;
+            float minY = 0;
+            float maxX = 0;
+            float maxY = 0;
+
+            foreach (var v in vertices)
+            {
+                minX = Math.Min(minX, v.X - radius);
+                minY = Math.Min(minY, v.Y - radius);
+                maxX = Math.Max(maxX, v.X + radius);
+                maxY = Math.Max(maxY, v.Y + radius);
+            }
+
+            return new RectangleF(minX, minY, maxX - minX, maxY - minY);
         }
     }
 }
