@@ -45,14 +45,14 @@ namespace osu.Game.Database
                         else
                             paths.Add(storage.GetFullPath(directory));
                     }
-                    catch (IOException e)
+                    catch (Exception e)
                     {
                         // Catch any errors when enumerating files
                         Logger.Log($"Error when enumerating files in {directoryStorage.GetFullPath(string.Empty)}: {e}");
                     }
                 }
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 // Catch any errors when enumerating directories
                 Logger.Log($"Error when enumerating directories in {storage.GetFullPath(string.Empty)}: {e}");
