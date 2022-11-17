@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("leaderboard still visible", () => leaderboard.Alpha == 1);
         }
 
-        private static List<ScoreInfo> createSampleScores(int numRandScores = 50)
+        private static List<ScoreInfo> createSampleScores()
         {
             return new[]
             {
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 new ScoreInfo { User = new APIUser { Username = @"spaceman_atlas" }, TotalScore = RNG.Next(500000, 1000000) },
                 new ScoreInfo { User = new APIUser { Username = @"frenzibyte" }, TotalScore = RNG.Next(500000, 1000000) },
                 new ScoreInfo { User = new APIUser { Username = @"Susko3" }, TotalScore = RNG.Next(500000, 1000000) },
-            }.Concat(Enumerable.Range(0, 49 - 5).Select(i => new ScoreInfo { User = new APIUser { Username = $"User {i + 1}" }, TotalScore = 1000000 - i * 10000 })).ToList();
+            }.Concat(Enumerable.Range(0, 44).Select(i => new ScoreInfo { User = new APIUser { Username = $"User {i + 1}" }, TotalScore = 1000000 - i * 10000 })).ToList();
         }
     }
 }
