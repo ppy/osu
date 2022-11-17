@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("add many scores in one go", () =>
             {
-                for (int i = 0; i < 49; i++)
+                for (int i = 0; i < 32; i++)
                     createRandomScore(new APIUser { Username = $"Player {i + 1}" });
 
                 // Add player at end to force an animation down the whole list.
@@ -60,12 +60,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 () => leaderboard.ChildrenOfType<GameplayLeaderboardScore>().Any(s => leaderboard.ScreenSpaceDrawQuad.Contains(s.ScreenSpaceDrawQuad.Centre)));
 
             AddUntilStep("wait for tracked score fully visible", () => leaderboard.ScreenSpaceDrawQuad.Intersects(leaderboard.TrackedScore!.ScreenSpaceDrawQuad));
-
-            AddUntilStep("ensure player is #50", () => leaderboard.CheckPositionByUsername("You", 50));
-
-            AddStep("add one more player", () => createRandomScore(new APIUser { Username = "Player 50" }));
-
-            AddUntilStep("ensure player is #?", () => leaderboard.CheckPositionByUsername("You", null));
 
             AddStep("change score to middle", () => playerScore.Value = 1000000);
             AddWaitStep("wait for movement", 5);
