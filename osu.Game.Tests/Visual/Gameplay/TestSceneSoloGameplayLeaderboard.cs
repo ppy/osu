@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -26,6 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly BindableList<ScoreInfo> scores = new BindableList<ScoreInfo>();
 
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
+        private readonly Bindable<PlayBeatmapDetailArea.TabType> beatmapTabType = new Bindable<PlayBeatmapDetailArea.TabType>();
 
         private SoloGameplayLeaderboard leaderboard = null!;
 
@@ -33,6 +35,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
+            config.BindWith(OsuSetting.BeatmapDetailTab, beatmapTabType);
         }
 
         [SetUpSteps]
@@ -71,6 +74,25 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestTrackedScorePosition()
+        {
+            AddStep("change TabType to global", () => beatmapTabType.Value = PlayBeatmapDetailArea.TabType.Global);
+            AddUntilStep("tracked player is #50", () => leaderboard.TrackedScore?.ScorePosition! == 50);
+
+            AddStep("change TabType to local", () => beatmapTabType.Value = PlayBeatmapDetailArea.TabType.Local);
+            AddUntilStep("tracked player is #50", () => leaderboard.TrackedScore?.ScorePosition! == 50);
+
+            AddStep("add one more score", () => scores.Add(new ScoreInfo { User = new APIUser { Username = "New player 1" }, TotalScore = RNG.Next(600000, 1000000) }));
+            AddUntilStep("tracked player is #51", () => leaderboard.TrackedScore?.ScorePosition! == 51);
+
+            AddStep("change TabType to global", () => beatmapTabType.Value = PlayBeatmapDetailArea.TabType.Global);
+            AddUntilStep("tracked player is -", () => leaderboard.TrackedScore?.ScorePosition! == null);
+
+            AddStep("change TabType to country", () => beatmapTabType.Value = PlayBeatmapDetailArea.TabType.Country);
+            AddUntilStep("tracked player is -", () => leaderboard.TrackedScore?.ScorePosition! == null);
+        }
+
+        [Test]
         public void TestVisibility()
         {
             AddStep("set config visible true", () => configVisibility.Value = true);
@@ -86,7 +108,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("leaderboard still visible", () => leaderboard.Alpha == 1);
         }
 
-        private static List<ScoreInfo> createSampleScores()
+        private static List<ScoreInfo> createSampleScores(int numRandScores = 50)
         {
             return new[]
             {
@@ -95,7 +117,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 new ScoreInfo { User = new APIUser { Username = @"spaceman_atlas" }, TotalScore = RNG.Next(500000, 1000000) },
                 new ScoreInfo { User = new APIUser { Username = @"frenzibyte" }, TotalScore = RNG.Next(500000, 1000000) },
                 new ScoreInfo { User = new APIUser { Username = @"Susko3" }, TotalScore = RNG.Next(500000, 1000000) },
-            }.Concat(Enumerable.Range(0, 50).Select(i => new ScoreInfo { User = new APIUser { Username = $"User {i + 1}" }, TotalScore = 1000000 - i * 10000 })).ToList();
+            }.Concat(Enumerable.Range(0, 49 - 5).Select(i => new ScoreInfo { User = new APIUser { Username = $"User {i + 1}" }, TotalScore = 1000000 - i * 10000 })).ToList();
         }
     }
 }
