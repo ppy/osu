@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     }
                 };
 
-                box.OnCommit += (_, __) =>
+                box.OnCommit += (_, _) =>
                 {
                     if (string.IsNullOrEmpty(box.Text))
                         return;
@@ -70,6 +70,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestEmptyHistory()
         {
             AddStep("Set text", () => box.Text = temp);
+            AddAssert("History is empty", () => !box.GetMessageHistory().Any());
 
             AddStep("Move down", () => InputManager.Key(Key.Down));
             AddAssert("Text is the same", () => box.Text == temp);
@@ -106,7 +107,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             addMessages(5);
             AddStep("Set text", () => box.Text = temp);
             AddAssert("History saved as <5-1>", () =>
-                Enumerable.Range(0, 5).Select(number => $"Message {5 - number}").SequenceEqual(box.MessageHistory));
+                Enumerable.Range(0, 5).Select(number => $"Message {5 - number}").SequenceEqual(box.GetMessageHistory()));
 
             AddStep("Move down", () => InputManager.Key(Key.Down));
             AddAssert("Text is the same", () => box.Text == temp);
@@ -114,7 +115,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             addMessages(2);
             AddStep("Set text", () => box.Text = temp);
             AddAssert("Overrode history to <7-3>", () =>
-                Enumerable.Range(0, 5).Select(number => $"Message {7 - number}").SequenceEqual(box.MessageHistory));
+                Enumerable.Range(0, 5).Select(number => $"Message {7 - number}").SequenceEqual(box.GetMessageHistory()));
 
             AddRepeatStep("Move Up", () => InputManager.Key(Key.Up), 5);
             AddAssert("Same as 3rd message", () => box.Text == "Message 3");
@@ -134,11 +135,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             addMessages(5);
             AddAssert("History saved as <5-1>", () =>
-                Enumerable.Range(0, 5).Select(number => $"Message {5 - number}").SequenceEqual(box.MessageHistory));
+                Enumerable.Range(0, 5).Select(number => $"Message {5 - number}").SequenceEqual(box.GetMessageHistory()));
 
             addMessages(6);
             AddAssert("Overrode history to <11-7>", () =>
-                Enumerable.Range(0, 5).Select(number => $"Message {11 - number}").SequenceEqual(box.MessageHistory));
+                Enumerable.Range(0, 5).Select(number => $"Message {11 - number}").SequenceEqual(box.GetMessageHistory()));
         }
 
         [Test]
