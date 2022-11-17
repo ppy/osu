@@ -20,6 +20,8 @@ using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Notifications;
+using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
@@ -298,6 +300,9 @@ namespace osu.Game.Online.API
 
         public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) =>
             new HubClientConnector(clientName, endpoint, this, versionHash, preferMessagePack);
+
+        public NotificationsClientConnector GetNotificationsConnector() =>
+            new WebSocketNotificationsClientConnector(this);
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
