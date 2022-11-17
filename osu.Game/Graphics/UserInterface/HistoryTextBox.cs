@@ -1,46 +1,44 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class HistoryTextBox : FocusedTextBox
     {
-        private readonly int historyLimit;
-        private readonly List<string> messageHistory;
+        private readonly LimitedCapacityQueue<string> messageHistory;
 
-        public IReadOnlyList<string> MessageHistory =>
-            Enumerable.Range(0, HistoryLength).Select(GetOldMessage).ToList();
+        public IEnumerable<string> GetMessageHistory()
+        {
+            if (HistoryCount == 0)
+                yield break;
 
-        public int HistoryLength => messageHistory.Count;
+            for (int i = HistoryCount - 1; i >= 0; i--)
+                yield return messageHistory[i];
+        }
 
-        private int startIndex;
-        private int selectedIndex = -1;
+        public int HistoryCount => messageHistory.Count;
+
+        private int selectedIndex;
 
         private string originalMessage = string.Empty;
         private bool everythingSelected;
 
-        private int getNormalizedIndex(int index) =>
-            (HistoryLength + startIndex - index - 1) % HistoryLength;
+        public string GetOldMessage(int index) => messageHistory[HistoryCount - index - 1];
 
-        public HistoryTextBox(int historyLimit = 100)
+        public HistoryTextBox(int capacity = 100)
         {
-            if (historyLimit <= 0)
-                throw new ArgumentOutOfRangeException();
-
-            this.historyLimit = historyLimit;
-            messageHistory = new List<string>(historyLimit);
+            messageHistory = new LimitedCapacityQueue<string>(capacity);
 
             Current.ValueChanged += text =>
             {
                 if (string.IsNullOrEmpty(text.NewValue) || everythingSelected)
                 {
-                    selectedIndex = -1;
+                    selectedIndex = HistoryCount;
                     everythingSelected = false;
                 }
             };
@@ -53,41 +51,33 @@ namespace osu.Game.Graphics.UserInterface
             base.OnTextSelectionChanged(selectionType);
         }
 
-        public string GetOldMessage(int index)
-        {
-            if (index < 0 || index >= HistoryLength)
-                throw new ArgumentOutOfRangeException();
-
-            return HistoryLength == 0 ? string.Empty : messageHistory[getNormalizedIndex(index)];
-        }
-
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             switch (e.Key)
             {
                 case Key.Up:
-                    if (selectedIndex == HistoryLength - 1)
+                    if (selectedIndex == 0)
                         return true;
 
-                    if (selectedIndex == -1)
+                    if (selectedIndex == HistoryCount)
                         originalMessage = Text;
 
-                    Text = messageHistory[getNormalizedIndex(++selectedIndex)];
+                    Text = messageHistory[--selectedIndex];
 
                     return true;
 
                 case Key.Down:
-                    if (selectedIndex == -1)
+                    if (selectedIndex == HistoryCount)
                         return true;
 
-                    if (selectedIndex == 0)
+                    if (selectedIndex == HistoryCount - 1)
                     {
-                        selectedIndex = -1;
+                        selectedIndex = HistoryCount;
                         Text = originalMessage;
                         return true;
                     }
 
-                    Text = messageHistory[getNormalizedIndex(--selectedIndex)];
+                    Text = messageHistory[++selectedIndex];
 
                     return true;
             }
@@ -98,19 +88,9 @@ namespace osu.Game.Graphics.UserInterface
         protected override void Commit()
         {
             if (!string.IsNullOrEmpty(Text))
-            {
-                if (HistoryLength == historyLimit)
-                {
-                    messageHistory[startIndex++] = Text;
-                    startIndex %= historyLimit;
-                }
-                else
-                {
-                    messageHistory.Add(Text);
-                }
-            }
+                messageHistory.Enqueue(Text);
 
-            selectedIndex = -1;
+            selectedIndex = HistoryCount;
 
             base.Commit();
         }
