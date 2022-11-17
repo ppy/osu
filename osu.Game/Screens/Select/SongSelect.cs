@@ -414,6 +414,7 @@ namespace osu.Game.Screens.Select
         private void updateCarouselSelection(ValueChangedEvent<WorkingBeatmap> e = null)
         {
             var beatmap = e?.NewValue ?? Beatmap.Value;
+            if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
             Logger.Log($"Song select working beatmap updated to {beatmap}");
 
