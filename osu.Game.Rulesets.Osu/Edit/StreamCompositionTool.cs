@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles);
+        public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Streams);
 
         public override PlacementBlueprint CreatePlacementBlueprint() => new StreamPlacementBlueprint();
     }
