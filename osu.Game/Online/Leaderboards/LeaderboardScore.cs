@@ -18,7 +18,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
@@ -67,16 +66,13 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved(canBeNull: true)]
         private SongSelect songSelect { get; set; }
 
-        [Resolved]
-        private Storage storage { get; set; }
-
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private LegacyExportManager exporter { get; set; }
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
@@ -431,7 +427,7 @@ namespace osu.Game.Online.Leaderboards
 
                 if (Score.Files.Count > 0)
                 {
-                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => Task.Run(() => exporter.ExportAsync(Score))));
+                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => Task.Run(() => exporter?.ExportAsync(Score))));
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
                 }
 
