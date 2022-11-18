@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            Scheduler.AddDelayed(Sort, 1000, true);
+            Scheduler.AddDelayed(sort, 1000, true);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        protected virtual void Sort()
+        private void sort()
         {
             if (sorting.IsValid)
                 return;
@@ -171,11 +171,13 @@ namespace osu.Game.Screens.Play.HUD
             for (int i = 0; i < Flow.Count; i++)
             {
                 Flow.SetLayoutPosition(orderedByScore[i], i);
-                orderedByScore[i].ScorePosition = i + 1;
+                orderedByScore[i].ScorePosition = CheckValidScorePosition(i + 1) ? i + 1 : null;
             }
 
             sorting.Validate();
         }
+
+        protected virtual bool CheckValidScorePosition(int i) => true;
 
         private class InputDisabledScrollContainer : OsuScrollContainer
         {
