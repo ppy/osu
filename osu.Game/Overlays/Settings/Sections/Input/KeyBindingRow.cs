@@ -226,7 +226,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             }
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromMouseButton(e.Button));
             return true;
         }
 
@@ -252,7 +252,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 if (bindTarget.IsHovered)
                 {
-                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState, e.ScrollDelta));
+                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState, e.ScrollDelta), KeyCombination.FromScrollDelta(e.ScrollDelta).First());
                     finalise();
                     return true;
                 }
@@ -263,10 +263,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (!HasFocus)
+            if (!HasFocus || e.Repeat)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromKey(e.Key));
             if (!isModifier(e.Key)) finalise();
 
             return true;
@@ -288,7 +288,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromJoystickButton(e.Button));
             finalise();
 
             return true;
@@ -310,7 +310,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromMidiKey(e.Key));
             finalise();
 
             return true;
@@ -332,7 +332,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromTabletAuxiliaryButton(e.Button));
             finalise();
 
             return true;
@@ -354,7 +354,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromTabletPenButton(e.Button));
             finalise();
 
             return true;
@@ -562,6 +562,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Text.FadeColour(IsHovered ? Color4.Black : Color4.White, transition_time, Easing.OutQuint);
                 }
             }
+
+            /// <summary>
+            /// Update from a key combination, only allowing a single non-modifier key to be specified.
+            /// </summary>
+            /// <param name="fullState">A <see cref="KeyCombination"/> generated from the full input state.</param>
+            /// <param name="triggerKey">The key which triggered this update, and should be used as the binding.</param>
+            public void UpdateKeyCombination(KeyCombination fullState, InputKey triggerKey) =>
+                UpdateKeyCombination(new KeyCombination(fullState.Keys.Where(KeyCombination.IsModifierKey).Append(triggerKey)));
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {
