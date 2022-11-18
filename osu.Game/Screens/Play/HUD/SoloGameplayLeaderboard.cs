@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
@@ -17,7 +18,6 @@ namespace osu.Game.Screens.Play.HUD
     public class SoloGameplayLeaderboard : GameplayLeaderboard
     {
         private const int duration = 100;
-        private const int max_online_scores = 50; // BAD!
 
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
         private readonly IUser trackingUser;
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Play.HUD
             if (scoresType.Value != PlayBeatmapDetailArea.TabType.Local)
             {
                 // change displayed potision to '-' when there are 50 already submitted scores and tracked score is last
-                if (TrackedScore?.ScorePosition == Flow.Count && Flow.Count > max_online_scores)
+                if (TrackedScore?.ScorePosition == Flow.Count && Flow.Count > GetScoresRequest.MAX_SCORES_PER_REQUEST)
                     TrackedScore.ScorePosition = null;
             }
         }
