@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private OsuSpriteText positionText, scoreText, accuracyText, comboText, usernameText;
 
-        public BindableDouble TotalScore { get; } = new BindableDouble();
+        public BindableLong TotalScore { get; } = new BindableLong();
         public BindableDouble Accuracy { get; } = new BindableDouble(1);
         public BindableInt Combo { get; } = new BindableInt();
         public BindableBool HasQuit { get; } = new BindableBool();

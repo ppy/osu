@@ -49,7 +49,6 @@ namespace osu.Game.Overlays.News
                 Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
             }
 
-            NewsPostBackground bg;
             AddRange(new Drawable[]
             {
                 background = new Box
@@ -71,14 +70,14 @@ namespace osu.Game.Overlays.News
                             CornerRadius = 6,
                             Children = new Drawable[]
                             {
-                                new DelayedLoadWrapper(bg = new NewsPostBackground(post.FirstImage)
+                                new DelayedLoadUnloadWrapper(() => new NewsPostBackground(post.FirstImage)
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fill,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Alpha = 0
-                                })
+                                }, timeBeforeUnload: 5000)
                                 {
                                     RelativeSizeAxes = Axes.Both
                                 },
@@ -115,8 +114,6 @@ namespace osu.Game.Overlays.News
 
             IdleColour = colourProvider.Background4;
             HoverColour = colourProvider.Background3;
-
-            bg.OnLoadComplete += d => d.FadeIn(250, Easing.In);
 
             main.AddParagraph(post.Title, t => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold));
             main.AddParagraph(post.Preview, t => t.Font = OsuFont.GetFont(size: 12)); // Should use sans-serif font
