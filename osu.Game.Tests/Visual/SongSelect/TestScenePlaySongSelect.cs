@@ -1055,6 +1055,18 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("mod overlay hidden", () => songSelect!.ModSelect.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestBeatmapOptionsDisabled()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+
+            AddAssert("options enabled", () => songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+            AddStep("delete all beatmaps", () => manager.Delete());
+            AddAssert("options disabled", () => !songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+        }
+
         private void waitForInitialSelection()
         {
             AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);

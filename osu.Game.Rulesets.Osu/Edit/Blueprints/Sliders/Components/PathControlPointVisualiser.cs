@@ -248,6 +248,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     break;
             }
 
+            slider.Path.ExpectedDistance.Value = null;
             piece.ControlPoint.Type = type;
         }
 
