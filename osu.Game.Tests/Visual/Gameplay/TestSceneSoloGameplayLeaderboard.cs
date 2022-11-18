@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for sort", () => leaderboard.ChildrenOfType<GameplayLeaderboardScore>().First().ScorePosition != null);
 
             if (expectedOverflowIndex == null)
-                AddUntilStep($"tracked player has null position", () => leaderboard.TrackedScore?.ScorePosition, () => Is.Null);
+                AddUntilStep("tracked player has null position", () => leaderboard.TrackedScore?.ScorePosition, () => Is.Null);
             else
                 AddUntilStep($"tracked player is #{expectedOverflowIndex}", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(expectedOverflowIndex));
         }
