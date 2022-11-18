@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            Scheduler.AddDelayed(sort, 1000, true);
+            Scheduler.AddDelayed(Sort, 1000, true);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        protected virtual void sort()
+        protected virtual void Sort()
         {
             if (sorting.IsValid)
                 return;

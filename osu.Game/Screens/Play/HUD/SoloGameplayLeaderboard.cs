@@ -100,13 +100,13 @@ namespace osu.Game.Screens.Play.HUD
             local.DisplayOrder.Value = long.MaxValue;
         }
 
-        protected override void sort()
+        protected override void Sort()
         {
-            base.sort();
+            base.Sort();
 
             if (scoresType.Value != PlayBeatmapDetailArea.TabType.Local)
             {
-                // change displayed potision to '-' when there are 50 already submitted scores and tracked score is last
+                // change displayed position to '-' when there are 50 already submitted scores and tracked score is last
                 if (TrackedScore?.ScorePosition == Flow.Count && Flow.Count > GetScoresRequest.MAX_SCORES_PER_REQUEST)
                     TrackedScore.ScorePosition = null;
             }
