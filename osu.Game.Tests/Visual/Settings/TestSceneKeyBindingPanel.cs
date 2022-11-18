@@ -41,6 +41,16 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
+        public void TestBindingTwoNonModifiers()
+        {
+            AddStep("press j", () => InputManager.PressKey(Key.J));
+            scrollToAndStartBinding("Increase volume");
+            AddStep("press k", () => InputManager.Key(Key.K));
+            AddStep("release j", () => InputManager.ReleaseKey(Key.J));
+            checkBinding("Increase volume", "K");
+        }
+
+        [Test]
         public void TestBindingSingleKey()
         {
             scrollToAndStartBinding("Increase volume");
