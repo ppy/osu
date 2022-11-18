@@ -43,7 +43,7 @@ namespace osu.Game.Database
                     break;
 
                 case ScoreInfo:
-                    await new LegacyScoreExporter(exportStorage, realmAccess, notification).ExportASync(item, false);
+                    await new LegacyScoreExporter(exportStorage, realmAccess, notification).ExportASync(item);
                     break;
 
                 case BeatmapSetInfo:
