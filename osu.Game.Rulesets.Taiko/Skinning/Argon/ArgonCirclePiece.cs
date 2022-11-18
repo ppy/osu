@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Objects;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
@@ -81,12 +82,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             updateStateTransforms(drawableHitObject, drawableHitObject.State.Value);
         }
 
-        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
+        private void updateStateTransforms(DrawableHitObject h, ArmedState state)
         {
+            if (h.HitObject is not Hit)
+                return;
+
             switch (state)
             {
                 case ArmedState.Hit:
-                    using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime))
+                    using (BeginAbsoluteSequence(h.HitStateUpdateTime))
                     {
                         flash.FadeTo(0.9f).FadeOut(500, Easing.OutQuint);
                     }

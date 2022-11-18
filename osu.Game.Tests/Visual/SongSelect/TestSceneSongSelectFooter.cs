@@ -3,8 +3,10 @@
 
 #nullable disable
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Input;
@@ -42,6 +44,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             InputManager.MoveMouseTo(Vector2.Zero);
         });
+
+        [Test]
+        public void TestState()
+        {
+            AddRepeatStep("toggle options state", () => this.ChildrenOfType<FooterButton>().Last().Enabled.Toggle(), 20);
+        }
 
         [Test]
         public void TestFooterRandom()

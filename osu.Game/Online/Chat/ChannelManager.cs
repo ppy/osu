@@ -74,6 +74,9 @@ namespace osu.Game.Online.Chat
         private bool channelsInitialised;
         private ScheduledDelegate scheduledAck;
 
+        private long? lastSilenceMessageId;
+        private uint? lastSilenceId;
+
         public ChannelManager(IAPIProvider api)
         {
             this.api = api;
@@ -105,28 +108,7 @@ namespace osu.Game.Online.Chat
             connector.Start();
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(_ => performChatAckRequest(), true);
-        }
-
-        private void performChatAckRequest()
-        {
-            if (apiState.Value != APIState.Online)
-                return;
-
-            scheduledAck?.Cancel();
-
-            var req = new ChatAckRequest();
-            req.Success += _ => scheduleNextRequest();
-            req.Failure += _ => scheduleNextRequest();
-            api.Queue(req);
-
-            // Todo: Handle silences.
-
-            void scheduleNextRequest()
-            {
-                scheduledAck?.Cancel();
-                scheduledAck = Scheduler.AddDelayed(performChatAckRequest, 60000);
-            }
+            apiState.BindValueChanged(_ => SendAck(), true);
         }
 
         /// <summary>
@@ -349,6 +331,8 @@ namespace osu.Game.Online.Chat
 
             foreach (var group in messages.GroupBy(m => m.ChannelId))
                 channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
+
+            lastSilenceMessageId ??= messages.LastOrDefault()?.Id;
         }
 
         private void initializeChannels()
@@ -396,6 +380,44 @@ namespace osu.Game.Online.Chat
             };
 
             api.Queue(fetchInitialMsgReq);
+        }
+
+        /// <summary>
+        /// Sends an acknowledgement request to the API.
+        /// This marks the user as online to receive messages from public channels, while also returning a list of silenced users.
+        /// It needs to be called at least once every 10 minutes to remain visibly marked as online.
+        /// </summary>
+        public void SendAck()
+        {
+            if (apiState.Value != APIState.Online)
+                return;
+
+            var req = new ChatAckRequest
+            {
+                SinceMessageId = lastSilenceMessageId,
+                SinceSilenceId = lastSilenceId
+            };
+
+            req.Failure += _ => scheduleNextRequest();
+            req.Success += ack =>
+            {
+                foreach (var silence in ack.Silences)
+                {
+                    foreach (var channel in JoinedChannels)
+                        channel.RemoveMessagesFromUser(silence.UserId);
+                    lastSilenceId = Math.Max(lastSilenceId ?? 0, silence.Id);
+                }
+
+                scheduleNextRequest();
+            };
+
+            api.Queue(req);
+
+            void scheduleNextRequest()
+            {
+                scheduledAck?.Cancel();
+                scheduledAck = Scheduler.AddDelayed(SendAck, 60000);
+            }
         }
 
         /// <summary>
