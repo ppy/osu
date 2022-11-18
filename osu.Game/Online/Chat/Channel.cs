@@ -157,6 +157,20 @@ namespace osu.Game.Online.Chat
             NewMessagesArrived?.Invoke(messages);
         }
 
+        public void RemoveMessagesFromUser(int userId)
+        {
+            for (int i = 0; i < Messages.Count; i++)
+            {
+                var message = Messages[i];
+
+                if (message.SenderId == userId)
+                {
+                    Messages.RemoveAt(i--);
+                    MessageRemoved?.Invoke(message);
+                }
+            }
+        }
+
         /// <summary>
         /// Replace or remove a message from the channel.
         /// </summary>

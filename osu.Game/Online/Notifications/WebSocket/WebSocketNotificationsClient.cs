@@ -72,7 +72,6 @@ namespace osu.Game.Online.Notifications.WebSocket
                                     break;
                                 }
 
-                                Logger.Log($"{GetType().ReadableName()} handling event: {message.Event}");
                                 await onMessageReceivedAsync(message);
                             }
 

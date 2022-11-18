@@ -163,10 +163,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for bars to disappear", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
             AddUntilStep("ensure max circles not exceeded", () =>
-            {
-                return this.ChildrenOfType<ColourHitErrorMeter>()
-                           .All(m => m.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count() <= max_displayed_judgements);
-            });
+                this.ChildrenOfType<ColourHitErrorMeter>().First().ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count(), () => Is.LessThanOrEqualTo(max_displayed_judgements));
 
             AddStep("show displays", () =>
             {
