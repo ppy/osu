@@ -20,6 +20,9 @@ namespace osu.Game.Screens.Play.HUD
         private const int duration = 100;
 
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
+
+        private readonly Bindable<PlayBeatmapDetailArea.TabType> scoreSource = new Bindable<PlayBeatmapDetailArea.TabType>();
+
         private readonly IUser trackingUser;
 
         public readonly IBindableList<ScoreInfo> Scores = new BindableList<ScoreInfo>();
@@ -39,8 +42,6 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public readonly Bindable<bool> AlwaysVisible = new Bindable<bool>(true);
 
-        private Bindable<PlayBeatmapDetailArea.TabType> scoresType = new Bindable<PlayBeatmapDetailArea.TabType>();
-
         public SoloGameplayLeaderboard(IUser trackingUser)
         {
             this.trackingUser = trackingUser;
@@ -50,14 +51,13 @@ namespace osu.Game.Screens.Play.HUD
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
-
-            // a way to differentiate scores taken from online ranking to local scores
-            scoresType = config.GetBindable<PlayBeatmapDetailArea.TabType>(OsuSetting.BeatmapDetailTab);
+            config.BindWith(OsuSetting.BeatmapDetailTab, scoreSource);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             Scores.BindCollectionChanged((_, _) => Scheduler.AddOnce(showScores), true);
 
             // Alpha will be updated via `updateVisibility` below.
@@ -104,9 +104,9 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Sort();
 
-            if (scoresType.Value != PlayBeatmapDetailArea.TabType.Local)
+            // change displayed position to '-' when there are 50 already submitted scores and tracked score is last
+            if (scoreSource.Value != PlayBeatmapDetailArea.TabType.Local)
             {
-                // change displayed position to '-' when there are 50 already submitted scores and tracked score is last
                 if (TrackedScore?.ScorePosition == Flow.Count && Flow.Count > GetScoresRequest.MAX_SCORES_PER_REQUEST)
                     TrackedScore.ScorePosition = null;
             }
