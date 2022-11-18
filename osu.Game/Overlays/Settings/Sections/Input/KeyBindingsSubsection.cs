@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     AllowMainMouseButtons = Ruleset != null,
                     Defaults = defaultGroup.Select(d => d.KeyCombination),
-                    BindingFinalised = bindingCompleted
+                    BindingUpdated = onBindingUpdated
                 });
             }
 
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             });
         }
 
-        private void bindingCompleted(KeyBindingRow sender)
+        private void onBindingUpdated(KeyBindingRow sender)
         {
             if (AutoAdvanceTarget)
             {

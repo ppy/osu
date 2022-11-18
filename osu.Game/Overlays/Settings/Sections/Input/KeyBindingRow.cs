@@ -34,9 +34,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     public class KeyBindingRow : Container, IFilterable
     {
         /// <summary>
-        /// Invoked when binding of this row finalises with a change being written.
+        /// Invoked when the binding of this row is updated with a change being written.
         /// </summary>
-        public Action<KeyBindingRow> BindingFinalised { get; set; }
+        public Action<KeyBindingRow> BindingUpdated { get; set; }
 
         private readonly object action;
         private readonly IEnumerable<RealmKeyBinding> bindings;
@@ -385,7 +385,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             finalise(false);
         }
 
-        private void finalise(bool changedKey = true)
+        private void finalise(bool hasChanged = true)
         {
             if (bindTarget != null)
             {
@@ -398,8 +398,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     // schedule to ensure we don't instantly get focus back on next OnMouseClick (see AcceptFocus impl.)
                     bindTarget = null;
-                    if (changedKey)
-                        BindingFinalised?.Invoke(this);
+                    if (hasChanged)
+                        BindingUpdated?.Invoke(this);
                 });
             }
 
