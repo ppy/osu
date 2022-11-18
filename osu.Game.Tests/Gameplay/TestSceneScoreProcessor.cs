@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Gameplay
             // Apply a miss judgement
             scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new TestJudgement()) { Type = HitResult.Miss });
 
-            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(0.0));
+            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(0));
         }
 
         [Test]
