@@ -147,8 +147,7 @@ namespace osu.Game.Overlays
 
             if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.SupporterOnlyFilters)
             {
-                var supporterOnly = new SupporterRequiredDrawable();
-                supporterOnly.UpdateText(searchResult.SupporterOnlyFiltersUsed);
+                var supporterOnly = new SupporterRequiredDrawable(searchResult.SupporterOnlyFiltersUsed);
                 replaceResultsAreaContent(supporterOnly);
                 return;
             }
@@ -297,11 +296,15 @@ namespace osu.Game.Overlays
         {
             private LinkFlowContainer supporterRequiredText;
 
-            public SupporterRequiredDrawable()
+            private readonly List<LocalisableString> filtersUsed;
+
+            public SupporterRequiredDrawable(List<LocalisableString> filtersUsed)
             {
                 RelativeSizeAxes = Axes.X;
                 Height = 225;
                 Alpha = 0;
+
+                this.filtersUsed = filtersUsed;
             }
 
             [BackgroundDependencyLoader]
@@ -333,14 +336,9 @@ namespace osu.Game.Overlays
                         },
                     }
                 });
-            }
-
-            public void UpdateText(List<LocalisableString> filters)
-            {
-                supporterRequiredText.Clear();
 
                 supporterRequiredText.AddText(
-                    BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filters), "").ToString(),
+                    BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filtersUsed), "").ToString(),
                     t =>
                     {
                         t.Font = OsuFont.GetFont(size: 16);
