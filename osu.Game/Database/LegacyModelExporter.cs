@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Platform;
@@ -25,89 +26,92 @@ namespace osu.Game.Database
 
         protected readonly Storage UserFileStorage;
 
-        private readonly Storage exportStorage;
+        protected readonly Storage ExportStorage;
 
-        private readonly RealmAccess realmAccess;
+        protected readonly RealmAccess RealmAccess;
 
-        private readonly ProgressNotification notification;
+        protected readonly ProgressNotification Notification;
 
-        protected ProgressNotification Notification = null!;
+        protected string Filename = null!;
 
-        private string filename = null!;
+        protected Stream? OutputStream;
 
-        protected LegacyModelExporter(Storage storage, RealmAccess realm, ProgressNotification notification)
+        protected bool ShouldDisposeStream;
+
+        protected LegacyModelExporter(Storage storage, RealmAccess realm, ProgressNotification notification, Stream? stream = null)
         {
-            exportStorage = storage.GetStorageForDirectory(@"exports");
+            ExportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
-            this.notification = notification;
-            realmAccess = realm;
+            Notification = notification;
+            RealmAccess = realm;
+            OutputStream = stream;
+            ShouldDisposeStream = false;
         }
 
-        public async Task ExportASync(IHasGuidPrimaryKey uuid, bool needZipArchive = true)
+        public virtual async Task ExportASync(IHasGuidPrimaryKey uuid)
         {
             Guid id = uuid.ID;
             await Task.Run(() =>
             {
-                realmAccess.Run(r =>
+                RealmAccess.Run(r =>
                 {
                     if (r.Find<TModel>(id) is IHasNamedFiles model)
                     {
-                        filename = $"{model.GetDisplayString().GetValidFilename()}{FileExtension}";
+                        Filename = $"{model.GetDisplayString().GetValidFilename()}{FileExtension}";
                     }
                     else
                     {
                         return;
                     }
 
-                    using (var outputStream = exportStorage.CreateFileSafely(filename))
+                    if (OutputStream == null)
                     {
-                        if (needZipArchive)
+                        OutputStream = ExportStorage.CreateFileSafely(Filename);
+                        ShouldDisposeStream = true;
+                    }
+
+                    using (var archive = ZipArchive.Create())
+                    {
+                        float i = 0;
+
+                        foreach (var file in model.Files)
                         {
-                            using (var archive = ZipArchive.Create())
-                            {
-                                float i = 0;
+                            if (Notification.CancellationToken.IsCancellationRequested) return;
 
-                                foreach (var file in model.Files)
-                                {
-                                    if (notification.CancellationToken.IsCancellationRequested) return;
-                                    archive.AddEntry(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
-                                    i++;
-                                    notification.Progress = i / model.Files.Count();
-                                    notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
-                                }
-
-                                notification.Text = "Saving Zip Archive...";
-                                archive.SaveTo(outputStream);
-                            }
+                            archive.AddEntry(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
+                            i++;
+                            Notification.Progress = i / model.Files.Count();
+                            Notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
                         }
-                        else
-                        {
-                            var file = model.Files.SingleOrDefault();
-                            if (file == null)
-                                return;
 
-                            using (var inputStream = UserFileStorage.GetStream(file.File.GetStoragePath()))
-                                inputStream.CopyTo(outputStream);
-                        }
+                        Notification.Text = "Saving Zip Archive...";
+                        archive.SaveTo(OutputStream);
                     }
                 });
-            }).ContinueWith(t =>
+            }).ContinueWith(OnComplete);
+        }
+
+        protected void OnComplete(Task t)
+        {
+            if (ShouldDisposeStream)
             {
-                if (t.IsFaulted)
-                {
-                    notification.State = ProgressNotificationState.Cancelled;
-                    return;
-                }
+                OutputStream?.Dispose();
+            }
 
-                if (notification.CancellationToken.IsCancellationRequested)
-                {
-                    return;
-                }
+            if (t.IsFaulted)
+            {
+                Notification.State = ProgressNotificationState.Cancelled;
+                return;
+            }
 
-                notification.CompletionText = "Export Complete, Click to open the folder";
-                notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
-                notification.State = ProgressNotificationState.Completed;
-            });
+            if (Notification.CancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            Notification.CompletionText = "Export Complete, Click to open the folder";
+            Notification.CompletionClickAction += () => ExportStorage.PresentFileExternally(Filename);
+            Notification.State = ProgressNotificationState.Completed;
         }
     }
 }
