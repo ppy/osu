@@ -22,8 +22,6 @@ namespace osu.Desktop.Updater
         private Squirrel.UpdateManager? updateManager;
         private INotificationOverlay notificationOverlay = null!;
 
-        public Task PrepareUpdateAsync() => Squirrel.UpdateManager.RestartAppWhenExited();
-
         private static readonly Logger logger = Logger.GetLogger("updater");
 
         /// <summary>
@@ -141,8 +139,7 @@ namespace osu.Desktop.Updater
 
         private bool restartToApplyUpdate()
         {
-            PrepareUpdateAsync()
-                .ContinueWith(_ => Schedule(() => game.AttemptExit()));
+            Schedule(() => game.AttemptExit(() => Squirrel.UpdateManager.RestartAppWhenExited()));
             return true;
         }
 
