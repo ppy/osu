@@ -83,7 +83,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("tracked player is #50", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(50));
 
             AddStep("add one more score", () => scores.Add(new ScoreInfo { User = new APIUser { Username = "New player 1" }, TotalScore = RNG.Next(600000, 1000000) }));
-            AddUntilStep($"tracked player is #{expectedOverflowIndex}", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(expectedOverflowIndex));
+
+            AddUntilStep("wait for sort", () => leaderboard.ChildrenOfType<GameplayLeaderboardScore>().First().ScorePosition != null);
+
+            if (expectedOverflowIndex == null)
+                AddUntilStep($"tracked player has null position", () => leaderboard.TrackedScore?.ScorePosition, () => Is.Null);
+            else
+                AddUntilStep($"tracked player is #{expectedOverflowIndex}", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(expectedOverflowIndex));
         }
 
         [Test]
