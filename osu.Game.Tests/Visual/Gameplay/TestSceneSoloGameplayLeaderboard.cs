@@ -73,23 +73,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("toggle expanded", () => leaderboard.Expanded.Value = !leaderboard.Expanded.Value);
         }
 
-        [Test]
-        public void TestTrackedScorePosition()
+        [TestCase(PlayBeatmapDetailArea.TabType.Local, 51)]
+        [TestCase(PlayBeatmapDetailArea.TabType.Global, null)]
+        [TestCase(PlayBeatmapDetailArea.TabType.Country, null)]
+        [TestCase(PlayBeatmapDetailArea.TabType.Friends, null)]
+        public void TestTrackedScorePosition(PlayBeatmapDetailArea.TabType tabType, int? expectedOverflowIndex)
         {
-            AddStep("change TabType to global", () => beatmapTabType.Value = PlayBeatmapDetailArea.TabType.Global);
-            AddUntilStep("tracked player is #50", () => leaderboard.TrackedScore?.ScorePosition! == 50);
-
-            AddStep("change TabType to local", () => beatmapTabType.Value = PlayBeatmapDetailArea.TabType.Local);
-            AddUntilStep("tracked player is #50", () => leaderboard.TrackedScore?.ScorePosition! == 50);
+            AddStep($"change TabType to {tabType}", () => beatmapTabType.Value = tabType);
+            AddUntilStep("tracked player is #50", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(50));
 
             AddStep("add one more score", () => scores.Add(new ScoreInfo { User = new APIUser { Username = "New player 1" }, TotalScore = RNG.Next(600000, 1000000) }));
-            AddUntilStep("tracked player is #51", () => leaderboard.TrackedScore?.ScorePosition! == 51);
-
-            AddStep("change TabType to global", () => beatmapTabType.Value = PlayBeatmapDetailArea.TabType.Global);
-            AddUntilStep("tracked player is -", () => leaderboard.TrackedScore?.ScorePosition! == null);
-
-            AddStep("change TabType to country", () => beatmapTabType.Value = PlayBeatmapDetailArea.TabType.Country);
-            AddUntilStep("tracked player is -", () => leaderboard.TrackedScore?.ScorePosition! == null);
+            AddUntilStep($"tracked player is #{expectedOverflowIndex}", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(expectedOverflowIndex));
         }
 
         [Test]
