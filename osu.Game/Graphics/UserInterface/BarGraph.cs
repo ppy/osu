@@ -42,7 +42,8 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private readonly List<BarInfo> bars = new List<BarInfo>();
+        private readonly BarsInfo bars = new BarsInfo(0);
+
         private float barBreadth;
 
         /// <summary>
@@ -71,16 +72,11 @@ namespace osu.Game.Graphics.UserInterface
 
                     if (bar.Index < bars.Count)
                     {
-                        BarInfo b = bars[bar.Index];
-
-                        b.InitialLength = b.FinalLength;
-                        b.FinalLength = length;
-
-                        bars[bar.Index] = b;
+                        bars.UpdateLength(bar.Index, length);
                         continue;
                     }
 
-                    bars.Add(new BarInfo { FinalLength = length });
+                    bars.AddBar(length);
                 }
 
                 if (bars.Count > newCount)
@@ -108,31 +104,19 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
-            if (!bars.Any())
+            if (!bars.Any)
                 return;
 
             double currentTime = Clock.CurrentTime;
 
             if (currentTime < animationStartTime + resize_duration)
             {
-                for (int i = 0; i < bars.Count; i++)
-                {
-                    BarInfo bar = bars[i];
-                    bar.InstantaneousLength = Interpolation.ValueAt(currentTime, bar.InitialLength, bar.FinalLength, animationStartTime, animationStartTime + resize_duration, easing);
-                    bars[i] = bar;
-                }
-
+                bars.Animate(animationStartTime, currentTime);
                 Invalidate(Invalidation.DrawNode);
             }
             else if (!animationComplete)
             {
-                for (int i = 0; i < bars.Count; i++)
-                {
-                    BarInfo bar = bars[i];
-                    bar.InstantaneousLength = bar.FinalLength;
-                    bars[i] = bar;
-                }
-
+                bars.FinishAnimation();
                 Invalidate(Invalidation.DrawNode);
 
                 animationComplete = true;
@@ -155,8 +139,7 @@ namespace osu.Game.Graphics.UserInterface
             private Vector2 drawSize;
             private BarDirection direction;
             private float barBreadth;
-
-            private readonly List<BarInfo> bars = new List<BarInfo>();
+            private BarsInfo bars;
 
             public override void ApplyState()
             {
@@ -167,26 +150,19 @@ namespace osu.Game.Graphics.UserInterface
                 drawSize = Source.DrawSize;
                 direction = Source.direction;
                 barBreadth = Source.barBreadth;
-
-                bars.Clear();
-                bars.AddRange(Source.bars);
+                bars = Source.bars;
             }
 
             public override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 
-                if (!bars.Any())
-                    return;
-
                 shader.Bind();
 
                 for (int i = 0; i < bars.Count; i++)
                 {
-                    var bar = bars[i];
-
-                    float barHeight = drawSize.Y * ((direction == BarDirection.TopToBottom || direction == BarDirection.BottomToTop) ? bar.InstantaneousLength : barBreadth);
-                    float barWidth = drawSize.X * ((direction == BarDirection.LeftToRight || direction == BarDirection.RightToLeft) ? bar.InstantaneousLength : barBreadth);
+                    float barHeight = drawSize.Y * ((direction == BarDirection.TopToBottom || direction == BarDirection.BottomToTop) ? bars.InstantaneousLength(i) : barBreadth);
+                    float barWidth = drawSize.X * ((direction == BarDirection.LeftToRight || direction == BarDirection.RightToLeft) ? bars.InstantaneousLength(i) : barBreadth);
 
                     Vector2 topLeft;
 
@@ -210,29 +186,85 @@ namespace osu.Game.Graphics.UserInterface
                             break;
                     }
 
-                    Vector2 topRight = topLeft + new Vector2(barWidth, 0);
-                    Vector2 bottomLeft = topLeft + new Vector2(0, barHeight);
-                    Vector2 bottomRight = bottomLeft + new Vector2(barWidth, 0);
-
-                    var drawQuad = new Quad(
-                        Vector2Extensions.Transform(topLeft, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(topRight, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(bottomLeft, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(bottomRight, DrawInfo.Matrix)
-                    );
-
-                    renderer.DrawQuad(texture, drawQuad, DrawColourInfo.Colour);
+                    renderer.DrawQuad(
+                        texture,
+                        new Quad(
+                            Vector2Extensions.Transform(topLeft, DrawInfo.Matrix),
+                            Vector2Extensions.Transform(topLeft + new Vector2(barWidth, 0), DrawInfo.Matrix),
+                            Vector2Extensions.Transform(topLeft + new Vector2(0, barHeight), DrawInfo.Matrix),
+                            Vector2Extensions.Transform(topLeft + new Vector2(barWidth, barHeight), DrawInfo.Matrix)
+                        ),
+                        DrawColourInfo.Colour);
                 }
 
                 shader.Unbind();
             }
         }
 
-        private struct BarInfo
+        private struct BarsInfo
         {
-            public float InitialLength { get; set; }
-            public float FinalLength { get; set; }
-            public float InstantaneousLength { get; set; }
+            private readonly List<float> initialLengths;
+            private readonly List<float> finalLengths;
+            private readonly List<float> instantaneousLengths;
+
+            public bool Any => initialLengths.Any();
+
+            public int Count => initialLengths.Count;
+
+            public BarsInfo(int initialCount)
+            {
+                initialLengths = new List<float>();
+                finalLengths = new List<float>();
+                instantaneousLengths = new List<float>();
+
+                for (int i = 0; i < initialCount; i++)
+                {
+                    initialLengths.Add(0);
+                    finalLengths.Add(0);
+                    instantaneousLengths.Add(0);
+                }
+            }
+
+            public float InstantaneousLength(int index) => instantaneousLengths[index];
+
+            public void UpdateLength(int index, float newLength)
+            {
+                initialLengths[index] = finalLengths[index];
+                finalLengths[index] = newLength;
+            }
+
+            public void AddBar(float finalLength)
+            {
+                initialLengths.Add(0);
+                finalLengths.Add(finalLength);
+                instantaneousLengths.Add(0);
+            }
+
+            public void Clear()
+            {
+                initialLengths.Clear();
+                finalLengths.Clear();
+                instantaneousLengths.Clear();
+            }
+
+            public void RemoveRange(int index, int count)
+            {
+                initialLengths.RemoveRange(index, count);
+                finalLengths.RemoveRange(index, count);
+                instantaneousLengths.RemoveRange(index, count);
+            }
+
+            public void Animate(double animationStartTime, double currentTime)
+            {
+                for (int i = 0; i < Count; i++)
+                    instantaneousLengths[i] = Interpolation.ValueAt(currentTime, initialLengths[i], finalLengths[i], animationStartTime, animationStartTime + resize_duration, easing);
+            }
+
+            public void FinishAnimation()
+            {
+                for (int i = 0; i < Count; i++)
+                    instantaneousLengths[i] = finalLengths[i];
+            }
         }
     }
 }
