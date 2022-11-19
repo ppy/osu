@@ -48,6 +48,12 @@ namespace osu.Game.Database
             ShouldDisposeStream = false;
         }
 
+        /// <summary>
+        /// Export model to <see cref="OutputStream"/>
+        /// if <see cref="OutputStream"/> is null, model will export to default folder.
+        /// </summary>
+        /// <param name="uuid">The model which have Guid.</param>
+        /// <returns></returns>
         public virtual async Task ExportASync(IHasGuidPrimaryKey uuid)
         {
             Guid id = uuid.ID;
