@@ -120,7 +120,6 @@ namespace osu.Game.Graphics.UserInterface
                     bar.IntermediateValue = Interpolation.ValueAt(currentTime, bar.OldValue, bar.Value, animationStartTime, animationStartTime + resize_duration, easing);
 
                 Invalidate(Invalidation.DrawNode);
-                return;
             }
             else if (!animationComplete)
             {
@@ -130,7 +129,6 @@ namespace osu.Game.Graphics.UserInterface
                 Invalidate(Invalidation.DrawNode);
 
                 animationComplete = true;
-                return;
             }
         }
 
