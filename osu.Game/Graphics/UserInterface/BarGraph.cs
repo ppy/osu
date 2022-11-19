@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (size != 0)
                     size = 1.0f / size;
 
-                float maxLength = MaxValue ?? value.Max();
+                float maxLength = MaxValue ?? (newCount == 0 ? 0 : value.Max());
 
                 foreach (var bar in value.Select((length, index) => new { Value = length, Index = index }))
                 {
