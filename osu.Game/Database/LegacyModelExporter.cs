@@ -56,6 +56,9 @@ namespace osu.Game.Database
         /// <returns></returns>
         public virtual async Task ExportASync(IHasGuidPrimaryKey uuid)
         {
+            bool canCancel = true;
+            Notification.CancelRequested += () => canCancel;
+
             Guid id = uuid.ID;
             await Task.Run(() =>
             {
@@ -91,6 +94,7 @@ namespace osu.Game.Database
                         }
 
                         Notification.Text = "Saving Zip Archive...";
+                        canCancel = false;
                         archive.SaveTo(OutputStream);
                     }
                 });
