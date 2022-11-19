@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Input.Events;
-using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Utils;
 using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
@@ -12,23 +11,12 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly LimitedCapacityQueue<string> messageHistory;
 
-        public IEnumerable<string> GetMessageHistory()
-        {
-            if (HistoryCount == 0)
-                yield break;
-
-            for (int i = HistoryCount - 1; i >= 0; i--)
-                yield return messageHistory[i];
-        }
-
         public int HistoryCount => messageHistory.Count;
 
         private int selectedIndex;
 
         private string originalMessage = string.Empty;
         private bool everythingSelected;
-
-        public string GetOldMessage(int index) => messageHistory[HistoryCount - index - 1];
 
         public HistoryTextBox(int capacity = 100)
         {
