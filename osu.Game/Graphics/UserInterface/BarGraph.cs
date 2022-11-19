@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private readonly List<BarStruct> bars = new List<BarStruct>();
+        private readonly List<BarInfo> bars = new List<BarInfo>();
 
         /// <summary>
         /// A list of floats that defines the length of each <see cref="Bar"/>
@@ -70,20 +70,20 @@ namespace osu.Game.Graphics.UserInterface
 
                     if (bar.Index < bars.Count)
                     {
-                        BarStruct b = bars[bar.Index];
+                        BarInfo b = bars[bar.Index];
 
-                        b.OldValue = b.Value;
-                        b.Value = length;
-                        b.ShortSide = size;
+                        b.InitialLength = b.FinalLength;
+                        b.FinalLength = length;
+                        b.Breadth = size;
 
                         bars[bar.Index] = b;
                     }
                     else
                     {
-                        bars.Add(new BarStruct
+                        bars.Add(new BarInfo
                         {
-                            Value = length,
-                            ShortSide = size
+                            FinalLength = length,
+                            Breadth = size
                         });
                     }
                 }
@@ -122,8 +122,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 for (int i = 0; i < bars.Count; i++)
                 {
-                    BarStruct bar = bars[i];
-                    bar.IntermediateValue = Interpolation.ValueAt(currentTime, bar.OldValue, bar.Value, animationStartTime, animationStartTime + resize_duration, easing);
+                    BarInfo bar = bars[i];
+                    bar.InstantaneousLength = Interpolation.ValueAt(currentTime, bar.InitialLength, bar.FinalLength, animationStartTime, animationStartTime + resize_duration, easing);
                     bars[i] = bar;
                 }
 
@@ -133,8 +133,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 for (int i = 0; i < bars.Count; i++)
                 {
-                    BarStruct bar = bars[i];
-                    bar.IntermediateValue = bar.Value;
+                    BarInfo bar = bars[i];
+                    bar.InstantaneousLength = bar.FinalLength;
                     bars[i] = bar;
                 }
 
@@ -160,7 +160,7 @@ namespace osu.Game.Graphics.UserInterface
             private Vector2 drawSize;
             private BarDirection direction;
 
-            private readonly List<BarStruct> bars = new List<BarStruct>();
+            private readonly List<BarInfo> bars = new List<BarInfo>();
 
             public override void ApplyState()
             {
@@ -188,8 +188,8 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     var bar = bars[i];
 
-                    float barHeight = drawSize.Y * ((direction == BarDirection.TopToBottom || direction == BarDirection.BottomToTop) ? bar.IntermediateValue : bar.ShortSide);
-                    float barWidth = drawSize.X * ((direction == BarDirection.LeftToRight || direction == BarDirection.RightToLeft) ? bar.IntermediateValue : bar.ShortSide);
+                    float barHeight = drawSize.Y * ((direction == BarDirection.TopToBottom || direction == BarDirection.BottomToTop) ? bar.InstantaneousLength : bar.Breadth);
+                    float barWidth = drawSize.X * ((direction == BarDirection.LeftToRight || direction == BarDirection.RightToLeft) ? bar.InstantaneousLength : bar.Breadth);
 
                     Vector2 topLeft;
 
@@ -231,12 +231,12 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private struct BarStruct
+        private struct BarInfo
         {
-            public float OldValue { get; set; }
-            public float Value { get; set; }
-            public float IntermediateValue { get; set; }
-            public float ShortSide { get; set; }
+            public float InitialLength { get; set; }
+            public float FinalLength { get; set; }
+            public float InstantaneousLength { get; set; }
+            public float Breadth { get; set; }
         }
     }
 }
