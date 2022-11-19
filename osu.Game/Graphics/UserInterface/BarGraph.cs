@@ -115,7 +115,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (currentTime < animationStartTime + resize_duration)
             {
-                for (int i = 0; i < bars.Count(); i++)
+                for (int i = 0; i < bars.Count; i++)
                 {
                     BarStruct bar = bars[i];
                     bar.IntermediateValue = Interpolation.ValueAt(currentTime, bar.OldValue, bar.Value, animationStartTime, animationStartTime + resize_duration, easing);
@@ -126,7 +126,7 @@ namespace osu.Game.Graphics.UserInterface
             }
             else if (!animationComplete)
             {
-                for (int i = 0; i < bars.Count(); i++)
+                for (int i = 0; i < bars.Count; i++)
                 {
                     BarStruct bar = bars[i];
                     bar.IntermediateValue = bar.Value;
