@@ -43,6 +43,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private readonly List<BarInfo> bars = new List<BarInfo>();
+        private float barBreadth;
 
         /// <summary>
         /// A list of floats that defines the length of each <see cref="Bar"/>
@@ -60,7 +61,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 int newCount = value.Count();
 
-                float size = 1.0f / newCount;
+                barBreadth = 1.0f / newCount;
 
                 float maxLength = MaxValue ?? value.Max();
 
@@ -74,18 +75,12 @@ namespace osu.Game.Graphics.UserInterface
 
                         b.InitialLength = b.FinalLength;
                         b.FinalLength = length;
-                        b.Breadth = size;
 
                         bars[bar.Index] = b;
+                        continue;
                     }
-                    else
-                    {
-                        bars.Add(new BarInfo
-                        {
-                            FinalLength = length,
-                            Breadth = size
-                        });
-                    }
+
+                    bars.Add(new BarInfo { FinalLength = length });
                 }
 
                 if (bars.Count > newCount)
@@ -159,6 +154,7 @@ namespace osu.Game.Graphics.UserInterface
             private Texture texture = null!;
             private Vector2 drawSize;
             private BarDirection direction;
+            private float barBreadth;
 
             private readonly List<BarInfo> bars = new List<BarInfo>();
 
@@ -170,6 +166,7 @@ namespace osu.Game.Graphics.UserInterface
                 texture = Source.texture;
                 drawSize = Source.DrawSize;
                 direction = Source.direction;
+                barBreadth = Source.barBreadth;
 
                 bars.Clear();
                 bars.AddRange(Source.bars);
@@ -188,8 +185,8 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     var bar = bars[i];
 
-                    float barHeight = drawSize.Y * ((direction == BarDirection.TopToBottom || direction == BarDirection.BottomToTop) ? bar.InstantaneousLength : bar.Breadth);
-                    float barWidth = drawSize.X * ((direction == BarDirection.LeftToRight || direction == BarDirection.RightToLeft) ? bar.InstantaneousLength : bar.Breadth);
+                    float barHeight = drawSize.Y * ((direction == BarDirection.TopToBottom || direction == BarDirection.BottomToTop) ? bar.InstantaneousLength : barBreadth);
+                    float barWidth = drawSize.X * ((direction == BarDirection.LeftToRight || direction == BarDirection.RightToLeft) ? bar.InstantaneousLength : barBreadth);
 
                     Vector2 topLeft;
 
@@ -236,7 +233,6 @@ namespace osu.Game.Graphics.UserInterface
             public float InitialLength { get; set; }
             public float FinalLength { get; set; }
             public float InstantaneousLength { get; set; }
-            public float Breadth { get; set; }
         }
     }
 }
