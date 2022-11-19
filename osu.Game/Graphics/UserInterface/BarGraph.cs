@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private IEnumerable<BarDescriptor> bars;
+        private readonly List<BarStruct> bars = new List<BarStruct>();
 
         /// <summary>
         /// A list of floats that defines the length of each <see cref="Bar"/>
@@ -51,30 +51,31 @@ namespace osu.Game.Graphics.UserInterface
         {
             set
             {
-                List<BarDescriptor> newBars = bars?.ToList() ?? new List<BarDescriptor>();
-
                 int newCount = value.Count();
 
                 float size = newCount;
                 if (size != 0)
                     size = 1.0f / size;
 
-                foreach (var bar in value.Select((length, index) => new { Value = length, Bar = newBars.Count > index ? newBars[index] : null }))
+                float maxLength = MaxValue ?? value.Max();
+
+                foreach (var bar in value.Select((length, index) => new { Value = length, Index = index }))
                 {
-                    float length = MaxValue ?? value.Max();
-                    if (length != 0)
-                        length = Math.Max(0f, bar.Value / length);
+                    float length = maxLength == 0 ? 0 : Math.Max(0f, bar.Value / maxLength);
 
-                    if (bar.Bar != null)
+                    if (bar.Index < bars.Count)
                     {
-                        bar.Bar.OldValue = bar.Bar.Value;
+                        BarStruct b = bars[bar.Index];
 
-                        bar.Bar.Value = length;
-                        bar.Bar.ShortSide = size;
+                        b.OldValue = b.Value;
+                        b.Value = length;
+                        b.ShortSide = size;
+
+                        bars[bar.Index] = b;
                     }
                     else
                     {
-                        newBars.Add(new BarDescriptor
+                        bars.Add(new BarStruct
                         {
                             Value = length,
                             ShortSide = size
@@ -82,10 +83,8 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 }
 
-                if (newBars.Count > newCount)
-                    newBars.RemoveRange(newCount, newBars.Count - newCount);
-
-                bars = newBars;
+                if (bars.Count > newCount)
+                    bars.RemoveRange(newCount, bars.Count - newCount);
 
                 animationStartTime = Clock.CurrentTime;
                 animationComplete = false;
@@ -109,30 +108,36 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
-            if (noBars)
+            if (!bars.Any())
                 return;
 
             double currentTime = Clock.CurrentTime;
 
             if (currentTime < animationStartTime + resize_duration)
             {
-                foreach (var bar in bars)
+                for (int i = 0; i < bars.Count(); i++)
+                {
+                    BarStruct bar = bars[i];
                     bar.IntermediateValue = Interpolation.ValueAt(currentTime, bar.OldValue, bar.Value, animationStartTime, animationStartTime + resize_duration, easing);
+                    bars[i] = bar;
+                }
 
                 Invalidate(Invalidation.DrawNode);
             }
             else if (!animationComplete)
             {
-                foreach (var bar in bars)
+                for (int i = 0; i < bars.Count(); i++)
+                {
+                    BarStruct bar = bars[i];
                     bar.IntermediateValue = bar.Value;
+                    bars[i] = bar;
+                }
 
                 Invalidate(Invalidation.DrawNode);
 
                 animationComplete = true;
             }
         }
-
-        private bool noBars => bars?.Any() != true;
 
         protected override DrawNode CreateDrawNode() => new BarGraphDrawNode(this);
 
@@ -150,7 +155,7 @@ namespace osu.Game.Graphics.UserInterface
             private Vector2 drawSize;
             private BarDirection direction;
 
-            private readonly List<BarDescriptor> bars = new List<BarDescriptor>();
+            private readonly List<BarStruct> bars = new List<BarStruct>();
 
             public override void ApplyState()
             {
@@ -162,10 +167,6 @@ namespace osu.Game.Graphics.UserInterface
                 direction = Source.direction;
 
                 bars.Clear();
-
-                if (Source.noBars)
-                    return;
-
                 bars.AddRange(Source.bars);
             }
 
@@ -225,7 +226,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private class BarDescriptor
+        private struct BarStruct
         {
             public float OldValue { get; set; }
             public float Value { get; set; }
