@@ -4,6 +4,7 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -69,6 +70,8 @@ namespace osu.Game.Graphics.UserInterface
         protected Box Background;
         protected SpriteText SpriteText;
 
+        private readonly Box flashLayer;
+
         public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Button)
         {
             Height = 40;
@@ -99,6 +102,14 @@ namespace osu.Game.Graphics.UserInterface
                         Depth = float.MinValue
                     },
                     SpriteText = CreateText(),
+                    flashLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Blending = BlendingParameters.Additive,
+                        Depth = float.MinValue,
+                        Colour = Color4.White.Opacity(0.5f),
+                        Alpha = 0,
+                    },
                 }
             });
 
@@ -125,7 +136,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(ClickEvent e)
         {
             if (Enabled.Value)
-                Background.FlashColour(Color4.White, 800, Easing.OutQuint);
+                flashLayer.FadeOutFromOne(800, Easing.OutQuint);
 
             return base.OnClick(e);
         }

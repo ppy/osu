@@ -110,9 +110,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                             {
                                 t.NewLine();
-                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedBindableString(TabletSettingsStrings.NoTabletDetectedDescription(RuntimeInfo.OS == RuntimeInfo.Platform.Windows
-                                    ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
-                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux")).Value);
+                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedBindableString(TabletSettingsStrings.NoTabletDetectedDescription(
+                                    RuntimeInfo.OS == RuntimeInfo.Platform.Windows
+                                        ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
+                                        : @"https://opentabletdriver.net/Wiki/FAQ/Linux")).Value);
                                 t.AddLinks(formattedSource.Text, formattedSource.Links);
                             }
                         }),
@@ -273,6 +274,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 sizeY.Default = sizeY.MaxValue = tab.Size.Y;
 
                 areaSize.Default = new Vector2(sizeX.Default, sizeY.Default);
+                areaOffset.Default = new Vector2(offsetX.Default, offsetY.Default);
             }), true);
         }
 

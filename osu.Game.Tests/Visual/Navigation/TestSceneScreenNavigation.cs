@@ -436,6 +436,8 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddUntilStep("Wait for toolbar to load", () => Game.Toolbar.IsLoaded);
 
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
             TestPlaySongSelect songSelect = null;
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 

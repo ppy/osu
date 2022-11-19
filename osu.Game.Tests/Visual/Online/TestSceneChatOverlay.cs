@@ -40,8 +40,10 @@ namespace osu.Game.Tests.Visual.Online
         private ChannelManager channelManager;
 
         private readonly APIUser testUser = new APIUser { Username = "test user", Id = 5071479 };
+        private readonly APIUser testUser1 = new APIUser { Username = "test user", Id = 5071480 };
 
         private Channel[] testChannels;
+        private Message[] initialMessages;
 
         private Channel testChannel1 => testChannels[0];
         private Channel testChannel2 => testChannels[1];
@@ -49,10 +51,14 @@ namespace osu.Game.Tests.Visual.Online
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        private int currentMessageId;
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            currentMessageId = 0;
             testChannels = Enumerable.Range(1, 10).Select(createPublicChannel).ToArray();
+            initialMessages = testChannels.SelectMany(createChannelMessages).ToArray();
 
             Child = new DependencyProvidingContainer
             {
@@ -99,7 +105,7 @@ namespace osu.Game.Tests.Visual.Online
                             return true;
 
                         case GetMessagesRequest getMessages:
-                            getMessages.TriggerSuccess(createChannelMessages(getMessages.Channel));
+                            getMessages.TriggerSuccess(initialMessages.ToList());
                             return true;
 
                         case GetUserRequest getUser:
@@ -495,6 +501,35 @@ namespace osu.Game.Tests.Visual.Online
             waitForChannel1Visible();
         }
 
+        [Test]
+        public void TestRemoveMessages()
+        {
+            AddStep("Show overlay with channel", () =>
+            {
+                chatOverlay.Show();
+                channelManager.CurrentChannel.Value = channelManager.JoinChannel(testChannel1);
+            });
+
+            AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
+            waitForChannel1Visible();
+
+            AddStep("Send message from another user", () =>
+            {
+                testChannel1.AddNewMessages(new Message
+                {
+                    ChannelId = testChannel1.Id,
+                    Content = "Message from another user",
+                    Timestamp = DateTimeOffset.Now,
+                    Sender = testUser1,
+                });
+            });
+
+            AddStep("Remove messages from other user", () =>
+            {
+                testChannel1.RemoveMessagesFromUser(testUser.Id);
+            });
+        }
+
         private void joinTestChannel(int i)
         {
             AddStep($"Join test channel {i}", () => channelManager.JoinChannel(testChannels[i]));
@@ -546,7 +581,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private List<Message> createChannelMessages(Channel channel)
         {
-            var message = new Message
+            var message = new Message(currentMessageId++)
             {
                 ChannelId = channel.Id,
                 Content = $"Hello, this is a message in {channel.Name}",

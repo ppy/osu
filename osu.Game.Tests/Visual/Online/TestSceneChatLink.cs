@@ -46,6 +46,8 @@ namespace osu.Game.Tests.Visual.Online
             availableChannels.Add(new Channel { Name = "#english" });
             availableChannels.Add(new Channel { Name = "#japanese" });
             Dependencies.Cache(chatManager);
+
+            Add(chatManager);
         }
 
         [SetUp]

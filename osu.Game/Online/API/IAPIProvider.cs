@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Notifications;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
@@ -111,6 +112,11 @@ namespace osu.Game.Online.API
         /// <param name="endpoint">The endpoint to the hub.</param>
         /// <param name="preferMessagePack">Whether to use MessagePack for serialisation if available on this platform.</param>
         IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack = true);
+
+        /// <summary>
+        /// Constructs a new <see cref="NotificationsClientConnector"/>.
+        /// </summary>
+        NotificationsClientConnector GetNotificationsConnector();
 
         /// <summary>
         /// Create a new user account. This is a blocking operation.

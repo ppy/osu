@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -184,7 +183,7 @@ namespace osu.Game.Screens.Play.HUD
                     continue;
 
                 if (TeamScores.TryGetValue(u.Team.Value, out var team))
-                    team.Value += (int)Math.Round(u.ScoreProcessor.TotalScore.Value);
+                    team.Value += u.ScoreProcessor.TotalScore.Value;
             }
         }
 
