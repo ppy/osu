@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -27,7 +28,12 @@ namespace osu.Game.Screens.Edit.GameplayTest
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
         {
             var masterGameplayClockContainer = new MasterGameplayClockContainer(beatmap, gameplayStart);
-            masterGameplayClockContainer.Reset(editorState.Time);
+
+            // Only reset the time to the current point if the editor is later than the normal start time (and the first object).
+            // This allows more sane test playing from the start of the beatmap (ie. correctly adding lead-in time).
+            if (editorState.Time > gameplayStart && editorState.Time > DrawableRuleset.Objects.FirstOrDefault()?.StartTime)
+                masterGameplayClockContainer.Reset(editorState.Time);
+
             return masterGameplayClockContainer;
         }
 
