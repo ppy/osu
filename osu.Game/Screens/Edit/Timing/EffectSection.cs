@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -40,6 +41,12 @@ namespace osu.Game.Screens.Edit.Timing
             kiai.Current.BindValueChanged(_ => saveChanges());
             omitBarLine.Current.BindValueChanged(_ => saveChanges());
             scrollSpeedSlider.Current.BindValueChanged(_ => saveChanges());
+
+            // adjusting scroll speed on osu/catch rulesets results in undefined behaviour during legacy beatmap decoding, and generally shouldn't be shown.
+            // todo: there should be proper way to identify such rulesets, but this should do for now.
+            var ruleset = Beatmap.BeatmapInfo.Ruleset;
+            if (ruleset.OnlineID == 0 || ruleset.OnlineID == 2)
+                scrollSpeedSlider.Hide();
 
             void saveChanges()
             {
