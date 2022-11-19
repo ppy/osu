@@ -7,12 +7,14 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -55,6 +57,7 @@ namespace osu.Game.Tests.Visual.Navigation
             presentAndConfirm(firstImport);
 
             var secondImport = importBeatmap(3);
+            confirmBeatmapInSongSelect(secondImport);
             presentAndConfirm(secondImport);
 
             // Test presenting same beatmap more than once
@@ -74,6 +77,7 @@ namespace osu.Game.Tests.Visual.Navigation
             presentAndConfirm(firstImport);
 
             var secondImport = importBeatmap(3, new ManiaRuleset().RulesetInfo);
+            confirmBeatmapInSongSelect(secondImport);
             presentAndConfirm(secondImport);
 
             presentSecondDifficultyAndConfirm(firstImport, 1);
@@ -134,13 +138,22 @@ namespace osu.Game.Tests.Visual.Navigation
             return () => imported;
         }
 
+        private void confirmBeatmapInSongSelect(Func<BeatmapSetInfo> getImport)
+        {
+            AddUntilStep("beatmap in song select", () =>
+            {
+                var songSelect = (Screens.Select.SongSelect)Game.ScreenStack.CurrentScreen;
+                return songSelect.ChildrenOfType<BeatmapCarousel>().Single().BeatmapSets.Any(b => b.MatchesOnlineID(getImport()));
+            });
+        }
+
         private void presentAndConfirm(Func<BeatmapSetInfo> getImport)
         {
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
-            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
-            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapSetInfo.MatchesOnlineID(getImport()));
-            AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Beatmaps.First().Ruleset));
+            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect songSelect && songSelect.IsLoaded);
+            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapSetInfo.OnlineID, () => Is.EqualTo(getImport().OnlineID));
+            AddAssert("correct ruleset selected", () => Game.Ruleset.Value, () => Is.EqualTo(getImport().Beatmaps.First().Ruleset));
         }
 
         private void presentSecondDifficultyAndConfirm(Func<BeatmapSetInfo> getImport, int importedID)
@@ -148,9 +161,9 @@ namespace osu.Game.Tests.Visual.Navigation
             Predicate<BeatmapInfo> pred = b => b.OnlineID == importedID * 2048;
             AddStep("present difficulty", () => Game.PresentBeatmap(getImport(), pred));
 
-            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
-            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineID == importedID * 2048);
-            AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Beatmaps.First().Ruleset));
+            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect songSelect && songSelect.IsLoaded);
+            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineID, () => Is.EqualTo(importedID * 2048));
+            AddAssert("correct ruleset selected", () => Game.Ruleset.Value, () => Is.EqualTo(getImport().Beatmaps.First().Ruleset));
         }
     }
 }
