@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.IO;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -14,6 +15,9 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {
+    /// <summary>
+    /// A class which centrally manage legacy file exports.
+    /// </summary>
     [ExcludeFromDynamicCompile]
     public class LegacyExportManager : Component
     {
@@ -26,7 +30,13 @@ namespace osu.Game.Database
         [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
-        public async Task ExportAsync(IHasGuidPrimaryKey item)
+        /// <summary>
+        /// Identify the model type and and automatically assigned to the corresponding exporter.
+        /// </summary>
+        /// <param name="item">The model should export.</param>
+        /// <param name="stream">The stream if requires a specific output-stream</param>
+        /// <returns></returns>
+        public async Task ExportAsync(IHasGuidPrimaryKey item, Stream? stream = null)
         {
             var notification = new ProgressNotification
             {
@@ -39,15 +49,15 @@ namespace osu.Game.Database
             switch (item)
             {
                 case SkinInfo:
-                    await new LegacySkinExporter(exportStorage, realmAccess, notification).ExportASync(item);
+                    await new LegacySkinExporter(exportStorage, realmAccess, notification, stream).ExportASync(item);
                     break;
 
                 case ScoreInfo:
-                    await new LegacyScoreExporter(exportStorage, realmAccess, notification).ExportASync(item);
+                    await new LegacyScoreExporter(exportStorage, realmAccess, notification, stream).ExportASync(item);
                     break;
 
                 case BeatmapSetInfo:
-                    await new LegacyBeatmapExporter(exportStorage, realmAccess, notification).ExportASync(item);
+                    await new LegacyBeatmapExporter(exportStorage, realmAccess, notification, stream).ExportASync(item);
                     break;
             }
         }
