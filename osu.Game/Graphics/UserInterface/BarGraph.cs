@@ -203,9 +203,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private struct BarsInfo
         {
-            private readonly List<float> initialLengths;
-            private readonly List<float> finalLengths;
-            private readonly List<float> instantaneousLengths;
+            private List<float> initialLengths;
+            private List<float> finalLengths;
+            private List<float> instantaneousLengths;
 
             public bool Any => initialLengths.Any();
 
