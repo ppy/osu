@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private readonly BarsInfo bars = new BarsInfo(0);
+        private BarsInfo bars = new BarsInfo(0);
 
         private float barBreadth;
 
@@ -201,11 +201,11 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private struct BarsInfo
+        private readonly struct BarsInfo
         {
-            private List<float> initialLengths;
-            private List<float> finalLengths;
-            private List<float> instantaneousLengths;
+            private readonly List<float> initialLengths;
+            private readonly List<float> finalLengths;
+            private readonly List<float> instantaneousLengths;
 
             public bool Any => initialLengths.Any();
 
