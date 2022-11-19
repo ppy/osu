@@ -51,13 +51,18 @@ namespace osu.Game.Graphics.UserInterface
         {
             set
             {
+                if (!value.Any())
+                {
+                    bars.Clear();
+                    Invalidate(Invalidation.DrawNode);
+                    return;
+                }
+
                 int newCount = value.Count();
 
-                float size = newCount;
-                if (size != 0)
-                    size = 1.0f / size;
+                float size = 1.0f / newCount;
 
-                float maxLength = MaxValue ?? (newCount == 0 ? 0 : value.Max());
+                float maxLength = MaxValue ?? value.Max();
 
                 foreach (var bar in value.Select((length, index) => new { Value = length, Index = index }))
                 {
