@@ -74,7 +74,6 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
             musicController.Stop();
 
-            editorState.Time = GameplayClockContainer.CurrentTime;
             editor.RestoreState(editorState);
             return base.OnExiting(e);
         }
