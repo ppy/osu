@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Edit
             {
                 IsSeeking &= Transforms.Any();
 
-                if (track.Value?.IsRunning != true)
+                if (!IsRunning)
                 {
                     // seeking in the editor can happen while the track isn't running.
                     // in this case we always want to expose ourselves as seeking (to avoid sample playback).
