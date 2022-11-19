@@ -90,7 +90,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 using (BeginAbsoluteSequence(secondHitTime.Value))
                 {
-                    this.ResizeTo(new Vector2(TaikoStrongableHitObject.DEFAULT_STRONG_SIZE), 50);
                     (skinnable.Drawable as IAnimatableHitExplosion)?.AnimateSecondHit();
                 }
             }

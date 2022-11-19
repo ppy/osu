@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Notifications;
+using osu.Game.Tests;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
@@ -114,6 +116,8 @@ namespace osu.Game.Online.API
         }
 
         public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
+
+        public NotificationsClientConnector GetNotificationsConnector() => new PollingNotificationsClientConnector(this);
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
