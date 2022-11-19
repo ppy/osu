@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 float maxLength = MaxValue ?? value.Max();
 
-                foreach (var bar in value.Select((length, index) => new { Value = length, Index = index }))
+                foreach (var bar in value.Select((length, index) => (Value: length, Index: index)))
                 {
                     float length = maxLength == 0 ? 0 : Math.Max(0f, bar.Value / maxLength);
 
