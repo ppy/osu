@@ -204,10 +204,11 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
                 else if (filterMods)
                 {
-                    // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
+                    // otherwise find all the scores that have all of the currently selected mods (similar to how web applies mod filters)
                     // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
                     var selectedMods = mods.Value.Select(m => m.Acronym);
-                    scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
+
+                    scores = scores.Where(s => s.Mods.Select(m => m.Acronym).SequenceEqual(selectedMods));
                 }
 
                 scores = scoreManager.OrderByTotalScore(scores.Detach());
