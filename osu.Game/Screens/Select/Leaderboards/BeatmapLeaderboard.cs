@@ -206,9 +206,9 @@ namespace osu.Game.Screens.Select.Leaderboards
                 {
                     // otherwise find all the scores that have all of the currently selected mods (similar to how web applies mod filters)
                     // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
-                    var selectedMods = mods.Value.Select(m => m.Acronym);
+                    var selectedMods = mods.Value.Select(m => m.Acronym).ToHashSet();
 
-                    scores = scores.Where(s => s.Mods.Select(m => m.Acronym).SequenceEqual(selectedMods));
+                    scores = scores.Where(s => selectedMods.SetEquals(s.Mods.Select(m => m.Acronym)));
                 }
 
                 scores = scoreManager.OrderByTotalScore(scores.Detach());
