@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Settings;
 using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.FirstRunSetup
     public class ScreenWelcome : FirstRunSetupScreen
     {
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(FrameworkConfigManager frameworkConfig)
         {
             Content.Children = new Drawable[]
             {
@@ -51,6 +52,11 @@ namespace osu.Game.Overlays.FirstRunSetup
                             },
                         },
                     }
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = GeneralSettingsStrings.PreferOriginalMetadataLanguage,
+                    Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode)
                 },
                 new LanguageSelectionFlow
                 {
