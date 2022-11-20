@@ -58,27 +58,9 @@ namespace osu.Game.Graphics.UserInterface
                     return;
                 }
 
-                int newCount = value.Count();
-
-                bars.Breadth = 1.0f / newCount;
-
                 float maxLength = MaxValue ?? value.Max();
 
-                foreach (var bar in value.Select((length, index) => (Value: length, Index: index)))
-                {
-                    float length = maxLength == 0 ? 0 : Math.Max(0f, bar.Value / maxLength);
-
-                    if (bar.Index < bars.Count)
-                    {
-                        bars.UpdateLength(bar.Index, length);
-                        continue;
-                    }
-
-                    bars.AddBar(length);
-                }
-
-                if (bars.Count > newCount)
-                    bars.RemoveRange(newCount, bars.Count - newCount);
+                bars.SetLengths(value.Select(v => maxLength == 0 ? 0 : Math.Max(0f, v / maxLength)).ToArray());
 
                 animationStartTime = Clock.CurrentTime;
                 animationComplete = false;
@@ -208,44 +190,48 @@ namespace osu.Game.Graphics.UserInterface
 
             public int Count { get; private set; }
 
-            public float Breadth { get; set; }
+            public float Breadth { get; private set; }
 
             public List<float> InstantaneousLengths { get; } = new List<float>();
 
             private readonly List<float> initialLengths = new List<float>();
             private readonly List<float> finalLengths = new List<float>();
 
-            public void UpdateLength(int index, float newLength)
+            public void Clear() => SetLengths(Array.Empty<float>());
+
+            public void SetLengths(float[] newLengths)
             {
-                initialLengths[index] = finalLengths[index];
-                finalLengths[index] = newLength;
-            }
+                int newCount = newLengths.Length;
 
-            public void AddBar(float finalLength)
-            {
-                initialLengths.Add(0);
-                finalLengths.Add(finalLength);
-                InstantaneousLengths.Add(0);
+                for (int i = 0; i < newCount; i++)
+                {
+                    // If we have an old bar at this index - change it's length
+                    if (i < Count)
+                    {
+                        initialLengths[i] = finalLengths[i];
+                        finalLengths[i] = newLengths[i];
 
-                Count++;
-            }
+                        continue;
+                    }
 
-            public void Clear()
-            {
-                initialLengths.Clear();
-                finalLengths.Clear();
-                InstantaneousLengths.Clear();
+                    // If exceeded old bars count - add new one
+                    initialLengths.Add(0);
+                    finalLengths.Add(newLengths[i]);
+                    InstantaneousLengths.Add(0);
+                }
 
-                Count = 0;
-            }
+                // Remove excessive bars
+                if (Count > newCount)
+                {
+                    int barsToRemove = Count - newCount;
 
-            public void RemoveRange(int index, int count)
-            {
-                initialLengths.RemoveRange(index, count);
-                finalLengths.RemoveRange(index, count);
-                InstantaneousLengths.RemoveRange(index, count);
+                    initialLengths.RemoveRange(newCount, barsToRemove);
+                    finalLengths.RemoveRange(newCount, barsToRemove);
+                    InstantaneousLengths.RemoveRange(newCount, barsToRemove);
+                }
 
-                Count -= count;
+                Count = newCount;
+                Breadth = Count == 0 ? 0 : (1f / Count);
             }
 
             public void Animate(double animationStartTime, double currentTime)
