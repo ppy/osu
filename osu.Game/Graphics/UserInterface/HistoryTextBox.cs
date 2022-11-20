@@ -7,6 +7,12 @@ using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
+    /// <summary>
+    /// A <see cref="FocusedTextBox"/> which additionally retains a history of text committed, up to a limit
+    /// (100 by default, specified in constructor).
+    /// The history of committed text can be navigated using up/down arrows.
+    /// This resembles the operation of command-line terminals.
+    /// </summary>
     public class HistoryTextBox : FocusedTextBox
     {
         private readonly LimitedCapacityQueue<string> messageHistory;
@@ -18,6 +24,13 @@ namespace osu.Game.Graphics.UserInterface
         private string originalMessage = string.Empty;
         private bool everythingSelected;
 
+        /// <summary>
+        /// Creates a new <see cref="HistoryTextBox"/>.
+        /// </summary>
+        /// <param name="capacity">
+        /// The maximum number of committed lines to keep in history.
+        /// When exceeded, the oldest lines in history will be dropped to make space for new ones.
+        /// </param>
         public HistoryTextBox(int capacity = 100)
         {
             messageHistory = new LimitedCapacityQueue<string>(capacity);
