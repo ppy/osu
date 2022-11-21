@@ -2,14 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Play;
@@ -19,15 +18,16 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class LegacyCirclePiece : BeatSyncedContainer, IHasAccentColour
+    public class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
     {
         private Drawable backgroundLayer = null!;
         private Drawable? foregroundLayer;
 
         private Bindable<int> currentCombo { get; } = new BindableInt();
 
-        private bool enableAnimations;
         private int animationFrame;
+        private int multiplier;
+        private double beatLength;
 
         // required for editor blueprints (not sure why these circle pieces are zero size).
         public override Quad ScreenSpaceDrawQuad => backgroundLayer.ScreenSpaceDrawQuad;
@@ -39,6 +39,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
         [Resolved]
         private GameplayState? gameplayState { get; set; }
+
+        [Resolved]
+        private IBeatSyncProvider? beatSyncProvider { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, DrawableHitObject drawableHitObject)
@@ -91,19 +94,25 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
             if (currentCombo.Value >= 150)
             {
-                enableAnimations = true;
-                Divisor = 4;
+                multiplier = 2;
             }
             else if (currentCombo.Value >= 50)
             {
-                enableAnimations = true;
-                Divisor = 2;
+                multiplier = 1;
             }
             else
             {
-                enableAnimations = false;
                 (foregroundLayer as IFramedAnimation)?.GotoFrame(0);
-                Divisor = 2;
+                return;
+            }
+
+            if (beatSyncProvider?.ControlPoints != null)
+            {
+                beatLength = beatSyncProvider.ControlPoints.TimingPointAt(LifetimeStart).BeatLength;
+
+                animationFrame = Time.Current % ((beatLength * 2) / multiplier) >= beatLength / multiplier ? 0 : 1;
+
+                (foregroundLayer as IFramedAnimation)?.GotoFrame(animationFrame);
             }
         }
 
@@ -126,16 +135,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private void updateAccentColour()
         {
             backgroundLayer.Colour = LegacyColourCompatibility.DisallowZeroAlpha(accentColour);
-        }
-
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
-        {
-            if (!enableAnimations)
-                return;
-
-            animationFrame = beatIndex % 4 == 0 || (beatIndex - 1) % 4 == 0 ? 1 : 0;
-
-            (foregroundLayer as IFramedAnimation)?.GotoFrame(animationFrame);
         }
     }
 }
