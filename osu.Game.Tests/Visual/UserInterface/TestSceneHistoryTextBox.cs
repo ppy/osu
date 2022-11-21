@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -64,62 +63,32 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestEmptyHistory()
+        public void TestChangedHistory()
         {
+            addMessages(2);
             AddStep("Set text", () => box.Text = temp);
+            AddStep("Move up", () => InputManager.Key(Key.Up));
 
+            AddStep("Change text", () => box.Text = "New message");
             AddStep("Move down", () => InputManager.Key(Key.Down));
-            AddAssert("Text is the same", () => box.Text == temp);
-
-            AddStep("Move Up", () => InputManager.Key(Key.Up));
-            AddAssert("Text is the same", () => box.Text == temp);
+            AddStep("Move up", () => InputManager.Key(Key.Up));
+            AddAssert("Changes kept", () => box.Text == "New message");
         }
 
         [Test]
-        public void TestPartialHistory()
+        public void TestInputOnEdge()
         {
             addMessages(2);
             AddStep("Set text", () => box.Text = temp);
 
             AddStep("Move down", () => InputManager.Key(Key.Down));
-            AddAssert("Text is the same", () => box.Text == temp);
+            AddAssert("Text unchanged", () => box.Text == temp);
 
-            AddRepeatStep("Move Up", () => InputManager.Key(Key.Up), 2);
+            AddRepeatStep("Move up", () => InputManager.Key(Key.Up), 2);
             AddAssert("Same as 1st message", () => box.Text == "Message 1");
 
-            AddStep("Move Up", () => InputManager.Key(Key.Up));
-            AddAssert("Text is the same", () => box.Text == "Message 1");
-
-            AddRepeatStep("Move down", () => InputManager.Key(Key.Down), 2);
-            AddAssert("Same as temp message", () => box.Text == temp);
-
-            AddStep("Move down", () => InputManager.Key(Key.Down));
-            AddAssert("Text is the same", () => box.Text == temp);
-        }
-
-        [Test]
-        public void TestFullHistory()
-        {
-            addMessages(5);
-            AddStep("Set text", () => box.Text = temp);
-
-            AddStep("Move down", () => InputManager.Key(Key.Down));
-            AddAssert("Text is the same", () => box.Text == temp);
-
-            addMessages(2);
-            AddStep("Set text", () => box.Text = temp);
-
-            AddRepeatStep("Move Up", () => InputManager.Key(Key.Up), 5);
-            AddAssert("Same as 3rd message", () => box.Text == "Message 3");
-
-            AddStep("Move Up", () => InputManager.Key(Key.Up));
-            AddAssert("Text is the same", () => box.Text == "Message 3");
-
-            AddRepeatStep("Move down", () => InputManager.Key(Key.Down), 4);
-            AddAssert("Same as previous message", () => box.Text == "Message 7");
-
-            AddStep("Move down", () => InputManager.Key(Key.Down));
-            AddAssert("Same as temp message", () => box.Text == temp);
+            AddStep("Move up", () => InputManager.Key(Key.Up));
+            AddAssert("Text unchanged", () => box.Text == "Message 1");
         }
 
         [Test]
@@ -131,12 +100,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("Same as 1st message", () => box.Text == "Message 1");
 
             AddStep("Remove text", () => box.Text = string.Empty);
-            AddStep("Move Up", () => InputManager.Key(Key.Up));
-            AddAssert("Same as previous message", () => box.Text == "Message 2");
-
-            AddStep("Move Up", () => InputManager.Key(Key.Up));
-            AddStep("Select text", () => InputManager.Keys(PlatformAction.SelectAll));
-            AddStep("Replace text", () => box.Text = "New text");
             AddStep("Move Up", () => InputManager.Key(Key.Up));
             AddAssert("Same as previous message", () => box.Text == "Message 2");
         }
