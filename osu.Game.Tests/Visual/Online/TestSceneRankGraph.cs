@@ -65,6 +65,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 graph.Statistics.Value = new UserStatistics
                 {
+                    IsRanked = true,
                     GlobalRank = 123456,
                     PP = 12345,
                 };
@@ -84,6 +85,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 graph.Statistics.Value = new UserStatistics
                 {
+                    IsRanked = true,
                     GlobalRank = 89000,
                     PP = 12345,
                     RankHistory = new APIRankHistory
@@ -110,6 +112,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 graph.Statistics.Value = new UserStatistics
                 {
+                    IsRanked = true,
                     GlobalRank = 89000,
                     PP = 12345,
                     RankHistory = new APIRankHistory
@@ -133,6 +136,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 graph.Statistics.Value = new UserStatistics
                 {
+                    IsRanked = true,
                     GlobalRank = 12000,
                     PP = 12345,
                     RankHistory = new APIRankHistory
@@ -161,6 +165,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 graph.Statistics.Value = new UserStatistics
                 {
+                    IsRanked = true,
                     GlobalRank = 12000,
                     PP = 12345,
                     RankHistory = new APIRankHistory
