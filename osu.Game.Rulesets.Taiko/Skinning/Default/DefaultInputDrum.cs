@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -135,8 +134,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
             public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
-                Drawable target = null;
-                Drawable back = null;
+                Drawable? target = null;
+                Drawable? back = null;
 
                 if (e.Action == CentreAction)
                 {

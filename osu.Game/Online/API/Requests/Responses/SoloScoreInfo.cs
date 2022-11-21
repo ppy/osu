@@ -31,7 +31,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool Passed { get; set; }
 
         [JsonProperty("total_score")]
-        public int TotalScore { get; set; }
+        public long TotalScore { get; set; }
 
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
@@ -213,7 +213,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public static SoloScoreInfo ForSubmission(ScoreInfo score) => new SoloScoreInfo
         {
             Rank = score.Rank,
-            TotalScore = (int)score.TotalScore,
+            TotalScore = score.TotalScore,
             Accuracy = score.Accuracy,
             PP = score.PP,
             MaxCombo = score.MaxCombo,

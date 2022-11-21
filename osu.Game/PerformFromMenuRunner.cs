@@ -89,6 +89,10 @@ namespace osu.Game
             // check if we are already at a valid target screen.
             if (validScreens.Any(t => t.IsAssignableFrom(type)))
             {
+                if (!((Drawable)current).IsLoaded)
+                    // wait until screen is loaded before invoking action.
+                    return true;
+
                 finalAction(current);
                 Cancel();
                 return true;

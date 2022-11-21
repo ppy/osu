@@ -1,17 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 
 namespace osu.Game.Skinning
 {
-    public class GameplaySkinComponent<T> : ISkinComponent
+    public class GameplaySkinComponentLookup<T> : ISkinComponentLookup
+        where T : notnull
     {
         public readonly T Component;
 
-        public GameplaySkinComponent(T component)
+        public GameplaySkinComponentLookup(T component)
         {
             Component = component;
         }
