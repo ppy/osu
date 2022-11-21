@@ -5,10 +5,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Play;
@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
+    public class LegacyCirclePiece : BeatSyncedContainer, IHasAccentColour
     {
         private Drawable backgroundLayer = null!;
         private Drawable? foregroundLayer;
@@ -135,6 +135,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private void updateAccentColour()
         {
             backgroundLayer.Colour = LegacyColourCompatibility.DisallowZeroAlpha(accentColour);
+        }
+
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+        {
+            if (!enableAnimations)
+                return;
+
+            animationFrame = beatIndex % 4 == 0 || (beatIndex - 1) % 4 == 0 ? 1 : 0;
+
+            (foregroundLayer as IFramedAnimation)?.GotoFrame(animationFrame);
         }
     }
 }

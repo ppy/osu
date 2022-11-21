@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         }
 
         [Test]
+
         public void TestHitKiai()
         {
             AddStep("Create beatmap", () => createBeatmap(true));
@@ -73,7 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public void TestHitAnimationFast()
         {
             AddStep("Create beatmap", () => createBeatmap(false));
-
+			
             AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
 
             AddRepeatStep("Increase combo", () => gameplayState.ScoreProcessor.Combo.Value++, 150);
