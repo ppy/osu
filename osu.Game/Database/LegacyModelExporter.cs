@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Overlays;
@@ -107,6 +108,8 @@ namespace osu.Game.Database
             if (t.IsFaulted)
             {
                 notification.State = ProgressNotificationState.Cancelled;
+                Logger.Error(t.Exception, "An error occurred while exporting");
+
                 return;
             }
 
