@@ -47,6 +47,7 @@ namespace osu.Game.Tests.Visual.Background
             base.LoadComplete();
 
             AddSliderStep("Spawn ratio", 0f, 2f, 1f, s => triangles.SpawnRatio = s);
+            AddSliderStep("Thickness", 0f, 1f, 0.02f, t => triangles.Thickness = t);
         }
     }
 }
