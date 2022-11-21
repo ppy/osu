@@ -45,20 +45,7 @@ namespace osu.Game.Graphics.Backgrounds
             set => colourBottom.Value = value;
         }
 
-        private float thickness = 0.02f;
-
-        public float Thickness
-        {
-            get => thickness;
-            set
-            {
-                if (thickness == value)
-                    return;
-
-                thickness = value;
-                // No need for invalidation since it's happening in Update()
-            }
-        }
+        public float Thickness { get; set; } = 0.02f; // No need for invalidation since it's happening in Update()
 
         /// <summary>
         /// Whether we should create new triangles as others expire.
@@ -257,7 +244,7 @@ namespace osu.Game.Graphics.Backgrounds
                 shader = Source.shader;
                 texture = Source.texture;
                 size = Source.DrawSize;
-                thickness = Source.thickness;
+                thickness = Source.Thickness;
 
                 parts.Clear();
                 parts.AddRange(Source.parts);
