@@ -22,7 +22,6 @@ namespace osu.Game.Graphics.UserInterface
         private int selectedIndex;
 
         private string originalMessage = string.Empty;
-        private bool everythingSelected;
 
         /// <summary>
         /// Creates a new <see cref="HistoryTextBox"/>.
@@ -37,26 +36,11 @@ namespace osu.Game.Graphics.UserInterface
 
             Current.ValueChanged += text =>
             {
-                if (string.IsNullOrEmpty(text.NewValue) || everythingSelected)
+                if (selectedIndex != HistoryCount && text.NewValue != messageHistory[selectedIndex])
                 {
                     selectedIndex = HistoryCount;
-                    everythingSelected = false;
                 }
             };
-        }
-
-        protected override void OnTextDeselected()
-        {
-            base.OnTextDeselected();
-
-            everythingSelected = false;
-        }
-
-        protected override void OnTextSelectionChanged(TextSelectionType selectionType)
-        {
-            base.OnTextSelectionChanged(selectionType);
-
-            everythingSelected = SelectedText == Text;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -66,8 +50,6 @@ namespace osu.Game.Graphics.UserInterface
                 case Key.Up:
                     if (selectedIndex == 0)
                         return true;
-
-                    everythingSelected = false;
 
                     if (selectedIndex == HistoryCount)
                         originalMessage = Text;
@@ -79,8 +61,6 @@ namespace osu.Game.Graphics.UserInterface
                 case Key.Down:
                     if (selectedIndex == HistoryCount)
                         return true;
-
-                    everythingSelected = false;
 
                     if (selectedIndex == HistoryCount - 1)
                     {
