@@ -134,8 +134,7 @@ namespace osu.Game.Overlays.Chat
 
             foreach (var message in displayMessages)
             {
-                if (lastMessage == null || lastMessage.Timestamp.ToLocalTime().Date != message.Timestamp.ToLocalTime().Date)
-                    ChatLineFlow.Add(CreateDaySeparator(message.Timestamp));
+                addDaySeparatorIfRequired(lastMessage, message);
 
                 ChatLineFlow.Add(CreateChatLine(message));
                 lastMessage = message;
@@ -183,9 +182,17 @@ namespace osu.Game.Overlays.Chat
 
                 ChatLineFlow.Remove(found, false);
                 found.Message = updated;
+
+                addDaySeparatorIfRequired(chatLines.LastOrDefault()?.Message, updated);
                 ChatLineFlow.Add(found);
             }
         });
+
+        private void addDaySeparatorIfRequired(Message lastMessage, Message message)
+        {
+            if (lastMessage == null || lastMessage.Timestamp.ToLocalTime().Date != message.Timestamp.ToLocalTime().Date)
+                ChatLineFlow.Add(CreateDaySeparator(message.Timestamp));
+        }
 
         private void messageRemoved(Message removed) => Schedule(() =>
         {
