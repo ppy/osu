@@ -33,12 +33,6 @@ namespace osu.Game.Graphics.UserInterface
         public HistoryTextBox(int capacity = 100)
         {
             messageHistory = new LimitedCapacityQueue<string>(capacity);
-
-            Current.ValueChanged += text =>
-            {
-                if (string.IsNullOrEmpty(text.NewValue))
-                    selectedIndex = HistoryCount;
-            };
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

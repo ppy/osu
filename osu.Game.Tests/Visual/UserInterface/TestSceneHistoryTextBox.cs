@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Remove text", () => box.Text = string.Empty);
             AddStep("Move Up", () => InputManager.Key(Key.Up));
-            AddAssert("Same as previous message", () => box.Text == "Message 2");
+            AddAssert("Text unchanged", () => box.Text == string.Empty);
         }
 
         private void addMessages(int count)
