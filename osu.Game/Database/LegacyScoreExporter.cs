@@ -28,8 +28,6 @@ namespace osu.Game.Database
                 {
                     ScoreInfo model = r.Find<ScoreInfo>(uuid.ID);
 
-                    Filename = $"{model.GetDisplayString().GetValidFilename()}{FileExtension}";
-
                     var file = model.Files.SingleOrDefault();
                     if (file == null)
                         return;

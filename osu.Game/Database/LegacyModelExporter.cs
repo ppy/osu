@@ -34,7 +34,7 @@ namespace osu.Game.Database
 
         private readonly ProgressNotification notification;
 
-        protected string Filename = null!;
+        private string filename = "";
 
         private bool canCancel = true;
 
@@ -64,9 +64,9 @@ namespace osu.Game.Database
         {
             if (item is TModel model)
             {
-                Filename = $"{model.GetDisplayString().GetValidFilename()}{FileExtension}";
+                filename = $"{model.GetDisplayString().GetValidFilename()}{FileExtension}";
 
-                using (var stream = ExportStorage.CreateFileSafely(Filename))
+                using (var stream = ExportStorage.CreateFileSafely(filename))
                 {
                     await ExportToStreamAsync(model, stream);
                 }
@@ -130,7 +130,7 @@ namespace osu.Game.Database
             }
 
             notification.CompletionText = "Export Complete, Click to open the folder";
-            notification.CompletionClickAction += () => ExportStorage.PresentFileExternally(Filename);
+            notification.CompletionClickAction += () => ExportStorage.PresentFileExternally(filename);
             notification.State = ProgressNotificationState.Completed;
         }
     }
