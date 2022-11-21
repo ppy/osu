@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Change text", () => box.Text = "New message");
             AddStep("Move down", () => InputManager.Key(Key.Down));
             AddStep("Move up", () => InputManager.Key(Key.Up));
-            AddAssert("Changes kept", () => box.Text == "New message");
+            AddAssert("Changes lost", () => box.Text == "Message 2");
         }
 
         [Test]
