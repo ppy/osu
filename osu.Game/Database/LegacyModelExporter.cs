@@ -55,6 +55,11 @@ namespace osu.Game.Database
             notifications?.Post(notification);
         }
 
+        /// <summary>
+        /// Export the model to default folder.
+        /// </summary>
+        /// <param name="item">The model should export.</param>
+        /// <returns></returns>
         public async Task ExportAsync(RealmObject item)
         {
             if (item is TModel model)
@@ -68,6 +73,12 @@ namespace osu.Game.Database
             }
         }
 
+        /// <summary>
+        /// Export te model corresponding to uuid to given stream.
+        /// </summary>
+        /// <param name="uuid">The medel which have <see cref="IHasGuidPrimaryKey"/>.</param>
+        /// <param name="stream">The stream to export.</param>
+        /// <returns></returns>
         public virtual async Task ExportToStreamAsync(TModel uuid, Stream stream)
         {
             Guid id = uuid.ID;
