@@ -45,8 +45,6 @@ namespace osu.Game.Graphics.UserInterface
 
                     if (selectedIndex == HistoryCount)
                         originalMessage = Text;
-                    else if (!string.IsNullOrEmpty(Text))
-                        messageHistory[selectedIndex] = Text;
 
                     Text = messageHistory[--selectedIndex];
 
@@ -55,9 +53,6 @@ namespace osu.Game.Graphics.UserInterface
                 case Key.Down:
                     if (selectedIndex == HistoryCount)
                         return true;
-
-                    if (!string.IsNullOrEmpty(Text))
-                        messageHistory[selectedIndex] = Text;
 
                     if (selectedIndex == HistoryCount - 1)
                     {
