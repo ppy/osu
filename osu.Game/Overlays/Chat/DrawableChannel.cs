@@ -191,7 +191,15 @@ namespace osu.Game.Overlays.Chat
         private void addDaySeparatorIfRequired(Message lastMessage, Message message)
         {
             if (lastMessage == null || lastMessage.Timestamp.ToLocalTime().Date != message.Timestamp.ToLocalTime().Date)
+            {
+                // A day separator is displayed even if no messages are in the channel.
+                // If there are no messages after it, the simplest way to ensure it is fresh is to remove it
+                // and add a new one instead.
+                if (ChatLineFlow.LastOrDefault() is DaySeparator ds)
+                    ChatLineFlow.Remove(ds, true);
+
                 ChatLineFlow.Add(CreateDaySeparator(message.Timestamp));
+            }
         }
 
         private void messageRemoved(Message removed) => Schedule(() =>
