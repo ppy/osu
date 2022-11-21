@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile.Header.Components;
@@ -50,11 +52,15 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestNullUser() =>
+        public void TestNullUser()
+        {
             AddStep("null user", () => graph.Statistics.Value = null);
+            AddAssert("line graph hidden", () => this.ChildrenOfType<LineGraph>().All(graph => graph.Alpha == 0));
+        }
 
         [Test]
-        public void TestRankOnly() =>
+        public void TestRankOnly()
+        {
             AddStep("rank only", () =>
             {
                 graph.Statistics.Value = new UserStatistics
@@ -63,6 +69,8 @@ namespace osu.Game.Tests.Visual.Online
                     PP = 12345,
                 };
             });
+            AddAssert("line graph hidden", () => this.ChildrenOfType<LineGraph>().All(graph => graph.Alpha == 0));
+        }
 
         [Test]
         public void TestWithRankHistory()
@@ -84,6 +92,7 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 };
             });
+            AddAssert("line graph shown", () => this.ChildrenOfType<LineGraph>().All(graph => graph.Alpha == 1));
         }
 
         [Test]
@@ -109,6 +118,7 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 };
             });
+            AddAssert("line graph shown", () => this.ChildrenOfType<LineGraph>().All(graph => graph.Alpha == 1));
         }
 
         [Test]
@@ -131,6 +141,7 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 };
             });
+            AddAssert("line graph shown", () => this.ChildrenOfType<LineGraph>().All(graph => graph.Alpha == 1));
         }
 
         [Test]
@@ -158,6 +169,7 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 };
             });
+            AddAssert("line graph shown", () => this.ChildrenOfType<LineGraph>().All(graph => graph.Alpha == 1));
         }
     }
 }
