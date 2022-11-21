@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [Resolved]
             private RealmAccess realm { get; set; }
 
-            [Resolved]
+            [Resolved(canBeNull: true)]
             private INotificationOverlay notifications { get; set; }
 
             private Bindable<Skin> currentSkin;

@@ -79,7 +79,7 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private RealmAccess realm { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private INotificationOverlay notifications { get; set; }
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
