@@ -436,8 +436,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 base.OnDragEnd(e);
 
-                OnDragHandled?.Invoke(null);
+                dragOperation?.Cancel();
+                dragOperation = null;
+
                 changeHandler?.EndChange();
+                OnDragHandled?.Invoke(null);
             }
         }
 

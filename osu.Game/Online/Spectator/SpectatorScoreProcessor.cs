@@ -26,7 +26,7 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// The current total score.
         /// </summary>
-        public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
+        public readonly BindableLong TotalScore = new BindableLong { MinValue = 0 };
 
         /// <summary>
         /// The current accuracy.
