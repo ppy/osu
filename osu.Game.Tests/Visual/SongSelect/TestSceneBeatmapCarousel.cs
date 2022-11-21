@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -116,6 +117,15 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 checkSelectionIsCentered();
             }
+        }
+
+        [Test]
+        public void TestDeletion()
+        {
+            loadBeatmaps(count: 5, randomDifficulties: true);
+
+            AddStep("remove first set", () => carousel.RemoveBeatmapSet(carousel.Items.Select(item => item.Item).OfType<CarouselBeatmapSet>().First().BeatmapSet));
+            AddUntilStep("4 beatmap sets visible", () => this.ChildrenOfType<DrawableCarouselBeatmapSet>().Count(set => set.Alpha > 0) == 4);
         }
 
         [Test]
