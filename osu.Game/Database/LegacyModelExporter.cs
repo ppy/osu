@@ -5,8 +5,10 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using Realms;
 using SharpCompress.Archives.Zip;
@@ -16,112 +18,106 @@ namespace osu.Game.Database
     /// <summary>
     /// A class which handles exporting legacy user data of a single type from osu-stable.
     /// </summary>
-    public abstract class LegacyModelExporter<TModel>
-        where TModel : RealmObject
+    public abstract class LegacyModelExporter<TModel> : Component
+        where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
     {
         /// <summary>
         /// The file extension for exports (including the leading '.').
         /// </summary>
         protected abstract string FileExtension { get; }
 
-        protected readonly Storage UserFileStorage;
+        protected Storage UserFileStorage;
+        protected Storage ExportStorage;
 
-        protected readonly Storage ExportStorage;
+        protected RealmAccess RealmAccess;
 
-        protected readonly RealmAccess RealmAccess;
-
-        protected readonly ProgressNotification Notification;
+        private readonly ProgressNotification notification;
 
         protected string Filename = null!;
 
-        protected Stream? OutputStream;
+        private bool canCancel = true;
 
-        protected bool ShouldDisposeStream;
-
-        protected LegacyModelExporter(Storage storage, RealmAccess realm, ProgressNotification notification, Stream? stream = null)
+        protected LegacyModelExporter(Storage storage, RealmAccess realm, INotificationOverlay? notifications = null)
         {
             ExportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
-            Notification = notification;
             RealmAccess = realm;
-            OutputStream = stream;
-            ShouldDisposeStream = false;
+
+            notification = new ProgressNotification
+            {
+                State = ProgressNotificationState.Active,
+                Text = "Exporting...",
+                CompletionText = "Export completed"
+            };
+            notification.CancelRequested += () => canCancel;
+
+            notifications?.Post(notification);
         }
 
-        /// <summary>
-        /// Export model to <see cref="OutputStream"/>
-        /// if <see cref="OutputStream"/> is null, model will export to default folder.
-        /// </summary>
-        /// <param name="uuid">The model which have Guid.</param>
-        /// <returns></returns>
+        public async Task ExportAsync(RealmObject item)
         {
-            bool canCancel = true;
-            Notification.CancelRequested += () => canCancel;
+            if (item is TModel model)
+            {
+                Filename = $"{model.GetDisplayString().GetValidFilename()}{FileExtension}";
 
-        public virtual async Task ExportAsync(IHasGuidPrimaryKey uuid)
+                using (var stream = ExportStorage.CreateFileSafely(Filename))
+                {
+                    await ExportToStreamAsync(model, stream);
+                }
+            }
+        }
+
+        public virtual async Task ExportToStreamAsync(TModel uuid, Stream stream)
+        {
             Guid id = uuid.ID;
             await Task.Run(() =>
             {
                 RealmAccess.Run(r =>
                 {
-                    if (r.Find<TModel>(id) is IHasNamedFiles model)
-                    {
-                        Filename = $"{model.GetDisplayString().GetValidFilename()}{FileExtension}";
-                    }
-                    else
-                    {
-                        return;
-                    }
-
-                    if (OutputStream == null)
-                    {
-                        OutputStream = ExportStorage.CreateFileSafely(Filename);
-                        ShouldDisposeStream = true;
-                    }
-
-                    using (var archive = ZipArchive.Create())
-                    {
-                        float i = 0;
-
-                        foreach (var file in model.Files)
-                        {
-                            if (Notification.CancellationToken.IsCancellationRequested) return;
-
-                            archive.AddEntry(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
-                            i++;
-                            Notification.Progress = i / model.Files.Count();
-                            Notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
-                        }
-
-                        Notification.Text = "Saving Zip Archive...";
-                        canCancel = false;
-                        archive.SaveTo(OutputStream);
-                    }
+                    TModel model = r.Find<TModel>(id);
+                    createZipArchive(model, stream);
                 });
             }).ContinueWith(OnComplete);
         }
 
+        private void createZipArchive(TModel model, Stream outputStream)
+        {
+            using (var archive = ZipArchive.Create())
+            {
+                float i = 0;
+
+                foreach (var file in model.Files)
+                {
+                    if (notification.CancellationToken.IsCancellationRequested) return;
+
+                    archive.AddEntry(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
+                    i++;
+                    notification.Progress = i / model.Files.Count();
+                    notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
+                }
+
+                notification.Text = "Saving Zip Archive...";
+                canCancel = false;
+                archive.SaveTo(outputStream);
+            }
+        }
+
         protected void OnComplete(Task t)
         {
-            if (ShouldDisposeStream)
-            {
-                OutputStream?.Dispose();
-            }
-
             if (t.IsFaulted)
             {
-                Notification.State = ProgressNotificationState.Cancelled;
+                notification.State = ProgressNotificationState.Cancelled;
                 return;
             }
 
-            if (Notification.CancellationToken.IsCancellationRequested)
+            if (notification.CancellationToken.IsCancellationRequested)
             {
                 return;
             }
 
-            Notification.CompletionText = "Export Complete, Click to open the folder";
-            Notification.CompletionClickAction += () => ExportStorage.PresentFileExternally(Filename);
-            Notification.State = ProgressNotificationState.Completed;
+            notification.CompletionText = "Export Complete, Click to open the folder";
+            notification.CompletionClickAction += () => ExportStorage.PresentFileExternally(Filename);
+            notification.State = ProgressNotificationState.Completed;
         }
     }
 }

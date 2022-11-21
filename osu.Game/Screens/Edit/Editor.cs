@@ -21,6 +21,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
@@ -89,6 +90,12 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
+
+        [Resolved]
+        private Storage storage { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
 
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
@@ -178,9 +185,6 @@ namespace osu.Game.Screens.Edit
 
         private Bindable<float> editorBackgroundDim;
         private Bindable<bool> editorHitMarkers;
-
-        [Resolved(canBeNull: true)]
-        private LegacyExportManager exporter { get; set; }
 
         public Editor(EditorLoader loader = null)
         {
@@ -938,7 +942,7 @@ namespace osu.Game.Screens.Edit
         private void exportBeatmap()
         {
             Save();
-            Task.Run(() => exporter?.ExportAsync(Beatmap.Value.BeatmapSetInfo));
+            Task.Run(() => new LegacyBeatmapExporter(storage, realm, notifications).ExportAsync(Beatmap.Value.BeatmapSetInfo));
         }
 
         /// <summary>
