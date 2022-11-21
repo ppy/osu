@@ -45,6 +45,21 @@ namespace osu.Game.Graphics.Backgrounds
             set => colourBottom.Value = value;
         }
 
+        private float thickness = 0.02f;
+
+        public float Thickness
+        {
+            get => thickness;
+            set
+            {
+                if (thickness == value)
+                    return;
+
+                thickness = value;
+                // No need for invalidation since it's happening in Update()
+            }
+        }
+
         /// <summary>
         /// Whether we should create new triangles as others expire.
         /// </summary>
@@ -226,6 +241,7 @@ namespace osu.Game.Graphics.Backgrounds
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
             private Vector2 size;
+            private float thickness;
 
             private IVertexBatch<TexturedVertex2D>? vertexBatch;
 
@@ -241,6 +257,7 @@ namespace osu.Game.Graphics.Backgrounds
                 shader = Source.shader;
                 texture = Source.texture;
                 size = Source.DrawSize;
+                thickness = Source.thickness;
 
                 parts.Clear();
                 parts.AddRange(Source.parts);
@@ -260,6 +277,7 @@ namespace osu.Game.Graphics.Backgrounds
                 }
 
                 shader.Bind();
+                shader.GetUniform<float>("thickness").UpdateValue(ref thickness);
 
                 foreach (TriangleParticle particle in parts)
                 {
