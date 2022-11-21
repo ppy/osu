@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
@@ -137,8 +138,14 @@ namespace osu.Game.Overlays.Settings.Sections
             [Resolved]
             private SkinManager skins { get; set; }
 
-            [Resolved(canBeNull: true)]
-            private LegacyExportManager exporter { get; set; }
+            [Resolved]
+            private Storage storage { get; set; }
+
+            [Resolved]
+            private RealmAccess realm { get; set; }
+
+            [Resolved]
+            private INotificationOverlay notifications { get; set; }
 
             private Bindable<Skin> currentSkin;
 
@@ -161,7 +168,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 try
                 {
-                    currentSkin.Value.SkinInfo.PerformRead(s => exporter?.ExportAsync(s));
+                    currentSkin.Value.SkinInfo.PerformRead(s => new LegacySkinExporter(storage, realm, notifications).ExportAsync(s));
                 }
                 catch (Exception e)
                 {
