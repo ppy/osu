@@ -54,11 +54,11 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="uuid">The model which have Guid.</param>
         /// <returns></returns>
-        public virtual async Task ExportASync(IHasGuidPrimaryKey uuid)
         {
             bool canCancel = true;
             Notification.CancelRequested += () => canCancel;
 
+        public virtual async Task ExportAsync(IHasGuidPrimaryKey uuid)
             Guid id = uuid.ID;
             await Task.Run(() =>
             {

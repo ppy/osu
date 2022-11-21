@@ -49,7 +49,7 @@ namespace osu.Game.Database
             switch (item)
             {
                 case SkinInfo:
-                    await new LegacySkinExporter(exportStorage, realmAccess, notification, stream).ExportASync(item);
+                    await new LegacySkinExporter(exportStorage, realmAccess, notification, stream).ExportAsync(item);
                     break;
 
                 case ScoreInfo:
@@ -57,7 +57,7 @@ namespace osu.Game.Database
                     break;
 
                 case BeatmapSetInfo:
-                    await new LegacyBeatmapExporter(exportStorage, realmAccess, notification, stream).ExportASync(item);
+                    await new LegacyBeatmapExporter(exportStorage, realmAccess, notification, stream).ExportAsync(item);
                     break;
             }
         }

@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Skins.IO
 
             await import1.PerformRead(async s =>
             {
-                await new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<RealmAccess>(), new ProgressNotification(), exportStream).ExportASync(s);
+                await new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<RealmAccess>(), new ProgressNotification(), exportStream).ExportAsync(s);
             });
 
             string exportFilename = import1.GetDisplayString();
@@ -204,7 +204,7 @@ namespace osu.Game.Tests.Skins.IO
                 Assert.IsFalse(s.Protected);
                 Assert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
 
-                await new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<RealmAccess>(), new ProgressNotification(), exportStream).ExportASync(s);
+                await new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<RealmAccess>(), new ProgressNotification(), exportStream).ExportAsync(s);
 
                 Assert.Greater(exportStream.Length, 0);
             });
@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Skins.IO
                 Assert.IsFalse(s.Protected);
                 Assert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
 
-                await new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<RealmAccess>(), new ProgressNotification(), exportStream).ExportASync(s);
+                await new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<RealmAccess>(), new ProgressNotification(), exportStream).ExportAsync(s);
 
                 Assert.Greater(exportStream.Length, 0);
             });
