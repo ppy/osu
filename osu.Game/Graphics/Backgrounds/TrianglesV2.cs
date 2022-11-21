@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Utils;
 using osuTK;
 using System;
@@ -71,11 +69,12 @@ namespace osu.Game.Graphics.Backgrounds
         private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
 
         [Resolved]
-        private IRenderer renderer { get; set; }
+        private IRenderer renderer { get; set; } = null!;
 
-        private Random stableRandom;
-        private IShader shader;
-        private Texture texture;
+        private Random? stableRandom;
+
+        private IShader shader = null!;
+        private Texture texture = null!;
 
         /// <summary>
         /// Construct a new triangle visualisation.
@@ -116,8 +115,7 @@ namespace osu.Game.Graphics.Backgrounds
                 image[i, 0] = new Rgba32(
                     colourBottom.Value.R * ratio + colourTop.Value.R * (1f - ratio),
                     colourBottom.Value.G * ratio + colourTop.Value.G * (1f - ratio),
-                    colourBottom.Value.B * ratio + colourTop.Value.B * (1f - ratio),
-                    1f
+                    colourBottom.Value.B * ratio + colourTop.Value.B * (1f - ratio)
                 );
             }
 
@@ -223,13 +221,13 @@ namespace osu.Game.Graphics.Backgrounds
         {
             protected new TrianglesV2 Source => (TrianglesV2)base.Source;
 
-            private IShader shader;
-            private Texture texture;
+            private IShader shader = null!;
+            private Texture texture = null!;
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
             private Vector2 size;
 
-            private IVertexBatch<TexturedVertex2D> vertexBatch;
+            private IVertexBatch<TexturedVertex2D>? vertexBatch;
 
             public TrianglesDrawNode(TrianglesV2 source)
                 : base(source)
@@ -252,7 +250,10 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 base.Draw(renderer);
 
-                if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
+                if (Source.AimCount == 0)
+                    return;
+
+                if (vertexBatch == null || vertexBatch.Size != Source.AimCount)
                 {
                     vertexBatch?.Dispose();
                     vertexBatch = renderer.CreateQuadBatch<TexturedVertex2D>(Source.AimCount, 1);
