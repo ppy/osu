@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -25,11 +26,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             TimeRange = { Value = 5000 },
         };
 
-        public TestSceneTaikoPlayfield()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
             TaikoBeatmap beatmap;
-            bool kiai = false;
-
             AddStep("set beatmap", () =>
             {
                 Beatmap.Value = CreateWorkingBeatmap(beatmap = new TaikoBeatmap());
@@ -41,12 +41,28 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
             AddStep("Load playfield", () => SetContents(_ => new TaikoPlayfield
             {
+                Height = 0.2f,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                Height = 0.6f,
             }));
+        }
 
+        [Test]
+        public void TestBasic()
+        {
+            AddStep("do nothing", () => { });
+        }
+
+        [Test]
+        public void TestHeightChanges()
+        {
             AddRepeatStep("change height", () => this.ChildrenOfType<TaikoPlayfield>().ForEach(p => p.Height = Math.Max(0.2f, (p.Height + 0.2f) % 1f)), 50);
+        }
+
+        [Test]
+        public void TestKiai()
+        {
+            bool kiai = false;
 
             AddStep("Toggle kiai", () =>
             {
