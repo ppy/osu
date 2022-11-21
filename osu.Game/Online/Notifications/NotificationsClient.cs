@@ -67,8 +67,11 @@ namespace osu.Game.Online.Notifications
 
         protected void HandleChannelParted(Channel channel) => ChannelParted?.Invoke(channel);
 
-        protected void HandleMessages(List<Message> messages)
+        protected void HandleMessages(List<Message>? messages)
         {
+            if (messages == null)
+                return;
+
             NewMessages?.Invoke(messages);
             lastMessageId = Math.Max(lastMessageId, messages.LastOrDefault()?.Id ?? 0);
         }
