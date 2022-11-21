@@ -18,7 +18,7 @@ namespace osu.Game.Overlays
             Height = 80;
             RelativeSizeAxes = Axes.X;
             Masking = true;
-            InternalChild = new Background(textureName);
+            InternalChild = new DelayedLoadWrapper(() => new Background(textureName));
         }
 
         private class Background : Sprite
@@ -36,9 +36,15 @@ namespace osu.Game.Overlays
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(LargeTextureStore textures)
             {
                 Texture = textures.Get(textureName);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                this.FadeInFromZero(500, Easing.OutQuint);
             }
         }
     }
