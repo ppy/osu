@@ -59,7 +59,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             // the dropdown. BASS does not give us a simple mechanism to select
             // specific audio devices in such a case anyways. Such
             // functionality would require involved OS-specific code.
-            dropdown.Items = deviceItems.Distinct().ToList();
+            dropdown.Items = deviceItems
+                             // Dropdown doesn't like null items. Somehow we are seeing some arrive here (see https://github.com/ppy/osu/issues/21271)
+                             .Where(i => i != null)
+                             .Distinct()
+                             .ToList();
         }
 
         protected override void Dispose(bool isDisposing)
