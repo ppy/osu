@@ -39,8 +39,7 @@ namespace osu.Game.Tests.Visual.Settings
                 {
                     new OsuScrollContainer(Direction.Vertical)
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.Both,
                         Child = settings = new TabletSettings(tabletHandler)
                         {
                             RelativeSizeAxes = Axes.None,
