@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -100,13 +99,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddRepeatStep("Move Up", () => InputManager.Key(Key.Up), 2);
             AddAssert("Same as 1st message", () => box.Text == "Message 1");
 
-            AddStep("Remove text", () => box.Text = string.Empty);
-            AddStep("Move Up", () => InputManager.Key(Key.Up));
-            AddAssert("Same as previous message", () => box.Text == "Message 2");
-
-            AddStep("Move Up", () => InputManager.Key(Key.Up));
-            AddStep("Select text", () => InputManager.Keys(PlatformAction.SelectAll));
-            AddStep("Replace text", () => box.Text = "New text");
+            AddStep("Change text", () => box.Text = "New message");
             AddStep("Move Up", () => InputManager.Key(Key.Up));
             AddAssert("Same as previous message", () => box.Text == "Message 2");
         }
