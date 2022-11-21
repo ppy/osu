@@ -174,8 +174,8 @@ namespace osu.Game.Online.Chat
             protected override float Spacing => 5;
             protected override float DateAlign => 125;
 
-            public StandAloneDaySeparator(DateTimeOffset time)
-                : base(time)
+            public StandAloneDaySeparator(DateTimeOffset date)
+                : base(date)
             {
             }
 
