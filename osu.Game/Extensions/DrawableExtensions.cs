@@ -47,7 +47,7 @@ namespace osu.Game.Extensions
         /// <param name="delta">A delta in screen-space coordinates.</param>
         /// <returns>The delta vector in Parent's coordinates.</returns>
         public static Vector2 ScreenSpaceDeltaToParentSpace(this Drawable drawable, Vector2 delta) =>
-            drawable.Parent.ToLocalSpace(drawable.Parent.ToScreenSpace(Vector2.Zero) + delta);
+            drawable.Parent?.ToLocalSpace(drawable.Parent.ToScreenSpace(Vector2.Zero) + delta) ?? Vector2.Zero;
 
         public static SkinnableInfo CreateSkinnableInfo(this Drawable component) => new SkinnableInfo(component);
 
