@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Practice
         {
             base.Update();
 
-            if (PracticeOverlay.IsPresent is not true) return;
+            if (!PracticeOverlay.IsPresent) return;
 
             GameplayClockContainer.Stop();
             GameplayClockContainer.Hide();

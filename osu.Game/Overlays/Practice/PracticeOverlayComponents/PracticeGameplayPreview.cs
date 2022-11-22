@@ -12,13 +12,14 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
-namespace osu.Game.Overlays.Practice
+namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 {
     public class PracticeGameplayPreview : CompositeDrawable
     {
-        public BindableDouble SeekTime;
+        public BindableDouble SeekTime = new BindableDouble();
 
-        //Todo: Make preview not depend on player?
+        private EditorClock clock = null!;
+
         [Resolved]
         private PracticePlayer player { get; set; } = null!;
 
@@ -32,13 +33,12 @@ namespace osu.Game.Overlays.Practice
 
             //Stops Catch Ruleset and OsuRuleset from clipping the header;
             Masking = true;
-            SeekTime = new BindableDouble();
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = gameplayClockContainer = new GameplayClockContainer(new EditorClock());
+            InternalChild = gameplayClockContainer = new GameplayClockContainer(clock = new EditorClock());
 
             //We dont want the preview to use mods (maybe rate ones??)
             drawableRuleset = player.CurrentRuleset.CreateDrawableRulesetWith(player.PlayableBeatmap);
@@ -47,6 +47,8 @@ namespace osu.Game.Overlays.Practice
 
             gameplayClockContainer.Add(rulesetSkinProvider);
 
+            drawableRuleset.FrameStablePlayback = false;
+
             rulesetSkinProvider.Add(createGameplayComponents());
         }
 
@@ -54,13 +56,15 @@ namespace osu.Game.Overlays.Practice
         {
             base.LoadComplete();
 
-            gameplayClockContainer.Start();
-
-            SeekTime.BindValueChanged(seek => seekTo(seek.NewValue));
+            SeekTime.BindValueChanged(seek =>
+            {
+                seekTo(seek.NewValue);
+            });
         }
 
         private void seekTo(double seekTime)
         {
+            gameplayClockContainer.Start();
             gameplayClockContainer.Seek(seekTime);
         }
 
