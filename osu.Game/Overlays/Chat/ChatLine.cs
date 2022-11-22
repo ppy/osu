@@ -61,6 +61,8 @@ namespace osu.Game.Overlays.Chat
 
         private OsuSpriteText username = null!;
 
+        private Drawable usernameColouredDrawable = null!;
+
         private Container? highlight;
 
         private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
@@ -89,6 +91,10 @@ namespace osu.Game.Overlays.Chat
                 ? Color4Extensions.FromHex(message.Sender.Colour)
                 : username_colours[message.Sender.Id % username_colours.Length];
 
+            // this can be either the username sprite text or a container
+            // around it depending on which branch is taken in createUsername()
+            var usernameDrawable = createUsername();
+
             InternalChild = new GridContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -113,13 +119,13 @@ namespace osu.Game.Overlays.Chat
                             Colour = colourProvider?.Background1 ?? Colour4.White,
                             AlwaysPresent = true,
                         },
-                        new MessageSender(message.Sender)
+                        new MessageSender(message.Sender, usernameColouredDrawable)
                         {
                             Width = UsernameWidth,
                             AutoSizeAxes = Axes.Y,
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
-                            Child = createUsername(),
+                            Child = usernameDrawable,
                             Margin = new MarginPadding { Horizontal = Spacing },
                         },
                         ContentFlow = new LinkFlowContainer(t =>
@@ -198,7 +204,6 @@ namespace osu.Game.Overlays.Chat
             username = new OsuSpriteText
             {
                 Shadow = false,
-                Colour = senderHasColour ? colours.ChatBlue : usernameColour,
                 Truncate = true,
                 EllipsisString = "…",
                 Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true),
@@ -208,7 +213,13 @@ namespace osu.Game.Overlays.Chat
             };
 
             if (!senderHasColour)
+            {
+                usernameColouredDrawable = username;
+                usernameColouredDrawable.Colour = usernameColour;
                 return username;
+            }
+
+            username.Colour = colours.ChatBlue;
 
             // Background effect
             return new Container
@@ -233,7 +244,7 @@ namespace osu.Game.Overlays.Chat
                     CornerRadius = 4,
                     Children = new Drawable[]
                     {
-                        new Box
+                        usernameColouredDrawable = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = usernameColour,
@@ -252,15 +263,19 @@ namespace osu.Game.Overlays.Chat
         private class MessageSender : OsuClickableContainer, IHasContextMenu
         {
             private readonly APIUser sender;
+            private readonly Drawable colouredDrawable;
+            private readonly Color4 defaultColour;
 
             private Action startChatAction = null!;
 
             [Resolved]
             private IAPIProvider api { get; set; } = null!;
 
-            public MessageSender(APIUser sender)
+            public MessageSender(APIUser sender, Drawable colouredDrawable)
             {
                 this.sender = sender;
+                this.colouredDrawable = colouredDrawable;
+                defaultColour = colouredDrawable.Colour;
             }
 
             [BackgroundDependencyLoader]
@@ -295,7 +310,7 @@ namespace osu.Game.Overlays.Chat
 
             protected override bool OnHover(HoverEvent e)
             {
-                this.FadeColour(new Color4(1.4f, 1.4f, 1.4f, 1), 150, Easing.OutQuint);
+                colouredDrawable.FadeColour(defaultColour.Lighten(0.4f), 150, Easing.OutQuint);
 
                 return base.OnHover(e);
             }
@@ -304,7 +319,7 @@ namespace osu.Game.Overlays.Chat
             {
                 base.OnHoverLost(e);
 
-                this.FadeColour(Color4.White, 250, Easing.OutQuint);
+                colouredDrawable.FadeColour(defaultColour, 250, Easing.OutQuint);
             }
         }
 
