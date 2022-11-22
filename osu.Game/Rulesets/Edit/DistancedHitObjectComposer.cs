@@ -259,9 +259,9 @@ namespace osu.Game.Rulesets.Edit
             return true;
         }
 
-        public virtual float GetBeatSnapDistanceAt(HitObject referenceObject, bool useReferenceSliderVelocity = true)
+        public virtual float GetBeatSnapDistanceAt(HitObject referenceObject)
         {
-            return (float)(100 * (useReferenceSliderVelocity ? referenceObject.DifficultyControlPoint.SliderVelocity : 1) * EditorBeatmap.Difficulty.SliderMultiplier * 1 / BeatSnapProvider.BeatDivisor);
+            return (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * 1 / BeatSnapProvider.BeatDivisor);
         }
 
         public virtual float DurationToDistance(HitObject referenceObject, double duration)

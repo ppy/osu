@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void updateSpacing()
         {
             float distanceSpacingMultiplier = (float)DistanceSpacingMultiplier.Value;
-            float beatSnapDistance = SnapProvider.GetBeatSnapDistanceAt(ReferenceObject, false);
+            float beatSnapDistance = SnapProvider.GetBeatSnapDistanceAt(ReferenceObject);
 
             DistanceBetweenTicks = beatSnapDistance * distanceSpacingMultiplier;
 
