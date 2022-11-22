@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
             AddStep("Set 50 combo", () => gameplayState.ScoreProcessor.Combo.Value = 50);
             addHitSteps();
+            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
         }
 
         [Test]
@@ -44,6 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
             AddStep("Set 150 combo", () => gameplayState.ScoreProcessor.Combo.Value = 150);
             addHitSteps();
+            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
         }
 
         private void addHitSteps()
