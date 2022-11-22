@@ -103,13 +103,6 @@ namespace osu.Game.Utils
 
                 return array[(start + index) % capacity];
             }
-            set
-            {
-                if (index < 0 || index >= Count)
-                    throw new ArgumentOutOfRangeException(nameof(index));
-
-                array[(start + index) % capacity] = value;
-            }
         }
 
         /// <summary>
