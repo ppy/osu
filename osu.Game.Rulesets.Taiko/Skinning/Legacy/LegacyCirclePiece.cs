@@ -36,10 +36,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             RelativeSizeAxes = Axes.Both;
         }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private GameplayState? gameplayState { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private IBeatSyncProvider? beatSyncProvider { get; set; }
 
         [BackgroundDependencyLoader]
