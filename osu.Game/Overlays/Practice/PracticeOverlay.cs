@@ -9,6 +9,8 @@ namespace osu.Game.Overlays.Practice
 {
     public class PracticeOverlay : ShearedOverlayContainer
     {
+        public PracticeGameplayPreview Preview = null!;
+
         public PracticeOverlay()
             : base(OverlayColourScheme.Green)
         {
@@ -19,6 +21,8 @@ namespace osu.Game.Overlays.Practice
         {
             Header.Title = PracticeOverlayStrings.PracticeOverlayHeaderTitle;
             Header.Description = PracticeOverlayStrings.PracticeOverlayHeaderDescription;
+
+            MainAreaContent.Add(Preview = new PracticeGameplayPreview());
         }
     }
 }
