@@ -22,7 +22,37 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         private GameplayState gameplayState = TestGameplayState.Create(new TaikoRuleset());
 
         [Test]
-        public void TestHits()
+        public void TestHits([Values] bool withKiai)
+        {
+            AddStep("Create beatmap", () => setUpBeatmap(withKiai));
+            addHitSteps();
+        }
+
+        [Test]
+        public void TestHitAnimationSlow()
+        {
+            AddStep("Create beatmap", () => setUpBeatmap(false));
+
+            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
+
+            AddRepeatStep("Increase combo", () => gameplayState.ScoreProcessor.Combo.Value++, 50);
+
+            addHitSteps();
+        }
+
+        [Test]
+        public void TestHitAnimationFast()
+        {
+            AddStep("Create beatmap", () => setUpBeatmap(false));
+
+            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
+
+            AddRepeatStep("Increase combo", () => gameplayState.ScoreProcessor.Combo.Value++, 150);
+
+            addHitSteps();
+        }
+
+        private void addHitSteps()
         {
             AddStep("Centre hit", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime())
             {
@@ -49,38 +79,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             }));
         }
 
-        [Test]
-        public void TestHitKiai()
-        {
-            AddStep("Create beatmap", () => createBeatmap(true));
-
-            TestHits();
-        }
-
-        [Test]
-        public void TestHitAnimationSlow()
-        {
-            AddStep("Create beatmap", () => createBeatmap(false));
-
-            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
-
-            AddRepeatStep("Increase combo", () => gameplayState.ScoreProcessor.Combo.Value++, 50);
-
-            TestHits();
-        }
-
-        [Test]
-        public void TestHitAnimationFast()
-        {
-            AddStep("Create beatmap", () => createBeatmap(false));
-
-            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
-
-            AddRepeatStep("Increase combo", () => gameplayState.ScoreProcessor.Combo.Value++, 150);
-
-            TestHits();
-        }
-
         private Hit createHitAtCurrentTime(bool strong = false, bool rim = false)
         {
             var hit = new Hit
@@ -95,13 +93,13 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             return hit;
         }
 
-        private void createBeatmap(bool includeKiai)
+        private void setUpBeatmap(bool withKiai)
         {
             var controlPointInfo = new ControlPointInfo();
 
             controlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
 
-            if (includeKiai)
+            if (withKiai)
                 controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
 
             Beatmap.Value = CreateWorkingBeatmap(new Beatmap

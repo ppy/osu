@@ -26,8 +26,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         };
 
         [Test]
-        public void TestDrumroll()
+        public void TestDrumroll([Values] bool withKiai)
         {
+            AddStep("set up beatmap", () => setUpBeatmap(withKiai));
+
             AddStep("Drum roll", () => SetContents(_ =>
             {
                 var hoc = new ScrollingHitObjectContainer();
@@ -57,14 +59,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             }));
         }
 
-        [Test]
-        public void TestDrumrollKiai()
-        {
-            AddStep("Create beatmap", createBeatmap);
-
-            TestDrumroll();
-        }
-
         private DrumRoll createDrumRollAtCurrentTime(bool strong = false)
         {
             var drumroll = new DrumRoll
@@ -82,12 +76,14 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             return drumroll;
         }
 
-        private void createBeatmap()
+        private void setUpBeatmap(bool withKiai)
         {
             var controlPointInfo = new ControlPointInfo();
 
             controlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
-            controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
+
+            if (withKiai)
+                controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
 
             Beatmap.Value = CreateWorkingBeatmap(new Beatmap
             {
