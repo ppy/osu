@@ -44,6 +44,11 @@ namespace osu.Game.Screens.Menu
 
         public override bool AllowExternalScreenChange => true;
 
+        /// <summary>
+        /// Optional delegate to be run when exit is actually performed.
+        /// </summary>
+        public Action InvokeWhenExiting;
+
         private Screen songSelect;
 
         private MenuSideFlashes sideFlashes;
@@ -284,7 +289,17 @@ namespace osu.Game.Screens.Menu
                 if (dialogOverlay.CurrentDialog is ConfirmExitDialog exitDialog)
                     exitDialog.PerformOkAction();
                 else
-                    dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
+                {
+                    dialogOverlay.Push(new ConfirmExitDialog(() =>
+                    {
+                        InvokeWhenExiting?.Invoke();
+                        confirmAndExit();
+                    }, () =>
+                    {
+                        exitConfirmOverlay.Abort();
+                        InvokeWhenExiting = null;
+                    }));
+                }
 
                 return true;
             }

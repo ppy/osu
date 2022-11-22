@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -475,13 +476,14 @@ namespace osu.Game
         /// Use to programatically exit the game as if the user was triggering via alt-f4.
         /// By default, will keep persisting until an exit occurs (exit may be blocked multiple times).
         /// May be interrupted (see <see cref="OsuGame"/>'s override).
+        /// /// <param name="invokeWhenExiting">Optional delegate to be run when exit is actually performed.</param>
         /// </summary>
-        public virtual void AttemptExit()
+        public virtual void AttemptExit([CanBeNull] Action invokeWhenExiting = null)
         {
             if (!OnExiting())
                 Exit();
             else
-                Scheduler.AddDelayed(AttemptExit, 2000);
+                Scheduler.AddDelayed(() => AttemptExit(invokeWhenExiting), 2000);
         }
 
         public bool Migrate(string path)
