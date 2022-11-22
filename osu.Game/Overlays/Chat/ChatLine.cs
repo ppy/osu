@@ -23,6 +23,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -290,6 +291,20 @@ namespace osu.Game.Overlays.Chat
 
                     return items.ToArray();
                 }
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                this.FadeColour(new Color4(1.4f, 1.4f, 1.4f, 1), 150, Easing.OutQuint);
+
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                base.OnHoverLost(e);
+
+                this.FadeColour(Color4.White, 250, Easing.OutQuint);
             }
         }
 
