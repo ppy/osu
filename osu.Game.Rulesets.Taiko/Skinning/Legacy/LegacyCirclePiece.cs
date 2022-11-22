@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private Bindable<int> currentCombo { get; } = new BindableInt();
 
         private int animationFrame;
-        private int multiplier;
         private double beatLength;
 
         // required for editor blueprints (not sure why these circle pieces are zero size).
@@ -94,6 +93,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             foreach (var c in InternalChildren)
                 c.Scale = new Vector2(DrawHeight / 128);
 
+            if (foregroundLayer is IFramedAnimation animatableForegroundLayer)
+                animateForegroundLayer(animatableForegroundLayer);
+        }
+
+        private void animateForegroundLayer(IFramedAnimation animatableForegroundLayer)
+        {
+            int multiplier;
+
             if (currentCombo.Value >= 150)
             {
                 multiplier = 2;
@@ -104,7 +111,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             }
             else
             {
-                (foregroundLayer as IFramedAnimation)?.GotoFrame(0);
+                animatableForegroundLayer.GotoFrame(0);
                 return;
             }
 
@@ -114,7 +121,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                 animationFrame = Time.Current % ((beatLength * 2) / multiplier) >= beatLength / multiplier ? 0 : 1;
 
-                (foregroundLayer as IFramedAnimation)?.GotoFrame(animationFrame);
+                animatableForegroundLayer.GotoFrame(animationFrame);
             }
         }
 
