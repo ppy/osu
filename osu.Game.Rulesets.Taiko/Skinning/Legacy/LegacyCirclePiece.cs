@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
             if (beatSyncProvider?.ControlPoints != null)
             {
-                beatLength = beatSyncProvider.ControlPoints.TimingPointAt(LifetimeStart).BeatLength;
+                beatLength = beatSyncProvider.ControlPoints.TimingPointAt(Time.Current).BeatLength;
 
                 animationFrame = Time.Current % ((beatLength * 2) / multiplier) >= beatLength / multiplier ? 0 : 1;
 
