@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Objects
         public static void SnapTo<THitObject>(this THitObject hitObject, IDistanceSnapProvider? snapProvider)
             where THitObject : HitObject, IHasPath
         {
-            hitObject.Path.ExpectedDistance.Value = snapProvider?.FindSnappedDistance(hitObject, (float)hitObject.Path.CalculatedDistance) ?? hitObject.Path.CalculatedDistance;
+            hitObject.Path.ExpectedDistance.Value = snapProvider?.FindSnappedDistance(hitObject, (float)hitObject.Path.CalculatedDistance) * hitObject.DifficultyControlPoint.SliderVelocity ?? hitObject.Path.CalculatedDistance;
         }
 
         /// <summary>
