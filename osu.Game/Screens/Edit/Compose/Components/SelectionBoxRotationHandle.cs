@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -27,6 +28,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private SpriteIcon icon;
 
         private readonly Bindable<float?> cumulativeRotation = new Bindable<float?>();
+
+        private bool isSnapping = false;
 
         [Resolved]
         private SelectionBox selectionBox { get; set; }
@@ -74,6 +77,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.OnDrag(e);
 
+            float oldRoundedCumulativeRotationValue = roundToNearestFifths(cumulativeRotation.Value ?? 0);
+
             float instantaneousAngle = convertDragEventToAngleOfRotation(e);
             cumulativeRotation.Value += instantaneousAngle;
 
@@ -82,6 +87,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             else if (cumulativeRotation.Value > 180)
                 cumulativeRotation.Value -= 360;
 
+            if (isSnapping)
+            {
+                float roundedCumulativeRotation = roundToNearestFifths(cumulativeRotation.Value ?? 0);
+                instantaneousAngle = roundedCumulativeRotation - oldRoundedCumulativeRotationValue;
+            }
+
             HandleRotate?.Invoke(instantaneousAngle);
         }
 
@@ -89,6 +100,27 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.OnDragEnd(e);
             cumulativeRotation.Value = null;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            isSnapping = e.Key == Key.ControlLeft;
+
+            // Make sure that the starting point is rounded to the nearest fifths
+            if (cumulativeRotation.Value != null)
+            {
+                HandleRotate?.Invoke(roundToNearestFifths(cumulativeRotation.Value ?? 0) - (cumulativeRotation.Value ?? 0));
+                updateTooltipText();
+            }
+
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            isSnapping = !(e.Key == Key.ControlLeft);
+
+            base.OnKeyUp(e);
         }
 
         private float convertDragEventToAngleOfRotation(DragEvent e)
@@ -102,7 +134,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateTooltipText()
         {
-            TooltipText = cumulativeRotation.Value?.ToLocalisableString("0.0°") ?? default;
+            TooltipText = (isSnapping ? roundToNearestFifths(cumulativeRotation.Value ?? 0) : cumulativeRotation.Value)?.ToLocalisableString("0.0°") ?? default;
         }
+
+        private float roundToNearestFifths(float angle) => MathF.Round((angle) / 5f) * 5f;
     }
 }
