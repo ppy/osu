@@ -262,12 +262,22 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         tick.MissForcefully();
                 }
 
-                ApplyResult(r => r.Type = Tail.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
-                endHold();
+                if (Tail.IsHit)
+                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                else
+                    MissForcefully();
             }
 
             if (Tail.Judged && !Tail.IsHit)
                 HoldBrokenTime = Time.Current;
+        }
+
+        public override void MissForcefully()
+        {
+            base.MissForcefully();
+
+            // Important that this is always called when a result is applied.
+            endHold();
         }
 
         public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
