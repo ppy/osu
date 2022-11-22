@@ -187,5 +187,31 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("top-right rotation handle shown", () =>
                 this.ChildrenOfType<SelectionBoxRotationHandle>().Single(r => r.Anchor == Anchor.TopRight).Alpha == 1);
         }
+
+        [Test]
+        public void TestRotationSnapping()
+        {
+            SelectionBoxRotationHandle rotationHandle = null;
+
+            AddStep("retrieve rotation handle", () => rotationHandle = this.ChildrenOfType<SelectionBoxRotationHandle>().First());
+
+            AddStep("hover over rotation handle", () => InputManager.MoveMouseTo(rotationHandle));
+
+            AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
+
+            AddStep("move mouse", () => InputManager.MoveMouseTo(rotationHandle, new Vector2(21, 112)));
+
+            AddAssert("rotation is not divisible by 5", () => selectionArea.Rotation % 5 != 0);
+
+            AddStep("press left control", () => InputManager.PressKey(Key.ControlLeft));
+
+            AddStep("move mouse", () => InputManager.MoveMouseTo(rotationHandle));
+
+            AddAssert("rotation is divisible by 5", () => selectionArea.Rotation % 5 == 0);
+
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddStep("release left control", () => InputManager.ReleaseKey(Key.ControlLeft));
+        }
     }
 }
