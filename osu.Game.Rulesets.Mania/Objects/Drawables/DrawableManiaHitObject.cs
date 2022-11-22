@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// <summary>
         /// Causes this <see cref="DrawableManiaHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
+        public virtual void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
     }
 
     public abstract class DrawableManiaHitObject<TObject> : DrawableManiaHitObject
