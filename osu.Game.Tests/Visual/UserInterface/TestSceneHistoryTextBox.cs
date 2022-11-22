@@ -63,6 +63,68 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestEmptyHistory()
+        {
+            AddStep("Set text", () => box.Text = temp);
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Text is unchanged", () => box.Text == temp);
+
+            AddStep("Move up", () => InputManager.Key(Key.Up));
+            AddAssert("Text is unchanged", () => box.Text == temp);
+        }
+
+        [Test]
+        public void TestPartialHistory()
+        {
+            addMessages(3);
+            AddStep("Set text", () => box.Text = temp);
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Text is unchanged", () => box.Text == temp);
+
+            AddRepeatStep("Move up", () => InputManager.Key(Key.Up), 3);
+            AddAssert("Same as 1st message", () => box.Text == "Message 1");
+
+            AddStep("Move up", () => InputManager.Key(Key.Up));
+            AddAssert("Same as 1st message", () => box.Text == "Message 1");
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Same as 2nd message", () => box.Text == "Message 2");
+
+            AddRepeatStep("Move down", () => InputManager.Key(Key.Down), 2);
+            AddAssert("Temporary message restored", () => box.Text == temp);
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Text is unchanged", () => box.Text == temp);
+        }
+
+        [Test]
+        public void TestFullHistory()
+        {
+            addMessages(7);
+            AddStep("Set text", () => box.Text = temp);
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Text is unchanged", () => box.Text == temp);
+
+            AddRepeatStep("Move up", () => InputManager.Key(Key.Up), 5);
+            AddAssert("Same as 3rd message", () => box.Text == "Message 3");
+
+            AddStep("Move up", () => InputManager.Key(Key.Up));
+            AddAssert("Same as 3rd message", () => box.Text == "Message 3");
+
+            AddRepeatStep("Move down", () => InputManager.Key(Key.Down), 4);
+            AddAssert("Same as 7th message", () => box.Text == "Message 7");
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Temporary message restored", () => box.Text == temp);
+
+            AddStep("Move down", () => InputManager.Key(Key.Down));
+            AddAssert("Text is unchanged", () => box.Text == temp);
+        }
+
+        [Test]
         public void TestChangedHistory()
         {
             addMessages(2);
