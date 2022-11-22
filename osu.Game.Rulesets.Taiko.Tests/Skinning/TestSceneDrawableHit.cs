@@ -4,17 +4,23 @@
 #nullable disable
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Screens.Play;
+using osu.Game.Tests.Gameplay;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
     public class TestSceneDrawableHit : TaikoSkinnableTestScene
     {
+        [Cached]
+        private GameplayState gameplayState = TestGameplayState.Create(new TaikoRuleset());
+
         [Test]
         public void TestHits()
         {
@@ -43,6 +49,38 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             }));
         }
 
+        [Test]
+        public void TestHitKiai()
+        {
+            AddStep("Create beatmap", () => createBeatmap(true));
+
+            TestHits();
+        }
+
+        [Test]
+        public void TestHitAnimationSlow()
+        {
+            AddStep("Create beatmap", () => createBeatmap(false));
+
+            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
+
+            AddRepeatStep("Increase combo", () => gameplayState.ScoreProcessor.Combo.Value++, 50);
+
+            TestHits();
+        }
+
+        [Test]
+        public void TestHitAnimationFast()
+        {
+            AddStep("Create beatmap", () => createBeatmap(false));
+
+            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
+
+            AddRepeatStep("Increase combo", () => gameplayState.ScoreProcessor.Combo.Value++, 150);
+
+            TestHits();
+        }
+
         private Hit createHitAtCurrentTime(bool strong = false, bool rim = false)
         {
             var hit = new Hit
@@ -55,6 +93,23 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             hit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             return hit;
+        }
+
+        private void createBeatmap(bool includeKiai)
+        {
+            var controlPointInfo = new ControlPointInfo();
+
+            controlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
+
+            if (includeKiai)
+                controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
+
+            Beatmap.Value = CreateWorkingBeatmap(new Beatmap
+            {
+                ControlPointInfo = controlPointInfo
+            });
+
+            Beatmap.Value.Track.Start();
         }
     }
 }
