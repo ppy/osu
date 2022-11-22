@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         };
 
         [Test]
-        public void DrumrollTest()
+        public void TestDrumroll()
         {
             AddStep("Drum roll", () => SetContents(_ =>
             {
@@ -57,6 +57,14 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             }));
         }
 
+        [Test]
+        public void TestDrumrollKiai()
+        {
+            AddStep("Create beatmap", createBeatmap);
+
+            TestDrumroll();
+        }
+
         private DrumRoll createDrumRollAtCurrentTime(bool strong = false)
         {
             var drumroll = new DrumRoll
@@ -72,6 +80,21 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             drumroll.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             return drumroll;
+        }
+
+        private void createBeatmap()
+        {
+            var controlPointInfo = new ControlPointInfo();
+
+            controlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
+            controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
+
+            Beatmap.Value = CreateWorkingBeatmap(new Beatmap
+            {
+                ControlPointInfo = controlPointInfo
+            });
+
+            Beatmap.Value.Track.Start();
         }
     }
 }
