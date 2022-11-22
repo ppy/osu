@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private readonly Bindable<float?> cumulativeRotation = new Bindable<float?>();
 
-        private bool isSnapping = false;
+        private bool isSnapping;
 
         [Resolved]
         private SelectionBox selectionBox { get; set; }
@@ -118,7 +118,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void OnKeyUp(KeyUpEvent e)
         {
-            isSnapping = !(e.Key == Key.ControlLeft);
+            if (e.Key == Key.ControlLeft)
+                isSnapping = false;
 
             base.OnKeyUp(e);
         }
