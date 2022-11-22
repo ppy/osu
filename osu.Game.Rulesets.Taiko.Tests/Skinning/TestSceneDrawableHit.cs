@@ -33,10 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             AddStep("Create beatmap", () => setUpBeatmap(false));
 
-            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
-
-            AddRepeatStep("Increase combo", () => gameplayState.ScoreProcessor.Combo.Value++, 50);
-
+            AddStep("Set 50 combo", () => gameplayState.ScoreProcessor.Combo.Value = 50);
             addHitSteps();
         }
 
@@ -45,10 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             AddStep("Create beatmap", () => setUpBeatmap(false));
 
-            AddStep("Reset combo", () => gameplayState.ScoreProcessor.Combo.Value = 0);
-
-            AddRepeatStep("Increase combo", () => gameplayState.ScoreProcessor.Combo.Value++, 150);
-
+            AddStep("Set 150 combo", () => gameplayState.ScoreProcessor.Combo.Value = 150);
             addHitSteps();
         }
 
