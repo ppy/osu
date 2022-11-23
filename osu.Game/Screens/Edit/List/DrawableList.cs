@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.List
 {
@@ -63,14 +61,6 @@ namespace osu.Game.Screens.Edit.List
             Height = 100f;
             ListContainer.Spacing = new Vector2(2.5f);
             UpdateItem();
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (e.Button == MouseButton.Left)
-                SelectAll(false);
-            base.OnClick(e);
-            return e.Button == MouseButton.Left;
         }
 
         public void AddRange(IEnumerable<T>? drawables)
