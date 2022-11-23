@@ -2,13 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
@@ -16,10 +15,6 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 {
     public class PracticeGameplayPreview : CompositeDrawable
     {
-        public BindableDouble SeekTime = new BindableDouble();
-
-        private EditorClock clock = null!;
-
         [Resolved]
         private PracticePlayer player { get; set; } = null!;
 
@@ -38,7 +33,7 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = gameplayClockContainer = new GameplayClockContainer(clock = new EditorClock());
+            InternalChild = gameplayClockContainer = new GameplayClockContainer(new FramedBeatmapClock());
 
             //We dont want the preview to use mods (maybe rate ones??)
             drawableRuleset = player.CurrentRuleset.CreateDrawableRulesetWith(player.PlayableBeatmap);
@@ -47,24 +42,15 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 
             gameplayClockContainer.Add(rulesetSkinProvider);
 
+            gameplayClockContainer.Start();
+
             drawableRuleset.FrameStablePlayback = false;
 
             rulesetSkinProvider.Add(createGameplayComponents());
         }
 
-        protected override void LoadComplete()
+        public void SeekTo(double seekTime)
         {
-            base.LoadComplete();
-
-            SeekTime.BindValueChanged(seek =>
-            {
-                seekTo(seek.NewValue);
-            });
-        }
-
-        private void seekTo(double seekTime)
-        {
-            gameplayClockContainer.Start();
             gameplayClockContainer.Seek(seekTime);
         }
 

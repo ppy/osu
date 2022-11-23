@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseMove(MouseMoveEvent e) => true;
 
-        protected void AddButton(string text, Color4 colour, Action action)
+        public void AddButton(string text, Color4 colour, Action action)
         {
             var button = new Button
             {

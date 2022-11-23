@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,8 +11,6 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
 
@@ -22,23 +18,17 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 {
     public class PracticeSegmentSliderComponent : CompositeDrawable
     {
-        [Resolved(canBeNull: true)]
-        private DrawableRuleset? drawableRuleset { get; set; }
-
         private SegmentSliderStart segmentSliderStart = null!;
         private SegmentSliderEnd segmentSliderEnd = null!;
 
-        public Bindable<double> customStartTime = new Bindable<double>();
-        public Bindable<double> customEndTime = new Bindable<double>();
-
-        private readonly BindableNumber<double> customStart = new BindableNumber<double>
+        public readonly BindableNumber<double> CustomStart = new BindableNumber<double>
         {
             MinValue = 0,
             MaxValue = 1,
             Precision = 0.01f
         };
 
-        private readonly BindableNumber<double> customEnd = new BindableNumber<double>(1)
+        public readonly BindableNumber<double> CustomEnd = new BindableNumber<double>(1)
         {
             MinValue = 0,
             MaxValue = 1,
@@ -48,32 +38,23 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (drawableRuleset != null)
-            {
-                Objects = drawableRuleset.Objects;
-            }
-
-            const float vertical_offset = 15;
-
             Padding = new MarginPadding(10);
             InternalChildren = new Drawable[]
             {
                 segmentSliderStart = new SegmentSliderStart
                 {
-                    Current = customStart,
+                    Current = CustomStart,
                     Depth = float.MinValue,
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.1f,
                     RelativeSizeAxes = Axes.X,
-                    Y = vertical_offset,
                 },
                 segmentSliderEnd = new SegmentSliderEnd
                 {
-                    Current = customEnd,
+                    Current = CustomEnd,
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.1f,
                     RelativeSizeAxes = Axes.X,
-                    Y = vertical_offset,
                 }
             };
         }
@@ -82,32 +63,15 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
         {
             base.LoadComplete();
 
-            customStart.ValueChanged += min =>
+            CustomStart.ValueChanged += min =>
             {
-                customStartTime.Value = lastHitTime * min.NewValue;
                 segmentSliderEnd.Current.Value = Math.Max(min.NewValue + 0.01, segmentSliderEnd.Current.Value);
             };
-            customEnd.ValueChanged += max =>
+            CustomEnd.ValueChanged += max =>
             {
-                customEndTime.Value = lastHitTime * max.NewValue;
                 segmentSliderStart.Current.Value = Math.Min(max.NewValue - 0.01, segmentSliderStart.Current.Value);
             };
         }
-
-        private IEnumerable<HitObject>? objects;
-
-        public IEnumerable<HitObject> Objects
-        {
-            set
-            {
-                objects = value;
-                lastHitTime = objects.LastOrDefault()?.GetEndTime() ?? 0;
-                UpdateObjects();
-            }
-        }
-
-        private double lastHitTime { get; set; }
-        protected virtual void UpdateObjects() { }
 
         private class SegmentSliderStart : SegmentSlider
         {
