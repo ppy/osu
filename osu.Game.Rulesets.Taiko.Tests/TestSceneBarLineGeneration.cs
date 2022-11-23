@@ -83,5 +83,41 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddAssert("first barline ommited", () => barlines.All(b => b.StartTime != start_time));
             AddAssert("second barline generated", () => barlines.Any(b => b.StartTime == start_time + (beat_length * time_signature_numerator)));
         }
+
+        [Test]
+        public void TestNegativeStartTimeTimingPoint()
+        {
+            const double beat_length = 250;
+
+            const int time_signature_numerator = 4;
+
+            var beatmap = new Beatmap<TaikoHitObject>
+            {
+                HitObjects =
+                {
+                    new Hit
+                    {
+                        Type = HitType.Centre,
+                        StartTime = 1000
+                    }
+                },
+                BeatmapInfo =
+                {
+                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Ruleset = new TaikoRuleset().RulesetInfo
+                },
+            };
+
+            beatmap.ControlPointInfo.Add(-100, new TimingControlPoint
+            {
+                BeatLength = beat_length,
+                TimeSignature = new TimeSignature(time_signature_numerator)
+            });
+
+            var barlines = new BarLineGenerator<BarLine>(beatmap).BarLines;
+
+            AddAssert("bar line generated at t=900", () => barlines.Any(line => line.StartTime == 900));
+            AddAssert("bar line generated at t=1900", () => barlines.Any(line => line.StartTime == 1900));
+        }
     }
 }
