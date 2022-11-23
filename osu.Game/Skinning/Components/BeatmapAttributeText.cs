@@ -130,45 +130,9 @@ namespace osu.Game.Skinning.Components
             //update Length
             valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(workingBeatmap.BeatmapInfo.Length).ToFormattedDuration();
             //update Status
-            valueDictionary[BeatmapAttribute.RankedStatus] = GetBetmapStatus(workingBeatmap.BeatmapInfo.Status);
+            valueDictionary[BeatmapAttribute.RankedStatus] = workingBeatmap.BeatmapInfo.Status.GetLocalisableDescription();
             //update BPM
             valueDictionary[BeatmapAttribute.BPM] = workingBeatmap.BeatmapInfo.BPM.ToString("F2");
-        }
-
-        public static LocalisableString GetBetmapStatus(BeatmapOnlineStatus status)
-        {
-            switch (status)
-            {
-                case BeatmapOnlineStatus.Approved:
-                    return BeatmapsetsStrings.ShowStatusApproved;
-
-                case BeatmapOnlineStatus.Graveyard:
-                    return BeatmapsetsStrings.ShowStatusGraveyard;
-
-                case BeatmapOnlineStatus.Loved:
-                    return BeatmapsetsStrings.ShowStatusLoved;
-
-                case BeatmapOnlineStatus.None:
-                    return "None";
-
-                case BeatmapOnlineStatus.Pending:
-                    return BeatmapsetsStrings.ShowStatusPending;
-
-                case BeatmapOnlineStatus.Qualified:
-                    return BeatmapsetsStrings.ShowStatusQualified;
-
-                case BeatmapOnlineStatus.Ranked:
-                    return BeatmapsetsStrings.ShowStatusRanked;
-
-                case BeatmapOnlineStatus.LocallyModified:
-                    return SongSelectStrings.LocallyModified;
-
-                case BeatmapOnlineStatus.WIP:
-                    return BeatmapsetsStrings.ShowStatusWip;
-
-                default:
-                    return @"null";
-            }
         }
     }
 
