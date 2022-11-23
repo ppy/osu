@@ -22,47 +22,46 @@ using osu.Game.Resources.Localisation.Web;
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
-    public class BeatmapInfoDrawable : Container, ISkinnableDrawable
+    public class BeatmapAttributeText : Container, ISkinnableDrawable
     {
-        private const BeatmapInfo default_beatmap_info = BeatmapInfo.StarRating;
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Tracked Beatmap Info/Label", "Which part of the BeatmapInformation should be displayed.")]
-        public Bindable<BeatmapInfo> Type { get; } = new Bindable<BeatmapInfo>(default_beatmap_info);
+        [SettingSource("Attribute", "The attribute to be displayed.")]
+        public Bindable<BeatmapAttribute> Attribute { get; } = new Bindable<BeatmapAttribute>(BeatmapAttribute.StarRating);
 
-        [SettingSource("Template", "Bypass the restriction of 1 Info per element. Format is '{'+Type+'}' to substitue values. e.g. '{Song}' ")]
+        [SettingSource("Template", "Supports {Label} and {Value}, but also including arbitrary attributes like {StarRating} (see attribute list for supported values).")]
         public Bindable<string> Template { get; set; } = new Bindable<string>("{Label}: {Value}");
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-        private readonly Dictionary<BeatmapInfo, LocalisableString> valueDictionary = new Dictionary<BeatmapInfo, LocalisableString>();
-        private static readonly ImmutableDictionary<BeatmapInfo, LocalisableString> label_dictionary;
+        private readonly Dictionary<BeatmapAttribute, LocalisableString> valueDictionary = new Dictionary<BeatmapAttribute, LocalisableString>();
+        private static readonly ImmutableDictionary<BeatmapAttribute, LocalisableString> label_dictionary;
 
         private readonly OsuSpriteText text;
 
-        static BeatmapInfoDrawable()
+        static BeatmapAttributeText()
         {
-            label_dictionary = new Dictionary<BeatmapInfo, LocalisableString>
+            label_dictionary = new Dictionary<BeatmapAttribute, LocalisableString>
             {
-                [BeatmapInfo.CircleSize] = BeatmapsetsStrings.ShowStatsCs,
-                [BeatmapInfo.Accuracy] = BeatmapsetsStrings.ShowStatsAccuracy,
-                [BeatmapInfo.HPDrain] = BeatmapsetsStrings.ShowStatsDrain,
-                [BeatmapInfo.ApproachRate] = BeatmapsetsStrings.ShowStatsAr,
-                [BeatmapInfo.StarRating] = BeatmapsetsStrings.ShowStatsStars,
-                [BeatmapInfo.Song] = EditorSetupStrings.Title,
-                [BeatmapInfo.Artist] = EditorSetupStrings.Artist,
-                [BeatmapInfo.Difficulty] = EditorSetupStrings.DifficultyHeader,
+                [BeatmapAttribute.CircleSize] = BeatmapsetsStrings.ShowStatsCs,
+                [BeatmapAttribute.Accuracy] = BeatmapsetsStrings.ShowStatsAccuracy,
+                [BeatmapAttribute.HPDrain] = BeatmapsetsStrings.ShowStatsDrain,
+                [BeatmapAttribute.ApproachRate] = BeatmapsetsStrings.ShowStatsAr,
+                [BeatmapAttribute.StarRating] = BeatmapsetsStrings.ShowStatsStars,
+                [BeatmapAttribute.Song] = EditorSetupStrings.Title,
+                [BeatmapAttribute.Artist] = EditorSetupStrings.Artist,
+                [BeatmapAttribute.Difficulty] = EditorSetupStrings.DifficultyHeader,
                 //todo: is there a good alternative, to NotificationsOptionsMapping?
-                [BeatmapInfo.Mapper] = AccountsStrings.NotificationsOptionsMapping,
-                [BeatmapInfo.Length] = ArtistStrings.TracklistLength,
-                [BeatmapInfo.Status] = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault,
-                [BeatmapInfo.BPM] = BeatmapsetsStrings.ShowStatsBpm,
-                [BeatmapInfo.None] = BeatmapInfo.None.ToString()
+                [BeatmapAttribute.Mapper] = AccountsStrings.NotificationsOptionsMapping,
+                [BeatmapAttribute.Length] = ArtistStrings.TracklistLength,
+                [BeatmapAttribute.Status] = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault,
+                [BeatmapAttribute.BPM] = BeatmapsetsStrings.ShowStatsBpm,
+                [BeatmapAttribute.None] = BeatmapAttribute.None.ToString()
             }.ToImmutableDictionary();
         }
 
-        public BeatmapInfoDrawable()
+        public BeatmapAttributeText()
         {
             AutoSizeAxes = Axes.Both;
             InternalChildren = new Drawable[]
@@ -76,7 +75,7 @@ namespace osu.Game.Skinning.Components
                 }
             };
 
-            foreach (var type in Enum.GetValues(typeof(BeatmapInfo)).Cast<BeatmapInfo>())
+            foreach (var type in Enum.GetValues(typeof(BeatmapAttribute)).Cast<BeatmapAttribute>())
             {
                 valueDictionary[type] = type.ToString();
             }
@@ -85,7 +84,7 @@ namespace osu.Game.Skinning.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Type.BindValueChanged(_ => updateLabel());
+            Attribute.BindValueChanged(_ => updateLabel());
             Template.BindValueChanged(f => updateLabel(), true);
             beatmap.BindValueChanged(b =>
             {
@@ -96,10 +95,10 @@ namespace osu.Game.Skinning.Components
 
         private void updateLabel()
         {
-            string newText = Template.Value.Replace("{Label}", label_dictionary[Type.Value].ToString())
-                                     .Replace("{Value}", valueDictionary[Type.Value].ToString());
+            string newText = Template.Value.Replace("{Label}", label_dictionary[Attribute.Value].ToString())
+                                     .Replace("{Value}", valueDictionary[Attribute.Value].ToString());
 
-            foreach (var type in Enum.GetValues(typeof(BeatmapInfo)).Cast<BeatmapInfo>())
+            foreach (var type in Enum.GetValues(typeof(BeatmapAttribute)).Cast<BeatmapAttribute>())
             {
                 newText = newText.Replace("{" + type + "}", valueDictionary[type].ToString());
             }
@@ -111,34 +110,34 @@ namespace osu.Game.Skinning.Components
         {
             //update cs
             double cs = workingBeatmap.BeatmapInfo.Difficulty.CircleSize;
-            valueDictionary[BeatmapInfo.CircleSize] = cs.ToString("F2");
+            valueDictionary[BeatmapAttribute.CircleSize] = cs.ToString("F2");
             //update HP
             double hp = workingBeatmap.BeatmapInfo.Difficulty.DrainRate;
-            valueDictionary[BeatmapInfo.HPDrain] = hp.ToString("F2");
+            valueDictionary[BeatmapAttribute.HPDrain] = hp.ToString("F2");
             //update od
             double od = workingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty;
-            valueDictionary[BeatmapInfo.Accuracy] = od.ToString("F2");
+            valueDictionary[BeatmapAttribute.Accuracy] = od.ToString("F2");
             //update ar
             double ar = workingBeatmap.BeatmapInfo.Difficulty.ApproachRate;
-            valueDictionary[BeatmapInfo.ApproachRate] = ar.ToString("F2");
+            valueDictionary[BeatmapAttribute.ApproachRate] = ar.ToString("F2");
             //update sr
             double sr = workingBeatmap.BeatmapInfo.StarRating;
-            valueDictionary[BeatmapInfo.StarRating] = sr.ToString("F2");
+            valueDictionary[BeatmapAttribute.StarRating] = sr.ToString("F2");
             //update song title
-            valueDictionary[BeatmapInfo.Song] = workingBeatmap.BeatmapInfo.Metadata.Title;
+            valueDictionary[BeatmapAttribute.Song] = workingBeatmap.BeatmapInfo.Metadata.Title;
             //update artist
-            valueDictionary[BeatmapInfo.Artist] = workingBeatmap.BeatmapInfo.Metadata.Artist;
+            valueDictionary[BeatmapAttribute.Artist] = workingBeatmap.BeatmapInfo.Metadata.Artist;
             //update difficulty name
-            valueDictionary[BeatmapInfo.Difficulty] = workingBeatmap.BeatmapInfo.DifficultyName;
+            valueDictionary[BeatmapAttribute.Difficulty] = workingBeatmap.BeatmapInfo.DifficultyName;
             //update mapper
-            valueDictionary[BeatmapInfo.Mapper] = workingBeatmap.BeatmapInfo.Metadata.Author.Username;
+            valueDictionary[BeatmapAttribute.Mapper] = workingBeatmap.BeatmapInfo.Metadata.Author.Username;
             //update Length
-            valueDictionary[BeatmapInfo.Length] = TimeSpan.FromMilliseconds(workingBeatmap.BeatmapInfo.Length).ToFormattedDuration();
+            valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(workingBeatmap.BeatmapInfo.Length).ToFormattedDuration();
             //update Status
-            valueDictionary[BeatmapInfo.Status] = GetBetmapStatus(workingBeatmap.BeatmapInfo.Status);
+            valueDictionary[BeatmapAttribute.Status] = GetBetmapStatus(workingBeatmap.BeatmapInfo.Status);
             //update BPM
-            valueDictionary[BeatmapInfo.BPM] = workingBeatmap.BeatmapInfo.BPM.ToString("F2");
-            valueDictionary[BeatmapInfo.None] = string.Empty;
+            valueDictionary[BeatmapAttribute.BPM] = workingBeatmap.BeatmapInfo.BPM.ToString("F2");
+            valueDictionary[BeatmapAttribute.None] = string.Empty;
         }
 
         public static LocalisableString GetBetmapStatus(BeatmapOnlineStatus status)
@@ -178,7 +177,7 @@ namespace osu.Game.Skinning.Components
         }
     }
 
-    public enum BeatmapInfo
+    public enum BeatmapAttribute
     {
         CircleSize,
         HPDrain,
