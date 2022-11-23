@@ -7,7 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace osu.Game.Rulesets.Difficulty.Utils
+namespace osu.Game.Utils
 {
     /// <summary>
     /// An indexed queue with limited capacity.
