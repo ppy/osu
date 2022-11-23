@@ -18,6 +18,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -123,6 +124,13 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddUntilStep("wait for track stopped", () => !EditorClock.IsRunning);
+        }
+
+        [Test]
+        public void TestNoCrashOnTapWhenNoGroupSelected()
+        {
+            AddStep("unset selected group", () => selectedGroup.Value = null);
+            AddStep("press T to tap", () => InputManager.Key(Key.T));
         }
 
         protected override void Dispose(bool isDisposing)
