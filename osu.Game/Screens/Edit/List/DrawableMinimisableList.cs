@@ -28,16 +28,10 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private Action<SelectionState> selectAll;
-
-        public Action<SelectionState> SelectAll
+        public Action<bool> SelectAll
         {
-            get => selectAll;
-            set
-            {
-                selectAll = value;
-                List.SelectAll = value;
-            }
+            get => List.SelectAll;
+            set => List.SelectAll = value;
         }
 
         private Func<T, LocalisableString> getName;
@@ -60,7 +54,6 @@ namespace osu.Game.Screens.Edit.List
         public DrawableMinimisableList()
         {
             getName = ((IDrawableListItem<T>)this).GetDefaultText;
-            selectAll = ((IDrawableListItem<T>)List).SelectableOnStateChanged;
             onDragAction = () => { };
 
             RelativeSizeAxes = Axes.X;
@@ -109,11 +102,6 @@ namespace osu.Game.Screens.Edit.List
             Enabled.BindValueChanged(v => SetShown(v.NewValue), true);
             Select(false);
         }
-
-        public void SelectableOnStateChanged(SelectionState obj) =>
-            ((IDrawableListItem<T>)List).SelectableOnStateChanged(obj);
-
-        public void Toggle() => SetShown(!Enabled.Value, true);
 
         public void SetShown(bool value, bool setValue = false)
         {

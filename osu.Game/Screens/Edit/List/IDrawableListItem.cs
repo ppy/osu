@@ -13,7 +13,9 @@ namespace osu.Game.Screens.Edit.List
 {
     public interface IDrawableListItem<T>
     {
-        public Action<SelectionState> SelectAll { get; set; }
+        //Selects all items of all items in connected lists, if the param is true.
+        //Else unselects them
+        public Action<bool> SelectAll { get; set; }
         public Func<T, LocalisableString> GetName { get; set; }
         public Action OnDragAction { get; set; }
         public bool EnableSelection => typeof(T).GetInterfaces().Contains(typeof(IStateful<SelectionState>));
@@ -25,20 +27,6 @@ namespace osu.Game.Screens.Edit.List
         /// </summary>
         /// <param name="value">if this List Item should be selected or not</param>
         public void Select(bool value);
-
-        public void SelectableOnStateChanged(SelectionState obj)
-        {
-            switch (obj)
-            {
-                case SelectionState.Selected:
-                    SelectInternal(true);
-                    return;
-
-                case SelectionState.NotSelected:
-                    SelectInternal(false);
-                    return;
-            }
-        }
 
         public LocalisableString GetDefaultText(Drawable target)
         {

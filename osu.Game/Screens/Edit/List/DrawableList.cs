@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Input;
 
@@ -29,9 +28,9 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private Action<SelectionState> selectAll;
+        private Action<bool> selectAll;
 
-        public Action<SelectionState> SelectAll
+        public Action<bool> SelectAll
         {
             get => selectAll;
             set
@@ -56,20 +55,20 @@ namespace osu.Game.Screens.Edit.List
         public DrawableList()
         {
             getName = ((IDrawableListItem<T>)this).GetDefaultText;
-            selectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
+            selectAll = SelectInternal;
             onDragAction = () => { };
 
             RelativeSizeAxes = Axes.X;
             //todo: compute this somehow add runtime
             Height = 100f;
             ListContainer.Spacing = new Vector2(2.5f);
-            SelectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
+            UpdateItem();
         }
 
         protected override bool OnClick(ClickEvent e)
         {
             if (e.Button == MouseButton.Left)
-                SelectAll(SelectionState.NotSelected);
+                SelectAll(false);
             base.OnClick(e);
             return e.Button == MouseButton.Left;
         }

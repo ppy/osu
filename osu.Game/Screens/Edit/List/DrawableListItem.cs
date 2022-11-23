@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.List
             set => onDragAction = value;
         }
 
-        public Action<SelectionState> SelectAll { get; set; }
+        public Action<bool> SelectAll { get; set; }
 
         private Func<T, LocalisableString> getName;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.List
             : base(d)
         {
             getName = ((IDrawableListItem<T>)this).GetDefaultText;
-            SelectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
+            SelectAll = SelectInternal;
             onDragAction = () => { };
             text.Text = name;
             AutoSizeAxes = Axes.Both;
@@ -69,8 +69,8 @@ namespace osu.Game.Screens.Edit.List
 
             if (d is IStateful<SelectionState> selectable)
             {
-                selectable.StateChanged += ((IDrawableListItem<T>)this).SelectableOnStateChanged;
-                ((IDrawableListItem<T>)this).SelectableOnStateChanged(selectable.State);
+                selectable.StateChanged += selectionState => ((IDrawableListItem<T>)this).SelectInternal(selectionState == SelectionState.Selected);
+                SelectInternal(selectable.State == SelectionState.Selected);
             }
 
             if (!((IDrawableListItem<T>)this).EnableSelection)
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Edit.List
             }
             else
             {
-                SelectAll(SelectionState.NotSelected);
+                SelectAll(false);
                 Select(true);
             }
 
@@ -114,16 +114,7 @@ namespace osu.Game.Screens.Edit.List
         {
             if (Model is IStateful<SelectionState> stateful)
             {
-                switch (stateful.State)
-                {
-                    case SelectionState.Selected:
-                        Select(false);
-                        break;
-
-                    case SelectionState.NotSelected:
-                        Select(true);
-                        break;
-                }
+                Select(stateful.State != SelectionState.Selected);
             }
             else
             {
@@ -138,7 +129,7 @@ namespace osu.Game.Screens.Edit.List
         {
             updateText(Model);
             if (Model is IStateful<SelectionState> selectable)
-                ((IDrawableListItem<T>)this).SelectableOnStateChanged(selectable.State);
+                SelectInternal(selectable.State == SelectionState.Selected);
         }
 
         private void updateText(T target)
@@ -171,7 +162,7 @@ namespace osu.Game.Screens.Edit.List
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            SelectAll(SelectionState.NotSelected);
+            SelectAll(false);
             Select(true);
             return base.OnDragStart(e);
         }
