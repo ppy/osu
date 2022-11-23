@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -46,9 +45,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private GameHost host { get; set; }
 
         /// <summary>
-        /// Based on ultrawide monitor configurations.
+        /// Based on ultrawide monitor configurations, plus a bit of lenience for users which are intentionally aiming for higher horizontal velocity.
         /// </summary>
-        private const float largest_feasible_aspect_ratio = 21f / 9;
+        private const float largest_feasible_aspect_ratio = 23f / 9;
 
         private readonly BindableNumber<float> aspectRatio = new BindableFloat(1)
         {
@@ -327,7 +326,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             aspectLock.Value = false;
 
-            int proposedHeight = getHeight(sizeX.Value, aspectRatio);
+            float proposedHeight = getHeight(sizeX.Value, aspectRatio);
 
             if (proposedHeight < sizeY.MaxValue)
                 sizeY.Value = proposedHeight;
@@ -344,8 +343,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private float currentAspectRatio => sizeX.Value / sizeY.Value;
 
-        private static int getHeight(float width, float aspectRatio) => (int)Math.Round(width / aspectRatio);
+        private static float getHeight(float width, float aspectRatio) => width / aspectRatio;
 
-        private static int getWidth(float height, float aspectRatio) => (int)Math.Round(height * aspectRatio);
+        private static float getWidth(float height, float aspectRatio) => height * aspectRatio;
     }
 }
