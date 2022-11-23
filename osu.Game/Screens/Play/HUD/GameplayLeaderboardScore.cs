@@ -62,20 +62,22 @@ namespace osu.Game.Screens.Play.HUD
 
         private int? scorePosition;
 
+        private bool scorePositionIsSet;
+
         public int? ScorePosition
         {
             get => scorePosition;
             set
             {
-                if (value == scorePosition)
+                // We always want to run once, as the incoming value may be null and require a visual update to "-".
+                if (value == scorePosition && scorePositionIsSet)
                     return;
 
                 scorePosition = value;
 
-                if (scorePosition.HasValue)
-                    positionText.Text = $"#{scorePosition.Value.FormatRank()}";
+                positionText.Text = scorePosition.HasValue ? $"#{scorePosition.Value.FormatRank()}" : "-";
+                scorePositionIsSet = true;
 
-                positionText.FadeTo(scorePosition.HasValue ? 1 : 0);
                 updateState();
             }
         }

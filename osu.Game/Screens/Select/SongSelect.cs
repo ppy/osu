@@ -304,6 +304,16 @@ namespace osu.Game.Screens.Select
             modSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(ModSelect);
         }
 
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // Match stable behaviour of only alt-scroll adjusting volume.
+            // Supporting scroll adjust without a modifier key just feels bad, since there are so many scrollable elements on the screen.
+            if (!e.CurrentState.Keyboard.AltPressed)
+                return true;
+
+            return base.OnScroll(e);
+        }
+
         /// <summary>
         /// Creates the buttons to be displayed in the footer.
         /// </summary>
