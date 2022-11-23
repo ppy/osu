@@ -104,35 +104,18 @@ namespace osu.Game.Skinning.Components
 
         public void UpdateBeatmapContent(WorkingBeatmap workingBeatmap)
         {
-            //update cs
-            double cs = workingBeatmap.BeatmapInfo.Difficulty.CircleSize;
-            valueDictionary[BeatmapAttribute.CircleSize] = cs.ToString("F2");
-            //update HP
-            double hp = workingBeatmap.BeatmapInfo.Difficulty.DrainRate;
-            valueDictionary[BeatmapAttribute.HPDrain] = hp.ToString("F2");
-            //update od
-            double od = workingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty;
-            valueDictionary[BeatmapAttribute.Accuracy] = od.ToString("F2");
-            //update ar
-            double ar = workingBeatmap.BeatmapInfo.Difficulty.ApproachRate;
-            valueDictionary[BeatmapAttribute.ApproachRate] = ar.ToString("F2");
-            //update sr
-            double sr = workingBeatmap.BeatmapInfo.StarRating;
-            valueDictionary[BeatmapAttribute.StarRating] = sr.ToString("F2");
-            //update song title
             valueDictionary[BeatmapAttribute.Title] = workingBeatmap.BeatmapInfo.Metadata.Title;
-            //update artist
             valueDictionary[BeatmapAttribute.Artist] = workingBeatmap.BeatmapInfo.Metadata.Artist;
-            //update difficulty name
             valueDictionary[BeatmapAttribute.DifficultyName] = workingBeatmap.BeatmapInfo.DifficultyName;
-            //update mapper
             valueDictionary[BeatmapAttribute.Creator] = workingBeatmap.BeatmapInfo.Metadata.Author.Username;
-            //update Length
             valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(workingBeatmap.BeatmapInfo.Length).ToFormattedDuration();
-            //update Status
             valueDictionary[BeatmapAttribute.RankedStatus] = workingBeatmap.BeatmapInfo.Status.GetLocalisableDescription();
-            //update BPM
-            valueDictionary[BeatmapAttribute.BPM] = workingBeatmap.BeatmapInfo.BPM.ToString("F2");
+            valueDictionary[BeatmapAttribute.BPM] = workingBeatmap.BeatmapInfo.BPM.ToString(@"F2");
+            valueDictionary[BeatmapAttribute.CircleSize] = ((double)workingBeatmap.BeatmapInfo.Difficulty.CircleSize).ToString(@"F2");
+            valueDictionary[BeatmapAttribute.HPDrain] = ((double)workingBeatmap.BeatmapInfo.Difficulty.DrainRate).ToString(@"F2");
+            valueDictionary[BeatmapAttribute.Accuracy] = ((double)workingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty).ToString(@"F2");
+            valueDictionary[BeatmapAttribute.ApproachRate] = ((double)workingBeatmap.BeatmapInfo.Difficulty.ApproachRate).ToString(@"F2");
+            valueDictionary[BeatmapAttribute.StarRating] = workingBeatmap.BeatmapInfo.StarRating.ToString(@"F2");
         }
     }
 
