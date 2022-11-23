@@ -183,12 +183,18 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void start()
         {
+            if (selectedGroup.Value == null)
+                return;
+
             editorClock.Seek(selectedGroup.Value.Time);
             editorClock.Start();
         }
 
         private void reset()
         {
+            if (selectedGroup.Value == null)
+                return;
+
             editorClock.Stop();
             editorClock.Seek(selectedGroup.Value.Time);
         }
