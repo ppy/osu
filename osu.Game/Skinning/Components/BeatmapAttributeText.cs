@@ -20,7 +20,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Skinning.Components
 {
@@ -40,28 +39,23 @@ namespace osu.Game.Skinning.Components
 
         private readonly Dictionary<BeatmapAttribute, LocalisableString> valueDictionary = new Dictionary<BeatmapAttribute, LocalisableString>();
 
-        private static readonly ImmutableDictionary<BeatmapAttribute, LocalisableString> label_dictionary;
+        private static readonly ImmutableDictionary<BeatmapAttribute, LocalisableString> label_dictionary = new Dictionary<BeatmapAttribute, LocalisableString>
+        {
+            [BeatmapAttribute.CircleSize] = BeatmapsetsStrings.ShowStatsCs,
+            [BeatmapAttribute.Accuracy] = BeatmapsetsStrings.ShowStatsAccuracy,
+            [BeatmapAttribute.HPDrain] = BeatmapsetsStrings.ShowStatsDrain,
+            [BeatmapAttribute.ApproachRate] = BeatmapsetsStrings.ShowStatsAr,
+            [BeatmapAttribute.StarRating] = BeatmapsetsStrings.ShowStatsStars,
+            [BeatmapAttribute.Title] = EditorSetupStrings.Title,
+            [BeatmapAttribute.Artist] = EditorSetupStrings.Artist,
+            [BeatmapAttribute.DifficultyName] = EditorSetupStrings.DifficultyHeader,
+            [BeatmapAttribute.Creator] = EditorSetupStrings.Creator,
+            [BeatmapAttribute.Length] = ArtistStrings.TracklistLength.ToTitle(),
+            [BeatmapAttribute.RankedStatus] = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault,
+            [BeatmapAttribute.BPM] = BeatmapsetsStrings.ShowStatsBpm,
+        }.ToImmutableDictionary();
 
         private readonly OsuSpriteText text;
-
-        static BeatmapAttributeText()
-        {
-            label_dictionary = new Dictionary<BeatmapAttribute, LocalisableString>
-            {
-                [BeatmapAttribute.CircleSize] = BeatmapsetsStrings.ShowStatsCs,
-                [BeatmapAttribute.Accuracy] = BeatmapsetsStrings.ShowStatsAccuracy,
-                [BeatmapAttribute.HPDrain] = BeatmapsetsStrings.ShowStatsDrain,
-                [BeatmapAttribute.ApproachRate] = BeatmapsetsStrings.ShowStatsAr,
-                [BeatmapAttribute.StarRating] = BeatmapsetsStrings.ShowStatsStars,
-                [BeatmapAttribute.Title] = EditorSetupStrings.Title,
-                [BeatmapAttribute.Artist] = EditorSetupStrings.Artist,
-                [BeatmapAttribute.DifficultyName] = EditorSetupStrings.DifficultyHeader,
-                [BeatmapAttribute.Creator] = EditorSetupStrings.Creator,
-                [BeatmapAttribute.Length] = ArtistStrings.TracklistLength.ToTitle(),
-                [BeatmapAttribute.RankedStatus] = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault,
-                [BeatmapAttribute.BPM] = BeatmapsetsStrings.ShowStatsBpm,
-            }.ToImmutableDictionary();
-        }
 
         public BeatmapAttributeText()
         {
