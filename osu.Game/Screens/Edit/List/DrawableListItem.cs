@@ -23,7 +23,6 @@ namespace osu.Game.Screens.Edit.List
         private readonly OsuSpriteText text = new OsuSpriteText();
         private readonly Box box;
         private bool selected;
-        private Action<SelectionState> selectAll;
         private Action onDragAction { get; set; }
 
         public Action OnDragAction
@@ -32,11 +31,7 @@ namespace osu.Game.Screens.Edit.List
             set => onDragAction = value;
         }
 
-        public Action<SelectionState> SelectAll
-        {
-            get => selectAll;
-            set => selectAll = value;
-        }
+        public Action<SelectionState> SelectAll { get; set; }
 
         private Func<T, LocalisableString> getName;
 
@@ -54,7 +49,7 @@ namespace osu.Game.Screens.Edit.List
             : base(d)
         {
             getName = ((IDrawableListItem<T>)this).GetDefaultText;
-            selectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
+            SelectAll = ((IDrawableListItem<T>)this).SelectableOnStateChanged;
             onDragAction = () => { };
             text.Text = name;
             AutoSizeAxes = Axes.Both;
@@ -107,7 +102,7 @@ namespace osu.Game.Screens.Edit.List
             }
             else
             {
-                selectAll(SelectionState.NotSelected);
+                SelectAll(SelectionState.NotSelected);
                 Select(true);
             }
 

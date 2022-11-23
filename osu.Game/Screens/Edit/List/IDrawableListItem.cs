@@ -17,7 +17,6 @@ namespace osu.Game.Screens.Edit.List
         public Func<T, LocalisableString> GetName { get; set; }
         public Action OnDragAction { get; set; }
         public bool EnableSelection => typeof(T).GetInterfaces().Contains(typeof(IStateful<SelectionState>));
-        public Drawable GetDrawableListItem();
 
         public void UpdateItem();
 

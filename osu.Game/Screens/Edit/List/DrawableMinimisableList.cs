@@ -52,10 +52,10 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private readonly OsuCheckbox button;
-        private readonly Box box;
         public BindableBool Enabled { get; } = new BindableBool();
         public readonly DrawableList<T> List = new DrawableList<T>();
+
+        private readonly Box box;
 
         public DrawableMinimisableList()
         {
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Edit.List
                                 Height = 1f,
                                 Colour = new Colour4(255, 255, 0, 0.25f),
                             },
-                            button = new OsuCheckbox
+                            new OsuCheckbox
                             {
                                 LabelText = @"SkinnableContainer",
                                 Current = Enabled

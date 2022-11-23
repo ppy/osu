@@ -211,10 +211,10 @@ namespace osu.Game.Skinning.Editor
 
             layerSidebar.Add(layerSidebarSection = new EditorSidebarSection(@"Layer Editor"));
             layerSidebarSection.Clear();
-            InitLayerEditor();
+            initLayerEditor();
         }
 
-        private void InitLayerEditor()
+        private void initLayerEditor()
         {
             layerSidebarSection.Child = LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>();
             LayerSidebarList.GetName = t => ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)LayerSidebarList).GetDefaultText((Drawable)t.Item);
@@ -300,7 +300,7 @@ namespace osu.Game.Skinning.Editor
                 content.Child = blueprintContainer;
 
                 bool open = LayerSidebarList.Enabled.Value;
-                InitLayerEditor();
+                initLayerEditor();
                 LayerSidebarList.Enabled.Value = open;
 
                 LayerSidebarList.AddRange(blueprintContainer.SelectionBlueprints.Children);
