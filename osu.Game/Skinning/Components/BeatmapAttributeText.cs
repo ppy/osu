@@ -8,6 +8,8 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -18,6 +20,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Skinning.Components
 {
@@ -36,6 +39,7 @@ namespace osu.Game.Skinning.Components
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         private readonly Dictionary<BeatmapAttribute, LocalisableString> valueDictionary = new Dictionary<BeatmapAttribute, LocalisableString>();
+
         private static readonly ImmutableDictionary<BeatmapAttribute, LocalisableString> label_dictionary;
 
         private readonly OsuSpriteText text;
@@ -49,15 +53,13 @@ namespace osu.Game.Skinning.Components
                 [BeatmapAttribute.HPDrain] = BeatmapsetsStrings.ShowStatsDrain,
                 [BeatmapAttribute.ApproachRate] = BeatmapsetsStrings.ShowStatsAr,
                 [BeatmapAttribute.StarRating] = BeatmapsetsStrings.ShowStatsStars,
-                [BeatmapAttribute.Song] = EditorSetupStrings.Title,
+                [BeatmapAttribute.Title] = EditorSetupStrings.Title,
                 [BeatmapAttribute.Artist] = EditorSetupStrings.Artist,
-                [BeatmapAttribute.Difficulty] = EditorSetupStrings.DifficultyHeader,
-                //todo: is there a good alternative, to NotificationsOptionsMapping?
-                [BeatmapAttribute.Mapper] = AccountsStrings.NotificationsOptionsMapping,
-                [BeatmapAttribute.Length] = ArtistStrings.TracklistLength,
-                [BeatmapAttribute.Status] = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault,
+                [BeatmapAttribute.DifficultyName] = EditorSetupStrings.DifficultyHeader,
+                [BeatmapAttribute.Creator] = EditorSetupStrings.Creator,
+                [BeatmapAttribute.Length] = ArtistStrings.TracklistLength.ToTitle(),
+                [BeatmapAttribute.RankedStatus] = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault,
                 [BeatmapAttribute.BPM] = BeatmapsetsStrings.ShowStatsBpm,
-                [BeatmapAttribute.None] = BeatmapAttribute.None.ToString()
             }.ToImmutableDictionary();
         }
 
@@ -124,20 +126,19 @@ namespace osu.Game.Skinning.Components
             double sr = workingBeatmap.BeatmapInfo.StarRating;
             valueDictionary[BeatmapAttribute.StarRating] = sr.ToString("F2");
             //update song title
-            valueDictionary[BeatmapAttribute.Song] = workingBeatmap.BeatmapInfo.Metadata.Title;
+            valueDictionary[BeatmapAttribute.Title] = workingBeatmap.BeatmapInfo.Metadata.Title;
             //update artist
             valueDictionary[BeatmapAttribute.Artist] = workingBeatmap.BeatmapInfo.Metadata.Artist;
             //update difficulty name
-            valueDictionary[BeatmapAttribute.Difficulty] = workingBeatmap.BeatmapInfo.DifficultyName;
+            valueDictionary[BeatmapAttribute.DifficultyName] = workingBeatmap.BeatmapInfo.DifficultyName;
             //update mapper
-            valueDictionary[BeatmapAttribute.Mapper] = workingBeatmap.BeatmapInfo.Metadata.Author.Username;
+            valueDictionary[BeatmapAttribute.Creator] = workingBeatmap.BeatmapInfo.Metadata.Author.Username;
             //update Length
             valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(workingBeatmap.BeatmapInfo.Length).ToFormattedDuration();
             //update Status
-            valueDictionary[BeatmapAttribute.Status] = GetBetmapStatus(workingBeatmap.BeatmapInfo.Status);
+            valueDictionary[BeatmapAttribute.RankedStatus] = GetBetmapStatus(workingBeatmap.BeatmapInfo.Status);
             //update BPM
             valueDictionary[BeatmapAttribute.BPM] = workingBeatmap.BeatmapInfo.BPM.ToString("F2");
-            valueDictionary[BeatmapAttribute.None] = string.Empty;
         }
 
         public static LocalisableString GetBetmapStatus(BeatmapOnlineStatus status)
@@ -184,13 +185,12 @@ namespace osu.Game.Skinning.Components
         Accuracy,
         ApproachRate,
         StarRating,
-        Song,
+        Title,
         Artist,
-        Difficulty,
-        Mapper,
+        DifficultyName,
+        Creator,
         Length,
-        Status,
+        RankedStatus,
         BPM,
-        None,
     }
 }
