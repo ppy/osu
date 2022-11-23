@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Input;
@@ -36,12 +37,16 @@ namespace osu.Game.Tests.Visual.Settings
 
                 Children = new Drawable[]
                 {
-                    settings = new TabletSettings(tabletHandler)
+                    new OsuScrollContainer(Direction.Vertical)
                     {
-                        RelativeSizeAxes = Axes.None,
-                        Width = SettingsPanel.PANEL_WIDTH,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
+                        RelativeSizeAxes = Axes.Both,
+                        Child = settings = new TabletSettings(tabletHandler)
+                        {
+                            RelativeSizeAxes = Axes.None,
+                            Width = SettingsPanel.PANEL_WIDTH,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        }
                     }
                 };
             });
