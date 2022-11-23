@@ -93,25 +93,34 @@ namespace osu.Game.Skinning.Components
             valueDictionary[BeatmapAttribute.Creator] = workingBeatmap.BeatmapInfo.Metadata.Author.Username;
             valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(workingBeatmap.BeatmapInfo.Length).ToFormattedDuration();
             valueDictionary[BeatmapAttribute.RankedStatus] = workingBeatmap.BeatmapInfo.Status.GetLocalisableDescription();
-            valueDictionary[BeatmapAttribute.BPM] = workingBeatmap.BeatmapInfo.BPM.ToString(@"F2");
-            valueDictionary[BeatmapAttribute.CircleSize] = ((double)workingBeatmap.BeatmapInfo.Difficulty.CircleSize).ToString(@"F2");
-            valueDictionary[BeatmapAttribute.HPDrain] = ((double)workingBeatmap.BeatmapInfo.Difficulty.DrainRate).ToString(@"F2");
-            valueDictionary[BeatmapAttribute.Accuracy] = ((double)workingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty).ToString(@"F2");
-            valueDictionary[BeatmapAttribute.ApproachRate] = ((double)workingBeatmap.BeatmapInfo.Difficulty.ApproachRate).ToString(@"F2");
-            valueDictionary[BeatmapAttribute.StarRating] = workingBeatmap.BeatmapInfo.StarRating.ToString(@"F2");
+            valueDictionary[BeatmapAttribute.BPM] = workingBeatmap.BeatmapInfo.BPM.ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.CircleSize] = ((double)workingBeatmap.BeatmapInfo.Difficulty.CircleSize).ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.HPDrain] = ((double)workingBeatmap.BeatmapInfo.Difficulty.DrainRate).ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.Accuracy] = ((double)workingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty).ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.ApproachRate] = ((double)workingBeatmap.BeatmapInfo.Difficulty.ApproachRate).ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.StarRating] = workingBeatmap.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
         }
 
         private void updateLabel()
         {
-            string newText = Template.Value.Replace("{Label}", label_dictionary[Attribute.Value].ToString())
-                                     .Replace("{Value}", valueDictionary[Attribute.Value].ToString());
+            string numberedTemplate = Template.Value
+                                              .Replace("{", "{{")
+                                              .Replace("}", "}}")
+                                              .Replace(@"{{Label}}", "{0}")
+                                              .Replace(@"{{Value}}", $"{{{1 + (int)Attribute.Value}}}");
+
+            object?[] args = valueDictionary.OrderBy(pair => pair.Key)
+                                            .Select(pair => pair.Value)
+                                            .Prepend(label_dictionary[Attribute.Value])
+                                            .Cast<object?>()
+                                            .ToArray();
 
             foreach (var type in Enum.GetValues(typeof(BeatmapAttribute)).Cast<BeatmapAttribute>())
             {
-                newText = newText.Replace("{" + type + "}", valueDictionary[type].ToString());
+                numberedTemplate = numberedTemplate.Replace($"{{{{{type}}}}}", $"{{{1 + (int)type}}}");
             }
 
-            text.Text = newText;
+            text.Text = LocalisableString.Format(numberedTemplate, args);
         }
     }
 
