@@ -141,27 +141,15 @@ namespace osu.Game.Overlays.Chat
             }
 
             var staleMessages = chatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
+
             int count = staleMessages.Length - Channel.MAX_HISTORY;
 
             if (count > 0)
             {
-                void expireAndAdjustScroll(Drawable d)
-                {
-                    scroll.OffsetScrollPosition(-d.DrawHeight);
-                    d.Expire();
-                }
-
                 for (int i = 0; i < count; i++)
                     expireAndAdjustScroll(staleMessages[i]);
 
-                // remove all adjacent day separators after stale message removal
-                for (int i = 0; i < ChatLineFlow.Count - 1; i++)
-                {
-                    if (!(ChatLineFlow[i] is DaySeparator)) break;
-                    if (!(ChatLineFlow[i + 1] is DaySeparator)) break;
-
-                    expireAndAdjustScroll(ChatLineFlow[i]);
-                }
+                removeAdjacentDaySeparators();
             }
 
             // due to the scroll adjusts from old messages removal above, a scroll-to-end must be enforced,
@@ -199,7 +187,27 @@ namespace osu.Game.Overlays.Chat
                     ChatLineFlow.Remove(ds, true);
 
                 ChatLineFlow.Add(CreateDaySeparator(message.Timestamp));
+
+                removeAdjacentDaySeparators();
             }
+        }
+
+        private void removeAdjacentDaySeparators()
+        {
+            // remove all adjacent day separators after stale message removal
+            for (int i = 0; i < ChatLineFlow.Count - 1; i++)
+            {
+                if (!(ChatLineFlow[i] is DaySeparator)) break;
+                if (!(ChatLineFlow[i + 1] is DaySeparator)) break;
+
+                expireAndAdjustScroll(ChatLineFlow[i]);
+            }
+        }
+
+        private void expireAndAdjustScroll(Drawable d)
+        {
+            scroll.OffsetScrollPosition(-d.DrawHeight);
+            d.Expire();
         }
 
         private void messageRemoved(Message removed) => Schedule(() =>
