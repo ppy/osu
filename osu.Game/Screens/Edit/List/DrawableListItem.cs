@@ -150,6 +150,8 @@ namespace osu.Game.Screens.Edit.List
             SelectInternal(value);
         }
 
+        public void ApplyAction(Action<IDrawableListItem<T>> action) => action(this);
+
         public void SelectInternal(bool value)
         {
             if (value)

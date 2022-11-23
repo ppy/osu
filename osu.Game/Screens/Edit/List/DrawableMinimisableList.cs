@@ -118,6 +118,8 @@ namespace osu.Game.Screens.Edit.List
             List.Select(value);
         }
 
+        public void ApplyAction(Action<IDrawableListItem<T>> action) => List.ApplyAction(action);
+
         public void AddRange(IEnumerable<T>? drawables) => List.AddRange(drawables);
 
         // public void Add(DrawableListItem<T> drawableListItem) => List.Add(drawableListItem);

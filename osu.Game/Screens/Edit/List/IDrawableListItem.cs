@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Edit.List
         /// <param name="value">if this List Item should be selected or not</param>
         public void Select(bool value);
 
+        public void ApplyAction(Action<IDrawableListItem<T>> action);
+
         public static LocalisableString GetDefaultText(Drawable target)
         {
             Logger.Log("GetDefaultText with" + target + " target.");

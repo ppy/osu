@@ -139,6 +139,14 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
+        public void ApplyAction(Action<IDrawableListItem<T>> action)
+        {
+            foreach (var child in ListContainer.Children)
+            {
+                if(child is IDrawableListItem<T> item) item.ApplyAction(action);
+            }
+        }
+
         public void SelectInternal(bool value) => Select(value);
 
         protected override ScrollContainer<Drawable> CreateScrollContainer() => new OsuScrollContainer();
@@ -157,7 +165,7 @@ namespace osu.Game.Screens.Edit.List
         {
             foreach (RearrangeableListItem<T> element in ListContainer.Children)
             {
-                if (element is IDrawableListItem<T> item) action(item);
+                if (element is IDrawableListItem<T> item) item.ApplyAction(action);
             }
         }
     }
