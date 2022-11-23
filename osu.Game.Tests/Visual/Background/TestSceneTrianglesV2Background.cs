@@ -27,16 +27,24 @@ namespace osu.Game.Tests.Visual.Background
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(500),
+                    Size = new Vector2(500, 100),
                     Masking = true,
                     CornerRadius = 40,
-                    Child = triangles = new TrianglesV2
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        ColourTop = Color4.Red,
-                        ColourBottom = Color4.Orange
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Red
+                        },
+                        triangles = new TrianglesV2
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            ColourTop = Color4.White,
+                            ColourBottom = Color4.Red
+                        }
                     }
                 }
             });
