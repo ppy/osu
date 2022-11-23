@@ -127,10 +127,38 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestNoCrashOnTapWhenNoGroupSelected()
+        public void TestNoCrashesWhenNoGroupSelected()
         {
             AddStep("unset selected group", () => selectedGroup.Value = null);
             AddStep("press T to tap", () => InputManager.Key(Key.T));
+
+            AddStep("click tap button", () =>
+            {
+                control.ChildrenOfType<OsuButton>()
+                       .Last()
+                       .TriggerClick();
+            });
+
+            AddStep("click reset button", () =>
+            {
+                control.ChildrenOfType<OsuButton>()
+                       .First()
+                       .TriggerClick();
+            });
+
+            AddStep("adjust offset", () =>
+            {
+                var adjustOffsetButton = control.ChildrenOfType<TimingAdjustButton>().First();
+                InputManager.MoveMouseTo(adjustOffsetButton);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("adjust BPM", () =>
+            {
+                var adjustBPMButton = control.ChildrenOfType<TimingAdjustButton>().Last();
+                InputManager.MoveMouseTo(adjustBPMButton);
+                InputManager.Click(MouseButton.Left);
+            });
         }
 
         protected override void Dispose(bool isDisposing)
