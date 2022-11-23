@@ -120,17 +120,20 @@ namespace osu.Game.Online.Chat
             AddInternal(drawableChannel);
         }
 
-        public class ChatTextBox : FocusedTextBox
+        public class ChatTextBox : HistoryTextBox
         {
             protected override bool OnKeyDown(KeyDownEvent e)
             {
                 // Chat text boxes are generally used in places where they retain focus, but shouldn't block interaction with other
                 // elements on the same screen.
-                switch (e.Key)
+                if (!HoldFocus)
                 {
-                    case Key.Up:
-                    case Key.Down:
-                        return false;
+                    switch (e.Key)
+                    {
+                        case Key.Up:
+                        case Key.Down:
+                            return false;
+                    }
                 }
 
                 return base.OnKeyDown(e);
