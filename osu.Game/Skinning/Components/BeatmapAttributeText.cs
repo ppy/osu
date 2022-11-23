@@ -60,49 +60,32 @@ namespace osu.Game.Skinning.Components
         public BeatmapAttributeText()
         {
             AutoSizeAxes = Axes.Both;
+
             InternalChildren = new Drawable[]
             {
                 text = new OsuSpriteText
                 {
-                    Text = "BeatInfoDrawable",
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Font = OsuFont.Default.With(size: 40)
                 }
             };
-
-            foreach (var type in Enum.GetValues(typeof(BeatmapAttribute)).Cast<BeatmapAttribute>())
-            {
-                valueDictionary[type] = type.ToString();
-            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             Attribute.BindValueChanged(_ => updateLabel());
-            Template.BindValueChanged(f => updateLabel(), true);
+            Template.BindValueChanged(_ => updateLabel());
             beatmap.BindValueChanged(b =>
             {
-                UpdateBeatmapContent(b.NewValue);
+                updateBeatmapContent(b.NewValue);
                 updateLabel();
             }, true);
         }
 
-        private void updateLabel()
-        {
-            string newText = Template.Value.Replace("{Label}", label_dictionary[Attribute.Value].ToString())
-                                     .Replace("{Value}", valueDictionary[Attribute.Value].ToString());
-
-            foreach (var type in Enum.GetValues(typeof(BeatmapAttribute)).Cast<BeatmapAttribute>())
-            {
-                newText = newText.Replace("{" + type + "}", valueDictionary[type].ToString());
-            }
-
-            text.Text = newText;
-        }
-
-        public void UpdateBeatmapContent(WorkingBeatmap workingBeatmap)
+        private void updateBeatmapContent(WorkingBeatmap workingBeatmap)
         {
             valueDictionary[BeatmapAttribute.Title] = workingBeatmap.BeatmapInfo.Metadata.Title;
             valueDictionary[BeatmapAttribute.Artist] = workingBeatmap.BeatmapInfo.Metadata.Artist;
@@ -116,6 +99,19 @@ namespace osu.Game.Skinning.Components
             valueDictionary[BeatmapAttribute.Accuracy] = ((double)workingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty).ToString(@"F2");
             valueDictionary[BeatmapAttribute.ApproachRate] = ((double)workingBeatmap.BeatmapInfo.Difficulty.ApproachRate).ToString(@"F2");
             valueDictionary[BeatmapAttribute.StarRating] = workingBeatmap.BeatmapInfo.StarRating.ToString(@"F2");
+        }
+
+        private void updateLabel()
+        {
+            string newText = Template.Value.Replace("{Label}", label_dictionary[Attribute.Value].ToString())
+                                     .Replace("{Value}", valueDictionary[Attribute.Value].ToString());
+
+            foreach (var type in Enum.GetValues(typeof(BeatmapAttribute)).Cast<BeatmapAttribute>())
+            {
+                newText = newText.Replace("{" + type + "}", valueDictionary[type].ToString());
+            }
+
+            text.Text = newText;
         }
     }
 
