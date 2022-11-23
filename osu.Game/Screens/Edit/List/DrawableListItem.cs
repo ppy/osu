@@ -100,6 +100,10 @@ namespace osu.Game.Screens.Edit.List
             {
                 toggleSelection();
             }
+            else if (e.ShiftPressed && e.Button == MouseButton.Left)
+            {
+                Select(true);
+            }
             else
             {
                 SelectAll(false);
