@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.List
             set => onDragAction = value;
         }
 
-        public Action<bool> SelectAll { get; set; }
+        public Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
 
         private Func<T, LocalisableString> getName;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.List
             : base(d)
         {
             getName = ((IDrawableListItem<T>)this).GetDefaultText;
-            SelectAll = SelectInternal;
+            ApplyAll = e => e(this);
             onDragAction = () => { };
             text.Text = name;
             AutoSizeAxes = Axes.Both;
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Edit.List
             }
             else
             {
-                SelectAll(false);
+                ApplyAll(element => element.Select(false));
                 Select(true);
             }
 
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Edit.List
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            SelectAll(false);
+            ApplyAll(element => element.Select(false));
             Select(true);
             return base.OnDragStart(e);
         }

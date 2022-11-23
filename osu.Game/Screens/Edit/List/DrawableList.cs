@@ -26,17 +26,7 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private Action<bool> selectAll;
-
-        public Action<bool> SelectAll
-        {
-            get => selectAll;
-            set
-            {
-                selectAll = value;
-                UpdateItem();
-            }
-        }
+        public Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
 
         private Func<T, LocalisableString> getName;
 
@@ -53,7 +43,7 @@ namespace osu.Game.Screens.Edit.List
         public DrawableList()
         {
             getName = ((IDrawableListItem<T>)this).GetDefaultText;
-            selectAll = SelectInternal;
+            ApplyAll = applyAll;
             onDragAction = () => { };
 
             RelativeSizeAxes = Axes.X;
@@ -109,7 +99,7 @@ namespace osu.Game.Screens.Edit.List
             {
                 if (item is IRearrangableDrawableListItem<T> rearrangableItem)
                 {
-                    rearrangableItem.SelectAll = selectAll;
+                    rearrangableItem.ApplyAll = ApplyAll;
                     rearrangableItem.GetName = getName;
                     rearrangableItem.OnDragAction = OnDragAction;
                     rearrangableItem.UpdateItem();
@@ -156,11 +146,19 @@ namespace osu.Game.Screens.Edit.List
         protected override RearrangeableListItem<T> CreateDrawable(T item)
         {
             var drawable = new DrawableListItem<T>(item);
-            drawable.SelectAll = SelectAll;
+            drawable.ApplyAll = ApplyAll;
             drawable.GetName = getName;
             drawable.OnDragAction = OnDragAction;
             // drawable.UpdateItem();
             return drawable.GetRearrangeableListItem();
+        }
+
+        private void applyAll(Action<IDrawableListItem<T>> action)
+        {
+            foreach (RearrangeableListItem<T> element in ListContainer.Children)
+            {
+                if (element is IDrawableListItem<T> item) action(item);
+            }
         }
     }
 }

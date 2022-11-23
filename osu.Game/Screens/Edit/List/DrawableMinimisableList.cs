@@ -28,10 +28,10 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        public Action<bool> SelectAll
+        public Action<Action<IDrawableListItem<T>>> ApplyAll
         {
-            get => List.SelectAll;
-            set => List.SelectAll = value;
+            get => List.ApplyAll;
+            set => List.ApplyAll = value;
         }
 
         private Func<T, LocalisableString> getName;
@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Edit.List
         public void UpdateItem()
         {
             List.GetName = GetName;
-            List.SelectAll = SelectAll;
+            List.ApplyAll = ApplyAll;
             List.UpdateItem();
         }
 

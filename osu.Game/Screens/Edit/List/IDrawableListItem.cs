@@ -13,9 +13,9 @@ namespace osu.Game.Screens.Edit.List
 {
     public interface IDrawableListItem<T>
     {
-        //Selects all items of all items in connected lists, if the param is true.
-        //Else unselects them
-        public Action<bool> SelectAll { get; set; }
+        //Applied a function onto all elements in this list.
+        //(If there are nested lists, this will always affect EVERY item)
+        public Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
         public Func<T, LocalisableString> GetName { get; set; }
         public Action OnDragAction { get; set; }
         public bool EnableSelection => typeof(T).GetInterfaces().Contains(typeof(IStateful<SelectionState>));
