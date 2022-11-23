@@ -16,7 +16,7 @@ namespace osu.Game.Skinning.Components
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Displayed Text", "What text should be displayed")]
+        [SettingSource("Text", "The text to be displayed.")]
         public Bindable<string> Text { get; } = new Bindable<string>("Circles!");
 
         public TextElement()
