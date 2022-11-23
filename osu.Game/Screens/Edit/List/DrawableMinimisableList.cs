@@ -34,16 +34,10 @@ namespace osu.Game.Screens.Edit.List
             set => List.ApplyAll = value;
         }
 
-        private Func<T, LocalisableString> getName;
-
         public Func<T, LocalisableString> GetName
         {
-            get => getName;
-            set
-            {
-                getName = value;
-                List.GetName = value;
-            }
+            get => List.GetName;
+            set => List.GetName = value;
         }
 
         public BindableBool Enabled { get; } = new BindableBool();
@@ -53,7 +47,6 @@ namespace osu.Game.Screens.Edit.List
 
         public DrawableMinimisableList()
         {
-            getName = ((IDrawableListItem<T>)this).GetDefaultText;
             onDragAction = () => { };
 
             RelativeSizeAxes = Axes.X;

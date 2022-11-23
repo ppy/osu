@@ -28,10 +28,10 @@ namespace osu.Game.Screens.Edit.List
         /// <param name="value">if this List Item should be selected or not</param>
         public void Select(bool value);
 
-        public LocalisableString GetDefaultText(Drawable target)
+        public static LocalisableString GetDefaultText(Drawable target)
         {
             Logger.Log("GetDefaultText with" + target + " target.");
-            return target.Name.Equals(string.Empty) ? (target.GetType().DeclaringType ?? target.GetType()).Name : target.Name;
+            return string.IsNullOrEmpty(target.Name) ? (target.GetType().DeclaringType ?? target.GetType()).Name : target.Name;
         }
 
         /// <summary>

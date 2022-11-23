@@ -217,7 +217,7 @@ namespace osu.Game.Skinning.Editor
         private void initLayerEditor()
         {
             layerSidebarSection.Child = LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>();
-            LayerSidebarList.GetName = t => ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)LayerSidebarList).GetDefaultText((Drawable)t.Item);
+            LayerSidebarList.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
             LayerSidebarList.OnDragAction = () =>
             {
                 foreach (var listItem in LayerSidebarList.List.Items)

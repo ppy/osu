@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.List
 
         public DrawableList()
         {
-            getName = ((IDrawableListItem<T>)this).GetDefaultText;
+            getName = IDrawableListItem<T>.GetDefaultText;
             ApplyAll = applyAll;
             onDragAction = () => { };
 

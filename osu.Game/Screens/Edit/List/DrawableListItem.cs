@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.List
         internal DrawableListItem(T d, LocalisableString name)
             : base(d)
         {
-            getName = ((IDrawableListItem<T>)this).GetDefaultText;
+            getName = IDrawableListItem<T>.GetDefaultText;
             ApplyAll = e => e(this);
             onDragAction = () => { };
             text.Text = name;
