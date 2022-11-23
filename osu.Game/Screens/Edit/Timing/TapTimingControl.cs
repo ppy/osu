@@ -201,6 +201,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void adjustOffset(double adjust)
         {
+            if (selectedGroup.Value == null)
+                return;
+
             bool wasAtStart = editorClock.CurrentTimeAccurate == selectedGroup.Value.Time;
 
             // VERY TEMPORARY
@@ -222,7 +225,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void adjustBpm(double adjust)
         {
-            var timing = selectedGroup.Value.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
+            var timing = selectedGroup.Value?.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
 
             if (timing == null)
                 return;
