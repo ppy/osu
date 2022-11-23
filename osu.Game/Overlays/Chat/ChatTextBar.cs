@@ -100,6 +100,7 @@ namespace osu.Game.Overlays.Chat
                                 Padding = new MarginPadding { Right = 5 },
                                 Child = chatTextBox = new ChatTextBox
                                 {
+                                    LengthLimit = 100,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     RelativeSizeAxes = Axes.X,
