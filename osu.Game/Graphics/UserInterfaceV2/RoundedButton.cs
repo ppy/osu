@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -21,7 +22,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override float HoverLayerFinalAlpha => 0;
 
-        private Color4 triangleGradientSecondColour = Color4.Transparent;
+        private Color4? triangleGradientSecondColour;
 
         public override float Height
         {
@@ -53,7 +54,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             // Not sure this is the correct direction, but we haven't decided on an `OverlayColourProvider` stand-in yet.
             // This is a better default. See `SettingsButton` for an override which uses `OverlayColourProvider`.
             DefaultBackgroundColour = overlayColourProvider?.Colour3 ?? colours.Blue3;
-            triangleGradientSecondColour = overlayColourProvider?.Colour1 ?? colours.Blue3.Lighten(0.2f);
+            triangleGradientSecondColour ??= overlayColourProvider?.Colour1 ?? colours.Blue3.Lighten(0.2f);
         }
 
         protected override void LoadComplete()
@@ -78,13 +79,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
             if (triangles == null)
                 return;
 
-            triangles.ColourTop = triangleGradientSecondColour;
+            Debug.Assert(triangleGradientSecondColour != null);
+
+            triangles.ColourTop = triangleGradientSecondColour.Value;
             triangles.ColourBottom = BackgroundColour;
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            Background.FadeColour(triangleGradientSecondColour, 300, Easing.OutQuint);
+            Debug.Assert(triangleGradientSecondColour != null);
+
+            Background.FadeColour(triangleGradientSecondColour.Value, 300, Easing.OutQuint);
             return base.OnHover(e);
         }
 

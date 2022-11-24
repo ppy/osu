@@ -275,7 +275,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = DrawableRoomPlaylistItem.HEIGHT
                                                         },
-                                                        new PurpleRoundedButton
+                                                        new RoundedButton
                                                         {
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = 40,
