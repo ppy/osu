@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies = new DrawableRulesetDependencies(Ruleset, base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
