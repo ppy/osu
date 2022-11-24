@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                     new SettingsButton
                     {
-                        Text = "Test button",
+                        Text = "Test settings button",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Enabled = { BindTarget = enabled },
