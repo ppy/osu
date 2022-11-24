@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class DrawableGameType : CircularContainer, IHasTooltip
+    public partial class DrawableGameType : CircularContainer, IHasTooltip
     {
         private readonly MatchType type;
 
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             }
         }
 
-        private class VersusRow : FillFlowContainer
+        private partial class VersusRow : FillFlowContainer
         {
             public VersusRow(Color4 first, Color4 second, float size)
             {

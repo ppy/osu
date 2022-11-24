@@ -13,7 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class ProfileSubsection : FillFlowContainer
+    public abstract partial class ProfileSubsection : FillFlowContainer
     {
         protected readonly Bindable<APIUser> User = new Bindable<APIUser>();
 

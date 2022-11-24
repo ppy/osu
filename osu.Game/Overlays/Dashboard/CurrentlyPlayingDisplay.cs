@@ -30,7 +30,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard
 {
-    internal class CurrentlyPlayingDisplay : CompositeDrawable
+    internal partial class CurrentlyPlayingDisplay : CompositeDrawable
     {
         private const float search_textbox_height = 40;
         private const float padding = 10;
@@ -153,7 +153,7 @@ namespace osu.Game.Overlays.Dashboard
                 panel.Origin = Anchor.TopCentre;
             });
 
-        public class PlayingUserPanel : CompositeDrawable, IFilterable
+        public partial class PlayingUserPanel : CompositeDrawable, IFilterable
         {
             public readonly APIUser User;
 

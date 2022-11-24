@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
-    public class DrawableMatchRoom : DrawableRoom
+    public partial class DrawableMatchRoom : DrawableRoom
     {
         public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
         public Action OnEdit;
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected override Drawable CreateBackground() => background = new BackgroundSprite();
 
-        private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
+        private partial class BackgroundSprite : UpdateableBeatmapBackgroundSprite
         {
             protected override double LoadDelay => 0;
         }

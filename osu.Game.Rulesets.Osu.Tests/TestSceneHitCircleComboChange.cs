@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneHitCircleComboChange : TestSceneHitCircle
+    public partial class TestSceneHitCircleComboChange : TestSceneHitCircle
     {
         private readonly Bindable<int> comboIndex = new Bindable<int>();
 

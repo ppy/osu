@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    public class StablePathSelectScreen : TournamentScreen
+    public partial class StablePathSelectScreen : TournamentScreen
     {
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }

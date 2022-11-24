@@ -28,7 +28,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
+    public partial class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
         public string IconTexture => "Icons/Hexacons/music";
         public LocalisableString Title => NowPlayingStrings.HeaderTitle;
@@ -356,7 +356,7 @@ namespace osu.Game.Overlays
                 musicController.TrackChanged -= trackChanged;
         }
 
-        private class MusicIconButton : IconButton
+        private partial class MusicIconButton : IconButton
         {
             public MusicIconButton()
             {
@@ -380,7 +380,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class Background : BufferedContainer
+        private partial class Background : BufferedContainer
         {
             private readonly Sprite sprite;
             private readonly WorkingBeatmap beatmap;
@@ -419,7 +419,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class DragContainer : Container
+        private partial class DragContainer : Container
         {
             protected override bool OnDragStart(DragStartEvent e)
             {
@@ -443,7 +443,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class HoverableProgressBar : ProgressBar
+        private partial class HoverableProgressBar : ProgressBar
         {
             public HoverableProgressBar()
                 : base(true)

@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayTitle : CompositeDrawable, INamedOverlayComponent
+    public abstract partial class OverlayTitle : CompositeDrawable, INamedOverlayComponent
     {
         public const float ICON_SIZE = 30;
 
@@ -69,7 +69,7 @@ namespace osu.Game.Overlays
             };
         }
 
-        private class OverlayTitleIcon : Sprite
+        private partial class OverlayTitleIcon : Sprite
         {
             private readonly string textureName;
 

@@ -10,7 +10,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public abstract class CreateRoomButton : PurpleTriangleButton, IKeyBindingHandler<PlatformAction>
+    public abstract partial class CreateRoomButton : PurpleTriangleButton, IKeyBindingHandler<PlatformAction>
     {
         [BackgroundDependencyLoader]
         private void load()

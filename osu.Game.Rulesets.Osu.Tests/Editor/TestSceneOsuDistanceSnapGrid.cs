@@ -27,7 +27,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneOsuDistanceSnapGrid : OsuManualInputManagerTestScene
+    public partial class TestSceneOsuDistanceSnapGrid : OsuManualInputManagerTestScene
     {
         private const float beat_length = 100;
 
@@ -217,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             return Precision.AlmostEquals(expectedDistance, Vector2.Distance(snappedPosition, grid_position));
         });
 
-        private class SnappingCursorContainer : CompositeDrawable
+        private partial class SnappingCursorContainer : CompositeDrawable
         {
             public Func<Vector2, Vector2> GetSnapPosition;
 

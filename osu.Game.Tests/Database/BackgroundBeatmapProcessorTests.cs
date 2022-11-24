@@ -15,7 +15,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Database
 {
     [HeadlessTest]
-    public class BackgroundBeatmapProcessorTests : OsuTestScene, ILocalUserPlayInfo
+    public partial class BackgroundBeatmapProcessorTests : OsuTestScene, ILocalUserPlayInfo
     {
         public IBindable<bool> IsPlaying => isPlaying;
 
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Database
             });
         }
 
-        public class TestBackgroundBeatmapProcessor : BackgroundBeatmapProcessor
+        public partial class TestBackgroundBeatmapProcessor : BackgroundBeatmapProcessor
         {
             protected override int TimeToSleepDuringGameplay => 10;
         }

@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModMuted : OsuModTestScene
+    public partial class TestSceneOsuModMuted : OsuModTestScene
     {
         /// <summary>
         /// Ensures that a final volume combo of 0 (i.e. "always muted" mode) constantly plays metronome and completely mutes track.

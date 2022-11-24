@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableTargetContainer : SkinReloadableDrawable, ISkinnableTarget
+    public partial class SkinnableTargetContainer : SkinReloadableDrawable, ISkinnableTarget
     {
         private SkinnableTargetComponentsContainer? content;
 

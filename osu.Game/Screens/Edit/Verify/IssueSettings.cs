@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    public class IssueSettings : EditorRoundedScreenSettings
+    public partial class IssueSettings : EditorRoundedScreenSettings
     {
         protected override IReadOnlyList<Drawable> CreateSections() => new Drawable[]
         {

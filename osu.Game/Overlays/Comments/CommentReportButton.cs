@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class CommentReportButton : CompositeDrawable, IHasPopover
+    public partial class CommentReportButton : CompositeDrawable, IHasPopover
     {
         private readonly Comment comment;
 

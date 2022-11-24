@@ -15,7 +15,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsButton : RoundedButton, IHasTooltip
+    public partial class SettingsButton : RoundedButton, IHasTooltip
     {
         public SettingsButton()
         {

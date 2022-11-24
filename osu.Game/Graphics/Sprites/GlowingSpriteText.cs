@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public class GlowingSpriteText : Container, IHasText
+    public partial class GlowingSpriteText : Container, IHasText
     {
         private readonly OsuSpriteText spriteText, blurredText;
 

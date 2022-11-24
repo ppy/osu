@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
     /// A sprite which is displayed within the playfield, but historically was not considered part of the playfield.
     /// Performs scale adjustment to undo the scale applied by <see cref="PlayfieldAdjustmentContainer"/> (osu! ruleset specifically).
     /// </summary>
-    public class NonPlayfieldSprite : Sprite
+    public partial class NonPlayfieldSprite : Sprite
     {
         public override Texture? Texture
         {

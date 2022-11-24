@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneTopLocalRank : OsuTestScene
+    public partial class TestSceneTopLocalRank : OsuTestScene
     {
         private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager = null!;

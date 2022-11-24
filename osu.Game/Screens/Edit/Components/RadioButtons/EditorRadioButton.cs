@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
-    public class EditorRadioButton : OsuButton, IHasTooltip
+    public partial class EditorRadioButton : OsuButton, IHasTooltip
     {
         /// <summary>
         /// Invoked when this <see cref="EditorRadioButton"/> has been selected.

@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class SelectionBoxRotationHandle : SelectionBoxDragHandle, IHasTooltip
+    public partial class SelectionBoxRotationHandle : SelectionBoxDragHandle, IHasTooltip
     {
         public Action<float> HandleRotate { get; set; }
 

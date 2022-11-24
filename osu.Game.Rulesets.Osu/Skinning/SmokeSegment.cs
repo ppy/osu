@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
-    public abstract class SmokeSegment : Drawable, ITexturedShaderDrawable
+    public abstract partial class SmokeSegment : Drawable, ITexturedShaderDrawable
     {
         // fade anim values
         private const double initial_fade_out_duration = 4000;

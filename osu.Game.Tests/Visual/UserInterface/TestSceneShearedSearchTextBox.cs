@@ -12,7 +12,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneShearedSearchTextBox : OsuTestScene
+    public partial class TestSceneShearedSearchTextBox : OsuTestScene
     {
         [Test]
         public void TestAllColourSchemes()

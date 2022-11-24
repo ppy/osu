@@ -12,7 +12,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class RoundedButton : OsuButton, IFilterable
+    public partial class RoundedButton : OsuButton, IFilterable
     {
         public override float Height
         {

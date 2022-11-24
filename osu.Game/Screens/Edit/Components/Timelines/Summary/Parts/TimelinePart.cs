@@ -14,14 +14,14 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
-    public class TimelinePart : TimelinePart<Drawable>
+    public partial class TimelinePart : TimelinePart<Drawable>
     {
     }
 
     /// <summary>
     /// Represents a part of the summary timeline..
     /// </summary>
-    public class TimelinePart<T> : Container<T> where T : Drawable
+    public partial class TimelinePart<T> : Container<T> where T : Drawable
     {
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 

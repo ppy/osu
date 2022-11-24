@@ -16,7 +16,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
-    public class Footer : Container
+    public partial class Footer : Container
     {
         private readonly Box modeLight;
 

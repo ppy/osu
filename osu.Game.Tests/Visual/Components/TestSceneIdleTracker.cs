@@ -14,7 +14,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Components
 {
     [TestFixture]
-    public class TestSceneIdleTracker : OsuManualInputManagerTestScene
+    public partial class TestSceneIdleTracker : OsuManualInputManagerTestScene
     {
         private IdleTrackingBox box1;
         private IdleTrackingBox box2;
@@ -154,7 +154,7 @@ namespace osu.Game.Tests.Visual.Components
             AddUntilStep("wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
         }
 
-        private class IdleTrackingBox : CompositeDrawable
+        private partial class IdleTrackingBox : CompositeDrawable
         {
             private readonly IdleTracker idleTracker;
 

@@ -26,7 +26,7 @@ using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class HeaderDownloadButton : CompositeDrawable, IHasTooltip
+    public partial class HeaderDownloadButton : CompositeDrawable, IHasTooltip
     {
         private const int text_size = 12;
 

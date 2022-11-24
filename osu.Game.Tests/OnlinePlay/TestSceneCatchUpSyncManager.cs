@@ -16,7 +16,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.OnlinePlay
 {
     [HeadlessTest]
-    public class TestSceneCatchUpSyncManager : OsuTestScene
+    public partial class TestSceneCatchUpSyncManager : OsuTestScene
     {
         private GameplayClockContainer master;
         private SpectatorSyncManager syncManager;

@@ -26,7 +26,7 @@ using osuTK;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(FirstRunOverlayImportFromStableScreenStrings), nameof(FirstRunOverlayImportFromStableScreenStrings.Header))]
-    public class ScreenImportFromStable : FirstRunSetupScreen
+    public partial class ScreenImportFromStable : FirstRunSetupScreen
     {
         private static readonly Vector2 button_size = new Vector2(400, 50);
 
@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 c.Current.Disabled = !allow;
         }
 
-        private class ImportCheckbox : SettingsCheckbox
+        private partial class ImportCheckbox : SettingsCheckbox
         {
             public readonly StableContent StableContent;
 
@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             }
         }
 
-        internal class StableLocatorLabelledTextBox : LabelledTextBoxWithPopover, ICanAcceptFiles
+        internal partial class StableLocatorLabelledTextBox : LabelledTextBoxWithPopover, ICanAcceptFiles
         {
             [Resolved]
             private LegacyImportManager legacyImportManager { get; set; } = null!;
@@ -245,7 +245,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             public override Popover GetPopover() => new DirectoryChooserPopover(currentDirectory);
 
-            private class DirectoryChooserPopover : OsuPopover
+            private partial class DirectoryChooserPopover : OsuPopover
             {
                 public DirectoryChooserPopover(Bindable<DirectoryInfo?> currentDirectory)
                 {

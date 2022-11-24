@@ -11,7 +11,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class BindingSettings : SettingsSubsection
+    public partial class BindingSettings : SettingsSubsection
     {
         protected override LocalisableString Header => BindingSettingsStrings.ShortcutAndGameplayBindings;
 

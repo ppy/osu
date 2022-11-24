@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public class LogoAnimation : Sprite
+    public partial class LogoAnimation : Sprite
     {
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)

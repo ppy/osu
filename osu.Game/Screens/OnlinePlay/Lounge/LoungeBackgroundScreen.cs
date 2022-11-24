@@ -8,7 +8,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
-    public class LoungeBackgroundScreen : OnlinePlayBackgroundScreen
+    public partial class LoungeBackgroundScreen : OnlinePlayBackgroundScreen
     {
         public readonly Bindable<Room?> SelectedRoom = new Bindable<Room?>();
         private readonly BindableList<PlaylistItem> playlist = new BindableList<PlaylistItem>();

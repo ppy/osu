@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class HeaderButton : TriangleButton
+    public partial class HeaderButton : TriangleButton
     {
         public HeaderButton()
         {

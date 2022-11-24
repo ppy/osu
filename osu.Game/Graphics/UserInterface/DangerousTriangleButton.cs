@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DangerousTriangleButton : TriangleButton
+    public partial class DangerousTriangleButton : TriangleButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

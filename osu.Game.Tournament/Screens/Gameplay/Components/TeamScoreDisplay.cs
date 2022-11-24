@@ -13,7 +13,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
-    public class TeamScoreDisplay : CompositeDrawable
+    public partial class TeamScoreDisplay : CompositeDrawable
     {
         private readonly TeamColour teamColour;
 

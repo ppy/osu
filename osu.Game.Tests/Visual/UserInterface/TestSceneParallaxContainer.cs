@@ -10,7 +10,7 @@ using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneParallaxContainer : OsuTestScene
+    public partial class TestSceneParallaxContainer : OsuTestScene
     {
         public TestSceneParallaxContainer()
         {

@@ -12,7 +12,7 @@ using osu.Game.Overlays.Settings.Sections.General;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class GeneralSection : SettingsSection
+    public partial class GeneralSection : SettingsSection
     {
         [Resolved(CanBeNull = true)]
         private FirstRunSetupOverlay firstRunSetupOverlay { get; set; }

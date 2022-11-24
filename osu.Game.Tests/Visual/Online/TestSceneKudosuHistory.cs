@@ -16,7 +16,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneKudosuHistory : OsuTestScene
+    public partial class TestSceneKudosuHistory : OsuTestScene
     {
         private readonly Box background;
 

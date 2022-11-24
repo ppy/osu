@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class ArgonTickPiece : CompositeDrawable
+    public partial class ArgonTickPiece : CompositeDrawable
     {
         private readonly Bindable<bool> isFirstTick = new Bindable<bool>();
 

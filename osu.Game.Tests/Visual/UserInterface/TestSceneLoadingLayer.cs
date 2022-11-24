@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLoadingLayer : OsuTestScene
+    public partial class TestSceneLoadingLayer : OsuTestScene
     {
         private TestLoadingLayer overlay;
 
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("hide", () => overlay.Hide());
         }
 
-        private class TestLoadingLayer : LoadingLayer
+        private partial class TestLoadingLayer : LoadingLayer
         {
             public new Box BackgroundDimLayer => base.BackgroundDimLayer;
 

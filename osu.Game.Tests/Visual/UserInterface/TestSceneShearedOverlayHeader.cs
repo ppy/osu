@@ -12,7 +12,7 @@ using osu.Game.Overlays;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneShearedOverlayHeader : OsuTestScene
+    public partial class TestSceneShearedOverlayHeader : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);

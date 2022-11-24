@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class TopHeaderContainer : CompositeDrawable
+    public partial class TopHeaderContainer : CompositeDrawable
     {
         private const float avatar_size = 110;
 
@@ -201,7 +201,7 @@ namespace osu.Game.Overlays.Profile.Header
             }
         }
 
-        private class UserStatsLine : Container
+        private partial class UserStatsLine : Container
         {
             public UserStatsLine(LocalisableString left, LocalisableString right)
             {

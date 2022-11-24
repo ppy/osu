@@ -10,7 +10,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class CommaSeparatedScoreCounter : RollingCounter<double>
+    public abstract partial class CommaSeparatedScoreCounter : RollingCounter<double>
     {
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;

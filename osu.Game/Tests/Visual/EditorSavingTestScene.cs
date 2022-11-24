@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// Tests the general expected flow of creating a new beatmap, saving it, then loading it back from song select.
     /// </summary>
-    public abstract class EditorSavingTestScene : OsuGameTestScene
+    public abstract partial class EditorSavingTestScene : OsuGameTestScene
     {
         protected Editor Editor => Game.ChildrenOfType<Editor>().FirstOrDefault();
 

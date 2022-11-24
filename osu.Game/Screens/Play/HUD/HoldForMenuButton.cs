@@ -25,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class HoldForMenuButton : FillFlowContainer
+    public partial class HoldForMenuButton : FillFlowContainer
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
+        private partial class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
         {
             private SpriteIcon icon;
             private CircularProgress circularProgress;

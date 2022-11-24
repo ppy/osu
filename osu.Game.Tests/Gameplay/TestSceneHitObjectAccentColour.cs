@@ -25,7 +25,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneHitObjectAccentColour : OsuTestScene
+    public partial class TestSceneHitObjectAccentColour : OsuTestScene
     {
         [Resolved]
         private OsuConfigManager config { get; set; }
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("combo colour is green", () => hitObject.AccentColour.Value == Color4.Green);
         }
 
-        private class TestDrawableHitObject : DrawableHitObject<TestHitObjectWithCombo>
+        private partial class TestDrawableHitObject : DrawableHitObject<TestHitObjectWithCombo>
         {
             public TestDrawableHitObject()
                 : base(new TestHitObjectWithCombo())

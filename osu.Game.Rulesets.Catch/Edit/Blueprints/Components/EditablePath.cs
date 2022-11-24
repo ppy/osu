@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
-    public abstract class EditablePath : CompositeDrawable
+    public abstract partial class EditablePath : CompositeDrawable
     {
         public int PathId => path.InvalidationID;
 

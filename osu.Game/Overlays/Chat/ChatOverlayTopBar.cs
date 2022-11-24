@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatOverlayTopBar : Container
+    public partial class ChatOverlayTopBar : Container
     {
         private Box background = null!;
 

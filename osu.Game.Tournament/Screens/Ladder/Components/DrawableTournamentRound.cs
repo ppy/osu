@@ -12,7 +12,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class DrawableTournamentRound : CompositeDrawable
+    public partial class DrawableTournamentRound : CompositeDrawable
     {
         [UsedImplicitly]
         private readonly Bindable<string> name;

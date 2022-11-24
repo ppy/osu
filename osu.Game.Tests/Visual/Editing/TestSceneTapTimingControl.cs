@@ -23,7 +23,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneTapTimingControl : EditorClockTestScene
+    public partial class TestSceneTapTimingControl : EditorClockTestScene
     {
         private EditorBeatmap editorBeatmap => editorBeatmapContainer?.EditorBeatmap;
 

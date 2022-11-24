@@ -13,7 +13,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class NotSupporterPlaceholder : Container
+    public partial class NotSupporterPlaceholder : Container
     {
         public NotSupporterPlaceholder()
         {

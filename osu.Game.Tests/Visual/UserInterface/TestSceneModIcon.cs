@@ -11,7 +11,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneModIcon : OsuTestScene
+    public partial class TestSceneModIcon : OsuTestScene
     {
         [Test]
         public void TestShowAllMods()

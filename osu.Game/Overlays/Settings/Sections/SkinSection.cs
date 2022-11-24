@@ -24,7 +24,7 @@ using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class SkinSection : SettingsSection
+    public partial class SkinSection : SettingsSection
     {
         private SkinSettingsDropdown skinDropdown;
 
@@ -123,17 +123,17 @@ namespace osu.Game.Overlays.Settings.Sections
             realmSubscription?.Dispose();
         }
 
-        private class SkinSettingsDropdown : SettingsDropdown<Live<SkinInfo>>
+        private partial class SkinSettingsDropdown : SettingsDropdown<Live<SkinInfo>>
         {
             protected override OsuDropdown<Live<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
 
-            private class SkinDropdownControl : DropdownControl
+            private partial class SkinDropdownControl : DropdownControl
             {
                 protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
             }
         }
 
-        public class ExportSkinButton : SettingsButton
+        public partial class ExportSkinButton : SettingsButton
         {
             [Resolved]
             private SkinManager skins { get; set; }
@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        public class DeleteSkinButton : DangerousSettingsButton
+        public partial class DeleteSkinButton : DangerousSettingsButton
         {
             [Resolved]
             private SkinManager skins { get; set; }

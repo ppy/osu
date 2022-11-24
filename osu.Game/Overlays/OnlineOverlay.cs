@@ -12,7 +12,7 @@ using osu.Game.Online;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OnlineOverlay<T> : FullscreenOverlay<T>
+    public abstract partial class OnlineOverlay<T> : FullscreenOverlay<T>
         where T : OverlayHeader
     {
         protected override Container<Drawable> Content => content;

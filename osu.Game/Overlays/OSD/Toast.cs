@@ -16,7 +16,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.OSD
 {
-    public abstract class Toast : Container
+    public abstract partial class Toast : Container
     {
         private const int toast_minimum_width = 240;
 

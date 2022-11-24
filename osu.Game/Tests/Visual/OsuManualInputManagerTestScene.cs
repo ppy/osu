@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class OsuManualInputManagerTestScene : OsuTestScene
+    public abstract partial class OsuManualInputManagerTestScene : OsuTestScene
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;

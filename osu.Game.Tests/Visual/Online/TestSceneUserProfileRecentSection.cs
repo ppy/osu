@@ -20,7 +20,7 @@ using osu.Game.Overlays.Profile.Sections.Recent;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserProfileRecentSection : OsuTestScene
+    public partial class TestSceneUserProfileRecentSection : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);

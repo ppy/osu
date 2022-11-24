@@ -17,7 +17,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
-    public class CountriesTable : RankingsTable<CountryStatistics>
+    public partial class CountriesTable : RankingsTable<CountryStatistics>
     {
         public CountriesTable(int page, IReadOnlyList<CountryStatistics> rankings)
             : base(page, rankings)
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         };
 
-        private class CountryName : LinkFlowContainer
+        private partial class CountryName : LinkFlowContainer
         {
             [Resolved(canBeNull: true)]
             private RankingsOverlay rankings { get; set; }
