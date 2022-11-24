@@ -118,12 +118,12 @@ namespace osu.Game.Rulesets.Mods
             if (!(them is DifficultyBindable otherDifficultyBindable))
                 throw new InvalidOperationException($"Cannot bind to a non-{nameof(DifficultyBindable)}.");
 
-            base.BindTo(them);
-
             ExtendedLimits.BindTarget = otherDifficultyBindable.ExtendedLimits;
 
             // the actual values need to be copied after the max value constraints.
             CurrentNumber.BindTarget = otherDifficultyBindable.CurrentNumber;
+
+            base.BindTo(them);
         }
 
         public override void UnbindFrom(IUnbindable them)
