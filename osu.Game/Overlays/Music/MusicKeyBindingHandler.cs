@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Music
     /// <summary>
     /// Handles <see cref="GlobalAction"/>s related to music playback, and displays <see cref="Toast"/>s via the global <see cref="OnScreenDisplay"/> accordingly.
     /// </summary>
-    public class MusicKeyBindingHandler : Component, IKeyBindingHandler<GlobalAction>
+    public partial class MusicKeyBindingHandler : Component, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Music
         {
         }
 
-        private class MusicActionToast : Toast
+        private partial class MusicActionToast : Toast
         {
             private readonly GlobalAction action;
 

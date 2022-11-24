@@ -13,7 +13,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public abstract class ReadyButton : TriangleButton, IHasTooltip
+    public abstract partial class ReadyButton : TriangleButton, IHasTooltip
     {
         public new readonly BindableBool Enabled = new BindableBool();
 

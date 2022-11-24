@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class PlayerTestScene : RateAdjustedBeatmapTestScene
+    public abstract partial class PlayerTestScene : RateAdjustedBeatmapTestScene
     {
         /// <summary>
         /// Whether custom test steps are provided. Custom tests should invoke <see cref="CreateTest"/> to create the test steps.

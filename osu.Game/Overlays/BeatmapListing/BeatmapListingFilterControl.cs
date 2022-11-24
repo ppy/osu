@@ -26,7 +26,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingFilterControl : CompositeDrawable
+    public partial class BeatmapListingFilterControl : CompositeDrawable
     {
         /// <summary>
         /// Fired when a search finishes.

@@ -9,7 +9,7 @@ using osu.Game.Tests.Visual.UserInterface;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    public class TestSceneDirectorySelector : ThemeComparisonTestScene
+    public partial class TestSceneDirectorySelector : ThemeComparisonTestScene
     {
         protected override Drawable CreateContent() => new OsuDirectorySelector
         {

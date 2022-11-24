@@ -10,7 +10,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class ScoreSettings : SettingsSubsection
+    public partial class ScoreSettings : SettingsSubsection
     {
         protected override LocalisableString Header => CommonStrings.Scores;
 

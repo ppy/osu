@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class PurpleTriangleButton : TriangleButton
+    public partial class PurpleTriangleButton : TriangleButton
     {
         [BackgroundDependencyLoader]
         private void load()

@@ -18,7 +18,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestScenePresentBeatmap : OsuGameTestScene
+    public partial class TestScenePresentBeatmap : OsuGameTestScene
     {
         [Test]
         public void TestFromMainMenu()

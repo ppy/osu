@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A button with moving triangles in the background.
     /// </summary>
-    public class TriangleButton : OsuButton, IFilterable
+    public partial class TriangleButton : OsuButton, IFilterable
     {
         protected Triangles Triangles { get; private set; }
 

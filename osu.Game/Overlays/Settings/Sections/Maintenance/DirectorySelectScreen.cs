@@ -20,7 +20,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public abstract class DirectorySelectScreen : OsuScreen
+    public abstract partial class DirectorySelectScreen : OsuScreen
     {
         private TriangleButton selectionButton;
 

@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Import
 {
-    public class FileImportScreen : OsuScreen
+    public partial class FileImportScreen : OsuScreen
     {
         public override bool HideOverlaysOnEnter => true;
 

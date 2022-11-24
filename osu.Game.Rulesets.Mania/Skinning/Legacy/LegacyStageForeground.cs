@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyStageForeground : CompositeDrawable
+    public partial class LegacyStageForeground : CompositeDrawable
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 

@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Select.Carousel
     /// <remarks>
     /// Used in cases when there are too many difficulty icons to show.
     /// </remarks>
-    public class GroupedDifficultyIcon : DifficultyIcon
+    public partial class GroupedDifficultyIcon : DifficultyIcon
     {
         public readonly List<CarouselBeatmap> Items;
 

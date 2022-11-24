@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ReplayDownloadButton : CompositeDrawable
+    public partial class ReplayDownloadButton : CompositeDrawable
     {
         public readonly Bindable<ScoreInfo> Score = new Bindable<ScoreInfo>();
 

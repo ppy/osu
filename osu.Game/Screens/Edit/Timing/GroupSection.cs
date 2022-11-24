@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class GroupSection : CompositeDrawable
+    internal partial class GroupSection : CompositeDrawable
     {
         private LabelledTextBox textBox;
 

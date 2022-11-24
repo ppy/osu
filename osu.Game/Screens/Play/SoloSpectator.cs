@@ -33,7 +33,7 @@ using osuTK;
 namespace osu.Game.Screens.Play
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public class SoloSpectator : SpectatorScreen, IPreviewTrackOwner
+    public partial class SoloSpectator : SpectatorScreen, IPreviewTrackOwner
     {
         [NotNull]
         private readonly APIUser targetUser;

@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class MatchBeatmapDetailArea : BeatmapDetailArea
+    public partial class MatchBeatmapDetailArea : BeatmapDetailArea
     {
         public Action CreateNewItem;
 

@@ -21,7 +21,7 @@ namespace osu.Game.Online.Spectator
     /// A wrapper over a <see cref="ScoreProcessor"/> for spectated users.
     /// This should be used when a local "playable" beatmap is unavailable or expensive to generate for the spectated user.
     /// </summary>
-    public class SpectatorScoreProcessor : Component
+    public partial class SpectatorScoreProcessor : Component
     {
         /// <summary>
         /// The current total score.

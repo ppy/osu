@@ -24,7 +24,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneReplayDownloadButton : OsuManualInputManagerTestScene
+    public partial class TestSceneReplayDownloadButton : OsuManualInputManagerTestScene
     {
         private const long online_score_id = 2553163309;
 
@@ -219,7 +219,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         };
 
-        private class TestReplayDownloadButton : ReplayDownloadButton
+        private partial class TestReplayDownloadButton : ReplayDownloadButton
         {
             public void SetDownloadState(DownloadState state) => State.Value = state;
 

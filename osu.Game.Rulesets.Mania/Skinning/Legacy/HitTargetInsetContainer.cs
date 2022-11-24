@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class HitTargetInsetContainer : Container
+    public partial class HitTargetInsetContainer : Container
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 

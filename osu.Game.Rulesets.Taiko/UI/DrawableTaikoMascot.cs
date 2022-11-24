@@ -16,7 +16,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class DrawableTaikoMascot : BeatSyncedContainer
+    public partial class DrawableTaikoMascot : BeatSyncedContainer
     {
         public readonly Bindable<TaikoMascotAnimationState> State;
         public readonly Bindable<JudgementResult?> LastResult;

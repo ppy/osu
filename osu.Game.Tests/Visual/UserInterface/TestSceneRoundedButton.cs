@@ -16,7 +16,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneRoundedButton : ThemeComparisonTestScene
+    public partial class TestSceneRoundedButton : ThemeComparisonTestScene
     {
         private readonly BindableBool enabled = new BindableBool(true);
 

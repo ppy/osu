@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuPopover : OsuGridTestScene
+    public partial class TestSceneOsuPopover : OsuGridTestScene
     {
         public TestSceneOsuPopover()
             : base(1, 2)
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class TriangleButtonWithPopover : TriangleButton, IHasPopover
+        private partial class TriangleButtonWithPopover : TriangleButton, IHasPopover
         {
             public TriangleButtonWithPopover()
             {
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class ColourProvidingContainer : Container
+        private partial class ColourProvidingContainer : Container
         {
             [Cached]
             private OverlayColourProvider provider { get; }

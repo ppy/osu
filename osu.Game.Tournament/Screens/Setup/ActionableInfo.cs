@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    internal class ActionableInfo : LabelledDrawable<Drawable>
+    internal partial class ActionableInfo : LabelledDrawable<Drawable>
     {
         protected OsuButton Button;
 

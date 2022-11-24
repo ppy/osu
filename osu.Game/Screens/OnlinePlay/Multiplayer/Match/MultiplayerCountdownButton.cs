@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerCountdownButton : IconButton, IHasPopover
+    public partial class MultiplayerCountdownButton : IconButton, IHasPopover
     {
         private static readonly TimeSpan[] available_delays =
         {

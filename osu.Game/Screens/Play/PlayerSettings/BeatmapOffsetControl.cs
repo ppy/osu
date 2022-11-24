@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class BeatmapOffsetControl : CompositeDrawable
+    public partial class BeatmapOffsetControl : CompositeDrawable
     {
         public Bindable<ScoreInfo?> ReferenceScore { get; } = new Bindable<ScoreInfo?>();
 
@@ -87,11 +87,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
             };
         }
 
-        public class OffsetSliderBar : PlayerSliderBar<double>
+        public partial class OffsetSliderBar : PlayerSliderBar<double>
         {
             protected override Drawable CreateControl() => new CustomSliderBar();
 
-            protected class CustomSliderBar : SliderBar
+            protected partial class CustomSliderBar : SliderBar
             {
                 public override LocalisableString TooltipText =>
                     Current.Value == 0

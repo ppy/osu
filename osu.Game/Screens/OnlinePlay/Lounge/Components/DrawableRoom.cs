@@ -29,7 +29,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class DrawableRoom : CompositeDrawable
+    public partial class DrawableRoom : CompositeDrawable
     {
         protected const float CORNER_RADIUS = 10;
         private const float height = 100;
@@ -311,7 +311,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             return pills;
         }
 
-        private class RoomNameText : OsuSpriteText
+        private partial class RoomNameText : OsuSpriteText
         {
             [Resolved(typeof(Room), nameof(Online.Rooms.Room.Name))]
             private Bindable<string> name { get; set; }
@@ -328,7 +328,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private class RoomStatusText : OnlinePlayComposite
+        private partial class RoomStatusText : OnlinePlayComposite
         {
             [Resolved]
             private OsuColour colours { get; set; }
@@ -434,7 +434,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        public class PasswordProtectedIcon : CompositeDrawable
+        public partial class PasswordProtectedIcon : CompositeDrawable
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)

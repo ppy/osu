@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Tournament.Screens.Showcase
 {
-    public class TournamentLogo : CompositeDrawable
+    public partial class TournamentLogo : CompositeDrawable
     {
         public TournamentLogo()
         {

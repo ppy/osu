@@ -15,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchTouchInputMapper : VisibilityContainer
+    public partial class CatchTouchInputMapper : VisibilityContainer
     {
         public override bool PropagatePositionalInputSubTree => true;
         public override bool PropagateNonPositionalInputSubTree => true;
@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override void PopOut() => mainContent.FadeOut(300, Easing.OutQuint);
 
-        private class InputArea : CompositeDrawable, IKeyBindingHandler<CatchAction>
+        private partial class InputArea : CompositeDrawable, IKeyBindingHandler<CatchAction>
         {
             private readonly TouchCatchAction handledAction;
 

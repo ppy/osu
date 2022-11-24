@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuTextBox : BasicTextBox
+    public partial class OsuTextBox : BasicTextBox
     {
         /// <summary>
         /// Whether to allow playing a different samples based on the type of character.
@@ -302,7 +302,7 @@ namespace osu.Game.Graphics.UserInterface
             sampleLastPlaybackTime = Time.Current;
         });
 
-        private class OsuCaret : Caret
+        private partial class OsuCaret : Caret
         {
             private const float caret_move_time = 60;
 
@@ -349,7 +349,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            private class CaretBeatSyncedContainer : BeatSyncedContainer
+            private partial class CaretBeatSyncedContainer : BeatSyncedContainer
             {
                 private bool hasSelection;
 
