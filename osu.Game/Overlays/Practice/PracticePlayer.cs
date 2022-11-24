@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
@@ -15,6 +16,9 @@ namespace osu.Game.Overlays.Practice
 
         public Ruleset CurrentRuleset = null!;
 
+        [Resolved]
+        private PracticePlayerLoader loader { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
@@ -25,7 +29,12 @@ namespace osu.Game.Overlays.Practice
             AddInternal(PracticeOverlay = new PracticeOverlay());
 
             addButtons(colour);
+
+            SetGameplayStartTime(loader.CustomStart.Value * PlayableBeatmap.HitObjects.Last().StartTime);
         }
+
+        //Hack to avoid auto failing due to lag upon entry
+        protected override bool CheckModsAllowFailure() => false; // never fail.
 
         protected override void Update()
         {

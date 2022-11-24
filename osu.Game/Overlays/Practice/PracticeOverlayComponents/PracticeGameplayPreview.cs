@@ -24,10 +24,9 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 
         public PracticeGameplayPreview()
         {
-            RelativeSizeAxes = Axes.Both;
-
             //Stops Catch Ruleset and OsuRuleset from clipping the header;
             Masking = true;
+            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]

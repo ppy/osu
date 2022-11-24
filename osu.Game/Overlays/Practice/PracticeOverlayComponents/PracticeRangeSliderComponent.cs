@@ -21,19 +21,15 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
         private SegmentSliderStart segmentSliderStart = null!;
         private SegmentSliderEnd segmentSliderEnd = null!;
 
-        public readonly BindableNumber<double> CustomStart = new BindableNumber<double>
-        {
-            MinValue = 0,
-            MaxValue = 1,
-            Precision = 0.01f
-        };
+        private readonly BindableNumber<double> customStart;
 
-        public readonly BindableNumber<double> CustomEnd = new BindableNumber<double>(1)
+        private readonly BindableNumber<double> customEnd;
+
+        public PracticeSegmentSliderComponent(BindableNumber<double> customStart, BindableNumber<double> customEnd)
         {
-            MinValue = 0,
-            MaxValue = 1,
-            Precision = 0.01f
-        };
+            this.customStart = customStart;
+            this.customEnd = customEnd;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -43,7 +39,7 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
             {
                 segmentSliderStart = new SegmentSliderStart
                 {
-                    Current = CustomStart,
+                    Current = customStart,
                     Depth = float.MinValue,
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.1f,
@@ -51,7 +47,7 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
                 },
                 segmentSliderEnd = new SegmentSliderEnd
                 {
-                    Current = CustomEnd,
+                    Current = customEnd,
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.1f,
                     RelativeSizeAxes = Axes.X,
@@ -63,11 +59,11 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
         {
             base.LoadComplete();
 
-            CustomStart.ValueChanged += min =>
+            customStart.ValueChanged += min =>
             {
                 segmentSliderEnd.Current.Value = Math.Max(min.NewValue + 0.01, segmentSliderEnd.Current.Value);
             };
-            CustomEnd.ValueChanged += max =>
+            customEnd.ValueChanged += max =>
             {
                 segmentSliderStart.Current.Value = Math.Min(max.NewValue - 0.01, segmentSliderStart.Current.Value);
             };

@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Localisation;
@@ -18,12 +19,13 @@ namespace osu.Game.Overlays.Practice
         [Resolved]
         private PracticePlayer player { get; set; } = null!;
 
+        [Resolved]
+        private PracticePlayerLoader playerLoader { get; set; } = null!;
+
         [Resolved(canBeNull: true)]
         private DrawableRuleset? drawableRuleset { get; set; }
 
         private PracticeGameplayPreview preview = null!;
-
-        private PracticeSegmentSliderComponent practiceSlider = null!;
 
         public PracticeOverlay()
             : base(OverlayColourScheme.Green)
@@ -33,17 +35,34 @@ namespace osu.Game.Overlays.Practice
         [BackgroundDependencyLoader]
         private void load()
         {
+            content();
+
             double? lastTime = drawableRuleset?.Objects.Last().StartTime;
 
+            playerLoader.CustomStart.ValueChanged += startPercent =>
+            {
+                preview.SeekTo(startPercent.NewValue * lastTime!.Value);
+            };
+            playerLoader.CustomEnd.ValueChanged += endPercent =>
+            {
+                preview.SeekTo(endPercent.NewValue * lastTime!.Value);
+            };
+        }
+
+        private void content()
+        {
             Header.Title = PracticeOverlayStrings.PracticeOverlayHeaderTitle;
             Header.Description = PracticeOverlayStrings.PracticeOverlayHeaderDescription;
 
-            MainAreaContent.Add(preview = new PracticeGameplayPreview());
+            MainAreaContent.Add(
+                new InputBlockingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = preview = new PracticeGameplayPreview()
+                }
+            );
 
             FooterContent.Add(footerContent());
-
-            practiceSlider.CustomStart.ValueChanged += startPercent => preview.SeekTo(startPercent.NewValue * lastTime!.Value);
-            practiceSlider.CustomEnd.ValueChanged += endPercent => preview.SeekTo(endPercent.NewValue * lastTime!.Value);
         }
 
         private Drawable footerContent()
@@ -62,14 +81,14 @@ namespace osu.Game.Overlays.Practice
                     new Drawable[]
                     {
                         new Container(),
-                        practiceSlider = new PracticeSegmentSliderComponent { RelativeSizeAxes = Axes.Both },
+                        new PracticeSegmentSliderComponent(playerLoader.CustomStart, playerLoader.CustomEnd) { RelativeSizeAxes = Axes.Both },
                         new ShearedButton(150)
                         {
                             Y = -5,
                             Text = "Play",
                             LighterColour = ColourProvider.Colour1,
                             DarkerColour = ColourProvider.Colour3,
-                            Action = () => player.Restart(true)
+                            Action = () => player.Restart()
                         }
                     },
                 }
