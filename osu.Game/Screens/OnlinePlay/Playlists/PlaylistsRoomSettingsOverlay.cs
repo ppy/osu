@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             public OsuTextBox NameField = null!, MaxParticipantsField = null!, MaxAttemptsField = null!;
             public OsuDropdown<TimeSpan> DurationField = null!;
             public RoomAvailabilityPicker AvailabilityPicker = null!;
-            public TriangleButton ApplyButton = null!;
+            public RoundedButton ApplyButton = null!;
 
             public bool IsLoading => loadingLayer.State.Value == Visibility.Visible;
 
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             private DrawableRoomPlaylist playlist = null!;
             private OsuSpriteText playlistLength = null!;
 
-            private PurpleTriangleButton editPlaylistButton = null!;
+            private PurpleRoundedButton editPlaylistButton = null!;
 
             [Resolved]
             private IRoomManager? manager { get; set; }
@@ -222,7 +223,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                     },
                                                                     new Drawable[]
                                                                     {
-                                                                        editPlaylistButton = new PurpleTriangleButton
+                                                                        editPlaylistButton = new PurpleRoundedButton
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             Height = 40,
@@ -414,7 +415,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         }
 
-        public class CreateRoomButton : TriangleButton
+        public class CreateRoomButton : RoundedButton
         {
             public CreateRoomButton()
             {

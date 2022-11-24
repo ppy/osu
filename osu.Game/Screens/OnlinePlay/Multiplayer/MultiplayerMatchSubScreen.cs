@@ -430,7 +430,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             modSettingChangeTracker?.Dispose();
         }
 
-        public class AddItemButton : PurpleTriangleButton
+        public class AddItemButton : PurpleRoundedButton
         {
         }
     }
