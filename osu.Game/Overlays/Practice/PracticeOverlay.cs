@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Practice
                     new Drawable[]
                     {
                         new Container(),
-                        new PracticeSegmentSliderComponent(playerLoader.CustomStart, playerLoader.CustomEnd) { RelativeSizeAxes = Axes.Both },
+                        new PracticeRangeSliderComponent(playerLoader.CustomStart, playerLoader.CustomEnd) { RelativeSizeAxes = Axes.Both },
                         new ShearedButton(150)
                         {
                             Y = -5,

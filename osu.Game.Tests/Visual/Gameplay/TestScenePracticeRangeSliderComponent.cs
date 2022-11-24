@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePracticeRangeControl : OsuTestScene
+    public class TestScenePracticeRangeSliderComponent : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestBasic()
         {
-            AddStep("create Control", () => Child = new PracticeSegmentSliderComponent(customStart, customEnd)
+            AddStep("create Control", () => Child = new PracticeRangeSliderComponent(customStart, customEnd)
             {
                 Width = 200,
                 Anchor = Anchor.Centre,

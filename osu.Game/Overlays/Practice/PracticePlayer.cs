@@ -42,7 +42,10 @@ namespace osu.Game.Overlays.Practice
 
             CurrentRuleset = rulesetInfo.CreateInstance();
 
-            SetGameplayStartTime(loader.CustomStart.Value * PlayableBeatmap.HitObjects.Last().StartTime);
+            if (PlayableBeatmap != null)
+            {
+                SetGameplayStartTime(loader.CustomStart.Value * PlayableBeatmap.HitObjects.Last().StartTime);
+            }
 
             AddInternal(practiceOverlay = new PracticeOverlay
             {

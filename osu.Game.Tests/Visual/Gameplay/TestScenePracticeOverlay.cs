@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Game.Overlays.Practice;
 using osu.Game.Rulesets;
@@ -11,13 +10,10 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    [Description("Player instantiated with an autoplay mod.")]
-    public class TestScenePractice : TestSceneAllRulesetPlayers
+    public class TestScenePracticeOverlay : TestSceneAllRulesetPlayers
     {
         [Cached]
         private PracticePlayerLoader loader { get; set; } = new PracticePlayerLoader();
-
-        protected new PracticePlayer Player => (PracticePlayer)base.Player;
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {

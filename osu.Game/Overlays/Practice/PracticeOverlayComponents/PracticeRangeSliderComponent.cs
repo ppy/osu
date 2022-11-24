@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 {
-    public class PracticeSegmentSliderComponent : CompositeDrawable
+    public class PracticeRangeSliderComponent : CompositeDrawable
     {
         private SegmentSliderStart segmentSliderStart = null!;
         private SegmentSliderEnd segmentSliderEnd = null!;
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 
         private readonly BindableNumber<double> customEnd;
 
-        public PracticeSegmentSliderComponent(BindableNumber<double> customStart, BindableNumber<double> customEnd)
+        public PracticeRangeSliderComponent(BindableNumber<double> customStart, BindableNumber<double> customEnd)
         {
             this.customStart = customStart;
             this.customEnd = customEnd;
@@ -168,4 +168,3 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
         }
     }
 }
-
