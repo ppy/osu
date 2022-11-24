@@ -13,8 +13,6 @@ namespace osu.Game.Graphics.UserInterface
         private void load(OsuColour colours)
         {
             BackgroundColour = colours.PinkDark;
-            Triangles.ColourDark = colours.PinkDarker;
-            Triangles.ColourLight = colours.Pink;
         }
     }
 }

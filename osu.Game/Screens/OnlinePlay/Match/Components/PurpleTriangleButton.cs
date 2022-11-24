@@ -15,8 +15,6 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         private void load()
         {
             BackgroundColour = Color4Extensions.FromHex(@"593790");
-            Triangles.ColourLight = Color4Extensions.FromHex(@"7247b6");
-            Triangles.ColourDark = Color4Extensions.FromHex(@"593790");
         }
     }
 }

@@ -475,8 +475,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private void load(OsuColour colours)
             {
                 BackgroundColour = colours.Yellow;
-                Triangles.ColourLight = colours.YellowLight;
-                Triangles.ColourDark = colours.YellowDark;
             }
         }
 

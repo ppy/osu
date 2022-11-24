@@ -16,7 +16,6 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         private void load()
         {
             SpriteText.Font = SpriteText.Font.With(size: 14);
-            Triangles.TriangleScale = 1.5f;
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
