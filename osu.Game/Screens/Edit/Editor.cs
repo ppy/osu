@@ -499,11 +499,12 @@ namespace osu.Game.Screens.Edit
                     seek(e, 1);
                     return true;
 
-                case Key.Down:
+                // Of those, these two keys are reversed from stable because it feels more natural (and matches mouse wheel scroll directionality).
+                case Key.Up:
                     seekControlPoint(-1);
                     return true;
 
-                case Key.Up:
+                case Key.Down:
                     seekControlPoint(1);
                     return true;
 

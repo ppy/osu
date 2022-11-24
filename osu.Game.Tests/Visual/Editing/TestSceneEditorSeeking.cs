@@ -124,17 +124,17 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("time is 0", () => EditorClock.CurrentTime == 0);
 
             // already at first control point, noop
-            pressAndCheckTime(Key.Down, 0);
-
-            pressAndCheckTime(Key.Up, 2000);
-
-            pressAndCheckTime(Key.Up, 20000);
-            // at last control point, noop
-            pressAndCheckTime(Key.Up, 20000);
+            pressAndCheckTime(Key.Up, 0);
 
             pressAndCheckTime(Key.Down, 2000);
-            pressAndCheckTime(Key.Down, 0);
-            pressAndCheckTime(Key.Down, 0);
+
+            pressAndCheckTime(Key.Down, 20000);
+            // at last control point, noop
+            pressAndCheckTime(Key.Down, 20000);
+
+            pressAndCheckTime(Key.Up, 2000);
+            pressAndCheckTime(Key.Up, 0);
+            pressAndCheckTime(Key.Up, 0);
         }
 
         private void pressAndCheckTime(Key key, double expectedTime)
