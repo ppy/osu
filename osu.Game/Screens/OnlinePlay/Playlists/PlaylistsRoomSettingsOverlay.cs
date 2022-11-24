@@ -425,8 +425,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             private void load(OsuColour colours)
             {
                 BackgroundColour = colours.Yellow;
-                Triangles.ColourLight = colours.YellowLight;
-                Triangles.ColourDark = colours.YellowDark;
             }
         }
 
