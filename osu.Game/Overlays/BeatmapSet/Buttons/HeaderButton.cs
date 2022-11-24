@@ -4,11 +4,11 @@
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class HeaderButton : TriangleButton
+    public class HeaderButton : RoundedButton
     {
         public HeaderButton()
         {

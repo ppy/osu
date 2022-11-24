@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Multiplayer;
 using osuTK;
 
@@ -23,11 +23,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private IBindable<bool> operationInProgress;
 
-        private readonly TriangleButton button;
+        private readonly RoundedButton button;
 
         public MultiplayerSpectateButton()
         {
-            InternalChild = button = new TriangleButton
+            InternalChild = button = new RoundedButton
             {
                 RelativeSizeAxes = Axes.Both,
                 Size = Vector2.One,
