@@ -45,8 +45,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 InverseMuting = { Value = false },
             }));
 
-            AddAssert("mute combo count = 0", () => muted.MuteComboCount.Value == 0);
-            AddAssert("inverse muting = false", () => muted.InverseMuting.Value == false);
+            AddAssert("mute combo count copied", () => muted.MuteComboCount.Value, () => Is.EqualTo(0));
+            AddAssert("inverse muting copied", () => muted.InverseMuting.Value, () => Is.False);
         }
     }
 }
