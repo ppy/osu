@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
@@ -17,19 +18,19 @@ namespace osu.Game.Overlays.Practice
     [Cached]
     public class PracticePlayer : Player
     {
-        public readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
-
-        public PracticeOverlay PracticeOverlay = null!;
+        private PracticeOverlay practiceOverlay = null!;
 
         public Ruleset CurrentRuleset = null!;
 
         [Resolved]
         private PracticePlayerLoader loader { get; set; } = null!;
 
-        public PracticePlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration? configuration = null)
+        private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
+
+        public PracticePlayer(PlayerConfiguration? configuration = null)
             : base(configuration)
         {
-            this.createScore = createScore;
+            createScore = (beatmap, mods) => mods.OfType<ModAutoplay>().First().CreateScoreFromReplayData(beatmap, mods);
         }
 
         protected override Score CreateScore(IBeatmap beatmap) => createScore(beatmap, Mods.Value);
@@ -41,30 +42,21 @@ namespace osu.Game.Overlays.Practice
 
             CurrentRuleset = rulesetInfo.CreateInstance();
 
-            AddInternal(PracticeOverlay = new PracticeOverlay());
-
-            addButtons(colour);
-
             SetGameplayStartTime(loader.CustomStart.Value * PlayableBeatmap.HitObjects.Last().StartTime);
+
+            AddInternal(practiceOverlay = new PracticeOverlay
+            {
+                State = { Value = Visibility.Visible }
+            });
+            addButtons(colour);
         }
 
-        //Hack to avoid auto failing due to lag upon entry
         protected override bool CheckModsAllowFailure() => false; // never fail.
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!PracticeOverlay.IsPresent) return;
-
-            GameplayClockContainer.Stop();
-            GameplayClockContainer.Hide();
-        }
 
         private void addButtons(OsuColour colour)
         {
-            PauseOverlay.AddButton("Practice", colour.Blue, () => PracticeOverlay.Show());
-            FailOverlay.AddButton("Practice", colour.Blue, () => PracticeOverlay.Show());
+            PauseOverlay.AddButton("Practice", colour.Blue, () => practiceOverlay.Show());
+            FailOverlay.AddButton("Practice", colour.Blue, () => practiceOverlay.Show());
         }
     }
 }

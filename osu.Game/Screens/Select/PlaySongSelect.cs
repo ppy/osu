@@ -10,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.Practice;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.Select
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
 
         private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
+
+        private bool practiceMode => true;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -81,7 +84,7 @@ namespace osu.Game.Screens.Select
             modsAtGameplayStart = Mods.Value;
 
             // Ctrl+Enter should start map with autoplay enabled.
-            if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
+            if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true || practiceMode)
             {
                 var autoInstance = getAutoplayMod();
 
@@ -104,7 +107,17 @@ namespace osu.Game.Screens.Select
 
             SampleConfirm?.Play();
 
-            this.Push(playerLoader = new PlayerLoader(createPlayer));
+            switch (practiceMode)
+            {
+                case true:
+                    this.Push(playerLoader = new PracticePlayerLoader());
+                    break;
+
+                case false:
+                    this.Push(playerLoader = new PlayerLoader(createPlayer));
+                    break;
+            }
+
             return true;
 
             Player createPlayer()

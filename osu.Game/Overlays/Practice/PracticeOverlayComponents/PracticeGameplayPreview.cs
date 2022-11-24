@@ -58,10 +58,7 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
             base.LoadComplete();
             drawableRuleset.SetReplayScore(player.Score);
 
-            if (drawableRuleset.Cursor != null)
-            {
-                drawableRuleset.Cursor.Alpha = 0.0001f;
-            }
+            drawableRuleset.Cursor?.FadeTo(0);
         }
 
         private Drawable createGameplayComponents() => new ScalingContainer(ScalingMode.Gameplay)

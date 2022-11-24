@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
@@ -51,16 +52,20 @@ namespace osu.Game.Overlays.Practice
 
         private void content()
         {
+            Add(new InputBlockingContainer
+            {
+                Depth = float.MaxValue,
+                RelativeSizeAxes = Axes.Both,
+                Child = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Colour4.Black.Opacity(.8f)
+                }
+            });
             Header.Title = PracticeOverlayStrings.PracticeOverlayHeaderTitle;
             Header.Description = PracticeOverlayStrings.PracticeOverlayHeaderDescription;
 
-            MainAreaContent.Add(
-                new InputBlockingContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = preview = new PracticeGameplayPreview()
-                }
-            );
+            MainAreaContent.Add(preview = new PracticeGameplayPreview());
 
             FooterContent.Add(footerContent());
         }
