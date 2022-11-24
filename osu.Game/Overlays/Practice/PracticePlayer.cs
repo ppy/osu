@@ -1,10 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Overlays.Practice
@@ -12,12 +17,22 @@ namespace osu.Game.Overlays.Practice
     [Cached]
     public class PracticePlayer : Player
     {
+        public readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
+
         public PracticeOverlay PracticeOverlay = null!;
 
         public Ruleset CurrentRuleset = null!;
 
         [Resolved]
         private PracticePlayerLoader loader { get; set; } = null!;
+
+        public PracticePlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration? configuration = null)
+            : base(configuration)
+        {
+            this.createScore = createScore;
+        }
+
+        protected override Score CreateScore(IBeatmap beatmap) => createScore(beatmap, Mods.Value);
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
