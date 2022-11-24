@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Practice.PracticeOverlayComponents;
@@ -15,16 +16,40 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
+        private readonly BindableNumber<double> customStart = new BindableNumber<double>
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.001f
+        };
+
+        private readonly BindableNumber<double> customEnd = new BindableNumber<double>(1)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.001f
+        };
+
         [Test]
         public void TestBasic()
         {
-            AddStep("create Control", () => Child = new PracticeSegmentSliderComponent
+            AddStep("create Control", () => Child = new PracticeSegmentSliderComponent(customStart, customEnd)
             {
                 Width = 200,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Scale = new Vector2(3),
+                Scale = new Vector2(3)
             });
+            AddStep("Test Range", () =>
+            {
+                customStart.Value = 0.5f;
+                customEnd.Value = 0.75f;
+            });
+            AddStep("Test nub pushing", () =>
+            {
+                customEnd.Value = 0.1f;
+            });
+            AddStep("Test nub pushing", () => customStart.Value = 0.7f);
         }
     }
 }
