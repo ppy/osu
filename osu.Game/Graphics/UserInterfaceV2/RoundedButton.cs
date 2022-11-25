@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 {
     public class RoundedButton : OsuButton, IFilterable
     {
-        private TrianglesV2? triangles;
+        protected TrianglesV2? Triangles { get; private set; }
 
         protected override float HoverLayerFinalAlpha => 0;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             updateCornerRadius();
 
-            Add(triangles = new TrianglesV2
+            Add(Triangles = new TrianglesV2
             {
                 Thickness = 0.02f,
                 SpawnRatio = 0.6f,
@@ -76,13 +76,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateColours()
         {
-            if (triangles == null)
+            if (Triangles == null)
                 return;
 
             Debug.Assert(triangleGradientSecondColour != null);
 
-            triangles.ColourTop = triangleGradientSecondColour.Value;
-            triangles.ColourBottom = BackgroundColour;
+            Triangles.ColourTop = triangleGradientSecondColour.Value;
+            Triangles.ColourBottom = BackgroundColour;
         }
 
         protected override bool OnHover(HoverEvent e)
