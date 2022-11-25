@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Text = @"No OverlayColourProvider",
                         Font = OsuFont.Default.With(size: 40)
                     },
-                    new TriangleButtonWithPopover()
+                    new RoundedButtonWithPopover()
                 }
             };
 
@@ -50,15 +50,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Text = @"With OverlayColourProvider (orange)",
                             Font = OsuFont.Default.With(size: 40)
                         },
-                        new TriangleButtonWithPopover()
+                        new RoundedButtonWithPopover()
                     }
                 }
             };
         }
 
-        private class TriangleButtonWithPopover : TriangleButton, IHasPopover
+        private class RoundedButtonWithPopover : RoundedButton, IHasPopover
         {
-            public TriangleButtonWithPopover()
+            public RoundedButtonWithPopover()
             {
                 Width = 100;
                 Height = 30;
