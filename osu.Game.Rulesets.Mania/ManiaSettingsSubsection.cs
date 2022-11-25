@@ -36,8 +36,7 @@ namespace osu.Game.Rulesets.Mania
                 new SettingsSlider<double, ManiaScrollSlider>
                 {
                     LabelText = "Scroll speed",
-                    Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
-                    KeyboardStep = 5
+                    Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime)
                 },
                 new SettingsCheckbox
                 {
@@ -47,9 +46,14 @@ namespace osu.Game.Rulesets.Mania
             };
         }
 
-        private class ManiaScrollSlider : OsuSliderBar<double>
+        public class ManiaScrollSlider : OsuSliderBar<double>
         {
             public override LocalisableString TooltipText => $"{Current.Value}ms (speed {(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / Current.Value)})";
+
+            public ManiaScrollSlider()
+            {
+                KeyboardStep = 5;
+            }
         }
     }
 }

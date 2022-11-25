@@ -64,6 +64,19 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        public BindableDouble ScoreSpeed = new BindableDouble();
+
+        private double scoreSpeed
+        {
+            get
+            {
+                if (ScoreSpeed.Disabled)
+                    return configTimeRange.Value;
+
+                return ScoreSpeed.Value;
+            }
+        }
+
         private ScrollVisualisationMethod scrollMethod = ScrollVisualisationMethod.Sequential;
 
         protected override ScrollVisualisationMethod VisualisationMethod => scrollMethod;
@@ -107,6 +120,10 @@ namespace osu.Game.Rulesets.Mania.UI
             Config.BindWith(ManiaRulesetSetting.ScrollTime, configTimeRange);
             TimeRange.MinValue = configTimeRange.MinValue;
             TimeRange.MaxValue = configTimeRange.MaxValue;
+            ScoreSpeed.MinValue = configTimeRange.MinValue;
+            ScoreSpeed.MaxValue = configTimeRange.MaxValue;
+
+            ScoreSpeed.Disabled = true;
         }
 
         protected override void AdjustScrollSpeed(int amount)
@@ -116,7 +133,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private double relativeTimeRange
         {
-            get => MAX_TIME_RANGE / configTimeRange.Value;
+            get => MAX_TIME_RANGE / scoreSpeed;
             set => configTimeRange.Value = MAX_TIME_RANGE / value;
         }
 
@@ -127,7 +144,7 @@ namespace osu.Game.Rulesets.Mania.UI
             updateTimeRange();
         }
 
-        private void updateTimeRange() => TimeRange.Value = configTimeRange.Value * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value;
+        private void updateTimeRange() => TimeRange.Value = scoreSpeed * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value;
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
 

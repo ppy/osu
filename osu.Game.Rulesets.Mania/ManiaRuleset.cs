@@ -267,7 +267,8 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModClassic(),
                         new ManiaModInvert(),
                         new ManiaModConstantSpeed(),
-                        new ManiaModHoldOff()
+                        new ManiaModHoldOff(),
+                        new ManiaModSlowDown(),
                     };
 
                 case ModType.Automation:
