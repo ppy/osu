@@ -125,7 +125,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             var track = new TrackVirtual(10000);
             score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             double clockRate = track.Rate;
-            double overallDifficulty = (50 - attributes.GreatHitWindow) / 3 * clockRate;
+
+            double overallDifficulty = (50 - attributes.GreatHitWindow * clockRate) / 3; 
             double goodHitWindow = 0;
             if (overallDifficulty <= 5)
                 goodHitWindow = (120 - 8 * overallDifficulty) / clockRate;
