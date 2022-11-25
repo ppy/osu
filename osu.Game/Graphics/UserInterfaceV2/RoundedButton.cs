@@ -50,9 +50,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load(OverlayColourProvider? overlayColourProvider, OsuColour colours)
         {
-            // According to flyte, buttons are supposed to have explicit colours for now.
-            // Not sure this is the correct direction, but we haven't decided on an `OverlayColourProvider` stand-in yet.
-            // This is a better default. See `SettingsButton` for an override which uses `OverlayColourProvider`.
+            // Many buttons have local colours, but this provides a sane default for all other cases.
             DefaultBackgroundColour = overlayColourProvider?.Colour3 ?? colours.Blue3;
             triangleGradientSecondColour ??= overlayColourProvider?.Colour1 ?? colours.Blue3.Lighten(0.2f);
         }
