@@ -4,10 +4,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Practice;
@@ -17,6 +21,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 using osu.Game.Utils;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Select
@@ -34,13 +39,24 @@ namespace osu.Game.Screens.Select
 
         private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
 
-        //TODO: create button that toggles this
-        private bool practiceMode => true;
+        private readonly BindableBool practiceMode = new BindableBool();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
+            Footer.Add(new Container
+            {
+                Anchor = Anchor.TopCentre,
+                Size = new Vector2(200, 50),
+                Child = new LabelledSwitchButton
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Current = practiceMode,
+                    Label = "Practice mode",
+                }
+            });
         }
 
         protected void PresentScore(ScoreInfo score) =>
@@ -108,7 +124,7 @@ namespace osu.Game.Screens.Select
 
             SampleConfirm?.Play();
 
-            switch (practiceMode)
+            switch (practiceMode.Value)
             {
                 case true:
                     this.Push(playerLoader = new PracticePlayerLoader());
