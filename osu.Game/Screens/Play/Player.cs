@@ -128,8 +128,6 @@ namespace osu.Game.Screens.Play
         private SkipOverlay skipIntroOverlay;
         private SkipOverlay skipOutroOverlay;
 
-        public IBeatmap PlayableBeatmap = null!;
-
         protected ScoreProcessor ScoreProcessor { get; private set; }
 
         protected HealthProcessor HealthProcessor { get; private set; }
@@ -210,9 +208,9 @@ namespace osu.Game.Screens.Play
             if (Beatmap.Value is DummyWorkingBeatmap)
                 return;
 
-            PlayableBeatmap = loadPlayableBeatmap(gameplayMods, cancellationToken);
+            IBeatmap playableBeatmap = loadPlayableBeatmap(gameplayMods, cancellationToken);
 
-            if (PlayableBeatmap == null)
+            if (playableBeatmap == null)
                 return;
 
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
@@ -225,17 +223,17 @@ namespace osu.Game.Screens.Play
             if (game is OsuGame osuGame)
                 LocalUserPlaying.BindTo(osuGame.LocalUserPlaying);
 
-            DrawableRuleset = ruleset.CreateDrawableRulesetWith(PlayableBeatmap, gameplayMods);
+            DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, gameplayMods);
             dependencies.CacheAs(DrawableRuleset);
 
             ScoreProcessor = ruleset.CreateScoreProcessor();
             ScoreProcessor.Mods.Value = gameplayMods;
-            ScoreProcessor.ApplyBeatmap(PlayableBeatmap);
+            ScoreProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(ScoreProcessor);
 
-            HealthProcessor = ruleset.CreateHealthProcessor(PlayableBeatmap.HitObjects[0].StartTime);
-            HealthProcessor.ApplyBeatmap(PlayableBeatmap);
+            HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
+            HealthProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(HealthProcessor);
 
@@ -246,16 +244,16 @@ namespace osu.Game.Screens.Play
 
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
-            Score = CreateScore(PlayableBeatmap);
+            Score = CreateScore(playableBeatmap);
 
             // ensure the score is in a consistent state with the current player.
             Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
             Score.ScoreInfo.Mods = gameplayMods;
 
-            dependencies.CacheAs(GameplayState = new GameplayState(PlayableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor));
+            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor));
 
-            var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, PlayableBeatmap, Beatmap.Value.Skin);
+            var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.

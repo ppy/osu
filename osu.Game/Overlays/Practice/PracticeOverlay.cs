@@ -1,56 +1,71 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Practice.PracticeOverlayComponents;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Overlays.Practice
 {
     public class PracticeOverlay : ShearedOverlayContainer
     {
-        [Resolved]
-        private PracticePlayer player { get; set; } = null!;
+        private readonly Action restart;
 
         [Resolved]
         private PracticePlayerLoader playerLoader { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private DrawableRuleset? drawableRuleset { get; set; }
+        private readonly BindableNumber<double> customStart = new BindableNumber<double>
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = .001
+        };
+
+        private readonly BindableNumber<double> customEnd = new BindableNumber<double>(1)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = .001
+        };
 
         private PracticeGameplayPreview preview = null!;
 
-        public PracticeOverlay()
+        public PracticeOverlay(Action restart)
             : base(OverlayColourScheme.Green)
         {
+            this.restart = restart;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
-            content();
+            var playableBeatmap = beatmap.Value.GetPlayableBeatmap(beatmap.Value.BeatmapInfo.Ruleset);
 
-            double? lastTime = drawableRuleset?.Objects.Last().StartTime;
+            createContent();
 
-            playerLoader.CustomStart.ValueChanged += startPercent =>
-            {
-                preview.SeekTo(startPercent.NewValue * lastTime!.Value);
-            };
-            playerLoader.CustomEnd.ValueChanged += endPercent =>
-            {
-                preview.SeekTo(endPercent.NewValue * lastTime!.Value);
-            };
+            double lastTime = playableBeatmap.HitObjects.Last().StartTime;
+            double startTime = playableBeatmap.HitObjects.First().StartTime;
+
+            customStart.BindTo(playerLoader.CustomStart);
+            customEnd.BindTo(playerLoader.CustomEnd);
+
+            customStart.BindValueChanged(startPercent =>
+                preview.SeekTo(startPercent.NewValue * (lastTime - startTime)));
+            customEnd.BindValueChanged(endPercent =>
+                preview.SeekTo(endPercent.NewValue * (lastTime - startTime)));
         }
 
-        private void content()
+        private void createContent()
         {
             Add(new InputBlockingContainer
             {
@@ -86,14 +101,14 @@ namespace osu.Game.Overlays.Practice
                     new Drawable[]
                     {
                         new Container(),
-                        new PracticeRangeSliderComponent(playerLoader.CustomStart, playerLoader.CustomEnd) { RelativeSizeAxes = Axes.Both },
+                        new PracticeRangeSliderComponent(customStart, customEnd) { RelativeSizeAxes = Axes.Both },
                         new ShearedButton(150)
                         {
                             Y = -5,
-                            Text = "Play",
+                            Text = "Practice!",
                             LighterColour = ColourProvider.Colour1,
                             DarkerColour = ColourProvider.Colour3,
-                            Action = () => player.Restart()
+                            Action = () => restart.Invoke()
                         }
                     },
                 }

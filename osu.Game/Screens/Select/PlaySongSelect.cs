@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Select
 
         private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
 
+        //TODO: create button that toggles this
         private bool practiceMode => true;
 
         [BackgroundDependencyLoader]
@@ -84,7 +85,7 @@ namespace osu.Game.Screens.Select
             modsAtGameplayStart = Mods.Value;
 
             // Ctrl+Enter should start map with autoplay enabled.
-            if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true || practiceMode)
+            if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
                 var autoInstance = getAutoplayMod();
 
