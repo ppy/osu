@@ -520,11 +520,29 @@ namespace osu.Game
                 }
                 else
                 {
-                    Logger.Log($"Completing {nameof(PresentBeatmap)} with beatmap {beatmap} ruleset {selection.Ruleset}");
-                    Ruleset.Value = selection.Ruleset;
-                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+                    // Don't change the local ruleset if the user is on another ruleset and is showing converted beatmaps at song select.
+                    // Eventually we probably want to check whether conversion is actually possible for the current ruleset.
+                    bool requiresRulesetSwitch = !selection.Ruleset.Equals(Ruleset.Value)
+                                                 && (selection.Ruleset.OnlineID > 0 || !LocalConfig.Get<bool>(OsuSetting.ShowConvertedBeatmaps));
+
+                    if (requiresRulesetSwitch)
+                    {
+                        Ruleset.Value = selection.Ruleset;
+                        Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+
+                        Logger.Log($"Completing {nameof(PresentBeatmap)} with beatmap {beatmap} ruleset {selection.Ruleset}");
+                    }
+                    else
+                    {
+                        Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+
+                        Logger.Log($"Completing {nameof(PresentBeatmap)} with beatmap {beatmap} (maintaining ruleset)");
+                    }
                 }
-            }, validScreens: new[] { typeof(SongSelect), typeof(IHandlePresentBeatmap) });
+            }, validScreens: new[]
+            {
+                typeof(SongSelect), typeof(IHandlePresentBeatmap)
+            });
         }
 
         /// <summary>
