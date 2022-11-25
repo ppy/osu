@@ -100,7 +100,7 @@ namespace osu.Game.Overlays
                             },
                             Children = new[]
                             {
-                                background = new Background(),
+                                background = Empty(),
                                 title = new OsuSpriteText
                                 {
                                     Origin = Anchor.BottomCentre,
@@ -413,7 +413,7 @@ namespace osu.Game.Overlays
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(LargeTextureStore textures)
             {
                 sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
             }

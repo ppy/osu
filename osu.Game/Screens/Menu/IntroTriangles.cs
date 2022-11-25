@@ -224,8 +224,8 @@ namespace osu.Game.Screens.Menu
                     {
                         rulesetsScale.ScaleTo(0.8f, 1000);
                         rulesets.FadeIn().ScaleTo(1).TransformSpacingTo(new Vector2(200, 0));
-                        welcomeText.FadeOut();
-                        triangles.FadeOut();
+                        welcomeText.FadeOut().Expire();
+                        triangles.FadeOut().Expire();
                     }
 
                     using (BeginDelayedSequence(rulesets_2))
@@ -307,7 +307,7 @@ namespace osu.Game.Screens.Menu
                 }
 
                 [BackgroundDependencyLoader]
-                private void load(TextureStore textures)
+                private void load(LargeTextureStore textures)
                 {
                     InternalChildren = new Drawable[]
                     {

@@ -112,6 +112,8 @@ namespace osu.Game.Screens.Select
 
         protected BeatmapDetailArea BeatmapDetails { get; private set; }
 
+        private FooterButtonOptions beatmapOptionsButton;
+
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
         private double audioFeedbackLastPlaybackTime;
@@ -302,6 +304,16 @@ namespace osu.Game.Screens.Select
             modSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(ModSelect);
         }
 
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // Match stable behaviour of only alt-scroll adjusting volume.
+            // Supporting scroll adjust without a modifier key just feels bad, since there are so many scrollable elements on the screen.
+            if (!e.CurrentState.Keyboard.AltPressed)
+                return true;
+
+            return base.OnScroll(e);
+        }
+
         /// <summary>
         /// Creates the buttons to be displayed in the footer.
         /// </summary>
@@ -314,7 +326,7 @@ namespace osu.Game.Screens.Select
                 NextRandom = () => Carousel.SelectNextRandom(),
                 PreviousRandom = Carousel.SelectPreviousRandom
             }, null),
-            (new FooterButtonOptions(), BeatmapOptions)
+            (beatmapOptionsButton = new FooterButtonOptions(), BeatmapOptions)
         };
 
         protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
@@ -739,6 +751,16 @@ namespace osu.Game.Screens.Select
             beatmapInfoWedge.Beatmap = beatmap;
 
             BeatmapDetails.Beatmap = beatmap;
+
+            bool beatmapSelected = beatmap is not DummyWorkingBeatmap;
+
+            if (beatmapSelected)
+                beatmapOptionsButton.Enabled.Value = true;
+            else
+            {
+                beatmapOptionsButton.Enabled.Value = false;
+                BeatmapOptions.Hide();
+            }
         }
 
         private readonly WeakReference<ITrack> lastTrack = new WeakReference<ITrack>(null);
