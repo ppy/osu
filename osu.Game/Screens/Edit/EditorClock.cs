@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly Bindable<Track> track = new Bindable<Track>();
 
-        public double TrackLength => track.Value?.Length ?? 60000;
+        public double TrackLength => track.Value?.IsLoaded == true ? track.Value.Length : 60000;
 
         public ControlPointInfo ControlPointInfo => Beatmap.ControlPointInfo;
 
@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Edit
             {
                 IsSeeking &= Transforms.Any();
 
-                if (track.Value?.IsRunning != true)
+                if (!IsRunning)
                 {
                     // seeking in the editor can happen while the track isn't running.
                     // in this case we always want to expose ourselves as seeking (to avoid sample playback).

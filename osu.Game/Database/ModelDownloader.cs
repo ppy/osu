@@ -45,7 +45,7 @@ namespace osu.Game.Database
 
         public bool Download(T model, bool minimiseDownloadSize = false) => Download(model, minimiseDownloadSize, null);
 
-        public void DownloadAsUpdate(TModel originalModel) => Download(originalModel, false, originalModel);
+        public void DownloadAsUpdate(TModel originalModel, bool minimiseDownloadSize) => Download(originalModel, minimiseDownloadSize, originalModel);
 
         protected bool Download(T model, bool minimiseDownloadSize, TModel? originalModel)
         {
@@ -111,7 +111,7 @@ namespace osu.Game.Database
                 {
                     if (error is WebException webException && webException.Message == @"TooManyRequests")
                     {
-                        notification.Close();
+                        notification.Close(false);
                         PostNotification?.Invoke(new TooManyDownloadsNotification());
                     }
                     else

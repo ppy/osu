@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 var cont = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.8f,
+                    Height = 0.2f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 var cont = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.8f,
+                    Height = 0.2f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             var barLine = new BarLine
             {
                 Major = major,
-                StartTime = Time.Current + 2000,
+                StartTime = Time.Current + 5000,
             };
 
             var cpi = new ControlPointInfo();

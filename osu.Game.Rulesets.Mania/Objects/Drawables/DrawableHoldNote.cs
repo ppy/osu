@@ -4,12 +4,14 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -38,6 +40,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private Container<DrawableHoldNoteTail> tailContainer;
         private Container<DrawableHoldNoteTick> tickContainer;
 
+        private PausableSkinnableSound slidingSample;
+
         /// <summary>
         /// Contains the size of the hold note covering the whole head/tail bounds. The size of this container changes as the hold note is being pressed.
         /// </summary>
@@ -64,6 +68,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// Whether the hold note has been released potentially without having caused a break.
         /// </summary>
         private double? releaseTime;
+
+        public override double MaximumJudgementOffset => Tail.MaximumJudgementOffset;
 
         public DrawableHoldNote()
             : this(null)
@@ -99,7 +105,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         headContainer = new Container<DrawableHoldNoteHead> { RelativeSizeAxes = Axes.Both }
                     }
                 },
-                bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody), _ => new DefaultBodyPiece
+                bodyPiece = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.HoldNoteBody), _ => new DefaultBodyPiece
                 {
                     RelativeSizeAxes = Axes.Both,
                 })
@@ -108,6 +114,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 },
                 tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
                 tailContainer = new Container<DrawableHoldNoteTail> { RelativeSizeAxes = Axes.Both },
+                slidingSample = new PausableSkinnableSound { Looping = true }
             });
 
             maskedContents.AddRange(new[]
@@ -116,6 +123,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 tickContainer.CreateProxy(),
                 tailContainer.CreateProxy(),
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            isHitting.BindValueChanged(updateSlidingSample, true);
         }
 
         protected override void OnApply()
@@ -248,12 +262,22 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         tick.MissForcefully();
                 }
 
-                ApplyResult(r => r.Type = r.Judgement.MaxResult);
-                endHold();
+                if (Tail.IsHit)
+                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                else
+                    MissForcefully();
             }
 
             if (Tail.Judged && !Tail.IsHit)
                 HoldBrokenTime = Time.Current;
+        }
+
+        public override void MissForcefully()
+        {
+            base.MissForcefully();
+
+            // Important that this is always called when a result is applied.
+            endHold();
         }
 
         public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
@@ -321,6 +345,39 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             HoldStartTime = null;
             isHitting.Value = false;
+        }
+
+        protected override void LoadSamples()
+        {
+            // Note: base.LoadSamples() isn't called since the slider plays the tail's hitsounds for the time being.
+
+            if (HitObject.SampleControlPoint == null)
+            {
+                throw new InvalidOperationException($"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
+                                                    + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
+            }
+
+            slidingSample.Samples = HitObject.CreateSlidingSamples().Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
+        }
+
+        public override void StopAllSamples()
+        {
+            base.StopAllSamples();
+            slidingSample?.Stop();
+        }
+
+        private void updateSlidingSample(ValueChangedEvent<bool> tracking)
+        {
+            if (tracking.NewValue)
+                slidingSample?.Play();
+            else
+                slidingSample?.Stop();
+        }
+
+        protected override void OnFree()
+        {
+            slidingSample.Samples = null;
+            base.OnFree();
         }
     }
 }

@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -338,26 +339,36 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestRulesetChanges()
+        public void TestCommonModsMaintainedOnRulesetChange()
         {
             createScreen();
             changeRuleset(0);
 
-            var noFailMod = new OsuRuleset().GetModsFor(ModType.DifficultyReduction).FirstOrDefault(m => m is OsuModNoFail);
-
-            AddStep("set mods externally", () => { SelectedMods.Value = new[] { noFailMod }; });
+            AddStep("select relax mod", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModRelax>() });
 
             changeRuleset(0);
+            AddAssert("ensure mod still selected", () => SelectedMods.Value.SingleOrDefault() is OsuModRelax);
 
-            AddAssert("ensure mods still selected", () => SelectedMods.Value.SingleOrDefault(m => m is OsuModNoFail) != null);
+            changeRuleset(2);
+            AddAssert("catch variant selected", () => SelectedMods.Value.SingleOrDefault() is CatchModRelax);
 
             changeRuleset(3);
+            AddAssert("no mod selected", () => SelectedMods.Value.Count == 0);
+        }
 
-            AddAssert("ensure mods not selected", () => SelectedMods.Value.Count == 0);
-
+        [Test]
+        public void TestUncommonModsDiscardedOnRulesetChange()
+        {
+            createScreen();
             changeRuleset(0);
 
-            AddAssert("ensure mods not selected", () => SelectedMods.Value.Count == 0);
+            AddStep("select single tap mod", () => SelectedMods.Value = new[] { new OsuModSingleTap() });
+
+            changeRuleset(0);
+            AddAssert("ensure mod still selected", () => SelectedMods.Value.SingleOrDefault() is OsuModSingleTap);
+
+            changeRuleset(3);
+            AddAssert("no mod selected", () => SelectedMods.Value.Count == 0);
         }
 
         [Test]

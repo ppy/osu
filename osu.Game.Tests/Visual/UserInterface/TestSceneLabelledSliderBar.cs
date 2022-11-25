@@ -38,6 +38,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("revert back", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.ResizeWidthTo(1, 200, Easing.OutQuint)));
         }
 
+        [Test]
+        public void TestDisable()
+        {
+            createSliderBar();
+            AddStep("set disabled", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.Current.Disabled = true));
+            AddStep("unset disabled", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.Current.Disabled = false));
+        }
+
         private void createSliderBar()
         {
             AddStep("create component", () =>

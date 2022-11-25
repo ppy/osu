@@ -436,6 +436,8 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddUntilStep("Wait for toolbar to load", () => Game.Toolbar.IsLoaded);
 
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
             TestPlaySongSelect songSelect = null;
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
@@ -511,6 +513,40 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("open room", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().Single().Open());
             AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
             AddWaitStep("wait two frames", 2);
+        }
+
+        [Test]
+        public void TestMainOverlaysClosesNotificationOverlay()
+        {
+            ChangelogOverlay getChangelogOverlay() => Game.ChildrenOfType<ChangelogOverlay>().FirstOrDefault();
+
+            AddUntilStep("Wait for notifications to load", () => Game.Notifications.IsLoaded);
+            AddStep("Show notifications", () => Game.Notifications.Show());
+            AddUntilStep("wait for notifications shown", () => Game.Notifications.IsPresent && Game.Notifications.State.Value == Visibility.Visible);
+            AddStep("Show changelog listing", () => Game.ShowChangelogListing());
+            AddUntilStep("wait for changelog shown", () => getChangelogOverlay()?.IsPresent == true && getChangelogOverlay()?.State.Value == Visibility.Visible);
+            AddAssert("Notifications is hidden", () => Game.Notifications.State.Value == Visibility.Hidden);
+
+            AddStep("Show notifications", () => Game.Notifications.Show());
+            AddUntilStep("wait for notifications shown", () => Game.Notifications.State.Value == Visibility.Visible);
+            AddUntilStep("changelog still visible", () => getChangelogOverlay().State.Value == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestMainOverlaysClosesSettingsOverlay()
+        {
+            ChangelogOverlay getChangelogOverlay() => Game.ChildrenOfType<ChangelogOverlay>().FirstOrDefault();
+
+            AddUntilStep("Wait for settings to load", () => Game.Settings.IsLoaded);
+            AddStep("Show settings", () => Game.Settings.Show());
+            AddUntilStep("wait for settings shown", () => Game.Settings.IsPresent && Game.Settings.State.Value == Visibility.Visible);
+            AddStep("Show changelog listing", () => Game.ShowChangelogListing());
+            AddUntilStep("wait for changelog shown", () => getChangelogOverlay()?.IsPresent == true && getChangelogOverlay()?.State.Value == Visibility.Visible);
+            AddAssert("Settings is hidden", () => Game.Settings.State.Value == Visibility.Hidden);
+
+            AddStep("Show settings", () => Game.Settings.Show());
+            AddUntilStep("wait for settings shown", () => Game.Settings.State.Value == Visibility.Visible);
+            AddUntilStep("changelog still visible", () => getChangelogOverlay().State.Value == Visibility.Visible);
         }
 
         [Test]

@@ -248,6 +248,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     break;
             }
 
+            slider.Path.ExpectedDistance.Value = null;
             piece.ControlPoint.Type = type;
         }
 
@@ -303,11 +304,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
             {
+                var result = snapProvider?.FindSnappedPositionAndTime(Parent.ToScreenSpace(e.MousePosition));
+
+                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? Parent.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - slider.Position;
+
                 for (int i = 0; i < controlPoints.Count; ++i)
                 {
                     var controlPoint = controlPoints[i];
                     if (selectedControlPoints.Contains(controlPoint))
-                        controlPoint.Position = dragStartPositions[i] + (e.MousePosition - e.MouseDownPosition);
+                        controlPoint.Position = dragStartPositions[i] + movementDelta;
                 }
             }
 

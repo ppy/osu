@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The current total score.
         /// </summary>
-        public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
+        public readonly BindableLong TotalScore = new BindableLong { MinValue = 0 };
 
         /// <summary>
         /// The current accuracy.
@@ -267,12 +267,29 @@ namespace osu.Game.Rulesets.Scoring
 
         private void updateScore()
         {
-            Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
+            Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
             TotalScore.Value = ComputeScore(Mode.Value, currentScoringValues, maximumScoringValues);
         }
 
         /// <summary>
-        /// Computes the total score of a given finalised <see cref="ScoreInfo"/>. This should be used when a score is known to be complete.
+        /// Computes the accuracy of a given <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
+        /// <returns>The score's accuracy.</returns>
+        [Pure]
+        public double ComputeAccuracy(ScoreInfo scoreInfo)
+        {
+            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+
+            // We only extract scoring values from the score's statistics. This is because accuracy is always relative to the point of pass or fail rather than relative to the whole beatmap.
+            extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
+
+            return maximum.BaseScore > 0 ? current.BaseScore / maximum.BaseScore : 1;
+        }
+
+        /// <summary>
+        /// Computes the total score of a given <see cref="ScoreInfo"/>.
         /// </summary>
         /// <remarks>
         /// Does not require <see cref="JudgementProcessor.ApplyBeatmap"/> to have been called before use.
@@ -281,7 +298,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         [Pure]
-        public double ComputeScore(ScoringMode mode, ScoreInfo scoreInfo)
+        public long ComputeScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
@@ -299,9 +316,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="maximum">The maximum scoring values.</param>
         /// <returns>The total score computed from the given scoring values.</returns>
         [Pure]
-        public double ComputeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum)
+        public long ComputeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum)
         {
-            double accuracyRatio = maximum.BaseScore > 0 ? current.BaseScore / maximum.BaseScore : 1;
+            double accuracyRatio = maximum.BaseScore > 0 ? (double)current.BaseScore / maximum.BaseScore : 1;
             double comboRatio = maximum.MaxCombo > 0 ? (double)current.MaxCombo / maximum.MaxCombo : 1;
             return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.CountBasicHitObjects);
         }
@@ -316,21 +333,23 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="totalBasicHitObjects">The total number of basic (non-tick and non-bonus) hitobjects in the beatmap.</param>
         /// <returns>The total score computed from the given scoring component ratios.</returns>
         [Pure]
-        public double ComputeScore(ScoringMode mode, double accuracyRatio, double comboRatio, double bonusScore, int totalBasicHitObjects)
+        public long ComputeScore(ScoringMode mode, double accuracyRatio, double comboRatio, long bonusScore, int totalBasicHitObjects)
         {
+            double accuracyScore = accuracyPortion * accuracyRatio;
+            double comboScore = comboPortion * comboRatio;
+            double rawScore = (max_score * (accuracyScore + comboScore) + bonusScore) * scoreMultiplier;
+
             switch (mode)
             {
                 default:
                 case ScoringMode.Standardised:
-                    double accuracyScore = accuracyPortion * accuracyRatio;
-                    double comboScore = comboPortion * comboRatio;
-                    return (max_score * (accuracyScore + comboScore) + bonusScore) * scoreMultiplier;
+                    return (long)Math.Round(rawScore);
 
                 case ScoringMode.Classic:
                     // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
                     // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
-                    double scaledStandardised = ComputeScore(ScoringMode.Standardised, accuracyRatio, comboRatio, bonusScore, totalBasicHitObjects) / max_score;
-                    return Math.Pow(scaledStandardised * Math.Max(1, totalBasicHitObjects), 2) * ClassicScoreMultiplier;
+                    double scaledRawScore = rawScore / max_score;
+                    return (long)Math.Round(Math.Pow(scaledRawScore * Math.Max(1, totalBasicHitObjects), 2) * ClassicScoreMultiplier);
             }
         }
 
@@ -400,7 +419,7 @@ namespace osu.Game.Rulesets.Scoring
                 score.MaximumStatistics[result] = maximumResultCounts.GetValueOrDefault(result);
 
             // Populate total score after everything else.
-            score.TotalScore = (long)Math.Round(ComputeScore(ScoringMode.Standardised, score));
+            score.TotalScore = ComputeScore(ScoringMode.Standardised, score);
         }
 
         /// <summary>

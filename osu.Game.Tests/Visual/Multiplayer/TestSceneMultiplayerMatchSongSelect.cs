@@ -19,7 +19,6 @@ using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -66,37 +65,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value)));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
-        }
-
-        [Test]
-        public void TestBeatmapRevertedOnExitIfNoSelection()
-        {
-            BeatmapInfo selectedBeatmap = null;
-
-            AddStep("select beatmap",
-                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.Where(beatmap => beatmap.Ruleset.OnlineID == new OsuRuleset().LegacyID).ElementAt(1)));
-            AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
-
-            AddStep("exit song select", () => songSelect.Exit());
-            AddAssert("beatmap reverted", () => Beatmap.IsDefault);
-        }
-
-        [Test]
-        public void TestModsRevertedOnExitIfNoSelection()
-        {
-            AddStep("change mods", () => SelectedMods.Value = new[] { new OsuModDoubleTime() });
-
-            AddStep("exit song select", () => songSelect.Exit());
-            AddAssert("mods reverted", () => SelectedMods.Value.Count == 0);
-        }
-
-        [Test]
-        public void TestRulesetRevertedOnExitIfNoSelection()
-        {
-            AddStep("change ruleset", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
-
-            AddStep("exit song select", () => songSelect.Exit());
-            AddAssert("ruleset reverted", () => Ruleset.Value.Equals(new OsuRuleset().RulesetInfo));
         }
 
         [Test]
@@ -152,8 +120,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             public new BeatmapCarousel Carousel => base.Carousel;
 
-            public TestMultiplayerMatchSongSelect(Room room, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
-                : base(room, null, beatmap, ruleset)
+            public TestMultiplayerMatchSongSelect(Room room)
+                : base(room)
             {
             }
         }

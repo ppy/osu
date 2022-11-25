@@ -2,15 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
@@ -22,6 +26,18 @@ namespace osu.Game.Screens.Select.Carousel
         private SpriteIcon icon = null!;
         private Box progressFill = null!;
 
+        [Resolved]
+        private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private LoginOverlay? loginOverlay { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
         public UpdateBeatmapSetButton(BeatmapSetInfo beatmapSetInfo)
         {
             this.beatmapSetInfo = beatmapSetInfo;
@@ -32,13 +48,14 @@ namespace osu.Game.Screens.Select.Carousel
             Origin = Anchor.CentreLeft;
         }
 
-        [Resolved]
-        private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
+        private Bindable<bool> preferNoVideo = null!;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             const float icon_size = 14;
+
+            preferNoVideo = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
             Content.Anchor = Anchor.CentreLeft;
             Content.Origin = Anchor.CentreLeft;
@@ -88,11 +105,34 @@ namespace osu.Game.Screens.Select.Carousel
                 },
             });
 
-            Action = () =>
+            Action = updateBeatmap;
+        }
+
+        private bool updateConfirmed;
+
+        private void updateBeatmap()
+        {
+            if (!api.IsLoggedIn)
             {
-                beatmapDownloader.DownloadAsUpdate(beatmapSetInfo);
-                attachExistingDownload();
-            };
+                loginOverlay?.Show();
+                return;
+            }
+
+            if (dialogOverlay != null && beatmapSetInfo.Status == BeatmapOnlineStatus.LocallyModified && !updateConfirmed)
+            {
+                dialogOverlay.Push(new UpdateLocalConfirmationDialog(() =>
+                {
+                    updateConfirmed = true;
+                    updateBeatmap();
+                }));
+
+                return;
+            }
+
+            updateConfirmed = false;
+
+            beatmapDownloader.DownloadAsUpdate(beatmapSetInfo, preferNoVideo.Value);
+            attachExistingDownload();
         }
 
         protected override void LoadComplete()

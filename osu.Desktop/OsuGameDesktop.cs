@@ -18,17 +18,9 @@ using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
-using osu.Framework.Input.Handlers;
-using osu.Framework.Input.Handlers.Joystick;
-using osu.Framework.Input.Handlers.Mouse;
-using osu.Framework.Input.Handlers.Tablet;
-using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.Threading;
 using osu.Game.IO;
 using osu.Game.IPC;
-using osu.Game.Overlays.Settings;
-using osu.Game.Overlays.Settings.Sections;
-using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Utils;
 using SDL2;
 
@@ -137,35 +129,15 @@ namespace osu.Desktop
         {
             base.SetHost(host);
 
-            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
-
             var desktopWindow = (SDL2DesktopWindow)host.Window;
 
+            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
+            if (iconStream != null)
+                desktopWindow.SetIconFromStream(iconStream);
+
             desktopWindow.CursorState |= CursorState.Hidden;
-            desktopWindow.SetIconFromStream(iconStream);
             desktopWindow.Title = Name;
             desktopWindow.DragDrop += f => fileDrop(new[] { f });
-        }
-
-        public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
-        {
-            switch (handler)
-            {
-                case ITabletHandler th:
-                    return new TabletSettings(th);
-
-                case MouseHandler mh:
-                    return new MouseSettings(mh);
-
-                case JoystickHandler jh:
-                    return new JoystickSettings(jh);
-
-                case TouchHandler th:
-                    return new InputSection.HandlerSection(th);
-
-                default:
-                    return base.CreateSettingsSubsectionFor(handler);
-            }
         }
 
         protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();

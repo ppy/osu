@@ -5,6 +5,9 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   sentry_release:
     runs-on: ubuntu-latest

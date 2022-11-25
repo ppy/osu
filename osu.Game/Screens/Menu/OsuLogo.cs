@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Menu
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        logoBounceContainer = new DragContainer
+                        logoBounceContainer = new Container
                         {
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
@@ -407,27 +407,24 @@ namespace osu.Game.Screens.Menu
             impactContainer.ScaleTo(1.12f, 250);
         }
 
-        private class DragContainer : Container
+        public override bool DragBlocksClick => false;
+
+        protected override bool OnDragStart(DragStartEvent e) => true;
+
+        protected override void OnDrag(DragEvent e)
         {
-            public override bool DragBlocksClick => false;
+            Vector2 change = e.MousePosition - e.MouseDownPosition;
 
-            protected override bool OnDragStart(DragStartEvent e) => true;
+            // Diminish the drag distance as we go further to simulate "rubber band" feeling.
+            change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.6f) / change.Length;
 
-            protected override void OnDrag(DragEvent e)
-            {
-                Vector2 change = e.MousePosition - e.MouseDownPosition;
+            logoBounceContainer.MoveTo(change);
+        }
 
-                // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-                change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.6f) / change.Length;
-
-                this.MoveTo(change);
-            }
-
-            protected override void OnDragEnd(DragEndEvent e)
-            {
-                this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-                base.OnDragEnd(e);
-            }
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            logoBounceContainer.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
+            base.OnDragEnd(e);
         }
     }
 }
