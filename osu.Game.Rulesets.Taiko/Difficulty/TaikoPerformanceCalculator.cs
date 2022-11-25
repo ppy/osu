@@ -12,6 +12,9 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Scoring;
 using MathNet.Numerics;
+using MathNet.Numerics.RootFinding;
+using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
@@ -66,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 Accuracy = accuracyValue,
                 EffectiveMissCount = effectiveMissCount,
                 EstimatedUr = estimatedDeviation * 10,
-                Total = totalValue
+                Total = (double)estimatedDeviation * 10
             };
         }
 
@@ -118,20 +121,56 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (totalHits == 0)
                 return null;
 
-            double greatProbability = 1 - (countOk + countMiss + 1.0) / (totalHits + 1.0);
+            // Create a new track to properly calculate the hit windows of 100s and 50s.
+            var track = new TrackVirtual(10000);
+            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+            double clockRate = track.Rate;
+            double overallDifficulty = (50 - attributes.GreatHitWindow) / 3 * clockRate;
+            double goodHitWindow = 0;
+            if (overallDifficulty <= 5)
+                goodHitWindow = (120 - 8 * overallDifficulty) / clockRate;
+            if (overallDifficulty > 5)
+                goodHitWindow = 80 - 6 * (overallDifficulty - 5);
+            
+            double root2 = Math.Sqrt(2);
 
-            if (greatProbability is <= 0 or >= 1)
+            double logLikelihoodGradient(double d)
             {
-                return null;
+                if (d <= 0)
+                    return 1;
+                
+                double p300 = SpecialFunctions.Erf(attributes.GreatHitWindow / root2 * d);
+                double lnP300 = lnErfcApprox(attributes.GreatHitWindow / root2 * d);
+                double lnP100 = lnErfcApprox(goodHitWindow / root2 * d);
+
+                double t1 = countGreat * ((attributes.GreatHitWindow * Math.Exp(-Math.Pow(attributes.GreatHitWindow / root2 * d, 2))) / p300);
+
+                double t2a = Math.Exp(Math.Log(goodHitWindow * Math.Exp(-Math.Pow(goodHitWindow / root2 * d, 2))) - logDiff(lnP300, lnP100));
+                double t2b = Math.Exp(Math.Log(attributes.GreatHitWindow * Math.Exp(-Math.Pow(attributes.GreatHitWindow / root2 * d, 2))) - logDiff(lnP300, lnP100));
+                double t2 = (countOk + 1) * (t2a - t2b);
+
+                double t3 = countMiss * Math.Exp(Math.Log(goodHitWindow * Math.Exp(-Math.Pow(goodHitWindow / root2 * d, 2))) - lnP100);
+
+                return t1 + t2 - t3;
             }
 
-            double deviation = attributes.GreatHitWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbability));
+            double root = Brent.FindRootExpand(logLikelihoodGradient, 0.02, 0.3, expandFactor: 2);
 
-            return deviation;
+            return 1 / root;
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
 
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
+
+        double lnErfcApprox(double x)
+        {
+            if (x <= 5)
+                return Math.Log(SpecialFunctions.Erfc(x));
+            
+            return -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI));
+        }
+
+        double logDiff(double l1, double l2) => l1 + SpecialFunctions.Log1p(-Math.Exp(-(l1 - l2)));
     }
 }
