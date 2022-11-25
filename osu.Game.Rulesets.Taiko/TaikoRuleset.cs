@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Rulesets.Taiko.Scoring;
+using osu.Game.Rulesets.Taiko.Skinning.Argon;
 using osu.Game.Rulesets.Taiko.Skinning.Legacy;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
@@ -43,7 +44,19 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap, this);
 
-        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new TaikoLegacySkinTransformer(skin);
+        public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)
+        {
+            switch (skin)
+            {
+                case ArgonSkin:
+                    return new TaikoArgonSkinTransformer(skin);
+
+                case LegacySkin:
+                    return new TaikoLegacySkinTransformer(skin);
+            }
+
+            return null;
+        }
 
         public const string SHORT_NAME = "taiko";
 

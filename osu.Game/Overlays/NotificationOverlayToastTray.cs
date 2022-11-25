@@ -26,6 +26,8 @@ namespace osu.Game.Overlays
     {
         public override bool IsPresent => toastContentBackground.Height > 0 || toastFlow.Count > 0;
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => toastFlow.ReceivePositionalInputAt(screenSpacePos);
+
         public bool IsDisplayingToasts => toastFlow.Count > 0;
 
         private FillFlowContainer<Notification> toastFlow = null!;
@@ -100,6 +102,8 @@ namespace osu.Game.Overlays
         {
             ++runningDepth;
 
+            notification.ForwardToOverlay = () => forwardNotification(notification);
+
             int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
 
             toastFlow.Insert(depth, notification);
@@ -130,6 +134,9 @@ namespace osu.Game.Overlays
 
         private void forwardNotification(Notification notification)
         {
+            if (!notification.IsInToastTray)
+                return;
+
             Debug.Assert(notification.Parent == toastFlow);
 
             // Temporarily remove from flow so we can animate the position off to the right.

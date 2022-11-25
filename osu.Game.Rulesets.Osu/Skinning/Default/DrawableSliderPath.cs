@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics.Lines;
 using osuTK.Graphics;
 
@@ -10,8 +8,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public abstract class DrawableSliderPath : SmoothPath
     {
-        protected const float BORDER_PORTION = 0.128f;
-        protected const float GRADIENT_PORTION = 1 - BORDER_PORTION;
+        public const float BORDER_PORTION = 0.128f;
+        public const float GRADIENT_PORTION = 1 - BORDER_PORTION;
 
         private const float border_max_size = 8f;
         private const float border_min_size = 0f;

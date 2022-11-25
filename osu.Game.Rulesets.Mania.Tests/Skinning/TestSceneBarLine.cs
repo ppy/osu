@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         {
             var stageDefinitions = new List<StageDefinition>
             {
-                new StageDefinition { Columns = 4 },
+                new StageDefinition(4),
             };
 
             SetContents(_ => new ManiaPlayfield(stageDefinitions).With(s =>

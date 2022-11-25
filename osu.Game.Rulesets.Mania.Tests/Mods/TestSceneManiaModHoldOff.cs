@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
         private static ManiaBeatmap createRawBeatmap()
         {
-            var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 1 });
+            var beatmap = new ManiaBeatmap(new StageDefinition(1));
             beatmap.ControlPointInfo.Add(0.0, new TimingControlPoint { BeatLength = 1000 }); // Set BPM to 60
 
             // Add test hit objects

@@ -23,10 +23,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
-        // Leaving the default (10s) makes hitobjects not appear, as this offset is used for the initial state transforms.
-        // Calculated as DrawableManiaRuleset.MAX_TIME_RANGE + some additional allowance for velocity < 1.
-        protected override double InitialLifetimeOffset => 30000;
-
         [Resolved(canBeNull: true)]
         private ManiaPlayfield playfield { get; set; }
 
@@ -69,22 +65,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Direction.BindValueChanged(OnDirectionChanged, true);
         }
 
-        protected override void OnApply()
-        {
-            base.OnApply();
-
-            if (ParentHitObject != null)
-                AccentColour.BindTo(ParentHitObject.AccentColour);
-        }
-
-        protected override void OnFree()
-        {
-            base.OnFree();
-
-            if (ParentHitObject != null)
-                AccentColour.UnbindFrom(ParentHitObject.AccentColour);
-        }
-
         protected virtual void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
         {
             Anchor = Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
@@ -107,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// <summary>
         /// Causes this <see cref="DrawableManiaHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
+        public virtual void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
     }
 
     public abstract class DrawableManiaHitObject<TObject> : DrawableManiaHitObject
