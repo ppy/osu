@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double? computeEstimatedDeviation(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
-            if (totalHits == 0)
+            if (totalSuccessfulHits == 0)
                 return null;
 
             // Create a new track to properly calculate the hit windows of 100s and 50s.
@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 return t1 + t2 - t3;
             }
 
-            double root = Brent.FindRootExpand(logLikelihoodGradient, 0.02, 0.3, expandFactor: 2);
+            double root = Brent.FindRootExpand(logLikelihoodGradient, 0.02, 0.3);
 
             return 1 / root;
         }
@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
 
-        double lnErfcApprox(double x)
+        private double lnErfcApprox(double x)
         {
             if (x <= 5)
                 return Math.Log(SpecialFunctions.Erfc(x));
@@ -172,6 +172,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI));
         }
 
-        double logDiff(double l1, double l2) => l1 + SpecialFunctions.Log1p(-Math.Exp(-(l1 - l2)));
+        private double logDiff(double l1, double l2) => l1 + SpecialFunctions.Log1p(-Math.Exp(-(l1 - l2)));
     }
 }
