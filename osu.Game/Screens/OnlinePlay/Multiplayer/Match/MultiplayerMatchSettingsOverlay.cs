@@ -475,7 +475,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                BackgroundColour = colours.Yellow;
+                BackgroundColour = colours.YellowDark;
             }
         }
 
