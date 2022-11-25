@@ -61,7 +61,7 @@ namespace osu.Game.Tournament.Screens.Setup
                     Spacing = new Vector2(10, 0),
                     Children = new Drawable[]
                     {
-                        Button = new TriangleButton
+                        Button = new RoundedButton
                         {
                             Size = new Vector2(100, 40),
                             Action = () => Action?.Invoke()

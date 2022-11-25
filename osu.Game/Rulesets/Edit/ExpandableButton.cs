@@ -86,6 +86,7 @@ namespace osu.Game.Rulesets.Edit
                     SpriteText.Font = OsuFont.GetFont(weight: FontWeight.Bold);
                     base.Height = actualHeight;
                     Background.Show();
+                    Triangles?.Show();
                 }
                 else
                 {
@@ -94,6 +95,7 @@ namespace osu.Game.Rulesets.Edit
                     SpriteText.Font = OsuFont.GetFont(weight: FontWeight.Regular);
                     base.Height = actualHeight / 2;
                     Background.Hide();
+                    Triangles?.Hide();
                 }
             }, true);
         }

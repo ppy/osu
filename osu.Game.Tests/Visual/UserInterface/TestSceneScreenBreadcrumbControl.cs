@@ -11,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Screens;
 using osuTK;
 
@@ -109,7 +110,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Origin = Anchor.TopCentre,
                             Text = Title,
                         },
-                        new TriangleButton
+                        new RoundedButton
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,

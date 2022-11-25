@@ -93,7 +93,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                         Spacing = new Vector2(20),
                                         Children = new Drawable[]
                                         {
-                                            new TriangleButton
+                                            new RoundedButton
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
@@ -101,7 +101,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                                 Text = "Select stable path",
                                                 Action = ChangePath
                                             },
-                                            new TriangleButton
+                                            new RoundedButton
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
