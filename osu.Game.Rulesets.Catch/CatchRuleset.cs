@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using osu.Framework.Extensions.EnumExtensions;
@@ -19,6 +17,7 @@ using osu.Game.Rulesets.Catch.Edit;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Catch.Scoring;
+using osu.Game.Rulesets.Catch.Skinning.Argon;
 using osu.Game.Rulesets.Catch.Skinning.Legacy;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty;
@@ -33,7 +32,7 @@ namespace osu.Game.Rulesets.Catch
 {
     public class CatchRuleset : Ruleset, ILegacyRuleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableCatchRuleset(this, beatmap, mods);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableCatchRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
 
@@ -184,7 +183,19 @@ namespace osu.Game.Rulesets.Catch
 
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new CatchDifficultyCalculator(RulesetInfo, beatmap);
 
-        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new CatchLegacySkinTransformer(skin);
+        public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)
+        {
+            switch (skin)
+            {
+                case LegacySkin:
+                    return new CatchLegacySkinTransformer(skin);
+
+                case ArgonSkin:
+                    return new CatchArgonSkinTransformer(skin);
+            }
+
+            return null;
+        }
 
         public override PerformanceCalculator CreatePerformanceCalculator() => new CatchPerformanceCalculator();
 

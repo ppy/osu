@@ -56,7 +56,9 @@ namespace osu.Game.Tests.Visual.Online
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Add(channelManager = new ChannelManager(parent.Get<IAPIProvider>()));
+            var api = parent.Get<IAPIProvider>();
+
+            Add(channelManager = new ChannelManager(api));
 
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 

@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
             Origin = Anchor.Centre;
 
-            InternalChild = scaleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderScorePoint), _ => new CircularContainer
+            AddInternal(scaleContainer = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderScorePoint), _ => new CircularContainer
             {
                 Masking = true,
                 Origin = Anchor.Centre,
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-            };
+            });
 
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }

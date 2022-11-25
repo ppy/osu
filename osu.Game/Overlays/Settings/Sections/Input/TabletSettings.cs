@@ -45,9 +45,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private GameHost host { get; set; }
 
         /// <summary>
-        /// Based on ultrawide monitor configurations.
+        /// Based on ultrawide monitor configurations, plus a bit of lenience for users which are intentionally aiming for higher horizontal velocity.
         /// </summary>
-        private const float largest_feasible_aspect_ratio = 21f / 9;
+        private const float largest_feasible_aspect_ratio = 23f / 9;
 
         private readonly BindableNumber<float> aspectRatio = new BindableFloat(1)
         {
@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, LocalisationManager localisation)
         {
             Children = new Drawable[]
             {
@@ -110,11 +110,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                             {
                                 t.NewLine();
-                                t.AddText("If your tablet is not detected, please read ");
-                                t.AddLink("this FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
-                                    ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
-                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux");
-                                t.AddText(" for troubleshooting steps.");
+                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedBindableString(TabletSettingsStrings.NoTabletDetectedDescription(
+                                    RuntimeInfo.OS == RuntimeInfo.Platform.Windows
+                                        ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
+                                        : @"https://opentabletdriver.net/Wiki/FAQ/Linux")).Value);
+                                t.AddLinks(formattedSource.Text, formattedSource.Links);
                             }
                         }),
                     }
@@ -215,21 +215,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             rotation.BindTo(tabletHandler.Rotation);
 
             areaOffset.BindTo(tabletHandler.AreaOffset);
-            areaOffset.BindValueChanged(val =>
+            areaOffset.BindValueChanged(val => Schedule(() =>
             {
                 offsetX.Value = val.NewValue.X;
                 offsetY.Value = val.NewValue.Y;
-            }, true);
+            }), true);
 
             offsetX.BindValueChanged(val => areaOffset.Value = new Vector2(val.NewValue, areaOffset.Value.Y));
             offsetY.BindValueChanged(val => areaOffset.Value = new Vector2(areaOffset.Value.X, val.NewValue));
 
             areaSize.BindTo(tabletHandler.AreaSize);
-            areaSize.BindValueChanged(val =>
+            areaSize.BindValueChanged(val => Schedule(() =>
             {
                 sizeX.Value = val.NewValue.X;
                 sizeY.Value = val.NewValue.Y;
-            }, true);
+            }), true);
 
             sizeX.BindValueChanged(val =>
             {
@@ -255,7 +255,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             });
 
             tablet.BindTo(tabletHandler.Tablet);
-            tablet.BindValueChanged(val =>
+            tablet.BindValueChanged(val => Schedule(() =>
             {
                 Scheduler.AddOnce(updateVisibility);
 
@@ -274,7 +274,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 sizeY.Default = sizeY.MaxValue = tab.Size.Y;
 
                 areaSize.Default = new Vector2(sizeX.Default, sizeY.Default);
-            }, true);
+                areaOffset.Default = new Vector2(offsetX.Default, offsetY.Default);
+            }), true);
         }
 
         private void updateVisibility()
@@ -309,9 +310,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 // if lock is applied (or the specified values were out of range) aim to adjust the axis the user was not adjusting to conform.
                 if (sizeChanged == sizeX)
-                    sizeY.Value = (int)(areaSize.Value.X / aspectRatio.Value);
+                    sizeY.Value = getHeight(areaSize.Value.X, aspectRatio.Value);
                 else
-                    sizeX.Value = (int)(areaSize.Value.Y * aspectRatio.Value);
+                    sizeX.Value = getWidth(areaSize.Value.Y, aspectRatio.Value);
             }
             finally
             {
@@ -325,12 +326,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             aspectLock.Value = false;
 
-            int proposedHeight = (int)(sizeX.Value / aspectRatio);
+            float proposedHeight = getHeight(sizeX.Value, aspectRatio);
 
             if (proposedHeight < sizeY.MaxValue)
                 sizeY.Value = proposedHeight;
             else
-                sizeX.Value = (int)(sizeY.Value * aspectRatio);
+                sizeX.Value = getWidth(sizeY.Value, aspectRatio);
 
             updateAspectRatio();
 
@@ -341,5 +342,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private void updateAspectRatio() => aspectRatio.Value = currentAspectRatio;
 
         private float currentAspectRatio => sizeX.Value / sizeY.Value;
+
+        private static float getHeight(float width, float aspectRatio) => width / aspectRatio;
+
+        private static float getWidth(float height, float aspectRatio) => height * aspectRatio;
     }
 }

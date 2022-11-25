@@ -58,10 +58,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null)
         {
-            var drawable = createSingle(circleSize, auto, timeOffset, positionOffset);
-
             var playfield = new TestOsuPlayfield();
-            playfield.Add(drawable);
+
+            for (double t = timeOffset; t < timeOffset + 60000; t += 2000)
+                playfield.Add(createSingle(circleSize, auto, t, positionOffset));
+
             return playfield;
         }
 

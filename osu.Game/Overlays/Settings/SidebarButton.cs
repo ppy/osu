@@ -16,6 +16,11 @@ namespace osu.Game.Overlays.Settings
         [Resolved]
         protected OverlayColourProvider ColourProvider { get; private set; }
 
+        protected SidebarButton()
+            : base(HoverSampleSet.ButtonSidebar)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {

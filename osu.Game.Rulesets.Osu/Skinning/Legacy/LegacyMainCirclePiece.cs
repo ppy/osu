@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             InternalChildren = new[]
             {
-                CircleSprite = new KiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
+                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = OverlaySprite = new KiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
+                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             if (hasNumber)
             {
-                OverlayLayer.Add(hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
+                OverlayLayer.Add(hitCircleText = new SkinnableSpriteText(new OsuSkinComponentLookup(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
@@ -134,10 +134,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        CircleSprite.FadeOut(legacy_fade_duration, Easing.Out);
+                        CircleSprite.FadeOut(legacy_fade_duration);
                         CircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
-                        OverlaySprite.FadeOut(legacy_fade_duration, Easing.Out);
+                        OverlaySprite.FadeOut(legacy_fade_duration);
                         OverlaySprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
                         if (hasNumber)
@@ -146,11 +146,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                             if (legacyVersion >= 2.0m)
                                 // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
-                                hitCircleText.FadeOut(legacy_fade_duration / 4, Easing.Out);
+                                hitCircleText.FadeOut(legacy_fade_duration / 4);
                             else
                             {
                                 // old skins scale and fade it normally along other pieces.
-                                hitCircleText.FadeOut(legacy_fade_duration, Easing.Out);
+                                hitCircleText.FadeOut(legacy_fade_duration);
                                 hitCircleText.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
                             }
                         }

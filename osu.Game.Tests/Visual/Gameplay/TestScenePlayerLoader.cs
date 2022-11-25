@@ -264,13 +264,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestMutedNotificationMasterVolume()
         {
-            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, () => audioManager.Volume.IsDefault);
+            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, () => audioManager.Volume.Value == 0.5);
         }
 
         [Test]
         public void TestMutedNotificationTrackVolume()
         {
-            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, () => audioManager.VolumeTrack.IsDefault);
+            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, () => audioManager.VolumeTrack.Value == 0.5);
         }
 
         [Test]

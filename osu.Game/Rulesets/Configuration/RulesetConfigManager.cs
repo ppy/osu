@@ -58,6 +58,9 @@ namespace osu.Game.Rulesets.Configuration
                 pendingWrites.Clear();
             }
 
+            if (!changed.Any())
+                return true;
+
             realm?.Write(r =>
             {
                 foreach (var c in changed)

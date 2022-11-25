@@ -93,10 +93,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override Beatmap<ManiaHitObject> CreateBeatmap()
         {
-            beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns }, originalTargetColumns);
+            beatmap = new ManiaBeatmap(new StageDefinition(TargetColumns), originalTargetColumns);
 
             if (Dual)
-                beatmap.Stages.Add(new StageDefinition { Columns = TargetColumns });
+                beatmap.Stages.Add(new StageDefinition(TargetColumns));
 
             return beatmap;
         }

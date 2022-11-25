@@ -70,6 +70,8 @@ namespace osu.Game.Graphics.UserInterface
         protected Box Background;
         protected SpriteText SpriteText;
 
+        private readonly Box flashLayer;
+
         public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Button)
         {
             Height = 40;
@@ -95,16 +97,24 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White.Opacity(.1f),
+                        Colour = Color4.White,
                         Blending = BlendingParameters.Additive,
                         Depth = float.MinValue
                     },
                     SpriteText = CreateText(),
+                    flashLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Blending = BlendingParameters.Additive,
+                        Depth = float.MinValue,
+                        Colour = Color4.White.Opacity(0.5f),
+                        Alpha = 0,
+                    },
                 }
             });
 
             if (hoverSounds.HasValue)
-                AddInternal(new HoverClickSounds(hoverSounds.Value));
+                AddInternal(new HoverClickSounds(hoverSounds.Value) { Enabled = { BindTarget = Enabled } });
         }
 
         [BackgroundDependencyLoader]
@@ -126,7 +136,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(ClickEvent e)
         {
             if (Enabled.Value)
-                Background.FlashColour(BackgroundColour.Lighten(0.4f), 200);
+                flashLayer.FadeOutFromOne(800, Easing.OutQuint);
 
             return base.OnClick(e);
         }
@@ -134,7 +144,11 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             if (Enabled.Value)
-                Hover.FadeIn(200, Easing.OutQuint);
+            {
+                Hover.FadeTo(0.2f, 40, Easing.OutQuint)
+                     .Then()
+                     .FadeTo(0.1f, 800, Easing.OutQuint);
+            }
 
             return base.OnHover(e);
         }
@@ -143,7 +157,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnHoverLost(e);
 
-            Hover.FadeOut(300);
+            Hover.FadeOut(800, Easing.OutQuint);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

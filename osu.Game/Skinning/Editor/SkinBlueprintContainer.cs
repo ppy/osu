@@ -11,9 +11,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit.Compose.Components;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -88,6 +91,52 @@ namespace osu.Game.Skinning.Editor
                 return;
 
             base.AddBlueprintFor(item);
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                    moveSelection(new Vector2(-1, 0));
+                    return true;
+
+                case Key.Right:
+                    moveSelection(new Vector2(1, 0));
+                    return true;
+
+                case Key.Up:
+                    moveSelection(new Vector2(0, -1));
+                    return true;
+
+                case Key.Down:
+                    moveSelection(new Vector2(0, 1));
+                    return true;
+            }
+
+            return false;
+        }
+
+        protected override void SelectAll()
+        {
+            SelectedItems.AddRange(targetComponents.SelectMany(list => list).Except(SelectedItems).ToArray());
+        }
+
+        /// <summary>
+        /// Move the current selection spatially by the specified delta, in screen coordinates (ie. the same coordinates as the blueprints).
+        /// </summary>
+        /// <param name="delta"></param>
+        private void moveSelection(Vector2 delta)
+        {
+            var firstBlueprint = SelectionHandler.SelectedBlueprints.FirstOrDefault();
+
+            if (firstBlueprint == null)
+                return;
+
+            // convert to game space coordinates
+            delta = firstBlueprint.ToScreenSpace(delta) - firstBlueprint.ToScreenSpace(Vector2.Zero);
+
+            SelectionHandler.HandleMovement(new MoveSelectionEvent<ISkinnableDrawable>(firstBlueprint, delta));
         }
 
         protected override SelectionHandler<ISkinnableDrawable> CreateSelectionHandler() => new SkinSelectionHandler();

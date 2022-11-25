@@ -35,6 +35,8 @@ namespace osu.Game.Tests.Visual.Online
 
         private OsuConfigManager localConfig;
 
+        private bool returnCursorOnResponse;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -61,6 +63,7 @@ namespace osu.Game.Tests.Visual.Online
                     searchBeatmapSetsRequest.TriggerSuccess(new SearchBeatmapSetsResponse
                     {
                         BeatmapSets = setsForResponse,
+                        Cursor = returnCursorOnResponse ? new Cursor() : null,
                     });
 
                     return true;
@@ -106,7 +109,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
 
-            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
+            AddStep("show many results", () => fetchFor(getManyBeatmaps(100).ToArray()));
 
             AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
 
@@ -127,10 +130,10 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
 
-            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
+            AddStep("show many results", () => fetchFor(getManyBeatmaps(100).ToArray()));
             assertAllCardsOfType<BeatmapCardNormal>(100);
 
-            AddStep("show more results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 30).ToArray()));
+            AddStep("show more results", () => fetchFor(getManyBeatmaps(30).ToArray()));
             assertAllCardsOfType<BeatmapCardNormal>(30);
         }
 
@@ -139,7 +142,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
 
-            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
+            AddStep("show many results", () => fetchFor(getManyBeatmaps(100).ToArray()));
             assertAllCardsOfType<BeatmapCardNormal>(100);
 
             setCardSize(BeatmapCardSize.Extra, viaConfig);
@@ -161,7 +164,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("fetch for 0 beatmaps", () => fetchFor());
             placeholderShown();
 
-            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
+            AddStep("show many results", () => fetchFor(getManyBeatmaps(100).ToArray()));
             AddUntilStep("wait for loaded", () => this.ChildrenOfType<BeatmapCard>().Count() == 100);
             AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
 
@@ -178,6 +181,32 @@ namespace osu.Game.Tests.Visual.Online
                     var notFoundDrawable = overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault();
                     return notFoundDrawable != null && notFoundDrawable.IsPresent && notFoundDrawable.Parent.DrawHeight > 0;
                 });
+        }
+
+        /// <summary>
+        /// During pagination, the first beatmap of the second page may be a duplicate of the last beatmap from the previous page.
+        /// This is currently the case with osu!web API due to ES relevance score's presence in the response cursor.
+        /// See: https://github.com/ppy/osu-web/issues/9270
+        /// </summary>
+        [Test]
+        public void TestDuplicatedBeatmapOnlyShowsOnce()
+        {
+            APIBeatmapSet beatmapSet = null;
+
+            AddStep("show many results", () =>
+            {
+                beatmapSet = CreateAPIBeatmapSet(Ruleset.Value);
+                beatmapSet.Title = "last beatmap of first page";
+
+                fetchFor(getManyBeatmaps(49).Append(new APIBeatmapSet { Title = "last beatmap of first page", OnlineID = beatmapSet.OnlineID }).ToArray(), true);
+            });
+            AddUntilStep("wait for loaded", () => this.ChildrenOfType<BeatmapCard>().Count() == 50);
+
+            AddStep("set next page", () => setSearchResponse(getManyBeatmaps(49).Prepend(new APIBeatmapSet { Title = "this shouldn't show up", OnlineID = beatmapSet.OnlineID }).ToArray(), false));
+            AddStep("scroll to end", () => overlay.ChildrenOfType<OverlayScrollContainer>().Single().ScrollToEnd());
+            AddUntilStep("wait for loaded", () => this.ChildrenOfType<BeatmapCard>().Count() >= 99);
+
+            AddAssert("beatmap not duplicated", () => overlay.ChildrenOfType<BeatmapCard>().Count(c => c.BeatmapSet.Equals(beatmapSet)) == 1);
         }
 
         [Test]
@@ -336,13 +365,23 @@ namespace osu.Game.Tests.Visual.Online
 
         private static int searchCount;
 
-        private void fetchFor(params APIBeatmapSet[] beatmaps)
+        private APIBeatmapSet[] getManyBeatmaps(int count) => Enumerable.Range(0, count).Select(_ => CreateAPIBeatmapSet(Ruleset.Value)).ToArray();
+
+        private void fetchFor(params APIBeatmapSet[] beatmaps) => fetchFor(beatmaps, false);
+
+        private void fetchFor(APIBeatmapSet[] beatmaps, bool hasNextPage)
         {
-            setsForResponse.Clear();
-            setsForResponse.AddRange(beatmaps);
+            setSearchResponse(beatmaps, hasNextPage);
 
             // trigger arbitrary change for fetching.
             searchControl.Query.Value = $"search {searchCount++}";
+        }
+
+        private void setSearchResponse(APIBeatmapSet[] beatmaps, bool hasNextPage)
+        {
+            setsForResponse.Clear();
+            setsForResponse.AddRange(beatmaps);
+            returnCursorOnResponse = hasNextPage;
         }
 
         private void setRankAchievedFilter(ScoreRank[] ranks)

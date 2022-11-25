@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.Notifications
 
         public Func<bool>? CancelRequested { get; set; }
 
+        protected override bool AllowFlingDismiss => false;
+
         /// <summary>
         /// The function to post completion notifications back to.
         /// </summary>
@@ -142,12 +144,11 @@ namespace osu.Game.Overlays.Notifications
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
                     attemptPostCompletion();
-                    base.Close();
                     break;
             }
         }
 
-        private bool completionSent;
+        private int completionSent;
 
         /// <summary>
         /// Attempt to post a completion notification.
@@ -161,11 +162,13 @@ namespace osu.Game.Overlays.Notifications
             if (CompletionTarget == null)
                 return;
 
-            if (completionSent)
+            // Thread-safe barrier, as this may be called by a web request and also scheduled to the update thread at the same time.
+            if (Interlocked.Exchange(ref completionSent, 1) == 1)
                 return;
 
             CompletionTarget.Invoke(CreateCompletionNotification());
-            completionSent = true;
+
+            Close(false);
         }
 
         private ProgressNotificationState state;
@@ -226,6 +229,7 @@ namespace osu.Game.Overlays.Notifications
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
+                    Depth = float.MaxValue,
                 },
                 loadingSpinner = new LoadingSpinner
                 {
@@ -234,12 +238,13 @@ namespace osu.Game.Overlays.Notifications
             });
         }
 
-        public override void Close()
+        public override void Close(bool runFlingAnimation)
         {
             switch (State)
             {
+                case ProgressNotificationState.Completed:
                 case ProgressNotificationState.Cancelled:
-                    base.Close();
+                    base.Close(runFlingAnimation);
                     break;
 
                 case ProgressNotificationState.Active:

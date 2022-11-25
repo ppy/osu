@@ -59,6 +59,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             return base.OnScroll(e);
         }
 
+        protected override bool OnClick(ClickEvent e) => true;
+
         private class ExpandedContentScrollbar : OsuScrollbar
         {
             public ExpandedContentScrollbar(Direction scrollDir)

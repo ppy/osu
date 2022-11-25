@@ -79,7 +79,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (section)
             {
                 case Section.Colours:
-                    HandleColours(output, line);
+                    HandleColours(output, line, false);
                     return;
             }
         }
@@ -93,7 +93,7 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        protected void HandleColours<TModel>(TModel output, string line)
+        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
         {
             var pair = SplitKeyVal(line);
 
@@ -108,7 +108,7 @@ namespace osu.Game.Beatmaps.Formats
 
             try
             {
-                byte alpha = split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
+                byte alpha = allowAlpha && split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
                 colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), alpha);
             }
             catch
@@ -130,18 +130,28 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
+        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':', bool shouldTrim = true)
         {
             string[] split = line.Split(separator, 2);
 
+            if (shouldTrim)
+            {
+                for (int i = 0; i < split.Length; i++)
+                    split[i] = split[i].Trim();
+            }
+
             return new KeyValuePair<string, string>
             (
-                split[0].Trim(),
-                split.Length > 1 ? split[1].Trim() : string.Empty
+                split[0],
+                split.Length > 1 ? split[1] : string.Empty
             );
         }
 
-        protected string CleanFilename(string path) => path.Trim('"').ToStandardisedPath();
+        protected string CleanFilename(string path) => path
+                                                       // User error which is supported by stable (https://github.com/ppy/osu/issues/21204)
+                                                       .Replace(@"\\", @"\")
+                                                       .Trim('"')
+                                                       .ToStandardisedPath();
 
         public enum Section
         {
@@ -174,11 +184,15 @@ namespace osu.Game.Beatmaps.Formats
             /// </summary>
             public bool GenerateTicks { get; private set; } = true;
 
-            public LegacyDifficultyControlPoint(double beatLength)
+            public LegacyDifficultyControlPoint(int rulesetId, double beatLength)
                 : this()
             {
                 // Note: In stable, the division occurs on floats, but with compiler optimisations turned on actually seems to occur on doubles via some .NET black magic (possibly inlining?).
-                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
+                if (rulesetId == 1 || rulesetId == 3)
+                    BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
+                else
+                    BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 1000) / 100.0 : 1;
+
                 GenerateTicks = !double.IsNaN(beatLength);
             }
 

@@ -4,8 +4,10 @@
 #nullable disable
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -13,6 +15,9 @@ namespace osu.Game.Tests.Visual.Editing
     [TestFixture]
     public class TestSceneEditorComposeRadioButtons : OsuTestScene
     {
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         public TestSceneEditorComposeRadioButtons()
         {
             EditorRadioButtonCollection collection;

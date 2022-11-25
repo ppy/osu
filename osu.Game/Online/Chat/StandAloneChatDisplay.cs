@@ -120,17 +120,20 @@ namespace osu.Game.Online.Chat
             AddInternal(drawableChannel);
         }
 
-        public class ChatTextBox : FocusedTextBox
+        public class ChatTextBox : HistoryTextBox
         {
             protected override bool OnKeyDown(KeyDownEvent e)
             {
                 // Chat text boxes are generally used in places where they retain focus, but shouldn't block interaction with other
                 // elements on the same screen.
-                switch (e.Key)
+                if (!HoldFocus)
                 {
-                    case Key.Up:
-                    case Key.Down:
-                        return false;
+                    switch (e.Key)
+                    {
+                        case Key.Up:
+                        case Key.Down:
+                            return false;
+                    }
                 }
 
                 return base.OnKeyDown(e);
@@ -174,8 +177,8 @@ namespace osu.Game.Online.Chat
             protected override float Spacing => 5;
             protected override float DateAlign => 125;
 
-            public StandAloneDaySeparator(DateTimeOffset time)
-                : base(time)
+            public StandAloneDaySeparator(DateTimeOffset date)
+                : base(date)
             {
             }
 
@@ -191,7 +194,6 @@ namespace osu.Game.Online.Chat
         {
             protected override float TextSize => 15;
             protected override float Spacing => 5;
-            protected override float TimestampWidth => 45;
             protected override float UsernameWidth => 75;
 
             public StandAloneMessage(Message message)

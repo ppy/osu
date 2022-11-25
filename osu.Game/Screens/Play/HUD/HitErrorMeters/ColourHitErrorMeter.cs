@@ -1,13 +1,15 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -15,20 +17,40 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
+    [Cached]
     public class ColourHitErrorMeter : HitErrorMeter
     {
-        internal const int MAX_DISPLAYED_JUDGEMENTS = 20;
-
         private const int animation_duration = 200;
         private const int drawable_judgement_size = 8;
-        private const int spacing = 2;
+
+        [SettingSource("Judgement count", "The number of displayed judgements")]
+        public BindableNumber<int> JudgementCount { get; } = new BindableNumber<int>(20)
+        {
+            MinValue = 1,
+            MaxValue = 50,
+        };
+
+        [SettingSource("Judgement spacing", "The space between each displayed judgement")]
+        public BindableNumber<float> JudgementSpacing { get; } = new BindableNumber<float>(2)
+        {
+            MinValue = 0,
+            MaxValue = 10,
+        };
+
+        [SettingSource("Judgement shape", "The shape of each displayed judgement")]
+        public Bindable<ShapeStyle> JudgementShape { get; } = new Bindable<ShapeStyle>();
 
         private readonly JudgementFlow judgementsFlow;
 
         public ColourHitErrorMeter()
         {
             AutoSizeAxes = Axes.Both;
-            InternalChild = judgementsFlow = new JudgementFlow();
+            InternalChild = judgementsFlow = new JudgementFlow
+            {
+                JudgementShape = { BindTarget = JudgementShape },
+                JudgementSpacing = { BindTarget = JudgementSpacing },
+                JudgementCount = { BindTarget = JudgementCount }
+            };
         }
 
         protected override void OnNewJudgement(JudgementResult judgement)
@@ -41,61 +63,137 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         public override void Clear() => judgementsFlow.Clear();
 
-        private class JudgementFlow : FillFlowContainer<HitErrorCircle>
+        private class JudgementFlow : FillFlowContainer<HitErrorShape>
         {
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
 
+            public readonly Bindable<ShapeStyle> JudgementShape = new Bindable<ShapeStyle>();
+
+            public readonly Bindable<float> JudgementSpacing = new Bindable<float>();
+
+            public readonly Bindable<int> JudgementCount = new Bindable<int>();
+
             public JudgementFlow()
             {
-                AutoSizeAxes = Axes.X;
-                Height = MAX_DISPLAYED_JUDGEMENTS * (drawable_judgement_size + spacing) - spacing;
-                Spacing = new Vector2(0, spacing);
+                Width = drawable_judgement_size;
                 Direction = FillDirection.Vertical;
                 LayoutDuration = animation_duration;
                 LayoutEasing = Easing.OutQuint;
-            }
-
-            public void Push(Color4 colour)
-            {
-                Add(new HitErrorCircle(colour, drawable_judgement_size));
-
-                if (Children.Count > MAX_DISPLAYED_JUDGEMENTS)
-                    Children.FirstOrDefault(c => !c.IsRemoved)?.Remove();
-            }
-        }
-
-        internal class HitErrorCircle : Container
-        {
-            public bool IsRemoved { get; private set; }
-
-            private readonly Circle circle;
-
-            public HitErrorCircle(Color4 colour, int size)
-            {
-                Size = new Vector2(size);
-                Child = circle = new Circle
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    Colour = colour
-                };
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                circle.FadeInFromZero(animation_duration, Easing.OutQuint);
-                circle.MoveToY(-DrawSize.Y);
-                circle.MoveToY(0, animation_duration, Easing.OutQuint);
+                JudgementCount.BindValueChanged(_ =>
+                {
+                    removeExtraJudgements();
+                    updateMetrics();
+                });
+
+                JudgementSpacing.BindValueChanged(_ => updateMetrics(), true);
+            }
+
+            private readonly DrawablePool<HitErrorShape> judgementLinePool = new DrawablePool<HitErrorShape>(50);
+
+            public void Push(Color4 colour)
+            {
+                judgementLinePool.Get(shape =>
+                {
+                    shape.Colour = colour;
+                    Add(shape);
+
+                    removeExtraJudgements();
+                });
+            }
+
+            private void removeExtraJudgements()
+            {
+                var remainingChildren = Children.Where(c => !c.IsRemoved);
+
+                while (remainingChildren.Count() > JudgementCount.Value)
+                    remainingChildren.First().Remove();
+            }
+
+            private void updateMetrics()
+            {
+                Height = JudgementCount.Value * (drawable_judgement_size + JudgementSpacing.Value) - JudgementSpacing.Value;
+                Spacing = new Vector2(0, JudgementSpacing.Value);
+            }
+        }
+
+        public class HitErrorShape : PoolableDrawable
+        {
+            public bool IsRemoved { get; private set; }
+
+            public readonly Bindable<ShapeStyle> Shape = new Bindable<ShapeStyle>();
+
+            [Resolved]
+            private ColourHitErrorMeter hitErrorMeter { get; set; } = null!;
+
+            private Container content = null!;
+
+            public HitErrorShape()
+            {
+                Size = new Vector2(drawable_judgement_size);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                InternalChild = content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
+
+                Shape.BindTo(hitErrorMeter.JudgementShape);
+                Shape.BindValueChanged(shape =>
+                {
+                    switch (shape.NewValue)
+                    {
+                        case ShapeStyle.Circle:
+                            content.Child = new Circle { RelativeSizeAxes = Axes.Both };
+                            break;
+
+                        case ShapeStyle.Square:
+                            content.Child = new Box { RelativeSizeAxes = Axes.Both };
+                            break;
+                    }
+                }, true);
+            }
+
+            protected override void PrepareForUse()
+            {
+                base.PrepareForUse();
+
+                this.FadeInFromZero(animation_duration, Easing.OutQuint)
+                    // On pool re-use, start flow animation from (0,0).
+                    .MoveTo(Vector2.Zero);
+
+                content.MoveToY(-DrawSize.Y)
+                       .MoveToY(0, animation_duration, Easing.OutQuint);
+            }
+
+            protected override void FreeAfterUse()
+            {
+                base.FreeAfterUse();
+                IsRemoved = false;
             }
 
             public void Remove()
             {
                 IsRemoved = true;
 
-                this.FadeOut(animation_duration, Easing.OutQuint).Expire();
+                this.FadeOut(animation_duration, Easing.OutQuint)
+                    .Expire();
             }
+        }
+
+        public enum ShapeStyle
+        {
+            Circle,
+            Square
         }
     }
 }

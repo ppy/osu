@@ -334,6 +334,7 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=GL/@EntryIndexedValue">GL</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=GLSL/@EntryIndexedValue">GLSL</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=HID/@EntryIndexedValue">HID</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=HSPA/@EntryIndexedValue">HSPA</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=HSV/@EntryIndexedValue">HSV</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=HTML/@EntryIndexedValue">HTML</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=HUD/@EntryIndexedValue">HUD</s:String>
@@ -807,7 +808,6 @@ See the LICENCE file in the repository root for full licence text.&#xD;
 	<s:String x:Key="/Default/CustomTools/CustomToolsData/@EntryValue"></s:String>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=Microsoft_002EExtensions_002ELogging_002E_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=Microsoft_002EToolkit_002EHighPerformance_002EBox_002A/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=NUnit_002EFramework_002EInternal_002ELogger/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=OpenTabletDriver_002EPlugin_002EDependencyInjection_002E_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=Realms_002ELogging_002ELogger/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002EComponentModel_002EComponent/@EntryIndexedValue">True</s:Boolean>

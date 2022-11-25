@@ -31,14 +31,17 @@ namespace osu.Game.Input.Bindings
             parentInputManager = GetContainingInputManager();
         }
 
-        // IMPORTANT: Do not change the order of key bindings in this list.
-        // It is used to decide the order of precedence (see note in DatabasedKeyBindingContainer).
+        // IMPORTANT: Take care when changing order of the items in the enumerable.
+        // It is used to decide the order of precedence, with the earlier items having higher precedence.
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings
-                                                                       .Concat(OverlayKeyBindings)
                                                                        .Concat(EditorKeyBindings)
                                                                        .Concat(InGameKeyBindings)
                                                                        .Concat(SongSelectKeyBindings)
-                                                                       .Concat(AudioControlKeyBindings);
+                                                                       .Concat(AudioControlKeyBindings)
+                                                                       // Overlay bindings may conflict with more local cases like the editor so they are checked last.
+                                                                       // It has generally been agreed on that local screens like the editor should have priority,
+                                                                       // based on such usages potentially requiring a lot more key bindings that may be "shared" with global ones.
+                                                                       .Concat(OverlayKeyBindings);
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
@@ -75,7 +78,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
             new KeyBinding(InputKey.F6, GlobalAction.ToggleNowPlaying),
             new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
-            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleBeatmapListing),
+            new KeyBinding(new[] { InputKey.Control, InputKey.B }, GlobalAction.ToggleBeatmapListing),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
         };
@@ -87,6 +90,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.F3 }, GlobalAction.EditorTimingMode),
             new KeyBinding(new[] { InputKey.F4 }, GlobalAction.EditorSetupMode),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.A }, GlobalAction.EditorVerifyMode),
+            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.EditorCloneSelection),
             new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
             new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridDisplayMode),
@@ -343,5 +347,8 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleProfile))]
         ToggleProfile,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCloneSelection))]
+        EditorCloneSelection
     }
 }

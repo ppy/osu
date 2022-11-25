@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -83,6 +84,19 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true));
             AddUntilStep("returned to song select", () => Game.ScreenStack.CurrentScreen is MainMenu);
             AddAssert("did perform", () => actionPerformed);
+        }
+
+        [Test]
+        public void TestPerformEnsuresScreenIsLoaded()
+        {
+            TestLoadBlockingScreen screen = null;
+
+            AddStep("push blocking screen", () => Game.ScreenStack.Push(screen = new TestLoadBlockingScreen()));
+            AddStep("perform", () => Game.PerformFromScreen(_ => actionPerformed = true, new[] { typeof(TestLoadBlockingScreen) }));
+            AddAssert("action not performed", () => !actionPerformed);
+
+            AddStep("allow load", () => screen.LoadEvent.Set());
+            AddUntilStep("action performed", () => actionPerformed);
         }
 
         [Test]
@@ -268,6 +282,17 @@ namespace osu.Game.Tests.Visual.Navigation
                 }
 
                 return base.OnExiting(e);
+            }
+        }
+
+        public class TestLoadBlockingScreen : OsuScreen
+        {
+            public readonly ManualResetEventSlim LoadEvent = new ManualResetEventSlim();
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadEvent.Wait(10000);
             }
         }
     }

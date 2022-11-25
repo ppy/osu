@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -30,12 +27,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
     {
-        private MatchSettings settings;
+        private MatchSettings settings = null!;
 
         protected override OsuButton SubmitButton => settings.ApplyButton;
 
         [Resolved]
-        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+        private OngoingOperationTracker ongoingOperationTracker { get; set; } = null!;
 
         protected override bool IsLoading => ongoingOperationTracker.InProgress.Value;
 
@@ -57,20 +54,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             private const float disabled_alpha = 0.2f;
 
-            public Action SettingsApplied;
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
-            public OsuTextBox NameField, MaxParticipantsField;
-            public MatchTypePicker TypePicker;
-            public OsuEnumDropdown<QueueMode> QueueModeDropdown;
-            public OsuTextBox PasswordTextBox;
-            public OsuCheckbox AutoSkipCheckbox;
-            public TriangleButton ApplyButton;
+            public Action? SettingsApplied;
 
-            public OsuSpriteText ErrorText;
+            public OsuTextBox NameField = null!;
+            public OsuTextBox MaxParticipantsField = null!;
+            public MatchTypePicker TypePicker = null!;
+            public OsuEnumDropdown<QueueMode> QueueModeDropdown = null!;
+            public OsuTextBox PasswordTextBox = null!;
+            public OsuCheckbox AutoSkipCheckbox = null!;
+            public TriangleButton ApplyButton = null!;
 
-            private OsuEnumDropdown<StartMode> startModeDropdown;
-            private OsuSpriteText typeLabel;
-            private LoadingLayer loadingLayer;
+            public OsuSpriteText ErrorText = null!;
+
+            private OsuEnumDropdown<StartMode> startModeDropdown = null!;
+            private OsuSpriteText typeLabel = null!;
+            private LoadingLayer loadingLayer = null!;
 
             public void SelectBeatmap()
             {
@@ -79,26 +79,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             }
 
             [Resolved]
-            private MultiplayerMatchSubScreen matchSubScreen { get; set; }
+            private MultiplayerMatchSubScreen matchSubScreen { get; set; } = null!;
 
             [Resolved]
-            private IRoomManager manager { get; set; }
+            private IRoomManager manager { get; set; } = null!;
 
             [Resolved]
-            private MultiplayerClient client { get; set; }
+            private MultiplayerClient client { get; set; } = null!;
 
             [Resolved]
-            private OngoingOperationTracker ongoingOperationTracker { get; set; }
+            private OngoingOperationTracker ongoingOperationTracker { get; set; } = null!;
 
             private readonly IBindable<bool> operationInProgress = new BindableBool();
-
-            [CanBeNull]
-            private IDisposable applyingSettingsOperation;
-
             private readonly Room room;
 
-            private Drawable playlistContainer;
-            private DrawableRoomPlaylist drawablePlaylist;
+            private IDisposable? applyingSettingsOperation;
+            private Drawable playlistContainer = null!;
+            private DrawableRoomPlaylist drawablePlaylist = null!;
 
             public MatchSettings(Room room)
             {
@@ -423,13 +420,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     else
                         room.MaxParticipants.Value = null;
 
-                    manager?.CreateRoom(room, onSuccess, onError);
+                    manager.CreateRoom(room, onSuccess, onError);
                 }
             }
 
             private void hideError() => ErrorText.FadeOut(50);
 
-            private void onSuccess(Room room)
+            private void onSuccess(Room room) => Schedule(() =>
             {
                 Debug.Assert(applyingSettingsOperation != null);
 
@@ -437,9 +434,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 applyingSettingsOperation.Dispose();
                 applyingSettingsOperation = null;
-            }
+            });
 
-            private void onError(string text)
+            private void onError(string text) => Schedule(() =>
             {
                 Debug.Assert(applyingSettingsOperation != null);
 
@@ -460,13 +457,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 applyingSettingsOperation.Dispose();
                 applyingSettingsOperation = null;
-            }
+            });
         }
 
         public class CreateOrUpdateButton : TriangleButton
         {
             [Resolved(typeof(Room), nameof(Room.RoomID))]
-            private Bindable<long?> roomId { get; set; }
+            private Bindable<long?> roomId { get; set; } = null!;
 
             protected override void LoadComplete()
             {

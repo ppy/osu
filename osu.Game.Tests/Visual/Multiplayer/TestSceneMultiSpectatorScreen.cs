@@ -13,9 +13,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
@@ -333,6 +335,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestGameplayRateAdjust()
+        {
+            start(getPlayerIds(4), mods: new[] { new APIMod(new OsuModDoubleTime()) });
+
+            loadSpectateScreen();
+
+            sendFrames(getPlayerIds(4), 300);
+
+            AddUntilStep("wait for correct track speed", () => Beatmap.Value.Track.Rate, () => Is.EqualTo(1.5));
+        }
+
+        [Test]
         public void TestPlayersLeaveWhileSpectating()
         {
             start(getPlayerIds(4));
@@ -420,7 +434,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void start(int userId, int? beatmapId = null) => start(new[] { userId }, beatmapId);
 
-        private void start(int[] userIds, int? beatmapId = null)
+        private void start(int[] userIds, int? beatmapId = null, APIMod[]? mods = null)
         {
             AddStep("start play", () =>
             {
@@ -429,10 +443,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     var user = new MultiplayerRoomUser(id)
                     {
                         User = new APIUser { Id = id },
+                        Mods = mods ?? Array.Empty<APIMod>(),
                     };
 
-                    OnlinePlayDependencies.MultiplayerClient.AddUser(user.User, true);
-                    SpectatorClient.SendStartPlay(id, beatmapId ?? importedBeatmapId);
+                    OnlinePlayDependencies.MultiplayerClient.AddUser(user, true);
+                    SpectatorClient.SendStartPlay(id, beatmapId ?? importedBeatmapId, mods);
 
                     playingUsers.Add(user);
                 }
@@ -507,7 +522,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private PlayerArea getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerArea>().Single(p => p.UserId == userId);
 
-        private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId);
+        private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.OnlineID == userId);
 
         private int[] getPlayerIds(int count) => Enumerable.Range(PLAYER_1_ID, count).ToArray();
     }

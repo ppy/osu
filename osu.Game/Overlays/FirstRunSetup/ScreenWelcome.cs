@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Settings;
 using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.FirstRunSetup
     public class ScreenWelcome : FirstRunSetupScreen
     {
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(FrameworkConfigManager frameworkConfig)
         {
             Content.Children = new Drawable[]
             {
@@ -52,6 +53,11 @@ namespace osu.Game.Overlays.FirstRunSetup
                         },
                     }
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = GeneralSettingsStrings.PreferOriginalMetadataLanguage,
+                    Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode)
+                },
                 new LanguageSelectionFlow
                 {
                     RelativeSizeAxes = Axes.X,
@@ -63,11 +69,12 @@ namespace osu.Game.Overlays.FirstRunSetup
         private class LanguageSelectionFlow : FillFlowContainer
         {
             private Bindable<string> frameworkLocale = null!;
+            private IBindable<LocalisationParameters> localisationParameters = null!;
 
             private ScheduledDelegate? updateSelectedDelegate;
 
             [BackgroundDependencyLoader]
-            private void load(FrameworkConfigManager frameworkConfig)
+            private void load(FrameworkConfigManager frameworkConfig, LocalisationManager localisation)
             {
                 Direction = FillDirection.Full;
                 Spacing = new Vector2(5);
@@ -80,10 +87,11 @@ namespace osu.Game.Overlays.FirstRunSetup
                                          });
 
                 frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
-                frameworkLocale.BindValueChanged(locale =>
+
+                localisationParameters = localisation.CurrentParameters.GetBoundCopy();
+                localisationParameters.BindValueChanged(p =>
                 {
-                    if (!LanguageExtensions.TryParseCultureCode(locale.NewValue, out var language))
-                        language = Language.en;
+                    var language = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, p.NewValue);
 
                     // Changing language may cause a short period of blocking the UI thread while the new glyphs are loaded.
                     // Scheduling ensures the button animation plays smoothly after any blocking operation completes.

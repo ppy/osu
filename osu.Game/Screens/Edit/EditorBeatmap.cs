@@ -49,6 +49,15 @@ namespace osu.Game.Screens.Edit
         public event Action<HitObject> HitObjectUpdated;
 
         /// <summary>
+        /// Invoked after any state changes occurred which triggered a beatmap reprocess via an <see cref="IBeatmapProcessor"/>.
+        /// </summary>
+        /// <remarks>
+        /// Beatmap processing may change the order of hitobjects. This event gives external components a chance to handle any changes
+        /// not covered by the <see cref="HitObjectAdded"/> / <see cref="HitObjectUpdated"/> / <see cref="HitObjectRemoved"/> events.
+        /// </remarks>
+        public event Action BeatmapReprocessed;
+
+        /// <summary>
         /// All currently selected <see cref="HitObject"/>s.
         /// </summary>
         public readonly BindableList<HitObject> SelectedHitObjects = new BindableList<HitObject>();
@@ -331,6 +340,8 @@ namespace osu.Game.Screens.Edit
 
             beatmapProcessor?.PostProcess();
 
+            BeatmapReprocessed?.Invoke();
+
             // callbacks may modify the lists so let's be safe about it
             var deletes = batchPendingDeletes.ToArray();
             batchPendingDeletes.Clear();
@@ -340,6 +351,8 @@ namespace osu.Game.Screens.Edit
 
             var updates = batchPendingUpdates.ToArray();
             batchPendingUpdates.Clear();
+
+            foreach (var h in deletes) SelectedHitObjects.Remove(h);
 
             foreach (var h in deletes) HitObjectRemoved?.Invoke(h);
             foreach (var h in inserts) HitObjectAdded?.Invoke(h);
