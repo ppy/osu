@@ -172,7 +172,7 @@ namespace osu.Game.Graphics.Backgrounds
             // Limited by the maximum size of QuadVertexBuffer for safety.
             const int max_triangles = ushort.MaxValue / (IRenderer.VERTICES_PER_QUAD + 2);
 
-            AimCount = (int)Math.Min(max_triangles, DrawWidth * DrawHeight * 0.0005f * SpawnRatio);
+            AimCount = (int)Math.Min(max_triangles, DrawWidth * 0.02f * SpawnRatio);
 
             int currentCount = parts.Count;
 
