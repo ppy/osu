@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 Accuracy = accuracyValue,
                 EffectiveMissCount = effectiveMissCount,
                 EstimatedUr = estimatedDeviation * 10,
-                Total = (double)estimatedDeviation * 10
+                Total = totalValue
             };
         }
 
