@@ -425,7 +425,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                BackgroundColour = colours.Yellow;
+                BackgroundColour = colours.YellowDark;
             }
         }
 
