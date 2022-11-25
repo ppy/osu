@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Edit
         protected readonly Ruleset Ruleset;
 
         // Provides `Playfield`
-        private DependencyContainer dependencies;
+        private DrawableRulesetDependencies dependencies;
 
         [Resolved]
         protected EditorClock EditorClock { get; private set; }
@@ -410,6 +410,13 @@ namespace osu.Game.Rulesets.Edit
         }
 
         #endregion
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            dependencies.Dispose();
+        }
     }
 
     /// <summary>
