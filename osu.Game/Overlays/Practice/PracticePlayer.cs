@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,6 +21,11 @@ namespace osu.Game.Overlays.Practice
         {
         }
 
+        [Resolved(CanBeNull = true)]
+        internal IOverlayManager? OverlayManager { get; private set; }
+
+        private IDisposable? practiceOverlayRegistration;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, IBindable<WorkingBeatmap> beatmap, PracticePlayerLoader loader)
         {
@@ -27,11 +33,21 @@ namespace osu.Game.Overlays.Practice
 
             SetGameplayStartTime(loader.CustomStart.Value * (playableBeatmap.HitObjects.Last().StartTime - playableBeatmap.HitObjects.First().StartTime));
 
-            AddInternal(practiceOverlay = new PracticeOverlay(() => Restart())
-            {
-                State = { Value = Visibility.Visible }
-            });
             addButtons(colour);
+            LoadComponent(practiceOverlay = new PracticeOverlay(() => Restart()) { State = { Value = Visibility.Visible } });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            practiceOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(practiceOverlay);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            practiceOverlayRegistration?.Dispose();
         }
 
         protected override bool CheckModsAllowFailure() => false; // never fail. Todo: find a way to avoid instantly failing after initial seek
