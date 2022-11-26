@@ -389,6 +389,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             if (bindTarget != null)
             {
+                if (hasChanged && bindTarget.IsErroring)
+                    return;
+
                 updateStoreFromButton(bindTarget);
 
                 updateIsDefaultValue();
@@ -475,8 +478,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             private OverlayColourProvider colourProvider { get; set; }
 
             [Resolved]
+            private OsuColour colours { get; set; }
+
+            [Resolved]
             private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
 
+            [Resolved]
+            private RealmAccess realm { get; set; }
             private bool isBinding;
 
             public bool IsBinding
@@ -487,6 +495,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     if (value == isBinding) return;
 
                     isBinding = value;
+
+                    updateHoverState();
+                }
+            }
+
+            private bool isErroring;
+
+            public bool IsErroring
+            {
+                get => isErroring;
+                set
+                {
+                    if (value == isErroring) return;
+
+                    isErroring = value;
 
                     updateHoverState();
                 }
@@ -560,8 +583,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 if (isBinding)
                 {
-                    box.FadeColour(colourProvider.Light2, transition_time, Easing.OutQuint);
-                    Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
+                    box.FadeColour(isErroring ? colours.RedDark : colourProvider.Light2, transition_time, Easing.OutQuint);
+                    Text.FadeColour(isErroring ? Color4.White : Color4.Black, transition_time, Easing.OutQuint);
                 }
                 else
                 {
@@ -583,8 +606,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 if (KeyBinding.RulesetName != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
                     return;
 
+                if (KeyBinding.RulesetName != null && keyCombinationExists(newCombination) && !newCombination.Equals(KeyBinding.KeyCombination))
+                {
+                    isErroring = true;
+                    updateHoverState();
+                    return;
+                }
+
                 KeyBinding.KeyCombination = newCombination;
                 updateKeyCombinationText();
+                isErroring = false;
             }
 
             private void updateKeyCombinationText()
@@ -600,6 +631,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 if (keyCombinationProvider != null)
                     keyCombinationProvider.KeymapChanged -= updateKeyCombinationText;
+            }
+
+            private bool keyCombinationExists(KeyCombination keyCombination)
+            {
+                var bindings = realm.Run(r => r.All<RealmKeyBinding>()
+                                           .Where(b => b.RulesetName == KeyBinding.RulesetName && b.Variant == KeyBinding.Variant)
+                                           .Detach());
+
+                return bindings.Select(b => b.KeyCombination).Contains(keyCombination);
             }
         }
     }
