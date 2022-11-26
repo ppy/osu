@@ -229,6 +229,7 @@ namespace osu.Game.Graphics.Backgrounds
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
             private Vector2 size;
             private float thickness;
+            private float texelSize;
 
             private IVertexBatch<TexturedVertex2D>? vertexBatch;
 
@@ -245,6 +246,7 @@ namespace osu.Game.Graphics.Backgrounds
                 texture = Source.texture;
                 size = Source.DrawSize;
                 thickness = Source.Thickness;
+                texelSize = Math.Max(1.5f / Source.ScreenSpaceDrawQuad.Size.X, 1.5f / Source.ScreenSpaceDrawQuad.Size.Y);
 
                 parts.Clear();
                 parts.AddRange(Source.parts);
@@ -265,6 +267,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 shader.Bind();
                 shader.GetUniform<float>("thickness").UpdateValue(ref thickness);
+                shader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
 
                 foreach (TriangleParticle particle in parts)
                 {
