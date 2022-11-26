@@ -16,7 +16,7 @@ using Xamarin.Essentials;
 
 namespace osu.iOS
 {
-    public class OsuGameIOS : OsuGame
+    public partial class OsuGameIOS : OsuGame
     {
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 

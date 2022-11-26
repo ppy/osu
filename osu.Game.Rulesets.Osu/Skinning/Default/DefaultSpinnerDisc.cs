@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class DefaultSpinnerDisc : CompositeDrawable
+    public partial class DefaultSpinnerDisc : CompositeDrawable
     {
         private DrawableSpinner drawableSpinner = null!;
 

@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableOsuJudgement : DrawableJudgement
+    public partial class DrawableOsuJudgement : DrawableJudgement
     {
         protected SkinnableLighting Lighting { get; private set; }
 
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override Drawable CreateDefaultJudgement(HitResult result) => new OsuJudgementPiece(result);
 
-        private class OsuJudgementPiece : DefaultJudgementPiece
+        private partial class OsuJudgementPiece : DefaultJudgementPiece
         {
             public OsuJudgementPiece(HitResult result)
                 : base(result)

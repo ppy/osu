@@ -26,7 +26,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Online.Multiplayer
 {
-    public abstract class MultiplayerClient : Component, IMultiplayerClient, IMultiplayerRoomServer
+    public abstract partial class MultiplayerClient : Component, IMultiplayerClient, IMultiplayerRoomServer
     {
         public Action<Notification>? PostNotification { protected get; set; }
 

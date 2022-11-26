@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public partial class ArgonJudgementPiece : CompositeDrawable, IAnimatableJudgement
     {
         protected readonly HitResult Result;
 
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         public Drawable? GetAboveHitObjectsProxiedContent() => JudgementText.CreateProxy();
 
-        private class RingExplosion : CompositeDrawable
+        private partial class RingExplosion : CompositeDrawable
         {
             private readonly float travel = 52;
 

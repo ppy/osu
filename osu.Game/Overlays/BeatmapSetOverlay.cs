@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapSetOverlay : OnlineOverlay<BeatmapSetHeader>
+    public partial class BeatmapSetOverlay : OnlineOverlay<BeatmapSetHeader>
     {
         public const float X_PADDING = 40;
         public const float Y_PADDING = 25;
@@ -118,7 +118,7 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        private class CommentsSection : BeatmapSetLayoutSection
+        private partial class CommentsSection : BeatmapSetLayoutSection
         {
             public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 

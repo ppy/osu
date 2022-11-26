@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class StarRatingRangeDisplay : OnlinePlayComposite
+    public partial class StarRatingRangeDisplay : OnlinePlayComposite
     {
         [Resolved]
         private OsuColour colours { get; set; }

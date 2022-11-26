@@ -26,7 +26,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
-    public class PerformanceBreakdownChart : Container
+    public partial class PerformanceBreakdownChart : Container
     {
         private readonly ScoreInfo score;
         private readonly IBeatmap playableBeatmap;

@@ -6,7 +6,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class VariantBindingsSubsection : KeyBindingsSubsection
+    public partial class VariantBindingsSubsection : KeyBindingsSubsection
     {
         protected override bool AutoAdvanceTarget => true;
 

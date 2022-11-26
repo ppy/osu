@@ -12,7 +12,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class BeatmapSettings : SettingsSubsection
+    public partial class BeatmapSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.BeatmapHeader;
 

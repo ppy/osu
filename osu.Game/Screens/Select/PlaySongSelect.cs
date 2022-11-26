@@ -26,7 +26,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public class PlaySongSelect : SongSelect
+    public partial class PlaySongSelect : SongSelect
     {
         private OsuScreen? playerLoader;
 

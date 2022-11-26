@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
     /// A piece of a selection or placement blueprint which visualises an <see cref="OsuHitObject"/>.
     /// </summary>
     /// <typeparam name="T">The type of <see cref="OsuHitObject"/> which this <see cref="BlueprintPiece{T}"/> visualises.</typeparam>
-    public abstract class BlueprintPiece<T> : CompositeDrawable
+    public abstract partial class BlueprintPiece<T> : CompositeDrawable
         where T : OsuHitObject
     {
         /// <summary>

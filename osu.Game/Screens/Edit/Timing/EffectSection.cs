@@ -13,7 +13,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class EffectSection : Section<EffectControlPoint>
+    internal partial class EffectSection : Section<EffectControlPoint>
     {
         private LabelledSwitchButton kiai;
         private LabelledSwitchButton omitBarLine;

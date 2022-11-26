@@ -27,7 +27,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public class TestSceneManiaHitObjectComposer : EditorClockTestScene
+    public partial class TestSceneManiaHitObjectComposer : EditorClockTestScene
     {
         private TestComposer composer;
 
@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private void setScrollStep(ScrollingDirection direction)
             => AddStep($"set scroll direction = {direction}", () => ((Bindable<ScrollingDirection>)composer.Composer.ScrollingInfo.Direction).Value = direction);
 
-        private class TestComposer : CompositeDrawable
+        private partial class TestComposer : CompositeDrawable
         {
             [Cached(typeof(EditorBeatmap))]
             [Cached(typeof(IBeatSnapProvider))]

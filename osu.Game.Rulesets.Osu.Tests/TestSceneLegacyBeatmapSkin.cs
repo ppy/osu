@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneLegacyBeatmapSkin : LegacyBeatmapSkinColourTest
+    public partial class TestSceneLegacyBeatmapSkin : LegacyBeatmapSkinColourTest
     {
         [Resolved]
         private AudioManager audio { get; set; }

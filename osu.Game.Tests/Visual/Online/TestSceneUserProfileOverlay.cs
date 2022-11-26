@@ -14,7 +14,7 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserProfileOverlay : OsuTestScene
+    public partial class TestSceneUserProfileOverlay : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Show without reload", profile.Show);
         }
 
-        private class TestUserProfileOverlay : UserProfileOverlay
+        private partial class TestUserProfileOverlay : UserProfileOverlay
         {
             public new ProfileHeader Header => base.Header;
         }

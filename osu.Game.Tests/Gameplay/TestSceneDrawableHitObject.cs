@@ -16,7 +16,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneDrawableHitObject : OsuTestScene
+    public partial class TestSceneDrawableHitObject : OsuTestScene
     {
         [Test]
         public void TestEntryLifetime()
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("DHO state is correct", () => dho.State.Value == ArmedState.Miss);
         }
 
-        private class TestDrawableHitObject : DrawableHitObject
+        private partial class TestDrawableHitObject : DrawableHitObject
         {
             public const double INITIAL_LIFETIME_OFFSET = 100;
             public const double LIFETIME_ON_APPLY = 222;

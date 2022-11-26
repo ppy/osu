@@ -15,7 +15,7 @@ using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneSimpleStatisticTable : OsuTestScene
+    public partial class TestSceneSimpleStatisticTable : OsuTestScene
     {
         private Container container;
 

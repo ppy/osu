@@ -23,7 +23,7 @@ using osuTK;
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
     [Cached]
-    public class BarHitErrorMeter : HitErrorMeter
+    public partial class BarHitErrorMeter : HitErrorMeter
     {
         [SettingSource("Judgement line thickness", "How thick the individual lines should be.")]
         public BindableNumber<float> JudgementLineThickness { get; } = new BindableNumber<float>(4)
@@ -422,7 +422,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private float getRelativeJudgementPosition(double value) => Math.Clamp((float)((value / maxHitWindow) + 1) / 2, 0, 1);
 
-        internal class JudgementLine : PoolableDrawable
+        internal partial class JudgementLine : PoolableDrawable
         {
             public readonly BindableNumber<float> JudgementLineThickness = new BindableFloat();
 

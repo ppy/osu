@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// <summary>
     /// The component that displays the player's accuracy on the results screen.
     /// </summary>
-    public class AccuracyCircle : CompositeDrawable
+    public partial class AccuracyCircle : CompositeDrawable
     {
         /// <summary>
         /// Duration for the transforms causing this component to appear.

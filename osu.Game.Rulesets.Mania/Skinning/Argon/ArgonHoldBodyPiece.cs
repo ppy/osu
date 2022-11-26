@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
     /// <summary>
     /// Represents length-wise portion of a hold note.
     /// </summary>
-    public class ArgonHoldBodyPiece : CompositeDrawable, IHoldNoteBody
+    public partial class ArgonHoldBodyPiece : CompositeDrawable, IHoldNoteBody
     {
         protected readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
         protected readonly IBindable<bool> IsHitting = new Bindable<bool>();

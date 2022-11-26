@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class CirclePiece : CompositeDrawable
+    public partial class CirclePiece : CompositeDrawable
     {
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
