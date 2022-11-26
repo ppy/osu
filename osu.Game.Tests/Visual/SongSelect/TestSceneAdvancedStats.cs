@@ -22,7 +22,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [System.ComponentModel.Description("Advanced beatmap statistics display")]
-    public class TestSceneAdvancedStats : OsuTestScene
+    public partial class TestSceneAdvancedStats : OsuTestScene
     {
         private TestAdvancedStats advancedStats;
 
@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private bool barIsBlue(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == colours.BlueDark;
         private bool barIsRed(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == colours.Red;
 
-        private class TestAdvancedStats : AdvancedStats
+        private partial class TestAdvancedStats : AdvancedStats
         {
             public new StatisticRow FirstValue => base.FirstValue;
             public new StatisticRow HpDrain => base.HpDrain;

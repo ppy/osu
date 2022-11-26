@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class OverlinedInfoContainer : CompositeDrawable
+    public partial class OverlinedInfoContainer : CompositeDrawable
     {
         private readonly Circle line;
         private readonly OsuSpriteText title;

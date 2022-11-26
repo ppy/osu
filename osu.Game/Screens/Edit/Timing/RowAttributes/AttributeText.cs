@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
-    public class AttributeText : OsuSpriteText
+    public partial class AttributeText : OsuSpriteText
     {
         private readonly ControlPoint controlPoint;
 

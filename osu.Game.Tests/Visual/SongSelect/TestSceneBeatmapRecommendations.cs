@@ -23,7 +23,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneBeatmapRecommendations : OsuGameTestScene
+    public partial class TestSceneBeatmapRecommendations : OsuGameTestScene
     {
         [Resolved]
         private IRulesetStore rulesetStore { get; set; }

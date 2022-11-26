@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class DeselectAllModsButton : ShearedButton, IKeyBindingHandler<GlobalAction>
+    public partial class DeselectAllModsButton : ShearedButton, IKeyBindingHandler<GlobalAction>
     {
         private readonly Bindable<IReadOnlyList<Mod>> selectedMods = new Bindable<IReadOnlyList<Mod>>();
 

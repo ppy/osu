@@ -27,7 +27,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class SkinnableTestScene : OsuGridTestScene, IStorageResourceProvider
+    public abstract partial class SkinnableTestScene : OsuGridTestScene, IStorageResourceProvider
     {
         private TrianglesSkin trianglesSkin;
         private Skin metricsSkin;
@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual
 
         #endregion
 
-        private class OutlineBox : CompositeDrawable
+        private partial class OutlineBox : CompositeDrawable
         {
             public OutlineBox()
             {

@@ -10,7 +10,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
-    public class TournamentSpriteTextWithBackground : CompositeDrawable
+    public partial class TournamentSpriteTextWithBackground : CompositeDrawable
     {
         public readonly TournamentSpriteText Text;
 

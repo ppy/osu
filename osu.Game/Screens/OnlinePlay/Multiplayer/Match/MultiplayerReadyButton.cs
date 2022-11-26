@@ -17,7 +17,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerReadyButton : ReadyButton
+    public partial class MultiplayerReadyButton : ReadyButton
     {
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; }

@@ -10,7 +10,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneShowMoreButton : OsuTestScene
+    public partial class TestSceneShowMoreButton : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);

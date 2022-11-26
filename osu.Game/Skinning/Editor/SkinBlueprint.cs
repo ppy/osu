@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinBlueprint : SelectionBlueprint<ISkinnableDrawable>
+    public partial class SkinBlueprint : SelectionBlueprint<ISkinnableDrawable>
     {
         private Container box;
 
@@ -131,7 +131,7 @@ namespace osu.Game.Skinning.Editor
         public override Quad SelectionQuad => drawable.ScreenSpaceDrawQuad;
     }
 
-    internal class AnchorOriginVisualiser : CompositeDrawable
+    internal partial class AnchorOriginVisualiser : CompositeDrawable
     {
         private readonly Drawable drawable;
 

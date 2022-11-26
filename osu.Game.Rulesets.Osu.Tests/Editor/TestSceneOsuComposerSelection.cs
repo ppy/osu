@@ -21,7 +21,7 @@ using osuTK.Input;
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     [TestFixture]
-    public class TestSceneOsuComposerSelection : TestSceneOsuEditor
+    public partial class TestSceneOsuComposerSelection : TestSceneOsuEditor
     {
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
 

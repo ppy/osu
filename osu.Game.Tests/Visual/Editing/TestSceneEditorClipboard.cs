@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorClipboard : EditorTestScene
+    public partial class TestSceneEditorClipboard : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

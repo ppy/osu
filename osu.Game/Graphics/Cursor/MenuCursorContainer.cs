@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class MenuCursorContainer : CursorContainer
+    public partial class MenuCursorContainer : CursorContainer
     {
         private readonly IBindable<bool> screenshotCursorVisibility = new Bindable<bool>(true);
         public override bool IsPresent => screenshotCursorVisibility.Value && base.IsPresent;
@@ -241,7 +241,7 @@ namespace osu.Game.Graphics.Cursor
             channel.Play();
         }
 
-        public class Cursor : Container
+        public partial class Cursor : Container
         {
             private Container cursorContainer = null!;
             private Bindable<float> cursorScale = null!;
@@ -284,7 +284,7 @@ namespace osu.Game.Graphics.Cursor
             }
         }
 
-        private class MouseInputDetector : Component
+        private partial class MouseInputDetector : Component
         {
             /// <summary>
             /// Whether the last input applied to the game is sourced from mouse.

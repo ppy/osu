@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Pippidon.UI
 {
-    public class PippidonCharacter : BeatSyncedContainer, IKeyBindingHandler<PippidonAction>
+    public partial class PippidonCharacter : BeatSyncedContainer, IKeyBindingHandler<PippidonAction>
     {
         public readonly BindableInt LanePosition = new BindableInt
         {

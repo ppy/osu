@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacySliderBall : CompositeDrawable
+    public partial class LegacySliderBall : CompositeDrawable
     {
         private readonly Drawable animationContent;
 

@@ -17,7 +17,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserPanel : OsuTestScene
+    public partial class TestSceneUserPanel : OsuTestScene
     {
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
         private readonly Bindable<UserStatus> status = new Bindable<UserStatus>();
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(null, rulesetStore.GetRuleset(rulesetId));
 
-        private class TestUserListPanel : UserListPanel
+        private partial class TestUserListPanel : UserListPanel
         {
             public TestUserListPanel(APIUser user)
                 : base(user)

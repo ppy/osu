@@ -28,7 +28,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneModSelectOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneModSelectOverlay : OsuManualInputManagerTestScene
     {
         protected override bool UseFreshStoragePerRun => true;
 
@@ -584,7 +584,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private ModPanel getPanelForMod(Type modType)
             => modSelectOverlay.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.GetType() == modType);
 
-        private class TestModSelectOverlay : UserModSelectOverlay
+        private partial class TestModSelectOverlay : UserModSelectOverlay
         {
             protected override bool ShowPresets => true;
 

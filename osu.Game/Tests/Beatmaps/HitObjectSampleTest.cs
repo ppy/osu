@@ -33,7 +33,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Beatmaps
 {
     [HeadlessTest]
-    public abstract class HitObjectSampleTest : PlayerTestScene, IStorageResourceProvider
+    public abstract partial class HitObjectSampleTest : PlayerTestScene, IStorageResourceProvider
     {
         protected abstract IResourceStore<byte[]> RulesetResources { get; }
         protected LegacySkin Skin { get; private set; }

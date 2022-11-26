@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     /// x   : button press
     /// o   : button release
     /// </summary>
-    public class TestSceneHoldNoteInput : RateAdjustedBeatmapTestScene
+    public partial class TestSceneHoldNoteInput : RateAdjustedBeatmapTestScene
     {
         private const double time_before_head = 250;
         private const double time_head = 1500;
@@ -572,7 +572,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor?.HasCompleted.Value == true);
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

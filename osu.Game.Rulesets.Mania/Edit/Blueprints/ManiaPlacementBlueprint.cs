@@ -15,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public abstract class ManiaPlacementBlueprint<T> : PlacementBlueprint
+    public abstract partial class ManiaPlacementBlueprint<T> : PlacementBlueprint
         where T : ManiaHitObject
     {
         protected new T HitObject => (T)base.HitObject;

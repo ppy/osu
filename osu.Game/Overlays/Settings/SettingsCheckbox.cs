@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsCheckbox : SettingsItem<bool>
+    public partial class SettingsCheckbox : SettingsItem<bool>
     {
         private LocalisableString labelText;
 

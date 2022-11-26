@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class SetPanelBackground : BufferedContainer
+    public partial class SetPanelBackground : BufferedContainer
     {
         public SetPanelBackground(IWorkingBeatmap working)
             : base(cachedFrameBuffer: true)

@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class CountryFilter : CompositeDrawable, IHasCurrentValue<CountryCode>
+    public partial class CountryFilter : CompositeDrawable, IHasCurrentValue<CountryCode>
     {
         private const int duration = 200;
         private const int height = 70;

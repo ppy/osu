@@ -18,7 +18,7 @@ using Xamarin.Essentials;
 
 namespace osu.Android
 {
-    public class OsuGameAndroid : OsuGame
+    public partial class OsuGameAndroid : OsuGame
     {
         [Cached]
         private readonly OsuGameActivity gameActivity;

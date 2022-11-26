@@ -11,7 +11,7 @@ namespace osu.Game.Tests.Visual.Editing
     /// <summary>
     /// Test editor hotkeys at a high level to ensure they all work well together.
     /// </summary>
-    public class TestSceneEditorBindings : EditorTestScene
+    public partial class TestSceneEditorBindings : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

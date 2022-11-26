@@ -13,7 +13,7 @@ using static osu.Game.Skinning.SkinConfiguration;
 
 namespace osu.Game.Tests.Gameplay
 {
-    public class TestSceneHitObjectSamples : HitObjectSampleTest
+    public partial class TestSceneHitObjectSamples : HitObjectSampleTest
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
         protected override IResourceStore<byte[]> RulesetResources => TestResources.GetStore();

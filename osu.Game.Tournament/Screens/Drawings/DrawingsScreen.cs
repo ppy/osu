@@ -24,7 +24,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Drawings
 {
-    public class DrawingsScreen : TournamentScreen
+    public partial class DrawingsScreen : TournamentScreen
     {
         private const string results_filename = "drawings_results.txt";
 

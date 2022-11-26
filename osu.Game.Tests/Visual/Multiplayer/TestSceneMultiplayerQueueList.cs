@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerQueueList : MultiplayerTestScene
+    public partial class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
         private MultiplayerQueueList playlist;
         private BeatmapManager beatmaps;

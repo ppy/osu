@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneJuiceStream : TestSceneCatchPlayer
+    public partial class TestSceneJuiceStream : TestSceneCatchPlayer
     {
         [Test]
         public void TestJuiceStreamEndingCombo()

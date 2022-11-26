@@ -9,7 +9,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public abstract class RoomPollingComponent : PollingComponent
+    public abstract partial class RoomPollingComponent : PollingComponent
     {
         [Resolved]
         protected IAPIProvider API { get; private set; }

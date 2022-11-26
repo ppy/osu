@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class KiaiHitExplosion : Container
+    public partial class KiaiHitExplosion : Container
     {
         public override bool RemoveWhenNotAlive => true;
 

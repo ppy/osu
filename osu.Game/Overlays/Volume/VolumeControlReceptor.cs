@@ -12,7 +12,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeControlReceptor : Container, IScrollBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
+    public partial class VolumeControlReceptor : Container, IScrollBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         public Func<GlobalAction, bool> ActionRequested;
         public Func<GlobalAction, float, bool, bool> ScrollActionRequested;

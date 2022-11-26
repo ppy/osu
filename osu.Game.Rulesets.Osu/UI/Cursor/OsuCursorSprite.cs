@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public abstract class OsuCursorSprite : CompositeDrawable
+    public abstract partial class OsuCursorSprite : CompositeDrawable
     {
         /// <summary>
         /// The an optional piece of the cursor to expand when in a clicked state.

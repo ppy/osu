@@ -12,7 +12,7 @@ using osu.Game.Overlays.Wiki;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneWikiMainPage : OsuTestScene
+    public partial class TestSceneWikiMainPage : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Orange);

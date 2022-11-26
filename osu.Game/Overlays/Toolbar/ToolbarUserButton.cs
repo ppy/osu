@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarUserButton : ToolbarOverlayToggleButton
+    public partial class ToolbarUserButton : ToolbarOverlayToggleButton
     {
         private UpdateableAvatar avatar = null!;
 

@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneSliderApplication : OsuTestScene
+    public partial class TestSceneSliderApplication : OsuTestScene
     {
         [Resolved]
         private SkinManager skinManager { get; set; }

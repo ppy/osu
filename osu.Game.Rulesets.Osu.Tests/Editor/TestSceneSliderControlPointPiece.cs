@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderControlPointPiece : SelectionBlueprintTestScene
+    public partial class TestSceneSliderControlPointPiece : SelectionBlueprintTestScene
     {
         private Slider slider;
         private DrawableSlider drawableObject;
@@ -349,7 +349,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private void assertControlPointPosition(int index, Vector2 position) =>
             AddAssert($"control point {index} at {position}", () => Precision.AlmostEquals(position, slider.Path.ControlPoints[index].Position, 1));
 
-        private class TestSliderBlueprint : SliderSelectionBlueprint
+        private partial class TestSliderBlueprint : SliderSelectionBlueprint
         {
             public new SliderBodyPiece BodyPiece => base.BodyPiece;
             public new TestSliderCircleOverlay HeadOverlay => (TestSliderCircleOverlay)base.HeadOverlay;
@@ -364,7 +364,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             protected override SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new TestSliderCircleOverlay(slider, position);
         }
 
-        private class TestSliderCircleOverlay : SliderCircleOverlay
+        private partial class TestSliderCircleOverlay : SliderCircleOverlay
         {
             public new HitCirclePiece CirclePiece => base.CirclePiece;
 

@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// A default implementation of an icon used to represent beatmap statistics.
     /// </summary>
-    public class BeatmapStatisticIcon : Sprite
+    public partial class BeatmapStatisticIcon : Sprite
     {
         private readonly BeatmapStatisticsIconType iconType;
 

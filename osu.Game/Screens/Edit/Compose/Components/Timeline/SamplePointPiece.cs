@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class SamplePointPiece : HitObjectPointPiece, IHasPopover
+    public partial class SamplePointPiece : HitObjectPointPiece, IHasPopover
     {
         public readonly HitObject HitObject;
 
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public Popover GetPopover() => new SampleEditPopover(HitObject);
 
-        public class SampleEditPopover : OsuPopover
+        public partial class SampleEditPopover : OsuPopover
         {
             private readonly HitObject hitObject;
 

@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class Details : FillFlowContainer
+    public partial class Details : FillFlowContainer
     {
         protected readonly UserRatings Ratings;
 
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.BeatmapSet
             updateDisplay();
         }
 
-        private class DetailBox : Container
+        private partial class DetailBox : Container
         {
             private readonly Container content;
             private readonly Box background;

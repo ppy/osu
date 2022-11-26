@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonSpinner : CompositeDrawable
+    public partial class ArgonSpinner : CompositeDrawable
     {
         private DrawableSpinner drawableSpinner = null!;
 

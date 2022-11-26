@@ -23,7 +23,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tournament
 {
     [Cached]
-    public class TournamentGame : TournamentGameBase
+    public partial class TournamentGame : TournamentGameBase
     {
         public static ColourInfo GetTeamColour(TeamColour teamColour) => teamColour == TeamColour.Red ? COLOUR_RED : COLOUR_BLUE;
 

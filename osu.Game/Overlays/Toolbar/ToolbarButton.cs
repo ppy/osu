@@ -28,7 +28,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public abstract class ToolbarButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
+    public abstract partial class ToolbarButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         protected GlobalAction? Hotkey { get; set; }
 
@@ -219,7 +219,7 @@ namespace osu.Game.Overlays.Toolbar
         }
     }
 
-    public class OpaqueBackground : Container
+    public partial class OpaqueBackground : Container
     {
         public OpaqueBackground()
         {

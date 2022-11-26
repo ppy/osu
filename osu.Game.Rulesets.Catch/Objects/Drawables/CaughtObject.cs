@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     /// Represents a <see cref="PalpableCatchHitObject"/> caught by the catcher.
     /// </summary>
     [Cached(typeof(IHasCatchObjectState))]
-    public abstract class CaughtObject : SkinnableDrawable, IHasCatchObjectState
+    public abstract partial class CaughtObject : SkinnableDrawable, IHasCatchObjectState
     {
         public PalpableCatchHitObject HitObject { get; private set; }
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();

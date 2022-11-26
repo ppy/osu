@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class SliderBodyPiece : BlueprintPiece<Slider>
+    public partial class SliderBodyPiece : BlueprintPiece<Slider>
     {
         private readonly ManualSliderBody body;
 

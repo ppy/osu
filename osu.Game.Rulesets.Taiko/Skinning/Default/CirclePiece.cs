@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
     /// for a usage example.
     /// </para>
     /// </summary>
-    public abstract class CirclePiece : BeatSyncedContainer, IHasAccentColour
+    public abstract partial class CirclePiece : BeatSyncedContainer, IHasAccentColour
     {
         public const float SYMBOL_SIZE = TaikoHitObject.DEFAULT_SIZE;
         public const float SYMBOL_BORDER = 8;

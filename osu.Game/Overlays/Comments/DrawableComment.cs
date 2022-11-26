@@ -32,7 +32,7 @@ using osu.Game.Resources.Localisation.Web;
 namespace osu.Game.Overlays.Comments
 {
     [Cached]
-    public class DrawableComment : CompositeDrawable
+    public partial class DrawableComment : CompositeDrawable
     {
         private const int avatar_size = 40;
 
@@ -497,7 +497,7 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
-        private class PinnedCommentNotice : FillFlowContainer
+        private partial class PinnedCommentNotice : FillFlowContainer
         {
             public PinnedCommentNotice()
             {
@@ -524,7 +524,7 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        private class ParentUsername : FillFlowContainer, IHasTooltip
+        private partial class ParentUsername : FillFlowContainer, IHasTooltip
         {
             public LocalisableString TooltipText => getParentMessage();
 

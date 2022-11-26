@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint which governs the creation of a new <see cref="HitObject"/> to actualisation.
     /// </summary>
-    public abstract class PlacementBlueprint : CompositeDrawable
+    public abstract partial class PlacementBlueprint : CompositeDrawable
     {
         /// <summary>
         /// Whether the <see cref="HitObject"/> is currently mid-placement, but has not necessarily finished being placed.

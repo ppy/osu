@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Tournament
 {
-    internal class SaveChangesOverlay : CompositeDrawable
+    internal partial class SaveChangesOverlay : CompositeDrawable
     {
         [Resolved]
         private TournamentGame tournamentGame { get; set; } = null!;

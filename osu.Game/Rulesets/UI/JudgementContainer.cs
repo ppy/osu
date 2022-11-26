@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.UI
 {
-    public class JudgementContainer<T> : Container<T>
+    public partial class JudgementContainer<T> : Container<T>
         where T : DrawableJudgement
     {
         public override void Add(T judgement)

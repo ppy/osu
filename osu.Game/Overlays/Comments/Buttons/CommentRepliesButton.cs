@@ -17,7 +17,7 @@ using static osu.Game.Graphics.UserInterface.ShowMoreButton;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
-    public abstract class CommentRepliesButton : CompositeDrawable
+    public abstract partial class CommentRepliesButton : CompositeDrawable
     {
         protected LocalisableString Text
         {

@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatTextBar : Container
+    public partial class ChatTextBar : Container
     {
         public readonly BindableBool ShowSearch = new BindableBool();
 

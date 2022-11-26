@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneBeatmapListingSortTabControl : OsuTestScene
+    public partial class TestSceneBeatmapListingSortTabControl : OsuTestScene
     {
         private readonly BeatmapListingSortTabControl control;
 
