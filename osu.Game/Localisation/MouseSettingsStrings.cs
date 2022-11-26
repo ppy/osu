@@ -65,9 +65,9 @@ namespace osu.Game.Localisation
         public static LocalisableString EnableHighPrecisionForSensitivityAdjust => new TranslatableString(getKey(@"enable_high_precision_for_sensitivity_adjust"), @"Enable high precision mouse to adjust sensitivity");
 
         /// <summary>
-        /// "Enable separate sensitivitiy to adjust vertical sensitivity"
+        /// "Enable separate sensitivity to adjust vertical sensitivity"
         /// </summary>
-        public static LocalisableString EnableSeparateSensitivity => new TranslatableString(getKey(@"enable_separate_sensitivity"), @"Enable separate sensitivitiy to adjust vertical sensitivity");
+        public static LocalisableString EnableSeparateSensitivity => new TranslatableString(getKey(@"enable_separate_sensitivity"), @"Enable separate sensitivity to adjust vertical sensitivity");
 
         /// <summary>
         /// "Horizontal sensitivity"
