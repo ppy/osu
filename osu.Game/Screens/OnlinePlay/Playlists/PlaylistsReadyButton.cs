@@ -38,8 +38,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private void load(OsuColour colours)
         {
             BackgroundColour = colours.Green;
-            Triangles.ColourDark = colours.Green;
-            Triangles.ColourLight = colours.GreenLight;
         }
 
         private bool hasRemainingAttempts = true;

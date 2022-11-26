@@ -12,7 +12,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Components;
 
@@ -20,8 +19,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public partial class MultiplayerReadyButton : ReadyButton
     {
-        public new Triangles Triangles => base.Triangles;
-
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; }
 
@@ -212,15 +209,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             void setYellow()
             {
                 BackgroundColour = colours.YellowDark;
-                Triangles.ColourDark = colours.YellowDark;
-                Triangles.ColourLight = colours.Yellow;
             }
 
             void setGreen()
             {
                 BackgroundColour = colours.Green;
-                Triangles.ColourDark = colours.Green;
-                Triangles.ColourLight = colours.GreenLight;
             }
         }
 

@@ -6,6 +6,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Tournament.IO;
 
 namespace osu.Game.Tournament.Screens.Setup
@@ -37,7 +38,7 @@ namespace osu.Game.Tournament.Screens.Setup
         {
             var drawable = base.CreateComponent();
 
-            FlowContainer.Insert(-1, folderButton = new TriangleButton
+            FlowContainer.Insert(-1, folderButton = new RoundedButton
             {
                 Text = "Open folder",
                 Width = 100

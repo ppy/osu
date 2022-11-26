@@ -197,7 +197,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             }
 
             private OsuPasswordTextBox passwordTextBox;
-            private TriangleButton joinButton;
+            private RoundedButton joinButton;
             private OsuSpriteText errorText;
             private Sample sampleJoinFail;
 
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                     Width = 200,
                                     PlaceholderText = "password",
                                 },
-                                joinButton = new TriangleButton
+                                joinButton = new RoundedButton
                                 {
                                     Width = 80,
                                     Text = "Join Room",
