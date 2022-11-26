@@ -22,6 +22,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Resources.Localisation.Web;
@@ -446,7 +447,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             isDefault.Value = bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
         }
 
-        private partial class CancelButton : TriangleButton
+        private partial class CancelButton : RoundedButton
         {
             public CancelButton()
             {
@@ -455,7 +456,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
         }
 
-        public partial class ClearButton : DangerousTriangleButton
+        public partial class ClearButton : DangerousRoundedButton
         {
             public ClearButton()
             {

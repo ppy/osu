@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             if (allowEdit)
             {
-                ButtonsContainer.Add(editButton = new PurpleTriangleButton
+                ButtonsContainer.Add(editButton = new PurpleRoundedButton
                 {
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(100, 1),

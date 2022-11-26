@@ -517,7 +517,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// <param name="room">The room to change the settings of.</param>
         protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay(Room room);
 
-        public partial class UserModSelectButton : PurpleTriangleButton, IKeyBindingHandler<GlobalAction>
+        public partial class UserModSelectButton : PurpleRoundedButton, IKeyBindingHandler<GlobalAction>
         {
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {

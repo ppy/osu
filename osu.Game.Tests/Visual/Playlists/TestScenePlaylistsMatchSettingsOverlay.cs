@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -148,7 +149,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private partial class TestRoomSettings : PlaylistsRoomSettingsOverlay
         {
-            public TriangleButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
+            public RoundedButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
 
             public OsuTextBox NameField => ((MatchSettings)Settings).NameField;
             public OsuDropdown<TimeSpan> DurationField => ((MatchSettings)Settings).DurationField;

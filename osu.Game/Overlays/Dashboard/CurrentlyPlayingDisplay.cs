@@ -203,7 +203,7 @@ namespace osu.Game.Overlays.Dashboard
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                             },
-                            new PurpleTriangleButton
+                            new PurpleRoundedButton
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Text = "Spectate",
