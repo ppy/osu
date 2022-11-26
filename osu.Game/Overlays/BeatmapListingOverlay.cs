@@ -31,7 +31,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapListingOverlay : OnlineOverlay<BeatmapListingHeader>
+    public partial class BeatmapListingOverlay : OnlineOverlay<BeatmapListingHeader>
     {
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
@@ -248,7 +248,7 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        public class NotFoundDrawable : CompositeDrawable
+        public partial class NotFoundDrawable : CompositeDrawable
         {
             public NotFoundDrawable()
             {
@@ -292,7 +292,7 @@ namespace osu.Game.Overlays
 
         // TODO: localisation requires Text/LinkFlowContainer support for localising strings with links inside
         // (https://github.com/ppy/osu-framework/issues/4530)
-        public class SupporterRequiredDrawable : CompositeDrawable
+        public partial class SupporterRequiredDrawable : CompositeDrawable
         {
             private LinkFlowContainer supporterRequiredText;
 

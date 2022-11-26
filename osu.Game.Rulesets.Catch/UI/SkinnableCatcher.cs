@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.UI
     /// The visual representation of the <see cref="Catcher"/>.
     /// It includes the body part of the catcher and the catcher plate.
     /// </summary>
-    public class SkinnableCatcher : SkinnableDrawable
+    public partial class SkinnableCatcher : SkinnableDrawable
     {
         /// <summary>
         /// This is used by skin elements to determine which texture of the catcher is used.

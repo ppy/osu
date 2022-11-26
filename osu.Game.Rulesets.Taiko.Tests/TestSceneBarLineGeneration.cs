@@ -12,7 +12,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneBarLineGeneration : OsuTestScene
+    public partial class TestSceneBarLineGeneration : OsuTestScene
     {
         [Test]
         public void TestCloseBarLineGeneration()

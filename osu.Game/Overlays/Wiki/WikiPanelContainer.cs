@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Wiki
 {
-    public class WikiPanelContainer : Container
+    public partial class WikiPanelContainer : Container
     {
         private WikiPanelMarkdownContainer panelContainer;
 
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Wiki
             Height = Math.Max(panelContainer.Height, Parent.DrawHeight);
         }
 
-        private class WikiPanelMarkdownContainer : WikiMarkdownContainer
+        private partial class WikiPanelMarkdownContainer : WikiMarkdownContainer
         {
             private readonly bool isFullWidth;
 
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Wiki
             };
         }
 
-        private class WikiPanelHeading : OsuMarkdownHeading
+        private partial class WikiPanelHeading : OsuMarkdownHeading
         {
             public bool IsFullWidth;
 

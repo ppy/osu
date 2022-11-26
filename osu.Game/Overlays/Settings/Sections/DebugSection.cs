@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings.Sections.DebugSettings;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class DebugSection : SettingsSection
+    public partial class DebugSection : SettingsSection
     {
         public override LocalisableString Header => DebugSettingsStrings.DebugSectionHeader;
 

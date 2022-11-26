@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineArea : CompositeDrawable
+    public partial class TimelineArea : CompositeDrawable
     {
         public Timeline Timeline;
 

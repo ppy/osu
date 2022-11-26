@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyReverseArrow : CompositeDrawable
+    public partial class LegacyReverseArrow : CompositeDrawable
     {
         [Resolved(canBeNull: true)]
         private DrawableHitObject? drawableHitObject { get; set; }

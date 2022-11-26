@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class ArgonRimCirclePiece : ArgonCirclePiece
+    public partial class ArgonRimCirclePiece : ArgonCirclePiece
     {
         [BackgroundDependencyLoader]
         private void load()

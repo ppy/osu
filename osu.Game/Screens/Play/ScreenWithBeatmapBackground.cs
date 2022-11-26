@@ -8,7 +8,7 @@ using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class ScreenWithBeatmapBackground : OsuScreen
+    public abstract partial class ScreenWithBeatmapBackground : OsuScreen
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 

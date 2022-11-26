@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public abstract class KeyBindingsSubsection : SettingsSubsection
+    public abstract partial class KeyBindingsSubsection : SettingsSubsection
     {
         /// <summary>
         /// After a successful binding, automatically select the next binding row to make quickly
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
     }
 
-    public class ResetButton : DangerousSettingsButton
+    public partial class ResetButton : DangerousSettingsButton
     {
         [BackgroundDependencyLoader]
         private void load()

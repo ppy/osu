@@ -32,7 +32,7 @@ using osu.Game.Screens.Edit.Components.Menus;
 namespace osu.Game.Skinning.Editor
 {
     [Cached(typeof(SkinEditor))]
-    public class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
+    public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
     {
         public const double TRANSITION_DURATION = 500;
 
@@ -424,7 +424,7 @@ namespace osu.Game.Skinning.Editor
             game?.UnregisterImportHandler(this);
         }
 
-        private class SkinEditorToast : Toast
+        private partial class SkinEditorToast : Toast
         {
             public SkinEditorToast(LocalisableString value, string skinDisplayName)
                 : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName)

@@ -11,7 +11,7 @@ using osu.Game.Tournament.IO;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    internal class TournamentSwitcher : ActionableInfo
+    internal partial class TournamentSwitcher : ActionableInfo
     {
         private OsuDropdown<string> dropdown;
         private OsuButton folderButton;

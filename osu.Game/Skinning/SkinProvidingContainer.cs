@@ -17,7 +17,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A container which adds a local <see cref="ISkinSource"/> to the hierarchy.
     /// </summary>
-    public class SkinProvidingContainer : Container, ISkinSource
+    public partial class SkinProvidingContainer : Container, ISkinSource
     {
         public event Action? SourceChanged;
 

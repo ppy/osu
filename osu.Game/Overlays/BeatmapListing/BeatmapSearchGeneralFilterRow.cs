@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapSearchGeneralFilterRow : BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>
+    public partial class BeatmapSearchGeneralFilterRow : BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>
     {
         public BeatmapSearchGeneralFilterRow()
             : base(BeatmapsStrings.ListingSearchFiltersGeneral)
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override MultipleSelectionFilter CreateMultipleSelectionFilter() => new GeneralFilter();
 
-        private class GeneralFilter : MultipleSelectionFilter
+        private partial class GeneralFilter : MultipleSelectionFilter
         {
             protected override MultipleSelectionFilterTabItem CreateTabItem(SearchGeneral value)
             {
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.BeatmapListing
             }
         }
 
-        private class FeaturedArtistsTabItem : MultipleSelectionFilterTabItem
+        private partial class FeaturedArtistsTabItem : MultipleSelectionFilterTabItem
         {
             public FeaturedArtistsTabItem()
                 : base(SearchGeneral.FeaturedArtists)

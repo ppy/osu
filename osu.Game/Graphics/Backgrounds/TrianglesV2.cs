@@ -19,7 +19,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    public class TrianglesV2 : Drawable
+    public partial class TrianglesV2 : Drawable
     {
         private const float triangle_size = 100;
         private const float base_velocity = 50;

@@ -11,7 +11,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneHistoryTextBox : OsuManualInputManagerTestScene
+    public partial class TestSceneHistoryTextBox : OsuManualInputManagerTestScene
     {
         private const string temp = "Temp message";
 

@@ -16,7 +16,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class LabelledTimeSignature : LabelledComponent<LabelledTimeSignature.TimeSignatureBox, TimeSignature>
+    public partial class LabelledTimeSignature : LabelledComponent<LabelledTimeSignature.TimeSignatureBox, TimeSignature>
     {
         public LabelledTimeSignature()
             : base(false)
@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override TimeSignatureBox CreateComponent() => new TimeSignatureBox();
 
-        public class TimeSignatureBox : CompositeDrawable, IHasCurrentValue<TimeSignature>
+        public partial class TimeSignatureBox : CompositeDrawable, IHasCurrentValue<TimeSignature>
         {
             private readonly BindableWithCurrent<TimeSignature> current = new BindableWithCurrent<TimeSignature>(TimeSignature.SimpleQuadruple);
 

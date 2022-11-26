@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class LongestComboCounter : ComboCounter
+    public partial class LongestComboCounter : ComboCounter
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, ScoreProcessor scoreProcessor)
@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override IHasText CreateText() => new TextComponent();
 
-        private class TextComponent : CompositeDrawable, IHasText
+        private partial class TextComponent : CompositeDrawable, IHasText
         {
             public LocalisableString Text
             {
