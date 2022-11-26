@@ -110,7 +110,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.LoadComplete();
 
-            relativeMode.BindValueChanged(relative => localSensitivity.Disabled = !relative.NewValue, true);
+            relativeMode.BindValueChanged(relative => 
+            {
+                localSensitivity.Disabled = !relative.NewValue;
+                localSensitivityY.Disabled = !relative.NewValue || !separateMode.Value;
+            }, true);
 
             handlerSensitivity.BindValueChanged(val =>
             {
@@ -175,7 +179,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             separateSensitivity.Current.BindValueChanged(separate =>
             {
-                localSensitivityY.Disabled = !separate.NewValue;
+                localSensitivityY.Disabled = !separate.NewValue || !relativeMode.Value;
                 horizontalSensitivity.LabelText = separate.NewValue ? MouseSettingsStrings.CursorHorizontalSensitivity : MouseSettingsStrings.CursorSensitivity;
             }, true);
         }
