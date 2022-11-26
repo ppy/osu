@@ -27,11 +27,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private Bindable<double> localSensitivity;
 
+        private Bindable<double> handlerSensitivityY;
+
+        private Bindable<double> localSensitivityY;
+
         private Bindable<WindowMode> windowMode;
         private SettingsEnumDropdown<OsuConfineMouseMode> confineMouseModeSetting;
         private Bindable<bool> relativeMode;
 
+        private Bindable<bool> separateMode;
+
         private SettingsCheckbox highPrecisionMouse;
+
+        private SettingsCheckbox separateSensitivity;
+
+        private SensitivitySetting horizontalSensitivity;
 
         public MouseSettings(MouseHandler mouseHandler)
         {
@@ -44,8 +54,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             // use local bindable to avoid changing enabled state of game host's bindable.
             handlerSensitivity = mouseHandler.Sensitivity.GetBoundCopy();
             localSensitivity = handlerSensitivity.GetUnboundCopy();
+            handlerSensitivityY = mouseHandler.SensitivityY.GetBoundCopy();
+            localSensitivityY = handlerSensitivityY.GetUnboundCopy();
 
             relativeMode = mouseHandler.UseRelativeMode.GetBoundCopy();
+            separateMode = mouseHandler.UseSeparateSensitivity.GetBoundCopy();
             windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
 
             Children = new Drawable[]
@@ -57,10 +70,22 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Current = relativeMode,
                     Keywords = new[] { @"raw", @"input", @"relative", @"cursor" }
                 },
-                new SensitivitySetting
+                separateSensitivity = new SettingsCheckbox
                 {
-                    LabelText = MouseSettingsStrings.CursorSensitivity,
+                    LabelText = MouseSettingsStrings.SeparateSensitivity,
+                    TooltipText = MouseSettingsStrings.SeparateSensitivityTooltip,
+                    Current = separateMode,
+                    Keywords = new[] { @"sensitivity", @"mouse", @"separate", @"cursor" }
+                },
+                horizontalSensitivity = new SensitivitySetting
+                {
+                    LabelText = separateMode.Value ? MouseSettingsStrings.CursorHorizontalSensitivity : MouseSettingsStrings.CursorSensitivity,
                     Current = localSensitivity
+                },
+                new SensitivitySettingY
+                {
+                    LabelText = MouseSettingsStrings.CursorVerticalSensitivity,
+                    Current = localSensitivityY,
                 },
                 confineMouseModeSetting = new SettingsEnumDropdown<OsuConfineMouseMode>
                 {
@@ -96,7 +121,30 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 localSensitivity.Disabled = disabled;
             }, true);
 
-            localSensitivity.BindValueChanged(val => handlerSensitivity.Value = val.NewValue);
+            localSensitivity.BindValueChanged(val =>
+            {
+                handlerSensitivity.Value = val.NewValue;
+
+                if (!separateMode.Value)
+                {
+                    bool disabled = localSensitivityY.Disabled;
+
+                    localSensitivityY.Disabled = false;
+                    localSensitivityY.Value = val.NewValue;
+                    localSensitivityY.Disabled = disabled;
+                }
+            });
+
+            handlerSensitivityY.BindValueChanged(val =>
+            {
+                bool disabled = localSensitivityY.Disabled;
+
+                localSensitivityY.Disabled = false;
+                localSensitivityY.Value = val.NewValue;
+                localSensitivityY.Disabled = disabled;
+            }, true);
+
+            localSensitivityY.BindValueChanged(val => handlerSensitivityY.Value = val.NewValue);
 
             windowMode.BindValueChanged(mode =>
             {
@@ -124,6 +172,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         highPrecisionMouse.ClearNoticeText();
                 }
             }, true);
+
+            separateSensitivity.Current.BindValueChanged(separate =>
+            {
+                localSensitivityY.Disabled = !separate.NewValue;
+                horizontalSensitivity.LabelText = separate.NewValue ? MouseSettingsStrings.CursorHorizontalSensitivity : MouseSettingsStrings.CursorSensitivity;
+            }, true);
         }
 
         public class SensitivitySetting : SettingsSlider<double, SensitivitySlider>
@@ -135,9 +189,23 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
         }
 
+        public class SensitivitySettingY : SettingsSlider<double, SensitivitySliderY>
+        {
+            public SensitivitySettingY()
+            {
+                KeyboardStep = 0.01f;
+                TransferValueOnCommit = true;
+            }
+        }
+
         public class SensitivitySlider : OsuSliderBar<double>
         {
             public override LocalisableString TooltipText => Current.Disabled ? MouseSettingsStrings.EnableHighPrecisionForSensitivityAdjust : $"{base.TooltipText}x";
+        }
+
+        public class SensitivitySliderY : OsuSliderBar<double>
+        {
+            public override LocalisableString TooltipText => Current.Disabled ? MouseSettingsStrings.EnableSeparateSensitivity : $"{base.TooltipText}x";
         }
     }
 }

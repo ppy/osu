@@ -29,6 +29,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString HighPrecisionMouseTooltip => new TranslatableString(getKey(@"high_precision_mouse_tooltip"), @"Attempts to bypass any operation system mouse acceleration. On windows, this is equivalent to what used to be known as ""Raw Input"".");
 
+         /// <summary>
+        /// "Separate sensitivity"
+        /// </summary>
+        public static LocalisableString SeparateSensitivity => new TranslatableString(getKey(@"separate_sensitivity"), @"Separate sensitivity");
+
+        /// <summary>
+        /// "Separate sensitivity for horizontal movement and vertical movement."
+        /// </summary>
+        public static LocalisableString SeparateSensitivityTooltip => new TranslatableString(getKey(@"separate_sensitivity_tooltip"), @"Separate sensitivity for horizontal movement and vertical movement.");
+
         /// <summary>
         /// "Confine mouse cursor to window"
         /// </summary>
@@ -53,6 +63,21 @@ namespace osu.Game.Localisation
         /// "Enable high precision mouse to adjust sensitivity"
         /// </summary>
         public static LocalisableString EnableHighPrecisionForSensitivityAdjust => new TranslatableString(getKey(@"enable_high_precision_for_sensitivity_adjust"), @"Enable high precision mouse to adjust sensitivity");
+
+        /// <summary>
+        /// "Enable separate sensitivitiy to adjust vertical sensitivity"
+        /// </summary>
+        public static LocalisableString EnableSeparateSensitivity => new TranslatableString(getKey(@"enable_separate_sensitivity"), @"Enable separate sensitivitiy to adjust vertical sensitivity");
+
+        /// <summary>
+        /// "Horizontal sensitivity"
+        /// </summary>
+        public static LocalisableString CursorHorizontalSensitivity => new TranslatableString(getKey(@"cursor_horizontal_sensitivity"), @"Horizontal sensitivity");
+
+        /// <summary>
+        /// "Vertical sensitivity"
+        /// </summary>
+        public static LocalisableString CursorVerticalSensitivity => new TranslatableString(getKey(@"cursor_vertical_sensitivity"), @"Vertical sensitivity");
 
         /// <summary>
         /// "Cursor sensitivity"
