@@ -22,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuSelectionHandler : EditorSelectionHandler
+    public partial class OsuSelectionHandler : EditorSelectionHandler
     {
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider? snapProvider { get; set; }

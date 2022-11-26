@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class ReverseArrowPiece : BeatSyncedContainer
+    public partial class ReverseArrowPiece : BeatSyncedContainer
     {
         [Resolved]
         private DrawableHitObject drawableRepeat { get; set; } = null!;

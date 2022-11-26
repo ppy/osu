@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// A player instance which submits to a room backing. This is generally used by playlists and multiplayer.
     /// </summary>
-    public abstract class RoomSubmittingPlayer : SubmittingPlayer
+    public abstract partial class RoomSubmittingPlayer : SubmittingPlayer
     {
         protected readonly PlaylistItem PlaylistItem;
         protected readonly Room Room;

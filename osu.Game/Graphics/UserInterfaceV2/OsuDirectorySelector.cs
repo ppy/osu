@@ -12,7 +12,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class OsuDirectorySelector : DirectorySelector
+    public partial class OsuDirectorySelector : DirectorySelector
     {
         public const float ITEM_HEIGHT = 20;
 

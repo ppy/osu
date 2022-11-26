@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     /// <summary>
     /// A component of the playfield that captures input and displays input as a drum.
     /// </summary>
-    internal class LegacyInputDrum : Container
+    internal partial class LegacyInputDrum : Container
     {
         private Container content = null!;
         private LegacyHalfDrum left = null!;
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         /// <summary>
         /// A half-drum. Contains one centre and one rim hit.
         /// </summary>
-        private class LegacyHalfDrum : Container, IKeyBindingHandler<TaikoAction>
+        private partial class LegacyHalfDrum : Container, IKeyBindingHandler<TaikoAction>
         {
             /// <summary>
             /// The key to be used for the rim of the half-drum.

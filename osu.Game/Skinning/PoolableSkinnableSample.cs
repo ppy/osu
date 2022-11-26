@@ -20,7 +20,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A sample corresponding to an <see cref="ISampleInfo"/> that supports being pooled and responding to skin changes.
     /// </summary>
-    public class PoolableSkinnableSample : SkinReloadableDrawable, IAdjustableAudioComponent
+    public partial class PoolableSkinnableSample : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         /// <summary>
         /// The currently-loaded <see cref="DrawableSample"/>.

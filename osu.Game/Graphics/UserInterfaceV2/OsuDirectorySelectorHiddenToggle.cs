@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    internal class OsuDirectorySelectorHiddenToggle : OsuCheckbox
+    internal partial class OsuDirectorySelectorHiddenToggle : OsuCheckbox
     {
         public OsuDirectorySelectorHiddenToggle()
         {

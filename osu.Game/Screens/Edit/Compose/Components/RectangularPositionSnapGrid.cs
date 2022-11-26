@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class RectangularPositionSnapGrid : CompositeDrawable
+    public partial class RectangularPositionSnapGrid : CompositeDrawable
     {
         /// <summary>
         /// The position of the origin of this <see cref="RectangularPositionSnapGrid"/> in local coordinates.

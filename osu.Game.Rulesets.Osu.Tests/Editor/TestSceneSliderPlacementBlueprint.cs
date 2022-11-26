@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderPlacementBlueprint : PlacementBlueprintTestScene
+    public partial class TestSceneSliderPlacementBlueprint : PlacementBlueprintTestScene
     {
         [SetUp]
         public void Setup() => Schedule(() =>

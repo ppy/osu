@@ -9,7 +9,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Online.Placeholders
 {
-    public abstract class Placeholder : OsuTextFlowContainer, IEquatable<Placeholder>
+    public abstract partial class Placeholder : OsuTextFlowContainer, IEquatable<Placeholder>
     {
         protected const float TEXT_SIZE = 22;
 

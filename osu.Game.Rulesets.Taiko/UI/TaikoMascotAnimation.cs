@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public sealed class TaikoMascotAnimation : BeatSyncedContainer
+    public sealed partial class TaikoMascotAnimation : BeatSyncedContainer
     {
         private readonly TextureAnimation textureAnimation;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        private class ManualMascotTextureAnimation : TextureAnimation
+        private partial class ManualMascotTextureAnimation : TextureAnimation
         {
             private readonly TaikoMascotAnimationState state;
 
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        private class ClearMascotTextureAnimation : TextureAnimation
+        private partial class ClearMascotTextureAnimation : TextureAnimation
         {
             private const float clear_animation_speed = 1000 / 10f;
 

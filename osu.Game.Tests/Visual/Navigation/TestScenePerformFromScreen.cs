@@ -22,7 +22,7 @@ using static osu.Game.Tests.Visual.Navigation.TestSceneScreenNavigation;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestScenePerformFromScreen : OsuGameTestScene
+    public partial class TestScenePerformFromScreen : OsuGameTestScene
     {
         private bool actionPerformed;
 
@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("beatmap updated", () => Game.Beatmap.Value.BeatmapSetInfo.OnlineID == 241526);
         }
 
-        public class DialogBlockingScreen : OsuScreen
+        public partial class DialogBlockingScreen : OsuScreen
         {
             [Resolved]
             private IDialogOverlay dialogOverlay { get; set; }
@@ -260,7 +260,7 @@ namespace osu.Game.Tests.Visual.Navigation
             }
         }
 
-        public class TestScreenWithNestedStack : OsuScreen, IHasSubScreenStack
+        public partial class TestScreenWithNestedStack : OsuScreen, IHasSubScreenStack
         {
             public DialogBlockingScreen Blocker { get; private set; }
 
@@ -285,7 +285,7 @@ namespace osu.Game.Tests.Visual.Navigation
             }
         }
 
-        public class TestLoadBlockingScreen : OsuScreen
+        public partial class TestLoadBlockingScreen : OsuScreen
         {
             public readonly ManualResetEventSlim LoadEvent = new ManualResetEventSlim();
 

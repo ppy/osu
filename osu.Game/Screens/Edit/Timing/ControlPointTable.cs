@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class ControlPointTable : EditorTable
+    public partial class ControlPointTable : EditorTable
     {
         [Resolved]
         private Bindable<ControlPointGroup> selectedGroup { get; set; }
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.Timing
             };
         }
 
-        private class ControlGroupAttributes : CompositeDrawable
+        private partial class ControlGroupAttributes : CompositeDrawable
         {
             private readonly Func<ControlPoint, bool> matchFunction;
 

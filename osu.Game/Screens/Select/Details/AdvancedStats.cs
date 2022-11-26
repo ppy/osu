@@ -28,7 +28,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public class AdvancedStats : Container
+    public partial class AdvancedStats : Container
     {
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Select.Details
             starDifficultyCancellationSource?.Cancel();
         }
 
-        public class StatisticRow : Container, IHasAccentColour
+        public partial class StatisticRow : Container, IHasAccentColour
         {
             private const float value_width = 25;
             private const float name_width = 70;

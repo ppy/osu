@@ -10,7 +10,7 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Tests.Visual.Background
 {
-    public class TestSceneTrianglesV2Background : OsuTestScene
+    public partial class TestSceneTrianglesV2Background : OsuTestScene
     {
         private readonly TrianglesV2 triangles;
 

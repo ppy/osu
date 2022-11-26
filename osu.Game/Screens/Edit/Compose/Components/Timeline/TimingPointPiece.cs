@@ -9,7 +9,7 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimingPointPiece : TopPointPiece
+    public partial class TimingPointPiece : TopPointPiece
     {
         private readonly BindableNumber<double> beatLength;
 

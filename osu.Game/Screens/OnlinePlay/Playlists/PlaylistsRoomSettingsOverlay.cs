@@ -26,7 +26,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsRoomSettingsOverlay : RoomSettingsOverlay
+    public partial class PlaylistsRoomSettingsOverlay : RoomSettingsOverlay
     {
         public Action? EditPlaylist;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             EditPlaylist = () => EditPlaylist?.Invoke()
         };
 
-        protected class MatchSettings : OnlinePlayComposite
+        protected partial class MatchSettings : OnlinePlayComposite
         {
             private const float disabled_alpha = 0.2f;
 
@@ -415,7 +415,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         }
 
-        public class CreateRoomButton : RoundedButton
+        public partial class CreateRoomButton : RoundedButton
         {
             public CreateRoomButton()
             {
@@ -429,7 +429,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         }
 
-        private class DurationDropdown : OsuDropdown<TimeSpan>
+        private partial class DurationDropdown : OsuDropdown<TimeSpan>
         {
             public DurationDropdown()
             {

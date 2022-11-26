@@ -18,7 +18,7 @@ using osu.Game.Rulesets;
 namespace osu.Game.Tests.Database
 {
     [TestFixture]
-    public abstract class RealmTest
+    public abstract partial class RealmTest
     {
         protected void RunTestWithRealm([InstantHandle] Action<RealmAccess, OsuStorage> testAction, [CallerMemberName] string caller = "")
         {
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Database
         protected static RulesetInfo CreateRuleset() =>
             new RulesetInfo("osu", "osu!", string.Empty, 0) { Available = true };
 
-        private class RealmTestGame : Framework.Game
+        private partial class RealmTestGame : Framework.Game
         {
             public RealmTestGame([InstantHandle] Func<Task> work)
             {

@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public abstract class ArgonCirclePiece : BeatSyncedContainer
+    public abstract partial class ArgonCirclePiece : BeatSyncedContainer
     {
         public const float ICON_SIZE = 20 / 70f;
 

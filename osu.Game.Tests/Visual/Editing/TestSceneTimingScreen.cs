@@ -20,7 +20,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneTimingScreen : EditorClockTestScene
+    public partial class TestSceneTimingScreen : EditorClockTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);

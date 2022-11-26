@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class ColumnHitObjectArea : HitObjectArea
+    public partial class ColumnHitObjectArea : HitObjectArea
     {
         public readonly Container Explosions;
 

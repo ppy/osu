@@ -14,7 +14,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal abstract class LabelledTextBoxWithPopover : LabelledTextBox, IHasPopover
+    internal abstract partial class LabelledTextBoxWithPopover : LabelledTextBox, IHasPopover
     {
         public abstract Popover GetPopover();
 
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Setup
                 OnFocused = this.ShowPopover
             };
 
-        internal class PopoverTextBox : OsuTextBox
+        internal partial class PopoverTextBox : OsuTextBox
         {
             public Action OnFocused;
 

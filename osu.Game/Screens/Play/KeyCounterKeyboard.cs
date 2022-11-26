@@ -8,7 +8,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterKeyboard : KeyCounter
+    public partial class KeyCounterKeyboard : KeyCounter
     {
         public Key Key { get; }
 

@@ -8,7 +8,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class ArgonPlayfieldBackgroundLeft : CompositeDrawable
+    public partial class ArgonPlayfieldBackgroundLeft : CompositeDrawable
     {
         public ArgonPlayfieldBackgroundLeft()
         {

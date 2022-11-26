@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
-    public class AttributeProgressBar : ProgressBar
+    public partial class AttributeProgressBar : ProgressBar
     {
         private readonly ControlPoint controlPoint;
 

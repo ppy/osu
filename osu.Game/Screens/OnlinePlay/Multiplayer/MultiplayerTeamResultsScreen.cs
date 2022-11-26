@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerTeamResultsScreen : MultiplayerResultsScreen
+    public partial class MultiplayerTeamResultsScreen : MultiplayerResultsScreen
     {
         private readonly SortedDictionary<int, BindableLong> teamScores;
 

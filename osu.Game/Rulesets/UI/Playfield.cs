@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.UI
 {
     [Cached(typeof(IPooledHitObjectProvider))]
     [Cached(typeof(IPooledSampleProvider))]
-    public abstract class Playfield : CompositeDrawable, IPooledHitObjectProvider, IPooledSampleProvider
+    public abstract partial class Playfield : CompositeDrawable, IPooledHitObjectProvider, IPooledSampleProvider
     {
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
@@ -427,7 +427,7 @@ namespace osu.Game.Rulesets.UI
             return pool;
         }
 
-        private class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>
+        private partial class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>
         {
             private readonly ISampleInfo sampleInfo;
 

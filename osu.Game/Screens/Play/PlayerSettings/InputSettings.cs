@@ -10,7 +10,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class InputSettings : PlayerSettingsGroup
+    public partial class InputSettings : PlayerSettingsGroup
     {
         private readonly PlayerCheckbox mouseButtonsCheckbox;
 

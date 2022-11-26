@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardDifficultyList : CompositeDrawable
+    public partial class BeatmapCardDifficultyList : CompositeDrawable
     {
         public BeatmapCardDifficultyList(IBeatmapSetInfo beatmapSetInfo)
         {
@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
         }
 
-        private class BeatmapCardDifficultyRow : CompositeDrawable
+        private partial class BeatmapCardDifficultyRow : CompositeDrawable
         {
             private readonly IBeatmapInfo beatmapInfo;
 

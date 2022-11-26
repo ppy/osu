@@ -26,7 +26,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestSceneBeatmapCarousel : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatmapCarousel : OsuManualInputManagerTestScene
     {
         private TestBeatmapCarousel carousel;
         private RulesetStore rulesets;
@@ -1112,7 +1112,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selection is visible", selectedBeatmapVisible);
         }
 
-        private class TestBeatmapCarousel : BeatmapCarousel
+        private partial class TestBeatmapCarousel : BeatmapCarousel
         {
             public bool PendingFilterTask => PendingFilter != null;
 

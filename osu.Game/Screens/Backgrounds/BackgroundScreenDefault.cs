@@ -19,7 +19,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenDefault : BackgroundScreen
+    public partial class BackgroundScreenDefault : BackgroundScreen
     {
         private Background background;
 
