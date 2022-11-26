@@ -288,6 +288,25 @@ namespace osu.Game.Tests.Visual.Settings
             AddUntilStep("all reset section bindings buttons shown", () => panel.ChildrenOfType<ResetButton>().All(button => button.Alpha == 1));
         }
 
+        [Test]
+        public void TestBindingSameKeyCombinationInRuleset()
+        {
+            scrollToAndStartBinding("Left button");
+            AddStep("press k", () => InputManager.Key(Key.K));
+            AddStep("press k", () => InputManager.Key(Key.K));
+
+            checkBinding("Left button", "K");
+            checkBindingNegative("Right button", "K");
+
+            AddAssert("right button still binding", () =>
+            {
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Right button"));
+                var firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
+
+                return firstButton.IsBinding;
+            });
+        }
+
         private void checkBinding(string name, string keyName)
         {
             AddAssert($"Check {name} is bound to {keyName}", () =>
@@ -297,6 +316,17 @@ namespace osu.Game.Tests.Visual.Settings
 
                 return firstButton.Text.Text.ToString();
             }, () => Is.EqualTo(keyName));
+        }
+
+        private void checkBindingNegative(string name, string keyName)
+        {
+            AddAssert($"Check {name} is bound to {keyName}", () =>
+            {
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
+                var firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
+
+                return firstButton.Text.Text.ToString();
+            }, () => !Is.EqualTo(keyName));
         }
 
         private void scrollToAndStartBinding(string name)
