@@ -14,13 +14,13 @@ namespace osu.Game.Tests.Visual.UserInterface
     public class TestSceneRangeSlider : OsuTestScene
     {
         [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Red);
 
         private readonly BindableNumber<double> customStart = new BindableNumber<double>
         {
             MinValue = 0,
             MaxValue = 100,
-            Precision = 0.001f
+            Precision = 0.1f
         };
 
         private readonly BindableNumber<double> customEnd = new BindableNumber<double>(100)
@@ -44,7 +44,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 TooltipSuffix = "suffix",
                 NubWidth = Nub.HEIGHT * 2,
                 DefaultStringLowerBound = "Start",
-                DefaultStringUpperBound = "End"
+                DefaultStringUpperBound = "End",
+                MinRange = 10
             });
             AddStep("Test Range", () =>
             {
