@@ -13,7 +13,7 @@ namespace osu.Game.Skinning
     /// Optionally also applies a default layout to the components.
     /// </summary>
     [Serializable]
-    public class SkinnableTargetComponentsContainer : Container, ISkinnableDrawable
+    public partial class SkinnableTargetComponentsContainer : Container, ISkinnableDrawable
     {
         public bool IsEditable => false;
 

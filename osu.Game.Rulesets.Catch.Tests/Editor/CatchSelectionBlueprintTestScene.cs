@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public abstract class CatchSelectionBlueprintTestScene : SelectionBlueprintTestScene
+    public abstract partial class CatchSelectionBlueprintTestScene : SelectionBlueprintTestScene
     {
         protected ScrollingHitObjectContainer HitObjectContainer => contentContainer.Playfield.HitObjectContainer;
 
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             InputManager.MoveMouseTo(pos);
         });
 
-        private class EditorBeatmapDependencyContainer : Container
+        private partial class EditorBeatmapDependencyContainer : Container
         {
             [Cached]
             private readonly EditorClock editorClock;

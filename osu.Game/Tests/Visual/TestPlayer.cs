@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A player that exposes many components that would otherwise not be available, for testing purposes.
     /// </summary>
-    public class TestPlayer : SoloPlayer
+    public partial class TestPlayer : SoloPlayer
     {
         protected override bool PauseOnFocusLost { get; }
 

@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
-    public class TestSceneDrawableSwell : TaikoSkinnableTestScene
+    public partial class TestSceneDrawableSwell : TaikoSkinnableTestScene
     {
         [Test]
         public void TestHits()

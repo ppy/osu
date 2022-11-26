@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public class TestSceneColumnBackground : ManiaSkinnableTestScene
+    public partial class TestSceneColumnBackground : ManiaSkinnableTestScene
     {
         [BackgroundDependencyLoader]
         private void load()

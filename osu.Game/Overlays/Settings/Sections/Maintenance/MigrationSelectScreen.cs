@@ -17,7 +17,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class MigrationSelectScreen : DirectorySelectScreen
+    public partial class MigrationSelectScreen : DirectorySelectScreen
     {
         [Resolved]
         private Storage storage { get; set; }

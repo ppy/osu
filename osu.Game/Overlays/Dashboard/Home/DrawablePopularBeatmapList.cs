@@ -10,7 +10,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
-    public class DrawablePopularBeatmapList : DrawableBeatmapList
+    public partial class DrawablePopularBeatmapList : DrawableBeatmapList
     {
         public DrawablePopularBeatmapList(List<APIBeatmapSet> beatmapSets)
             : base(beatmapSets)

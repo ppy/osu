@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneDistanceSnapGrid : EditorClockTestScene
+    public partial class TestSceneDistanceSnapGrid : EditorClockTestScene
     {
         private const double beat_length = 100;
         private const int beat_snap_distance = 10;
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("check correct interval count", () => Assert.That((end_time / grid.DistanceBetweenTicks) * multiplier, Is.EqualTo(grid.MaxIntervals)));
         }
 
-        private class TestDistanceSnapGrid : DistanceSnapGrid
+        private partial class TestDistanceSnapGrid : DistanceSnapGrid
         {
             public new float DistanceBetweenTicks => base.DistanceBetweenTicks;
 

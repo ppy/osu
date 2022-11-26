@@ -16,7 +16,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play.Break
 {
-    public class BreakInfoLine<T> : Container
+    public partial class BreakInfoLine<T> : Container
         where T : struct
     {
         private const int margin = 2;
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play.Break
         }
     }
 
-    public class PercentageBreakInfoLine : BreakInfoLine<double>
+    public partial class PercentageBreakInfoLine : BreakInfoLine<double>
     {
         public PercentageBreakInfoLine(LocalisableString name, string prefix = "")
             : base(name, prefix)

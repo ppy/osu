@@ -19,7 +19,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModStrictTracking : Mod, IApplicableAfterBeatmapConversion, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
+    public partial class OsuModStrictTracking : Mod, IApplicableAfterBeatmapConversion, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => @"Strict Tracking";
         public override string Acronym => @"ST";
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             public override Judgement CreateJudgement() => new OsuJudgement();
         }
 
-        private class StrictTrackingDrawableSliderTail : DrawableSliderTail
+        private partial class StrictTrackingDrawableSliderTail : DrawableSliderTail
         {
             public override bool DisplayResult => true;
         }

@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Settings
     /// <summary>
     /// A <see cref="SettingsButton"/> with pink colours to mark dangerous/destructive actions.
     /// </summary>
-    public class DangerousSettingsButton : SettingsButton
+    public partial class DangerousSettingsButton : SettingsButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

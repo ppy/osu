@@ -14,7 +14,7 @@ using osu.Game.Screens.Play.Break;
 
 namespace osu.Game.Screens.Play
 {
-    public class BreakOverlay : Container
+    public partial class BreakOverlay : Container
     {
         /// <summary>
         /// The duration of the break overlay fading.

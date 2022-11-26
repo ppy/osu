@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
-    public class ScrollingPath : CompositeDrawable
+    public partial class ScrollingPath : CompositeDrawable
     {
         private readonly Path drawablePath;
 

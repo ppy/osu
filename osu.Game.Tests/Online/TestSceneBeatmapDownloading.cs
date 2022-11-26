@@ -15,7 +15,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Online
 {
     [HeadlessTest]
-    public class TestSceneBeatmapDownloading : OsuTestScene
+    public partial class TestSceneBeatmapDownloading : OsuTestScene
     {
         private BeatmapModelDownloader beatmaps;
         private ProgressNotification recentNotification;

@@ -18,7 +18,7 @@ namespace osu.Game.Graphics
     /// <summary>
     /// An explosion of textured particles based on how osu-stable randomises the explosion pattern.
     /// </summary>
-    public class ParticleExplosion : Sprite
+    public partial class ParticleExplosion : Sprite
     {
         private readonly int particleCount;
         private readonly double duration;

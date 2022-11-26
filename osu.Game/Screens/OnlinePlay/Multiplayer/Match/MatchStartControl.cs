@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MatchStartControl : MultiplayerRoomComposite
+    public partial class MatchStartControl : MultiplayerRoomComposite
     {
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }

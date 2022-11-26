@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuTextBox : ThemeComparisonTestScene
+    public partial class TestSceneOsuTextBox : ThemeComparisonTestScene
     {
         private IEnumerable<OsuNumberBox> numberBoxes => this.ChildrenOfType<OsuNumberBox>();
 

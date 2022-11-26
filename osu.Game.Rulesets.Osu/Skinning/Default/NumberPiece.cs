@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class NumberPiece : Container
+    public partial class NumberPiece : Container
     {
         private readonly SkinnableSpriteText number;
 

@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
     /// Adds hover and click sounds to a drawable.
     /// Does not draw anything.
     /// </summary>
-    public class HoverClickSounds : HoverSounds
+    public partial class HoverClickSounds : HoverSounds
     {
         public Bindable<bool> Enabled = new Bindable<bool>(true);
 

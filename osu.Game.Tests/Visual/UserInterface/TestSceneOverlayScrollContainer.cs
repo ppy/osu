@@ -15,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOverlayScrollContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneOverlayScrollContainer : OsuManualInputManagerTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("invocation count is 1", () => invocationCount == 1);
         }
 
-        private class TestScrollContainer : OverlayScrollContainer
+        private partial class TestScrollContainer : OverlayScrollContainer
         {
             public new ScrollToTopButton Button => base.Button;
         }

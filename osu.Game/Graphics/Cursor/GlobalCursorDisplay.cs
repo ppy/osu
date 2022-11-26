@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.Cursor
     /// A container which provides the main <see cref="MenuCursorContainer"/>.
     /// Also handles cases where a more localised cursor is provided by another component (via <see cref="IProvideCursor"/>).
     /// </summary>
-    public class GlobalCursorDisplay : Container, IProvideCursor
+    public partial class GlobalCursorDisplay : Container, IProvideCursor
     {
         /// <summary>
         /// Control whether any cursor should be displayed.

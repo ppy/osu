@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mods
         public abstract float DefaultFlashlightSize { get; }
     }
 
-    public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
+    public abstract partial class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
         where T : HitObject
     {
         public const double FLASHLIGHT_FADE_DURATION = 800;
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mods
 
         protected abstract Flashlight CreateFlashlight();
 
-        public abstract class Flashlight : Drawable
+        public abstract partial class Flashlight : Drawable
         {
             public readonly BindableInt Combo = new BindableInt();
 

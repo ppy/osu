@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual
     /// </list>
     /// </p>
     /// </summary>
-    public class TestMultiplayerComponents : OsuScreen
+    public partial class TestMultiplayerComponents : OsuScreen
     {
         public Screens.OnlinePlay.Multiplayer.Multiplayer MultiplayerScreen => multiplayerScreen;
 
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual
             return true;
         }
 
-        private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
+        private partial class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
         {
             public new TestMultiplayerRoomManager RoomManager { get; private set; }
             public TestRoomRequestsHandler RequestsHandler { get; private set; }

@@ -30,7 +30,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuHitObjectComposer : DistancedHitObjectComposer<OsuHitObject>
+    public partial class OsuHitObjectComposer : DistancedHitObjectComposer<OsuHitObject>
     {
         public OsuHitObjectComposer(Ruleset ruleset)
             : base(ruleset)

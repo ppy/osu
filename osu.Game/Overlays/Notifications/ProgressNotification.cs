@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class ProgressNotification : Notification, IHasCompletionTarget
+    public partial class ProgressNotification : Notification, IHasCompletionTarget
     {
         private const float loading_spinner_size = 22;
 
@@ -255,7 +255,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private class ProgressBar : Container
+        private partial class ProgressBar : Container
         {
             private readonly Box box;
 

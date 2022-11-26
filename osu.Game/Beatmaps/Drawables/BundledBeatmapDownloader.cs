@@ -21,7 +21,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class BundledBeatmapDownloader : CompositeDrawable
+    public partial class BundledBeatmapDownloader : CompositeDrawable
     {
         private readonly bool shouldPostNotifications;
 

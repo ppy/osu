@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Taiko.UI;
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
-    public class TestSceneKiaiHitExplosion : TaikoSkinnableTestScene
+    public partial class TestSceneKiaiHitExplosion : TaikoSkinnableTestScene
     {
         [Test]
         public void TestKiaiHits()

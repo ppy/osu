@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual
     /// A container which provides a <see cref="IScrollingInfo"/> to children.
     /// This should only be used when testing
     /// </summary>
-    public class ScrollingTestContainer : Container
+    public partial class ScrollingTestContainer : Container
     {
         public SortedList<MultiplierControlPoint> ControlPoints => scrollingInfo.Algorithm.ControlPoints;
 

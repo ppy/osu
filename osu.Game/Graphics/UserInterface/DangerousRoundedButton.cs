@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DangerousRoundedButton : RoundedButton
+    public partial class DangerousRoundedButton : RoundedButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

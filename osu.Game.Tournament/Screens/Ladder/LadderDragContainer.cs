@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Ladder
 {
-    public class LadderDragContainer : Container
+    public partial class LadderDragContainer : Container
     {
         protected override bool OnDragStart(DragStartEvent e) => true;
 

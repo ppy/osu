@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     /// Legacy skinned spinner with two main spinning layers, one fixed overlay and one final spinning overlay.
     /// No background layer.
     /// </summary>
-    public class LegacyNewStyleSpinner : LegacySpinner
+    public partial class LegacyNewStyleSpinner : LegacySpinner
     {
         private Sprite glow = null!;
         private Sprite discBottom = null!;

@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Graphics
 {
-    public abstract class ParticleSpewer : Sprite
+    public abstract partial class ParticleSpewer : Sprite
     {
         private readonly FallingParticle[] particles;
         private int currentIndex;

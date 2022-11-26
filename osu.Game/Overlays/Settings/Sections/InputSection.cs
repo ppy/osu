@@ -14,7 +14,7 @@ using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class InputSection : SettingsSection
+    public partial class InputSection : SettingsSection
     {
         private readonly KeyBindingPanel keyConfig;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        public class HandlerSection : SettingsSubsection
+        public partial class HandlerSection : SettingsSubsection
         {
             private readonly InputHandler handler;
 

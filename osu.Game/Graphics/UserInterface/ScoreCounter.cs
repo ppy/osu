@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class ScoreCounter : RollingCounter<long>
+    public abstract partial class ScoreCounter : RollingCounter<long>
     {
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;

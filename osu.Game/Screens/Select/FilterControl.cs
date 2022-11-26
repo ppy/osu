@@ -24,7 +24,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
-    public class FilterControl : Container
+    public partial class FilterControl : Container
     {
         public const float HEIGHT = 2 * side_margin + 85;
         private const float side_margin = 20;

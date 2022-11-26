@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps
     ///  - Exposes track length.
     ///  - Allows changing the source to a new track (for cases like editor track updating).
     /// </summary>
-    public class FramedBeatmapClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
+    public partial class FramedBeatmapClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
         private readonly bool applyOffsets;
 

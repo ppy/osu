@@ -9,7 +9,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
-    public class RoomBackgroundScreen : OnlinePlayBackgroundScreen
+    public partial class RoomBackgroundScreen : OnlinePlayBackgroundScreen
     {
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 

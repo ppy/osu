@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultComboCounter : ComboCounter
+    public partial class DefaultComboCounter : ComboCounter
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, ScoreProcessor scoreProcessor)

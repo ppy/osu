@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class FlashPiece : Container
+    public partial class FlashPiece : Container
     {
         public FlashPiece()
         {

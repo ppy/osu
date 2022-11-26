@@ -20,7 +20,7 @@ namespace osu.Game.Overlays
     /// An on-screen display which automatically tracks and displays toast notifications for <seealso cref="TrackedSettings"/>.
     /// Can also display custom content via <see cref="Display(Toast)"/>
     /// </summary>
-    public class OnScreenDisplay : Container
+    public partial class OnScreenDisplay : Container
     {
         private readonly Container box;
 

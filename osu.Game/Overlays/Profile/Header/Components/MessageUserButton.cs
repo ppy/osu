@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class MessageUserButton : ProfileHeaderButton
+    public partial class MessageUserButton : ProfileHeaderButton
     {
         public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 

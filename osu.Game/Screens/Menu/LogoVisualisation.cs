@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// A visualiser that reacts to music coming from beatmaps.
     /// </summary>
-    public class LogoVisualisation : Drawable
+    public partial class LogoVisualisation : Drawable
     {
         /// <summary>
         /// The number of bars to jump each update iteration.

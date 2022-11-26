@@ -5,7 +5,7 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class TrianglesPiece : Triangles
+    public partial class TrianglesPiece : Triangles
     {
         protected override bool CreateNewTriangles => false;
         protected override float SpawnRatio => 0.5f;

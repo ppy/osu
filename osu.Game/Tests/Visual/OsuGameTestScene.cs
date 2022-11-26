@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A scene which tests full game flow.
     /// </summary>
-    public abstract class OsuGameTestScene : OsuManualInputManagerTestScene
+    public abstract partial class OsuGameTestScene : OsuManualInputManagerTestScene
     {
         protected TestOsuGame Game;
 
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected void DismissAnyNotifications() => Game.Notifications.State.Value = Visibility.Hidden;
 
-        public class TestOsuGame : OsuGame
+        public partial class TestOsuGame : OsuGame
         {
             public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
 
@@ -189,11 +189,11 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        public class TestLoader : Loader
+        public partial class TestLoader : Loader
         {
             protected override ShaderPrecompiler CreateShaderPrecompiler() => new TestShaderPrecompiler();
 
-            private class TestShaderPrecompiler : ShaderPrecompiler
+            private partial class TestShaderPrecompiler : ShaderPrecompiler
             {
                 protected override bool AllLoaded => true;
             }

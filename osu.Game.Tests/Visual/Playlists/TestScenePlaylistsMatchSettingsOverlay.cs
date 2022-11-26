@@ -18,7 +18,7 @@ using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsMatchSettingsOverlay : OnlinePlayTestScene
+    public partial class TestScenePlaylistsMatchSettingsOverlay : OnlinePlayTestScene
     {
         protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("error not displayed", () => !settings.ErrorText.IsPresent);
         }
 
-        private class TestRoomSettings : PlaylistsRoomSettingsOverlay
+        private partial class TestRoomSettings : PlaylistsRoomSettingsOverlay
         {
             public RoundedButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
 

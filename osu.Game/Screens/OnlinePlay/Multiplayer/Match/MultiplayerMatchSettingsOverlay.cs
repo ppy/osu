@@ -26,7 +26,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
+    public partial class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
     {
         private MatchSettings settings = null!;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             SettingsApplied = Hide
         };
 
-        protected class MatchSettings : OnlinePlayComposite
+        protected partial class MatchSettings : OnlinePlayComposite
         {
             private const float disabled_alpha = 0.2f;
 
@@ -461,7 +461,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             });
         }
 
-        public class CreateOrUpdateButton : RoundedButton
+        public partial class CreateOrUpdateButton : RoundedButton
         {
             [Resolved(typeof(Room), nameof(Room.RoomID))]
             private Bindable<long?> roomId { get; set; } = null!;

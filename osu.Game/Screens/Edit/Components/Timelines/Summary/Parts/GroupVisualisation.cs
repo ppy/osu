@@ -11,7 +11,7 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
-    public class GroupVisualisation : CompositeDrawable
+    public partial class GroupVisualisation : CompositeDrawable
     {
         public readonly ControlPointGroup Group;
 

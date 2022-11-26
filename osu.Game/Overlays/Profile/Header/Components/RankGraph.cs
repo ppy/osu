@@ -17,7 +17,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class RankGraph : UserGraph<int, int>
+    public partial class RankGraph : UserGraph<int, int>
     {
         private const int ranked_days = 88;
 

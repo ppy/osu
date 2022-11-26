@@ -21,7 +21,7 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class TabletSettings : SettingsSubsection
+    public partial class TabletSettings : SettingsSubsection
     {
         public TabletAreaSelection AreaSelection { get; private set; }
 

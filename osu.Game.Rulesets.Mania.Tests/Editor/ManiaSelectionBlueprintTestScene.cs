@@ -15,7 +15,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public abstract class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene
+    public abstract partial class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene
     {
         protected override Container<Drawable> Content => blueprints ?? base.Content;
 

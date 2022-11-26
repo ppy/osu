@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonCursorTrail : CursorTrail
+    public partial class ArgonCursorTrail : CursorTrail
     {
         protected override float IntervalMultiplier => 0.4f;
 

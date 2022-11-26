@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public sealed class SelectionBoxButton : SelectionBoxControl, IHasTooltip
+    public sealed partial class SelectionBoxButton : SelectionBoxControl, IHasTooltip
     {
         private SpriteIcon icon;
 

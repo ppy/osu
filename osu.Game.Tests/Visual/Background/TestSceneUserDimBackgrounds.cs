@@ -37,7 +37,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneUserDimBackgrounds : ScreenTestScene
+    public partial class TestSceneUserDimBackgrounds : ScreenTestScene
     {
         private DummySongSelect songSelect;
         private TestPlayerLoader playerLoader;
@@ -299,7 +299,7 @@ namespace osu.Game.Tests.Visual.Background
             rulesets?.Dispose();
         }
 
-        private class DummySongSelect : PlaySongSelect
+        private partial class DummySongSelect : PlaySongSelect
         {
             private FadeAccessibleBackground background;
 
@@ -346,7 +346,7 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsBackgroundCurrent() => background?.IsCurrentScreen() == true;
         }
 
-        private class FadeAccessibleResults : ResultsScreen
+        private partial class FadeAccessibleResults : ResultsScreen
         {
             public FadeAccessibleResults(ScoreInfo score)
                 : base(score, true)
@@ -358,7 +358,7 @@ namespace osu.Game.Tests.Visual.Background
             public Vector2 ExpectedBackgroundBlur => new Vector2(BACKGROUND_BLUR);
         }
 
-        private class LoadBlockingTestPlayer : TestPlayer
+        private partial class LoadBlockingTestPlayer : TestPlayer
         {
             protected override BackgroundScreen CreateBackground() =>
                 new FadeAccessibleBackground(Beatmap.Value);
@@ -400,7 +400,7 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
-        private class TestPlayerLoader : PlayerLoader
+        private partial class TestPlayerLoader : PlayerLoader
         {
             private FadeAccessibleBackground background;
 
@@ -419,7 +419,7 @@ namespace osu.Game.Tests.Visual.Background
             protected override BackgroundScreen CreateBackground() => background = new FadeAccessibleBackground(Beatmap.Value);
         }
 
-        private class FadeAccessibleBackground : BackgroundScreenBeatmap
+        private partial class FadeAccessibleBackground : BackgroundScreenBeatmap
         {
             protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground { RelativeSizeAxes = Axes.Both };
 
@@ -439,7 +439,7 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
-        private class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
+        private partial class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
         {
             public Color4 CurrentColour => Content.Colour;
             public float CurrentAlpha => Content.Alpha;

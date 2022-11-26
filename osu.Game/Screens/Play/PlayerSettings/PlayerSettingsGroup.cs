@@ -8,7 +8,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class PlayerSettingsGroup : SettingsToolboxGroup
+    public partial class PlayerSettingsGroup : SettingsToolboxGroup
     {
         public PlayerSettingsGroup(string title)
             : base(title)

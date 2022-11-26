@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyCatcherOld : CompositeDrawable
+    public partial class LegacyCatcherOld : CompositeDrawable
     {
         public LegacyCatcherOld()
         {

@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
     /// <remarks>
     /// This is intended to be used as a single controller for gameplay, or as a reference source for other <see cref="GameplayClockContainer"/>s.
     /// </remarks>
-    public class MasterGameplayClockContainer : GameplayClockContainer, IBeatSyncProvider
+    public partial class MasterGameplayClockContainer : GameplayClockContainer, IBeatSyncProvider
     {
         /// <summary>
         /// Duration before gameplay start time required before skip button displays.

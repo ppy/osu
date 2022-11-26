@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    internal class SkinSettingsToolbox : EditorSidebarSection
+    internal partial class SkinSettingsToolbox : EditorSidebarSection
     {
         protected override Container<Drawable> Content { get; }
 

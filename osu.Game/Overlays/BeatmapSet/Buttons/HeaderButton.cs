@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class HeaderButton : RoundedButton
+    public partial class HeaderButton : RoundedButton
     {
         public HeaderButton()
         {

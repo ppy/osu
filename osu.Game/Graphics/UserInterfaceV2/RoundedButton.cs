@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class RoundedButton : OsuButton, IFilterable
+    public partial class RoundedButton : OsuButton, IFilterable
     {
         protected TrianglesV2? Triangles { get; private set; }
 

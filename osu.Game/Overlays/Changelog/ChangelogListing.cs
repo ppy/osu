@@ -15,7 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogListing : ChangelogContent
+    public partial class ChangelogListing : ChangelogContent
     {
         private readonly List<APIChangelogBuild> entries;
 

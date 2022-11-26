@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorChangeStates : EditorTestScene
+    public partial class TestSceneEditorChangeStates : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
