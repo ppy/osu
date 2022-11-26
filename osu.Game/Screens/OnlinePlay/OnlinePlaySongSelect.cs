@@ -176,7 +176,7 @@ namespace osu.Game.Screens.OnlinePlay
         protected override IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons()
         {
             var buttons = base.CreateFooterButtons().ToList();
-            buttons.Insert(buttons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (new FooterButtonFreeMods { Current = FreeMods }, freeModSelectOverlay));
+            buttons.Insert(buttons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (new FooterButtonFreeMods(), freeModSelectOverlay));
             return buttons;
         }
 

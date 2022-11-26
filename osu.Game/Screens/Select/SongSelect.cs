@@ -308,7 +308,7 @@ namespace osu.Game.Screens.Select
         /// <returns>A set of <see cref="FooterButton"/> and an optional <see cref="OverlayContainer"/> which the button opens when pressed.</returns>
         protected virtual IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons() => new (FooterButton, OverlayContainer)[]
         {
-            (new FooterButtonMods { Current = Mods }, ModSelect),
+            (new FooterButtonMods(), ModSelect),
             (new FooterButtonRandom
             {
                 NextRandom = () => Carousel.SelectNextRandom(),
