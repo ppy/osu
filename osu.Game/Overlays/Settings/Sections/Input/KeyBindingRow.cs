@@ -485,6 +485,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             [Resolved]
             private RealmAccess realm { get; set; }
+
             private bool isBinding;
 
             public bool IsBinding
@@ -636,8 +637,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             private bool keyCombinationExists(KeyCombination keyCombination)
             {
                 var bindings = realm.Run(r => r.All<RealmKeyBinding>()
-                                           .Where(b => b.RulesetName == KeyBinding.RulesetName && b.Variant == KeyBinding.Variant)
-                                           .Detach());
+                                               .Where(b => b.RulesetName == KeyBinding.RulesetName && b.Variant == KeyBinding.Variant)
+                                               .Detach());
 
                 return bindings.Select(b => b.KeyCombination).Contains(keyCombination);
             }

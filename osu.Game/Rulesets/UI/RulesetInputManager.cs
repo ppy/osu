@@ -236,10 +236,7 @@ namespace osu.Game.Rulesets.UI
 
                 int keyBindingsUniqueCount = KeyBindings.Select(b => b.KeyCombination).Distinct().Count();
 
-                if (KeyBindings.Count() != keyBindingsUniqueCount)
-                    KeyBindings = DefaultKeyBindings;
-                else
-                    KeyBindings = KeyBindings.Where(b => RealmKeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
+                KeyBindings = (KeyBindings.Count() != keyBindingsUniqueCount) ? DefaultKeyBindings : KeyBindings.Where(b => RealmKeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
             }
         }
     }
