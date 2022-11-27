@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit.Verify
             selectedIssue = verify.SelectedIssue.GetBoundCopy();
             selectedIssue.BindValueChanged(issue =>
             {
-                SetRowSelected(issue);
+                SetRowSelected(issue.NewValue);
             }, true);
         }
 
