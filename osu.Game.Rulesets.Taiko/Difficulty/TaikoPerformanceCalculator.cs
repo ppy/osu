@@ -116,12 +116,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return accuracyValue;
         }
 
+        /// <summary>
+        /// Estimates the player's tap deviation based on the OD, number of objects, and number of 300s, 100s, and misses,
+        /// assuming the player's mean hit error is 0. The estimation is consistent in that two SS scores on the same map with the same settings
+        /// will always return the same deviation. See: https://www.desmos.com/calculator/qlr946netu
+        /// </summary>
         private double? computeEstimatedDeviation(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
             if (totalSuccessfulHits == 0)
                 return null;
 
-            // Create a new track to properly calculate the hit windows of 100s and 50s.
+            // Create a new track to properly calculate the hit window of 100s.
             var track = new TrackVirtual(10000);
             score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             double clockRate = track.Rate;
@@ -135,6 +140,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             
             double root2 = Math.Sqrt(2);
 
+            // Log of the most likely deviation resulting in the score's hit judgements, differentiated such that 1 over the most likely deviation returns 0.
             double logLikelihoodGradient(double d)
             {
                 if (d <= 0)
