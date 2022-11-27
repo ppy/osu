@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -20,19 +18,19 @@ namespace osu.Game.Screens.Edit.Verify
 {
     public partial class IssueTable : EditorTable
     {
-        [Resolved]
-        private VerifyScreen verify { get; set; }
-
-        private Bindable<Issue> selectedIssue;
+        private Bindable<Issue> selectedIssue = null!;
 
         [Resolved]
-        private EditorClock clock { get; set; }
+        private VerifyScreen verify { get; set; } = null!;
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
+        private EditorClock clock { get; set; } = null!;
 
         [Resolved]
-        private Editor editor { get; set; }
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private Editor editor { get; set; } = null!;
 
         public IEnumerable<Issue> Issues
         {
@@ -88,10 +86,10 @@ namespace osu.Game.Screens.Edit.Verify
             var columns = new List<TableColumn>
             {
                 new TableColumn(string.Empty, Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("Type", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
-                new TableColumn("Time", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
-                new TableColumn("Message", Anchor.CentreLeft),
-                new TableColumn("Category", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn(@"Type", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
+                new TableColumn(@"Time", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
+                new TableColumn(@"Message", Anchor.CentreLeft),
+                new TableColumn(@"Category", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
             };
 
             return columns.ToArray();
