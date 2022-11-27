@@ -7,9 +7,9 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.UI
 {
-    public class DrawableRulesetDependenciesProvidingContainer : Container
+    public partial class DrawableRulesetDependenciesProvidingContainer : Container
     {
-        private Ruleset ruleset;
+        private readonly Ruleset ruleset;
 
         private DrawableRulesetDependencies rulesetDependencies = null!;
 

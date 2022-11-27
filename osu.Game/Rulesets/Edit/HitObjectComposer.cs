@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
-        protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer( this, Ruleset);
+        protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this, Ruleset);
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
