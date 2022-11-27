@@ -15,11 +15,13 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
 using osuTK.Input;
@@ -37,15 +39,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private PlacementBlueprint currentPlacement;
 
+        private readonly Ruleset ruleset;
+
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
         /// in order to handle composer blueprints which are partially offscreen.
         /// </remarks>
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        public ComposeBlueprintContainer(HitObjectComposer composer)
+        public ComposeBlueprintContainer(HitObjectComposer composer, Ruleset ruleset)
             : base(composer)
         {
+            this.ruleset = ruleset;
+
             placementBlueprintContainer = new Container<PlacementBlueprint>
             {
                 RelativeSizeAxes = Axes.Both
@@ -57,7 +63,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             TernaryStates = CreateTernaryButtons().ToArray();
 
-            AddInternal(placementBlueprintContainer);
+            AddInternal(new DrawableRulesetDependenciesProvidingContainer(ruleset)
+            {
+                Child = placementBlueprintContainer
+            });
         }
 
         protected override void LoadComplete()
