@@ -17,9 +17,9 @@ using osu.Game.Overlays.Practice.PracticeOverlayComponents;
 
 namespace osu.Game.Overlays.Practice
 {
-    public class PracticeOverlay : ShearedOverlayContainer
+    public partial class PracticeOverlay : ShearedOverlayContainer
     {
-        private readonly Action restart;
+        public Action Restart = null!;
 
         [Resolved]
         private PracticePlayerLoader playerLoader { get; set; } = null!;
@@ -28,22 +28,21 @@ namespace osu.Game.Overlays.Practice
         {
             MinValue = 0,
             MaxValue = 1,
-            Precision = .001
+            Precision = 0.001f
         };
 
         private readonly BindableNumber<double> customEnd = new BindableNumber<double>(1)
         {
             MinValue = 0,
             MaxValue = 1,
-            Precision = .001
+            Precision = 0.001f
         };
 
         private PracticeGameplayPreview preview = null!;
 
-        public PracticeOverlay(Action restart)
+        public PracticeOverlay()
             : base(OverlayColourScheme.Green)
         {
-            this.restart = restart;
         }
 
         [BackgroundDependencyLoader]
@@ -108,7 +107,7 @@ namespace osu.Game.Overlays.Practice
                             Text = "Practice!",
                             LighterColour = ColourProvider.Colour1,
                             DarkerColour = ColourProvider.Colour3,
-                            Action = () => restart.Invoke()
+                            Action = () => Restart.Invoke()
                         }
                     },
                 }

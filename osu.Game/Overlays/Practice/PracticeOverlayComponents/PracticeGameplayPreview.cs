@@ -14,7 +14,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 {
-    public class PracticeGameplayPreview : CompositeDrawable
+    public partial class PracticeGameplayPreview : CompositeDrawable
     {
         private DrawableRuleset drawableRuleset = null!;
 

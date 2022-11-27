@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 {
-    public class PracticeRangeSliderComponent : CompositeDrawable
+    public partial class PracticeRangeSliderComponent : CompositeDrawable
     {
         private SegmentSliderStart segmentSliderStart = null!;
         private SegmentSliderEnd segmentSliderEnd = null!;
@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
             };
         }
 
-        private class SegmentSliderStart : SegmentSlider
+        private partial class SegmentSliderStart : SegmentSlider
         {
             public SegmentSliderStart()
                 : base("Start")
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
                 && screenSpacePos.X <= Nub.ScreenSpaceDrawQuad.TopRight.X;
         }
 
-        private class SegmentSliderEnd : SegmentSlider
+        private partial class SegmentSliderEnd : SegmentSlider
         {
             public SegmentSliderEnd()
                 : base("End")
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
                 && screenSpacePos.X >= Nub.ScreenSpaceDrawQuad.TopLeft.X;
         }
 
-        private class SegmentSlider : OsuSliderBar<double>
+        private partial class SegmentSlider : OsuSliderBar<double>
         {
             private readonly string defaultString;
 

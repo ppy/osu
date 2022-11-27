@@ -8,7 +8,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePracticeOverlay : TestSceneAllRulesetPlayers
+    public partial class TestScenePracticeOverlay : TestSceneAllRulesetPlayers
     {
         [Cached]
         private PracticePlayerLoader loader { get; set; } = new PracticePlayerLoader();

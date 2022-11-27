@@ -12,7 +12,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Overlays.Practice
 {
-    public class PracticePlayer : Player
+    public partial class PracticePlayer : Player
     {
         private PracticeOverlay practiceOverlay = null!;
 
@@ -34,7 +34,11 @@ namespace osu.Game.Overlays.Practice
             SetGameplayStartTime(loader.CustomStart.Value * (playableBeatmap.HitObjects.Last().StartTime - playableBeatmap.HitObjects.First().StartTime));
 
             addButtons(colour);
-            LoadComponent(practiceOverlay = new PracticeOverlay(() => Restart()) { State = { Value = Visibility.Visible } });
+            LoadComponent(practiceOverlay = new PracticeOverlay
+            {
+                State = { Value = Visibility.Visible },
+                Restart = () => Restart()
+            });
         }
 
         protected override void LoadComplete()

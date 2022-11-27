@@ -8,7 +8,7 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Overlays.Practice
 {
     [Cached]
-    public class PracticePlayerLoader : PlayerLoader
+    public partial class PracticePlayerLoader : PlayerLoader
     {
         public PracticePlayerLoader()
             : base(() => new PracticePlayer())
