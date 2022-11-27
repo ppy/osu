@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -50,24 +48,24 @@ namespace osu.Game.Screens.Edit.Timing
 
         public partial class ControlPointList : CompositeDrawable
         {
-            private OsuButton deleteButton;
-            private ControlPointTable table;
+            private OsuButton deleteButton = null!;
+            private ControlPointTable table = null!;
+            private OsuScrollContainer scroll = null!;
+            private RoundedButton addButton = null!;
 
             private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
-            private RoundedButton addButton;
+            [Resolved]
+            private EditorClock clock { get; set; } = null!;
 
             [Resolved]
-            private EditorClock clock { get; set; }
+            protected EditorBeatmap Beatmap { get; private set; } = null!;
 
             [Resolved]
-            protected EditorBeatmap Beatmap { get; private set; }
+            private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
             [Resolved]
-            private Bindable<ControlPointGroup> selectedGroup { get; set; }
-
-            [Resolved(canBeNull: true)]
-            private IEditorChangeHandler changeHandler { get; set; }
+            private IEditorChangeHandler? changeHandler { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colours)
@@ -132,8 +130,8 @@ namespace osu.Game.Screens.Edit.Timing
                     deleteButton.Enabled.Value = selected.NewValue != null;
 
                     addButton.Text = selected.NewValue != null
-                        ? "+ Clone to current time"
-                        : "+ Add at current time";
+                        ? @"+ Clone to current time"
+                        : @"+ Add at current time";
                 }, true);
 
                 controlPointGroups.BindTo(Beatmap.ControlPointInfo.Groups);
@@ -159,7 +157,7 @@ namespace osu.Game.Screens.Edit.Timing
                 addButton.Enabled.Value = clock.CurrentTimeAccurate != selectedGroup.Value?.Time;
             }
 
-            private Type trackedType;
+            private Type? trackedType;
 
             /// <summary>
             /// Given the user has selected a control point group, we want to track any group which is
