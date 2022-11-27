@@ -21,7 +21,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class DrawableCatchRuleset : DrawableScrollingRuleset<CatchHitObject>
+    public partial class DrawableCatchRuleset : DrawableScrollingRuleset<CatchHitObject>
     {
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Constant;
 

@@ -16,7 +16,7 @@ using osu.Game.Tests.Gameplay;
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
-    public class TestSceneDrawableHit : TaikoSkinnableTestScene
+    public partial class TestSceneDrawableHit : TaikoSkinnableTestScene
     {
         [Cached]
         private GameplayState gameplayState = TestGameplayState.Create(new TaikoRuleset());

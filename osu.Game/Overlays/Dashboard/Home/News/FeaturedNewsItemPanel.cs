@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
 {
-    public class FeaturedNewsItemPanel : HomePanel
+    public partial class FeaturedNewsItemPanel : HomePanel
     {
         private readonly APINewsPost post;
 
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             };
         }
 
-        private class ClickableNewsBackground : OsuHoverContainer
+        private partial class ClickableNewsBackground : OsuHoverContainer
         {
             private readonly APINewsPost post;
 
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             }
         }
 
-        private class Date : CompositeDrawable, IHasCustomTooltip<DateTimeOffset>
+        private partial class Date : CompositeDrawable, IHasCustomTooltip<DateTimeOffset>
         {
             private readonly DateTimeOffset date;
 

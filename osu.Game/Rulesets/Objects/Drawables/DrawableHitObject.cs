@@ -30,7 +30,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Objects.Drawables
 {
     [Cached(typeof(DrawableHitObject))]
-    public abstract class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>
+    public abstract partial class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>
     {
         /// <summary>
         /// Invoked after this <see cref="DrawableHitObject"/>'s applied <see cref="HitObject"/> has had its defaults applied.
@@ -745,7 +745,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
     }
 
-    public abstract class DrawableHitObject<TObject> : DrawableHitObject
+    public abstract partial class DrawableHitObject<TObject> : DrawableHitObject
         where TObject : HitObject
     {
         public new TObject HitObject => (TObject)base.HitObject;

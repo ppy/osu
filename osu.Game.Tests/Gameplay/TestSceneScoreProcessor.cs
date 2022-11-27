@@ -22,7 +22,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneScoreProcessor : OsuTestScene
+    public partial class TestSceneScoreProcessor : OsuTestScene
     {
         [Test]
         public void TestNoScoreIncreaseFromMiss()

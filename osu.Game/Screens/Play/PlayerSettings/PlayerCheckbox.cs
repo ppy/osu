@@ -9,11 +9,11 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class PlayerCheckbox : SettingsCheckbox
+    public partial class PlayerCheckbox : SettingsCheckbox
     {
         protected override Drawable CreateControl() => new PlayerCheckboxControl();
 
-        public class PlayerCheckboxControl : OsuCheckbox
+        public partial class PlayerCheckboxControl : OsuCheckbox
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)

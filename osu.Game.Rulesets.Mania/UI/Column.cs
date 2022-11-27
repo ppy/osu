@@ -26,7 +26,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Mania.UI
 {
     [Cached]
-    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>
+    public partial class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>
     {
         public const float COLUMN_WIDTH = 80;
         public const float SPECIAL_COLUMN_WIDTH = 70;
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Mania.UI
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
 
-        public class ColumnTouchInputArea : Drawable
+        public partial class ColumnTouchInputArea : Drawable
         {
             private readonly Column column;
 

@@ -18,7 +18,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    public class IssueTable : EditorTable
+    public partial class IssueTable : EditorTable
     {
         [Resolved]
         private VerifyScreen verify { get; set; }

@@ -11,7 +11,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Utility
 {
-    public class ButtonWithKeyBind : SettingsButton
+    public partial class ButtonWithKeyBind : SettingsButton
     {
         private readonly Key key;
 

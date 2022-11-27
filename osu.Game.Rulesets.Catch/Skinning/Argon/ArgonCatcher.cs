@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Argon
 {
-    public class ArgonCatcher : CompositeDrawable
+    public partial class ArgonCatcher : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         private void load()

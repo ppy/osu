@@ -20,11 +20,11 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public class RoundEditorScreen : TournamentEditorScreen<RoundEditorScreen.RoundRow, TournamentRound>
+    public partial class RoundEditorScreen : TournamentEditorScreen<RoundEditorScreen.RoundRow, TournamentRound>
     {
         protected override BindableList<TournamentRound> Storage => LadderInfo.Rounds;
 
-        public class RoundRow : CompositeDrawable, IModelBacked<TournamentRound>
+        public partial class RoundRow : CompositeDrawable, IModelBacked<TournamentRound>
         {
             public TournamentRound Model { get; }
 
@@ -113,7 +113,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 AutoSizeAxes = Axes.Y;
             }
 
-            public class RoundBeatmapEditor : CompositeDrawable
+            public partial class RoundBeatmapEditor : CompositeDrawable
             {
                 private readonly TournamentRound round;
                 private readonly FillFlowContainer flow;
@@ -141,7 +141,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     flow.Add(new RoundBeatmapRow(round, user));
                 }
 
-                public class RoundBeatmapRow : CompositeDrawable
+                public partial class RoundBeatmapRow : CompositeDrawable
                 {
                     public RoundBeatmap Model { get; }
 

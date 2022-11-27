@@ -24,7 +24,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSpinner : DrawableOsuHitObject
+    public partial class DrawableSpinner : DrawableOsuHitObject
     {
         public new Spinner HitObject => (Spinner)base.HitObject;
 

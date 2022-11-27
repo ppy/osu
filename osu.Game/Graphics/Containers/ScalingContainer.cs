@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// Handles user-defined scaling, allowing application at multiple levels defined by <see cref="ScalingMode"/>.
     /// </summary>
-    public class ScalingContainer : Container
+    public partial class ScalingContainer : Container
     {
         internal const float TRANSITION_DURATION = 500;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        public class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
+        public partial class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
         {
             private readonly bool applyUIScale;
             private Bindable<float> uiScale;
@@ -211,7 +211,7 @@ namespace osu.Game.Graphics.Containers
                             .OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
         }
 
-        private class ScalingBackgroundScreen : BackgroundScreenDefault
+        private partial class ScalingBackgroundScreen : BackgroundScreenDefault
         {
             protected override bool AllowStoryboardBackground => false;
 
@@ -221,7 +221,7 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        private class SizeableAlwaysInputContainer : Container
+        private partial class SizeableAlwaysInputContainer : Container
         {
             [Resolved]
             private GameHost host { get; set; }

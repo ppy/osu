@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class SpinnerBackgroundLayer : SpinnerFill
+    public partial class SpinnerBackgroundLayer : SpinnerFill
     {
         [BackgroundDependencyLoader]
         private void load()

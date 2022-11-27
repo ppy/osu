@@ -13,7 +13,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingSortTabControl : OverlaySortTabControl<SortCriteria>
+    public partial class BeatmapListingSortTabControl : OverlaySortTabControl<SortCriteria>
     {
         public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>(Overlays.SortDirection.Descending);
 
@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.BeatmapListing
             SortDirection = { BindTarget = SortDirection },
         };
 
-        private class BeatmapSortTabControl : SortTabControl
+        private partial class BeatmapSortTabControl : SortTabControl
         {
             protected override bool AddEnumEntriesAutomatically => false;
 
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.BeatmapListing
             };
         }
 
-        private class BeatmapSortTabItem : SortTabItem
+        private partial class BeatmapSortTabItem : SortTabItem
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.BeatmapListing
             };
         }
 
-        private class BeatmapTabButton : TabButton
+        private partial class BeatmapTabButton : TabButton
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 

@@ -20,7 +20,7 @@ namespace osu.Game.Screens.OnlinePlay
     /// <summary>
     /// A scrollable list which displays the <see cref="PlaylistItem"/>s in a <see cref="Room"/>.
     /// </summary>
-    public class DrawableRoomPlaylist : OsuRearrangeableListContainer<PlaylistItem>, IKeyBindingHandler<GlobalAction>
+    public partial class DrawableRoomPlaylist : OsuRearrangeableListContainer<PlaylistItem>, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// The currently-selected item. Selection is visually represented with a border.

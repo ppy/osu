@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    public class Stage : ScrollingPlayfield
+    public partial class Stage : ScrollingPlayfield
     {
         [Cached]
         public readonly StageDefinition Definition;

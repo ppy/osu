@@ -14,7 +14,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public class JuiceStreamPlacementBlueprint : CatchPlacementBlueprint<JuiceStream>
+    public partial class JuiceStreamPlacementBlueprint : CatchPlacementBlueprint<JuiceStream>
     {
         private readonly ScrollingPath scrollingPath;
 

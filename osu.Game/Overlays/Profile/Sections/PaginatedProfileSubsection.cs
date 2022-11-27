@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class PaginatedProfileSubsection<TModel> : ProfileSubsection
+    public abstract partial class PaginatedProfileSubsection<TModel> : ProfileSubsection
     {
         /// <summary>
         /// The number of items displayed per page.

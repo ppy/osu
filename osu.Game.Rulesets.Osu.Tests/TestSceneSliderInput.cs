@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneSliderInput : RateAdjustedBeatmapTestScene
+    public partial class TestSceneSliderInput : RateAdjustedBeatmapTestScene
     {
         private const double time_before_slider = 250;
         private const double time_slider_start = 1500;
@@ -384,7 +384,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 
