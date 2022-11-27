@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -76,7 +77,7 @@ namespace osu.Game.Online.Chat
 
             string getModPart()
             {
-                if (api.Activity.Value is UserActivity.InGame) return string.Empty;
+                if (api.Activity.Value is not UserActivity.InGame) return string.Empty;
 
                 if (selectedMods.Value.Count == 0)
                 {
@@ -85,9 +86,14 @@ namespace osu.Game.Online.Chat
 
                 StringBuilder modS = new StringBuilder();
 
-                foreach (var mod in selectedMods.Value)
+                foreach (var mod in selectedMods.Value.Where(mod => mod.Type == ModType.DifficultyIncrease))
                 {
-                    modS.Append($"+{mod.Name} ");
+                    modS.Append($"+{mod.Acronym} ");
+                }
+
+                foreach (var mod in selectedMods.Value.Where(mod => mod.Type != ModType.DifficultyIncrease))
+                {
+                    modS.Append($"-{mod.Acronym} ");
                 }
 
                 return modS.ToString();
