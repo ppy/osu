@@ -3,7 +3,6 @@
 
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Overlays;
@@ -20,22 +19,14 @@ namespace osu.Game.Database
 
         protected override string FileExtension => ".osr";
 
-        public override async Task ExportToStreamAsync(ScoreInfo uuid, Stream stream)
+        protected override void ExportToStream(ScoreInfo model, Stream stream)
         {
-            await Task.Run(() =>
-            {
-                RealmAccess.Run(r =>
-                {
-                    ScoreInfo model = r.Find<ScoreInfo>(uuid.ID);
+            var file = model.Files.SingleOrDefault();
+            if (file == null)
+                return;
 
-                    var file = model.Files.SingleOrDefault();
-                    if (file == null)
-                        return;
-
-                    using (var inputStream = UserFileStorage.GetStream(file.File.GetStoragePath()))
-                        inputStream.CopyTo(stream);
-                });
-            }).ContinueWith(OnComplete);
+            using (var inputStream = UserFileStorage.GetStream(file.File.GetStoragePath()))
+                inputStream.CopyTo(stream);
         }
     }
 }
