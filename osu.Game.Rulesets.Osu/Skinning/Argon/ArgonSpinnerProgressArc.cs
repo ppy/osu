@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonSpinnerProgressArc : CompositeDrawable
+    public partial class ArgonSpinnerProgressArc : CompositeDrawable
     {
         private const float arc_fill = 0.15f;
         private const float arc_radius = 0.12f;

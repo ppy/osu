@@ -8,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneDifficultyRangeFilterControl : OsuTestScene
+    public partial class TestSceneDifficultyRangeFilterControl : OsuTestScene
     {
         [Test]
         public void TestBasic()

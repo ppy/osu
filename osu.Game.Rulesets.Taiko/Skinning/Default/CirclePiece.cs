@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
     /// for a usage example.
     /// </para>
     /// </summary>
-    public abstract class CirclePiece : BeatSyncedContainer, IHasAccentColour
+    public abstract partial class CirclePiece : BeatSyncedContainer, IHasAccentColour
     {
         public const float SYMBOL_SIZE = TaikoHitObject.DEFAULT_SIZE;
         public const float SYMBOL_BORDER = 8;
@@ -153,13 +153,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             updateStateTransforms(drawableHitObject, drawableHitObject.State.Value);
         }
 
-        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
+        private void updateStateTransforms(DrawableHitObject h, ArmedState state)
         {
+            if (h.HitObject is not Hit)
+                return;
+
             switch (state)
             {
                 case ArmedState.Hit:
-                    using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime))
-                        flashBox?.FadeTo(0.9f).FadeOut(300);
+                    using (BeginAbsoluteSequence(h.HitStateUpdateTime))
+                        flashBox.FadeTo(0.9f).FadeOut(300);
                     break;
             }
         }

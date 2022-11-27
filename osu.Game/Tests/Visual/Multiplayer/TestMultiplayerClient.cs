@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// <summary>
     /// A <see cref="MultiplayerClient"/> for use in multiplayer test scenes. Should generally not be used by itself outside of a <see cref="MultiplayerTestScene"/>.
     /// </summary>
-    public class TestMultiplayerClient : MultiplayerClient
+    public partial class TestMultiplayerClient : MultiplayerClient
     {
         public override IBindable<bool> IsConnected => isConnected;
         private readonly Bindable<bool> isConnected = new Bindable<bool>(true);

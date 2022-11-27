@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Timing
     /// where multiple objects with multiple different property values are selected
     /// by providing an "indeterminate state".
     /// </summary>
-    public class IndeterminateSliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T?>
+    public partial class IndeterminateSliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T?>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         /// <summary>

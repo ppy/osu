@@ -8,10 +8,11 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class VisualSettings : PlayerSettingsGroup
+    public partial class VisualSettings : PlayerSettingsGroup
     {
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
+        private readonly PlayerSliderBar<float> comboColourNormalisationSliderBar;
         private readonly PlayerCheckbox showStoryboardToggle;
         private readonly PlayerCheckbox beatmapSkinsToggle;
         private readonly PlayerCheckbox beatmapColorsToggle;
@@ -34,6 +35,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 showStoryboardToggle = new PlayerCheckbox { LabelText = GraphicsSettingsStrings.StoryboardVideo },
                 beatmapSkinsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapSkins },
                 beatmapColorsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapColours },
+                comboColourNormalisationSliderBar = new PlayerSliderBar<float>
+                {
+                    LabelText = GraphicsSettingsStrings.ComboColourNormalisation,
+                    DisplayAsPercentage = true,
+                },
             };
         }
 
@@ -45,6 +51,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             showStoryboardToggle.Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
             beatmapSkinsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
             beatmapColorsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapColours);
+            comboColourNormalisationSliderBar.Current = config.GetBindable<float>(OsuSetting.ComboColourNormalisationAmount);
         }
     }
 }

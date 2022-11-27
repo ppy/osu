@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -23,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Select
 {
-    public abstract class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
+    public partial class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         private const int outer_corner_radius = 10;
         private const int button_height = 120;
@@ -157,12 +157,19 @@ namespace osu.Game.Screens.Select
                 }
             };
         }
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Enabled.BindValueChanged(_ => updateDisplay(), true);
+        }
 
-        protected Action Hovered;
-        protected Action HoverLost;
-        protected GlobalAction? Hotkey;
+        public Action Hovered;
+        public Action HoverLost;
+        public GlobalAction? Hotkey;
 
-        protected override bool OnClick(ClickEvent e)
+        private bool mouseDown;
+
+        protected override void UpdateAfterChildren()
         {
             flashLayer.FadeOutFromOne(800, Easing.OutQuint);
 
@@ -173,6 +180,8 @@ namespace osu.Game.Screens.Select
         {
             backgroundColourBox.FadeColour(colourProvider.Background3.Lighten(.2f));
             Hovered?.Invoke();
+
+            updateDisplay();
             return true;
         }
 
@@ -180,18 +189,58 @@ namespace osu.Game.Screens.Select
         {
             backgroundColourBox.FadeColour(colourProvider.Background3, 500, Easing.OutQuint);
             HoverLost?.Invoke();
+
+            updateDisplay();
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (!Enabled.Value)
+                return true;
+
+            mouseDown = true;
+            updateDisplay();
+            return base.OnMouseDown(e);
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action != Hotkey || e.Repeat) return false;
+            mouseDown = false;
+            updateDisplay();
+            base.OnMouseUp(e);
+        }
 
-            TriggerClick();
-            return true;
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (!Enabled.Value)
+                return true;
+
+            box.ClearTransforms();
+            box.Alpha = 1;
+            box.FadeOut(Footer.TRANSITION_LENGTH * 3, Easing.OutQuint);
+            return base.OnClick(e);
         }
 
         public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+
+        public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
+
+        private void updateDisplay()
+        {
+            this.FadeTo(Enabled.Value ? 1 : 0.25f, Footer.TRANSITION_LENGTH, Easing.OutQuint);
+
+            light.ScaleTo(Enabled.Value && IsHovered ? new Vector2(1, 2) : new Vector2(1), Footer.TRANSITION_LENGTH, Easing.OutQuint);
+            light.FadeColour(Enabled.Value && IsHovered ? SelectedColour : DeselectedColour, Footer.TRANSITION_LENGTH, Easing.OutQuint);
+
+            box.FadeTo(Enabled.Value & mouseDown ? 0.3f : 0f, Footer.TRANSITION_LENGTH * 2, Easing.OutQuint);
+
+            if (Enabled.Value && IsHovered)
+                Hovered?.Invoke();
+            else
+                HoverLost?.Invoke();
         }
     }
 }

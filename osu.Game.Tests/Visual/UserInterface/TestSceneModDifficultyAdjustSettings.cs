@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneModDifficultyAdjustSettings : OsuManualInputManagerTestScene
+    public partial class TestSceneModDifficultyAdjustSettings : OsuManualInputManagerTestScene
     {
         private OsuModDifficultyAdjust modDifficultyAdjust;
 

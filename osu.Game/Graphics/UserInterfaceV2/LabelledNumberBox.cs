@@ -7,7 +7,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class LabelledNumberBox : LabelledTextBox
+    public partial class LabelledNumberBox : LabelledTextBox
     {
         protected override OsuTextBox CreateTextBox() => new OsuNumberBox();
     }

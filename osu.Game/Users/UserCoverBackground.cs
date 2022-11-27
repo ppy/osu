@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Users
 {
-    public class UserCoverBackground : ModelBackedDrawable<APIUser>
+    public partial class UserCoverBackground : ModelBackedDrawable<APIUser>
     {
         public APIUser User
         {
@@ -38,7 +38,7 @@ namespace osu.Game.Users
             => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay);
 
         [LongRunningLoad]
-        private class Cover : CompositeDrawable
+        private partial class Cover : CompositeDrawable
         {
             private readonly APIUser user;
 

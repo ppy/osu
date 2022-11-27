@@ -14,7 +14,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
 {
-    public class NewsGroupItem : CompositeDrawable
+    public partial class NewsGroupItem : CompositeDrawable
     {
         private readonly APINewsPost post;
 
@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             };
         }
 
-        private class Date : CompositeDrawable, IHasCustomTooltip<DateTimeOffset>
+        private partial class Date : CompositeDrawable, IHasCustomTooltip<DateTimeOffset>
         {
             private readonly DateTimeOffset date;
 

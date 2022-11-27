@@ -25,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
-    public class LayoutSettings : SettingsSubsection
+    public partial class LayoutSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GraphicsSettingsStrings.LayoutHeader;
 
@@ -324,7 +324,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             base.Dispose(isDisposing);
         }
 
-        private class ScalingPreview : ScalingContainer
+        private partial class ScalingPreview : ScalingContainer
         {
             public ScalingPreview()
             {
@@ -337,16 +337,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
         }
 
-        private class UIScaleSlider : OsuSliderBar<float>
+        private partial class UIScaleSlider : OsuSliderBar<float>
         {
             public override LocalisableString TooltipText => base.TooltipText + "x";
         }
 
-        private class DisplaySettingsDropdown : SettingsDropdown<Display>
+        private partial class DisplaySettingsDropdown : SettingsDropdown<Display>
         {
             protected override OsuDropdown<Display> CreateDropdown() => new DisplaySettingsDropdownControl();
 
-            private class DisplaySettingsDropdownControl : DropdownControl
+            private partial class DisplaySettingsDropdownControl : DropdownControl
             {
                 protected override LocalisableString GenerateItemText(Display item)
                 {
@@ -355,11 +355,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
         }
 
-        private class ResolutionSettingsDropdown : SettingsDropdown<Size>
+        private partial class ResolutionSettingsDropdown : SettingsDropdown<Size>
         {
             protected override OsuDropdown<Size> CreateDropdown() => new ResolutionDropdownControl();
 
-            private class ResolutionDropdownControl : DropdownControl
+            private partial class ResolutionDropdownControl : DropdownControl
             {
                 protected override LocalisableString GenerateItemText(Size item)
                 {

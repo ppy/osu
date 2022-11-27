@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
-    public abstract class EditorTable : TableContainer
+    public abstract partial class EditorTable : TableContainer
     {
         private const float horizontal_inset = 20;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Edit
 
         protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? default);
 
-        private class HeaderText : OsuSpriteText
+        private partial class HeaderText : OsuSpriteText
         {
             public HeaderText(LocalisableString text)
             {
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        public class RowBackground : OsuClickableContainer
+        public partial class RowBackground : OsuClickableContainer
         {
             public readonly object Item;
 

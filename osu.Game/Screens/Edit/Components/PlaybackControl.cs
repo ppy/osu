@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Components
 {
-    public class PlaybackControl : BottomBarContainer
+    public partial class PlaybackControl : BottomBarContainer
     {
         private IconButton playButton;
 
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Edit.Components
             playButton.Icon = editorClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
         }
 
-        private class PlaybackTabControl : OsuTabControl<double>
+        private partial class PlaybackTabControl : OsuTabControl<double>
         {
             private static readonly double[] tempo_values = { 0.25, 0.5, 0.75, 1 };
 
@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Edit.Components
                 Current.Value = tempo_values.Last();
             }
 
-            public class PlaybackTabItem : TabItem<double>
+            public partial class PlaybackTabItem : TabItem<double>
             {
                 private const float fade_duration = 200;
 

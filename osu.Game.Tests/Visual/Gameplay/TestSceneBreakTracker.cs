@@ -14,7 +14,7 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneBreakTracker : OsuTestScene
+    public partial class TestSceneBreakTracker : OsuTestScene
     {
         private readonly BreakOverlay breakOverlay;
 
@@ -161,7 +161,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private class TestBreakTracker : BreakTracker
+        private partial class TestBreakTracker : BreakTracker
         {
             public readonly FramedClock FramedManualClock;
 

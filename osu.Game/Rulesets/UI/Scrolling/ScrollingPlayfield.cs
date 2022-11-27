@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
     /// <summary>
     /// A type of <see cref="Playfield"/> specialized towards scrolling <see cref="DrawableHitObject"/>s.
     /// </summary>
-    public abstract class ScrollingPlayfield : Playfield
+    public abstract partial class ScrollingPlayfield : Playfield
     {
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 

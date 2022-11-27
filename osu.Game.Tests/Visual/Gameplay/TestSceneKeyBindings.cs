@@ -20,7 +20,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneKeyBindings : OsuManualInputManagerTestScene
+    public partial class TestSceneKeyBindings : OsuManualInputManagerTestScene
     {
         private readonly ActionReceiver receiver;
 
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Down,
         }
 
-        private class TestKeyBindingContainer : DatabasedKeyBindingContainer<TestAction>
+        private partial class TestKeyBindingContainer : DatabasedKeyBindingContainer<TestAction>
         {
             public TestKeyBindingContainer()
                 : base(new TestRuleset().RulesetInfo, 0)
@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class ActionReceiver : CompositeDrawable, IKeyBindingHandler<TestAction>
+        private partial class ActionReceiver : CompositeDrawable, IKeyBindingHandler<TestAction>
         {
             public bool ReceivedAction;
 

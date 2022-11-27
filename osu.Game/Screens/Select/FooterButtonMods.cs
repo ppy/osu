@@ -8,7 +8,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButtonMods : FooterButton
+    public partial class FooterButtonMods : FooterButton
     {
         [BackgroundDependencyLoader]
         private void load()

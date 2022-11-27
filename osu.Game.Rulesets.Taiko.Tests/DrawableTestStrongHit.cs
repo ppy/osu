@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class DrawableTestStrongHit : DrawableTestHit
+    public partial class DrawableTestStrongHit : DrawableTestHit
     {
         private readonly bool hitBoth;
 

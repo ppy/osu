@@ -9,7 +9,7 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Rulesets.Catch
 {
     [Cached]
-    public class CatchInputManager : RulesetInputManager<CatchAction>
+    public partial class CatchInputManager : RulesetInputManager<CatchAction>
     {
         public CatchInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)

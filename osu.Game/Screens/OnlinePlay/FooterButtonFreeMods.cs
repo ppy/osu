@@ -9,7 +9,8 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class FooterButtonFreeMods : FooterButton
+    public partial class FooterButtonFreeMods : FooterButton
+
     {
         [BackgroundDependencyLoader]
         private void load()

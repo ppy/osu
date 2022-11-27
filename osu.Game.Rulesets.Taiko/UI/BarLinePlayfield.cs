@@ -8,7 +8,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class BarLinePlayfield : ScrollingPlayfield
+    public partial class BarLinePlayfield : ScrollingPlayfield
     {
         [BackgroundDependencyLoader]
         private void load()

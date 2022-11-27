@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     /// <summary>
     /// A <see cref="StatisticDisplay"/> to display the player's accuracy.
     /// </summary>
-    public class AccuracyStatistic : StatisticDisplay
+    public partial class AccuracyStatistic : StatisticDisplay
     {
         private readonly double accuracy;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         protected override Drawable CreateContent() => counter = new Counter();
 
-        private class Counter : RollingCounter<double>
+        private partial class Counter : RollingCounter<double>
         {
             protected override double RollingDuration => AccuracyCircle.ACCURACY_TRANSFORM_DURATION;
 

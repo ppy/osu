@@ -15,7 +15,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
-    public class Footer : Container
+    public partial class Footer : Container
     {
         public const float HEIGHT = 50;
 
@@ -50,6 +50,19 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        private void updateModeLight()
+        {
+            var selectedButton = buttons.FirstOrDefault(b => b.Enabled.Value && b.IsHovered);
+
+            if (selectedButton != null)
+            {
+                modeLight.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
+                modeLight.FadeColour(selectedButton.SelectedColour, TRANSITION_LENGTH, Easing.OutQuint);
+            }
+            else
+                modeLight.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
+        }
+
         public Footer()
         {
             RelativeSizeAxes = Axes.X;
@@ -61,7 +74,16 @@ namespace osu.Game.Screens.Select
                 backgroundColour = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One
+
+                    Size = Vector2.One,
+                    Colour = Color4.Black.Opacity(0.5f),
+                },
+                modeLight = new Box
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 3,
+                    Position = new Vector2(0, -3),
+                    Colour = Color4.Black,
                 },
                 new FillFlowContainer
                 {
