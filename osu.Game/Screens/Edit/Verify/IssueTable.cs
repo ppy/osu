@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Verify
                 Content = null;
                 BackgroundFlow.Clear();
 
-                if (value == null)
+                if (!value.Any())
                     return;
 
                 foreach (var issue in value)

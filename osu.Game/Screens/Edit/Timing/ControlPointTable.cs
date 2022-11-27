@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Edit.Timing
                 Content = null;
                 BackgroundFlow.Clear();
 
-                if (value?.Any() != true)
+                if (!value.Any())
                     return;
 
                 foreach (var group in value)
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Edit.Timing
             }, true);
         }
 
-        private void updateSelectedGroup() => SetRowSelected(selectedGroup?.Value);
+        private void updateSelectedGroup() => SetRowSelected(selectedGroup.Value);
 
         private TableColumn[] createHeaders()
         {
