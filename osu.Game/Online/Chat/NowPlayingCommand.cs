@@ -76,6 +76,8 @@ namespace osu.Game.Online.Chat
 
             string getModPart()
             {
+                if (api.Activity.Value is UserActivity.InGame) return string.Empty;
+
                 if (selectedMods.Value.Count == 0)
                 {
                     return string.Empty;
