@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class RangeSlider : CompositeDrawable
+    public partial class RangeSlider : CompositeDrawable
     {
         /// <summary>
         /// The lower limiting value
@@ -125,7 +125,7 @@ namespace osu.Game.Graphics.UserInterface
             upperBound.Current.ValueChanged += max => lowerBound.Current.Value = Math.Min(max.NewValue - minRange, lowerBound.Current.Value);
         }
 
-        private class LowerBoundSlider : BoundSlider
+        private partial class LowerBoundSlider : BoundSlider
         {
             protected override void LoadComplete()
             {
@@ -142,7 +142,7 @@ namespace osu.Game.Graphics.UserInterface
                 && screenSpacePos.X <= Nub.ScreenSpaceDrawQuad.TopRight.X;
         }
 
-        private class UpperBoundSlider : BoundSlider
+        private partial class UpperBoundSlider : BoundSlider
         {
             protected override void LoadComplete()
             {
@@ -156,7 +156,7 @@ namespace osu.Game.Graphics.UserInterface
                 && screenSpacePos.X >= Nub.ScreenSpaceDrawQuad.TopLeft.X;
         }
 
-        protected class BoundSlider : OsuSliderBar<double>
+        protected partial class BoundSlider : OsuSliderBar<double>
         {
             public string? DefaultString;
             public LocalisableString? DefaultTooltip;
