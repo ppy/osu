@@ -63,17 +63,11 @@ namespace osu.Game.Screens.Edit.Timing
 
             selectedGroup.BindValueChanged(_ =>
             {
-                // TODO: This should scroll the selected row into view.
                 updateSelectedGroup();
             }, true);
         }
 
-        private void updateSelectedGroup()
-        {
-            // TODO: This should scroll the selected row into view.
-            foreach (var b in BackgroundFlow)
-                b.Selected = ReferenceEquals(b.Item, selectedGroup?.Value);
-        }
+        private void updateSelectedGroup() => SetRowSelected(selectedGroup?.Value);
 
         private TableColumn[] createHeaders()
         {

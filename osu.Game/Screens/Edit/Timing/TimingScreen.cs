@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Edit.Timing
                         RelativeSizeAxes = Axes.Y,
                         Width = ControlPointTable.TIMING_COLUMN_WIDTH + margins,
                     },
-                    new OsuScrollContainer
+                    scroll = new OsuScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = table = new ControlPointTable(),
@@ -140,6 +140,8 @@ namespace osu.Game.Screens.Edit.Timing
                     table.ControlGroups = controlPointGroups;
                     changeHandler?.SaveState();
                 }, true);
+
+                table.OnRowSelected += (drawable) => scroll.ScrollIntoView(drawable);
             }
 
             protected override bool OnClick(ClickEvent e)
