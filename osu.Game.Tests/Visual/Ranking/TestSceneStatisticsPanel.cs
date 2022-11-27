@@ -27,7 +27,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneStatisticsPanel : OsuTestScene
+    public partial class TestSceneStatisticsPanel : OsuTestScene
     {
         [Test]
         public void TestScoreWithTimeStatistics()

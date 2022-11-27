@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestSceneChangeAndUseGameplayBindings : OsuGameTestScene
+    public partial class TestSceneChangeAndUseGameplayBindings : OsuGameTestScene
     {
         [Test]
         public void TestGameplayKeyBindings()

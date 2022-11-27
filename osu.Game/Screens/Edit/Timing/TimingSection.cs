@@ -11,7 +11,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class TimingSection : Section<TimingControlPoint>
+    internal partial class TimingSection : Section<TimingControlPoint>
     {
         private LabelledTimeSignature timeSignature;
         private BPMTextBox bpmTextEntry;
@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Edit.Timing
             };
         }
 
-        private class BPMTextBox : LabelledTextBox
+        private partial class BPMTextBox : LabelledTextBox
         {
             private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
 

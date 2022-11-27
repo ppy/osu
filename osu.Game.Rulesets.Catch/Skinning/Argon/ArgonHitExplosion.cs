@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Argon
 {
-    public class ArgonHitExplosion : CompositeDrawable, IHitExplosion
+    public partial class ArgonHitExplosion : CompositeDrawable, IHitExplosion
     {
         public override bool RemoveWhenNotAlive => true;
 

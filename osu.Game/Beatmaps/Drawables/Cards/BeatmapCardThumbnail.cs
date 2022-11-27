@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardThumbnail : Container
+    public partial class BeatmapCardThumbnail : Container
     {
         public BindableBool Dimmed { get; } = new BindableBool();
 

@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A test case which can be used to test a screen (that relies on OnEntering being called to execute startup instructions).
     /// </summary>
-    public abstract class ScreenTestScene : OsuManualInputManagerTestScene, IOverlayManager
+    public abstract partial class ScreenTestScene : OsuManualInputManagerTestScene, IOverlayManager
     {
         protected readonly OsuScreenStack Stack;
 

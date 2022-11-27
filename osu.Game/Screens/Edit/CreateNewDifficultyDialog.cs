@@ -8,7 +8,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Edit
 {
-    public class CreateNewDifficultyDialog : PopupDialog
+    public partial class CreateNewDifficultyDialog : PopupDialog
     {
         /// <summary>
         /// Delegate used to create new difficulties.

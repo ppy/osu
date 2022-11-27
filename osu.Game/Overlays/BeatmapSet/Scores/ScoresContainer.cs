@@ -24,7 +24,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoresContainer : BeatmapSetLayoutSection
+    public partial class ScoresContainer : BeatmapSetLayoutSection
     {
         private const int spacing = 15;
 

@@ -16,10 +16,10 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class DrawableTaikoMascot : BeatSyncedContainer
+    public partial class DrawableTaikoMascot : BeatSyncedContainer
     {
         public readonly Bindable<TaikoMascotAnimationState> State;
-        public readonly Bindable<JudgementResult> LastResult;
+        public readonly Bindable<JudgementResult?> LastResult;
 
         private readonly Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation> animations;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             Origin = Anchor = Anchor.BottomLeft;
 
             State = new Bindable<TaikoMascotAnimationState>(startingState);
-            LastResult = new Bindable<JudgementResult>();
+            LastResult = new Bindable<JudgementResult?>();
 
             animations = new Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation>();
         }
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             LastResult.BindValueChanged(onNewResult);
         }
 
-        private void onNewResult(ValueChangedEvent<JudgementResult> resultChangedEvent)
+        private void onNewResult(ValueChangedEvent<JudgementResult?> resultChangedEvent)
         {
             var result = resultChangedEvent.NewValue;
             if (result == null)

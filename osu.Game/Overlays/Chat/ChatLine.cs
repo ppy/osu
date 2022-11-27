@@ -26,7 +26,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatLine : CompositeDrawable
+    public partial class ChatLine : CompositeDrawable
     {
         public Message Message
         {
@@ -248,7 +248,7 @@ namespace osu.Game.Overlays.Chat
             };
         }
 
-        private class MessageSender : OsuClickableContainer, IHasContextMenu
+        private partial class MessageSender : OsuClickableContainer, IHasContextMenu
         {
             private readonly APIUser sender;
 

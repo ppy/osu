@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestScenePathControlPointVisualiser : OsuManualInputManagerTestScene
+    public partial class TestScenePathControlPointVisualiser : OsuManualInputManagerTestScene
     {
         private Slider slider;
         private PathControlPointVisualiser visualiser;

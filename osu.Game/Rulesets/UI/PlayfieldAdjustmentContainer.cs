@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// A container which handles sizing of the <see cref="Playfield"/> and any other components that need to match their size.
     /// </summary>
-    public class PlayfieldAdjustmentContainer : Container
+    public partial class PlayfieldAdjustmentContainer : Container
     {
         public PlayfieldAdjustmentContainer()
         {

@@ -16,7 +16,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class SetupScreenHeader : OverlayHeader
+    internal partial class SetupScreenHeader : OverlayHeader
     {
         public SetupScreenHeaderBackground Background { get; private set; }
 
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit.Setup
             });
         }
 
-        private class SetupScreenTitle : OverlayTitle
+        private partial class SetupScreenTitle : OverlayTitle
         {
             public SetupScreenTitle()
             {
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Edit.Setup
             }
         }
 
-        internal class SetupScreenTabControl : OverlayTabControl<SetupSection>
+        internal partial class SetupScreenTabControl : OverlayTabControl<SetupSection>
         {
             private readonly Box background;
 
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Edit.Setup
                 AccentColour = AccentColour
             };
 
-            private class SetupScreenTabItem : OverlayTabItem
+            private partial class SetupScreenTabItem : OverlayTabItem
             {
                 public SetupScreenTabItem(SetupSection value)
                     : base(value)

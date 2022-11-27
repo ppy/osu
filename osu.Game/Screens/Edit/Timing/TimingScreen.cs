@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class TimingScreen : EditorScreenWithTimeline
+    public partial class TimingScreen : EditorScreenWithTimeline
     {
         [Cached]
         public readonly Bindable<ControlPointGroup> SelectedGroup = new Bindable<ControlPointGroup>();
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Timing
             }
         };
 
-        public class ControlPointList : CompositeDrawable
+        public partial class ControlPointList : CompositeDrawable
         {
             private OsuButton deleteButton;
             private ControlPointTable table;

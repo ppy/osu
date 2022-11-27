@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class GlowPiece : Container
+    public partial class GlowPiece : Container
     {
         public GlowPiece()
         {

@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class LegacyBarLine : Sprite
+    public partial class LegacyBarLine : Sprite
     {
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)

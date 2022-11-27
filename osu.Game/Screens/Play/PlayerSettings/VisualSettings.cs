@@ -8,7 +8,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class VisualSettings : PlayerSettingsGroup
+    public partial class VisualSettings : PlayerSettingsGroup
     {
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;

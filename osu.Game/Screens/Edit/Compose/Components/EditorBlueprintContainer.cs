@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class EditorBlueprintContainer : BlueprintContainer<HitObject>
+    public partial class EditorBlueprintContainer : BlueprintContainer<HitObject>
     {
         [Resolved]
         protected EditorClock EditorClock { get; private set; }

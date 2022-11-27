@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Taiko.Replays;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 {
-    public class TestSceneHitJudgements : JudgementTest
+    public partial class TestSceneHitJudgements : JudgementTest
     {
         [Test]
         public void TestHitCentreHit()

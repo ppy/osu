@@ -9,7 +9,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
 {
-    public class SpectatorPlayerLoader : PlayerLoader
+    public partial class SpectatorPlayerLoader : PlayerLoader
     {
         public readonly ScoreInfo Score;
 

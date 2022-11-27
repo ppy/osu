@@ -13,7 +13,7 @@ using osu.Game.Screens.Edit;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 {
-    public abstract class OsuSelectionBlueprint<T> : HitObjectSelectionBlueprint<T>
+    public abstract partial class OsuSelectionBlueprint<T> : HitObjectSelectionBlueprint<T>
         where T : OsuHitObject
     {
         [Resolved]

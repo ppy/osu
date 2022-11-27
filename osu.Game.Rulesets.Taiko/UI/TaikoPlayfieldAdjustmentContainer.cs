@@ -8,7 +8,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
+    public partial class TaikoPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
         private const float default_aspect = 16f / 9f;

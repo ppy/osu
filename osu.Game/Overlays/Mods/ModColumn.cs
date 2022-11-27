@@ -25,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModColumn : ModSelectColumn
+    public partial class ModColumn : ModSelectColumn
     {
         public readonly ModType ModType;
 
@@ -219,7 +219,7 @@ namespace osu.Game.Overlays.Mods
                 dequeuedAction();
         }
 
-        private class ToggleAllCheckbox : OsuCheckbox
+        private partial class ToggleAllCheckbox : OsuCheckbox
         {
             private Color4 accentColour;
 

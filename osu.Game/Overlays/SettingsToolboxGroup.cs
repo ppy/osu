@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsToolboxGroup : Container, IExpandable
+    public partial class SettingsToolboxGroup : Container, IExpandable
     {
         private readonly string title;
         public const int CONTAINER_WIDTH = 270;

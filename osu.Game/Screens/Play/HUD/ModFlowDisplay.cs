@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// A horizontally wrapping display of mods. For cases where wrapping is not required, use <see cref="ModDisplay"/> instead.
     /// </summary>
-    public class ModFlowDisplay : ReverseChildIDFillFlowContainer<ModIcon>, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class ModFlowDisplay : ReverseChildIDFillFlowContainer<ModIcon>, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         private const int fade_duration = 1000;
 

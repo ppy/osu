@@ -13,7 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Database
 {
-    public class BeatmapLookupCache : OnlineLookupCache<int, APIBeatmap, GetBeatmapsRequest>
+    public partial class BeatmapLookupCache : OnlineLookupCache<int, APIBeatmap, GetBeatmapsRequest>
     {
         /// <summary>
         /// Perform an API lookup on the specified beatmap, populating a <see cref="APIBeatmap"/> model.

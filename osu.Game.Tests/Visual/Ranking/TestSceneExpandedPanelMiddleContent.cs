@@ -27,7 +27,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneExpandedPanelMiddleContent : OsuTestScene
+    public partial class TestSceneExpandedPanelMiddleContent : OsuTestScene
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private bool containsAny(string text, params string[] stringsToMatch) => stringsToMatch.Any(text.Contains);
 
-        private class ExpandedPanelMiddleContentContainer : Container
+        private partial class ExpandedPanelMiddleContentContainer : Container
         {
             public ExpandedPanelMiddleContentContainer(ScoreInfo score)
             {

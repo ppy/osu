@@ -10,7 +10,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens
 {
-    public abstract class TournamentScreen : CompositeDrawable
+    public abstract partial class TournamentScreen : CompositeDrawable
     {
         public const double FADE_DELAY = 200;
 

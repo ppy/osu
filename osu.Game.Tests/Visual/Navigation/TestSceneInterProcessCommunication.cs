@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Navigation
 {
     [TestFixture]
     [Ignore("This test cannot be run headless, as it requires the game host running the nested game to have IPC bound.")]
-    public class TestSceneInterProcessCommunication : OsuGameTestScene
+    public partial class TestSceneInterProcessCommunication : OsuGameTestScene
     {
         private HeadlessGameHost ipcSenderHost = null!;
 

@@ -8,7 +8,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarSettingsButton : ToolbarOverlayToggleButton
+    public partial class ToolbarSettingsButton : ToolbarOverlayToggleButton
     {
         public ToolbarSettingsButton()
         {

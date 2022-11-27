@@ -15,7 +15,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class DummyAPIAccess : Component, IAPIProvider
+    public partial class DummyAPIAccess : Component, IAPIProvider
     {
         public const int DUMMY_USER_ID = 1001;
 

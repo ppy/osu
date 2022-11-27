@@ -11,7 +11,7 @@ using osu.Framework.Screens;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class StableDirectorySelectScreen : DirectorySelectScreen
+    public partial class StableDirectorySelectScreen : DirectorySelectScreen
     {
         private readonly TaskCompletionSource<string> taskCompletionSource;
 

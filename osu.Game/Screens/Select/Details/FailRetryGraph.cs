@@ -14,7 +14,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public class FailRetryGraph : Container
+    public partial class FailRetryGraph : Container
     {
         private readonly BarGraph retryGraph, failGraph;
 

@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class DrawableTestHit : DrawableHit
+    public partial class DrawableTestHit : DrawableHit
     {
         public readonly HitResult Type;
 

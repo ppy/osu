@@ -19,7 +19,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    public class TrianglesV2 : Drawable
+    public partial class TrianglesV2 : Drawable
     {
         private const float triangle_size = 100;
         private const float base_velocity = 50;
@@ -172,7 +172,7 @@ namespace osu.Game.Graphics.Backgrounds
             // Limited by the maximum size of QuadVertexBuffer for safety.
             const int max_triangles = ushort.MaxValue / (IRenderer.VERTICES_PER_QUAD + 2);
 
-            AimCount = (int)Math.Min(max_triangles, DrawWidth * DrawHeight * 0.0005f * SpawnRatio);
+            AimCount = (int)Math.Clamp(DrawWidth * 0.02f * SpawnRatio, 1, max_triangles);
 
             int currentCount = parts.Count;
 
@@ -229,6 +229,7 @@ namespace osu.Game.Graphics.Backgrounds
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
             private Vector2 size;
             private float thickness;
+            private float texelSize;
 
             private IVertexBatch<TexturedVertex2D>? vertexBatch;
 
@@ -245,6 +246,7 @@ namespace osu.Game.Graphics.Backgrounds
                 texture = Source.texture;
                 size = Source.DrawSize;
                 thickness = Source.Thickness;
+                texelSize = Math.Max(1.5f / Source.ScreenSpaceDrawQuad.Size.X, 1.5f / Source.ScreenSpaceDrawQuad.Size.Y);
 
                 parts.Clear();
                 parts.AddRange(Source.parts);
@@ -265,6 +267,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 shader.Bind();
                 shader.GetUniform<float>("thickness").UpdateValue(ref thickness);
+                shader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
 
                 foreach (TriangleParticle particle in parts)
                 {

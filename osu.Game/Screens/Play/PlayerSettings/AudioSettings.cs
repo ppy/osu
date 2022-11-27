@@ -12,7 +12,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class AudioSettings : PlayerSettingsGroup
+    public partial class AudioSettings : PlayerSettingsGroup
     {
         public Bindable<ScoreInfo> ReferenceScore { get; } = new Bindable<ScoreInfo>();
 

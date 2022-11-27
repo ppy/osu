@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class VersionManager : VisibilityContainer
+    public partial class VersionManager : VisibilityContainer
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, TextureStore textures, OsuGameBase game)

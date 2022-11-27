@@ -30,7 +30,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
-    public class ParticipantPanel : MultiplayerRoomComposite, IHasContextMenu
+    public partial class ParticipantPanel : MultiplayerRoomComposite, IHasContextMenu
     {
         public readonly MultiplayerRoomUser User;
 
@@ -250,7 +250,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             }
         }
 
-        public class KickButton : IconButton
+        public partial class KickButton : IconButton
         {
             public KickButton()
             {

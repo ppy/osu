@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
 {
-    public class TestSceneManiaModHoldOff : ModTestScene
+    public partial class TestSceneManiaModHoldOff : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 

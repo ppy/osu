@@ -11,7 +11,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
-    public sealed class DifficultyMultiplierDisplay : ModsEffectDisplay
+    public sealed partial class DifficultyMultiplierDisplay : ModsEffectDisplay
     {
         protected override LocalisableString Label => DifficultyMultiplierDisplayStrings.DifficultyMultiplier;
 

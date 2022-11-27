@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Audio.Effects
 {
-    public class AudioFilter : Component, ITransformableFilter
+    public partial class AudioFilter : Component, ITransformableFilter
     {
         /// <summary>
         /// The maximum cutoff frequency that can be used with a low-pass filter.

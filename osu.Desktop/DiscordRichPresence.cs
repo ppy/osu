@@ -20,7 +20,7 @@ using LogLevel = osu.Framework.Logging.LogLevel;
 
 namespace osu.Desktop
 {
-    internal class DiscordRichPresence : Component
+    internal partial class DiscordRichPresence : Component
     {
         private const string client_id = "367827983903490050";
 

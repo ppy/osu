@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class DefaultHitExplosion : CompositeDrawable, IHitExplosion
+    public partial class DefaultHitExplosion : CompositeDrawable, IHitExplosion
     {
         private CircularContainer largeFaint = null!;
         private CircularContainer smallFaint = null!;

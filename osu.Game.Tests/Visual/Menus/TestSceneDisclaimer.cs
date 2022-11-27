@@ -10,7 +10,7 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual.Menus
 {
-    public class TestSceneDisclaimer : ScreenTestScene
+    public partial class TestSceneDisclaimer : ScreenTestScene
     {
         [BackgroundDependencyLoader]
         private void load()

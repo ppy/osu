@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Login
 {
-    public class UserDropdown : OsuEnumDropdown<UserAction>
+    public partial class UserDropdown : OsuEnumDropdown<UserAction>
     {
         protected override DropdownHeader CreateHeader() => new UserDropdownHeader();
 
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Login
             }
         }
 
-        protected class UserDropdownMenu : OsuDropdownMenu
+        protected partial class UserDropdownMenu : OsuDropdownMenu
         {
             public UserDropdownMenu()
             {
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Login
 
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
 
-            private class DrawableUserDropdownMenuItem : DrawableOsuDropdownMenuItem
+            private partial class DrawableUserDropdownMenuItem : DrawableOsuDropdownMenuItem
             {
                 public DrawableUserDropdownMenuItem(MenuItem item)
                     : base(item)
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Login
             }
         }
 
-        private class UserDropdownHeader : OsuDropdownHeader
+        private partial class UserDropdownHeader : OsuDropdownHeader
         {
             public const float LABEL_LEFT_MARGIN = 20;
 

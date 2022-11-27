@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSlider : DrawableOsuHitObject
+    public partial class DrawableSlider : DrawableOsuHitObject
     {
         public new Slider HitObject => (Slider)base.HitObject;
 
@@ -327,7 +327,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => SliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
-        private class DefaultSliderBody : PlaySliderBody
+        private partial class DefaultSliderBody : PlaySliderBody
         {
         }
     }

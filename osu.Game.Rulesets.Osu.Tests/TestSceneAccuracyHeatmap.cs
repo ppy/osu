@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneAccuracyHeatmap : OsuManualInputManagerTestScene
+    public partial class TestSceneAccuracyHeatmap : OsuManualInputManagerTestScene
     {
         private Box background;
         private Drawable object1;
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             return true;
         }
 
-        private class TestAccuracyHeatmap : AccuracyHeatmap
+        private partial class TestAccuracyHeatmap : AccuracyHeatmap
         {
             public TestAccuracyHeatmap(ScoreInfo score)
                 : base(score, new TestBeatmap(new OsuRuleset().RulesetInfo))
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 => base.AddPoint(start, end, hitPoint, radius);
         }
 
-        private class BorderCircle : CircularContainer
+        private partial class BorderCircle : CircularContainer
         {
             public BorderCircle()
             {

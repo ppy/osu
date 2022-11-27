@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.Break
 {
-    public class GlowIcon : Container
+    public partial class GlowIcon : Container
     {
         private readonly SpriteIcon spriteIcon;
         private readonly BlurredIcon blurredIcon;

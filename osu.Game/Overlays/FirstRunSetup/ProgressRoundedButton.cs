@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
-    public class ProgressRoundedButton : RoundedButton
+    public partial class ProgressRoundedButton : RoundedButton
     {
         public new Action? Action;
 

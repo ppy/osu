@@ -17,7 +17,7 @@ using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class BarGraph : Drawable
+    public partial class BarGraph : Drawable
     {
         private const int resize_duration = 250;
         private const Easing easing = Easing.InOutCubic;

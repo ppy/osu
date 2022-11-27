@@ -18,7 +18,7 @@ using Direction = osu.Framework.Graphics.Direction;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class CatchSelectionHandler : EditorSelectionHandler
+    public partial class CatchSelectionHandler : EditorSelectionHandler
     {
         protected ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)playfield.HitObjectContainer;
 

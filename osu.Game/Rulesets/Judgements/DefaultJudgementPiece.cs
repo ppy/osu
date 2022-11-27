@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Judgements
 {
-    public class DefaultJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public partial class DefaultJudgementPiece : CompositeDrawable, IAnimatableJudgement
     {
         protected readonly HitResult Result;
 

@@ -33,7 +33,7 @@ using JetBrains.Annotations;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneDrawableScrollingRuleset : OsuTestScene
+    public partial class TestSceneDrawableScrollingRuleset : OsuTestScene
     {
         /// <summary>
         /// The amount of time visible by the "view window" of the playfield.
@@ -305,7 +305,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override string ShortName { get; } = string.Empty;
         }
 
-        private class TestDrawableScrollingRuleset : DrawableScrollingRuleset<TestHitObject>
+        private partial class TestDrawableScrollingRuleset : DrawableScrollingRuleset<TestHitObject>
         {
             public bool RelativeScaleBeatLengthsOverride { get; set; }
 
@@ -342,7 +342,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override Playfield CreatePlayfield() => new TestPlayfield();
         }
 
-        private class TestPlayfield : ScrollingPlayfield
+        private partial class TestPlayfield : ScrollingPlayfield
         {
             public TestPlayfield()
             {
@@ -427,7 +427,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class DrawableTestHitObject : DrawableHitObject<TestHitObject>
+        private partial class DrawableTestHitObject : DrawableHitObject<TestHitObject>
         {
             public DrawableTestHitObject([CanBeNull] TestHitObject hitObject)
                 : base(hitObject)
@@ -457,7 +457,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void Update() => LifetimeEnd = HitObject.EndTime;
         }
 
-        private class DrawableTestPooledHitObject : DrawableTestHitObject
+        private partial class DrawableTestPooledHitObject : DrawableTestHitObject
         {
             public DrawableTestPooledHitObject()
                 : base(null)
@@ -467,7 +467,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class DrawableTestParentHitObject : DrawableTestHitObject
+        private partial class DrawableTestParentHitObject : DrawableTestHitObject
         {
             private readonly Container<DrawableHitObject> container;
 
@@ -491,7 +491,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void ClearNestedHitObjects() => container.Clear(false);
         }
 
-        private class DrawableTestPooledParentHitObject : DrawableTestParentHitObject
+        private partial class DrawableTestPooledParentHitObject : DrawableTestParentHitObject
         {
             public DrawableTestPooledParentHitObject()
                 : base(null)

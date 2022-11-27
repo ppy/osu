@@ -16,7 +16,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
-    public class MemorySettings : SettingsSubsection
+    public partial class MemorySettings : SettingsSubsection
     {
         protected override LocalisableString Header => DebugSettingsStrings.MemoryHeader;
 

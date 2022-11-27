@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public abstract class DrawableCarouselItem : PoolableDrawable
+    public abstract partial class DrawableCarouselItem : PoolableDrawable
     {
         public const float MAX_HEIGHT = 80;
 

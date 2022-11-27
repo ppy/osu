@@ -15,7 +15,7 @@ using osu.Game.Overlays.Chat;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChatLineTruncation : OsuTestScene
+    public partial class TestSceneChatLineTruncation : OsuTestScene
     {
         private readonly TestChatLineContainer textContainer;
 
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Online
             }
         }
 
-        private class TestChatLineContainer : FillFlowContainer<ChatLine>
+        private partial class TestChatLineContainer : FillFlowContainer<ChatLine>
         {
             protected override int Compare(Drawable x, Drawable y)
             {

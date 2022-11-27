@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// <summary>
     /// A solid "notch" of the <see cref="AccuracyCircle"/> that appears at the ends of the rank circles to add separation.
     /// </summary>
-    public class RankNotch : CompositeDrawable
+    public partial class RankNotch : CompositeDrawable
     {
         private readonly float position;
 

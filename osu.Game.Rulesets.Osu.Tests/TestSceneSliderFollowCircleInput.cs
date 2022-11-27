@@ -24,7 +24,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [HeadlessTest]
-    public class TestSceneSliderFollowCircleInput : RateAdjustedBeatmapTestScene
+    public partial class TestSceneSliderFollowCircleInput : RateAdjustedBeatmapTestScene
     {
         private List<JudgementResult>? judgementResults;
         private ScoreAccessibleReplayPlayer? currentPlayer;
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep("Wait for completion", () => currentPlayer?.ScoreProcessor.HasCompleted.Value == true);
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

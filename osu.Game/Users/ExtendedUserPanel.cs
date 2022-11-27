@@ -17,7 +17,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users
 {
-    public abstract class ExtendedUserPanel : UserPanel
+    public abstract partial class ExtendedUserPanel : UserPanel
     {
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 

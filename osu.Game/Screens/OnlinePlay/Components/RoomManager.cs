@@ -17,7 +17,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class RoomManager : Component, IRoomManager
+    public partial class RoomManager : Component, IRoomManager
     {
         public event Action RoomsUpdated;
 

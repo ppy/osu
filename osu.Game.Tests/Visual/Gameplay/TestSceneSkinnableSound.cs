@@ -20,7 +20,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableSound : OsuTestScene
+    public partial class TestSceneSkinnableSound : OsuTestScene
     {
         private TestSkinSourceContainer skinSource;
         private PausableSkinnableSound skinnableSound;
@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Cached(typeof(ISkinSource))]
-        private class TestSkinSourceContainer : Container, ISkinSource, ISamplePlaybackDisabler
+        private partial class TestSkinSourceContainer : Container, ISkinSource, ISamplePlaybackDisabler
         {
             [Resolved]
             private ISkinSource source { get; set; }

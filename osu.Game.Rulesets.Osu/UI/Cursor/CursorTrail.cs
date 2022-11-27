@@ -24,7 +24,7 @@ using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
+    public partial class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
     {
         private const int max_sprites = 2048;
 

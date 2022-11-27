@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModFlashlight : OsuModTestScene
+    public partial class TestSceneOsuModFlashlight : OsuModTestScene
     {
         [TestCase(600)]
         [TestCase(120)]

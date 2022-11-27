@@ -20,7 +20,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A skinnable element which uses a single texture backing.
     /// </summary>
-    public class SkinnableSprite : SkinnableDrawable, ISkinnableDrawable
+    public partial class SkinnableSprite : SkinnableDrawable, ISkinnableDrawable
     {
         protected override bool ApplySizeRestrictionsToDefault => true;
 
@@ -75,7 +75,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public class SpriteSelectorControl : SettingsDropdown<string>
+        public partial class SpriteSelectorControl : SettingsDropdown<string>
         {
             protected override void LoadComplete()
             {
@@ -117,7 +117,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public class SpriteNotFound : CompositeDrawable
+        public partial class SpriteNotFound : CompositeDrawable
         {
             public SpriteNotFound(string lookup)
             {

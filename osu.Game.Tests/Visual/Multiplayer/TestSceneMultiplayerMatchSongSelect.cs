@@ -31,7 +31,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerMatchSongSelect : MultiplayerTestScene
+    public partial class TestSceneMultiplayerMatchSongSelect : MultiplayerTestScene
     {
         private BeatmapManager manager;
         private RulesetStore rulesets;
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                           .All(b => b.Mod.GetType() != type));
         }
 
-        private class TestMultiplayerMatchSongSelect : MultiplayerMatchSongSelect
+        private partial class TestMultiplayerMatchSongSelect : MultiplayerMatchSongSelect
         {
             public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
 

@@ -13,7 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users.Drawables
 {
-    public class ClickableAvatar : Container
+    public partial class ClickableAvatar : Container
     {
         private const string default_tooltip_text = "view profile";
 
@@ -71,7 +71,7 @@ namespace osu.Game.Users.Drawables
                 game?.ShowUser(user);
         }
 
-        private class ClickableArea : OsuClickableContainer
+        private partial class ClickableArea : OsuClickableContainer
         {
             private LocalisableString tooltip = default_tooltip_text;
 

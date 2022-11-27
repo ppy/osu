@@ -27,7 +27,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapPicker : Container
+    public partial class BeatmapPicker : Container
     {
         private const float tile_icon_padding = 7;
         private const float tile_spacing = 2;
@@ -209,7 +209,7 @@ namespace osu.Game.Overlays.BeatmapSet
             Difficulties.Children.ToList().ForEach(diff => diff.State = diff.Beatmap == Beatmap.Value ? DifficultySelectorState.Selected : DifficultySelectorState.NotSelected);
         }
 
-        public class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
+        public partial class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
         {
             public Action OnLostHover;
 
@@ -220,7 +220,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        public class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>
+        public partial class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>
         {
             private const float transition_duration = 100;
             private const float size = 54;
@@ -325,7 +325,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private class Statistic : FillFlowContainer
+        private partial class Statistic : FillFlowContainer
         {
             private readonly OsuSpriteText text;
 

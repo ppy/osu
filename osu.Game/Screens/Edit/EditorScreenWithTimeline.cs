@@ -15,7 +15,7 @@ using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit
 {
-    public abstract class EditorScreenWithTimeline : EditorScreen
+    public abstract partial class EditorScreenWithTimeline : EditorScreen
     {
         private const float padding = 10;
 

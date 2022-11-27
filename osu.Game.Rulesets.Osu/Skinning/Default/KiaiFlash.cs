@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class KiaiFlash : BeatSyncedContainer
+    public partial class KiaiFlash : BeatSyncedContainer
     {
         private const double fade_length = 80;
 

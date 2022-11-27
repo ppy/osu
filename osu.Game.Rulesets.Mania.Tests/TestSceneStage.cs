@@ -24,7 +24,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    public class TestSceneStage : ManiaInputTestScene
+    public partial class TestSceneStage : ManiaInputTestScene
     {
         private const int columns = 4;
 

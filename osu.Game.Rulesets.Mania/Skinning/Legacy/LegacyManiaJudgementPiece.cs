@@ -13,7 +13,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyManiaJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public partial class LegacyManiaJudgementPiece : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
         private readonly Drawable animation;

@@ -29,7 +29,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneScrollingHitObjects : OsuTestScene
+    public partial class TestSceneScrollingHitObjects : OsuTestScene
     {
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
@@ -252,7 +252,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void setScrollAlgorithm(ScrollVisualisationMethod algorithm) => scrollContainers.ForEach(c => c.ScrollAlgorithm = algorithm);
 
-        private class TestPlayfield : ScrollingPlayfield
+        private partial class TestPlayfield : ScrollingPlayfield
         {
             public new ScrollingDirection Direction => base.Direction.Value;
 
@@ -279,7 +279,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override ScrollingHitObjectContainer CreateScrollingHitObjectContainer() => new TestScrollingHitObjectContainer();
         }
 
-        private class TestDrawableControlPoint : DrawableHitObject<HitObject>
+        private partial class TestDrawableControlPoint : DrawableHitObject<HitObject>
         {
             public TestDrawableControlPoint(ScrollingDirection direction, double time)
                 : base(new HitObject { StartTime = time, HitWindows = HitWindows.Empty })
@@ -320,7 +320,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class TestDrawableHitObject : DrawableHitObject<TestHitObject>
+        private partial class TestDrawableHitObject : DrawableHitObject<TestHitObject>
         {
             public TestDrawableHitObject(TestHitObject hitObject)
                 : base(hitObject)
@@ -336,7 +336,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class TestScrollingHitObjectContainer : ScrollingHitObjectContainer
+        private partial class TestScrollingHitObjectContainer : ScrollingHitObjectContainer
         {
             protected override RectangleF GetConservativeBoundingBox(HitObjectLifetimeEntry entry)
             {

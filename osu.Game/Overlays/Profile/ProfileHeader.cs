@@ -18,7 +18,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class ProfileHeader : TabControlOverlayHeader<LocalisableString>
+    public partial class ProfileHeader : TabControlOverlayHeader<LocalisableString>
     {
         private UserCoverBackground coverContainer;
 
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Profile
 
         private void updateDisplay(APIUser user) => coverContainer.User = user;
 
-        private class ProfileHeaderTitle : OverlayTitle
+        private partial class ProfileHeaderTitle : OverlayTitle
         {
             public ProfileHeaderTitle()
             {
@@ -113,7 +113,7 @@ namespace osu.Game.Overlays.Profile
             }
         }
 
-        private class ProfileCoverBackground : UserCoverBackground
+        private partial class ProfileCoverBackground : UserCoverBackground
         {
             protected override double LoadDelay => 0;
         }

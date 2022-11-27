@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests.Mods
 {
-    public class TestSceneCatchModRelax : ModTestScene
+    public partial class TestSceneCatchModRelax : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
 

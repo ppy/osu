@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// <summary>
     /// Contains a <see cref="CircularProgress"/> with smoothened edges.
     /// </summary>
-    public class SmoothCircularProgress : CompositeDrawable
+    public partial class SmoothCircularProgress : CompositeDrawable
     {
         public Bindable<double> Current
         {

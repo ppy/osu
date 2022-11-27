@@ -32,7 +32,7 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneBackgroundScreenDefault : OsuTestScene
+    public partial class TestSceneBackgroundScreenDefault : OsuTestScene
     {
         private BackgroundScreenStack stack;
         private TestBackgroundScreenDefault screen;
@@ -252,7 +252,7 @@ namespace osu.Game.Tests.Visual.Background
         private WorkingBeatmap createTestWorkingBeatmapWithUniqueBackground() => new UniqueBackgroundTestWorkingBeatmap(renderer, Audio);
         private WorkingBeatmap createTestWorkingBeatmapWithStoryboard() => new TestWorkingBeatmapWithStoryboard(Audio);
 
-        private class TestBackgroundScreenDefault : BackgroundScreenDefault
+        private partial class TestBackgroundScreenDefault : BackgroundScreenDefault
         {
             private bool? lastLoadTriggerCausedChange;
 
@@ -289,7 +289,7 @@ namespace osu.Game.Tests.Visual.Background
             protected override Texture GetBackground() => renderer.CreateTexture(1, 1);
         }
 
-        private class TestWorkingBeatmapWithStoryboard : TestWorkingBeatmap
+        private partial class TestWorkingBeatmapWithStoryboard : TestWorkingBeatmap
         {
             public TestWorkingBeatmapWithStoryboard(AudioManager audioManager)
                 : base(new Beatmap(), createStoryboard(), audioManager)
@@ -315,7 +315,7 @@ namespace osu.Game.Tests.Visual.Background
                 public Drawable CreateDrawable() => new DrawableTestStoryboardElement();
             }
 
-            private class DrawableTestStoryboardElement : OsuSpriteText
+            private partial class DrawableTestStoryboardElement : OsuSpriteText
             {
                 public override bool RemoveWhenNotAlive => false;
 
