@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyBananaPiece : LegacyCatchHitObjectPiece
+    public partial class LegacyBananaPiece : LegacyCatchHitObjectPiece
     {
         protected override void LoadComplete()
         {

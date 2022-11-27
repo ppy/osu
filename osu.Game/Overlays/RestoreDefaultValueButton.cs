@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class RestoreDefaultValueButton<T> : OsuButton, IHasTooltip, IHasCurrentValue<T>
+    public partial class RestoreDefaultValueButton<T> : OsuButton, IHasTooltip, IHasCurrentValue<T>
     {
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 

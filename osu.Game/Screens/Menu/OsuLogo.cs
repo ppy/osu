@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// osu! logo and its attachments (pulsing, visualiser etc.)
     /// </summary>
-    public class OsuLogo : BeatSyncedContainer
+    public partial class OsuLogo : BeatSyncedContainer
     {
         public readonly Color4 OsuPink = Color4Extensions.FromHex(@"e967a1");
 

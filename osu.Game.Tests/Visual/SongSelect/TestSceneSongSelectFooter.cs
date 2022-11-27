@@ -13,7 +13,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneSongSelectFooter : OsuManualInputManagerTestScene
+    public partial class TestSceneSongSelectFooter : OsuManualInputManagerTestScene
     {
         private FooterButtonRandom randomButton;
 

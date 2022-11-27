@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
     [HeadlessTest]
-    public class TestSceneAutoGeneration : OsuTestScene
+    public partial class TestSceneAutoGeneration : OsuTestScene
     {
         /// <summary>
         /// The number of frames which are generated at the start of a replay regardless of hitobject content.

@@ -16,7 +16,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
-    public class PaginatedRecentActivityContainer : PaginatedProfileSubsection<APIRecentActivity>
+    public partial class PaginatedRecentActivityContainer : PaginatedProfileSubsection<APIRecentActivity>
     {
         public PaginatedRecentActivityContainer(Bindable<APIUser> user)
             : base(user, missingText: EventsStrings.Empty)

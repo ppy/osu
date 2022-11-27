@@ -13,7 +13,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
-    public class RendererSettings : SettingsSubsection
+    public partial class RendererSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GraphicsSettingsStrings.RendererHeader;
 

@@ -25,7 +25,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
+    public partial class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         /// <summary>

@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneAccuracyCircle : OsuTestScene
+    public partial class TestSceneAccuracyCircle : OsuTestScene
     {
         [TestCase(0.2, ScoreRank.D)]
         [TestCase(0.5, ScoreRank.D)]

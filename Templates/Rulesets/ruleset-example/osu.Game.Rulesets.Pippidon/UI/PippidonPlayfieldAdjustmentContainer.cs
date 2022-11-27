@@ -7,7 +7,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Pippidon.UI
 {
-    public class PippidonPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
+    public partial class PippidonPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         public PippidonPlayfieldAdjustmentContainer()
         {

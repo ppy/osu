@@ -10,7 +10,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
-    public class DashboardNewBeatmapPanel : DashboardBeatmapPanel
+    public partial class DashboardNewBeatmapPanel : DashboardBeatmapPanel
     {
         public DashboardNewBeatmapPanel(APIBeatmapSet beatmapSet)
             : base(beatmapSet)

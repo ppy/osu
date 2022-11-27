@@ -9,7 +9,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
-    public class ShowRepliesButton : CommentRepliesButton
+    public partial class ShowRepliesButton : CommentRepliesButton
     {
         public readonly BindableBool Expanded = new BindableBool(true);
 

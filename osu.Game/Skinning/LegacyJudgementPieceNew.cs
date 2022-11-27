@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyJudgementPieceNew : CompositeDrawable, IAnimatableJudgement
+    public partial class LegacyJudgementPieceNew : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
 

@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class DefaultApproachCircle : SkinnableSprite
+    public partial class DefaultApproachCircle : SkinnableSprite
     {
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 

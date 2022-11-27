@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public sealed class LegacySpriteText : OsuSpriteText
+    public sealed partial class LegacySpriteText : OsuSpriteText
     {
         private readonly LegacyFont font;
 

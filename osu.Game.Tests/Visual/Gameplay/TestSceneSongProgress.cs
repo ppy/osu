@@ -17,7 +17,7 @@ using osu.Game.Skinning;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneSongProgress : SkinnableHUDComponentTestScene
+    public partial class TestSceneSongProgress : SkinnableHUDComponentTestScene
     {
         private GameplayClockContainer gameplayClockContainer = null!;
 

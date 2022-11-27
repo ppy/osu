@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// A circle explodes from the hit target to indicate a hitobject has been hit.
     /// </summary>
-    internal class HitExplosion : PoolableDrawable
+    internal partial class HitExplosion : PoolableDrawable
     {
         public override bool RemoveWhenNotAlive => true;
         public override bool RemoveCompletedTransforms => false;

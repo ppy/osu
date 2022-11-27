@@ -13,7 +13,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneTimelineTickDisplay : TimelineTestScene
+    public partial class TestSceneTimelineTickDisplay : TimelineTestScene
     {
         public override Drawable CreateTestComponent() => Empty(); // tick display is implicitly inside the timeline.
 

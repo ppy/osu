@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Menu
     /// Button designed specifically for the osu!next main menu.
     /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
     /// </summary>
-    public class MainMenuButton : BeatSyncedContainer, IStateful<ButtonState>
+    public partial class MainMenuButton : BeatSyncedContainer, IStateful<ButtonState>
     {
         public event Action<ButtonState> StateChanged;
 

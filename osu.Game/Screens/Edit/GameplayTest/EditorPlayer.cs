@@ -10,7 +10,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Edit.GameplayTest
 {
-    public class EditorPlayer : Player
+    public partial class EditorPlayer : Player
     {
         private readonly Editor editor;
         private readonly EditorState editorState;

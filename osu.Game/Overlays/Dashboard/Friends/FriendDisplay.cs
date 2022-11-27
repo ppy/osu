@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendDisplay : CompositeDrawable
+    public partial class FriendDisplay : CompositeDrawable
     {
         private List<APIUser> users = new List<APIUser>();
 

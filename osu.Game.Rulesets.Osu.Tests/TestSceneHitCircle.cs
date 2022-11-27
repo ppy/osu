@@ -18,7 +18,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneHitCircle : OsuSkinnableTestScene
+    public partial class TestSceneHitCircle : OsuSkinnableTestScene
     {
         private int depthIndex;
 
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             Depth = depthIndex++
         };
 
-        protected class TestDrawableHitCircle : DrawableHitCircle
+        protected partial class TestDrawableHitCircle : DrawableHitCircle
         {
             private readonly bool auto;
             private readonly double hitOffset;
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        protected class TestOsuPlayfield : OsuPlayfield
+        protected partial class TestOsuPlayfield : OsuPlayfield
         {
             public TestOsuPlayfield()
             {

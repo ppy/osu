@@ -14,7 +14,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     [Cached(typeof(IHasCatchObjectState))]
-    public abstract class DrawablePalpableCatchHitObject : DrawableCatchHitObject, IHasCatchObjectState
+    public abstract partial class DrawablePalpableCatchHitObject : DrawableCatchHitObject, IHasCatchObjectState
     {
         public new PalpableCatchHitObject HitObject => (PalpableCatchHitObject)base.HitObject;
 

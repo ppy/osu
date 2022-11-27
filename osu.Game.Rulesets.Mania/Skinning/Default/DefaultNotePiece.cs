@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
     /// <summary>
     /// Represents the static hit markers of notes.
     /// </summary>
-    internal class DefaultNotePiece : CompositeDrawable
+    internal partial class DefaultNotePiece : CompositeDrawable
     {
         public const float NOTE_HEIGHT = 12;
 

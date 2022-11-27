@@ -23,7 +23,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class CommentsContainer : CompositeDrawable
+    public partial class CommentsContainer : CompositeDrawable
     {
         private readonly Bindable<CommentableType> type = new Bindable<CommentableType>();
         private readonly BindableLong id = new BindableLong();
@@ -317,7 +317,7 @@ namespace osu.Game.Overlays.Comments
             base.Dispose(isDisposing);
         }
 
-        private class NoCommentsPlaceholder : CompositeDrawable
+        private partial class NoCommentsPlaceholder : CompositeDrawable
         {
             [BackgroundDependencyLoader]
             private void load()

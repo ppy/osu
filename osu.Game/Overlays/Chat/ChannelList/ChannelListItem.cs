@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public class ChannelListItem : OsuClickableContainer
+    public partial class ChannelListItem : OsuClickableContainer
     {
         public event Action<Channel>? OnRequestSelect;
         public event Action<Channel>? OnRequestLeave;

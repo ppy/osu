@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Textures;
 namespace osu.Game.Overlays.News
 {
     [LongRunningLoad]
-    public class NewsPostBackground : Sprite
+    public partial class NewsPostBackground : Sprite
     {
         private readonly string sourceUrl;
 

@@ -11,7 +11,7 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
-    public class SpectatorResultsScreen : SoloResultsScreen
+    public partial class SpectatorResultsScreen : SoloResultsScreen
     {
         public SpectatorResultsScreen(ScoreInfo score)
             : base(score, false)

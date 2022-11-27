@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarClock : OsuClickableContainer
+    public partial class ToolbarClock : OsuClickableContainer
     {
         private Bindable<ToolbarClockDisplayMode> clockDisplayMode;
         private Bindable<bool> prefer24HourTime;

@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class DefaultKeyArea : CompositeDrawable, IKeyBindingHandler<ManiaAction>
+    public partial class DefaultKeyArea : CompositeDrawable, IKeyBindingHandler<ManiaAction>
     {
         private const float key_icon_size = 10;
         private const float key_icon_corner_radius = 3;

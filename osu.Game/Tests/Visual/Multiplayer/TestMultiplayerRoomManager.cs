@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// A <see cref="RoomManager"/> for use in multiplayer test scenes.
     /// Should generally not be used by itself outside of a <see cref="MultiplayerTestScene"/>.
     /// </summary>
-    public class TestMultiplayerRoomManager : MultiplayerRoomManager
+    public partial class TestMultiplayerRoomManager : MultiplayerRoomManager
     {
         private readonly TestRoomRequestsHandler requestsHandler;
 

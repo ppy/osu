@@ -12,7 +12,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public abstract class ProfileHeaderButton : OsuHoverContainer
+    public abstract partial class ProfileHeaderButton : OsuHoverContainer
     {
         private readonly Box background;
         private readonly Container content;

@@ -19,7 +19,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public class TestSceneJuiceStreamSelectionBlueprint : CatchSelectionBlueprintTestScene
+    public partial class TestSceneJuiceStreamSelectionBlueprint : CatchSelectionBlueprintTestScene
     {
         private JuiceStream hitObject;
 

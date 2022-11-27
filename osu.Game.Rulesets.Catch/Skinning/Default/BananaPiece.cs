@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class BananaPiece : CatchHitObjectPiece
+    public partial class BananaPiece : CatchHitObjectPiece
     {
         protected override Drawable BorderPiece { get; }
 

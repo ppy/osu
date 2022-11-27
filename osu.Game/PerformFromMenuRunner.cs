@@ -18,7 +18,7 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game
 {
-    internal class PerformFromMenuRunner : Component
+    internal partial class PerformFromMenuRunner : Component
     {
         private readonly Action<IScreen> finalAction;
         private readonly Type[] validScreens;

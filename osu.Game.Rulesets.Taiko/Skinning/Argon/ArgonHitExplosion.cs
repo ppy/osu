@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class ArgonHitExplosion : CompositeDrawable, IAnimatableHitExplosion
+    public partial class ArgonHitExplosion : CompositeDrawable, IAnimatableHitExplosion
     {
         private readonly TaikoSkinComponents component;
         private readonly Circle outer;

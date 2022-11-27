@@ -10,7 +10,7 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineControlPointGroup : CompositeDrawable
+    public partial class TimelineControlPointGroup : CompositeDrawable
     {
         public readonly ControlPointGroup Group;
 

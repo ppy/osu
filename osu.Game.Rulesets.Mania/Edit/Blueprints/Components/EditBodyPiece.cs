@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Mania.Skinning.Default;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
 {
-    public class EditBodyPiece : DefaultBodyPiece
+    public partial class EditBodyPiece : DefaultBodyPiece
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

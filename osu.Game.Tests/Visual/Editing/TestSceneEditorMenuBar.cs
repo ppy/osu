@@ -15,7 +15,7 @@ using osu.Game.Screens.Edit.Components.Menus;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneEditorMenuBar : OsuTestScene
+    public partial class TestSceneEditorMenuBar : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Aquamarine);

@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    internal class OsuDirectorySelectorParentDirectory : OsuDirectorySelectorDirectory
+    internal partial class OsuDirectorySelectorParentDirectory : OsuDirectorySelectorDirectory
     {
         protected override IconUsage? Icon => FontAwesome.Solid.Folder;
 

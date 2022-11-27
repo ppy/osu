@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class ExpandDetailsButton : ProfileHeaderButton
+    public partial class ExpandDetailsButton : ProfileHeaderButton
     {
         public readonly BindableBool DetailsVisible = new BindableBool();
 

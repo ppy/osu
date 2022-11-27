@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSliderPath : OsuTestScene
+    public partial class TestSceneSliderPath : OsuTestScene
     {
         private readonly SmoothPath drawablePath;
         private SliderPath path;

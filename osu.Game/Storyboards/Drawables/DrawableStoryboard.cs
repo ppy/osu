@@ -20,7 +20,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboard : Container<DrawableStoryboardLayer>
+    public partial class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
         [Cached]
         public Storyboard Storyboard { get; }

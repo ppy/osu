@@ -19,7 +19,7 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
 {
-    public class SquareGraph : Container
+    public partial class SquareGraph : Container
     {
         private BufferedContainer<Column> columns;
 
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Play
             calculatedValues = newValues.ToArray();
         }
 
-        public class Column : Container, IStateful<ColumnState>
+        public partial class Column : Container, IStateful<ColumnState>
         {
             protected readonly Color4 EmptyColour = Color4.White.Opacity(20);
             public Color4 LitColour = Color4.LightBlue;

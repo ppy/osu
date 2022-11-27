@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class ProgressionPath : Path
+    public partial class ProgressionPath : Path
     {
         public DrawableTournamentMatch Source { get; }
         public DrawableTournamentMatch Destination { get; }

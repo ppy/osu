@@ -8,7 +8,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedToggleButton : ShearedButton
+    public partial class ShearedToggleButton : ShearedButton
     {
         private Sample? sampleClick;
         private Sample? sampleOff;

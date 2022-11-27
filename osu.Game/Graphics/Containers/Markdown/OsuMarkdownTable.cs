@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers.Markdown;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownTable : MarkdownTable
+    public partial class OsuMarkdownTable : MarkdownTable
     {
         public OsuMarkdownTable(Table table)
             : base(table)

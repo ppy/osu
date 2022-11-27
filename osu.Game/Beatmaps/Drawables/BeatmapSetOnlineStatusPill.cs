@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class BeatmapSetOnlineStatusPill : CircularContainer, IHasTooltip
+    public partial class BeatmapSetOnlineStatusPill : CircularContainer, IHasTooltip
     {
         private BeatmapOnlineStatus status;
 

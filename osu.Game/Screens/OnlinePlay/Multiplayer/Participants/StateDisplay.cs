@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
-    public class StateDisplay : CompositeDrawable
+    public partial class StateDisplay : CompositeDrawable
     {
         private const double fade_time = 50;
 

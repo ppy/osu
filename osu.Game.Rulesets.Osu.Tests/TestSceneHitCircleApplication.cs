@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneHitCircleApplication : OsuTestScene
+    public partial class TestSceneHitCircleApplication : OsuTestScene
     {
         [Test]
         public void TestApplyNewCircle()

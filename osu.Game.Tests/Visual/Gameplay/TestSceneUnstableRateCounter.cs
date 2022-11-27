@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneUnstableRateCounter : OsuTestScene
+    public partial class TestSceneUnstableRateCounter : OsuTestScene
     {
         [Cached(typeof(ScoreProcessor))]
         private TestScoreProcessor scoreProcessor = new TestScoreProcessor();
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private class TestScoreProcessor : ScoreProcessor
+        private partial class TestScoreProcessor : ScoreProcessor
         {
             public TestScoreProcessor()
                 : base(new OsuRuleset())

@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public class TickPiece : CompositeDrawable
+    public partial class TickPiece : CompositeDrawable
     {
         /// <summary>
         /// Any tick that is not the first for a drumroll is not filled, but is instead displayed

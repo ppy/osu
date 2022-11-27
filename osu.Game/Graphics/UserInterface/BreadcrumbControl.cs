@@ -14,7 +14,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class BreadcrumbControl<T> : OsuTabControl<T>
+    public partial class BreadcrumbControl<T> : OsuTabControl<T>
     {
         private const float padding = 10;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        public class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
+        public partial class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
             protected virtual float ChevronSize => 10;
 

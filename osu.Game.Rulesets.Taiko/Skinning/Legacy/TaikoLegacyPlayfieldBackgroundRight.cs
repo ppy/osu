@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class TaikoLegacyPlayfieldBackgroundRight : BeatSyncedContainer
+    public partial class TaikoLegacyPlayfieldBackgroundRight : BeatSyncedContainer
     {
         private Sprite kiai = null!;
 

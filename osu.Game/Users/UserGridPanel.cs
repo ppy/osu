@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Users
 {
-    public class UserGridPanel : ExtendedUserPanel
+    public partial class UserGridPanel : ExtendedUserPanel
     {
         private const int margin = 10;
 

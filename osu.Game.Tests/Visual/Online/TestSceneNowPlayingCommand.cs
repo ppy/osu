@@ -16,7 +16,7 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual.Online
 {
     [HeadlessTest]
-    public class TestSceneNowPlayingCommand : OsuTestScene
+    public partial class TestSceneNowPlayingCommand : OsuTestScene
     {
         [Cached(typeof(IChannelPostTarget))]
         private PostTarget postTarget { get; set; }
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Online
                 AddAssert("Check link not present", () => !postTarget.LastMessage.Contains("https://"));
         }
 
-        public class PostTarget : Component, IChannelPostTarget
+        public partial class PostTarget : Component, IChannelPostTarget
         {
             public void PostMessage(string text, bool isAction = false, Channel target = null)
             {

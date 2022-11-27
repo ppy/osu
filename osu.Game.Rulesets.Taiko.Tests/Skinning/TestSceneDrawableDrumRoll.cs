@@ -16,7 +16,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
-    public class TestSceneDrawableDrumRoll : TaikoSkinnableTestScene
+    public partial class TestSceneDrawableDrumRoll : TaikoSkinnableTestScene
     {
         [Cached(typeof(IScrollingInfo))]
         private ScrollingTestContainer.TestScrollingInfo info = new ScrollingTestContainer.TestScrollingInfo

@@ -14,7 +14,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneToolbarRulesetSelector : OsuTestScene
+    public partial class TestSceneToolbarRulesetSelector : OsuTestScene
     {
         [Resolved]
         private RulesetStore rulesets { get; set; }
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("mode line has moved", () => selector.ModeButtonLine.DrawPosition.X > 0);
         }
 
-        private class TestSelector : ToolbarRulesetSelector
+        private partial class TestSelector : ToolbarRulesetSelector
         {
             public new Drawable ModeButtonLine => base.ModeButtonLine;
         }

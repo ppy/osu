@@ -19,7 +19,7 @@ using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Screens
 {
-    public class Loader : StartupScreen
+    public partial class Loader : StartupScreen
     {
         private bool showDisclaimer;
 
@@ -116,7 +116,7 @@ namespace osu.Game.Screens
         /// <summary>
         /// Compiles a set of shaders before continuing. Attempts to draw some frames between compilation by limiting to one compile per draw frame.
         /// </summary>
-        public class ShaderPrecompiler : Drawable
+        public partial class ShaderPrecompiler : Drawable
         {
             private readonly List<IShader> loadTargets = new List<IShader>();
 

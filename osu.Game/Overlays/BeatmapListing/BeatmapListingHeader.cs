@@ -8,11 +8,11 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingHeader : OverlayHeader
+    public partial class BeatmapListingHeader : OverlayHeader
     {
         protected override OverlayTitle CreateTitle() => new BeatmapListingTitle();
 
-        private class BeatmapListingTitle : OverlayTitle
+        private partial class BeatmapListingTitle : OverlayTitle
         {
             public BeatmapListingTitle()
             {

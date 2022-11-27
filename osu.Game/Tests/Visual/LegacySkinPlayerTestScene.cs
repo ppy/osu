@@ -14,7 +14,7 @@ using osu.Game.Skinning;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public abstract class LegacySkinPlayerTestScene : PlayerTestScene
+    public abstract partial class LegacySkinPlayerTestScene : PlayerTestScene
     {
         protected LegacySkin LegacySkin { get; private set; }
 
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual
             AddUntilStep("wait for components to load", () => this.ChildrenOfType<SkinnableTargetContainer>().All(t => t.ComponentsLoaded));
         }
 
-        public class SkinProvidingPlayer : TestPlayer
+        public partial class SkinProvidingPlayer : TestPlayer
         {
             [Cached(typeof(ISkinSource))]
             private readonly ISkinSource skinSource;

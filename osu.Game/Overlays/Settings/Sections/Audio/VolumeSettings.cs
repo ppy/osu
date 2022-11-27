@@ -13,7 +13,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
-    public class VolumeSettings : SettingsSubsection
+    public partial class VolumeSettings : SettingsSubsection
     {
         protected override LocalisableString Header => AudioSettingsStrings.VolumeHeader;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             };
         }
 
-        private class VolumeAdjustSlider : SettingsSlider<double>
+        private partial class VolumeAdjustSlider : SettingsSlider<double>
         {
             protected override Drawable CreateControl()
             {

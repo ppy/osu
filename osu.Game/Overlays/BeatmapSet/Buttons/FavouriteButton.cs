@@ -21,7 +21,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class FavouriteButton : HeaderButton, IHasTooltip
+    public partial class FavouriteButton : HeaderButton, IHasTooltip
     {
         public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 

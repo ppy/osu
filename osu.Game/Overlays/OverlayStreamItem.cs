@@ -18,7 +18,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayStreamItem<T> : TabItem<T>
+    public abstract partial class OverlayStreamItem<T> : TabItem<T>
     {
         public readonly Bindable<T> SelectedItem = new Bindable<T>();
 
