@@ -19,6 +19,8 @@ namespace osu.Game.Screens.Edit
 {
     public abstract partial class EditorTable : TableContainer
     {
+        public event Action<Drawable>? OnRowSelected;
+
         private const float horizontal_inset = 20;
 
         protected const float ROW_HEIGHT = 25;
@@ -42,6 +44,17 @@ namespace osu.Game.Screens.Edit
                 Padding = new MarginPadding { Horizontal = -horizontal_inset },
                 Margin = new MarginPadding { Top = ROW_HEIGHT }
             });
+        }
+
+        protected void SetRowSelected(object? item)
+        {
+            foreach (var b in BackgroundFlow)
+            {
+                b.Selected = ReferenceEquals(b.Item, item);
+
+                if (b.Selected)
+                    OnRowSelected?.Invoke(b);
+            }
         }
 
         protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? default);
