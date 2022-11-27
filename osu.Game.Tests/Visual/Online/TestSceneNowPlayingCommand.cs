@@ -81,11 +81,13 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestModPresence()
         {
+            AddStep("Set activity", () => api.Activity.Value = new UserActivity.InSoloGame(new BeatmapInfo(), new RulesetInfo()));
+
             AddStep("Add Hidden mod", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModHidden>() });
 
             AddStep("Run command", () => Add(new NowPlayingCommand()));
 
-            AddAssert("Check mod is present", () => postTarget.LastMessage.Contains("+Hidden"));
+            AddAssert("Check mod is present", () => postTarget.LastMessage.Contains("+HD"));
         }
 
         public partial class PostTarget : Component, IChannelPostTarget
