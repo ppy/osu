@@ -584,8 +584,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 if (isBinding)
                 {
-                    box.FadeColour(isErroring ? colours.RedDark : colourProvider.Light2, transition_time, Easing.OutQuint);
-                    Text.FadeColour(isErroring ? Color4.White : Color4.Black, transition_time, Easing.OutQuint);
+                    box.FadeColour(colourProvider.Light2, transition_time, Easing.OutQuint);
+                    Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
                 }
                 else
                 {
@@ -609,8 +609,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 if (KeyBinding.RulesetName != null && keyCombinationExists(newCombination) && !newCombination.Equals(KeyBinding.KeyCombination))
                 {
+                    box.FlashColour(colours.RedDark, 1000, Easing.In);
                     isErroring = true;
-                    updateHoverState();
                     return;
                 }
 
