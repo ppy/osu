@@ -74,23 +74,25 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Export te model corresponding to uuid to given stream.
+        /// Export te model corresponding to model to given stream.
         /// </summary>
-        /// <param name="uuid">The medel which have <see cref="IHasGuidPrimaryKey"/>.</param>
+        /// <param name="model">The medel which have <see cref="IHasGuidPrimaryKey"/>.</param>
         /// <param name="stream">The stream to export.</param>
         /// <returns></returns>
-        public virtual async Task ExportToStreamAsync(TModel uuid, Stream stream)
+        public async Task ExportToStreamAsync(TModel model, Stream stream)
         {
-            Guid id = uuid.ID;
+            Guid id = model.ID;
             await Task.Run(() =>
             {
                 RealmAccess.Run(r =>
                 {
-                    TModel model = r.Find<TModel>(id);
-                    createZipArchive(model, stream);
+                    TModel refetchModel = r.Find<TModel>(id);
+                    ExportToStream(refetchModel, stream);
                 });
             }).ContinueWith(OnComplete);
         }
+
+        protected virtual void ExportToStream(TModel model, Stream outputStream) => createZipArchive(model, outputStream);
 
         private void createZipArchive(TModel model, Stream outputStream)
         {
