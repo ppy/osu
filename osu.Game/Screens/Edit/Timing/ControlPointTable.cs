@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,10 +21,10 @@ namespace osu.Game.Screens.Edit.Timing
     public partial class ControlPointTable : EditorTable
     {
         [Resolved]
-        private Bindable<ControlPointGroup> selectedGroup { get; set; }
+        private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
 
         [Resolved]
-        private EditorClock clock { get; set; }
+        private EditorClock clock { get; set; } = null!;
 
         public const float TIMING_COLUMN_WIDTH = 230;
 
@@ -81,8 +79,8 @@ namespace osu.Game.Screens.Edit.Timing
         {
             var columns = new List<TableColumn>
             {
-                new TableColumn("Time", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, TIMING_COLUMN_WIDTH)),
-                new TableColumn("Attributes", Anchor.CentreLeft),
+                new TableColumn(@"Time", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, TIMING_COLUMN_WIDTH)),
+                new TableColumn(@"Attributes", Anchor.CentreLeft),
             };
 
             return columns.ToArray();
@@ -162,12 +160,13 @@ namespace osu.Game.Screens.Edit.Timing
                                           .Where(matchFunction)
                                           .Select(createAttribute)
                                           .Where(c => c != null)
+                                          .Select(c => c!)
                                           // arbitrary ordering to make timing points first.
                                           // probably want to explicitly define order in the future.
                                           .OrderByDescending(c => c.GetType().Name);
             }
 
-            private Drawable createAttribute(ControlPoint controlPoint)
+            private Drawable? createAttribute(ControlPoint controlPoint)
             {
                 switch (controlPoint)
                 {
@@ -182,9 +181,10 @@ namespace osu.Game.Screens.Edit.Timing
 
                     case SampleControlPoint sample:
                         return new SampleRowAttribute(sample);
-                }
 
-                return null;
+                    default:
+                        return null;
+                }
             }
         }
     }
