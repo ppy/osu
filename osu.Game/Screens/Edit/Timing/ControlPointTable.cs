@@ -90,30 +90,36 @@ namespace osu.Game.Screens.Edit.Timing
         {
             return new Drawable[]
             {
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = TIMING_COLUMN_WIDTH,
-                    Spacing = new Vector2(5),
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Text = group.Time.ToEditorFormattedString(),
-                            Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
-                            Width = 70,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                        },
-                        new ControlGroupAttributes(group, c => c is TimingControlPoint)
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                        }
-                    }
-                },
-                new ControlGroupAttributes(group, c => !(c is TimingControlPoint))
+                new ControlGroupTiming(group),
+                new ControlGroupAttributes(group, c => c is not TimingControlPoint)
             };
+        }
+
+        private partial class ControlGroupTiming : FillFlowContainer
+        {
+            public ControlGroupTiming(ControlPointGroup group)
+            {
+                Name = @"ControlGroupTiming";
+                RelativeSizeAxes = Axes.Y;
+                Width = TIMING_COLUMN_WIDTH;
+                Spacing = new Vector2(5);
+                Children = new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Text = group.Time.ToEditorFormattedString(),
+                        Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
+                        Width = 70,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    },
+                    new ControlGroupAttributes(group, c => c is TimingControlPoint)
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    }
+                };
+            }
         }
 
         private partial class ControlGroupAttributes : CompositeDrawable
@@ -130,6 +136,7 @@ namespace osu.Game.Screens.Edit.Timing
 
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
+                Name = @"ControlGroupAttributes";
 
                 InternalChild = fill = new FillFlowContainer
                 {
