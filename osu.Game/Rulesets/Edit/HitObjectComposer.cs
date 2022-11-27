@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Edit
         protected readonly Ruleset Ruleset;
 
         // Provides `Playfield`
-        private DrawableRulesetDependencies dependencies;
+        private DependencyContainer dependencies;
 
         [Resolved]
         protected EditorClock EditorClock { get; private set; }
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DrawableRulesetDependencies(Ruleset, base.CreateChildDependencies(parent));
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
-        protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
+        protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer( this, Ruleset);
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
@@ -410,13 +410,6 @@ namespace osu.Game.Rulesets.Edit
         }
 
         #endregion
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            dependencies.Dispose();
-        }
     }
 
     /// <summary>
