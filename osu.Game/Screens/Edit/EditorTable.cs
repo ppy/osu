@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? default);
+        protected override Drawable CreateHeader(int index, TableColumn? column) => new HeaderText(column?.Header ?? default);
 
         private partial class HeaderText : OsuSpriteText
         {

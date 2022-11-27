@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Edit.Timing
                     changeHandler?.SaveState();
                 }, true);
 
-                table.OnRowSelected += (drawable) => scroll.ScrollIntoView(drawable);
+                table.OnRowSelected += drawable => scroll.ScrollIntoView(drawable);
             }
 
             protected override bool OnClick(ClickEvent e)
