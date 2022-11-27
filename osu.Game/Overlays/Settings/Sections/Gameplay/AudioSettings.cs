@@ -11,7 +11,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class AudioSettings : SettingsSubsection
+    public partial class AudioSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.AudioHeader;
 

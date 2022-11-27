@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonFollowCircle : FollowCircle
+    public partial class ArgonFollowCircle : FollowCircle
     {
         public ArgonFollowCircle()
         {

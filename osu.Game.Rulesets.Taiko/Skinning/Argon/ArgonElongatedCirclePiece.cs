@@ -8,7 +8,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class ArgonElongatedCirclePiece : ArgonCirclePiece
+    public partial class ArgonElongatedCirclePiece : ArgonCirclePiece
     {
         public ArgonElongatedCirclePiece()
         {

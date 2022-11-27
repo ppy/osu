@@ -29,7 +29,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
-    public class SliderSelectionBlueprint : OsuSelectionBlueprint<Slider>
+    public partial class SliderSelectionBlueprint : OsuSelectionBlueprint<Slider>
     {
         protected new DrawableSlider DrawableObject => (DrawableSlider)base.DrawableObject;
 

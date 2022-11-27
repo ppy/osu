@@ -26,7 +26,7 @@ using SDL2;
 
 namespace osu.Desktop
 {
-    internal class OsuGameDesktop : OsuGame
+    internal partial class OsuGameDesktop : OsuGame
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
 

@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class DaySeparator : Container
+    public partial class DaySeparator : Container
     {
         protected virtual float TextSize => 15;
 

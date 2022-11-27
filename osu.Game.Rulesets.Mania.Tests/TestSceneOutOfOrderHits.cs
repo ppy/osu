@@ -24,7 +24,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class TestSceneOutOfOrderHits : RateAdjustedBeatmapTestScene
+    public partial class TestSceneOutOfOrderHits : RateAdjustedBeatmapTestScene
     {
         [Test]
         public void TestPreviousHitWindowDoesNotExtendPastNextObject()
@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

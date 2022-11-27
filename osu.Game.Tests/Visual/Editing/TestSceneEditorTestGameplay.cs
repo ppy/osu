@@ -27,7 +27,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorTestGameplay : EditorTestScene
+    public partial class TestSceneEditorTestGameplay : EditorTestScene
     {
         protected override bool IsolateSavingFromDatabase => false;
 

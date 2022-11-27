@@ -12,7 +12,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 {
-    public class HitPlacementBlueprint : PlacementBlueprint
+    public partial class HitPlacementBlueprint : PlacementBlueprint
     {
         private readonly HitPiece piece;
 

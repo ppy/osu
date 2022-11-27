@@ -14,7 +14,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class Info : Container
+    public partial class Info : Container
     {
         private const float metadata_width = 175;
         private const float spacing = 20;

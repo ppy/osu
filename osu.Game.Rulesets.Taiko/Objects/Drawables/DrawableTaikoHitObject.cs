@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public abstract class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
+    public abstract partial class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
     {
         protected readonly Container Content;
         private readonly Container proxiedContent;
@@ -105,13 +105,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        private class ProxiedContentContainer : Container
+        private partial class ProxiedContentContainer : Container
         {
             public override bool RemoveWhenNotAlive => false;
         }
     }
 
-    public abstract class DrawableTaikoHitObject<TObject> : DrawableTaikoHitObject
+    public abstract partial class DrawableTaikoHitObject<TObject> : DrawableTaikoHitObject
         where TObject : TaikoHitObject
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);

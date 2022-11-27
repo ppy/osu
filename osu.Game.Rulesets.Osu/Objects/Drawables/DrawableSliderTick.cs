@@ -14,7 +14,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderTick : DrawableOsuHitObject, IRequireTracking
+    public partial class DrawableSliderTick : DrawableOsuHitObject, IRequireTracking
     {
         public const double ANIM_DURATION = 150;
 

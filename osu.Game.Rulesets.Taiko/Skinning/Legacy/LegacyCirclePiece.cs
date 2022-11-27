@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
+    public partial class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
     {
         private Drawable backgroundLayer = null!;
         private Drawable? foregroundLayer;

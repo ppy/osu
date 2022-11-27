@@ -30,7 +30,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Utility
 {
     [Cached]
-    public class LatencyCertifierScreen : OsuScreen
+    public partial class LatencyCertifierScreen : OsuScreen
     {
         private FrameSync previousFrameSyncMode;
         private double previousActiveHz;

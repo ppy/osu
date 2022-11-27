@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// Provides a border around the playfield.
     /// </summary>
-    public class PlayfieldBorder : CompositeDrawable
+    public partial class PlayfieldBorder : CompositeDrawable
     {
         public Bindable<PlayfieldBorderStyle> PlayfieldBorderStyle { get; } = new Bindable<PlayfieldBorderStyle>();
 
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        private class Line : Box
+        private partial class Line : Box
         {
             private readonly Direction direction;
 

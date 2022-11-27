@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyMainCirclePiece : CompositeDrawable
+    public partial class LegacyMainCirclePiece : CompositeDrawable
     {
         public override bool RemoveCompletedTransforms => false;
 

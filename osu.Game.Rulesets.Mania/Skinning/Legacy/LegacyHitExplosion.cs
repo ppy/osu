@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyHitExplosion : LegacyManiaColumnElement, IHitExplosion
+    public partial class LegacyHitExplosion : LegacyManiaColumnElement, IHitExplosion
     {
         public const double FADE_IN_DURATION = 80;
 

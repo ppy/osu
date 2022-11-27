@@ -22,7 +22,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.NonVisual.Skinning
 {
     [HeadlessTest]
-    public class LegacySkinAnimationTest : OsuTestScene
+    public partial class LegacySkinAnimationTest : OsuTestScene
     {
         private const string animation_name = "animation";
         private const int frame_count = 6;

@@ -15,7 +15,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableDrumRollTick : DrawableTaikoStrongableHitObject<DrumRollTick, DrumRollTick.StrongNestedHit>
+    public partial class DrawableDrumRollTick : DrawableTaikoStrongableHitObject<DrumRollTick, DrumRollTick.StrongNestedHit>
     {
         public BindableBool IsFirstTick = new BindableBool();
 
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override DrawableStrongNestedHit CreateStrongNestedHit(DrumRollTick.StrongNestedHit hitObject) => new StrongNestedHit(hitObject);
 
-        public class StrongNestedHit : DrawableStrongNestedHit
+        public partial class StrongNestedHit : DrawableStrongNestedHit
         {
             public new DrawableDrumRollTick ParentHitObject => (DrawableDrumRollTick)base.ParentHitObject;
 

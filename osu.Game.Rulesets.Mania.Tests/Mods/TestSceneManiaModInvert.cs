@@ -7,7 +7,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
 {
-    public class TestSceneManiaModInvert : ModTestScene
+    public partial class TestSceneManiaModInvert : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 

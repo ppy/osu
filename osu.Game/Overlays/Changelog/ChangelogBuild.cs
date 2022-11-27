@@ -16,7 +16,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogBuild : FillFlowContainer
+    public partial class ChangelogBuild : FillFlowContainer
     {
         public const float HORIZONTAL_PADDING = 70;
 

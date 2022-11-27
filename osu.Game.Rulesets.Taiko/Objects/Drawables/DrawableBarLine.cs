@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     /// <summary>
     /// A line that scrolls alongside hit objects in the playfield and visualises control points.
     /// </summary>
-    public class DrawableBarLine : DrawableHitObject<HitObject>
+    public partial class DrawableBarLine : DrawableHitObject<HitObject>
     {
         public new BarLine HitObject => (BarLine)base.HitObject;
 

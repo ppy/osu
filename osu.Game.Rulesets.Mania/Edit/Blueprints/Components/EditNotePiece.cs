@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Mania.Skinning.Default;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
 {
-    public class EditNotePiece : CompositeDrawable
+    public partial class EditNotePiece : CompositeDrawable
     {
         public EditNotePiece()
         {

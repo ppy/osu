@@ -14,7 +14,7 @@ using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    public class BeatmapBackgroundWithStoryboard : BeatmapBackground
+    public partial class BeatmapBackgroundWithStoryboard : BeatmapBackground
     {
         private readonly InterpolatingFramedClock storyboardClock;
 

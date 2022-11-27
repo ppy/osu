@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components
 {
-    public class BottomBarContainer : Container
+    public partial class BottomBarContainer : Container
     {
         private const float contents_padding = 15;
 
