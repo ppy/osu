@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             comboColourBrightness.BindValueChanged(_ => UpdateComboColour());
 
             // Apply transforms
-            updateState(State.Value, true);
+            updateStateBasedOnResults();
         }
 
         /// <summary>
@@ -266,17 +266,22 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // If not loaded, the state update happens in LoadComplete().
             if (IsLoaded)
             {
-                if (Result.IsHit)
-                    updateState(ArmedState.Hit, true);
-                else if (Result.HasResult)
-                    updateState(ArmedState.Miss, true);
-                else
-                    updateState(ArmedState.Idle, true);
+                updateStateBasedOnResults();
 
                 // Combo colour may have been applied via a bindable flow while no object entry was attached.
                 // Update here to ensure we're in a good state.
                 UpdateComboColour();
             }
+        }
+
+        private void updateStateBasedOnResults()
+        {
+            if (Result.IsHit)
+                updateState(ArmedState.Hit, true);
+            else if (Result.HasResult)
+                updateState(ArmedState.Miss, true);
+            else
+                updateState(ArmedState.Idle, true);
         }
 
         protected sealed override void OnFree(HitObjectLifetimeEntry entry)
