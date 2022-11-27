@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneRangeSlider : OsuTestScene
+    public partial class TestSceneRangeSlider : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Red);
