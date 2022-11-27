@@ -67,14 +67,14 @@ namespace osu.Game.Online.Chat
                     break;
             }
 
-            string beatmapString()
+            string getBeatmapPart()
             {
                 string beatmapInfoString = localisation.GetLocalisedBindableString(beatmapInfo.GetDisplayTitleRomanisable()).Value;
 
                 return beatmapInfo.OnlineID > 0 ? $"[{api.WebsiteRootUrl}/b/{beatmapInfo.OnlineID} {beatmapInfoString}]" : beatmapInfoString;
             }
 
-            string modString()
+            string getModPart()
             {
                 if (selectedMods.Value.Count == 0)
                 {
@@ -91,7 +91,7 @@ namespace osu.Game.Online.Chat
                 return modS.ToString();
             }
 
-            channelManager.PostMessage($"is {verb} {beatmapString()} {modString()}", true, target);
+            channelManager.PostMessage($"is {verb} {getBeatmapPart()} {getModPart()}", true, target);
             Expire();
         }
     }
