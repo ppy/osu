@@ -208,6 +208,9 @@ namespace osu.Game.Beatmaps
             {
                 return beatmapLoadTask ??= Task.Factory.StartNew(() =>
                 {
+                    // Update beatmap metadate to indicate beatmap state
+                    this.Metadata.Title = "selected beatmap not loaded!";
+                    
                     // Todo: Handle cancellation during beatmap parsing
                     var b = GetBeatmap() ?? new Beatmap();
 
