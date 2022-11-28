@@ -104,12 +104,25 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 },
             });
 
-            if (item is IHasDuration)
+            switch (item)
             {
-                colouredComponents.Add(new DragArea(item)
-                {
-                    OnDragHandled = e => OnDragHandled?.Invoke(e)
-                });
+                case IHasStreamPath streamHitObject:
+                    for (int i = 1; i < streamHitObject.StreamPath.ControlPoints.Count; i++)
+                    {
+                        colouredComponents.Add(new DragArea(item, i)
+                        {
+                            OnDragHandled = e => OnDragHandled?.Invoke(e)
+                        });
+                    }
+
+                    break;
+
+                case IHasDuration:
+                    colouredComponents.Add(new DragArea(item)
+                    {
+                        OnDragHandled = e => OnDragHandled?.Invoke(e)
+                    });
+                    break;
             }
         }
 
@@ -282,6 +295,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             private readonly HitObject? hitObject;
 
+            private readonly int? index;
+
             [Resolved]
             private EditorBeatmap beatmap { get; set; } = null!;
 
@@ -300,17 +315,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public override bool HandlePositionalInput => hitObject != null;
 
-            public DragArea(HitObject? hitObject)
+            public DragArea(HitObject? hitObject, int? index = null)
             {
                 this.hitObject = hitObject;
+                this.index = index;
 
                 CornerRadius = circle_size / 2;
                 Masking = true;
                 Size = new Vector2(circle_size, 1);
-                Anchor = Anchor.CentreRight;
+                Anchor = Anchor.CentreLeft;
                 Origin = Anchor.Centre;
                 RelativePositionAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
+                X = 1;
 
                 InternalChildren = new Drawable[]
                 {
@@ -371,6 +388,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 this.FadeTo(IsHovered || hasMouseDown ? 1f : 0.9f, 200, Easing.OutQuint);
             }
 
+            protected override void Update()
+            {
+                base.Update();
+
+                // Update position to stream control point time
+                if (index.HasValue && hitObject is IHasStreamPath streamHitObject)
+                    X = (float)(streamHitObject.StreamPath.ControlPoints[index.Value].Time / streamHitObject.Duration);
+            }
+
             protected override bool OnDragStart(DragStartEvent e)
             {
                 changeHandler?.BeginChange();
@@ -421,6 +447,24 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     beatmap.Update(hitObject);
                                 }
 
+                                break;
+
+                            case IHasStreamPath streamHitObject:
+                                if (!index.HasValue) return;
+
+                                var controlPoints = streamHitObject.StreamPath.ControlPoints;
+                                double prevTime = index > 0 ? controlPoints[index.Value - 1].Time : 0;
+                                double nextTime = index < controlPoints.Count - 1 ? controlPoints[index.Value + 1].Time : double.PositiveInfinity;
+                                double clippedTime = MathHelper.Clamp(time - hitObject.StartTime, prevTime, nextTime);
+
+                                if (controlPoints[index.Value].Time == clippedTime || Precision.AlmostEquals(clippedTime, prevTime, 1) || Precision.AlmostEquals(clippedTime, nextTime, 1))
+                                    return;
+
+                                controlPoints[index.Value].Time = clippedTime;
+                                controlPoints[index.Value].Count = (int)Math.Round((clippedTime - prevTime) / beatmap.GetBeatLengthAtTime(clippedTime));
+                                if (index < controlPoints.Count - 1)
+                                    controlPoints[index.Value + 1].Count = (int)Math.Round((nextTime - clippedTime) / beatmap.GetBeatLengthAtTime(nextTime));
+                                beatmap.Update(hitObject);
                                 break;
 
                             case IHasDuration endTimeHitObject:
