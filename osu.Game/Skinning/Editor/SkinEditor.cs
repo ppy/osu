@@ -217,7 +217,7 @@ namespace osu.Game.Skinning.Editor
 
         private void initLayerEditor()
         {
-            var name = new SkinBlueprint(new BigBlackBox()
+            var name = new SkinBlueprint(new BigBlackBox
             {
                 Name = "DrawableMinimisableList"
             });
