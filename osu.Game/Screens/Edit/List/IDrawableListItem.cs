@@ -6,12 +6,11 @@ using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public interface IDrawableListItem<T>
+    public interface IDrawableListItem<T> : IDrawableListRepresetedItem<T>
     {
         //Applied a function onto all elements in this list.
         //(If there are nested lists, this will always affect EVERY item)
@@ -32,7 +31,7 @@ namespace osu.Game.Screens.Edit.List
 
         public static LocalisableString GetDefaultText(Drawable target)
         {
-            Logger.Log("GetDefaultText with" + target + " target.");
+            // Logger.Log("GetDefaultText with" + target + " target.");
             return string.IsNullOrEmpty(target.Name) ? (target.GetType().DeclaringType ?? target.GetType()).Name : target.Name;
         }
 

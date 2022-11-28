@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Edit.List
 {
     //todo: rework this, to be simpler.
     //I should probably just implement IStateful<SelectionState>
-    public class DrawableListItem<T> : RearrangeableListItem<T>, IRearrangableDrawableListItem<T>
+    public class DrawableListItem<T> : RearrangeableListItem<IDrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
         where T : Drawable
     {
         private readonly OsuSpriteText text = new OsuSpriteText();
@@ -45,8 +45,8 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        internal DrawableListItem(T d, LocalisableString name)
-            : base(d)
+        internal DrawableListItem(IDrawableListRepresetedItem<T> represetedItem, LocalisableString name)
+            : base(represetedItem)
         {
             getName = IDrawableListItem<T>.GetDefaultText;
             ApplyAll = e => e(this);
@@ -65,9 +65,9 @@ namespace osu.Game.Screens.Edit.List
                 },
                 text
             };
-            updateText(d);
+            updateText(RepresentedItem);
 
-            if (d is IStateful<SelectionState> selectable)
+            if (RepresentedItem is IStateful<SelectionState> selectable)
             {
                 selectable.StateChanged += selectionState => ((IDrawableListItem<T>)this).SelectInternal(selectionState == SelectionState.Selected);
                 SelectInternal(selectable.State == SelectionState.Selected);
@@ -82,10 +82,10 @@ namespace osu.Game.Screens.Edit.List
             box.Hide();
         }
 
-        public DrawableListItem(T d)
+        public DrawableListItem(IDrawableListRepresetedItem<T> represetedItem)
             //select the name of the from the drawable as it's name, if it is set
             //otherwise use the
-            : this(d, string.Empty)
+            : this(represetedItem, string.Empty)
         {
         }
 
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Edit.List
 
         private void toggleSelection()
         {
-            if (Model is IStateful<SelectionState> stateful)
+            if (RepresentedItem is IStateful<SelectionState> stateful)
             {
                 Select(stateful.State != SelectionState.Selected);
             }
@@ -127,24 +127,25 @@ namespace osu.Game.Screens.Edit.List
         }
 
         public Drawable GetDrawableListItem() => this;
-        public RearrangeableListItem<T> GetRearrangeableListItem() => this;
+        public RearrangeableListItem<IDrawableListRepresetedItem<T>> GetRearrangeableListItem() => this;
 
         public void UpdateItem()
         {
-            updateText(Model);
-            if (Model is IStateful<SelectionState> selectable)
+            updateText(RepresentedItem!);
+            if (RepresentedItem is IStateful<SelectionState> selectable)
                 SelectInternal(selectable.State == SelectionState.Selected);
         }
 
-        private void updateText(T target)
+        private void updateText(T? target)
         {
+            if (target is null) return;
             //Set the text to the target's name, if set. Else try and get the name of the class that defined T
             text.Text = getName(target);
         }
 
         public void Select(bool value)
         {
-            if (Model is IStateful<SelectionState> selectable)
+            if (RepresentedItem is IStateful<SelectionState> selectable)
                 selectable.State = value ? SelectionState.Selected : SelectionState.NotSelected;
 
             SelectInternal(value);
@@ -184,5 +185,7 @@ namespace osu.Game.Screens.Edit.List
             onDragAction();
             base.OnDragEnd(e);
         }
+
+        public T? RepresentedItem => Model.RepresentedItem;
     }
 }

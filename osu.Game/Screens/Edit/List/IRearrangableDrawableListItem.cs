@@ -7,6 +7,6 @@ namespace osu.Game.Screens.Edit.List
 {
     public interface IRearrangableDrawableListItem<T> : IDrawableListItem<T>
     {
-        public RearrangeableListItem<T> GetRearrangeableListItem();
+        public RearrangeableListItem<IDrawableListRepresetedItem<T>> GetRearrangeableListItem();
     }
 }

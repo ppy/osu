@@ -30,6 +30,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.List;
+using osu.Game.Skinning.Components;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -216,7 +217,11 @@ namespace osu.Game.Skinning.Editor
 
         private void initLayerEditor()
         {
-            layerSidebarSection.Child = LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>();
+            var name = new SkinBlueprint(new BigBlackBox()
+            {
+                Name = "DrawableMinimisableList"
+            });
+            layerSidebarSection.Child = LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>(name);
             LayerSidebarList.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
             LayerSidebarList.OnDragAction = () =>
             {
@@ -224,15 +229,15 @@ namespace osu.Game.Skinning.Editor
                 {
                     int depth = LayerSidebarList.List.Items.IndexOf(listItem);
 
-                    if (listItem.Item.Parent is Container<Drawable> container)
+                    if (listItem.RepresentedItem?.Parent is Container<Drawable> container)
                     {
-                        container.ChangeChildDepth((Drawable)listItem.Item, depth);
+                        container.ChangeChildDepth(listItem.RepresentedItem, depth);
                         container.Invalidate();
                     }
 
-                    if (listItem.Parent is Container<Drawable> containerM)
+                    if (listItem.RepresentedItem?.Item.Parent is Container<Drawable> containerM)
                     {
-                        containerM.ChangeChildDepth(listItem, depth);
+                        containerM.ChangeChildDepth((Drawable)listItem.RepresentedItem.Item, depth);
                         containerM.Invalidate();
                     }
                 }
@@ -303,7 +308,12 @@ namespace osu.Game.Skinning.Editor
                 initLayerEditor();
                 LayerSidebarList.Enabled.Value = open;
 
-                LayerSidebarList.AddRange(blueprintContainer.SelectionBlueprints.Children);
+                LayerSidebarList.List.Items.AddRange(
+                    blueprintContainer.SelectionBlueprints
+                                      .Children
+                                      .Select(item =>
+                                          new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(item)
+                                      ));
                 componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)
                 {
                     RequestPlacement = placeComponent

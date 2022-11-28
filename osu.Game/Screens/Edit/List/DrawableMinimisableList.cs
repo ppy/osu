@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public class DrawableMinimisableList<T> : CompositeDrawable, IDrawableListItem<T>
+    public class DrawableMinimisableList<T> : RearrangeableListItem<IDrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
         where T : Drawable
     {
         private Action onDragAction { get; set; }
@@ -42,10 +41,12 @@ namespace osu.Game.Screens.Edit.List
 
         public BindableBool Enabled { get; } = new BindableBool();
         public readonly DrawableList<T> List = new DrawableList<T>();
+        public T? RepresentedItem => Model.RepresentedItem;
 
         private readonly Box box;
 
-        public DrawableMinimisableList()
+        public DrawableMinimisableList(T item)
+            : base(new DrawableListRepresetedItem<T>(item))
         {
             onDragAction = () => { };
 
@@ -120,16 +121,9 @@ namespace osu.Game.Screens.Edit.List
 
         public void ApplyAction(Action<IDrawableListItem<T>> action) => List.ApplyAction(action);
 
-        public void AddRange(IEnumerable<T>? drawables) => List.AddRange(drawables);
-
-        // public void Add(DrawableListItem<T> drawableListItem) => List.Add(drawableListItem);
-        // public void Add(DrawableMinimisableList<T> minimisableList) => List.Add(minimisableList);
-        // public void Add(DrawableList<T> list) => list.Add(list);
-        public void Add(T? item) => List.Add(item);
-        public void Remove(T? item) => List.Remove(item);
-
         public void SelectInternal(bool value) => List.SelectInternal(value);
 
         public Drawable GetDrawableListItem() => this;
+        public RearrangeableListItem<IDrawableListRepresetedItem<T>> GetRearrangeableListItem() => this;
     }
 }

@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Screens.Edit.List;
 using osuTK;
 using osuTK.Input;
 
@@ -63,13 +64,13 @@ namespace osu.Game.Skinning.Editor
         protected override void OnBlueprintAdded(SelectionBlueprint<ISkinnableDrawable> item)
         {
             base.OnBlueprintAdded(item);
-            editor.LayerSidebarList.Add(item);
+            editor.LayerSidebarList.List.Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(item));
         }
 
         protected override void OnBlueprintRemoved(SelectionBlueprint<ISkinnableDrawable> item)
         {
             base.OnBlueprintRemoved(item);
-            editor.LayerSidebarList.Remove(item);
+            editor.LayerSidebarList.List.Items.RemoveAll(element => element.RepresentedItem == item);
         }
 
         private void componentsChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
