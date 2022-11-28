@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Objects.Types
 {
-    public interface IHasStreamPath
+    public interface IHasStreamPath : IHasPath
     {
         /// <summary>
         /// The stream path.

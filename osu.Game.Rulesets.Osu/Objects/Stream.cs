@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Stream : OsuHitObject, IHasStreamPath, IHasPath, IHasMultipleComboInformation
+    public class Stream : OsuHitObject, IHasStreamPath, IHasMultipleComboInformation
     {
         public double EndTime => StreamPath.ControlPoints.Count > 0 ? StartTime + StreamPath.ControlPoints.Last().Time : StartTime;
 
