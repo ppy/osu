@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class ExpandingToolboxContainer : ExpandingContainer
+    public partial class ExpandingToolboxContainer : ExpandingContainer
     {
         protected override double HoverExpansionDelay => 250;
 

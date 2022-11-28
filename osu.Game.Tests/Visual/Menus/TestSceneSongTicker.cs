@@ -10,7 +10,7 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual.Menus
 {
-    public class TestSceneSongTicker : OsuTestScene
+    public partial class TestSceneSongTicker : OsuTestScene
     {
         public TestSceneSongTicker()
         {

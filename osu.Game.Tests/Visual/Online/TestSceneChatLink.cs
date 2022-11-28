@@ -20,7 +20,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChatLink : OsuTestScene
+    public partial class TestSceneChatLink : OsuTestScene
     {
         private readonly TestChatLineContainer textContainer;
         private Color4 linkColour;
@@ -46,6 +46,8 @@ namespace osu.Game.Tests.Visual.Online
             availableChannels.Add(new Channel { Name = "#english" });
             availableChannels.Add(new Channel { Name = "#japanese" });
             Dependencies.Cache(chatManager);
+
+            Add(chatManager);
         }
 
         [SetUp]
@@ -205,7 +207,7 @@ namespace osu.Game.Tests.Visual.Online
             }
         }
 
-        private class TestChatLineContainer : FillFlowContainer<ChatLine>
+        private partial class TestChatLineContainer : FillFlowContainer<ChatLine>
         {
             protected override int Compare(Drawable x, Drawable y)
             {

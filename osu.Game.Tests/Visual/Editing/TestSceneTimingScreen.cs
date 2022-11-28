@@ -3,14 +3,15 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Timing.RowAttributes;
@@ -19,12 +20,8 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneTimingScreen : EditorClockTestScene
+    public partial class TestSceneTimingScreen : EditorClockTestScene
     {
-        [Cached(typeof(EditorBeatmap))]
-        [Cached(typeof(IBeatSnapProvider))]
-        private readonly EditorBeatmap editorBeatmap;
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
@@ -32,21 +29,27 @@ namespace osu.Game.Tests.Visual.Editing
 
         protected override bool ScrollUsingMouseWheel => false;
 
-        public TestSceneTimingScreen()
-        {
-            editorBeatmap = new EditorBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
+            Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
             Beatmap.Disabled = true;
 
-            Child = timingScreen = new TimingScreen
+            var editorBeatmap = new EditorBeatmap(Beatmap.Value.GetPlayableBeatmap(Ruleset.Value));
+
+            Child = new DependencyProvidingContainer
             {
-                State = { Value = Visibility.Visible },
+                RelativeSizeAxes = Axes.Both,
+                CachedDependencies = new (Type, object)[]
+                {
+                    (typeof(EditorBeatmap), editorBeatmap),
+                    (typeof(IBeatSnapProvider), editorBeatmap)
+                },
+                Child = timingScreen = new TimingScreen
+                {
+                    State = { Value = Visibility.Visible },
+                },
             };
         }
 

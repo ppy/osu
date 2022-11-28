@@ -23,7 +23,16 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class TestSceneHoldNoteInput : RateAdjustedBeatmapTestScene
+    /// <summary>
+    /// Diagrams in this class are represented as:
+    /// -   : time
+    /// O   : note
+    /// [ ] : hold note
+    ///
+    /// x   : button press
+    /// o   : button release
+    /// </summary>
+    public partial class TestSceneHoldNoteInput : RateAdjustedBeatmapTestScene
     {
         private const double time_before_head = 250;
         private const double time_head = 1500;
@@ -224,6 +233,149 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         /// <summary>
+        ///     -----[ ]-O-------------
+        ///           xo                 o
+        /// </summary>
+        [Test]
+        public void TestPressAndReleaseJustBeforeTailWithNearbyNoteAndCloseByHead()
+        {
+            Note note;
+
+            const int duration = 50;
+
+            var beatmap = new Beatmap<ManiaHitObject>
+            {
+                HitObjects =
+                {
+                    // hold note is very short, to make the head still in range
+                    new HoldNote
+                    {
+                        StartTime = time_head,
+                        Duration = duration,
+                        Column = 0,
+                    },
+                    {
+                        // Next note within tail lenience
+                        note = new Note
+                        {
+                            StartTime = time_head + duration + 10
+                        }
+                    }
+                },
+                BeatmapInfo =
+                {
+                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Ruleset = new ManiaRuleset().RulesetInfo
+                },
+            };
+
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(time_head + duration, ManiaAction.Key1),
+                new ManiaReplayFrame(time_head + duration + 10),
+            }, beatmap);
+
+            assertHeadJudgement(HitResult.Good);
+            assertTailJudgement(HitResult.Perfect);
+
+            assertHitObjectJudgement(note, HitResult.Miss);
+        }
+
+        /// <summary>
+        ///     -----[           ]--O--
+        ///                     xo       o
+        /// </summary>
+        [Test]
+        public void TestPressAndReleaseJustBeforeTailWithNearbyNote()
+        {
+            Note note;
+
+            var beatmap = new Beatmap<ManiaHitObject>
+            {
+                HitObjects =
+                {
+                    new HoldNote
+                    {
+                        StartTime = time_head,
+                        Duration = time_tail - time_head,
+                        Column = 0,
+                    },
+                    {
+                        // Next note within tail lenience
+                        note = new Note
+                        {
+                            StartTime = time_tail + 50
+                        }
+                    }
+                },
+                BeatmapInfo =
+                {
+                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Ruleset = new ManiaRuleset().RulesetInfo
+                },
+            };
+
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(time_tail - 10, ManiaAction.Key1),
+                new ManiaReplayFrame(time_tail),
+            }, beatmap);
+
+            assertHeadJudgement(HitResult.Miss);
+            assertTickJudgement(HitResult.LargeTickMiss);
+            assertTailJudgement(HitResult.Miss);
+
+            assertHitObjectJudgement(note, HitResult.Good);
+        }
+
+        /// <summary>
+        ///     -----[           ]--O--
+        ///                       xo     o
+        /// </summary>
+        [Test]
+        public void TestPressAndReleaseJustAfterTailWithNearbyNote()
+        {
+            Note note;
+
+            var beatmap = new Beatmap<ManiaHitObject>
+            {
+                HitObjects =
+                {
+                    new HoldNote
+                    {
+                        StartTime = time_head,
+                        Duration = time_tail - time_head,
+                        Column = 0,
+                    },
+                    {
+                        // Next note within tail lenience
+                        note = new Note
+                        {
+                            StartTime = time_tail + 50
+                        }
+                    }
+                },
+                BeatmapInfo =
+                {
+                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Ruleset = new ManiaRuleset().RulesetInfo
+                },
+            };
+
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(time_tail + 10, ManiaAction.Key1),
+                new ManiaReplayFrame(time_tail + 20),
+            }, beatmap);
+
+            assertHeadJudgement(HitResult.Miss);
+            assertTickJudgement(HitResult.LargeTickMiss);
+            assertTailJudgement(HitResult.Miss);
+
+            assertHitObjectJudgement(note, HitResult.Great);
+        }
+
+        /// <summary>
         ///     -----[           ]-----
         ///                      xo      o
         /// </summary>
@@ -351,20 +503,23 @@ namespace osu.Game.Rulesets.Mania.Tests
                                                              .All(j => j.Type.IsHit()));
         }
 
+        private void assertHitObjectJudgement(HitObject hitObject, HitResult result)
+            => AddAssert($"object judged as {result}", () => judgementResults.First(j => j.HitObject == hitObject).Type, () => Is.EqualTo(result));
+
         private void assertHeadJudgement(HitResult result)
-            => AddAssert($"head judged as {result}", () => judgementResults.First(j => j.HitObject is Note).Type == result);
+            => AddAssert($"head judged as {result}", () => judgementResults.First(j => j.HitObject is Note).Type, () => Is.EqualTo(result));
 
         private void assertTailJudgement(HitResult result)
-            => AddAssert($"tail judged as {result}", () => judgementResults.Single(j => j.HitObject is TailNote).Type == result);
+            => AddAssert($"tail judged as {result}", () => judgementResults.Single(j => j.HitObject is TailNote).Type, () => Is.EqualTo(result));
 
         private void assertNoteJudgement(HitResult result)
-            => AddAssert($"hold note judged as {result}", () => judgementResults.Single(j => j.HitObject is HoldNote).Type == result);
+            => AddAssert($"hold note judged as {result}", () => judgementResults.Single(j => j.HitObject is HoldNote).Type, () => Is.EqualTo(result));
 
         private void assertTickJudgement(HitResult result)
-            => AddAssert($"any tick judged as {result}", () => judgementResults.Where(j => j.HitObject is HoldNoteTick).Any(j => j.Type == result));
+            => AddAssert($"any tick judged as {result}", () => judgementResults.Where(j => j.HitObject is HoldNoteTick).Select(j => j.Type), () => Does.Contain(result));
 
         private void assertLastTickJudgement(HitResult result)
-            => AddAssert($"last tick judged as {result}", () => judgementResults.Last(j => j.HitObject is HoldNoteTick).Type == result);
+            => AddAssert($"last tick judged as {result}", () => judgementResults.Last(j => j.HitObject is HoldNoteTick).Type, () => Is.EqualTo(result));
 
         private ScoreAccessibleReplayPlayer currentPlayer;
 
@@ -417,7 +572,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor?.HasCompleted.Value == true);
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

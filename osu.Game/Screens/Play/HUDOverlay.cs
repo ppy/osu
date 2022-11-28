@@ -28,7 +28,7 @@ using osuTK;
 namespace osu.Game.Screens.Play
 {
     [Cached]
-    public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
+    public partial class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         public const float FADE_DURATION = 300;
 
@@ -383,7 +383,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class MainComponentsContainer : SkinnableTargetContainer
+        private partial class MainComponentsContainer : SkinnableTargetContainer
         {
             private Bindable<ScoringMode> scoringMode;
 
@@ -391,7 +391,7 @@ namespace osu.Game.Screens.Play
             private OsuConfigManager config { get; set; }
 
             public MainComponentsContainer()
-                : base(SkinnableTarget.MainHUDComponents)
+                : base(GlobalSkinComponentLookup.LookupType.MainHUDComponents)
             {
                 RelativeSizeAxes = Axes.Both;
             }

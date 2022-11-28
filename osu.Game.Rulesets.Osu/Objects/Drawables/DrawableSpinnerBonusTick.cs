@@ -5,7 +5,7 @@
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSpinnerBonusTick : DrawableSpinnerTick
+    public partial class DrawableSpinnerBonusTick : DrawableSpinnerTick
     {
         public DrawableSpinnerBonusTick()
             : base(null)

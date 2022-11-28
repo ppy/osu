@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public abstract class OnlinePlayBackgroundScreen : BackgroundScreen
+    public abstract partial class OnlinePlayBackgroundScreen : BackgroundScreen
     {
         private CancellationTokenSource? cancellationSource;
         private PlaylistItemBackground? background;

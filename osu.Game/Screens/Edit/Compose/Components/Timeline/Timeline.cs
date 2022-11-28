@@ -22,7 +22,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     [Cached]
-    public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
+    public partial class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
         private const float timeline_height = 72;
         private const float timeline_expanded_height = 94;
@@ -196,9 +196,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
 
-                float initialZoom = (float)(defaultTimelineZoom * (editorBeatmap.BeatmapInfo.TimelineZoom == 0 ? 1 : editorBeatmap.BeatmapInfo.TimelineZoom));
                 float minimumZoom = getZoomLevelForVisibleMilliseconds(10000);
                 float maximumZoom = getZoomLevelForVisibleMilliseconds(500);
+
+                float initialZoom = (float)Math.Clamp(defaultTimelineZoom * (editorBeatmap.BeatmapInfo.TimelineZoom == 0 ? 1 : editorBeatmap.BeatmapInfo.TimelineZoom), minimumZoom, maximumZoom);
 
                 SetupZoom(initialZoom, minimumZoom, maximumZoom);
 

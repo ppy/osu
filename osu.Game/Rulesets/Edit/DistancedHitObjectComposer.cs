@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Edit
     /// Represents a <see cref="HitObjectComposer{TObject}"/> for rulesets with the concept of distances between objects.
     /// </summary>
     /// <typeparam name="TObject">The base type of supported objects.</typeparam>
-    public abstract class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider, IScrollBindingHandler<GlobalAction>
+    public abstract partial class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider, IScrollBindingHandler<GlobalAction>
         where TObject : HitObject
     {
         private const float adjust_step = 0.1f;
@@ -297,7 +297,7 @@ namespace osu.Game.Rulesets.Edit
             return DurationToDistance(referenceObject, snappedEndTime - startTime);
         }
 
-        private class DistanceSpacingToast : Toast
+        private partial class DistanceSpacingToast : Toast
         {
             private readonly ValueChangedEvent<double> change;
 

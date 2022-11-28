@@ -13,12 +13,13 @@ using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarClock : OsuClickableContainer
+    public partial class ToolbarClock : OsuClickableContainer
     {
         private Bindable<ToolbarClockDisplayMode> clockDisplayMode;
         private Bindable<bool> prefer24HourTime;
@@ -122,6 +123,8 @@ namespace osu.Game.Overlays.Toolbar
 
             base.OnHoverLost(e);
         }
+
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
 
         private void cycleDisplayMode()
         {

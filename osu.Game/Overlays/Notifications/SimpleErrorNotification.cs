@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class SimpleErrorNotification : SimpleNotification
+    public partial class SimpleErrorNotification : SimpleNotification
     {
         public override string PopInSampleName => "UI/error-notification-pop-in";
 

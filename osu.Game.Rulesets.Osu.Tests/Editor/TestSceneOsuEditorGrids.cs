@@ -15,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneOsuEditorGrids : EditorTestScene
+    public partial class TestSceneOsuEditorGrids : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

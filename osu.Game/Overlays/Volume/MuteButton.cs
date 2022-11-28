@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class MuteButton : OsuButton, IHasCurrentValue<bool>
+    public partial class MuteButton : OsuButton, IHasCurrentValue<bool>
     {
         private readonly Bindable<bool> current = new Bindable<bool>();
 

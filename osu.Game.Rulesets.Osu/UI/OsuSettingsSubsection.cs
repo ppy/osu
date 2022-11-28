@@ -12,7 +12,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuSettingsSubsection : RulesetSettingsSubsection
+    public partial class OsuSettingsSubsection : RulesetSettingsSubsection
     {
         protected override LocalisableString Header => "osu!";
 

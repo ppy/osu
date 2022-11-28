@@ -19,7 +19,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
-    public class DrawableRecentActivity : CompositeDrawable
+    public partial class DrawableRecentActivity : CompositeDrawable
     {
         private const int font_size = 14;
 

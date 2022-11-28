@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     /// A visualisation of a single <see cref="PathControlPoint"/> in an osu hit object with a path.
     /// </summary>
     /// <typeparam name="T">The type of <see cref="OsuHitObject"/> which this <see cref="PathControlPointPiece{T}"/> visualises.</typeparam>
-    public class PathControlPointPiece<T> : BlueprintPiece<T>, IHasTooltip where T : OsuHitObject, IHasPath
+    public partial class PathControlPointPiece<T> : BlueprintPiece<T>, IHasTooltip where T : OsuHitObject, IHasPath
     {
         public Action<PathControlPointPiece<T>, MouseButtonEvent> RequestSelection;
 
