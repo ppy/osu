@@ -4,7 +4,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace osu.Game.Rulesets.Osu.Objects
+namespace osu.Game.Rulesets.Objects
 {
     public class StreamControlPoint : IEquatable<StreamControlPoint>
     {

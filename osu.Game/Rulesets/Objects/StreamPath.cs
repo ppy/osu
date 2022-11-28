@@ -9,10 +9,9 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Objects;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Objects
+namespace osu.Game.Rulesets.Objects
 {
     public class StreamPath
     {
