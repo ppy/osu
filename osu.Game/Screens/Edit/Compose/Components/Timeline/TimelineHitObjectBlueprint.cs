@@ -133,6 +133,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     displayColourBindable.BindValueChanged(_ => updateColour(), true);
                     break;
 
+                case IHasMultipleComboInformation:
+                    Item.DefaultsApplied += _ => updateColour();
+                    skin.SourceChanged += updateColour;
+                    break;
+
                 case IHasComboInformation comboInfo:
                     indexInCurrentComboBindable = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
                     indexInCurrentComboBindable.BindValueChanged(_ =>
@@ -165,10 +170,80 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateColour()
         {
+            if (IsSelected)
+                border.Show();
+            else
+                border.Hide();
+
             Color4 colour;
 
             switch (Item)
             {
+                case IHasStreamPath hasStreamPath and IHasMultipleComboInformation hasCombos when hasStreamPath.Duration > 0:
+                    int i = 0;
+                    Color4? prevColour = null;
+                    double? prevTime = null;
+                    var streamPath = hasStreamPath.StreamPath.GetStreamPath();
+
+                    var colourContainer = new Container
+                    {
+                        Depth = -1,
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Horizontal = circle_size / 2f }
+                    };
+
+                    foreach (var comboObject in hasCombos.ComboObjects)
+                    {
+                        if (i == streamPath.Count) break;
+
+                        double time = streamPath[i++].Item2;
+                        var currentColour = comboObject.GetComboColour(skin);
+
+                        if (!prevColour.HasValue || !prevTime.HasValue)
+                        {
+                            // Add a bit of colour for the part until before the first tick
+                            colourContainer.Add(new Box
+                            {
+                                RelativeSizeAxes = Axes.Y,
+                                Width = circle_size / 2f,
+                                X = -circle_size / 2f,
+                                Colour = currentColour
+                            });
+
+                            prevColour = currentColour;
+                            prevTime = time;
+                            continue;
+                        }
+
+                        colourContainer.Add(new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            RelativePositionAxes = Axes.X,
+                            Width = (float)((time - prevTime.Value) / hasStreamPath.Duration),
+                            X = (float)(prevTime.Value / hasStreamPath.Duration),
+                            Colour = ColourInfo.GradientHorizontal(prevColour.Value, currentColour)
+                        });
+
+                        prevColour = currentColour;
+                        prevTime = time;
+                    }
+
+                    if (prevColour.HasValue)
+                    {
+                        // Add a bit of colour for the part after the last tick
+                        colourContainer.Add(new Box
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            Width = circle_size / 2f,
+                            Anchor = Anchor.TopRight,
+                            Colour = prevColour.Value
+                        });
+                    }
+
+                    circle.Content.Child = colourContainer;
+                    colour = Color4.White;
+                    break;
+
                 case IHasDisplayColour displayColour:
                     colour = displayColour.DisplayColour.Value;
                     break;
@@ -181,13 +256,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     return;
             }
 
-            if (IsSelected)
-                border.Show();
-            else
-                border.Hide();
-
             if (Item is IHasDuration duration && duration.Duration > 0)
-                circle.Colour = ColourInfo.GradientHorizontal(colour, colour.Lighten(0.4f));
+                circle.Colour = colour == Color4.White ? ColourInfo.GradientHorizontal(colour.Darken(0.4f), colour) : ColourInfo.GradientHorizontal(colour, colour.Lighten(0.4f));
             else
                 circle.Colour = colour;
 
@@ -506,7 +576,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public partial class ExtendableCircle : CompositeDrawable
         {
-            protected readonly Circle Content;
+            public readonly Circle Content;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
 
