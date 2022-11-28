@@ -57,14 +57,9 @@ namespace osu.Game.Screens.Edit.List
             UpdateItem();
         }
 
-        private void addInternal(T? drawable)
-        {
-            if (drawable is null || Items.Contains(drawable)) return;
-
-            Items.Add(drawable);
-        }
-
         public virtual Drawable GetDrawableListItem() => this;
+
+        #region IDrawableListItem<T>
 
         public void UpdateItem()
         {
@@ -120,7 +115,17 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
+        private void applyAll(Action<IDrawableListItem<T>> action)
+        {
+            for (int i = 0; i < ListContainer.Children.Count; i++)
+            {
+                if (ListContainer.Children[i] is IDrawableListItem<T> item) item.ApplyAction(action);
+            }
+        }
+
         public void SelectInternal(bool value) => Select(value);
+
+        #endregion
 
         protected override ScrollContainer<Drawable> CreateScrollContainer() => new OsuScrollContainer();
 
@@ -132,14 +137,6 @@ namespace osu.Game.Screens.Edit.List
             drawable.OnDragAction = OnDragAction;
             // drawable.UpdateItem();
             return drawable.GetRearrangeableListItem();
-        }
-
-        private void applyAll(Action<IDrawableListItem<T>> action)
-        {
-            for (int i = 0; i < ListContainer.Children.Count; i++)
-            {
-                if (ListContainer.Children[i] is IDrawableListItem<T> item) item.ApplyAction(action);
-            }
         }
 
         #region IReadOnlyList<T>
@@ -171,6 +168,13 @@ namespace osu.Game.Screens.Edit.List
         {
             drawables.ForEach(addInternal);
             OnDragAction();
+        }
+
+        private void addInternal(T? drawable)
+        {
+            if (drawable is null || Items.Contains(drawable)) return;
+
+            Items.Add(drawable);
         }
 
         public bool Remove(T? drawable, bool disposeImmediately)
