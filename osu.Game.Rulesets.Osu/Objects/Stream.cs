@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -67,7 +68,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        public IList<StreamHitCircleState> HitCircleStates { get; set; } = new List<StreamHitCircleState>();
+        public BindableList<StreamHitCircleState> HitCircleStates { get; set; } = new BindableList<StreamHitCircleState>();
+
+        public IEnumerable<IHasComboInformation> ComboObjects => HitCircleStates;
 
         public Stream()
         {
@@ -165,11 +168,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         private StreamHitCircleState createHitCircleState()
         {
             return new StreamHitCircleState(Samples.Select(o => o.With()).ToList(), (SampleControlPoint)SampleControlPoint.DeepClone());
-        }
-
-        public IEnumerable<IHasComboInformation> GetComboObjects()
-        {
-            return HitCircleStates;
         }
 
         public override Judgement CreateJudgement() => new OsuIgnoreJudgement();

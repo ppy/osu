@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps
             {
                 if (hitObject is IHasMultipleComboInformation mult)
                 {
-                    foreach (var comboObject in mult.GetComboObjects())
+                    foreach (var comboObject in mult.ComboObjects)
                     {
                         process(comboObject);
                     }
