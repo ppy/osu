@@ -478,6 +478,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     X = (float)(streamHitObject.StreamPath.ControlPoints[index.Value].Time / streamHitObject.Duration);
             }
 
+            protected override bool OnScroll(ScrollEvent e)
+            {
+                if (!index.HasValue || hitObject is not IHasStreamPath streamHitObject || !e.ShiftPressed) return base.OnScroll(e);
+
+                // Change acceleration of stream control point
+                changeHandler?.BeginChange();
+                streamHitObject.StreamPath.ControlPoints[index.Value].Acceleration += e.ScrollDelta.X * 0.5d;
+                beatmap.Update(hitObject);
+                changeHandler?.EndChange();
+                return true;
+            }
+
             protected override bool OnDragStart(DragStartEvent e)
             {
                 changeHandler?.BeginChange();
