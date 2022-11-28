@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Edit.List
 {
     //todo: rework this, to be simpler.
     //I should probably just implement IStateful<SelectionState>
-    public class DrawableListItem<T> : RearrangeableListItem<IDrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
+    public partial class DrawableListItem<T> : RearrangeableListItem<IDrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
         where T : Drawable
     {
         private readonly OsuSpriteText text = new OsuSpriteText();

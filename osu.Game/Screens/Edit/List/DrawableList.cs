@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public class DrawableList<T> : RearrangeableListContainer<IDrawableListRepresetedItem<T>>, IDrawableListItem<T>
+    public partial class DrawableList<T> : RearrangeableListContainer<IDrawableListRepresetedItem<T>>, IDrawableListItem<T>
         where T : Drawable
     {
         private Action onDragAction { get; set; }

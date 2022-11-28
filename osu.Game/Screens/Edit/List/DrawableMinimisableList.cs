@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public class DrawableMinimisableList<T> : RearrangeableListItem<IDrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
+    public partial class DrawableMinimisableList<T> : RearrangeableListItem<IDrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
         where T : Drawable
     {
         private Action onDragAction { get; set; }
