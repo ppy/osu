@@ -254,11 +254,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
                 // The cursor does not overlap a previous non-inherit control point, so a valid new segment can be added.
                 if (streamCursor == null)
                 {
-                    HitObject.StreamPath.ControlPoints.Add(streamCursor = new StreamControlPoint(1000, 8));
+                    HitObject.StreamPath.ControlPoints.Add(streamCursor = new StreamControlPoint());
                 }
 
                 double time = EditorClock.CurrentTime;
-                streamCursor.Time = time - HitObject.StartTime;
+                streamCursor.Time = Math.Max(time - HitObject.StartTime, streamSegmentStart.Time + editorBeatmap.GetBeatLengthAtTime(streamSegmentStart.Time));
                 streamCursor.Count = (int)Math.Round((streamCursor.Time - streamSegmentStart.Time) / editorBeatmap.GetBeatLengthAtTime(time));
             }
             else if (streamCursor != null)
