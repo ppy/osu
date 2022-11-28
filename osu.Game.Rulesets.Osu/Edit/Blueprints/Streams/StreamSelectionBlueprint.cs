@@ -22,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 {
-    public class StreamSelectionBlueprint : OsuSelectionBlueprint<Stream>
+    public partial class StreamSelectionBlueprint : OsuSelectionBlueprint<Stream>
     {
         protected new DrawableStream DrawableObject => (DrawableStream)base.DrawableObject;
 

@@ -5,7 +5,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableStreamHitCircle : DrawableHitCircle
+    public partial class DrawableStreamHitCircle : DrawableHitCircle
     {
         public new StreamHitCircle HitObject => (StreamHitCircle)base.HitObject;
 

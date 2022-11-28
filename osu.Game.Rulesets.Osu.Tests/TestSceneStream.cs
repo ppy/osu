@@ -17,7 +17,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneStream : OsuSkinnableTestScene
+    public partial class TestSceneStream : OsuSkinnableTestScene
     {
         [Test]
         public void TestHits()
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected virtual DrawableStream CreateDrawableStream(Stream stream) => new DrawableStream(stream);
 
-        protected class TestOsuPlayfield : OsuPlayfield
+        protected partial class TestOsuPlayfield : OsuPlayfield
         {
             public TestOsuPlayfield()
             {

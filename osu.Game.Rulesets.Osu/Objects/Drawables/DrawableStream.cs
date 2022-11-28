@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableStream : DrawableOsuHitObject
+    public partial class DrawableStream : DrawableOsuHitObject
     {
         public new Stream HitObject => (Stream)base.HitObject;
 

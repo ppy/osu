@@ -21,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 {
-    public class StreamPlacementBlueprint : PlacementBlueprint
+    public partial class StreamPlacementBlueprint : PlacementBlueprint
     {
         public new Stream HitObject => (Stream)base.HitObject;
 

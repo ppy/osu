@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams.Components
 {
-    public class StreamPiece : BlueprintPiece<Stream>
+    public partial class StreamPiece : BlueprintPiece<Stream>
     {
         private readonly Container<RingPiece> circles;
 
