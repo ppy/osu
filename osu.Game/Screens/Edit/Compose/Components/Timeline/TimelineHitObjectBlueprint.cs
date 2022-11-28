@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         {
                             // Add colour of this stream segment and start a gradient about 600 ms before the next segment
                             double segmentDuration = time - segmentStart;
-                            double split = time - Math.Min(segmentDuration / 2, 600);
+                            double split = time - Math.Min(segmentDuration, 600);
 
                             colourContainer.Add(new Box
                             {
