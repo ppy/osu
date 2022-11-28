@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 case IHasStreamPath hasStreamPath and IHasMultipleComboInformation hasCombos when hasStreamPath.Duration > 0:
                     int i = 0;
                     Color4? prevColour = null;
-                    double? prevTime = null;
+                    double segmentStart = 0;
                     var streamPath = hasStreamPath.StreamPath.GetStreamPath();
 
                     var colourContainer = new Container
@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         double time = streamPath[i++].Item2;
                         var currentColour = comboObject.GetComboColour(skin);
 
-                        if (!prevColour.HasValue || !prevTime.HasValue)
+                        if (!prevColour.HasValue)
                         {
                             // Add a bit of colour for the part until before the first tick
                             colourContainer.Add(new Box
@@ -211,21 +211,36 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             });
 
                             prevColour = currentColour;
-                            prevTime = time;
                             continue;
                         }
 
-                        colourContainer.Add(new Box
+                        if (currentColour != prevColour.Value || i == streamPath.Count)
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            RelativePositionAxes = Axes.X,
-                            Width = (float)((time - prevTime.Value) / hasStreamPath.Duration),
-                            X = (float)(prevTime.Value / hasStreamPath.Duration),
-                            Colour = ColourInfo.GradientHorizontal(prevColour.Value, currentColour)
-                        });
+                            // Add colour of this stream segment and start a gradient about 600 ms before the next segment
+                            double segmentDuration = time - segmentStart;
+                            double split = time - Math.Min(segmentDuration / 2, 600);
+
+                            colourContainer.Add(new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                RelativePositionAxes = Axes.X,
+                                Width = (float)((split - segmentStart) / hasStreamPath.Duration),
+                                X = (float)(segmentStart / hasStreamPath.Duration),
+                                Colour = prevColour.Value
+                            });
+                            colourContainer.Add(new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                RelativePositionAxes = Axes.X,
+                                Width = (float)((time - split) / hasStreamPath.Duration),
+                                X = (float)(split / hasStreamPath.Duration),
+                                Colour = ColourInfo.GradientHorizontal(prevColour.Value, currentColour)
+                            });
+
+                            segmentStart = time;
+                        }
 
                         prevColour = currentColour;
-                        prevTime = time;
                     }
 
                     if (prevColour.HasValue)
@@ -257,7 +272,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             if (Item is IHasDuration duration && duration.Duration > 0)
-                circle.Colour = colour == Color4.White ? ColourInfo.GradientHorizontal(colour.Darken(0.4f), colour) : ColourInfo.GradientHorizontal(colour, colour.Lighten(0.4f));
+                circle.Colour = ColourInfo.GradientHorizontal(colour, colour.Lighten(0.4f));
             else
                 circle.Colour = colour;
 
