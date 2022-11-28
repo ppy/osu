@@ -76,14 +76,14 @@ namespace osu.Game.Screens.Edit.List
         }
 
         /// <summary>
-        /// Selects obj, if it can be cast to a IRearrangableListItem.
+        /// Selects obj, if it can be cast to a IDrawableListItem.
         /// </summary>
         /// <param name="obj">the object to call Select on</param>
-        /// <param name="value">The value to pass to the Select call of IRearrangableListItem</param>
+        /// <param name="value">The value to pass to the Select call of IDrawableListItem</param>
         /// <returns>If Select was actually called</returns>
         private static bool select(object obj, bool value)
         {
-            if (obj is IRearrangableDrawableListItem<T> item)
+            if (obj is IDrawableListItem<T> item)
             {
                 item.Select(value);
                 return true;
