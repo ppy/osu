@@ -525,9 +525,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 var controlPoints = streamHitObject.StreamPath.ControlPoints;
                                 double prevTime = index > 0 ? controlPoints[index.Value - 1].Time : 0;
                                 double nextTime = index < controlPoints.Count - 1 ? controlPoints[index.Value + 1].Time : double.PositiveInfinity;
-                                double clippedTime = MathHelper.Clamp(time - hitObject.StartTime, prevTime, nextTime);
+                                double clippedTime = MathHelper.Clamp(time - hitObject.StartTime, prevTime + beatmap.GetBeatLengthAtTime(time), nextTime - beatmap.GetBeatLengthAtTime(time));
 
-                                if (controlPoints[index.Value].Time == clippedTime || Precision.AlmostEquals(clippedTime, prevTime, 1) || Precision.AlmostEquals(clippedTime, nextTime, 1))
+                                if (controlPoints[index.Value].Time == clippedTime)
                                     return;
 
                                 controlPoints[index.Value].Time = clippedTime;
