@@ -256,7 +256,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 base.Draw(renderer);
 
-                if (Source.AimCount == 0)
+                if (Source.AimCount == 0 || thickness == 0)
                     return;
 
                 if (vertexBatch == null || vertexBatch.Size != Source.AimCount)
