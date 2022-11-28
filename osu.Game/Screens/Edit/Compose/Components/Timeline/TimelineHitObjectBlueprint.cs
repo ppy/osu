@@ -184,6 +184,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             switch (Item)
             {
                 case IHasStreamPath hasStreamPath and IHasMultipleComboInformation hasCombos when hasStreamPath.Duration > 0:
+                    // Build a multi-colour gradient to represent each combo colour in the stream path
                     int i = 0;
                     Color4? prevColour = null;
                     double segmentStart = 0;
