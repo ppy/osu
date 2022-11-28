@@ -607,12 +607,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 if (KeyBinding.RulesetName != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
                     return;
 
-                // if (KeyBinding.RulesetName != null && keyCombinationExists(newCombination) && !newCombination.Equals(KeyBinding.KeyCombination))
-                // {
-                //     box.FlashColour(colours.RedDark, 1000, Easing.In);
-                //     isErroring = true;
-                //     return;
-                // }
+                if (KeyBinding.RulesetName != null && keyCombinationExists(newCombination) && !newCombination.Equals(KeyBinding.KeyCombination))
+                {
+                    box.FlashColour(colours.RedDark, 1000, Easing.In);
+                    isErroring = true;
+                    return;
+                }
 
                 KeyBinding.KeyCombination = newCombination;
                 updateKeyCombinationText();
