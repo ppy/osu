@@ -18,7 +18,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Settings
 {
     [TestFixture]
-    public class TestSceneSettingsPanel : OsuManualInputManagerTestScene
+    public partial class TestSceneSettingsPanel : OsuManualInputManagerTestScene
     {
         private SettingsPanel settings;
         private DialogOverlay dialogOverlay;

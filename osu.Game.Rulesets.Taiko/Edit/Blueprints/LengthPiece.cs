@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 {
-    public class LengthPiece : CompositeDrawable
+    public partial class LengthPiece : CompositeDrawable
     {
         public LengthPiece()
         {

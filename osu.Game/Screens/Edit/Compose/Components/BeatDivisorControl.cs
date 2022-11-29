@@ -29,7 +29,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class BeatDivisorControl : CompositeDrawable
+    public partial class BeatDivisorControl : CompositeDrawable
     {
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
@@ -220,7 +220,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return base.OnKeyDown(e);
         }
 
-        internal class DivisorDisplay : OsuAnimatedButton, IHasPopover
+        internal partial class DivisorDisplay : OsuAnimatedButton, IHasPopover
         {
             public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
 
@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        internal class CustomDivisorPopover : OsuPopover
+        internal partial class CustomDivisorPopover : OsuPopover
         {
             public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
 
@@ -328,7 +328,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private class DivisorTypeText : OsuSpriteText
+        private partial class DivisorTypeText : OsuSpriteText
         {
             public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
 
@@ -347,7 +347,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        internal class ChevronButton : IconButton
+        internal partial class ChevronButton : IconButton
         {
             public ChevronButton()
             {
@@ -370,7 +370,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private class TickSliderBar : SliderBar<int>
+        private partial class TickSliderBar : SliderBar<int>
         {
             private Marker marker;
 
@@ -485,7 +485,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             private float getMappedPosition(float divisor) => MathF.Pow((divisor - 1) / (beatDivisor.ValidDivisors.Value.Presets.Last() - 1), 0.90f);
 
-            private class Tick : Circle
+            private partial class Tick : Circle
             {
                 public Tick(int divisor)
                 {
@@ -494,7 +494,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 }
             }
 
-            private class Marker : CompositeDrawable
+            private partial class Marker : CompositeDrawable
             {
                 [Resolved]
                 private OverlayColourProvider colourProvider { get; set; }

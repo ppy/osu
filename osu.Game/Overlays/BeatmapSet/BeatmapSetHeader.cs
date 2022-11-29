@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapSetHeader : OverlayHeader
+    public partial class BeatmapSetHeader : OverlayHeader
     {
         public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         protected override OverlayTitle CreateTitle() => new BeatmapHeaderTitle();
 
-        private class BeatmapHeaderTitle : OverlayTitle
+        private partial class BeatmapHeaderTitle : OverlayTitle
         {
             public BeatmapHeaderTitle()
             {

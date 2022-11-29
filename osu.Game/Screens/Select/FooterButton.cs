@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
+    public partial class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float SHEAR_WIDTH = 7.5f;
 

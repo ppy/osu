@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class ArgonBarLine : CompositeDrawable
+    public partial class ArgonBarLine : CompositeDrawable
     {
         private Container majorEdgeContainer = null!;
 

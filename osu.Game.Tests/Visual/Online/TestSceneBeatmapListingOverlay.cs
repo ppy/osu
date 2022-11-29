@@ -25,7 +25,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneBeatmapListingOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatmapListingOverlay : OsuManualInputManagerTestScene
     {
         private readonly List<APIBeatmapSet> setsForResponse = new List<APIBeatmapSet>();
 

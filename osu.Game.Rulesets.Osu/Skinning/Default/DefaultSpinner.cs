@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class DefaultSpinner : CompositeDrawable
+    public partial class DefaultSpinner : CompositeDrawable
     {
         private DrawableSpinner drawableSpinner = null!;
 

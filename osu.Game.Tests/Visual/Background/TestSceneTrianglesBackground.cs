@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Tests.Visual.Background
 {
-    public class TestSceneTrianglesBackground : OsuTestScene
+    public partial class TestSceneTrianglesBackground : OsuTestScene
     {
         private readonly Triangles triangles;
 

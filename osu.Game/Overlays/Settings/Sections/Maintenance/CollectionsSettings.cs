@@ -10,7 +10,7 @@ using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class CollectionsSettings : SettingsSubsection
+    public partial class CollectionsSettings : SettingsSubsection
     {
         protected override LocalisableString Header => CommonStrings.Collections;
 

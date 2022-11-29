@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneUnknownMod : ModTestScene
+    public partial class TestSceneUnknownMod : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 

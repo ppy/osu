@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tournament
 {
-    public class TourneyButton : OsuButton
+    public partial class TourneyButton : OsuButton
     {
         public new Box Background => base.Background;
 

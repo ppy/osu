@@ -12,7 +12,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
-    public class NowPlayingCommand : Component
+    public partial class NowPlayingCommand : Component
     {
         [Resolved]
         private IChannelPostTarget channelManager { get; set; }

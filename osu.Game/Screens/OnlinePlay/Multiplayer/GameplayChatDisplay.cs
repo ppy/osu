@@ -16,7 +16,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class GameplayChatDisplay : MatchChatDisplay, IKeyBindingHandler<GlobalAction>
+    public partial class GameplayChatDisplay : MatchChatDisplay, IKeyBindingHandler<GlobalAction>
     {
         [Resolved(CanBeNull = true)]
         [CanBeNull]

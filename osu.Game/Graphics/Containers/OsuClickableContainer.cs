@@ -12,7 +12,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuClickableContainer : ClickableContainer, IHasTooltip
+    public partial class OsuClickableContainer : ClickableContainer, IHasTooltip
     {
         private readonly HoverSampleSet sampleSet;
 

@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableFruit : DrawablePalpableCatchHitObject
+    public partial class DrawableFruit : DrawablePalpableCatchHitObject
     {
         public DrawableFruit()
             : this(null)

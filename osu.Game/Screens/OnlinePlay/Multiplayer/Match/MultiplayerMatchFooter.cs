@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerMatchFooter : CompositeDrawable
+    public partial class MultiplayerMatchFooter : CompositeDrawable
     {
         private const float ready_button_width = 600;
         private const float spectate_button_width = 200;

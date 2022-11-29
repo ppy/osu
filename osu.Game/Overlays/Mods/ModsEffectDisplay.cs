@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Mods
     /// <summary>
     /// Base class for displays of mods effects.
     /// </summary>
-    public abstract class ModsEffectDisplay : Container, IHasCurrentValue<double>
+    public abstract partial class ModsEffectDisplay : Container, IHasCurrentValue<double>
     {
         public const float HEIGHT = 42;
         private const float transition_duration = 200;
@@ -201,7 +201,7 @@ namespace osu.Game.Overlays.Mods
             DifficultyIncrease
         }
 
-        private class EffectCounter : RollingCounter<double>
+        private partial class EffectCounter : RollingCounter<double>
         {
             private readonly string? format;
 

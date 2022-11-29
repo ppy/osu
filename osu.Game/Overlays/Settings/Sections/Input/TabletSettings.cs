@@ -21,7 +21,7 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class TabletSettings : SettingsSubsection
+    public partial class TabletSettings : SettingsSubsection
     {
         public TabletAreaSelection AreaSelection { get; private set; }
 
@@ -45,9 +45,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private GameHost host { get; set; }
 
         /// <summary>
-        /// Based on ultrawide monitor configurations.
+        /// Based on ultrawide monitor configurations, plus a bit of lenience for users which are intentionally aiming for higher horizontal velocity.
         /// </summary>
-        private const float largest_feasible_aspect_ratio = 21f / 9;
+        private const float largest_feasible_aspect_ratio = 23f / 9;
 
         private readonly BindableNumber<float> aspectRatio = new BindableFloat(1)
         {

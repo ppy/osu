@@ -99,21 +99,30 @@ namespace osu.Game.Rulesets.Mods
             CurrentNumber.MaxValue = ExtendedLimits.Value && extendedMaxValue != null ? extendedMaxValue.Value : maxValue;
         }
 
+        public override void CopyTo(Bindable<float?> them)
+        {
+            if (!(them is DifficultyBindable otherDifficultyBindable))
+                throw new InvalidOperationException($"Cannot copy to a non-{nameof(DifficultyBindable)}.");
+
+            base.CopyTo(them);
+
+            otherDifficultyBindable.ReadCurrentFromDifficulty = ReadCurrentFromDifficulty;
+
+            // the following max value copies are only safe as long as these values are effectively constants.
+            otherDifficultyBindable.MaxValue = maxValue;
+            otherDifficultyBindable.ExtendedMaxValue = extendedMaxValue;
+        }
+
         public override void BindTo(Bindable<float?> them)
         {
             if (!(them is DifficultyBindable otherDifficultyBindable))
                 throw new InvalidOperationException($"Cannot bind to a non-{nameof(DifficultyBindable)}.");
 
-            ReadCurrentFromDifficulty = otherDifficultyBindable.ReadCurrentFromDifficulty;
-
-            // the following max value copies are only safe as long as these values are effectively constants.
-            MaxValue = otherDifficultyBindable.maxValue;
-            ExtendedMaxValue = otherDifficultyBindable.extendedMaxValue;
-
             ExtendedLimits.BindTarget = otherDifficultyBindable.ExtendedLimits;
 
             // the actual values need to be copied after the max value constraints.
             CurrentNumber.BindTarget = otherDifficultyBindable.CurrentNumber;
+
             base.BindTo(them);
         }
 

@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A button with added default sound effects.
     /// </summary>
-    public class OsuButton : Button
+    public partial class OsuButton : Button
     {
         public LocalisableString Text
         {
@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Sets a custom background colour to this button, replacing the provided default.
         /// </summary>
-        public Color4 BackgroundColour
+        public virtual Color4 BackgroundColour
         {
             get => backgroundColour ?? defaultBackgroundColour;
             set
@@ -90,6 +90,7 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
+                        Depth = float.MaxValue,
                     },
                     Hover = new Box
                     {
@@ -141,13 +142,15 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnClick(e);
         }
 
+        protected virtual float HoverLayerFinalAlpha => 0.1f;
+
         protected override bool OnHover(HoverEvent e)
         {
             if (Enabled.Value)
             {
                 Hover.FadeTo(0.2f, 40, Easing.OutQuint)
                      .Then()
-                     .FadeTo(0.1f, 800, Easing.OutQuint);
+                     .FadeTo(HoverLayerFinalAlpha, 800, Easing.OutQuint);
             }
 
             return base.OnHover(e);

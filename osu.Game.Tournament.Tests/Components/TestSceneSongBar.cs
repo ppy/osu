@@ -14,7 +14,7 @@ using osu.Game.Tournament.Models;
 namespace osu.Game.Tournament.Tests.Components
 {
     [TestFixture]
-    public class TestSceneSongBar : OsuTestScene
+    public partial class TestSceneSongBar : OsuTestScene
     {
         [Cached]
         private readonly LadderInfo ladder = new LadderInfo();

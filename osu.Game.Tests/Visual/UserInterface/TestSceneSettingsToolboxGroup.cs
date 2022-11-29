@@ -18,7 +18,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneSettingsToolboxGroup : OsuManualInputManagerTestScene
+    public partial class TestSceneSettingsToolboxGroup : OsuManualInputManagerTestScene
     {
         private SettingsToolboxGroup group;
 
