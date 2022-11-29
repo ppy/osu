@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -21,8 +19,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private TestCommentEditor commentEditor;
-        private TestCancellableCommentEditor cancellableCommentEditor;
+        private TestCommentEditor commentEditor = null!;
+        private TestCancellableCommentEditor cancellableCommentEditor = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -109,7 +107,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             public new Bindable<string> Current => base.Current;
             public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
 
-            public string CommittedText { get; private set; }
+            public string? CommittedText { get; private set; }
 
             public TestCommentEditor()
             {
