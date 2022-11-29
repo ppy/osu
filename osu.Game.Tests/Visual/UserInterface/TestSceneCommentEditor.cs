@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("press Enter", () => InputManager.Key(Key.Enter));
 
-            AddAssert("no text committed", () => commentEditor.CommittedText == null);
+            AddAssert("no text committed", () => commentEditor.CommittedText.Length == 0);
             AddAssert("button is not loading", () => !commentEditor.IsLoading);
         }
 
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             public new Bindable<string> Current => base.Current;
             public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
 
-            public string? CommittedText { get; private set; }
+            public string CommittedText { get; private set; } = string.Empty;
 
             public TestCommentEditor()
             {
