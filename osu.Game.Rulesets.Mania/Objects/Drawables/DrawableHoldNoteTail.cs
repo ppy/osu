@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// <summary>
     /// The tail of a <see cref="DrawableHoldNote"/>.
     /// </summary>
-    public class DrawableHoldNoteTail : DrawableNote
+    public partial class DrawableHoldNoteTail : DrawableNote
     {
         /// <summary>
         /// Lenience of release hit windows. This is to make cases where the hold note release

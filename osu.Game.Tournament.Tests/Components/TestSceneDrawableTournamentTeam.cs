@@ -14,7 +14,7 @@ using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneDrawableTournamentTeam : OsuGridTestScene
+    public partial class TestSceneDrawableTournamentTeam : OsuGridTestScene
     {
         public TestSceneDrawableTournamentTeam()
             : base(4, 3)

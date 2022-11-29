@@ -23,7 +23,7 @@ using osu.Game.Rulesets.Scoring;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatcherArea : CatchSkinnableTestScene
+    public partial class TestSceneCatcherArea : CatchSkinnableTestScene
     {
         private RulesetInfo catchRuleset;
 
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             catchRuleset = rulesets.GetRuleset(2);
         }
 
-        private class TestCatcherArea : CatcherArea
+        private partial class TestCatcherArea : CatcherArea
         {
             public TestCatcherArea(IBeatmapDifficultyInfo beatmapDifficulty)
             {

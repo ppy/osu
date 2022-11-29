@@ -13,7 +13,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
-    public class NestedOutlineContainer : CompositeDrawable
+    public partial class NestedOutlineContainer : CompositeDrawable
     {
         private readonly List<CatchHitObject> nestedHitObjects = new List<CatchHitObject>();
 

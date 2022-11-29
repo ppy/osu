@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,6 +11,10 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     public class CatchLegacySkinTransformer : LegacySkinTransformer
     {
+        public override bool IsProvidingLegacyResources => base.IsProvidingLegacyResources || hasPear;
+
+        private bool hasPear => GetTexture("fruit-pear") != null;
+
         /// <summary>
         /// For simplicity, let's use legacy combo font texture existence as a way to identify legacy skins from default.
         /// </summary>
@@ -23,14 +25,14 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (component is SkinnableTargetComponent targetComponent)
+            if (lookup is GlobalSkinComponentLookup targetComponent)
             {
-                switch (targetComponent.Target)
+                switch (targetComponent.Lookup)
                 {
-                    case SkinnableTarget.MainHUDComponents:
-                        var components = base.GetDrawableComponent(component) as SkinnableTargetComponentsContainer;
+                    case GlobalSkinComponentLookup.LookupType.MainHUDComponents:
+                        var components = base.GetDrawableComponent(lookup) as SkinnableTargetComponentsContainer;
 
                         if (providesComboCounter && components != null)
                         {
@@ -44,12 +46,12 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 }
             }
 
-            if (component is CatchSkinComponent catchSkinComponent)
+            if (lookup is CatchSkinComponentLookup catchSkinComponent)
             {
                 switch (catchSkinComponent.Component)
                 {
                     case CatchSkinComponents.Fruit:
-                        if (GetTexture("fruit-pear") != null)
+                        if (hasPear)
                             return new LegacyFruitPiece();
 
                         return null;
@@ -93,11 +95,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                         return null;
 
                     default:
-                        throw new UnsupportedSkinComponentException(component);
+                        throw new UnsupportedSkinComponentException(lookup);
                 }
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
 
         private bool hasOldStyleCatcherSprite() =>
@@ -108,12 +110,12 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             GetTexture(@"fruit-catcher-idle") != null
             || GetTexture(@"fruit-catcher-idle-0") != null;
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
             {
                 case CatchSkinColour colour:
-                    var result = (Bindable<Color4>)base.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                    var result = (Bindable<Color4>?)base.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
                     if (result == null)
                         return null;
 
@@ -125,7 +127,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     {
                         case CatchSkinConfiguration.FlipCatcherPlate:
                             // Don't flip catcher plate contents if the catcher is provided by this legacy skin.
-                            if (GetDrawableComponent(new CatchSkinComponent(CatchSkinComponents.Catcher)) != null)
+                            if (GetDrawableComponent(new CatchSkinComponentLookup(CatchSkinComponents.Catcher)) != null)
                                 return (IBindable<TValue>)new Bindable<bool>();
 
                             break;

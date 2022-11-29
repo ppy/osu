@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestSceneTournamentSceneManager : TournamentTestScene
+    public partial class TestSceneTournamentSceneManager : TournamentTestScene
     {
         [BackgroundDependencyLoader]
         private void load()

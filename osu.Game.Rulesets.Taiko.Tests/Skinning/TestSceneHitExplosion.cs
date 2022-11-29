@@ -13,11 +13,12 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
-    public class TestSceneHitExplosion : TaikoSkinnableTestScene
+    public partial class TestSceneHitExplosion : TaikoSkinnableTestScene
     {
         protected override double TimePerAction => 100;
 
@@ -49,11 +50,19 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     // the hit needs to be added to hierarchy in order for nested objects to be created correctly.
                     // setting zero alpha is supposed to prevent the test from looking broken.
                     hit.With(h => h.Alpha = 0),
-                    new HitExplosion(hit.Type)
+
+                    new AspectContainer
                     {
+                        RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }.With(explosion => explosion.Apply(hit))
+                        Child =
+                            new HitExplosion(hit.Type)
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }.With(explosion => explosion.Apply(hit))
+                    }
                 }
             };
         }

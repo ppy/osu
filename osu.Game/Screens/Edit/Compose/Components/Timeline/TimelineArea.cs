@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineArea : CompositeDrawable
+    public partial class TimelineArea : CompositeDrawable
     {
         public Timeline Timeline;
 
@@ -78,16 +78,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 LabelText = "Waveform",
                                                 Current = { Value = true },
                                             },
-                                            controlPointsCheckbox = new OsuCheckbox
-                                            {
-                                                LabelText = "Control Points",
-                                                Current = { Value = true },
-                                            },
                                             ticksCheckbox = new OsuCheckbox
                                             {
                                                 LabelText = "Ticks",
                                                 Current = { Value = true },
-                                            }
+                                            },
+                                            controlPointsCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = "BPM",
+                                                Current = { Value = true },
+                                            },
                                         }
                                     }
                                 }

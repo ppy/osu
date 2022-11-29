@@ -23,7 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// <summary>
     /// A <see cref="SpectatorScreen"/> that spectates multiple users in a match.
     /// </summary>
-    public class MultiSpectatorScreen : SpectatorScreen
+    public partial class MultiSpectatorScreen : SpectatorScreen
     {
         // Isolates beatmap/ruleset to this screen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;

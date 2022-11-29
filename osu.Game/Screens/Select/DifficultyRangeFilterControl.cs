@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
-    internal class DifficultyRangeFilterControl : CompositeDrawable
+    internal partial class DifficultyRangeFilterControl : CompositeDrawable
     {
         private Bindable<double> lowerStars = null!;
         private Bindable<double> upperStars = null!;
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Select
             upperStars.ValueChanged += max => lowerStars.Value = Math.Min(max.NewValue - 0.1, lowerStars.Value);
         }
 
-        private class MinimumStarsSlider : StarsSlider
+        private partial class MinimumStarsSlider : StarsSlider
         {
             public MinimumStarsSlider()
                 : base("0")
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Select
                 && screenSpacePos.X <= Nub.ScreenSpaceDrawQuad.TopRight.X;
         }
 
-        private class MaximumStarsSlider : StarsSlider
+        private partial class MaximumStarsSlider : StarsSlider
         {
             public MaximumStarsSlider()
                 : base("∞")
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Select
                 && screenSpacePos.X >= Nub.ScreenSpaceDrawQuad.TopLeft.X;
         }
 
-        private class StarsSlider : OsuSliderBar<double>
+        private partial class StarsSlider : OsuSliderBar<double>
         {
             private readonly string defaultString;
 

@@ -47,6 +47,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (totalSuccessfulHits > 0)
                 effectiveMissCount = Math.Max(1.0, 1000.0 / totalSuccessfulHits) * countMiss;
 
+            // TODO: The detection of rulesets is temporary until the leftover old skills have been reworked.
+            bool isConvert = score.BeatmapInfo.Ruleset.OnlineID != 1;
+
             double multiplier = 1.13;
 
             if (score.Mods.Any(m => m is ModHidden))
@@ -55,8 +58,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModEasy))
                 multiplier *= 0.975;
 
-            double difficultyValue = computeDifficultyValue(score, taikoAttributes);
-            double accuracyValue = computeAccuracyValue(score, taikoAttributes);
+            double difficultyValue = computeDifficultyValue(score, taikoAttributes, isConvert);
+            double accuracyValue = computeAccuracyValue(score, taikoAttributes, isConvert);
             double totalValue =
                 Math.Pow(
                     Math.Pow(difficultyValue, 1.1) +
@@ -73,7 +76,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             };
         }
 
-        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
+        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
             double difficultyValue = Math.Pow(5 * Math.Max(1.0, attributes.StarRating / 0.115) - 4.0, 2.25) / 1150.0;
 
@@ -85,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModEasy))
                 difficultyValue *= 0.985;
 
-            if (score.Mods.Any(m => m is ModHidden))
+            if (score.Mods.Any(m => m is ModHidden) && !isConvert)
                 difficultyValue *= 1.025;
 
             if (score.Mods.Any(m => m is ModHardRock))
@@ -100,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return difficultyValue * Math.Pow(SpecialFunctions.Erf(40 / (Math.Sqrt(2) * estimatedDeviation.Value)), 2.0);
         }
 
-        private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
+        private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
             if (attributes.GreatHitWindow <= 0 || estimatedDeviation == null)
                 return 0;
@@ -109,8 +112,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
-            // Slight HDFL Bonus for accuracy. A clamp is used to prevent against negative values
-            if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden))
+            // Slight HDFL Bonus for accuracy. A clamp is used to prevent against negative values.
+            if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden) && !isConvert)
                 accuracyValue *= Math.Max(1.0, 1.05 * lengthBonus);
 
             return accuracyValue;
@@ -131,13 +134,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             double clockRate = track.Rate;
 
-            double overallDifficulty = (50 - attributes.GreatHitWindow * clockRate) / 3; 
+            double overallDifficulty = (50 - attributes.GreatHitWindow * clockRate) / 3;
             double goodHitWindow = 0;
             if (overallDifficulty <= 5)
                 goodHitWindow = (120 - 8 * overallDifficulty) / clockRate;
             if (overallDifficulty > 5)
                 goodHitWindow = 80 - 6 * (overallDifficulty - 5);
-            
+
             double root2 = Math.Sqrt(2);
 
             // Log of the most likely deviation resulting in the score's hit judgements, differentiated such that 1 over the most likely deviation returns 0.
@@ -145,7 +148,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 if (d <= 0)
                     return 1;
-                
+
                 double p300 = SpecialFunctions.Erf(attributes.GreatHitWindow / root2 * d);
                 double lnP300 = lnErfcApprox(attributes.GreatHitWindow / root2 * d);
                 double lnP100 = lnErfcApprox(goodHitWindow / root2 * d);
@@ -174,7 +177,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             if (x <= 5)
                 return Math.Log(SpecialFunctions.Erfc(x));
-            
+
             return -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI));
         }
 

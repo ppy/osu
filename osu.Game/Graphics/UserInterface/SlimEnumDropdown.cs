@@ -9,12 +9,12 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class SlimEnumDropdown<T> : OsuEnumDropdown<T>
+    public partial class SlimEnumDropdown<T> : OsuEnumDropdown<T>
         where T : struct, Enum
     {
         protected override DropdownHeader CreateHeader() => new SlimDropdownHeader();
 
-        private class SlimDropdownHeader : OsuDropdownHeader
+        private partial class SlimDropdownHeader : OsuDropdownHeader
         {
             public SlimDropdownHeader()
             {

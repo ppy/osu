@@ -4,11 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -33,9 +31,6 @@ namespace osu.Game.Skinning
             this.skinResources = skinResources;
 
             modelManager = new ModelManager<SkinInfo>(storage, realm);
-
-            // can be removed 20220420.
-            populateMissingHashes();
         }
 
         public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
@@ -158,18 +153,6 @@ namespace osu.Game.Skinning
                     }
 
                     modelManager.ReplaceFile(existingFile, stream, realm);
-
-                    // can be removed 20220502.
-                    if (!ensureIniWasUpdated(item))
-                    {
-                        Logger.Log($"Skin {item}'s skin.ini had issues and has been removed. Please report this and provide the problematic skin.", LoggingTarget.Database, LogLevel.Important);
-
-                        var existingIni = item.GetFile(@"skin.ini");
-                        if (existingIni != null)
-                            item.Files.Remove(existingIni);
-
-                        writeNewSkinIni();
-                    }
                 }
             }
 
@@ -192,38 +175,6 @@ namespace osu.Game.Skinning
 
                 item.Hash = ComputeHash(item);
             }
-        }
-
-        private bool ensureIniWasUpdated(SkinInfo item)
-        {
-            // This is a final consistency check to ensure that hash computation doesn't enter an infinite loop.
-            // With other changes to the surrounding code this should never be hit, but until we are 101% sure that there
-            // are no other cases let's avoid a hard startup crash by bailing and alerting.
-
-            var instance = createInstance(item);
-
-            return instance.Configuration.SkinInfo.Name == item.Name;
-        }
-
-        private void populateMissingHashes()
-        {
-            Realm.Run(realm =>
-            {
-                var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => !i.Protected && string.IsNullOrEmpty(i.Hash)).ToArray();
-
-                foreach (SkinInfo skin in skinsWithoutHashes)
-                {
-                    try
-                    {
-                        realm.Write(_ => skin.Hash = ComputeHash(skin));
-                    }
-                    catch (Exception e)
-                    {
-                        modelManager.Delete(skin);
-                        Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
-                    }
-                }
-            });
         }
 
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);

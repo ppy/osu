@@ -29,7 +29,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
+    public partial class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // allow context menu to appear outside of the playfield.
 
@@ -248,6 +248,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     break;
             }
 
+            slider.Path.ExpectedDistance.Value = null;
             piece.ControlPoint.Type = type;
         }
 

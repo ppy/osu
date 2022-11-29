@@ -20,7 +20,7 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScoreTooltip : VisibilityContainer, ITooltip<ScoreInfo>
+    public partial class LeaderboardScoreTooltip : VisibilityContainer, ITooltip<ScoreInfo>
     {
         private OsuSpriteText timestampLabel = null!;
         private FillFlowContainer<HitResultCell> topScoreStatistics = null!;
@@ -147,7 +147,7 @@ namespace osu.Game.Online.Leaderboards
 
         public void Move(Vector2 pos) => Position = pos;
 
-        private class HitResultCell : CompositeDrawable
+        private partial class HitResultCell : CompositeDrawable
         {
             private readonly LocalisableString displayName;
             private readonly HitResult result;
@@ -189,7 +189,7 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private class ModCell : CompositeDrawable
+        private partial class ModCell : CompositeDrawable
         {
             private readonly Mod mod;
 

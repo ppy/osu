@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public abstract class SetupSection : Container
+    public abstract partial class SetupSection : Container
     {
         private FillFlowContainer flow;
 

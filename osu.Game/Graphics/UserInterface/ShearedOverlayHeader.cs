@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedOverlayHeader : CompositeDrawable
+    public partial class ShearedOverlayHeader : CompositeDrawable
     {
         public const float HEIGHT = main_area_height + 2 * corner_radius;
 
