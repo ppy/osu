@@ -6,7 +6,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    internal class DrumRollHitContainer : ScrollingHitObjectContainer
+    internal partial class DrumRollHitContainer : ScrollingHitObjectContainer
     {
         // TODO: this usage is buggy.
         // Because `LifetimeStart` is set based on scrolling, lifetime is not same as the time when the object is created.

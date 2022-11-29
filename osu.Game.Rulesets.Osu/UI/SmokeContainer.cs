@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.UI
     /// <summary>
     /// Manages smoke trails generated from user input.
     /// </summary>
-    public class SmokeContainer : Container, IRequireHighFrequencyMousePosition, IKeyBindingHandler<OsuAction>
+    public partial class SmokeContainer : Container, IRequireHighFrequencyMousePosition, IKeyBindingHandler<OsuAction>
     {
         private SmokeSkinnableDrawable? currentSegmentSkinnable;
 
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void addPosition() => (currentSegmentSkinnable?.Drawable as SmokeSegment)?.AddPosition(lastMousePosition, Time.Current);
 
-        private class SmokeSkinnableDrawable : SkinnableDrawable
+        private partial class SmokeSkinnableDrawable : SkinnableDrawable
         {
             public override bool RemoveWhenNotAlive => true;
 

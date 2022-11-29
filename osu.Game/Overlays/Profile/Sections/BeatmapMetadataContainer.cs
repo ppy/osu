@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Profile.Sections
     /// <summary>
     /// Display artist/title/mapper information, commonly used as the left portion of a profile or score display row.
     /// </summary>
-    public abstract class BeatmapMetadataContainer : OsuHoverContainer
+    public abstract partial class BeatmapMetadataContainer : OsuHoverContainer
     {
         private readonly IBeatmapInfo beatmapInfo;
 

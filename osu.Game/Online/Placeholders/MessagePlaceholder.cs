@@ -9,7 +9,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Online.Placeholders
 {
-    public class MessagePlaceholder : Placeholder
+    public partial class MessagePlaceholder : Placeholder
     {
         private readonly LocalisableString message;
 

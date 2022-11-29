@@ -13,7 +13,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuHoverContainer : OsuClickableContainer
+    public partial class OsuHoverContainer : OsuClickableContainer
     {
         protected const float FADE_DURATION = 500;
 

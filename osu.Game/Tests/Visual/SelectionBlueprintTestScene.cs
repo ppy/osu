@@ -11,7 +11,7 @@ using osu.Game.Screens.Edit;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class SelectionBlueprintTestScene : OsuManualInputManagerTestScene
+    public abstract partial class SelectionBlueprintTestScene : OsuManualInputManagerTestScene
     {
         [Cached]
         private readonly EditorClock editorClock = new EditorClock();

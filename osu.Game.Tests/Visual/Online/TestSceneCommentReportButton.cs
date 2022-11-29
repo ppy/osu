@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneCommentReportButton : ThemeComparisonTestScene
+    public partial class TestSceneCommentReportButton : ThemeComparisonTestScene
     {
         [SetUpSteps]
         public void SetUpSteps()

@@ -16,7 +16,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
-    public class TestSceneDrawableDrumRoll : TaikoSkinnableTestScene
+    public partial class TestSceneDrawableDrumRoll : TaikoSkinnableTestScene
     {
         [Cached(typeof(IScrollingInfo))]
         private ScrollingTestContainer.TestScrollingInfo info = new ScrollingTestContainer.TestScrollingInfo
@@ -26,8 +26,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         };
 
         [Test]
-        public void DrumrollTest()
+        public void TestDrumroll([Values] bool withKiai)
         {
+            AddStep("set up beatmap", () => setUpBeatmap(withKiai));
+
             AddStep("Drum roll", () => SetContents(_ =>
             {
                 var hoc = new ScrollingHitObjectContainer();
@@ -72,6 +74,23 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             drumroll.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             return drumroll;
+        }
+
+        private void setUpBeatmap(bool withKiai)
+        {
+            var controlPointInfo = new ControlPointInfo();
+
+            controlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
+
+            if (withKiai)
+                controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
+
+            Beatmap.Value = CreateWorkingBeatmap(new Beatmap
+            {
+                ControlPointInfo = controlPointInfo
+            });
+
+            Beatmap.Value.Track.Start();
         }
     }
 }

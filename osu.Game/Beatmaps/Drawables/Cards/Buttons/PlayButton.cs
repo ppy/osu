@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
-    public class PlayButton : OsuHoverContainer
+    public partial class PlayButton : OsuHoverContainer
     {
         public IBindable<double> Progress => progress;
         private readonly BindableDouble progress = new BindableDouble();

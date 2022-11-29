@@ -21,7 +21,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Rulesets
 {
     [HeadlessTest]
-    public class TestSceneRulesetSkinProvidingContainer : OsuTestScene
+    public partial class TestSceneRulesetSkinProvidingContainer : OsuTestScene
     {
         private SkinRequester requester;
 
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Rulesets
             });
         }
 
-        private class SkinRequester : Drawable, ISkin
+        private partial class SkinRequester : Drawable, ISkin
         {
             private ISkinSource skin;
 

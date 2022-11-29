@@ -19,7 +19,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class DrawableTournamentMatch : CompositeDrawable
+    public partial class DrawableTournamentMatch : CompositeDrawable
     {
         public readonly TournamentMatch Match;
         private readonly bool editor;

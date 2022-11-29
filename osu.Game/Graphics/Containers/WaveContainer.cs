@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class WaveContainer : VisibilityContainer
+    public partial class WaveContainer : VisibilityContainer
     {
         public const float APPEAR_DURATION = 800;
         public const float DISAPPEAR_DURATION = 500;
@@ -131,7 +131,7 @@ namespace osu.Game.Graphics.Containers
             wavesContainer.Height = Math.Max(0, DrawHeight - (contentContainer.DrawHeight - contentContainer.Y * DrawHeight));
         }
 
-        private class Wave : VisibilityContainer
+        private partial class Wave : VisibilityContainer
         {
             public float FinalPosition;
 

@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
-    public class TournamentBeatmapPanel : CompositeDrawable
+    public partial class TournamentBeatmapPanel : CompositeDrawable
     {
         public readonly TournamentBeatmap Beatmap;
 

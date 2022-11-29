@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat.Listing
 {
-    public class ChannelListingItem : OsuClickableContainer, IFilterable
+    public partial class ChannelListingItem : OsuClickableContainer, IFilterable
     {
         public event Action<Channel>? OnRequestJoin;
         public event Action<Channel>? OnRequestLeave;

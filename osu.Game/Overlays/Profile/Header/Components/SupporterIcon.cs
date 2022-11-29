@@ -17,7 +17,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class SupporterIcon : OsuClickableContainer
+    public partial class SupporterIcon : OsuClickableContainer
     {
         private readonly Box background;
         private readonly FillFlowContainer iconContainer;

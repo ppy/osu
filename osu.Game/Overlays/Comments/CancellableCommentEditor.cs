@@ -17,7 +17,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
-    public abstract class CancellableCommentEditor : CommentEditor
+    public abstract partial class CancellableCommentEditor : CommentEditor
     {
         public Action OnCancel;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Comments
             });
         }
 
-        private class CancelButton : OsuHoverContainer
+        private partial class CancelButton : OsuHoverContainer
         {
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 

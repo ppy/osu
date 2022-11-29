@@ -22,7 +22,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Rulesets.Scoring
 {
-    public class ScoreProcessorTest
+    public partial class ScoreProcessorTest
     {
         private ScoreProcessor scoreProcessor;
         private IBeatmap beatmap;
@@ -394,7 +394,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             }
         }
 
-        private class TestScoreProcessor : ScoreProcessor
+        private partial class TestScoreProcessor : ScoreProcessor
         {
             protected override double DefaultAccuracyPortion => 0.5;
             protected override double DefaultComboPortion => 0.5;

@@ -13,7 +13,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary
 {
-    public class TestGameplayButton : OsuButton
+    public partial class TestGameplayButton : OsuButton
     {
         protected override SpriteText CreateText() => new OsuSpriteText
         {

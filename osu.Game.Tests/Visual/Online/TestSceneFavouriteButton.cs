@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneFavouriteButton : OsuTestScene
+    public partial class TestSceneFavouriteButton : OsuTestScene
     {
         private FavouriteButton favourite;
 

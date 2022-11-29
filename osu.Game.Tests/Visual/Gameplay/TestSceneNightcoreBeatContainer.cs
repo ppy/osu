@@ -13,7 +13,7 @@ using osu.Game.Tests.Visual.UserInterface;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneNightcoreBeatContainer : TestSceneBeatSyncedContainer
+    public partial class TestSceneNightcoreBeatContainer : TestSceneBeatSyncedContainer
     {
         protected override void LoadComplete()
         {

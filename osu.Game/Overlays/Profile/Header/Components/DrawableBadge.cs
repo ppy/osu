@@ -14,7 +14,7 @@ using osuTK;
 namespace osu.Game.Overlays.Profile.Header.Components
 {
     [LongRunningLoad]
-    public class DrawableBadge : OsuClickableContainer
+    public partial class DrawableBadge : OsuClickableContainer
     {
         public static readonly Vector2 DRAWABLE_BADGE_SIZE = new Vector2(86, 40);
 

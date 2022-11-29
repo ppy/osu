@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// Content can be added to individual columns via <see cref="SetContentForColumn"/>.
     /// </summary>
     /// <typeparam name="TContent">The type of content in each column.</typeparam>
-    public class ColumnFlow<TContent> : CompositeDrawable
+    public partial class ColumnFlow<TContent> : CompositeDrawable
         where TContent : Drawable
     {
         /// <summary>

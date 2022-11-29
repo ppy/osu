@@ -16,7 +16,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatchPlayerLegacySkin : LegacySkinPlayerTestScene
+    public partial class TestSceneCatchPlayerLegacySkin : LegacySkinPlayerTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
 

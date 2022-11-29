@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class DrawableRoomParticipantsList : OnlinePlayComposite
+    public partial class DrawableRoomParticipantsList : OnlinePlayComposite
     {
         private const float avatar_size = 36;
 
@@ -270,7 +270,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private class CircularAvatar : CompositeDrawable
+        private partial class CircularAvatar : CompositeDrawable
         {
             public APIUser User
             {
@@ -302,7 +302,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        public class HiddenUserCount : CompositeDrawable
+        public partial class HiddenUserCount : CompositeDrawable
         {
             public int Count
             {

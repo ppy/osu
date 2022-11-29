@@ -10,7 +10,7 @@ using osu.Game.Beatmaps.ControlPoints;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneHitCircleKiai : TestSceneHitCircle
+    public partial class TestSceneHitCircleKiai : TestSceneHitCircle
     {
         [SetUp]
         public void SetUp() => Schedule(() =>

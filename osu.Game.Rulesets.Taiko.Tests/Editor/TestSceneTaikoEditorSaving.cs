@@ -10,7 +10,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Editor
 {
-    public class TestSceneTaikoEditorSaving : EditorSavingTestScene
+    public partial class TestSceneTaikoEditorSaving : EditorSavingTestScene
     {
         protected override Ruleset CreateRuleset() => new TaikoRuleset();
 

@@ -29,7 +29,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.UI
 {
     [Cached]
-    public class OsuPlayfield : Playfield
+    public partial class OsuPlayfield : Playfield
     {
         private readonly PlayfieldBorder playfieldBorder;
         private readonly ProxyContainer approachCircles;
@@ -181,12 +181,12 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
 
-        private class ProxyContainer : LifetimeManagementContainer
+        private partial class ProxyContainer : LifetimeManagementContainer
         {
             public void Add(Drawable proxy) => AddInternal(proxy);
         }
 
-        private class DrawableJudgementPool : DrawablePool<DrawableOsuJudgement>
+        private partial class DrawableJudgementPool : DrawablePool<DrawableOsuJudgement>
         {
             private readonly HitResult result;
             private readonly Action<DrawableOsuJudgement> onLoaded;

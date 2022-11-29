@@ -22,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tournament.Screens.MapPool
 {
-    public class MapPoolScreen : TournamentMatchScreen
+    public partial class MapPoolScreen : TournamentMatchScreen
     {
         private readonly FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>> mapFlows;
 

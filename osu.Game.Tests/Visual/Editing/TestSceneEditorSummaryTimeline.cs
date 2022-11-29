@@ -14,7 +14,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneEditorSummaryTimeline : EditorClockTestScene
+    public partial class TestSceneEditorSummaryTimeline : EditorClockTestScene
     {
         [Cached(typeof(EditorBeatmap))]
         private readonly EditorBeatmap editorBeatmap;

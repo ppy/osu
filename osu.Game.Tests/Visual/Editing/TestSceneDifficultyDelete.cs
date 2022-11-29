@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneDifficultyDelete : EditorTestScene
+    public partial class TestSceneDifficultyDelete : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
         protected override bool IsolateSavingFromDatabase => false;

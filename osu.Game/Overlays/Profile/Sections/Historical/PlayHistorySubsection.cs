@@ -10,7 +10,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public class PlayHistorySubsection : ChartProfileSubsection
+    public partial class PlayHistorySubsection : ChartProfileSubsection
     {
         protected override LocalisableString GraphCounterName => UsersStrings.ShowExtraHistoricalMonthlyPlaycountsCountLabel;
 

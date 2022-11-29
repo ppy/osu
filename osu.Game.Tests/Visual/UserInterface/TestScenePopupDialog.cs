@@ -13,7 +13,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestScenePopupDialog : OsuManualInputManagerTestScene
+    public partial class TestScenePopupDialog : OsuManualInputManagerTestScene
     {
         private TestPopupDialog dialog;
 
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("release button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
-        private class TestPopupDialog : PopupDialog
+        private partial class TestPopupDialog : PopupDialog
         {
             public PopupDialogDangerousButton DangerousButton { get; }
 

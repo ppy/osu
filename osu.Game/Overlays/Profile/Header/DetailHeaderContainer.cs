@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class DetailHeaderContainer : CompositeDrawable
+    public partial class DetailHeaderContainer : CompositeDrawable
     {
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
         private OverlinedInfoContainer medalInfo;
@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.Profile.Header
             rankGraph.Statistics.Value = user?.Statistics;
         }
 
-        private class ScoreRankInfo : CompositeDrawable
+        private partial class ScoreRankInfo : CompositeDrawable
         {
             private readonly OsuSpriteText rankCount;
 

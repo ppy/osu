@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Components
 {
-    public class DrawableTeamTitleWithHeader : CompositeDrawable
+    public partial class DrawableTeamTitleWithHeader : CompositeDrawable
     {
         public DrawableTeamTitleWithHeader(TournamentTeam team, TeamColour colour)
         {

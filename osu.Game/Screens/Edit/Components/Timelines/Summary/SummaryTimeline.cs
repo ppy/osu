@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
     /// <summary>
     /// The timeline that sits at the bottom of the editor.
     /// </summary>
-    public class SummaryTimeline : BottomBarContainer
+    public partial class SummaryTimeline : BottomBarContainer
     {
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)

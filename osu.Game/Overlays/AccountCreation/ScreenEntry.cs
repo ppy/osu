@@ -25,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.AccountCreation
 {
-    public class ScreenEntry : AccountCreationScreen
+    public partial class ScreenEntry : AccountCreationScreen
     {
         private ErrorTextFlowContainer usernameDescription;
         private ErrorTextFlowContainer emailAddressDescription;

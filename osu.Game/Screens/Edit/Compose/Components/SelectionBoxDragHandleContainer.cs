@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// Represents a display composite containing and managing the visibility state of the selection box's drag handles.
     /// </summary>
-    public class SelectionBoxDragHandleContainer : CompositeDrawable
+    public partial class SelectionBoxDragHandleContainer : CompositeDrawable
     {
         private Container<SelectionBoxScaleHandle> scaleHandles;
         private Container<SelectionBoxRotationHandle> rotationHandles;

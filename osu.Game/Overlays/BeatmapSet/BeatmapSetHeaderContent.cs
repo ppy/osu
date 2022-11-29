@@ -26,7 +26,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapSetHeaderContent : CompositeDrawable
+    public partial class BeatmapSetHeaderContent : CompositeDrawable
     {
         public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 

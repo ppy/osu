@@ -9,7 +9,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Edit
 {
-    public class PromptForSaveDialog : PopupDialog
+    public partial class PromptForSaveDialog : PopupDialog
     {
         public PromptForSaveDialog(Action exit, Action saveAndExit, Action cancel)
         {

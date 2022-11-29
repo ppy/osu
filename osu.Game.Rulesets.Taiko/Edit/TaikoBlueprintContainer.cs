@@ -10,7 +10,7 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public class TaikoBlueprintContainer : ComposeBlueprintContainer
+    public partial class TaikoBlueprintContainer : ComposeBlueprintContainer
     {
         public TaikoBlueprintContainer(HitObjectComposer composer)
             : base(composer)

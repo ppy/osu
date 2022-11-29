@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
 {
-    public class GroupTeam : DrawableTournamentTeam
+    public partial class GroupTeam : DrawableTournamentTeam
     {
         private readonly FillFlowContainer innerContainer;
 

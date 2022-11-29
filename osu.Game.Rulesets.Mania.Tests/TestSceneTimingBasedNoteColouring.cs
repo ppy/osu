@@ -24,7 +24,7 @@ using osu.Game.Rulesets.Mania.UI;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    public class TestSceneTimingBasedNoteColouring : OsuTestScene
+    public partial class TestSceneTimingBasedNoteColouring : OsuTestScene
     {
         private Bindable<bool> configTimingBasedNoteColouring;
 

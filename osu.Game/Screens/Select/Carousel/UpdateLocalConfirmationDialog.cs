@@ -8,7 +8,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class UpdateLocalConfirmationDialog : DeleteConfirmationDialog
+    public partial class UpdateLocalConfirmationDialog : DeleteConfirmationDialog
     {
         public UpdateLocalConfirmationDialog(Action onConfirm)
         {

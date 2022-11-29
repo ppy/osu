@@ -11,7 +11,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class BackgroundSettings : SettingsSubsection
+    public partial class BackgroundSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.BackgroundHeader;
 

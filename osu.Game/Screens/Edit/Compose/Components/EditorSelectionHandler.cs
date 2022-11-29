@@ -18,7 +18,7 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class EditorSelectionHandler : SelectionHandler<HitObject>
+    public partial class EditorSelectionHandler : SelectionHandler<HitObject>
     {
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }

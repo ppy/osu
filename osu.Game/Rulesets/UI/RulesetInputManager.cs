@@ -25,7 +25,7 @@ using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachHUDPieces, IHasReplayHandler, IHasRecordingHandler
+    public abstract partial class RulesetInputManager<T> : PassThroughInputManager, ICanAttachHUDPieces, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
         public readonly KeyBindingContainer<T> KeyBindingContainer;
@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.UI
                                                    .Select(action => new KeyCounterAction<T>(action)));
         }
 
-        private class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
+        private partial class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
         {
             public ActionReceptor(KeyCounterDisplay target)
                 : base(target)
@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.UI
             KeyBindingContainer.Add(listener);
         }
 
-        private class ActionListener : Component, IKeyBindingHandler<T>
+        private partial class ActionListener : Component, IKeyBindingHandler<T>
         {
             private readonly ClicksPerSecondCalculator calculator;
 
@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.UI
         protected virtual KeyBindingContainer<T> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new RulesetKeyBindingContainer(ruleset, variant, unique);
 
-        public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
+        public partial class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
         {
             protected override bool HandleRepeats => false;
 

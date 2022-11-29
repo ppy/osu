@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public class TestScenePlayfield : ManiaSkinnableTestScene
+    public partial class TestScenePlayfield : ManiaSkinnableTestScene
     {
         private List<StageDefinition> stageDefinitions = new List<StageDefinition>();
 

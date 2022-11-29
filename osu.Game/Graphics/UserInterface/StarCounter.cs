@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class StarCounter : Container
+    public partial class StarCounter : Container
     {
         private readonly FillFlowContainer<Star> stars;
 
@@ -120,7 +120,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public class DefaultStar : Star
+        public partial class DefaultStar : Star
         {
             private const double scaling_duration = 1000;
 
@@ -156,7 +156,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public abstract class Star : CompositeDrawable
+        public abstract partial class Star : CompositeDrawable
         {
             public abstract void DisplayAt(float scale);
         }

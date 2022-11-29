@@ -12,7 +12,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class InputSettings : SettingsSubsection
+    public partial class InputSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.InputHeader;
 

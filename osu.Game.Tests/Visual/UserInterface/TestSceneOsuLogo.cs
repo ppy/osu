@@ -9,7 +9,7 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuLogo : OsuTestScene
+    public partial class TestSceneOsuLogo : OsuTestScene
     {
         [Test]
         public void TestBasic()

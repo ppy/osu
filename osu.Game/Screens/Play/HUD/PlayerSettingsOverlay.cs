@@ -12,7 +12,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class PlayerSettingsOverlay : VisibilityContainer
+    public partial class PlayerSettingsOverlay : VisibilityContainer
     {
         private const int fade_duration = 200;
 

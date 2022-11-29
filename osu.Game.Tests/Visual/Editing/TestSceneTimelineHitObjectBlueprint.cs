@@ -18,7 +18,7 @@ using static osu.Game.Screens.Edit.Compose.Components.Timeline.TimelineHitObject
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneTimelineHitObjectBlueprint : TimelineTestScene
+    public partial class TestSceneTimelineHitObjectBlueprint : TimelineTestScene
     {
         public override Drawable CreateTestComponent() => new TimelineBlueprintContainer(Composer);
 

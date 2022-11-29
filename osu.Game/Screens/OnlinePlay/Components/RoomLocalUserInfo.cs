@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class RoomLocalUserInfo : OnlinePlayComposite
+    public partial class RoomLocalUserInfo : OnlinePlayComposite
     {
         private OsuSpriteText attemptDisplay;
 

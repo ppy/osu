@@ -13,7 +13,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFailAnimation : TestSceneAllRulesetPlayers
+    public partial class TestSceneFailAnimation : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("frequency only ever decreased", () => !((FailPlayer)Player).FrequencyIncreased);
         }
 
-        private class FailPlayer : TestPlayer
+        private partial class FailPlayer : TestPlayer
         {
             public new FailOverlay FailOverlay => base.FailOverlay;
 

@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DialogButton : OsuClickableContainer, IStateful<SelectionState>
+    public partial class DialogButton : OsuClickableContainer, IStateful<SelectionState>
     {
         private const float idle_width = 0.8f;
         private const float hover_width = 0.9f;

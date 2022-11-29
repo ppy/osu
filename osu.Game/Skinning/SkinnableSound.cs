@@ -21,7 +21,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A sound consisting of one or more samples to be played.
     /// </summary>
-    public class SkinnableSound : SkinReloadableDrawable, IAdjustableAudioComponent
+    public partial class SkinnableSound : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;

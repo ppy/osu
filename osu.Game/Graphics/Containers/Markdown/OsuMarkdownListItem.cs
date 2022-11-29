@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public abstract class OsuMarkdownListItem : CompositeDrawable
+    public abstract partial class OsuMarkdownListItem : CompositeDrawable
     {
         [Resolved]
         private IMarkdownTextComponent parentTextComponent { get; set; }

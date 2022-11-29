@@ -8,7 +8,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class HitExplosion : PoolableDrawableWithLifetime<HitExplosionEntry>
+    public partial class HitExplosion : PoolableDrawableWithLifetime<HitExplosionEntry>
     {
         private readonly SkinnableDrawable skinnableExplosion;
 

@@ -18,7 +18,7 @@ using osuTK.Graphics;
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
     [Cached]
-    public class ColourHitErrorMeter : HitErrorMeter
+    public partial class ColourHitErrorMeter : HitErrorMeter
     {
         private const int animation_duration = 200;
         private const int drawable_judgement_size = 8;
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         public override void Clear() => judgementsFlow.Clear();
 
-        private class JudgementFlow : FillFlowContainer<HitErrorShape>
+        private partial class JudgementFlow : FillFlowContainer<HitErrorShape>
         {
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
 
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        public class HitErrorShape : PoolableDrawable
+        public partial class HitErrorShape : PoolableDrawable
         {
             public bool IsRemoved { get; private set; }
 

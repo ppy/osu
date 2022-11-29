@@ -13,7 +13,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneStatefulMenuItem : OsuManualInputManagerTestScene
+    public partial class TestSceneStatefulMenuItem : OsuManualInputManagerTestScene
     {
         [Test]
         public void TestTernaryRadioMenuItem()

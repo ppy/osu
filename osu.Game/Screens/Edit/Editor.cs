@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
     [Cached]
-    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
+    public partial class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -499,6 +499,15 @@ namespace osu.Game.Screens.Edit
                     seek(e, 1);
                     return true;
 
+                // Of those, these two keys are reversed from stable because it feels more natural (and matches mouse wheel scroll directionality).
+                case Key.Up:
+                    seekControlPoint(-1);
+                    return true;
+
+                case Key.Down:
+                    seekControlPoint(1);
+                    return true;
+
                 // Track traversal keys.
                 // Matching osu-stable implementations.
                 case Key.Z:
@@ -892,6 +901,16 @@ namespace osu.Game.Screens.Edit
             }
         }
 
+        private void seekControlPoint(int direction)
+        {
+            var found = direction < 1
+                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime)
+                : editorBeatmap.ControlPointInfo.AllControlPoints.FirstOrDefault(p => p.Time > clock.CurrentTime);
+
+            if (found != null)
+                clock.Seek(found.Time);
+        }
+
         private void seek(UIEvent e, int direction)
         {
             double amount = e.ShiftPressed ? 4 : 1;
@@ -1034,7 +1053,7 @@ namespace osu.Game.Screens.Edit
         IClock IBeatSyncProvider.Clock => clock;
         ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
 
-        private class BeatmapEditorToast : Toast
+        private partial class BeatmapEditorToast : Toast
         {
             public BeatmapEditorToast(LocalisableString value, string beatmapDisplayName)
                 : base(InputSettingsStrings.EditorSection, value, beatmapDisplayName)

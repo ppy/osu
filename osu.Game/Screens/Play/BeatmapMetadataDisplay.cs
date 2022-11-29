@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// Displays beatmap metadata inside <see cref="PlayerLoader"/>
     /// </summary>
-    public class BeatmapMetadataDisplay : Container
+    public partial class BeatmapMetadataDisplay : Container
     {
         private readonly IWorkingBeatmap beatmap;
         private readonly Bindable<IReadOnlyList<Mod>> mods;
@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        private class MetadataLineLabel : OsuSpriteText
+        private partial class MetadataLineLabel : OsuSpriteText
         {
             public MetadataLineLabel(LocalisableString text)
             {
@@ -224,7 +224,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class MetadataLineInfo : OsuSpriteText
+        private partial class MetadataLineInfo : OsuSpriteText
         {
             public MetadataLineInfo(string text)
             {

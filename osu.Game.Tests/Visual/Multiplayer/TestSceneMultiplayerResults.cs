@@ -11,7 +11,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerResults : ScreenTestScene
+    public partial class TestSceneMultiplayerResults : ScreenTestScene
     {
         [Test]
         public void TestDisplayResults()

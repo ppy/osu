@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneDrawableHitObjects : OsuTestScene
+    public partial class TestSceneDrawableHitObjects : OsuTestScene
     {
         private DrawableCatchRuleset drawableRuleset;
         private double playfieldTime => drawableRuleset.Playfield.Time.Current;

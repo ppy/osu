@@ -24,7 +24,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public abstract class QueueModeTestScene : ScreenTestScene
+    public abstract partial class QueueModeTestScene : ScreenTestScene
     {
         protected abstract QueueMode Mode { get; }
 

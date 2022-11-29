@@ -34,7 +34,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChatOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneChatOverlay : OsuManualInputManagerTestScene
     {
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
@@ -621,7 +621,7 @@ namespace osu.Game.Tests.Visual.Online
             };
         }
 
-        private class TestChatOverlay : ChatOverlay
+        private partial class TestChatOverlay : ChatOverlay
         {
             public bool SlowLoading { get; set; }
 
@@ -635,7 +635,7 @@ namespace osu.Game.Tests.Visual.Online
             }
         }
 
-        private class SlowLoadingDrawableChannel : DrawableChannel
+        private partial class SlowLoadingDrawableChannel : DrawableChannel
         {
             public readonly ManualResetEventSlim LoadEvent = new ManualResetEventSlim();
 

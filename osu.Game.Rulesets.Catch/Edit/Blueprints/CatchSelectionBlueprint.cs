@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public abstract class CatchSelectionBlueprint<THitObject> : HitObjectSelectionBlueprint<THitObject>
+    public abstract partial class CatchSelectionBlueprint<THitObject> : HitObjectSelectionBlueprint<THitObject>
         where THitObject : CatchHitObject
     {
         protected override bool AlwaysShowWhenSelected => true;

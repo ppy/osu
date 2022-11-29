@@ -25,7 +25,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneCommentActions : OsuManualInputManagerTestScene
+    public partial class TestSceneCommentActions : OsuManualInputManagerTestScene
     {
         private Container<Drawable> content = null!;
         protected override Container<Drawable> Content => content;

@@ -18,7 +18,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class LadderEditorSettings : PlayerSettingsGroup
+    public partial class LadderEditorSettings : PlayerSettingsGroup
     {
         private const int padding = 10;
 
@@ -89,7 +89,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
         }
 
-        private class SettingsRoundDropdown : SettingsDropdown<TournamentRound>
+        private partial class SettingsRoundDropdown : SettingsDropdown<TournamentRound>
         {
             public SettingsRoundDropdown(BindableList<TournamentRound> rounds)
             {

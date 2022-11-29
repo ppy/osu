@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchReplayRecorder : ReplayRecorder<CatchAction>
+    public partial class CatchReplayRecorder : ReplayRecorder<CatchAction>
     {
         private readonly CatchPlayfield playfield;
 

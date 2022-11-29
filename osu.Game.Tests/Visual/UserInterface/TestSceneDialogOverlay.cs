@@ -15,7 +15,7 @@ using osu.Game.Overlays.Dialog;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneDialogOverlay : OsuTestScene
+    public partial class TestSceneDialogOverlay : OsuTestScene
     {
         private DialogOverlay overlay;
 
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("dialog displayed", () => overlay.CurrentDialog == dialog);
         }
 
-        public class SlowLoadingDialogOverlay : DialogOverlay
+        public partial class SlowLoadingDialogOverlay : DialogOverlay
         {
             public ManualResetEventSlim LoadEvent = new ManualResetEventSlim();
 
@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("dialog is not part of hierarchy", () => testDialog.Parent == null);
         }
 
-        private class TestPopupDialog : PopupDialog
+        private partial class TestPopupDialog : PopupDialog
         {
         }
     }
