@@ -2,14 +2,9 @@
 
 using System;
 using System.Collections.Generic;
-using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
-using osu.Framework.Input.StateChanges;
-using osu.Framework.Input.States;
-using osu.Framework.Logging;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.List;
 using osu.Game.Skinning;
@@ -21,16 +16,15 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneList : OsuManualInputManagerTestScene
+    public partial class TestSceneList : OsuManualInputManagerTestScene
     {
         private Container skinElements = null!;
         private DrawableList<SelectionBlueprint<ISkinnableDrawable>> drawableList = null!;
-        private Container content = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Child = content = new Container
+            Child = new Container
             {
                 Size = new Vector2(500),
                 Children = new Drawable[]
