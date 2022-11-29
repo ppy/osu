@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
@@ -26,6 +27,9 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
             Masking = true;
             RelativeSizeAxes = Axes.Both;
         }
+
+        private double startTime;
+        private double lastTime;
 
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap)
@@ -51,11 +55,14 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 
             var autoplayMod = drawableRuleset.Mods.OfType<ModAutoplay>().Single();
             drawableRuleset.SetReplayScore(autoplayMod.CreateScoreFromReplayData(playableBeatmap, drawableRuleset.Mods));
+
+            startTime = playableBeatmap.HitObjects.FirstOrDefault()!.StartTime;
+            lastTime = playableBeatmap.HitObjects.LastOrDefault()!.GetEndTime();
         }
 
-        public void SeekTo(double seekTime)
+        public void SeekTo(double percent)
         {
-            gameplayClockContainer.Seek(seekTime);
+            gameplayClockContainer.Seek(percent * lastTime - startTime);
         }
     }
 }

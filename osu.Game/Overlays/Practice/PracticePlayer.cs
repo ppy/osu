@@ -4,8 +4,10 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Overlays.Practice
@@ -15,7 +17,10 @@ namespace osu.Game.Overlays.Practice
         private PracticeOverlay practiceOverlay = null!;
         private readonly PracticePlayerLoader loader;
 
+        private const double grace_period = 3000;
         private bool blockFail = true;
+        private double customEndTime;
+        private double customStartTime;
 
         public PracticePlayer(PracticePlayerLoader loader)
         {
@@ -38,7 +43,10 @@ namespace osu.Game.Overlays.Practice
         {
             var masterGameplayClockContainer = new MasterGameplayClockContainer(beatmap, gameplayStart);
             var playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset);
-            double customStartTime = loader.CustomStart.Value * (playableBeatmap.HitObjects.Last().StartTime - playableBeatmap.HitObjects.First().StartTime);
+
+            double beatmapLength = playableBeatmap.HitObjects.LastOrDefault()!.GetEndTime() - playableBeatmap.HitObjects.FirstOrDefault()!.StartTime;
+            customStartTime = loader.CustomStart.Value * beatmapLength;
+            customEndTime = loader.CustomEnd.Value * beatmapLength;
 
             //Make sure to only use custom startTime if it is bigger ( later) than the original one.
             if (customStartTime - 1 > gameplayStart)
@@ -57,7 +65,6 @@ namespace osu.Game.Overlays.Practice
 
             //set it to false after the last action that depends on it
             loader.IsFirstTry = false;
-            blockFail = false;
         }
 
         protected override void LoadComplete()
@@ -76,6 +83,12 @@ namespace osu.Game.Overlays.Practice
                 //Todo: remove this hack!. PauseOverlay seems to be being triggered by something
                 PauseOverlay.Hide();
             }
+
+            OnGameplayStarted += () =>
+            {
+                GameplayClockContainer.Delay(customEndTime - customStartTime).Then().Schedule(() => Restart());
+                GameplayClockContainer.Delay(grace_period).Then().Schedule(() => blockFail = false);
+            };
         }
 
         protected override void Dispose(bool isDisposing)
@@ -101,7 +114,9 @@ namespace osu.Game.Overlays.Practice
 
         protected override bool CheckModsAllowFailure()
         {
-            return blockFail && base.CheckModsAllowFailure();
+            if (blockFail) return false;
+
+            return base.CheckModsAllowFailure();
         }
     }
 }

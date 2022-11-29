@@ -2,13 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
@@ -21,8 +18,6 @@ namespace osu.Game.Overlays.Practice
     {
         public Action Restart = null!;
         public Action OnHide = null!;
-
-        private readonly PracticePlayerLoader loader;
 
         private readonly BindableNumber<double> customStart = new BindableNumber<double>
         {
@@ -43,26 +38,15 @@ namespace osu.Game.Overlays.Practice
         public PracticeOverlay(PracticePlayerLoader loader)
             : base(OverlayColourScheme.Green)
         {
-            this.loader = loader;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap)
-        {
-            var playableBeatmap = beatmap.Value.GetPlayableBeatmap(beatmap.Value.BeatmapInfo.Ruleset);
-
             createContent();
-
-            double lastTime = playableBeatmap.HitObjects.Last().StartTime;
-            double startTime = playableBeatmap.HitObjects.First().StartTime;
 
             customStart.BindTo(loader.CustomStart);
             customEnd.BindTo(loader.CustomEnd);
 
             customStart.BindValueChanged(startPercent =>
-                preview.SeekTo(startPercent.NewValue * (lastTime - startTime)));
+                preview.SeekTo(startPercent.NewValue));
             customEnd.BindValueChanged(endPercent =>
-                preview.SeekTo(endPercent.NewValue * (lastTime - startTime)));
+                preview.SeekTo(endPercent.NewValue));
         }
 
         private void createContent()
