@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Comments;
 using osuTK;
@@ -121,15 +122,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Scheduler.AddDelayed(() => IsLoading = false, 1000);
             }
 
-            protected override string FooterText => @"Footer text. And it is pretty long. Cool.";
-            protected override string CommitButtonText => @"Commit";
-            protected override string TextBoxPlaceholder => @"This text box is empty";
+            protected override LocalisableString FooterText => @"Footer text. And it is pretty long. Cool.";
+            protected override LocalisableString CommitButtonText => @"Commit";
+            protected override LocalisableString TextBoxPlaceholder => @"This text box is empty";
         }
 
         private partial class TestCancellableCommentEditor : CancellableCommentEditor
         {
             public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
-            protected override string FooterText => @"Wow, another one. Sicc";
+            protected override LocalisableString FooterText => @"Wow, another one. Sicc";
 
             public bool Cancelled { get; private set; }
 
@@ -138,8 +139,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 OnCancel = () => Cancelled = true;
             }
 
-            protected override string CommitButtonText => @"Save";
-            protected override string TextBoxPlaceholder => @"Multiline textboxes soon";
+            protected override LocalisableString CommitButtonText => @"Save";
+            protected override LocalisableString TextBoxPlaceholder => @"Multiline textboxes soon";
         }
     }
 }
