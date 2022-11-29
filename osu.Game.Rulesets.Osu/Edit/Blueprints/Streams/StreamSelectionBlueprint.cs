@@ -131,13 +131,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
         protected override void OnDeselected()
         {
+            base.OnDeselected();
+
+            updateVisualDefinition();
+
             // TODO: Remove this when streams can be saved.
             // Convert the stream to an actual stream on deselection so we're not left with a Stream object which can't be saved.
             Scheduler.AddOnce(convertToStream);
 
-            base.OnDeselected();
-
-            updateVisualDefinition();
+            // This is always prepended by the begin-change in StreamPlacementBlueprint
+            changeHandler?.EndChange();
         }
 
         private void updateVisualDefinition()
