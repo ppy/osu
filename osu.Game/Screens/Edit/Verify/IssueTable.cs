@@ -86,10 +86,10 @@ namespace osu.Game.Screens.Edit.Verify
             var columns = new List<TableColumn>
             {
                 new TableColumn(string.Empty, Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn(@"Type", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
-                new TableColumn(@"Time", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
-                new TableColumn(@"Message", Anchor.CentreLeft),
-                new TableColumn(@"Category", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("Type", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
+                new TableColumn("Time", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
+                new TableColumn("Message", Anchor.CentreLeft),
+                new TableColumn("Category", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
             };
 
             return columns.ToArray();

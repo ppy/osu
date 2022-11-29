@@ -73,8 +73,8 @@ namespace osu.Game.Screens.Edit.Timing
         {
             var columns = new List<TableColumn>
             {
-                new TableColumn(@"Time", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, TIMING_COLUMN_WIDTH)),
-                new TableColumn(@"Attributes", Anchor.CentreLeft),
+                new TableColumn("Time", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, TIMING_COLUMN_WIDTH)),
+                new TableColumn("Attributes", Anchor.CentreLeft),
             };
 
             return columns.ToArray();
