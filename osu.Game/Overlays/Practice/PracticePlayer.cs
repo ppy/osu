@@ -3,10 +3,7 @@
 
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Screens.Play;
@@ -16,44 +13,51 @@ namespace osu.Game.Overlays.Practice
     public partial class PracticePlayer : Player
     {
         private PracticeOverlay practiceOverlay = null!;
+        private readonly PracticePlayerLoader loader;
 
-        private bool blockFailure = true;
+        private bool blockFail = true;
 
-        public PracticePlayer(PlayerConfiguration? configuration = null)
-            : base(configuration)
+        public PracticePlayer(PracticePlayerLoader loader)
         {
+            this.loader = loader;
         }
 
-        [Resolved]
-        private PracticePlayerLoader loader { get; set; } = null!;
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colour)
+        {
+            createPauseOverlay();
+            addButtons(colour);
+        }
 
         [Resolved(CanBeNull = true)]
         internal IOverlayManager? OverlayManager { get; private set; }
 
         private IDisposable? practiceOverlayRegistration;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colour, IBindable<WorkingBeatmap> beatmap)
+        protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
         {
-            var playableBeatmap = beatmap.Value.GetPlayableBeatmap(beatmap.Value.BeatmapInfo.Ruleset);
-
+            var masterGameplayClockContainer = new MasterGameplayClockContainer(beatmap, gameplayStart);
+            var playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset);
             double customStartTime = loader.CustomStart.Value * (playableBeatmap.HitObjects.Last().StartTime - playableBeatmap.HitObjects.First().StartTime);
 
-            if (customStartTime > playableBeatmap.HitObjects.First().StartTime)
-            {
-                GameplayClockContainer.Reset(customStartTime);
+            //Make sure to only use custom startTime if it is bigger ( later) than the original one.
+            if (customStartTime - 1 > gameplayStart)
+                masterGameplayClockContainer.Reset(customStartTime);
 
-                OnGameplayStarted += () => Task.Run(async () =>
-                {
-                    //Todo : create some form of visual indicator of this grace period, possibly settings for its length?
-                    await Task.Delay(2000);
-                    blockFailure = false;
-                });
+            return masterGameplayClockContainer;
+        }
+
+        protected override void StartGameplay()
+        {
+            //We dont want the gameplay running on the first attempt since the practice screen is being shown automatically
+            if (!loader.IsFirstTry)
+            {
+                base.StartGameplay();
             }
 
-            addButtons(colour);
-
-            createPauseOverlay();
+            //set it to false after the last action that depends on it
+            loader.IsFirstTry = false;
+            blockFail = false;
         }
 
         protected override void LoadComplete()
@@ -65,9 +69,13 @@ namespace osu.Game.Overlays.Practice
             if (loader.IsFirstTry)
             {
                 practiceOverlay.Show();
+                PauseOverlay.Hide();
             }
-
-            loader.IsFirstTry = false;
+            else
+            {
+                //Todo: remove this hack!. PauseOverlay seems to be being triggered by something
+                PauseOverlay.Hide();
+            }
         }
 
         protected override void Dispose(bool isDisposing)
@@ -78,11 +86,10 @@ namespace osu.Game.Overlays.Practice
 
         private void createPauseOverlay()
         {
-            LoadComponent(practiceOverlay = new PracticeOverlay
+            LoadComponent(practiceOverlay = new PracticeOverlay(loader)
             {
-                State = { Value = Visibility.Hidden },
                 Restart = () => Restart(),
-                OnHide = () => { PauseOverlay.Show(); },
+                OnHide = () => PauseOverlay.Show()
             });
         }
 
@@ -94,12 +101,7 @@ namespace osu.Game.Overlays.Practice
 
         protected override bool CheckModsAllowFailure()
         {
-            if (blockFailure)
-            {
-                return false;
-            }
-
-            return base.CheckModsAllowFailure();
+            return blockFail && base.CheckModsAllowFailure();
         }
     }
 }

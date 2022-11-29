@@ -22,28 +22,28 @@ namespace osu.Game.Overlays.Practice
         public Action Restart = null!;
         public Action OnHide = null!;
 
-        [Resolved]
-        private PracticePlayerLoader playerLoader { get; set; } = null!;
+        private readonly PracticePlayerLoader loader;
 
         private readonly BindableNumber<double> customStart = new BindableNumber<double>
         {
             MinValue = 0,
-            MaxValue = 100,
-            Precision = 0.001f
+            MaxValue = 1,
+            Precision = 0.01f
         };
 
         private readonly BindableNumber<double> customEnd = new BindableNumber<double>(100)
         {
             MinValue = 0,
-            MaxValue = 100,
+            MaxValue = 1,
             Precision = 0.001f
         };
 
         private PracticeGameplayPreview preview = null!;
 
-        public PracticeOverlay()
+        public PracticeOverlay(PracticePlayerLoader loader)
             : base(OverlayColourScheme.Green)
         {
+            this.loader = loader;
         }
 
         [BackgroundDependencyLoader]
@@ -56,13 +56,13 @@ namespace osu.Game.Overlays.Practice
             double lastTime = playableBeatmap.HitObjects.Last().StartTime;
             double startTime = playableBeatmap.HitObjects.First().StartTime;
 
-            customStart.BindTo(playerLoader.CustomStart);
-            customEnd.BindTo(playerLoader.CustomEnd);
+            customStart.BindTo(loader.CustomStart);
+            customEnd.BindTo(loader.CustomEnd);
 
             customStart.BindValueChanged(startPercent =>
-                preview.SeekTo(startPercent.NewValue / 100 * (lastTime - startTime)));
+                preview.SeekTo(startPercent.NewValue * (lastTime - startTime)));
             customEnd.BindValueChanged(endPercent =>
-                preview.SeekTo(endPercent.NewValue / 100 * (lastTime - startTime)));
+                preview.SeekTo(endPercent.NewValue * (lastTime - startTime)));
         }
 
         private void createContent()
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Practice
                 Child = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Colour4.Black.Opacity(.8f)
+                    Colour = Colour4.Black.Opacity(.6f)
                 }
             });
             Header.Title = PracticeOverlayStrings.PracticeOverlayHeaderTitle;
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Practice
                             DefaultStringLowerBound = "Start",
                             DefaultStringUpperBound = "End",
                             DefaultTooltipLowerBound = "Start of beatmap",
-                            DefaultTooltipUpperBound = "End of beatmap"
+                            DefaultTooltipUpperBound = "End of beatmap",
                         },
                         new ShearedButton(150)
                         {

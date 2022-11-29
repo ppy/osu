@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play
             // not ready if a focused overlay is visible, like settings.
             && inputManager.FocusedDrawable == null;
 
-        private readonly Func<Player> createPlayer;
+        protected Func<Player> CreatePlayer = null!;
 
         /// <summary>
         /// The <see cref="Player"/> instance being loaded by this screen.
@@ -142,9 +142,12 @@ namespace osu.Game.Screens.Play
         [Resolved(CanBeNull = true)]
         private BatteryInfo? batteryInfo { get; set; }
 
-        public PlayerLoader(Func<Player> createPlayer)
+        public PlayerLoader(Func<Player>? createPlayer = null)
         {
-            this.createPlayer = createPlayer;
+            if (createPlayer != null)
+            {
+                CreatePlayer = createPlayer;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -380,7 +383,7 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            CurrentPlayer = createPlayer();
+            CurrentPlayer = CreatePlayer();
             CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
