@@ -553,12 +553,12 @@ namespace osu.Game.Overlays.Comments
                 };
             }
 
-            private string getParentMessage()
+            private LocalisableString getParentMessage()
             {
                 if (parentComment == null)
                     return string.Empty;
 
-                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? "deleted" : string.Empty;
+                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? CommentsStrings.Deleted : string.Empty;
             }
         }
     }
