@@ -111,6 +111,12 @@ namespace osu.Game.Rulesets.Objects
         {
             calculatedPath.Clear();
 
+            if (Path.ControlPoints.Count == 1)
+            {
+                calculatedPath.Add((Path.ControlPoints[0].Position, 0));
+                return;
+            }
+
             double[] segments = Path.GetSegmentEnds().ToArray();
 
             for (int i = 0; i < Math.Min(segments.Length - 1, ControlPoints.Count - 1); i++)
