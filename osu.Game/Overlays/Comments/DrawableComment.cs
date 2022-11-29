@@ -331,11 +331,11 @@ namespace osu.Game.Overlays.Comments
             if (WasDeleted)
                 makeDeleted();
 
-            actionsContainer.AddLink("Copy link", copyUrl);
+            actionsContainer.AddLink(CommonStrings.ButtonsPermalink, copyUrl);
             actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
-                actionsContainer.AddLink("Delete", deleteComment);
+                actionsContainer.AddLink(CommonStrings.ButtonsDelete, deleteComment);
             else
                 actionsContainer.AddArbitraryDrawable(new CommentReportButton(Comment));
 
