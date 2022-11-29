@@ -14,7 +14,6 @@ using osu.Game.Graphics.UserInterface;
 using System;
 using osuTK;
 using osu.Framework.Bindables;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 
@@ -221,22 +220,6 @@ namespace osu.Game.Overlays.Comments
                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                 Margin = new MarginPadding { Horizontal = 20 },
             };
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                if (!Enabled.Value)
-                    return false;
-
-                try
-                {
-                    return base.OnClick(e);
-                }
-                finally
-                {
-                    // run afterwards as this will disable this button.
-                    IsLoading = true;
-                }
-            }
         }
     }
 }

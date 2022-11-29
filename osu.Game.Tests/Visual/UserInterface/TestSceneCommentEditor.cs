@@ -116,6 +116,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             private void onCommit(string value)
             {
+                IsLoading = true;
                 CommittedText = value;
                 Scheduler.AddDelayed(() => IsLoading = false, 1000);
             }
