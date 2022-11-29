@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class MedalHeaderContainer : CompositeDrawable
+    public partial class MedalHeaderContainer : CompositeDrawable
     {
         private FillFlowContainer badgeFlowContainer;
 

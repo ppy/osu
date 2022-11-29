@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardContent : CompositeDrawable
+    public partial class BeatmapCardContent : CompositeDrawable
     {
         public Drawable MainContent
         {

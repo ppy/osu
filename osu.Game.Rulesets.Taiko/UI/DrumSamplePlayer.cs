@@ -10,7 +10,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    internal class DrumSamplePlayer : CompositeDrawable, IKeyBindingHandler<TaikoAction>
+    internal partial class DrumSamplePlayer : CompositeDrawable, IKeyBindingHandler<TaikoAction>
     {
         private readonly DrumSampleTriggerSource leftRimSampleTriggerSource;
         private readonly DrumSampleTriggerSource leftCentreSampleTriggerSource;

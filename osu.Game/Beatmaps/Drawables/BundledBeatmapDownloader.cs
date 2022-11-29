@@ -21,7 +21,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class BundledBeatmapDownloader : CompositeDrawable
+    public partial class BundledBeatmapDownloader : CompositeDrawable
     {
         private readonly bool shouldPostNotifications;
 
@@ -136,7 +136,9 @@ namespace osu.Game.Beatmaps.Drawables
         private static readonly string[] always_bundled_beatmaps =
         {
             // This thing is 40mb, I'm not sure we want it here...
-            @"1388906 Raphlesia & BilliumMoto - My Love.osz"
+            @"1388906 Raphlesia & BilliumMoto - My Love.osz",
+            // Winner of Triangles mapping competition: https://osu.ppy.sh/home/news/2022-10-06-results-triangles
+            @"1841885 cYsmix - triangles.osz",
         };
 
         private static readonly string[] bundled_osu =

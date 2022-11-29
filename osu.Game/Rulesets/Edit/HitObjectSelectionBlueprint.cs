@@ -3,7 +3,10 @@
 
 #nullable disable
 
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -11,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract class HitObjectSelectionBlueprint : SelectionBlueprint<HitObject>
+    public abstract partial class HitObjectSelectionBlueprint : SelectionBlueprint<HitObject>
     {
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectSelectionBlueprint"/> applies to.
@@ -23,11 +26,22 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         protected virtual bool AlwaysShowWhenSelected => false;
 
+        /// <summary>
+        /// Whether extra animations should be shown to convey hit position / state in addition to gameplay animations.
+        /// </summary>
+        protected Bindable<bool> ShowHitMarkers { get; private set; }
+
         protected override bool ShouldBeAlive => (DrawableObject?.IsAlive == true && DrawableObject.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
 
         protected HitObjectSelectionBlueprint(HitObject hitObject)
             : base(hitObject)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            ShowHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => DrawableObject.ReceivePositionalInputAt(screenSpacePos);
@@ -37,7 +51,7 @@ namespace osu.Game.Rulesets.Edit
         public override Quad SelectionQuad => DrawableObject.ScreenSpaceDrawQuad;
     }
 
-    public abstract class HitObjectSelectionBlueprint<T> : HitObjectSelectionBlueprint
+    public abstract partial class HitObjectSelectionBlueprint<T> : HitObjectSelectionBlueprint
         where T : HitObject
     {
         public T HitObject => (T)Item;

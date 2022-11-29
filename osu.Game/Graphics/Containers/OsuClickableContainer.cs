@@ -12,7 +12,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuClickableContainer : ClickableContainer, IHasTooltip
+    public partial class OsuClickableContainer : ClickableContainer, IHasTooltip
     {
         private readonly HoverSampleSet sampleSet;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override Container<Drawable> Content => content;
 
-        protected virtual HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
+        protected virtual HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet) { Enabled = { BindTarget = Enabled } };
 
         public OsuClickableContainer(HoverSampleSet sampleSet = HoverSampleSet.Default)
         {

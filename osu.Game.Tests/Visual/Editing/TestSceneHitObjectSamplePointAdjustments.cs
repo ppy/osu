@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneHitObjectSamplePointAdjustments : EditorTestScene
+    public partial class TestSceneHitObjectSamplePointAdjustments : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

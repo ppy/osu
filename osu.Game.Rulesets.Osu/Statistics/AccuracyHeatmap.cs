@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Statistics
 {
-    public class AccuracyHeatmap : CompositeDrawable
+    public partial class AccuracyHeatmap : CompositeDrawable
     {
         /// <summary>
         /// Size of the inner circle containing the "hit" points, relative to the size of this <see cref="AccuracyHeatmap"/>.
@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             bufferedGrid.ForceRedraw();
         }
 
-        private class HitPoint : Circle
+        private partial class HitPoint : Circle
         {
             /// <summary>
             /// The base colour which will be lightened/darkened depending on the value of this <see cref="HitPoint"/>.

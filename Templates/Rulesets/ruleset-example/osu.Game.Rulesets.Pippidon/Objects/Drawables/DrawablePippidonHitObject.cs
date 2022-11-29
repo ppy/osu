@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
 {
-    public class DrawablePippidonHitObject : DrawableHitObject<PippidonHitObject>
+    public partial class DrawablePippidonHitObject : DrawableHitObject<PippidonHitObject>
     {
         private const double time_preempt = 600;
         private const double time_fadein = 400;

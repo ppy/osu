@@ -14,7 +14,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
-    public class TestSceneTaikoScroller : TaikoSkinnableTestScene
+    public partial class TestSceneTaikoScroller : TaikoSkinnableTestScene
     {
         private readonly ManualClock clock = new ManualClock();
 
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public TestSceneTaikoScroller()
         {
             AddStep("Load scroller", () => SetContents(_ =>
-                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Scroller), _ => Empty())
+                new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Scroller), _ => Empty())
                 {
                     Clock = new FramedClock(clock),
                     Height = 0.4f,

@@ -17,7 +17,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapRulesetTabItem : OverlayRulesetTabItem
+    public partial class BeatmapRulesetTabItem : OverlayRulesetTabItem
     {
         public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 

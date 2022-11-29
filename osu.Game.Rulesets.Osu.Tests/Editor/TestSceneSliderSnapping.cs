@@ -26,7 +26,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderSnapping : EditorTestScene
+    public partial class TestSceneSliderSnapping : EditorTestScene
     {
         private const double beat_length = 1000;
 

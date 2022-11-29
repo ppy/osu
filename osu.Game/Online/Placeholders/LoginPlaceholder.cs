@@ -10,7 +10,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Online.Placeholders
 {
-    public sealed class LoginPlaceholder : ClickablePlaceholder
+    public sealed partial class LoginPlaceholder : ClickablePlaceholder
     {
         [Resolved(CanBeNull = true)]
         private LoginOverlay login { get; set; }

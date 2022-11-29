@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSpinnerTick : DrawableOsuHitObject
+    public partial class DrawableSpinnerTick : DrawableOsuHitObject
     {
         public override bool DisplayResult => false;
 

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -12,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacySliderBall : CompositeDrawable
+    public partial class LegacySliderBall : CompositeDrawable
     {
         private readonly Drawable animationContent;
 
@@ -20,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         [Resolved(canBeNull: true)]
         private DrawableHitObject? parentObject { get; set; }
+
+        public Color4 BallColour => animationContent.Colour;
 
         private Sprite layerNd = null!;
         private Sprite layerSpec = null!;
@@ -61,6 +64,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             };
         }
 
+        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -69,6 +74,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
                 parentObject.ApplyCustomUpdateState += updateStateTransforms;
                 updateStateTransforms(parentObject, parentObject.State.Value);
+
+                if (skin.GetConfig<SkinConfiguration.LegacySetting, bool>(SkinConfiguration.LegacySetting.AllowSliderBallTint)?.Value == true)
+                {
+                    accentColour.BindTo(parentObject.AccentColour);
+                    accentColour.BindValueChanged(a => animationContent.Colour = a.NewValue, true);
+                }
             }
         }
 

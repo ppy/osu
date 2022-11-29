@@ -17,7 +17,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneHyperDash : TestSceneCatchPlayer
+    public partial class TestSceneHyperDash : TestSceneCatchPlayer
     {
         protected override bool Autoplay => true;
 

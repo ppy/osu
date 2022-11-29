@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
@@ -19,7 +20,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A sample corresponding to an <see cref="ISampleInfo"/> that supports being pooled and responding to skin changes.
     /// </summary>
-    public class PoolableSkinnableSample : SkinReloadableDrawable, IAdjustableAudioComponent
+    public partial class PoolableSkinnableSample : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         /// <summary>
         /// The currently-loaded <see cref="DrawableSample"/>.
@@ -175,7 +176,7 @@ namespace osu.Game.Skinning
         {
             base.Dispose(isDisposing);
 
-            if (CurrentSkin != null)
+            if (CurrentSkin.IsNotNull())
                 CurrentSkin.SourceChanged -= skinChangedImmediate;
         }
 

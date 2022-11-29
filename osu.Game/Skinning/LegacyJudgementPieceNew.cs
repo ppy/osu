@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
@@ -16,17 +14,17 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyJudgementPieceNew : CompositeDrawable, IAnimatableJudgement
+    public partial class LegacyJudgementPieceNew : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
 
-        private readonly LegacyJudgementPieceOld temporaryOldStyle;
+        private readonly LegacyJudgementPieceOld? temporaryOldStyle;
 
         private readonly Drawable mainPiece;
 
-        private readonly ParticleExplosion particles;
+        private readonly ParticleExplosion? particles;
 
-        public LegacyJudgementPieceNew(HitResult result, Func<Drawable> createMainDrawable, Texture particleTexture)
+        public LegacyJudgementPieceNew(HitResult result, Func<Drawable> createMainDrawable, Texture? particleTexture)
         {
             this.result = result;
 
@@ -124,6 +122,6 @@ namespace osu.Game.Skinning
             }
         }
 
-        public Drawable GetAboveHitObjectsProxiedContent() => temporaryOldStyle?.CreateProxy(); // for new style judgements, only the old style temporary display is in front of objects.
+        public Drawable? GetAboveHitObjectsProxiedContent() => temporaryOldStyle?.CreateProxy(); // for new style judgements, only the old style temporary display is in front of objects.
     }
 }

@@ -12,7 +12,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarRulesetTabButton : TabItem<RulesetInfo>
+    public partial class ToolbarRulesetTabButton : TabItem<RulesetInfo>
     {
         private readonly RulesetButton ruleset;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void OnDeactivated() => ruleset.Active = false;
 
-        private class RulesetButton : ToolbarButton
+        private partial class RulesetButton : ToolbarButton
         {
             public bool Active
             {

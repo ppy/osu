@@ -12,7 +12,7 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Tests.Mods
 {
     [TestFixture]
-    public class SettingsSourceAttributeTest
+    public partial class SettingsSourceAttributeTest
     {
         [Test]
         public void TestOrdering()
@@ -60,11 +60,11 @@ namespace osu.Game.Tests.Mods
             public BindableInt UnorderedSetting { get; set; } = new BindableInt();
         }
 
-        private class CustomSettingsControl : SettingsItem<int>
+        private partial class CustomSettingsControl : SettingsItem<int>
         {
             protected override Drawable CreateControl() => new CustomControl();
 
-            private class CustomControl : Drawable, IHasCurrentValue<int>
+            private partial class CustomControl : Drawable, IHasCurrentValue<int>
             {
                 public Bindable<int> Current { get; set; } = new Bindable<int>();
             }

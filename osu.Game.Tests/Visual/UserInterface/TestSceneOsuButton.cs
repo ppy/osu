@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuButton : OsuTestScene
+    public partial class TestSceneOsuButton : OsuTestScene
     {
         [Test]
         public void TestToggleEnabled()

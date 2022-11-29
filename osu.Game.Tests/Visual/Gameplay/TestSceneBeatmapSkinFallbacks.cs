@@ -26,7 +26,7 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneBeatmapSkinFallbacks : OsuPlayerTestScene
+    public partial class TestSceneBeatmapSkinFallbacks : OsuPlayerTestScene
     {
         private ISkin currentBeatmapSkin;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             CreateSkinTest(TrianglesSkin.CreateInfo(), () => new LegacyBeatmapSkin(new BeatmapInfo(), null));
             AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
-            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(SkinnableTarget.MainHUDComponents, skinManager.CurrentSkin.Value));
+            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(GlobalSkinComponentLookup.LookupType.MainHUDComponents, skinManager.CurrentSkin.Value));
         }
 
         protected void CreateSkinTest(SkinInfo gameCurrentSkin, Func<ISkin> getBeatmapSkin)
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        protected bool AssertComponentsFromExpectedSource(SkinnableTarget target, ISkin expectedSource)
+        protected bool AssertComponentsFromExpectedSource(GlobalSkinComponentLookup.LookupType target, ISkin expectedSource)
         {
             var actualComponentsContainer = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target)
                                                   .ChildrenOfType<SkinnableTargetComponentsContainer>().SingleOrDefault();
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             var actualInfo = actualComponentsContainer.CreateSkinnableInfo();
 
-            var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource.GetDrawableComponent(new SkinnableTargetComponent(target));
+            var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource.GetDrawableComponent(new GlobalSkinComponentLookup(target));
             if (expectedComponentsContainer == null)
                 return false;
 

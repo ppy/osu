@@ -14,7 +14,7 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserProfileOverlay : OsuTestScene
+    public partial class TestSceneUserProfileOverlay : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 
@@ -52,8 +52,15 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
                     Description = "Outstanding help by being a voluntary test subject.",
-                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
-                }
+                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg",
+                    Url = "https://osu.ppy.sh/wiki/en/People/Community_Contributors",
+                },
+                new Badge
+                {
+                    AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
+                    Description = "Badge without a url.",
+                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg",
+                },
             },
             Title = "osu!volunteer",
             Colour = "ff0000",
@@ -110,7 +117,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Show without reload", profile.Show);
         }
 
-        private class TestUserProfileOverlay : UserProfileOverlay
+        private partial class TestUserProfileOverlay : UserProfileOverlay
         {
             public new ProfileHeader Header => base.Header;
         }

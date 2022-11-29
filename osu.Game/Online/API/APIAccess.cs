@@ -20,11 +20,13 @@ using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Notifications;
+using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class APIAccess : Component, IAPIProvider
+    public partial class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
 
@@ -299,6 +301,9 @@ namespace osu.Game.Online.API
         public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) =>
             new HubClientConnector(clientName, endpoint, this, versionHash, preferMessagePack);
 
+        public NotificationsClientConnector GetNotificationsConnector() =>
+            new WebSocketNotificationsClientConnector(this);
+
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
             Debug.Assert(State.Value == APIState.Offline);
@@ -414,7 +419,7 @@ namespace osu.Game.Online.API
             failureCount++;
             log.Add($@"API failure count is now {failureCount}");
 
-            if (failureCount >= 3 && State.Value == APIState.Online)
+            if (failureCount >= 3)
             {
                 state.Value = APIState.Failing;
                 flushQueue();

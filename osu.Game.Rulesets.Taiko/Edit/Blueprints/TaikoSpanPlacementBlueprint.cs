@@ -16,7 +16,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 {
-    public class TaikoSpanPlacementBlueprint : PlacementBlueprint
+    public partial class TaikoSpanPlacementBlueprint : PlacementBlueprint
     {
         private readonly HitPiece headPiece;
         private readonly HitPiece tailPiece;
@@ -51,6 +51,12 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 
         private double originalStartTime;
         private Vector2 originalPosition;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            BeginPlacement();
+        }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {

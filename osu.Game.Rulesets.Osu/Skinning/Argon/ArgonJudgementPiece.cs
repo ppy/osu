@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public partial class ArgonJudgementPiece : CompositeDrawable, IAnimatableJudgement
     {
         protected readonly HitResult Result;
 
@@ -75,6 +75,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             {
                 default:
                     JudgementText
+                        .FadeInFromZero(300, Easing.OutQuint)
                         .ScaleTo(Vector2.One)
                         .ScaleTo(new Vector2(1.2f), 1800, Easing.OutQuint);
                     break;
@@ -96,9 +97,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             ringExplosion?.PlayAnimation();
         }
 
-        public Drawable? GetAboveHitObjectsProxiedContent() => null;
+        public Drawable? GetAboveHitObjectsProxiedContent() => JudgementText.CreateProxy();
 
-        private class RingExplosion : CompositeDrawable
+        private partial class RingExplosion : CompositeDrawable
         {
             private readonly float travel = 52;
 

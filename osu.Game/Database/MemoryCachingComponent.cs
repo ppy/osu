@@ -18,7 +18,7 @@ namespace osu.Game.Database
     /// A component which performs lookups (or calculations) and caches the results.
     /// Currently not persisted between game sessions.
     /// </summary>
-    public abstract class MemoryCachingComponent<TLookup, TValue> : Component
+    public abstract partial class MemoryCachingComponent<TLookup, TValue> : Component
     {
         private readonly ConcurrentDictionary<TLookup, TValue> cache = new ConcurrentDictionary<TLookup, TValue>();
 

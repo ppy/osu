@@ -18,7 +18,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [HeadlessTest]
-    public class LegacyMainCirclePieceTest : OsuTestScene
+    public partial class LegacyMainCirclePieceTest : OsuTestScene
     {
         [Resolved]
         private IRenderer renderer { get; set; } = null!;
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("check overlay sprite", () => piece.OverlaySprite?.Texture?.AssetName == expectedOverlay);
         }
 
-        private class TestLegacyMainCirclePiece : LegacyMainCirclePiece
+        private partial class TestLegacyMainCirclePiece : LegacyMainCirclePiece
         {
             public new Sprite? CircleSprite => base.CircleSprite.ChildrenOfType<Sprite>().DistinctBy(s => s.Texture.AssetName).SingleOrDefault();
             public new Sprite? OverlaySprite => base.OverlaySprite.ChildrenOfType<Sprite>().DistinctBy(s => s.Texture.AssetName).SingleOrDefault();

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
@@ -15,7 +13,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyManiaJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public partial class LegacyManiaJudgementPiece : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
         private readonly Drawable animation;
@@ -41,21 +39,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
             Y = scorePosition ?? 0;
 
-            if (animation != null)
+            InternalChild = animation.With(d =>
             {
-                InternalChild = animation.With(d =>
-                {
-                    d.Anchor = Anchor.Centre;
-                    d.Origin = Anchor.Centre;
-                });
-            }
+                d.Anchor = Anchor.Centre;
+                d.Origin = Anchor.Centre;
+            });
         }
 
         public void PlayAnimation()
         {
-            if (animation == null)
-                return;
-
             (animation as IFramedAnimation)?.GotoFrame(0);
 
             this.FadeInFromZero(20, Easing.Out)
@@ -86,6 +78,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             }
         }
 
-        public Drawable GetAboveHitObjectsProxiedContent() => null;
+        public Drawable? GetAboveHitObjectsProxiedContent() => null;
     }
 }

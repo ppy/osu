@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneSliderComboChange : TestSceneSlider
+    public partial class TestSceneSliderComboChange : TestSceneSlider
     {
         private readonly Bindable<int> comboIndex = new Bindable<int>();
 

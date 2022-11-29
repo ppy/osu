@@ -21,7 +21,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneDrainingHealthProcessor : OsuTestScene
+    public partial class TestSceneDrainingHealthProcessor : OsuTestScene
     {
         private HealthProcessor processor;
         private ManualClock clock;

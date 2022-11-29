@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A container for <see cref="SelectionBlueprint{HitObject}"/> ordered by their <see cref="HitObject"/> start times.
     /// </summary>
-    public sealed class HitObjectOrderedSelectionContainer : Container<SelectionBlueprint<HitObject>>
+    public sealed partial class HitObjectOrderedSelectionContainer : Container<SelectionBlueprint<HitObject>>
     {
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; }

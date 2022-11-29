@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedButton : OsuClickableContainer
+    public partial class ShearedButton : OsuClickableContainer
     {
         public LocalisableString Text
         {
@@ -138,7 +138,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet) { Enabled = { BindTarget = Enabled } };
 
         protected override void LoadComplete()
         {

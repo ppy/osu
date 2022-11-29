@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonSpinnerTicks : CompositeDrawable
+    public partial class ArgonSpinnerTicks : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         private void load()

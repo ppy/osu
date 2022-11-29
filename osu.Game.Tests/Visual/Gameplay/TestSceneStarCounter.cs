@@ -13,7 +13,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneStarCounter : OsuTestScene
+    public partial class TestSceneStarCounter : OsuTestScene
     {
         private readonly StarCounter starCounter;
         private readonly OsuSpriteText starsLabel;

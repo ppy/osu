@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownTextFlowContainer : MarkdownTextFlowContainer
+    public partial class OsuMarkdownTextFlowContainer : MarkdownTextFlowContainer
     {
         protected override void AddLinkText(string text, LinkInline linkInline)
             => AddDrawable(new OsuMarkdownLinkText(text, linkInline));
@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             AddDrawable(new DrawableFlag(countryCode) { Size = new Vector2(20, 15) });
         }
 
-        private class OsuMarkdownInlineCode : Container
+        private partial class OsuMarkdownInlineCode : Container
         {
             [Resolved]
             private IMarkdownTextComponent parentTextComponent { get; set; }

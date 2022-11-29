@@ -21,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneZoomableScrollContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneZoomableScrollContainer : OsuManualInputManagerTestScene
     {
         private ZoomableScrollContainer scrollContainer;
         private Drawable innerBox;
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Editing
                             }
                         }
                     },
-                    new MenuCursor()
+                    new MenuCursorContainer()
                 };
 
                 scrollContainer.Add(innerBox = new Box

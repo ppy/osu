@@ -19,7 +19,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenDefault : BackgroundScreen
+    public partial class BackgroundScreenDefault : BackgroundScreen
     {
         private Background background;
 
@@ -95,14 +95,14 @@ namespace osu.Game.Screens.Backgrounds
             nextTask = Scheduler.AddDelayed(() =>
             {
                 LoadComponentAsync(nextBackground, displayNext, cancellationTokenSource.Token);
-            }, 100);
+            }, 500);
 
             return true;
         }
 
         private void displayNext(Background newBackground)
         {
-            background?.FadeOut(800, Easing.InOutSine);
+            background?.FadeOut(800, Easing.OutQuint);
             background?.Expire();
 
             AddInternal(background = newBackground);

@@ -15,7 +15,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneUserProfileHeader : OsuTestScene
+    public partial class TestSceneUserProfileHeader : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);

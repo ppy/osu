@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePerformancePointsCounter : OsuTestScene
+    public partial class TestScenePerformancePointsCounter : OsuTestScene
     {
         private DependencyProvidingContainer dependencyContainer;
 

@@ -18,7 +18,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public abstract class InputBlockingMod : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IUpdatableByPlayfield
+    public abstract partial class InputBlockingMod : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IUpdatableByPlayfield
     {
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(OsuModCinema) };
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             return false;
         }
 
-        private class InputInterceptor : Component, IKeyBindingHandler<OsuAction>
+        private partial class InputInterceptor : Component, IKeyBindingHandler<OsuAction>
         {
             private readonly InputBlockingMod mod;
 

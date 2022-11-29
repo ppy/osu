@@ -27,7 +27,10 @@ namespace osu.Game.Rulesets.Objects
             if (beatmap.HitObjects.Count == 0)
                 return;
 
+            HitObject firstObject = beatmap.HitObjects.First();
             HitObject lastObject = beatmap.HitObjects.Last();
+
+            double firstHitTime = firstObject.StartTime;
             double lastHitTime = 1 + lastObject.GetEndTime();
 
             var timingPoints = beatmap.ControlPointInfo.TimingPoints;
@@ -41,11 +44,30 @@ namespace osu.Game.Rulesets.Objects
                 EffectControlPoint currentEffectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTimingPoint.Time);
                 int currentBeat = 0;
 
+                // Don't generate barlines before the hit object or t=0 (whichever is earliest). Some beatmaps use very unrealistic values here (although none are ranked).
+                // I'm not sure we ever want barlines to appear before the first hitobject, but let's keep some degree of compatibility for now.
+                // Of note, this will still differ from stable if the first timing control point is t<0 and is not near the first hitobject.
+                double generationStartTime = Math.Min(0, firstHitTime);
+
                 // Stop on the next timing point, or if there is no next timing point stop slightly past the last object
                 double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastHitTime + currentTimingPoint.BeatLength * currentTimingPoint.TimeSignature.Numerator;
 
-                double startTime = currentTimingPoint.Time;
                 double barLength = currentTimingPoint.BeatLength * currentTimingPoint.TimeSignature.Numerator;
+
+                double startTime;
+
+                if (currentTimingPoint.Time > generationStartTime)
+                {
+                    startTime = currentTimingPoint.Time;
+                }
+                else
+                {
+                    // If the timing point starts before the minimum allowable time for bar lines,
+                    // we still need to compute a start time for generation that is actually properly aligned with the timing point.
+                    int barCount = (int)Math.Ceiling((generationStartTime - currentTimingPoint.Time) / barLength);
+
+                    startTime = currentTimingPoint.Time + barCount * barLength;
+                }
 
                 if (currentEffectPoint.OmitFirstBarLine)
                 {

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Rulesets.Osu.Objects;
@@ -13,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacySliderBody : PlaySliderBody
+    public partial class LegacySliderBody : PlaySliderBody
     {
         protected override DrawableSliderPath CreateSliderPath() => new LegacyDrawableSliderPath();
 
@@ -23,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             return base.GetBodyAccentColour(skin, hitObjectAccentColour).Opacity(0.7f);
         }
 
-        private class LegacyDrawableSliderPath : DrawableSliderPath
+        private partial class LegacyDrawableSliderPath : DrawableSliderPath
         {
             private const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
 

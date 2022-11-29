@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal abstract class Section<T> : CompositeDrawable
+    internal abstract partial class Section<T> : CompositeDrawable
         where T : ControlPoint
     {
         private OsuCheckbox checkbox;

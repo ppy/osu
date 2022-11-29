@@ -15,13 +15,19 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchPlayfield : ScrollingPlayfield
+    public partial class CatchPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// The width of the playfield.
         /// The horizontal movement of the catcher is confined in the area of this width.
         /// </summary>
         public const float WIDTH = 512;
+
+        /// <summary>
+        /// The height of the playfield.
+        /// This doesn't include the catcher area.
+        /// </summary>
+        public const float HEIGHT = 384;
 
         /// <summary>
         /// The center position of the playfield.

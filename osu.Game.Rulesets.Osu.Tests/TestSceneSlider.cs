@@ -26,7 +26,7 @@ using osu.Game.Rulesets.Objects.Types;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSlider : OsuSkinnableTestScene
+    public partial class TestSceneSlider : OsuSkinnableTestScene
     {
         private int depthIndex;
 

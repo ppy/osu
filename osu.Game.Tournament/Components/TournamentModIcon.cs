@@ -18,7 +18,7 @@ namespace osu.Game.Tournament.Components
     /// <summary>
     /// Mod icon displayed in tournament usages, allowing user overridden graphics.
     /// </summary>
-    public class TournamentModIcon : CompositeDrawable
+    public partial class TournamentModIcon : CompositeDrawable
     {
         private readonly string modAcronym;
 

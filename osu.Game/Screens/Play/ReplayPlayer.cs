@@ -20,7 +20,7 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
-    public class ReplayPlayer : Player, IKeyBindingHandler<GlobalAction>
+    public partial class ReplayPlayer : Player, IKeyBindingHandler<GlobalAction>
     {
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 

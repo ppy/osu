@@ -33,7 +33,7 @@ using osuTK.Input;
 namespace osu.Game.Tournament
 {
     [Cached]
-    public class TournamentSceneManager : CompositeDrawable
+    public partial class TournamentSceneManager : CompositeDrawable
     {
         private Container screens;
         private TourneyVideo video;
@@ -224,7 +224,7 @@ namespace osu.Game.Tournament
                 s.IsSelected = screenType == s.Type;
         }
 
-        private class Separator : CompositeDrawable
+        private partial class Separator : CompositeDrawable
         {
             public Separator()
             {
@@ -233,7 +233,7 @@ namespace osu.Game.Tournament
             }
         }
 
-        private class ScreenButton : TourneyButton
+        private partial class ScreenButton : TourneyButton
         {
             public readonly Type Type;
 

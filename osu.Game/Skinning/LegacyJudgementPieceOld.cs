@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyJudgementPieceOld : CompositeDrawable, IAnimatableJudgement
+    public partial class LegacyJudgementPieceOld : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
 

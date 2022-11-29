@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Music
 {
-    public class Playlist : OsuRearrangeableListContainer<Live<BeatmapSetInfo>>
+    public partial class Playlist : OsuRearrangeableListContainer<Live<BeatmapSetInfo>>
     {
         public Action<Live<BeatmapSetInfo>>? RequestSelection;
 

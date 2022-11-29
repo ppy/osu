@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class CollapsibleButtonContainer : Container
+    public partial class CollapsibleButtonContainer : Container
     {
         public Bindable<bool> ShowDetails = new Bindable<bool>();
         public Bindable<BeatmapSetFavouriteState> FavouriteState = new Bindable<BeatmapSetFavouriteState>();
@@ -46,12 +46,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 if (IsLoaded)
                     updateState();
             }
-        }
-
-        public MarginPadding ButtonsPadding
-        {
-            get => buttons.Padding;
-            set => buttons.Padding = value;
         }
 
         protected override Container<Drawable> Content => mainContent;
@@ -86,9 +80,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    // workaround for masking artifacts at the top & bottom of card,
-                    // which become especially visible on downloaded beatmaps (when the icon area has a lime background).
-                    Padding = new MarginPadding { Vertical = 1 },
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -104,25 +95,34 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Child = buttons = new Container<BeatmapCardIconButton>
                     {
                         RelativeSizeAxes = Axes.Both,
+                        // Padding of 4 avoids touching the card borders when in the expanded (ie. showing difficulties) state.
+                        // Left override allows the buttons to visually be wider and look better.
+                        Padding = new MarginPadding(4) { Left = 2 },
                         Children = new BeatmapCardIconButton[]
                         {
                             new FavouriteButton(beatmapSet)
                             {
                                 Current = FavouriteState,
                                 Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.48f,
                             },
                             new DownloadButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State }
+                                State = { BindTarget = downloadTracker.State },
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.48f,
                             },
                             new GoToBeatmapButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State }
+                                State = { BindTarget = downloadTracker.State },
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.48f,
                             }
                         }
                     }

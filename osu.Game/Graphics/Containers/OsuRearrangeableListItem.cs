@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
-    public abstract class OsuRearrangeableListItem<TModel> : RearrangeableListItem<TModel>
+    public abstract partial class OsuRearrangeableListItem<TModel> : RearrangeableListItem<TModel>
     {
         public const float FADE_DURATION = 100;
 
@@ -129,7 +129,7 @@ namespace osu.Game.Graphics.Containers
 
         protected abstract Drawable CreateContent();
 
-        public class PlaylistItemHandle : SpriteIcon
+        public partial class PlaylistItemHandle : SpriteIcon
         {
             public bool HandlingDrag { get; private set; }
             private bool isHovering;

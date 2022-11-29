@@ -13,7 +13,7 @@ using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class QueueModePill : OnlinePlayComposite
+    public partial class QueueModePill : OnlinePlayComposite
     {
         private OsuTextFlowContainer textFlow;
 

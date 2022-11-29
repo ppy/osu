@@ -10,7 +10,7 @@ using osu.Game.Tournament.Screens.TeamWin;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneTeamWinScreen : TournamentTestScene
+    public partial class TestSceneTeamWinScreen : TournamentTestScene
     {
         [Test]
         public void TestBasic()

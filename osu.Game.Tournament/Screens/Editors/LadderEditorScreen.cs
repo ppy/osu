@@ -23,7 +23,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tournament.Screens.Editors
 {
     [Cached]
-    public class LadderEditorScreen : LadderScreen, IHasContextMenu
+    public partial class LadderEditorScreen : LadderScreen, IHasContextMenu
     {
         [Cached]
         private LadderEditorInfo editorInfo = new LadderEditorInfo();
@@ -86,7 +86,7 @@ namespace osu.Game.Tournament.Screens.Editors
             MatchesContainer.FirstOrDefault(p => p.Match == match)?.Remove();
         }
 
-        private class JoinVisualiser : CompositeDrawable
+        private partial class JoinVisualiser : CompositeDrawable
         {
             private readonly Container<DrawableTournamentMatch> matchesContainer;
             public readonly TournamentMatch Source;

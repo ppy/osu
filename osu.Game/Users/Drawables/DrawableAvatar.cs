@@ -12,7 +12,7 @@ using osu.Game.Online.API.Requests.Responses;
 namespace osu.Game.Users.Drawables
 {
     [LongRunningLoad]
-    public class DrawableAvatar : Sprite
+    public partial class DrawableAvatar : Sprite
     {
         private readonly IUser user;
 

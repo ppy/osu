@@ -10,7 +10,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class SkinSettings : SettingsSubsection
+    public partial class SkinSettings : SettingsSubsection
     {
         protected override LocalisableString Header => CommonStrings.Skins;
 

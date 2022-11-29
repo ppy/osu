@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinEditorMultipleSkins : SkinnableTestScene
+    public partial class TestSceneSkinEditorMultipleSkins : SkinnableTestScene
     {
         [Cached]
         private readonly ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());

@@ -27,7 +27,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneTeamVersus : ScreenTestScene
+    public partial class TestSceneTeamVersus : ScreenTestScene
     {
         private BeatmapManager beatmaps;
         private BeatmapSetInfo importedSet;

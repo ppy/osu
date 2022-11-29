@@ -25,11 +25,12 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
     [TestFixture]
-    public class TestSceneOsuGame : OsuGameTestScene
+    public partial class TestSceneOsuGame : OsuGameTestScene
     {
         private IReadOnlyList<Type> requiredGameDependencies => new[]
         {
@@ -78,6 +79,16 @@ namespace osu.Game.Tests.Visual.Navigation
 
         [Resolved]
         private OsuGameBase gameBase { get; set; }
+
+        [Test]
+        public void TestCursorHidesWhenIdle()
+        {
+            AddStep("click mouse", () => InputManager.Click(MouseButton.Left));
+            AddUntilStep("wait until idle", () => Game.IsIdle.Value);
+            AddUntilStep("menu cursor hidden", () => Game.GlobalCursorDisplay.MenuCursor.ActiveCursor.Alpha == 0);
+            AddStep("click mouse", () => InputManager.Click(MouseButton.Left));
+            AddUntilStep("menu cursor shown", () => Game.GlobalCursorDisplay.MenuCursor.ActiveCursor.Alpha == 1);
+        }
 
         [Test]
         public void TestNullRulesetHandled()

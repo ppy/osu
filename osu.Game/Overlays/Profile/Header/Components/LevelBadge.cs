@@ -18,7 +18,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class LevelBadge : CompositeDrawable, IHasTooltip
+    public partial class LevelBadge : CompositeDrawable, IHasTooltip
     {
         public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 

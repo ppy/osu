@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.Sprites
     /// <summary>
     /// A wrapped version of <see cref="OsuSpriteText"/> which will expand in size based on text content, but never shrink back down.
     /// </summary>
-    public class SizePreservingSpriteText : CompositeDrawable
+    public partial class SizePreservingSpriteText : CompositeDrawable
     {
         private readonly OsuSpriteText text = new OsuSpriteText();
 

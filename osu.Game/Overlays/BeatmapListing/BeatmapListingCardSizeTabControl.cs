@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingCardSizeTabControl : OsuTabControl<BeatmapCardSize>
+    public partial class BeatmapListingCardSizeTabControl : OsuTabControl<BeatmapCardSize>
     {
         public BeatmapListingCardSizeTabControl()
         {
@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override TabItem<BeatmapCardSize> CreateTabItem(BeatmapCardSize value) => new TabItem(value);
 
-        private class TabItem : TabItem<BeatmapCardSize>
+        private partial class TabItem : TabItem<BeatmapCardSize>
         {
             private Box background;
             private SpriteIcon icon;

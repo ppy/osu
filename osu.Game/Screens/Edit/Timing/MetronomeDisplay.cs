@@ -26,7 +26,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class MetronomeDisplay : BeatSyncedContainer
+    public partial class MetronomeDisplay : BeatSyncedContainer
     {
         private Container swing;
 

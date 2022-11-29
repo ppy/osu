@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public abstract class GameplayAccuracyCounter : PercentageCounter
+    public abstract partial class GameplayAccuracyCounter : PercentageCounter
     {
         [BackgroundDependencyLoader]
         private void load(ScoreProcessor scoreProcessor)

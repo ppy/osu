@@ -13,7 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public abstract class ChartProfileSubsection : ProfileSubsection
+    public abstract partial class ChartProfileSubsection : ProfileSubsection
     {
         private ProfileLineChart chart;
 

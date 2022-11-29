@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Osu.Mods;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSpinnerHidden : TestSceneSpinner
+    public partial class TestSceneSpinnerHidden : TestSceneSpinner
     {
         [SetUp]
         public void SetUp() => Schedule(() =>

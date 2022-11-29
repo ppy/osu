@@ -38,7 +38,7 @@ using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.Pa
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     [Cached]
-    public class MultiplayerMatchSubScreen : RoomSubScreen, IHandlePresentBeatmap
+    public partial class MultiplayerMatchSubScreen : RoomSubScreen, IHandlePresentBeatmap
     {
         public override string Title { get; }
 
@@ -430,7 +430,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             modSettingChangeTracker?.Dispose();
         }
 
-        public class AddItemButton : PurpleTriangleButton
+        public partial class AddItemButton : PurpleRoundedButton
         {
         }
     }

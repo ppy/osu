@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.UI
 {
     [Cached(typeof(IPooledHitObjectProvider))]
     [Cached(typeof(IPooledSampleProvider))]
-    public abstract class Playfield : CompositeDrawable, IPooledHitObjectProvider, IPooledSampleProvider
+    public abstract partial class Playfield : CompositeDrawable, IPooledHitObjectProvider, IPooledSampleProvider
     {
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
@@ -202,16 +202,14 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
+        [CanBeNull]
         public GameplayCursorContainer Cursor { get; private set; }
 
         /// <summary>
         /// Provide a cursor which is to be used for gameplay.
         /// </summary>
-        /// <remarks>
-        /// The default provided cursor is invisible when inside the bounds of the <see cref="Playfield"/>.
-        /// </remarks>
         /// <returns>The cursor, or null to show the menu cursor.</returns>
-        protected virtual GameplayCursorContainer CreateCursor() => new InvisibleCursorContainer();
+        protected virtual GameplayCursorContainer CreateCursor() => null;
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
@@ -429,7 +427,7 @@ namespace osu.Game.Rulesets.UI
             return pool;
         }
 
-        private class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>
+        private partial class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>
         {
             private readonly ISampleInfo sampleInfo;
 
@@ -522,14 +520,5 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
-
-        public class InvisibleCursorContainer : GameplayCursorContainer
-        {
-            protected override Drawable CreateCursor() => new InvisibleCursor();
-
-            private class InvisibleCursor : Drawable
-            {
-            }
-        }
     }
 }

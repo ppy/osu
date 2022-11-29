@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayRulesetSelector : RulesetSelector
+    public partial class OverlayRulesetSelector : RulesetSelector
     {
         public OverlayRulesetSelector()
         {

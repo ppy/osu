@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +31,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Taiko;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
@@ -44,7 +42,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestScenePlaySongSelect : ScreenTestScene
+    public partial class TestScenePlaySongSelect : ScreenTestScene
     {
         private BeatmapManager manager = null!;
         private RulesetStore rulesets = null!;
@@ -536,36 +534,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             // this is an important check, to make sure updateComponentFromBeatmap() was actually run
             AddUntilStep("selection shown on wedge", () => songSelect!.CurrentBeatmapDetailsBeatmap.BeatmapInfo.MatchesOnlineID(target));
-        }
-
-        [Test]
-        public void TestRulesetChangeResetsMods()
-        {
-            createSongSelect();
-            changeRuleset(0);
-
-            changeMods(new OsuModHardRock());
-
-            int actionIndex = 0;
-            int modChangeIndex = 0;
-            int rulesetChangeIndex = 0;
-
-            AddStep("change ruleset", () =>
-            {
-                SelectedMods.ValueChanged += onModChange;
-                songSelect!.Ruleset.ValueChanged += onRulesetChange;
-
-                Ruleset.Value = new TaikoRuleset().RulesetInfo;
-
-                SelectedMods.ValueChanged -= onModChange;
-                songSelect!.Ruleset.ValueChanged -= onRulesetChange;
-            });
-
-            AddAssert("mods changed before ruleset", () => modChangeIndex < rulesetChangeIndex);
-            AddAssert("empty mods", () => !SelectedMods.Value.Any());
-
-            void onModChange(ValueChangedEvent<IReadOnlyList<Mod>> e) => modChangeIndex = actionIndex++;
-            void onRulesetChange(ValueChangedEvent<RulesetInfo> e) => rulesetChangeIndex = actionIndex++;
         }
 
         [Test]
@@ -1087,6 +1055,18 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("mod overlay hidden", () => songSelect!.ModSelect.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestBeatmapOptionsDisabled()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+
+            AddAssert("options enabled", () => songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+            AddStep("delete all beatmaps", () => manager.Delete());
+            AddAssert("options disabled", () => !songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+        }
+
         private void waitForInitialSelection()
         {
             AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
@@ -1161,7 +1141,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 rulesets.Dispose();
         }
 
-        private class TestSongSelect : PlaySongSelect
+        private partial class TestSongSelect : PlaySongSelect
         {
             public Action? StartRequested;
 

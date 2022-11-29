@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableDrumRoll : DrawableTaikoStrongableHitObject<DrumRoll, DrumRoll.StrongNestedHit>
+    public partial class DrawableDrumRoll : DrawableTaikoStrongableHitObject<DrumRoll, DrumRoll.StrongNestedHit>
     {
         /// <summary>
         /// Number of rolling hits required to reach the dark/final colour.
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return base.CreateNestedHitObject(hitObject);
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollBody),
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollBody),
             _ => new ElongatedCirclePiece());
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             (MainPiece.Drawable as IHasAccentColour)?.FadeAccent(newColour, fadeDuration);
         }
 
-        public class StrongNestedHit : DrawableStrongNestedHit
+        public partial class StrongNestedHit : DrawableStrongNestedHit
         {
             public new DrawableDrumRoll ParentHitObject => (DrawableDrumRoll)base.ParentHitObject;
 

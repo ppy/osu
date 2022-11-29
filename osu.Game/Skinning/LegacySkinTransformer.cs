@@ -13,6 +13,11 @@ namespace osu.Game.Skinning
     /// </summary>
     public abstract class LegacySkinTransformer : SkinTransformer
     {
+        /// <summary>
+        /// Whether the skin being transformed is able to provide legacy resources for the ruleset.
+        /// </summary>
+        public virtual bool IsProvidingLegacyResources => this.HasFont(LegacyFont.Combo);
+
         protected LegacySkinTransformer(ISkin skin)
             : base(skin)
         {

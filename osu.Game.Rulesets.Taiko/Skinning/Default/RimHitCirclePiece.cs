@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public class RimHitCirclePiece : CirclePiece
+    public partial class RimHitCirclePiece : CirclePiece
     {
         public RimHitCirclePiece()
         {
@@ -29,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         /// <summary>
         /// The symbol used for rim hit pieces.
         /// </summary>
-        public class RimHitSymbolPiece : CircularContainer
+        public partial class RimHitSymbolPiece : CircularContainer
         {
             public RimHitSymbolPiece()
             {

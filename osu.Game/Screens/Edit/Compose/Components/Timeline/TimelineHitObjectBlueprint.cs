@@ -27,7 +27,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
+    public partial class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
     {
         private const float circle_size = 38;
 
@@ -262,7 +262,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
 
-        private class Tick : Circle
+        private partial class Tick : Circle
         {
             public Tick()
             {
@@ -273,7 +273,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        public class DragArea : Circle
+        public partial class DragArea : Circle
         {
             private readonly HitObject? hitObject;
 
@@ -436,12 +436,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 base.OnDragEnd(e);
 
-                OnDragHandled?.Invoke(null);
+                dragOperation?.Cancel();
+                dragOperation = null;
+
                 changeHandler?.EndChange();
+                OnDragHandled?.Invoke(null);
             }
         }
 
-        public class Border : ExtendableCircle
+        public partial class Border : ExtendableCircle
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -457,7 +460,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// <summary>
         /// A circle with externalised end caps so it can take up the full width of a relative width area.
         /// </summary>
-        public class ExtendableCircle : CompositeDrawable
+        public partial class ExtendableCircle : CompositeDrawable
         {
             protected readonly Circle Content;
 

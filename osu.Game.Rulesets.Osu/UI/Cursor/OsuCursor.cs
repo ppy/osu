@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class OsuCursor : SkinReloadableDrawable
+    public partial class OsuCursor : SkinReloadableDrawable
     {
         private const float size = 28;
 
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Child = cursorSprite = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
+                Child = cursorSprite = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public void Contract() => expandTarget.ScaleTo(released_scale, 400, Easing.OutQuad);
 
-        private class DefaultCursor : OsuCursorSprite
+        private partial class DefaultCursor : OsuCursorSprite
         {
             public DefaultCursor()
             {
