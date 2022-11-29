@@ -129,6 +129,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     case TaikoSkinComponents.Mascot:
                         return new DrawableTaikoMascot();
 
+                    case TaikoSkinComponents.KiaiGlow:
+                        if (GetTexture("taiko-glow") != null)
+                            return new LegacyKiaiGlow();
+
+                        return null;
+
                     default:
                         throw new UnsupportedSkinComponentException(lookup);
                 }
