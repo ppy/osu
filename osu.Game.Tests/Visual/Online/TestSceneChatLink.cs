@@ -130,11 +130,11 @@ namespace osu.Game.Tests.Visual.Online
 
                     Color4 textColour = isAction && hasBackground ? Color4Extensions.FromHex(newLine.Message.Sender.Colour) : Color4.White;
 
-                    var linkCompilers = newLine.ContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
+                    var linkCompilers = newLine.DrawableContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
                     var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
 
                     return linkSprites.All(d => d.Colour == linkColour)
-                           && newLine.ContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
+                           && newLine.DrawableContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
                 }
             }
         }
