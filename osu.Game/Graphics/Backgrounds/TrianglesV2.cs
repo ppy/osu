@@ -227,6 +227,9 @@ namespace osu.Game.Graphics.Backgrounds
             private Texture texture = null!;
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
+
+            private readonly Vector2 triangleSize = new Vector2(1f, equilateral_triangle_ratio) * triangle_size;
+
             private Vector2 size;
             private float thickness;
             private float texelSize;
@@ -246,7 +249,15 @@ namespace osu.Game.Graphics.Backgrounds
                 texture = Source.texture;
                 size = Source.DrawSize;
                 thickness = Source.Thickness;
-                texelSize = Math.Max(1.5f / Source.ScreenSpaceDrawQuad.Size.X, 1.5f / Source.ScreenSpaceDrawQuad.Size.Y);
+
+                Quad triangleQuad = new Quad(
+                    Vector2Extensions.Transform(Vector2.Zero, DrawInfo.Matrix),
+                    Vector2Extensions.Transform(new Vector2(triangle_size, 0f), DrawInfo.Matrix),
+                    Vector2Extensions.Transform(new Vector2(0f, triangleSize.Y), DrawInfo.Matrix),
+                    Vector2Extensions.Transform(triangleSize, DrawInfo.Matrix)
+                );
+
+                texelSize = 1.5f / triangleQuad.Height;
 
                 parts.Clear();
                 parts.AddRange(Source.parts);
@@ -269,14 +280,15 @@ namespace osu.Game.Graphics.Backgrounds
                 shader.GetUniform<float>("thickness").UpdateValue(ref thickness);
                 shader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
 
+                float texturePartWidth = triangleSize.X / size.X;
+                float texturePartHeight = triangleSize.Y / size.Y * texture_height;
+
                 foreach (TriangleParticle particle in parts)
                 {
-                    var offset = triangle_size * new Vector2(0.5f, equilateral_triangle_ratio);
-
-                    Vector2 topLeft = particle.Position * size + new Vector2(-offset.X, 0f);
-                    Vector2 topRight = particle.Position * size + new Vector2(offset.X, 0);
-                    Vector2 bottomLeft = particle.Position * size + new Vector2(-offset.X, offset.Y);
-                    Vector2 bottomRight = particle.Position * size + new Vector2(offset.X, offset.Y);
+                    Vector2 topLeft = particle.Position * size - new Vector2(triangleSize.X * 0.5f, 0f);
+                    Vector2 topRight = topLeft + new Vector2(triangleSize.X, 0f);
+                    Vector2 bottomLeft = topLeft + new Vector2(0f, triangleSize.Y);
+                    Vector2 bottomRight = topLeft + triangleSize;
 
                     var drawQuad = new Quad(
                         Vector2Extensions.Transform(topLeft, DrawInfo.Matrix),
@@ -288,8 +300,8 @@ namespace osu.Game.Graphics.Backgrounds
                     var tRect = new Quad(
                         topLeft.X / size.X,
                         topLeft.Y / size.Y * texture_height,
-                        (topRight.X - topLeft.X) / size.X,
-                        (bottomRight.Y - topRight.Y) / size.Y * texture_height
+                        texturePartWidth,
+                        texturePartHeight
                     ).AABBFloat;
 
                     renderer.DrawQuad(texture, drawQuad, DrawColourInfo.Colour, tRect, vertexBatch.AddAction, textureCoords: tRect);
