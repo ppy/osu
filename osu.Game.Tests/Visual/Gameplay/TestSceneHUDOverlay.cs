@@ -24,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneHUDOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneHUDOverlay : OsuManualInputManagerTestScene
     {
         private OsuConfigManager localConfig = null!;
 

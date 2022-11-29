@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
-    public abstract class BeatmapCardIconButton : OsuClickableContainer
+    public abstract partial class BeatmapCardIconButton : OsuClickableContainer
     {
         private Colour4 idleColour;
 

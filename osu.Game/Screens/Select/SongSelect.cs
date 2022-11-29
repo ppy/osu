@@ -42,7 +42,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Select
 {
-    public abstract class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
+    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         public static readonly float WEDGE_HEIGHT = 245;
 
@@ -302,6 +302,16 @@ namespace osu.Game.Screens.Select
             base.LoadComplete();
 
             modSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(ModSelect);
+        }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // Match stable behaviour of only alt-scroll adjusting volume.
+            // Supporting scroll adjust without a modifier key just feels bad, since there are so many scrollable elements on the screen.
+            if (!e.CurrentState.Keyboard.AltPressed)
+                return true;
+
+            return base.OnScroll(e);
         }
 
         /// <summary>
@@ -915,7 +925,7 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(e);
         }
 
-        private class VerticalMaskingContainer : Container
+        private partial class VerticalMaskingContainer : Container
         {
             private const float panel_overflow = 1.2f;
 
@@ -938,7 +948,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private class ResetScrollContainer : Container
+        private partial class ResetScrollContainer : Container
         {
             private readonly Action onHoverAction;
 
@@ -954,7 +964,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        internal class SoloModSelectOverlay : UserModSelectOverlay
+        internal partial class SoloModSelectOverlay : UserModSelectOverlay
         {
             protected override bool ShowPresets => true;
         }

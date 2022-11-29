@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorSaving : EditorSavingTestScene
+    public partial class TestSceneEditorSaving : EditorSavingTestScene
     {
         [Test]
         public void TestCantExitWithoutSaving()

@@ -10,7 +10,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Components
 {
-    public class DrawableTeamTitle : TournamentSpriteTextWithBackground
+    public partial class DrawableTeamTitle : TournamentSpriteTextWithBackground
     {
         private readonly TournamentTeam team;
 

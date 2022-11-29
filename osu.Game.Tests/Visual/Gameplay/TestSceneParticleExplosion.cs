@@ -13,7 +13,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneParticleExplosion : OsuTestScene
+    public partial class TestSceneParticleExplosion : OsuTestScene
     {
         private ParticleExplosion explosion;
 

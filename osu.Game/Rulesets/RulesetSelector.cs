@@ -9,7 +9,7 @@ using osu.Framework.Logging;
 
 namespace osu.Game.Rulesets
 {
-    public abstract class RulesetSelector : TabControl<RulesetInfo>
+    public abstract partial class RulesetSelector : TabControl<RulesetInfo>
     {
         [Resolved]
         protected RulesetStore Rulesets { get; private set; }

@@ -12,7 +12,7 @@ using osu.Game.Overlays.Profile.Sections.Historical;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneUserHistoryGraph : OsuTestScene
+    public partial class TestSceneUserHistoryGraph : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);

@@ -31,7 +31,7 @@ using osu.Game.Screens.Menu;
 namespace osu.Game.Overlays
 {
     [Cached]
-    public class FirstRunSetupOverlay : ShearedOverlayContainer
+    public partial class FirstRunSetupOverlay : ShearedOverlayContainer
     {
         [Resolved]
         private IPerformFromScreenRunner performer { get; set; } = null!;

@@ -20,7 +20,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
-    public abstract class RankingsTable<TModel> : TableContainer
+    public abstract partial class RankingsTable<TModel> : TableContainer
     {
         protected const int TEXT_SIZE = 12;
         private const float horizontal_inset = 20;
@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             public virtual HeaderText CreateHeaderText() => new HeaderText(Header, Highlighted);
         }
 
-        protected class HeaderText : OsuSpriteText
+        protected partial class HeaderText : OsuSpriteText
         {
             private readonly bool isHighlighted;
 
@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         }
 
-        protected class RowText : OsuSpriteText
+        protected partial class RowText : OsuSpriteText
         {
             public RowText()
             {
@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         }
 
-        protected class ColouredRowText : RowText
+        protected partial class ColouredRowText : RowText
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)

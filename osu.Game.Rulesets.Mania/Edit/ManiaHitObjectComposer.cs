@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>
+    public partial class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>
     {
         private DrawableManiaEditorRuleset drawableRuleset;
         private ManiaBeatSnapGrid beatSnapGrid;

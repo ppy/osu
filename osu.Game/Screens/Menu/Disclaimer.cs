@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class Disclaimer : StartupScreen
+    public partial class Disclaimer : StartupScreen
     {
         private SpriteIcon icon;
         private Color4 iconColour;

@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class DrawableRank : CompositeDrawable
+    public partial class DrawableRank : CompositeDrawable
     {
         private readonly ScoreRank rank;
 

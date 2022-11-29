@@ -13,7 +13,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneKeyCounter : OsuManualInputManagerTestScene
+    public partial class TestSceneKeyCounter : OsuManualInputManagerTestScene
     {
         public TestSceneKeyCounter()
         {

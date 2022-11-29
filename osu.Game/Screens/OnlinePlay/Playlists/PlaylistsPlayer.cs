@@ -21,7 +21,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsPlayer : RoomSubmittingPlayer
+    public partial class PlaylistsPlayer : RoomSubmittingPlayer
     {
         public Action Exited;
 

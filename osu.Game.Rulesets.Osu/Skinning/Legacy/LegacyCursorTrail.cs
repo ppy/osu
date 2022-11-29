@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyCursorTrail : CursorTrail
+    public partial class LegacyCursorTrail : CursorTrail
     {
         private readonly ISkin skin;
         private const double disjoint_trail_time_separation = 1000 / 60.0;

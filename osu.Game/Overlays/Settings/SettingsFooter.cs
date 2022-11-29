@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsFooter : FillFlowContainer
+    public partial class SettingsFooter : FillFlowContainer
     {
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, RulesetStore rulesets)
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        private class BuildDisplay : OsuAnimatedButton
+        private partial class BuildDisplay : OsuAnimatedButton
         {
             private readonly string version;
             private readonly bool isDebug;

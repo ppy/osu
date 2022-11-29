@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A Checkbox styled to be placed in line with an <see cref="OsuTabControl{T}"/>
     /// </summary>
-    public class OsuTabControlCheckbox : Checkbox
+    public partial class OsuTabControlCheckbox : Checkbox
     {
         private readonly Box box;
         private readonly SpriteText text;

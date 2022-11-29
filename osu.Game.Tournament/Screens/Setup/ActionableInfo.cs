@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    internal class ActionableInfo : LabelledDrawable<Drawable>
+    internal partial class ActionableInfo : LabelledDrawable<Drawable>
     {
         protected OsuButton Button;
 
@@ -61,7 +61,7 @@ namespace osu.Game.Tournament.Screens.Setup
                     Spacing = new Vector2(10, 0),
                     Children = new Drawable[]
                     {
-                        Button = new TriangleButton
+                        Button = new RoundedButton
                         {
                             Size = new Vector2(100, 40),
                             Action = () => Action?.Invoke()

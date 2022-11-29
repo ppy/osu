@@ -21,7 +21,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogEntry : FillFlowContainer
+    public partial class ChangelogEntry : FillFlowContainer
     {
         private readonly APIChangelogEntry entry;
 

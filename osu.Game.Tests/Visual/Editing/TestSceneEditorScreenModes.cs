@@ -12,7 +12,7 @@ using osu.Game.Screens.Edit;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorScreenModes : EditorTestScene
+    public partial class TestSceneEditorScreenModes : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

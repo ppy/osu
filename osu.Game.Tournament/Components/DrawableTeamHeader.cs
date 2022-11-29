@@ -8,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Components
 {
-    public class DrawableTeamHeader : TournamentSpriteTextWithBackground
+    public partial class DrawableTeamHeader : TournamentSpriteTextWithBackground
     {
         public DrawableTeamHeader(TeamColour colour)
         {

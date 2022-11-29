@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyCursor : OsuCursorSprite
+    public partial class LegacyCursor : OsuCursorSprite
     {
         private readonly ISkin skin;
         private bool spin;

@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Mods
 {
-    public class TestSceneTaikoModFlashlight : TaikoModTestScene
+    public partial class TestSceneTaikoModFlashlight : TaikoModTestScene
     {
         [TestCase(1f)]
         [TestCase(0.5f)]
@@ -38,11 +38,11 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
             });
         }
 
-        private class TestTaikoModFlashlight : TaikoModFlashlight
+        private partial class TestTaikoModFlashlight : TaikoModFlashlight
         {
             protected override Flashlight CreateFlashlight() => new TestTaikoFlashlight(this, Playfield);
 
-            public class TestTaikoFlashlight : TaikoFlashlight
+            public partial class TestTaikoFlashlight : TaikoFlashlight
             {
                 public TestTaikoFlashlight(TaikoModFlashlight modFlashlight, TaikoPlayfield taikoPlayfield)
                     : base(modFlashlight, taikoPlayfield)

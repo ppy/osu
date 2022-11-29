@@ -24,7 +24,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneBeatmapSetOverlay : OsuTestScene
+    public partial class TestSceneBeatmapSetOverlay : OsuTestScene
     {
         private readonly TestBeatmapSetOverlay overlay;
 
@@ -283,7 +283,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.HeaderContent.DownloadButtonsVisible == shown);
         }
 
-        private class TestBeatmapSetOverlay : BeatmapSetOverlay
+        private partial class TestBeatmapSetOverlay : BeatmapSetOverlay
         {
             public new BeatmapSetHeader Header => base.Header;
         }

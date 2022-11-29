@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Catch.Objects;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneBananaShower : TestSceneCatchPlayer
+    public partial class TestSceneBananaShower : TestSceneCatchPlayer
     {
         [Test]
         public void TestBananaShower()

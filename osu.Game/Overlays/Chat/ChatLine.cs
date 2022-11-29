@@ -29,7 +29,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatLine : CompositeDrawable
+    public partial class ChatLine : CompositeDrawable
     {
         private Message message = null!;
 
@@ -191,7 +191,7 @@ namespace osu.Game.Overlays.Chat
                 : $@"{message.Timestamp.LocalDateTime:hh:mm:ss tt}";
         }
 
-        private class DrawableUsername : OsuClickableContainer, IHasContextMenu
+        private partial class DrawableUsername : OsuClickableContainer, IHasContextMenu
         {
             public new Color4 Colour { get; private set; }
 

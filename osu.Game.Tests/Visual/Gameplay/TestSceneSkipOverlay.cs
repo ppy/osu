@@ -15,7 +15,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneSkipOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneSkipOverlay : OsuManualInputManagerTestScene
     {
         private TestSkipOverlay skip;
         private int requestCount;
@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert($"request count is {expected}", () => requestCount, () => Is.EqualTo(expected));
         }
 
-        private class TestSkipOverlay : SkipOverlay
+        private partial class TestSkipOverlay : SkipOverlay
         {
             public TestSkipOverlay(double startTime)
                 : base(startTime)

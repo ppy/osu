@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// A component that is displayed at the hit position in the taiko playfield.
     /// </summary>
-    internal class TaikoHitTarget : Container
+    internal partial class TaikoHitTarget : Container
     {
         /// <summary>
         /// Thickness of all drawn line pieces.

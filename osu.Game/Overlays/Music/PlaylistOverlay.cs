@@ -22,7 +22,7 @@ using Realms;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistOverlay : VisibilityContainer
+    public partial class PlaylistOverlay : VisibilityContainer
     {
         private const float transition_duration = 600;
         public const float PLAYLIST_HEIGHT = 510;
