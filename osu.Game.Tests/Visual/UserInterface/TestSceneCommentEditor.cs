@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("press Enter", () => InputManager.Key(Key.Enter));
 
             AddAssert("text committed", () => commentEditor.CommittedText == "text");
-            AddAssert("button is loading", () => commentEditor.IsLoading);
+            AddAssert("button is loading", () => commentEditor.IsSubmitting);
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("press Enter", () => InputManager.Key(Key.Enter));
 
             AddAssert("no text committed", () => commentEditor.CommittedText.Length == 0);
-            AddAssert("button is not loading", () => !commentEditor.IsLoading);
+            AddAssert("button is not loading", () => !commentEditor.IsSubmitting);
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddAssert("text committed", () => commentEditor.CommittedText == "some other text");
-            AddAssert("button is loading", () => commentEditor.IsLoading);
+            AddAssert("button is loading", () => commentEditor.IsSubmitting);
         }
 
         [Test]
@@ -116,9 +116,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             private void onCommit(string value)
             {
-                IsLoading = true;
+                CommitButton.IsLoading = true;
                 CommittedText = value;
-                Scheduler.AddDelayed(() => IsLoading = false, 1000);
+                Scheduler.AddDelayed(() => CommitButton.IsLoading = false, 1000);
             }
 
             protected override LocalisableString FooterText => @"Footer text. And it is pretty long. Cool.";

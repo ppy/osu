@@ -25,11 +25,10 @@ namespace osu.Game.Overlays.Comments
 
         public Action<string>? OnCommit;
 
-        public bool IsLoading
-        {
-            get => commitButton.IsLoading;
-            set => commitButton.IsLoading = value;
-        }
+        /// <summary>
+        /// Is the editor waiting for submit action to complete?
+        /// </summary>
+        public bool IsSubmitting => CommitButton.IsLoading;
 
         protected abstract LocalisableString FooterText { get; }
 
@@ -41,7 +40,7 @@ namespace osu.Game.Overlays.Comments
 
         protected readonly Bindable<string> Current = new Bindable<string>();
 
-        private CommitButton commitButton = null!;
+        protected EditorCommitButton CommitButton = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -99,7 +98,7 @@ namespace osu.Game.Overlays.Comments
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(5, 0),
-                                    Child = commitButton = new CommitButton
+                                    Child = CommitButton = new EditorCommitButton
                                     {
                                         Text = CommitButtonText,
                                         Anchor = Anchor.CentreRight,
@@ -119,10 +118,10 @@ namespace osu.Game.Overlays.Comments
 
             textBox.OnCommit += (_, _) =>
             {
-                if (commitButton.IsLoading)
+                if (CommitButton.IsLoading)
                     return;
 
-                commitButton.TriggerClick();
+                CommitButton.TriggerClick();
             };
         }
 
@@ -130,7 +129,7 @@ namespace osu.Game.Overlays.Comments
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(text => commitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
+            Current.BindValueChanged(text => CommitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
         }
 
         private partial class EditorTextBox : BasicTextBox
@@ -167,7 +166,7 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
-        private sealed partial class CommitButton : RoundedButton
+        protected sealed partial class EditorCommitButton : RoundedButton
         {
             private const int duration = 200;
 
@@ -190,7 +189,7 @@ namespace osu.Game.Overlays.Comments
                 }
             }
 
-            public CommitButton()
+            public EditorCommitButton()
             {
                 Height = 25;
                 AutoSizeAxes = Axes.X;
