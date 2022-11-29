@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,7 +15,19 @@ namespace osu.Game.Screens.Edit.List
     public partial class DrawableList<T> : RearrangeableListContainer<IDrawableListRepresetedItem<T>>, IDrawableListItem<T>
         where T : Drawable
     {
-        private Action onDragAction { get; set; }
+        private Action<T, int> setItemDepth = IDrawableListItem<T>.DEFAULT_SET_ITEM_DEPTH;
+
+        public Action<T, int> SetItemDepth
+        {
+            get => setItemDepth;
+            set
+            {
+                setItemDepth = value;
+                UpdateItem();
+            }
+        }
+
+        private Action onDragAction;
 
         public Action OnDragAction
         {
@@ -31,6 +44,8 @@ namespace osu.Game.Screens.Edit.List
         private Func<T, LocalisableString> getName;
         public T? RepresentedItem => null;
 
+        public IReadOnlyDictionary<IDrawableListRepresetedItem<T>, RearrangeableListItem<IDrawableListRepresetedItem<T>>> ItemMaps => ItemMap;
+
         public Func<T, LocalisableString> GetName
         {
             get => getName;
@@ -44,17 +59,32 @@ namespace osu.Game.Screens.Edit.List
         public DrawableList()
         {
             getName = IDrawableListItem<T>.GetDefaultText;
+            onDragAction = default_onDragAction;
             ApplyAll = applyAll;
-            onDragAction = () => { };
 
             RelativeSizeAxes = Axes.X;
             //todo: compute this somehow add runtime
             Height = 100f;
             ListContainer.Spacing = new Vector2(2.5f);
+            Items.BindCollectionChanged((s, t) =>
+            {
+                if (t.NewItems.Count > 0) UpdateItem();
+            });
             UpdateItem();
         }
 
         public virtual Drawable GetDrawableListItem() => this;
+
+        private void default_onDragAction()
+        {
+            for (int i = 0; i < Items.Count; i++)
+            {
+                var representedItem = Items[i].RepresentedItem;
+                if (representedItem is null) continue;
+
+                SetItemDepth.Invoke(representedItem, Items.Count - i);
+            }
+        }
 
         #region IDrawableListItem<T>
 
@@ -66,6 +96,7 @@ namespace osu.Game.Screens.Edit.List
                 {
                     rearrangableItem.ApplyAll = ApplyAll;
                     rearrangableItem.GetName = getName;
+                    rearrangableItem.SetItemDepth = SetItemDepth;
                     rearrangableItem.OnDragAction = OnDragAction;
                     rearrangableItem.UpdateItem();
                 }
@@ -136,7 +167,6 @@ namespace osu.Game.Screens.Edit.List
             {
                 ApplyAll = ApplyAll,
                 GetName = getName,
-                OnDragAction = OnDragAction,
             };
             // drawable.UpdateItem();
         }

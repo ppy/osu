@@ -22,14 +22,10 @@ namespace osu.Game.Screens.Edit.List
     {
         private readonly OsuSpriteText text = new OsuSpriteText();
         private readonly Box box;
-        private bool selected;
-        private Action onDragAction { get; set; }
+        public bool Selected { get; private set; }
 
-        public Action OnDragAction
-        {
-            get => onDragAction;
-            set => onDragAction = value;
-        }
+        public Action<T, int> SetItemDepth { get; set; } = IDrawableListItem<T>.DEFAULT_SET_ITEM_DEPTH;
+        public Action OnDragAction { get; set; } = () => { };
 
         public Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
 
@@ -50,7 +46,6 @@ namespace osu.Game.Screens.Edit.List
         {
             getName = IDrawableListItem<T>.GetDefaultText;
             ApplyAll = e => e(this);
-            onDragAction = () => { };
             text.Text = name;
             AutoSizeAxes = Axes.Both;
 
@@ -100,10 +95,6 @@ namespace osu.Game.Screens.Edit.List
             {
                 toggleSelection();
             }
-            else if (e.ShiftPressed && e.Button == MouseButton.Left)
-            {
-                Select(true);
-            }
             else
             {
                 ApplyAll(element => element.Select(false));
@@ -122,7 +113,7 @@ namespace osu.Game.Screens.Edit.List
             }
             else
             {
-                Select(!selected);
+                Select(!Selected);
             }
         }
 
@@ -157,12 +148,12 @@ namespace osu.Game.Screens.Edit.List
         {
             if (value)
             {
-                selected = true;
+                Selected = true;
                 box.Show();
             }
             else
             {
-                selected = false;
+                Selected = false;
                 box.Hide();
             }
         }
@@ -176,13 +167,13 @@ namespace osu.Game.Screens.Edit.List
 
         protected override void OnDrag(DragEvent e)
         {
-            onDragAction();
+            OnDragAction();
             base.OnDrag(e);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            onDragAction();
+            OnDragAction();
             base.OnDragEnd(e);
         }
 

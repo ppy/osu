@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
@@ -12,10 +13,31 @@ namespace osu.Game.Screens.Edit.List
 {
     public interface IDrawableListItem<T> : IDrawableListRepresetedItem<T>
     {
+        public static readonly Action<T, int> DEFAULT_SET_ITEM_DEPTH = (t, d) =>
+        {
+            if (t is Drawable drawable)
+            {
+                if (drawable.Parent is Container<Drawable> container)
+                {
+                    container.ChangeChildDepth(drawable, d);
+                    container.Invalidate();
+                }
+                else
+                {
+                    try
+                    {
+                        drawable.Depth = d;
+                    }
+                    catch (InvalidOperationException) { }
+                }
+            }
+        };
+
         //Applied a function onto all elements in this list.
         //(If there are nested lists, this will always affect EVERY item)
         public Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
         public Func<T, LocalisableString> GetName { get; set; }
+        public Action<T, int> SetItemDepth { get; set; }
         public Action OnDragAction { get; set; }
         public bool EnableSelection => typeof(T).GetInterfaces().Contains(typeof(IStateful<SelectionState>));
 

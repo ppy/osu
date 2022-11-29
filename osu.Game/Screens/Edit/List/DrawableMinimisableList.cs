@@ -15,16 +15,16 @@ namespace osu.Game.Screens.Edit.List
     public partial class DrawableMinimisableList<T> : RearrangeableListItem<IDrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
         where T : Drawable
     {
-        private Action onDragAction { get; set; }
+        public Action<T, int> SetItemDepth
+        {
+            get => List.SetItemDepth;
+            set => List.SetItemDepth = value;
+        }
 
         public Action OnDragAction
         {
-            get => onDragAction;
-            set
-            {
-                onDragAction = value;
-                List.OnDragAction = value;
-            }
+            get => List.OnDragAction;
+            set => List.OnDragAction = value;
         }
 
         public Action<Action<IDrawableListItem<T>>> ApplyAll
@@ -48,8 +48,6 @@ namespace osu.Game.Screens.Edit.List
         public DrawableMinimisableList(T item)
             : base(new DrawableListRepresetedItem<T>(item))
         {
-            onDragAction = () => { };
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             InternalChild = new FillFlowContainer

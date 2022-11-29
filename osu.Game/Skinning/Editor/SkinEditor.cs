@@ -223,23 +223,18 @@ namespace osu.Game.Skinning.Editor
             });
             layerSidebarSection.Child = LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>(name);
             LayerSidebarList.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
-            LayerSidebarList.OnDragAction = () =>
+            LayerSidebarList.SetItemDepth = (blueprint, depth) =>
             {
-                foreach (var listItem in LayerSidebarList.List.Items)
+                if (blueprint.Parent is Container<Drawable> container)
                 {
-                    int depth = LayerSidebarList.List.Items.IndexOf(listItem);
+                    container.ChangeChildDepth(blueprint, depth);
+                    container.Invalidate();
+                }
 
-                    if (listItem.RepresentedItem?.Parent is Container<Drawable> container)
-                    {
-                        container.ChangeChildDepth(listItem.RepresentedItem, depth);
-                        container.Invalidate();
-                    }
-
-                    if (listItem.RepresentedItem?.Item.Parent is Container<Drawable> containerM)
-                    {
-                        containerM.ChangeChildDepth((Drawable)listItem.RepresentedItem.Item, depth);
-                        containerM.Invalidate();
-                    }
+                if (blueprint.Item.Parent is Container<Drawable> containerM)
+                {
+                    containerM.ChangeChildDepth((Drawable)blueprint.Item, depth);
+                    containerM.Invalidate();
                 }
             };
             LayerSidebarList.OnDragAction();
