@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System;
 using osuTK;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -32,11 +33,11 @@ namespace osu.Game.Overlays.Comments
             set => commitButton.IsLoading = value;
         }
 
-        protected abstract string FooterText { get; }
+        protected abstract LocalisableString FooterText { get; }
 
-        protected abstract string CommitButtonText { get; }
+        protected abstract LocalisableString CommitButtonText { get; }
 
-        protected abstract string TextBoxPlaceholder { get; }
+        protected abstract LocalisableString TextBoxPlaceholder { get; }
 
         protected FillFlowContainer ButtonsContainer { get; private set; }
 
@@ -177,7 +178,7 @@ namespace osu.Game.Overlays.Comments
 
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
-            private readonly string text;
+            private readonly LocalisableString text;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }
@@ -186,7 +187,7 @@ namespace osu.Game.Overlays.Comments
             private Box background;
             private Box blockedBackground;
 
-            public CommitButton(string text)
+            public CommitButton(LocalisableString text)
             {
                 this.text = text;
 
