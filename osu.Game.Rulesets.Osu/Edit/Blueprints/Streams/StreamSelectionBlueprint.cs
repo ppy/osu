@@ -62,6 +62,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
             InternalChild = StreamPiece = new StreamPiece();
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            // If I don't do this the stream piece somehow ends up in the scene graph while disposed
+            RemoveInternal(StreamPiece, true);
+            base.Dispose(isDisposing);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -76,16 +83,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
             if (editorBeatmap != null)
                 selectedObjects.BindTo(editorBeatmap.SelectedHitObjects);
             selectedObjects.BindCollectionChanged((_, _) => updateVisualDefinition(), true);
-
-            // TODO: Remove this when streams can be saved.
-            // Convert the stream to an actual stream on deselection so we're not left with a Stream object which can't be saved.
-            // This has to happen on the Deselected event instead of the override because convertToStream deletes the Stream and that can mess with the lifetime of this blueprint.
-            Deselected += onDeselectedEventHandler;
-        }
-
-        private void onDeselectedEventHandler(SelectionBlueprint<HitObject> _)
-        {
-            convertToStream();
         }
 
         public override bool HandleQuickDeletion()
@@ -134,6 +131,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
         protected override void OnDeselected()
         {
+            // TODO: Remove this when streams can be saved.
+            // Convert the stream to an actual stream on deselection so we're not left with a Stream object which can't be saved.
+            Scheduler.AddOnce(convertToStream);
+
             base.OnDeselected();
 
             updateVisualDefinition();
@@ -152,9 +153,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
                     });
                 }
             }
-            else
+            else if (ControlPointVisualiser != null)
             {
-                ControlPointVisualiser?.Expire();
+                RemoveInternal(ControlPointVisualiser, true);
                 ControlPointVisualiser = null;
             }
         }
@@ -281,9 +282,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
         {
             if (editorBeatmap == null)
                 return;
-
-            // Make sure this doesn't trigger again on deselected
-            Deselected -= onDeselectedEventHandler;
 
             changeHandler?.BeginChange();
 
