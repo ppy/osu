@@ -254,7 +254,6 @@ namespace osu.Game.Overlays.Chat
                 }
                 else
                 {
-
                     Colour = Color4Extensions.FromHex(user.Colour);
 
                     Child = new Container
