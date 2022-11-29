@@ -20,6 +20,7 @@ namespace osu.Game.Overlays.Practice
     public partial class PracticeOverlay : ShearedOverlayContainer
     {
         public Action Restart = null!;
+        public Action OnHide = null!;
 
         [Resolved]
         private PracticePlayerLoader playerLoader { get; set; } = null!;
@@ -27,14 +28,14 @@ namespace osu.Game.Overlays.Practice
         private readonly BindableNumber<double> customStart = new BindableNumber<double>
         {
             MinValue = 0,
-            MaxValue = 1,
+            MaxValue = 100,
             Precision = 0.001f
         };
 
-        private readonly BindableNumber<double> customEnd = new BindableNumber<double>(1)
+        private readonly BindableNumber<double> customEnd = new BindableNumber<double>(100)
         {
             MinValue = 0,
-            MaxValue = 1,
+            MaxValue = 100,
             Precision = 0.001f
         };
 
@@ -59,9 +60,9 @@ namespace osu.Game.Overlays.Practice
             customEnd.BindTo(playerLoader.CustomEnd);
 
             customStart.BindValueChanged(startPercent =>
-                preview.SeekTo(startPercent.NewValue * (lastTime - startTime)));
+                preview.SeekTo(startPercent.NewValue / 100 * (lastTime - startTime)));
             customEnd.BindValueChanged(endPercent =>
-                preview.SeekTo(endPercent.NewValue * (lastTime - startTime)));
+                preview.SeekTo(endPercent.NewValue / 100 * (lastTime - startTime)));
         }
 
         private void createContent()
@@ -100,7 +101,18 @@ namespace osu.Game.Overlays.Practice
                     new Drawable[]
                     {
                         new Container(),
-                        new PracticeRangeSliderComponent(customStart, customEnd) { RelativeSizeAxes = Axes.Both },
+                        new RangeSlider
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            LowerBound = customStart,
+                            UpperBound = customEnd,
+                            NubWidth = Nub.HEIGHT * 2,
+                            MinRange = 0.01f,
+                            DefaultStringLowerBound = "Start",
+                            DefaultStringUpperBound = "End",
+                            DefaultTooltipLowerBound = "Start of beatmap",
+                            DefaultTooltipUpperBound = "End of beatmap"
+                        },
                         new ShearedButton(150)
                         {
                             Y = -5,
@@ -109,9 +121,15 @@ namespace osu.Game.Overlays.Practice
                             DarkerColour = ColourProvider.Colour3,
                             Action = () => Restart.Invoke()
                         }
-                    },
+                    }
                 }
             };
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+            OnHide.Invoke();
         }
     }
 }

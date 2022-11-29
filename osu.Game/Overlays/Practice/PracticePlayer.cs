@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -16,10 +17,15 @@ namespace osu.Game.Overlays.Practice
     {
         private PracticeOverlay practiceOverlay = null!;
 
+        private bool blockFailure = true;
+
         public PracticePlayer(PlayerConfiguration? configuration = null)
             : base(configuration)
         {
         }
+
+        [Resolved]
+        private PracticePlayerLoader loader { get; set; } = null!;
 
         [Resolved(CanBeNull = true)]
         internal IOverlayManager? OverlayManager { get; private set; }
@@ -27,18 +33,27 @@ namespace osu.Game.Overlays.Practice
         private IDisposable? practiceOverlayRegistration;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, IBindable<WorkingBeatmap> beatmap, PracticePlayerLoader loader)
+        private void load(OsuColour colour, IBindable<WorkingBeatmap> beatmap)
         {
             var playableBeatmap = beatmap.Value.GetPlayableBeatmap(beatmap.Value.BeatmapInfo.Ruleset);
 
-            SetGameplayStartTime(loader.CustomStart.Value * (playableBeatmap.HitObjects.Last().StartTime - playableBeatmap.HitObjects.First().StartTime));
+            double customStartTime = loader.CustomStart.Value * (playableBeatmap.HitObjects.Last().StartTime - playableBeatmap.HitObjects.First().StartTime);
+
+            if (customStartTime > playableBeatmap.HitObjects.First().StartTime)
+            {
+                GameplayClockContainer.Reset(customStartTime);
+
+                OnGameplayStarted += () => Task.Run(async () =>
+                {
+                    //Todo : create some form of visual indicator of this grace period, possibly settings for its length?
+                    await Task.Delay(2000);
+                    blockFailure = false;
+                });
+            }
 
             addButtons(colour);
-            LoadComponent(practiceOverlay = new PracticeOverlay
-            {
-                State = { Value = Visibility.Visible },
-                Restart = () => Restart()
-            });
+
+            createPauseOverlay();
         }
 
         protected override void LoadComplete()
@@ -46,6 +61,13 @@ namespace osu.Game.Overlays.Practice
             base.LoadComplete();
 
             practiceOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(practiceOverlay);
+
+            if (loader.IsFirstTry)
+            {
+                practiceOverlay.Show();
+            }
+
+            loader.IsFirstTry = false;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -54,12 +76,30 @@ namespace osu.Game.Overlays.Practice
             practiceOverlayRegistration?.Dispose();
         }
 
-        protected override bool CheckModsAllowFailure() => false; // never fail. Todo: find a way to avoid instantly failing after initial seek
+        private void createPauseOverlay()
+        {
+            LoadComponent(practiceOverlay = new PracticeOverlay
+            {
+                State = { Value = Visibility.Hidden },
+                Restart = () => Restart(),
+                OnHide = () => { PauseOverlay.Show(); },
+            });
+        }
 
         private void addButtons(OsuColour colour)
         {
             PauseOverlay.AddButton("Practice", colour.Blue, () => practiceOverlay.Show());
             FailOverlay.AddButton("Practice", colour.Blue, () => practiceOverlay.Show());
+        }
+
+        protected override bool CheckModsAllowFailure()
+        {
+            if (blockFailure)
+            {
+                return false;
+            }
+
+            return base.CheckModsAllowFailure();
         }
     }
 }

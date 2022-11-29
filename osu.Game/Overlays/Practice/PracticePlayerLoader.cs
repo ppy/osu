@@ -18,15 +18,17 @@ namespace osu.Game.Overlays.Practice
         public BindableNumber<double> CustomStart = new BindableNumber<double>
         {
             MinValue = 0,
-            MaxValue = 1,
-            Precision = .001
+            MaxValue = 100,
+            Precision = 0.001f
         };
 
-        public BindableNumber<double> CustomEnd = new BindableNumber<double>(1)
+        public BindableNumber<double> CustomEnd = new BindableNumber<double>(100)
         {
             MinValue = 0,
-            MaxValue = 1,
-            Precision = .001
+            MaxValue = 100,
+            Precision = 0.001f
         };
+
+        public bool IsFirstTry = true;
     }
 }
