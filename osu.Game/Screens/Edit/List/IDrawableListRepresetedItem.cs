@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.Edit.List
 {
-    public interface IDrawableListRepresetedItem<T>
+    public interface IDrawableListRepresetedItem<out T>
     {
         T? RepresentedItem { get; }
     }
