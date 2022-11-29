@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.Backgrounds
     {
         private const float triangle_size = 100;
         private const float base_velocity = 50;
-        private const int texture_height = 128;
+        private const int texture_height = 16;
 
         /// <summary>
         /// sqrt(3) / 2
@@ -112,7 +112,7 @@ namespace osu.Game.Graphics.Backgrounds
 
             for (int i = 0; i < texture_height; i++)
             {
-                float ratio = (float)i / texture_height;
+                float ratio = (float)i / (texture_height - 1);
 
                 image[i, 0] = new Rgba32(
                     colourBottom.Value.R * ratio + colourTop.Value.R * (1f - ratio),

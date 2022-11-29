@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Background
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(500, 100),
+                    Size = new Vector2(100, 700),
                     Masking = true,
                     CornerRadius = 40,
                     Children = new Drawable[]
@@ -54,7 +54,11 @@ namespace osu.Game.Tests.Visual.Background
         {
             base.LoadComplete();
 
-            AddSliderStep("Spawn ratio", 0f, 2f, 1f, s => triangles.SpawnRatio = s);
+            AddSliderStep("Spawn ratio", 0f, 5f, 1f, s =>
+            {
+                triangles.SpawnRatio = s;
+                triangles.Reset(1234);
+            });
             AddSliderStep("Thickness", 0f, 1f, 0.02f, t => triangles.Thickness = t);
         }
     }
