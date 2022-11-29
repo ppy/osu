@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Comments
         public Action<string>? OnCommit;
 
         /// <summary>
-        /// Is the editor waiting for submit action to complete?
+        /// Whether editor is waiting for submit action to complete.
         /// </summary>
         public bool IsSubmitting => CommitButton.IsLoading;
 
@@ -177,6 +177,9 @@ namespace osu.Game.Overlays.Comments
 
             private bool isLoading;
 
+            /// <summary>
+            /// Whether loading spinner shown.
+            /// </summary>
             public bool IsLoading
             {
                 get => isLoading;
