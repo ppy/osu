@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
@@ -25,7 +23,7 @@ namespace osu.Game.Overlays.Comments
     {
         private const int side_padding = 8;
 
-        public Action<string> OnCommit;
+        public Action<string>? OnCommit;
 
         public bool IsLoading
         {
@@ -39,11 +37,11 @@ namespace osu.Game.Overlays.Comments
 
         protected abstract LocalisableString TextBoxPlaceholder { get; }
 
-        protected FillFlowContainer ButtonsContainer { get; private set; }
+        protected FillFlowContainer ButtonsContainer { get; private set; } = null!;
 
         protected readonly Bindable<string> Current = new Bindable<string>();
 
-        private CommitButton commitButton;
+        private CommitButton commitButton = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -80,7 +78,7 @@ namespace osu.Game.Overlays.Comments
                         },
                         new Container
                         {
-                            Name = "Footer",
+                            Name = @"Footer",
                             RelativeSizeAxes = Axes.X,
                             Height = 35,
                             Padding = new MarginPadding { Horizontal = side_padding },
@@ -95,7 +93,7 @@ namespace osu.Game.Overlays.Comments
                                 },
                                 ButtonsContainer = new FillFlowContainer
                                 {
-                                    Name = "Buttons",
+                                    Name = @"Buttons",
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
@@ -140,7 +138,7 @@ namespace osu.Game.Overlays.Comments
 
             protected override Color4 SelectionColour => Color4.Gray;
 
-            private OsuSpriteText placeholder;
+            private OsuSpriteText placeholder = null!;
 
             public EditorTextBox()
             {
@@ -181,11 +179,11 @@ namespace osu.Game.Overlays.Comments
             private readonly LocalisableString text;
 
             [Resolved]
-            private OverlayColourProvider colourProvider { get; set; }
+            private OverlayColourProvider colourProvider { get; set; } = null!;
 
-            private OsuSpriteText drawableText;
-            private Box background;
-            private Box blockedBackground;
+            private OsuSpriteText drawableText = null!;
+            private Box background = null!;
+            private Box blockedBackground = null!;
 
             public CommitButton(LocalisableString text)
             {
