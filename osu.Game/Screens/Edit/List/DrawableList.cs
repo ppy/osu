@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Edit.List
             ListContainer.Spacing = new Vector2(2.5f);
             Items.BindCollectionChanged((s, t) =>
             {
-                if (t.NewItems.Count > 0) UpdateItem();
+                if (t?.NewItems != null && t.NewItems.Count > 0) UpdateItem();
             });
             UpdateItem();
         }
