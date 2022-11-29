@@ -2,15 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
@@ -30,45 +27,22 @@ namespace osu.Game.Overlays.Comments
             });
         }
 
-        private partial class CancelButton : OsuHoverContainer
+        private sealed partial class CancelButton : RoundedButton
         {
-            protected override IEnumerable<Drawable> EffectTargets => new[] { background };
-
-            private readonly Box background;
-
             public CancelButton()
-                : base(HoverSampleSet.Button)
             {
-                AutoSizeAxes = Axes.Both;
-                Child = new CircularContainer
-                {
-                    Masking = true,
-                    Height = 25,
-                    AutoSizeAxes = Axes.X,
-                    Children = new Drawable[]
-                    {
-                        background = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                            Margin = new MarginPadding { Horizontal = 20 },
-                            Text = CommonStrings.ButtonsCancel
-                        }
-                    }
-                };
+                Height = 25;
+                AutoSizeAxes = Axes.X;
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            protected override SpriteText CreateText() => new OsuSpriteText
             {
-                IdleColour = colourProvider.Light4;
-                HoverColour = colourProvider.Light3;
-            }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                Margin = new MarginPadding { Horizontal = 20 },
+                Text = CommonStrings.ButtonsCancel
+            };
         }
     }
 }
