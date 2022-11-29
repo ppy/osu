@@ -22,6 +22,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public Bindable<double> LowerBound
         {
+            get => lowerBound.Current;
             set => lowerBound.Current = value;
         }
 
@@ -30,6 +31,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public Bindable<double> UpperBound
         {
+            get => upperBound.Current;
             set => upperBound.Current = value;
         }
 
