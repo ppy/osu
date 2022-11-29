@@ -1,4 +1,5 @@
-//
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -69,14 +70,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             drawableList.Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(skinBlueprint));
 
             skinElements.Add(new Container
+            {
+                Children = new[]
                 {
-                    Children = new[]
-                    {
-                        skinBlueprint,
-                        skinnable
-                    }
+                    skinBlueprint,
+                    skinnable
                 }
-            );
+            });
         }
 
         private bool applyToItems(Predicate<DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>> predicate,
