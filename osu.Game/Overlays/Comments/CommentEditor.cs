@@ -171,10 +171,25 @@ namespace osu.Game.Overlays.Comments
         private sealed partial class CommitButton : RoundedButton
         {
             private const int duration = 200;
-            private bool isLoading;
+
             private readonly LoadingSpinner spinner;
-            public readonly BindableBool IsBlocked = new BindableBool();
             private OsuSpriteText text = null!;
+
+            public readonly BindableBool IsBlocked = new BindableBool();
+
+            private bool isLoading;
+
+            public bool IsLoading
+            {
+                get => isLoading;
+                set
+                {
+                    isLoading = value;
+                    Enabled.Value = !value && !IsBlocked.Value;
+                    spinner.FadeTo(value ? 1f : 0f, duration, Easing.OutQuint);
+                    text.FadeTo(value ? 0f : 1f, duration, Easing.OutQuint);
+                }
+            }
 
             public CommitButton()
             {
@@ -206,18 +221,6 @@ namespace osu.Game.Overlays.Comments
                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                 Margin = new MarginPadding { Horizontal = 20 },
             };
-
-            public bool IsLoading
-            {
-                get => isLoading;
-                set
-                {
-                    isLoading = value;
-                    Enabled.Value = !value && !IsBlocked.Value;
-                    spinner.FadeTo(value ? 1f : 0f, duration, Easing.OutQuint);
-                    text.FadeTo(value ? 0f : 1f, duration, Easing.OutQuint);
-                }
-            }
 
             protected override bool OnClick(ClickEvent e)
             {
