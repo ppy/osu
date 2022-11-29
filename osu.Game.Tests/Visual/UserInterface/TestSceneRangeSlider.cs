@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
@@ -30,10 +31,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             Precision = 0.1f
         };
 
-        [Test]
-        public void TestBasic()
+        private RangeSlider rangeSlider = null!;
+
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            AddStep("create Control", () => Child = new RangeSlider
+            AddStep("create control", () => Child = rangeSlider = new RangeSlider
             {
                 Width = 200,
                 Anchor = Anchor.Centre,
@@ -47,15 +50,30 @@ namespace osu.Game.Tests.Visual.UserInterface
                 DefaultStringUpperBound = "End",
                 MinRange = 10
             });
-            AddStep("Test Range", () =>
+        }
+
+        [Test]
+        public void TestAdjustRange()
+        {
+            AddAssert("Initial lower bound is correct", () => rangeSlider.LowerBound.Value, () => Is.EqualTo(0).Within(0.1f));
+            AddAssert("Initial upper bound is correct", () => rangeSlider.UpperBound.Value, () => Is.EqualTo(100).Within(0.1f));
+
+            AddStep("Adjust range", () =>
             {
                 customStart.Value = 50;
                 customEnd.Value = 75;
             });
+
+            AddAssert("Adjusted lower bound is correct", () => rangeSlider.LowerBound.Value, () => Is.EqualTo(50).Within(0.1f));
+            AddAssert("Adjusted upper bound is correct", () => rangeSlider.UpperBound.Value, () => Is.EqualTo(75).Within(0.1f));
+
             AddStep("Test nub pushing", () =>
             {
                 customStart.Value = 90;
             });
+
+            AddAssert("Pushed lower bound is correct", () => rangeSlider.LowerBound.Value, () => Is.EqualTo(90).Within(0.1f));
+            AddAssert("Pushed upper bound is correct", () => rangeSlider.UpperBound.Value, () => Is.EqualTo(100).Within(0.1f));
         }
     }
 }
