@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Edit.List
         {
             if (target is null) return;
             //Set the text to the target's name, if set. Else try and get the name of the class that defined T
-            text.Text = getName(target);
+            Scheduler.Add(() => text.Text = getName(target));
         }
 
         public void Select(bool value)
@@ -146,16 +146,19 @@ namespace osu.Game.Screens.Edit.List
 
         public void SelectInternal(bool value)
         {
-            if (value)
+            Scheduler.Add(() =>
             {
-                Selected = true;
-                box.Show();
-            }
-            else
-            {
-                Selected = false;
-                box.Hide();
-            }
+                if (value)
+                {
+                    Selected = true;
+                    box.Show();
+                }
+                else
+                {
+                    Selected = false;
+                    box.Hide();
+                }
+            });
         }
 
         protected override bool OnDragStart(DragStartEvent e)

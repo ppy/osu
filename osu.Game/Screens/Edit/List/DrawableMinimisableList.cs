@@ -103,17 +103,15 @@ namespace osu.Game.Screens.Edit.List
             if (setValue) Enabled.Value = value;
         }
 
-        public void UpdateItem()
-        {
-            List.GetName = GetName;
-            List.ApplyAll = ApplyAll;
-            List.UpdateItem();
-        }
+        public void UpdateItem() => List.UpdateItem();
 
         public void Select(bool value)
         {
-            if (value) box.Show();
-            else box.Hide();
+            Scheduler.Add(() =>
+            {
+                if (value) box.Show();
+                else box.Hide();
+            });
             List.Select(value);
         }
 

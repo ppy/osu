@@ -39,9 +39,18 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        public Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
+        public Action<Action<IDrawableListItem<T>>> ApplyAll
+        {
+            get => applyAll1;
+            set
+            {
+                applyAll1 = value;
+                UpdateItem();
+            }
+        }
 
         private Func<T, LocalisableString> getName;
+        private Action<Action<IDrawableListItem<T>>> applyAll1;
         public T? RepresentedItem => null;
 
         public IReadOnlyDictionary<IDrawableListRepresetedItem<T>, RearrangeableListItem<IDrawableListRepresetedItem<T>>> ItemMaps => ItemMap;
@@ -60,7 +69,7 @@ namespace osu.Game.Screens.Edit.List
         {
             getName = IDrawableListItem<T>.GetDefaultText;
             onDragAction = default_onDragAction;
-            ApplyAll = applyAll;
+            applyAll1 = applyAll;
 
             RelativeSizeAxes = Axes.X;
             //todo: compute this somehow add runtime
