@@ -11,11 +11,12 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Sprites;
 using osuTK.Graphics;
 using osu.Game.Graphics.UserInterface;
-using System.Collections.Generic;
 using System;
 using osuTK;
 using osu.Framework.Bindables;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -99,8 +100,9 @@ namespace osu.Game.Overlays.Comments
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(5, 0),
-                                    Child = commitButton = new CommitButton(CommitButtonText)
+                                    Child = commitButton = new CommitButton
                                     {
+                                        Text = CommitButtonText,
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
                                         Action = () =>
@@ -118,7 +120,7 @@ namespace osu.Game.Overlays.Comments
 
             textBox.OnCommit += (_, _) =>
             {
-                if (commitButton.IsBlocked.Value)
+                if (commitButton.IsLoading)
                     return;
 
                 commitButton.TriggerClick();
@@ -166,84 +168,72 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
-        private partial class CommitButton : LoadingButton
+        private sealed partial class CommitButton : RoundedButton
         {
             private const int duration = 200;
-
+            private bool isLoading;
+            private readonly LoadingSpinner spinner;
             public readonly BindableBool IsBlocked = new BindableBool();
+            private OsuSpriteText text = null!;
 
-            public override bool PropagatePositionalInputSubTree => !IsBlocked.Value && base.PropagatePositionalInputSubTree;
-
-            protected override IEnumerable<Drawable> EffectTargets => new[] { background };
-
-            private readonly LocalisableString text;
-
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; } = null!;
-
-            private OsuSpriteText drawableText = null!;
-            private Box background = null!;
-            private Box blockedBackground = null!;
-
-            public CommitButton(LocalisableString text)
+            public CommitButton()
             {
-                this.text = text;
-
-                AutoSizeAxes = Axes.Both;
-                LoadingAnimationSize = new Vector2(10);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                IdleColour = colourProvider.Light4;
-                HoverColour = colourProvider.Light3;
-                blockedBackground.Colour = colourProvider.Background5;
+                Height = 25;
+                AutoSizeAxes = Axes.X;
+                Add(spinner = new LoadingSpinner
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(12),
+                    Depth = -2,
+                });
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                IsBlocked.BindValueChanged(onBlockedStateChanged, true);
-            }
-
-            private void onBlockedStateChanged(ValueChangedEvent<bool> isBlocked)
-            {
-                drawableText.FadeColour(isBlocked.NewValue ? colourProvider.Foreground1 : Color4.White, duration, Easing.OutQuint);
-                background.FadeTo(isBlocked.NewValue ? 0 : 1, duration, Easing.OutQuint);
-            }
-
-            protected override Drawable CreateContent() => new CircularContainer
-            {
-                Masking = true,
-                Height = 25,
-                AutoSizeAxes = Axes.X,
-                Children = new Drawable[]
+                IsBlocked.BindValueChanged(e =>
                 {
-                    blockedBackground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    },
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0
-                    },
-                    drawableText = new OsuSpriteText
-                    {
-                        AlwaysPresent = true,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Horizontal = 20 },
-                        Text = text,
-                    }
-                }
+                    Enabled.Value = !IsLoading && !e.NewValue;
+                }, true);
+            }
+
+            protected override SpriteText CreateText() => text = new OsuSpriteText
+            {
+                AlwaysPresent = true,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                Margin = new MarginPadding { Horizontal = 20 },
             };
 
-            protected override void OnLoadStarted() => drawableText.FadeOut(duration, Easing.OutQuint);
+            public bool IsLoading
+            {
+                get => isLoading;
+                set
+                {
+                    isLoading = value;
+                    Enabled.Value = !value && !IsBlocked.Value;
+                    spinner.FadeTo(value ? 1f : 0f, duration, Easing.OutQuint);
+                    text.FadeTo(value ? 0f : 1f, duration, Easing.OutQuint);
+                }
+            }
 
-            protected override void OnLoadFinished() => drawableText.FadeIn(duration, Easing.OutQuint);
+            protected override bool OnClick(ClickEvent e)
+            {
+                if (!Enabled.Value)
+                    return false;
+
+                try
+                {
+                    return base.OnClick(e);
+                }
+                finally
+                {
+                    // run afterwards as this will disable this button.
+                    IsLoading = true;
+                }
+            }
         }
     }
 }
