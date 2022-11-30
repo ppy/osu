@@ -3,9 +3,9 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Utils;
@@ -42,11 +42,9 @@ namespace osu.Game.Database
         {
             string itemFilename = item.GetDisplayString().GetValidFilename();
 
-            IEnumerable<string> existingExports = exportStorage
-                                                  .GetFiles("", $"{itemFilename}*{FileExtension}")
-                                                  .Select(export => export.Substring(0, export.Length - FileExtension.Length));
+            IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
 
-            string filename = $"{NamingUtils.GetNextBestName(existingExports, itemFilename)}{FileExtension}";
+            string filename = NamingUtils.GetNextBestFilename(existingExports, itemFilename, FileExtension);
             using (var stream = exportStorage.CreateFileSafely(filename))
                 ExportModelTo(item, stream);
 
