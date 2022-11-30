@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.Chat
 
         protected override bool OnHover(HoverEvent e)
         {
-            colouredDrawable.FadeColour(AccentColour.Lighten(0.4f), 150, Easing.OutQuint);
+            colouredDrawable.FadeColour(AccentColour.Lighten(0.6f), 30, Easing.OutQuint);
 
             return base.OnHover(e);
         }
@@ -180,7 +180,7 @@ namespace osu.Game.Overlays.Chat
         {
             base.OnHoverLost(e);
 
-            colouredDrawable.FadeColour(AccentColour, 250, Easing.OutQuint);
+            colouredDrawable.FadeColour(AccentColour, 800, Easing.OutQuint);
         }
 
         private static readonly Color4[] default_colours =
