@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class AddPresetButton : ShearedToggleButton, IHasPopover
+    public partial class AddPresetButton : ShearedToggleButton, IHasPopover
     {
         [Resolved]
         private OsuColour colours { get; set; } = null!;

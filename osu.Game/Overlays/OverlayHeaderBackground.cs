@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayHeaderBackground : CompositeDrawable
+    public partial class OverlayHeaderBackground : CompositeDrawable
     {
         public OverlayHeaderBackground(string textureName)
         {
@@ -21,7 +21,7 @@ namespace osu.Game.Overlays
             InternalChild = new DelayedLoadWrapper(() => new Background(textureName));
         }
 
-        private class Background : Sprite
+        private partial class Background : Sprite
         {
             private readonly string textureName;
 

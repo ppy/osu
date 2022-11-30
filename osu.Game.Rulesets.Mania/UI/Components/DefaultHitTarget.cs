@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class DefaultHitTarget : CompositeDrawable
+    public partial class DefaultHitTarget : CompositeDrawable
     {
         private const float hit_target_bar_height = 2;
 

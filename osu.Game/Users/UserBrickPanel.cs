@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Users
 {
-    public class UserBrickPanel : UserPanel
+    public partial class UserBrickPanel : UserPanel
     {
         public UserBrickPanel(APIUser user)
             : base(user)

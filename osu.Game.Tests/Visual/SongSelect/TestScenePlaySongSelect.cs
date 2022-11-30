@@ -42,7 +42,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestScenePlaySongSelect : ScreenTestScene
+    public partial class TestScenePlaySongSelect : ScreenTestScene
     {
         private BeatmapManager manager = null!;
         private RulesetStore rulesets = null!;
@@ -1141,7 +1141,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 rulesets.Dispose();
         }
 
-        private class TestSongSelect : PlaySongSelect
+        private partial class TestSongSelect : PlaySongSelect
         {
             public Action? StartRequested;
 

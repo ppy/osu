@@ -14,7 +14,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class IncompatibilityDisplayingModPanel : ModPanel, IHasCustomTooltip<Mod>
+    public partial class IncompatibilityDisplayingModPanel : ModPanel, IHasCustomTooltip<Mod>
     {
         private readonly BindableBool incompatible = new BindableBool();
 

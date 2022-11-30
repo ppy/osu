@@ -19,7 +19,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile
 {
-    public abstract class ProfileSection : Container
+    public abstract partial class ProfileSection : Container
     {
         public abstract LocalisableString Title { get; }
 
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Profile
             underscore.Colour = colourProvider.Highlight1;
         }
 
-        private class SectionTriangles : Container
+        private partial class SectionTriangles : Container
         {
             private readonly Triangles triangles;
             private readonly Box foreground;

@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapCardDownloadButton : OsuTestScene
+    public partial class TestSceneBeatmapCardDownloadButton : OsuTestScene
     {
         private DownloadButton downloadButton;
 

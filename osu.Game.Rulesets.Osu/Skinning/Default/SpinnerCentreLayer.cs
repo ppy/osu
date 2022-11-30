@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class SpinnerCentreLayer : CompositeDrawable, IHasAccentColour
+    public partial class SpinnerCentreLayer : CompositeDrawable, IHasAccentColour
     {
         private DrawableSpinner spinner = null!;
 

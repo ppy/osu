@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneTournamentModDisplay : TournamentTestScene
+    public partial class TestSceneTournamentModDisplay : TournamentTestScene
     {
         [Resolved]
         private IAPIProvider api { get; set; }

@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
+    public partial class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
     {
         [Resolved]
         private SkinEditor skinEditor { get; set; }

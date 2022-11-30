@@ -12,7 +12,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsHeader : Container
+    public partial class SettingsHeader : Container
     {
         private readonly LocalisableString heading;
         private readonly LocalisableString subheading;

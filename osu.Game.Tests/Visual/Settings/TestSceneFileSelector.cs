@@ -13,7 +13,7 @@ using osu.Game.Tests.Visual.UserInterface;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    public class TestSceneFileSelector : ThemeComparisonTestScene
+    public partial class TestSceneFileSelector : ThemeComparisonTestScene
     {
         [Resolved]
         private OsuColour colours { get; set; }

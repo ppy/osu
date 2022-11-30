@@ -26,7 +26,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerSpectateButton : MultiplayerTestScene
+    public partial class TestSceneMultiplayerSpectateButton : MultiplayerTestScene
     {
         private MultiplayerSpectateButton spectateButton;
         private MatchStartControl startControl;

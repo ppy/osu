@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    internal class DefaultHitExplosion : CircularContainer, IAnimatableHitExplosion
+    internal partial class DefaultHitExplosion : CircularContainer, IAnimatableHitExplosion
     {
         private readonly HitResult result;
 

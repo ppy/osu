@@ -12,7 +12,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class StatusColouredContainer : Container
+    public partial class StatusColouredContainer : Container
     {
         private readonly double transitionDuration;
 

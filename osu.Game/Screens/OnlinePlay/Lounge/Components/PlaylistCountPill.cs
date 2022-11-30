@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     /// <summary>
     /// A pill that displays the playlist item count.
     /// </summary>
-    public class PlaylistCountPill : OnlinePlayComposite
+    public partial class PlaylistCountPill : OnlinePlayComposite
     {
         private OsuTextFlowContainer count;
 

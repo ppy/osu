@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class ArgonJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public partial class ArgonJudgementPiece : CompositeDrawable, IAnimatableJudgement
     {
         protected readonly HitResult Result;
 
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
         public Drawable? GetAboveHitObjectsProxiedContent() => null;
 
-        private class RingExplosion : CompositeDrawable
+        private partial class RingExplosion : CompositeDrawable
         {
             private readonly float travel = 58;
 
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 this.FadeOutFromOne(1000, Easing.OutQuint);
             }
 
-            public class RingPiece : CircularContainer
+            public partial class RingPiece : CircularContainer
             {
                 public RingPiece(float thickness = 9)
                 {

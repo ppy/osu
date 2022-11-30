@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             => dependencies.Get(type, info);
 
         public void Inject<T>(T instance)
-            where T : class
+            where T : class, IDependencyInjectionCandidate
             => dependencies.Inject(instance);
 
         protected void Cache(object instance)

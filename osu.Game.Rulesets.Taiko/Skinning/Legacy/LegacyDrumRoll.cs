@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class LegacyDrumRoll : CompositeDrawable, IHasAccentColour
+    public partial class LegacyDrumRoll : CompositeDrawable, IHasAccentColour
     {
         public override Quad ScreenSpaceDrawQuad
         {

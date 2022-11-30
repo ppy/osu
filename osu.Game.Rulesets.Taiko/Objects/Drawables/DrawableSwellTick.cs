@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableSwellTick : DrawableTaikoHitObject<SwellTick>
+    public partial class DrawableSwellTick : DrawableTaikoHitObject<SwellTick>
     {
         public override bool DisplayResult => false;
 
