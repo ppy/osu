@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit
             });
         }
 
-        protected void SetRowSelected(object? item)
+        protected void SetSelectedRow(object? item)
         {
             foreach (var b in BackgroundFlow)
             {
