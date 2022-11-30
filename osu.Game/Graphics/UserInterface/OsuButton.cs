@@ -175,17 +175,6 @@ namespace osu.Game.Graphics.UserInterface
             base.OnMouseUp(e);
         }
 
-        public new Axes AutoSizeAxes
-        {
-            get => base.AutoSizeAxes;
-            set
-            {
-                base.AutoSizeAxes = value;
-                Content.RelativeSizeAxes = ~value;
-                Content.AutoSizeAxes = value;
-            }
-        }
-
         protected virtual SpriteText CreateText() => new OsuSpriteText
         {
             Depth = -1,
