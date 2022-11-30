@@ -70,12 +70,21 @@ namespace osu.Game.Skinning.Editor
 
         private bool hasBegunMutating;
 
-        private Container content = null!;
+        private readonly Container content = new Container
+        {
+            Depth = float.MaxValue,
+            RelativeSizeAxes = Axes.Both,
+        };
 
-        private EditorSidebar componentsSidebar = null!;
-        private EditorSidebar settingsSidebar = null!;
-        private EditorSidebarSection layerSidebarSection = null!;
-        public DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> LayerSidebarList = null!;
+        private readonly EditorSidebar componentsSidebar = new EditorSidebar();
+        private readonly EditorSidebar settingsSidebar = new EditorSidebar();
+        private readonly EditorSidebarSection layerSidebarSection = new EditorSidebarSection(@"Layer Editor");
+
+        public readonly DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> LayerSidebarList
+            = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>(new SkinBlueprint(new BigBlackBox
+            {
+                Name = "DrawableMinimisableList"
+            }));
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay? onScreenDisplay { get; set; }
@@ -174,12 +183,8 @@ namespace osu.Game.Skinning.Editor
                                 {
                                     new Drawable[]
                                     {
-                                        componentsSidebar = new EditorSidebar(),
-                                        content = new Container
-                                        {
-                                            Depth = float.MaxValue,
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
+                                        componentsSidebar,
+                                        content,
                                         new GridContainer
                                         {
                                             RelativeSizeAxes = Axes.Y,
@@ -193,7 +198,7 @@ namespace osu.Game.Skinning.Editor
                                             {
                                                 new Drawable[]
                                                 {
-                                                    settingsSidebar = new EditorSidebar(),
+                                                    settingsSidebar,
                                                 },
                                                 new Drawable[]
                                                 {
@@ -209,18 +214,15 @@ namespace osu.Game.Skinning.Editor
                 }
             };
 
-            layerSidebar.Add(layerSidebarSection = new EditorSidebarSection(@"Layer Editor"));
+            layerSidebar.Add(layerSidebarSection);
             layerSidebarSection.Clear();
             initLayerEditor();
         }
 
         private void initLayerEditor()
         {
-            var name = new SkinBlueprint(new BigBlackBox
-            {
-                Name = "DrawableMinimisableList"
-            });
-            layerSidebarSection.Child = LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>(name);
+            LayerSidebarList.List?.Items.RemoveAll(_ => true);
+            layerSidebarSection.Child = LayerSidebarList;
             LayerSidebarList.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
             LayerSidebarList.SetItemDepth = (blueprint, depth) =>
             {
@@ -300,14 +302,15 @@ namespace osu.Game.Skinning.Editor
 
                 bool open = LayerSidebarList.Enabled.Value;
                 initLayerEditor();
-                LayerSidebarList.Enabled.Value = open;
 
+                LayerSidebarList.Enabled.Value = open;
                 LayerSidebarList.List?.Items.AddRange(
                     blueprintContainer.SelectionBlueprints
                                       .Children
                                       .Select(item =>
                                           new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(item)
                                       ));
+
                 componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)
                 {
                     RequestPlacement = placeComponent
@@ -374,7 +377,7 @@ namespace osu.Game.Skinning.Editor
 
             foreach (var component in SelectedComponents.OfType<Drawable>())
             {
-                settingsSidebar.Add(new SkinSettingsToolbox(component));
+                settingsSidebar?.Add(new SkinSettingsToolbox(component));
             }
         }
 
