@@ -817,7 +817,8 @@ namespace osu.Game
                 },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker,
-                new ConfineMouseTracker()
+                new ConfineMouseTracker(),
+                new RulesetKeyBinderChecker { PostNotification = n => Notifications.Post(n) }
             });
 
             ScreenStack.ScreenPushed += screenPushed;
