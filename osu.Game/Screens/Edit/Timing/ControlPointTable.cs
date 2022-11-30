@@ -61,13 +61,10 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            selectedGroup.BindValueChanged(_ =>
-            {
-                updateSelectedGroup();
-            }, true);
+            selectedGroup.BindValueChanged(_ => updateSelectedGroup(), true);
         }
 
-        private void updateSelectedGroup() => SetRowSelected(selectedGroup.Value);
+        private void updateSelectedGroup() => SetSelectedRow(selectedGroup.Value);
 
         private TableColumn[] createHeaders()
         {
