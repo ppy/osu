@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,6 +19,7 @@ namespace osu.Game.Overlays.Practice
     {
         public Action Restart = null!;
         public Action OnHide = null!;
+        public Action OnShow = null!;
 
         private readonly BindableNumber<double> customStart = new BindableNumber<double>
         {
@@ -38,8 +40,6 @@ namespace osu.Game.Overlays.Practice
         public PracticeOverlay(PracticePlayerLoader loader)
             : base(OverlayColourScheme.Green)
         {
-            createContent();
-
             customStart.BindTo(loader.CustomStart);
             customEnd.BindTo(loader.CustomEnd);
 
@@ -47,6 +47,12 @@ namespace osu.Game.Overlays.Practice
                 preview.SeekTo(startPercent.NewValue));
             customEnd.BindValueChanged(endPercent =>
                 preview.SeekTo(endPercent.NewValue));
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            createContent();
         }
 
         private void createContent()
@@ -114,6 +120,12 @@ namespace osu.Game.Overlays.Practice
         {
             base.PopOut();
             OnHide.Invoke();
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+            OnShow.Invoke();
         }
     }
 }

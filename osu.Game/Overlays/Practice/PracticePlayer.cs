@@ -18,9 +18,11 @@ namespace osu.Game.Overlays.Practice
         private readonly PracticePlayerLoader loader;
 
         private const double grace_period = 3000;
-        private bool blockFail = true;
+
         private double customEndTime;
         private double customStartTime;
+
+        private bool blockFail = true;
 
         public PracticePlayer(PracticePlayerLoader loader)
         {
@@ -45,11 +47,17 @@ namespace osu.Game.Overlays.Practice
             var playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset);
 
             double beatmapLength = playableBeatmap.HitObjects.LastOrDefault()!.GetEndTime() - playableBeatmap.HitObjects.FirstOrDefault()!.StartTime;
-            customStartTime = loader.CustomStart.Value * beatmapLength;
-            customEndTime = loader.CustomEnd.Value * beatmapLength;
 
-            //Make sure to only use custom startTime if it is bigger ( later) than the original one.
-            if (customStartTime - 1 > gameplayStart)
+            //If this isn't done infinite value weirdness happens
+            if (loader.CustomStart.Value != loader.CustomStart.Default)
+            {
+                customStartTime = playableBeatmap.HitObjects.FirstOrDefault()!.StartTime + loader.CustomStart.Value * beatmapLength;
+            }
+
+            customEndTime = playableBeatmap.HitObjects.FirstOrDefault()!.StartTime + beatmapLength * loader.CustomEnd.Value;
+
+            //Make sure to only use custom startTime if it is bigger ( later) than the original one by a meaningful amount.
+            if (customStartTime - 10 > gameplayStart)
                 masterGameplayClockContainer.Reset(customStartTime);
 
             return masterGameplayClockContainer;
@@ -76,11 +84,10 @@ namespace osu.Game.Overlays.Practice
             if (loader.IsFirstTry)
             {
                 practiceOverlay.Show();
-                PauseOverlay.Hide();
             }
             else
             {
-                //Todo: remove this hack!. PauseOverlay seems to be being triggered by something
+                //Todo: PauseOverlay seems to be being triggered by something unduly
                 PauseOverlay.Hide();
             }
 
@@ -102,7 +109,8 @@ namespace osu.Game.Overlays.Practice
             LoadComponent(practiceOverlay = new PracticeOverlay(loader)
             {
                 Restart = () => Restart(),
-                OnHide = () => PauseOverlay.Show()
+                OnHide = () => PauseOverlay.Show(),
+                OnShow = () => PauseOverlay.Hide()
             });
         }
 

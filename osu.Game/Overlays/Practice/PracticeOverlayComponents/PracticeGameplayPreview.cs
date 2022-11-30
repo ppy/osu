@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 
         public void SeekTo(double percent)
         {
-            gameplayClockContainer.Seek(percent * lastTime - startTime);
+            gameplayClockContainer.Seek(startTime + percent * (lastTime - startTime));
         }
     }
 }
