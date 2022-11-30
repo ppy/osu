@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 
 namespace osu.Game.Database
 {
@@ -28,6 +29,23 @@ namespace osu.Game.Database
 
             using (var inputStream = UserFileStorage.GetStream(file.File.GetStoragePath()))
                 inputStream.CopyTo(outputStream);
+        }
+
+        public override void Export(ScoreInfo item)
+        {
+            var itemFilename = item.GetDisplayString().GetValidFilename();
+
+            var existingExports = ExportStorage.GetFiles("", $"{itemFilename}*{FileExtension}").ToArray();
+
+            // trim the file extension
+            for (int i = 0; i < existingExports.Length; i++)
+                existingExports[i] = existingExports[i].TrimEnd(FileExtension.ToCharArray());
+
+            string filename = $"{NamingUtils.GetNextBestName(existingExports, itemFilename)}{FileExtension}";
+            using (var stream = ExportStorage.CreateFileSafely(filename))
+                ExportModelTo(item, stream);
+
+            ExportStorage.PresentFileExternally(filename);
         }
     }
 }
