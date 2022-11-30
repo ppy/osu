@@ -29,6 +29,9 @@ namespace osu.Game.Overlays.Chat
     {
         public Color4 AccentColour { get; }
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            Child.ReceivePositionalInputAt(screenSpacePos);
+
         public float FontSize
         {
             set => drawableText.Font = OsuFont.GetFont(size: value, weight: FontWeight.Bold, italics: true);
