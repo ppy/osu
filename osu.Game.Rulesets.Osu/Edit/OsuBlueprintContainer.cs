@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuBlueprintContainer : ComposeBlueprintContainer
     {
-        public OsuBlueprintContainer(HitObjectComposer composer, Ruleset ruleset)
-            : base(composer, ruleset)
+        public OsuBlueprintContainer(HitObjectComposer composer)
+            : base(composer)
         {
         }
 

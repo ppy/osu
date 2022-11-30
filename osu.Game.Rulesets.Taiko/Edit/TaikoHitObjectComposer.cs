@@ -24,6 +24,6 @@ namespace osu.Game.Rulesets.Taiko.Edit
         };
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
-            => new TaikoBlueprintContainer(this, Ruleset);
+            => new TaikoBlueprintContainer(this);
     }
 }

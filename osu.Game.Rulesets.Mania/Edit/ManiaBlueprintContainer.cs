@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public partial class ManiaBlueprintContainer : ComposeBlueprintContainer
     {
-        public ManiaBlueprintContainer(HitObjectComposer composer, Ruleset ruleset)
-            : base(composer, ruleset)
+        public ManiaBlueprintContainer(HitObjectComposer composer)
+            : base(composer)
         {
         }
 

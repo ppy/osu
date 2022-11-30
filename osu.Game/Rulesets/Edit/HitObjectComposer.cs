@@ -45,8 +45,6 @@ namespace osu.Game.Rulesets.Edit
     {
         protected IRulesetConfigManager Config { get; private set; }
 
-        protected readonly Ruleset Ruleset;
-
         // Provides `Playfield`
         private DependencyContainer dependencies;
 
@@ -74,8 +72,8 @@ namespace osu.Game.Rulesets.Edit
         private IBindable<bool> hasTiming;
 
         protected HitObjectComposer(Ruleset ruleset)
+            : base(ruleset)
         {
-            Ruleset = ruleset;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
@@ -218,7 +216,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
-        protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this, Ruleset);
+        protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
@@ -419,8 +417,11 @@ namespace osu.Game.Rulesets.Edit
     [Cached]
     public abstract partial class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
-        protected HitObjectComposer()
+        public readonly Ruleset Ruleset;
+
+        protected HitObjectComposer(Ruleset ruleset)
         {
+            Ruleset = ruleset;
             RelativeSizeAxes = Axes.Both;
         }
 
