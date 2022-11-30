@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
-            => new ManiaBlueprintContainer(this, Ruleset);
+            => new ManiaBlueprintContainer(this);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {

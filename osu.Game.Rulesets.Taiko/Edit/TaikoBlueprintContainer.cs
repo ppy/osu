@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Taiko.Edit
 {
     public partial class TaikoBlueprintContainer : ComposeBlueprintContainer
     {
-        public TaikoBlueprintContainer(HitObjectComposer composer, Ruleset ruleset)
-            : base(composer, ruleset)
+        public TaikoBlueprintContainer(HitObjectComposer composer)
+            : base(composer)
         {
         }
 

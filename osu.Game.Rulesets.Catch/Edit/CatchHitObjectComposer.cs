@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             return result;
         }
 
-        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new CatchBlueprintContainer(this, Ruleset);
+        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new CatchBlueprintContainer(this);
 
         [CanBeNull]
         private PalpableCatchHitObject getLastSnappableHitObject(double time)

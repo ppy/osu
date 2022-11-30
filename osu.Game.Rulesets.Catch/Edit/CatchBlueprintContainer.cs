@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Catch.Edit
 {
     public partial class CatchBlueprintContainer : ComposeBlueprintContainer
     {
-        public CatchBlueprintContainer(CatchHitObjectComposer composer, Ruleset ruleset)
-            : base(composer, ruleset)
+        public CatchBlueprintContainer(CatchHitObjectComposer composer)
+            : base(composer)
         {
         }
 
