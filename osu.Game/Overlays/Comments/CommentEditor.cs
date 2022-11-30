@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Comments
             private const int duration = 200;
 
             private readonly LoadingSpinner spinner;
-            private readonly OsuSpriteText text = null!;
+            private SpriteText text = null!;
 
             public readonly BindableBool IsBlocked = new BindableBool();
 
@@ -206,6 +206,11 @@ namespace osu.Game.Overlays.Comments
                 {
                     Enabled.Value = !IsLoadingSpinnerShown && !e.NewValue;
                 }, true);
+            }
+
+            protected override SpriteText CreateText()
+            {
+                return text = base.CreateText();
             }
         }
     }
