@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawableProfileScore : CompositeDrawable
+    public partial class DrawableProfileScore : CompositeDrawable
     {
         private const int height = 40;
         private const int performance_width = 100;
@@ -258,7 +258,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             };
         }
 
-        private class ScoreBeatmapMetadataContainer : BeatmapMetadataContainer
+        private partial class ScoreBeatmapMetadataContainer : BeatmapMetadataContainer
         {
             public ScoreBeatmapMetadataContainer(IBeatmapInfo beatmapInfo)
                 : base(beatmapInfo)

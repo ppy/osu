@@ -12,7 +12,7 @@ using osu.Game.Overlays.Changelog;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneChangelogSupporterPromo : OsuTestScene
+    public partial class TestSceneChangelogSupporterPromo : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);

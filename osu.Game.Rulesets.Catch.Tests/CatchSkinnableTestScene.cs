@@ -7,7 +7,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public abstract class CatchSkinnableTestScene : SkinnableTestScene
+    public abstract partial class CatchSkinnableTestScene : SkinnableTestScene
     {
         protected override Ruleset CreateRulesetForSkinProvider() => new CatchRuleset();
     }

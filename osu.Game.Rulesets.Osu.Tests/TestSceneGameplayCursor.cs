@@ -28,7 +28,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneGameplayCursor : OsuSkinnableTestScene
+    public partial class TestSceneGameplayCursor : OsuSkinnableTestScene
     {
         [Cached]
         private GameplayState gameplayState;
@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class ClickingCursorContainer : OsuCursorContainer
+        private partial class ClickingCursorContainer : OsuCursorContainer
         {
             private bool pressed;
 
@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class MovingCursorInputManager : ManualInputManager
+        private partial class MovingCursorInputManager : ManualInputManager
         {
             public MovingCursorInputManager()
             {

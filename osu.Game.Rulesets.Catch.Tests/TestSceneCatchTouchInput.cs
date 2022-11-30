@@ -15,7 +15,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatchTouchInput : OsuTestScene
+    public partial class TestSceneCatchTouchInput : OsuTestScene
     {
         [Test]
         public void TestBasic()

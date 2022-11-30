@@ -21,7 +21,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.News
 {
-    public class NewsCard : OsuHoverContainer
+    public partial class NewsCard : OsuHoverContainer
     {
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.News
             main.AddText(post.Author, t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold));
         }
 
-        private class DateContainer : CircularContainer, IHasCustomTooltip<DateTimeOffset>
+        private partial class DateContainer : CircularContainer, IHasCustomTooltip<DateTimeOffset>
         {
             private readonly DateTimeOffset date;
 

@@ -14,7 +14,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
-    public class AudioDevicesSettings : SettingsSubsection
+    public partial class AudioDevicesSettings : SettingsSubsection
     {
         protected override LocalisableString Header => AudioSettingsStrings.AudioDevicesHeader;
 
@@ -77,11 +77,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             }
         }
 
-        private class AudioDeviceSettingsDropdown : SettingsDropdown<string>
+        private partial class AudioDeviceSettingsDropdown : SettingsDropdown<string>
         {
             protected override OsuDropdown<string> CreateDropdown() => new AudioDeviceDropdownControl();
 
-            private class AudioDeviceDropdownControl : DropdownControl
+            private partial class AudioDeviceDropdownControl : DropdownControl
             {
                 protected override LocalisableString GenerateItemText(string item)
                     => string.IsNullOrEmpty(item) ? CommonStrings.Default : base.GenerateItemText(item);

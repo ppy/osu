@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// A component of the playfield that captures input and displays input as a drum.
     /// </summary>
-    internal class InputDrum : Container
+    internal partial class InputDrum : Container
     {
         public InputDrum()
         {

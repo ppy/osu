@@ -10,7 +10,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class ParticipantsDisplay : OnlinePlayComposite
+    public partial class ParticipantsDisplay : OnlinePlayComposite
     {
         public Bindable<string> Details = new Bindable<string>();
 

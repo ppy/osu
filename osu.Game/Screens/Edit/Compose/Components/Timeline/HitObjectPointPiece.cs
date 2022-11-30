@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class HitObjectPointPiece : CircularContainer
+    public partial class HitObjectPointPiece : CircularContainer
     {
         private readonly ControlPoint point;
 

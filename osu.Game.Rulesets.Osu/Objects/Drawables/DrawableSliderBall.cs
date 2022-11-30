@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
+    public partial class DrawableSliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
     {
         public const float FOLLOW_AREA = 2.4f;
 

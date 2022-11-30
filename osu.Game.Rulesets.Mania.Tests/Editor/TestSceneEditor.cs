@@ -14,7 +14,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
     [TestFixture]
-    public class TestSceneEditor : EditorTestScene
+    public partial class TestSceneEditor : EditorTestScene
     {
         private readonly Bindable<ManiaScrollingDirection> direction = new Bindable<ManiaScrollingDirection>();
 

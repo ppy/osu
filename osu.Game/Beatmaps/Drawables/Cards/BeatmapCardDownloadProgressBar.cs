@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardDownloadProgressBar : CompositeDrawable
+    public partial class BeatmapCardDownloadProgressBar : CompositeDrawable
     {
         public IBindable<DownloadState> State => state;
         private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();

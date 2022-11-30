@@ -6,7 +6,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyDropletPiece : LegacyCatchHitObjectPiece
+    public partial class LegacyDropletPiece : LegacyCatchHitObjectPiece
     {
         public LegacyDropletPiece()
         {

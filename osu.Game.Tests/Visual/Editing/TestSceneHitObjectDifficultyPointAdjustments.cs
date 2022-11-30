@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneHitObjectDifficultyPointAdjustments : EditorTestScene
+    public partial class TestSceneHitObjectDifficultyPointAdjustments : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

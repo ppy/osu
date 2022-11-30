@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Components
 {
-    public class TimeInfoContainer : BottomBarContainer
+    public partial class TimeInfoContainer : BottomBarContainer
     {
         private OsuSpriteText trackTimer;
         private OsuSpriteText bpm;

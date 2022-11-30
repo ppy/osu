@@ -19,7 +19,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneUserTopScoreContainer : OsuTestScene
+    public partial class TestSceneUserTopScoreContainer : OsuTestScene
     {
         [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay;

@@ -19,7 +19,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownContainer : MarkdownContainer
+    public partial class OsuMarkdownContainer : MarkdownContainer
     {
         /// <summary>
         /// Allows this markdown container to parse and link footnotes.

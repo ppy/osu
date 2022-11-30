@@ -26,7 +26,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public abstract class MultiplayerGameplayLeaderboardTestScene : OsuTestScene
+    public abstract partial class MultiplayerGameplayLeaderboardTestScene : OsuTestScene
     {
         protected const int TOTAL_USERS = 16;
 

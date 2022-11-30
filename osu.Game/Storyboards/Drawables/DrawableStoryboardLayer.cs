@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardLayer : CompositeDrawable
+    public partial class DrawableStoryboardLayer : CompositeDrawable
     {
         public StoryboardLayer Layer { get; }
         public bool Enabled;
@@ -32,7 +32,7 @@ namespace osu.Game.Storyboards.Drawables
             InternalChild = ElementContainer = new LayerElementContainer(layer);
         }
 
-        protected class LayerElementContainer : LifetimeManagementContainer
+        protected partial class LayerElementContainer : LifetimeManagementContainer
         {
             private readonly StoryboardLayer storyboardLayer;
 

@@ -18,7 +18,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Chat
 {
     [HeadlessTest]
-    public class TestSceneChannelManager : OsuTestScene
+    public partial class TestSceneChannelManager : OsuTestScene
     {
         private ChannelManager channelManager;
         private int currentMessageId;
@@ -183,7 +183,7 @@ namespace osu.Game.Tests.Chat
             LastMessageId = 0,
         };
 
-        private class ChannelManagerContainer : CompositeDrawable
+        private partial class ChannelManagerContainer : CompositeDrawable
         {
             [Cached]
             public ChannelManager ChannelManager { get; }

@@ -21,7 +21,7 @@ using osu.Game.Users;
 namespace osu.Game.Screens.OnlinePlay
 {
     [Cached]
-    public abstract class OnlinePlayScreen : OsuScreen, IHasSubScreenStack
+    public abstract partial class OnlinePlayScreen : OsuScreen, IHasSubScreenStack
     {
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
@@ -217,7 +217,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected abstract LoungeSubScreen CreateLounge();
 
-        private class MultiplayerWaveContainer : WaveContainer
+        private partial class MultiplayerWaveContainer : WaveContainer
         {
             protected override bool StartHidden => true;
 

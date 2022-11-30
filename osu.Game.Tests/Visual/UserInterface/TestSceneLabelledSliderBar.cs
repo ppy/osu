@@ -17,7 +17,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLabelledSliderBar : OsuTestScene
+    public partial class TestSceneLabelledSliderBar : OsuTestScene
     {
         [Test]
         public void TestBasic() => createSliderBar();
@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        private class OverlayColourContainer : Container
+        private partial class OverlayColourContainer : Container
         {
             [Cached]
             private OverlayColourProvider colourProvider;

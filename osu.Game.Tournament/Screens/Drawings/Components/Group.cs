@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
 {
-    public class Group : Container
+    public partial class Group : Container
     {
         public readonly string GroupName;
 

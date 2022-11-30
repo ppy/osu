@@ -38,7 +38,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestSceneScreenNavigation : OsuGameTestScene
+    public partial class TestSceneScreenNavigation : OsuGameTestScene
     {
         private const float click_padding = 25;
 
@@ -694,7 +694,7 @@ namespace osu.Game.Tests.Visual.Navigation
             ConfirmAtMainMenu();
         }
 
-        public class TestPlaySongSelect : PlaySongSelect
+        public partial class TestPlaySongSelect : PlaySongSelect
         {
             public ModSelectOverlay ModSelectOverlay => ModSelect;
 

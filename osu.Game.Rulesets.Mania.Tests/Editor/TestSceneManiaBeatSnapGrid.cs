@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public class TestSceneManiaBeatSnapGrid : EditorClockTestScene
+    public partial class TestSceneManiaBeatSnapGrid : EditorClockTestScene
     {
         [Cached(typeof(IScrollingInfo))]
         private ScrollingTestContainer.TestScrollingInfo scrollingInfo = new ScrollingTestContainer.TestScrollingInfo();
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         public ManiaPlayfield Playfield { get; }
     }
 
-    public class TestHitObjectComposer : HitObjectComposer
+    public partial class TestHitObjectComposer : HitObjectComposer
     {
         public override Playfield Playfield { get; }
         public override IEnumerable<DrawableHitObject> HitObjects => Enumerable.Empty<DrawableHitObject>();

@@ -18,7 +18,7 @@ using osu.Game.Overlays;
 namespace osu.Game.Graphics.Containers
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public abstract class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
+    public abstract partial class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
         private Sample samplePopIn;
         private Sample samplePopOut;

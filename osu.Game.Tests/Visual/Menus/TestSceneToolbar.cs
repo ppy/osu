@@ -26,7 +26,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestSceneToolbar : OsuManualInputManagerTestScene
+    public partial class TestSceneToolbar : OsuManualInputManagerTestScene
     {
         private TestToolbar toolbar;
 
@@ -201,7 +201,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddAssert("volume not changed", () => Audio.Volume.Value == 0.5);
         }
 
-        public class TestToolbar : Toolbar
+        public partial class TestToolbar : Toolbar
         {
             public new Bindable<OverlayActivation> OverlayActivationMode => base.OverlayActivationMode as Bindable<OverlayActivation>;
         }

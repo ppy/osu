@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class TapTimingControl : CompositeDrawable
+    public partial class TapTimingControl : CompositeDrawable
     {
         [Resolved]
         private EditorClock editorClock { get; set; } = null!;
@@ -233,7 +233,7 @@ namespace osu.Game.Screens.Edit.Timing
             timing.BeatLength = 60000 / (timing.BPM + adjust);
         }
 
-        private class InlineButton : OsuButton
+        private partial class InlineButton : OsuButton
         {
             private readonly IconUsage icon;
             private readonly Anchor anchor;

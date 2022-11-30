@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class ProfileRulesetTabItem : OverlayRulesetTabItem
+    public partial class ProfileRulesetTabItem : OverlayRulesetTabItem
     {
         private bool isDefault;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Add(icon = new DefaultRulesetIcon { Alpha = 0 });
         }
 
-        public class DefaultRulesetIcon : SpriteIcon, IHasTooltip
+        public partial class DefaultRulesetIcon : SpriteIcon, IHasTooltip
         {
             public LocalisableString TooltipText => UsersStrings.ShowEditDefaultPlaymodeIsDefaultTooltip;
 

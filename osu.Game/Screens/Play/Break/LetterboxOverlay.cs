@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.Break
 {
-    public class LetterboxOverlay : CompositeDrawable
+    public partial class LetterboxOverlay : CompositeDrawable
     {
         private const int height = 350;
 

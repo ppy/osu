@@ -16,7 +16,7 @@ using osu.Game.Overlays.Profile.Sections;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneHistoricalSection : OsuTestScene
+    public partial class TestSceneHistoricalSection : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 

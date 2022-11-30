@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
     /// <summary>
     /// Represents length-wise portion of a hold note.
     /// </summary>
-    public class DefaultBodyPiece : CompositeDrawable, IHoldNoteBody
+    public partial class DefaultBodyPiece : CompositeDrawable, IHoldNoteBody
     {
         protected readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
         protected readonly IBindable<bool> IsHitting = new Bindable<bool>();
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
 
         private void onAccentChanged(ValueChangedEvent<Color4> accent) => Background.Colour = accent.NewValue.Opacity(0.7f);
 
-        private class ForegroundPiece : CompositeDrawable
+        private partial class ForegroundPiece : CompositeDrawable
         {
             public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
             public readonly IBindable<bool> IsHitting = new Bindable<bool>();

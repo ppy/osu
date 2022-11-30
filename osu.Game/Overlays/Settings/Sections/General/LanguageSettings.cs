@@ -12,7 +12,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class LanguageSettings : SettingsSubsection
+    public partial class LanguageSettings : SettingsSubsection
     {
         private SettingsDropdown<Language> languageSelection = null!;
         private Bindable<string> frameworkLocale = null!;

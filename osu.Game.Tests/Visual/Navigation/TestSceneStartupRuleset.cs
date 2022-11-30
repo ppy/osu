@@ -10,7 +10,7 @@ using osu.Game.Configuration;
 namespace osu.Game.Tests.Visual.Navigation
 {
     [TestFixture]
-    public class TestSceneStartupRuleset : OsuGameTestScene
+    public partial class TestSceneStartupRuleset : OsuGameTestScene
     {
         protected override TestOsuGame CreateTestGame()
         {

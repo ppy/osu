@@ -25,7 +25,7 @@ using osuTK.Graphics;
 namespace osu.Game.Screens.Play.HUD
 {
     [LongRunningLoad]
-    public class MultiplayerGameplayLeaderboard : GameplayLeaderboard
+    public partial class MultiplayerGameplayLeaderboard : GameplayLeaderboard
     {
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
 

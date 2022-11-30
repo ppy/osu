@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class SetupScreenHeaderBackground : CompositeDrawable
+    public partial class SetupScreenHeaderBackground : CompositeDrawable
     {
         [Resolved]
         private OsuColour colours { get; set; }

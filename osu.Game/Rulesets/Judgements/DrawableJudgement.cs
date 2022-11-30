@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Judgements
     /// <summary>
     /// A drawable object which visualises the hit result of a <see cref="Judgements.Judgement"/>.
     /// </summary>
-    public class DrawableJudgement : PoolableDrawable
+    public partial class DrawableJudgement : PoolableDrawable
     {
         private const float judgement_size = 128;
 

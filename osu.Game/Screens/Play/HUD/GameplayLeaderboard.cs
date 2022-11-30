@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public abstract class GameplayLeaderboard : CompositeDrawable
+    public abstract partial class GameplayLeaderboard : CompositeDrawable
     {
         private readonly Cached sorting = new Cached();
 
@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected virtual bool CheckValidScorePosition(int i) => true;
 
-        private class InputDisabledScrollContainer : OsuScrollContainer
+        private partial class InputDisabledScrollContainer : OsuScrollContainer
         {
             public InputDisabledScrollContainer()
             {

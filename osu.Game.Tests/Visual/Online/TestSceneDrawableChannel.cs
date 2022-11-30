@@ -13,7 +13,7 @@ using osu.Game.Overlays.Chat;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneDrawableChannel : OsuTestScene
+    public partial class TestSceneDrawableChannel : OsuTestScene
     {
         private Channel channel = null!;
         private DrawableChannel drawableChannel = null!;

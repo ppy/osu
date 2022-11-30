@@ -26,7 +26,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class APIAccess : Component, IAPIProvider
+    public partial class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
 

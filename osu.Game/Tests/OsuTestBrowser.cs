@@ -12,7 +12,7 @@ using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Tests
 {
-    public class OsuTestBrowser : OsuGameBase
+    public partial class OsuTestBrowser : OsuGameBase
     {
         protected override void LoadComplete()
         {

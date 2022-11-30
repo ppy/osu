@@ -18,7 +18,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Settings
 {
     [TestFixture]
-    public class TestSceneSettingsPanel : OsuManualInputManagerTestScene
+    public partial class TestSceneSettingsPanel : OsuManualInputManagerTestScene
     {
         private SettingsPanel settings;
         private DialogOverlay dialogOverlay;
@@ -62,7 +62,6 @@ namespace osu.Game.Tests.Visual.Settings
                                                                          section.Children.Where(f => f.IsPresent)
                                                                                 .OfType<ISettingsItem>()
                                                                                 .OfType<IFilterable>()
-                                                                                .Where(f => !(f is IHasFilterableChildren))
                                                                                 .All(f => f.FilterTerms.Any(t => t.ToString().Contains("scaling")))
                                                                      ));
 

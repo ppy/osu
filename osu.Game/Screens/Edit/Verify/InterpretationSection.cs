@@ -10,7 +10,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    internal class InterpretationSection : EditorRoundedScreenSettingsSection
+    internal partial class InterpretationSection : EditorRoundedScreenSettingsSection
     {
         protected override string HeaderText => "Interpretation";
 

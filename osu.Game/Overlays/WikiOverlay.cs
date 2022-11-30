@@ -17,7 +17,7 @@ using osu.Game.Overlays.Wiki;
 
 namespace osu.Game.Overlays
 {
-    public class WikiOverlay : OnlineOverlay<WikiHeader>
+    public partial class WikiOverlay : OnlineOverlay<WikiHeader>
     {
         private const string index_path = @"main_page";
 

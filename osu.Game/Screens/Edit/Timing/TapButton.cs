@@ -28,7 +28,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class TapButton : CircularContainer, IKeyBindingHandler<GlobalAction>
+    internal partial class TapButton : CircularContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float SIZE = 140;
 
@@ -343,7 +343,7 @@ namespace osu.Game.Screens.Edit.Timing
             IsHandlingTapping.Value = false;
         }
 
-        private class Light : CompositeDrawable
+        private partial class Light : CompositeDrawable
         {
             public Drawable Glow { get; private set; } = null!;
 

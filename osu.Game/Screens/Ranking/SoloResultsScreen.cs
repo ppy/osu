@@ -15,7 +15,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class SoloResultsScreen : ResultsScreen
+    public partial class SoloResultsScreen : ResultsScreen
     {
         private GetScoresRequest getScoreRequest;
 

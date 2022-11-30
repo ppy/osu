@@ -9,7 +9,7 @@ using osu.Game.Beatmaps.Drawables;
 namespace osu.Game.Tests.Visual.Online
 {
     [Ignore("Only for visual testing")]
-    public class TestSceneBundledBeatmapDownloader : OsuTestScene
+    public partial class TestSceneBundledBeatmapDownloader : OsuTestScene
     {
         private BundledBeatmapDownloader downloader;
 

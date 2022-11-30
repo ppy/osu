@@ -17,7 +17,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapDetailAreaTabControl : Container
+    public partial class BeatmapDetailAreaTabControl : Container
     {
         public const float HEIGHT = 24;
 

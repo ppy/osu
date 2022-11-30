@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public class TestSceneBarLine : ManiaSkinnableTestScene
+    public partial class TestSceneBarLine : ManiaSkinnableTestScene
     {
         [Test]
         public void TestMinor()

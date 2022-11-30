@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySongProgress : SongProgress
+    public partial class LegacySongProgress : SongProgress
     {
         private CircularProgress circularProgress = null!;
 

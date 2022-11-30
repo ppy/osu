@@ -15,7 +15,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SoloGameplayLeaderboard : GameplayLeaderboard
+    public partial class SoloGameplayLeaderboard : GameplayLeaderboard
     {
         private const int duration = 100;
 

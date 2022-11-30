@@ -11,7 +11,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Input.Bindings
 {
-    public class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalKeyboardInput
+    public partial class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly Drawable? handler;
 

@@ -8,7 +8,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 namespace osu.Game.Rulesets.EmptyScrolling.UI
 {
     [Cached]
-    public class EmptyScrollingPlayfield : ScrollingPlayfield
+    public partial class EmptyScrollingPlayfield : ScrollingPlayfield
     {
         [BackgroundDependencyLoader]
         private void load()

@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Ladder
 {
-    public class LadderScreen : TournamentScreen
+    public partial class LadderScreen : TournamentScreen
     {
         protected Container<DrawableTournamentMatch> MatchesContainer;
         private Container<Path> paths;

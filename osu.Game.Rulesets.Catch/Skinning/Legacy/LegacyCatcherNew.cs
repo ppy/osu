@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyCatcherNew : CompositeDrawable
+    public partial class LegacyCatcherNew : CompositeDrawable
     {
         [Resolved]
         private Bindable<CatcherAnimationState> currentState { get; set; } = null!;

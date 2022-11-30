@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneAllPlayersQueueMode : QueueModeTestScene
+    public partial class TestSceneAllPlayersQueueMode : QueueModeTestScene
     {
         protected override QueueMode Mode => QueueMode.AllPlayers;
 

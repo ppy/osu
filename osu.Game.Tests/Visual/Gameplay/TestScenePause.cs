@@ -21,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePause : OsuPlayerTestScene
+    public partial class TestScenePause : OsuPlayerTestScene
     {
         protected new PausePlayer Player => (PausePlayer)base.Player;
 
@@ -396,7 +396,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new PausePlayer();
 
-        protected class PausePlayer : TestPlayer
+        protected partial class PausePlayer : TestPlayer
         {
             public double LastPauseTime { get; private set; }
             public double LastResumeTime { get; private set; }

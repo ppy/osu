@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public class DefaultInputDrum : AspectContainer
+    public partial class DefaultInputDrum : AspectContainer
     {
         public DefaultInputDrum()
         {
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         /// <summary>
         /// A half-drum. Contains one centre and one rim hit.
         /// </summary>
-        private class TaikoHalfDrum : Container, IKeyBindingHandler<TaikoAction>
+        private partial class TaikoHalfDrum : Container, IKeyBindingHandler<TaikoAction>
         {
             /// <summary>
             /// The key to be used for the rim of the half-drum.

@@ -12,7 +12,7 @@ using osu.Game.Overlays.Profile.Header.Components;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserProfilePreviousUsernames : OsuTestScene
+    public partial class TestSceneUserProfilePreviousUsernames : OsuTestScene
     {
         private PreviousUsernames container;
 

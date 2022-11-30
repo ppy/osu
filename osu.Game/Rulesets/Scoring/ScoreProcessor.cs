@@ -21,7 +21,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public class ScoreProcessor : JudgementProcessor
+    public partial class ScoreProcessor : JudgementProcessor
     {
         private const double max_score = 1000000;
 

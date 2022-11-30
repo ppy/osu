@@ -11,7 +11,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class ColoursSection : SetupSection
+    internal partial class ColoursSection : SetupSection
     {
         public override LocalisableString Title => EditorSetupStrings.ColoursHeader;
 

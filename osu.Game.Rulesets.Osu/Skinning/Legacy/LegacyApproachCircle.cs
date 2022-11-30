@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyApproachCircle : SkinnableSprite
+    public partial class LegacyApproachCircle : SkinnableSprite
     {
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 

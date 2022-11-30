@@ -19,7 +19,7 @@ using osuTK.Input;
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     [TestFixture]
-    public class TestSceneSliderLengthValidity : TestSceneOsuEditor
+    public partial class TestSceneSliderLengthValidity : TestSceneOsuEditor
     {
         private OsuPlayfield playfield;
 

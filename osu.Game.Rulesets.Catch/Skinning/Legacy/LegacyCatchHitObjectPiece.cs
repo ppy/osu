@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public abstract class LegacyCatchHitObjectPiece : PoolableDrawable
+    public abstract partial class LegacyCatchHitObjectPiece : PoolableDrawable
     {
         protected readonly Bindable<int> IndexInBeatmap = new Bindable<int>();
 

@@ -34,7 +34,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Online
 {
     [HeadlessTest]
-    public class TestSceneOnlinePlayBeatmapAvailabilityTracker : OsuTestScene
+    public partial class TestSceneOnlinePlayBeatmapAvailabilityTracker : OsuTestScene
     {
         private RulesetStore rulesets;
         private TestBeatmapManager beatmaps;

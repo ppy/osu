@@ -17,7 +17,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButtonRandom : FooterButton
+    public partial class FooterButtonRandom : FooterButton
     {
         public Action NextRandom { get; set; }
         public Action PreviousRandom { get; set; }

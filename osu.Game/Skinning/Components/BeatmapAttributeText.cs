@@ -24,7 +24,7 @@ using osu.Game.Resources.Localisation.Web;
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
-    public class BeatmapAttributeText : Container, ISkinnableDrawable
+    public partial class BeatmapAttributeText : Container, ISkinnableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 

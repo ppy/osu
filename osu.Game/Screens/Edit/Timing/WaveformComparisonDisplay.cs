@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class WaveformComparisonDisplay : CompositeDrawable
+    internal partial class WaveformComparisonDisplay : CompositeDrawable
     {
         private const int total_waveforms = 8;
 
@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        internal class LockedOverlay : CompositeDrawable
+        internal partial class LockedOverlay : CompositeDrawable
         {
             private OsuSpriteText text = null!;
 
@@ -285,7 +285,7 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        internal class WaveformRow : CompositeDrawable
+        internal partial class WaveformRow : CompositeDrawable
         {
             private readonly bool isMainRow;
             private OsuSpriteText beatIndexText = null!;

@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneDrumRollApplication : HitObjectApplicationTestScene
+    public partial class TestSceneDrumRollApplication : HitObjectApplicationTestScene
     {
         [Test]
         public void TestApplyNewDrumRoll()

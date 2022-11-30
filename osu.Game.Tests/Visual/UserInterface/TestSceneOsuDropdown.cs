@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuDropdown : ThemeComparisonTestScene
+    public partial class TestSceneOsuDropdown : ThemeComparisonTestScene
     {
         protected override Drawable CreateContent() =>
             new OsuEnumDropdown<BeatmapOnlineStatus>

@@ -18,7 +18,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Rulesets
 {
     [HeadlessTest]
-    public class TestSceneBrokenRulesetHandling : OsuTestScene
+    public partial class TestSceneBrokenRulesetHandling : OsuTestScene
     {
         [Resolved]
         private OsuGameBase gameBase { get; set; } = null!;

@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyHitExplosion : CompositeDrawable, IHitExplosion
+    public partial class LegacyHitExplosion : CompositeDrawable, IHitExplosion
     {
         [Resolved]
         private Catcher catcher { get; set; } = null!;

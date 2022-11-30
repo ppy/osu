@@ -13,7 +13,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneTaikoSuddenDeath : TestSceneTaikoPlayer
+    public partial class TestSceneTaikoSuddenDeath : TestSceneTaikoPlayer
     {
         protected override bool AllowFail => true;
 

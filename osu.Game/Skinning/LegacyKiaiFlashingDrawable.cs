@@ -9,7 +9,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyKiaiFlashingDrawable : BeatSyncedContainer
+    public partial class LegacyKiaiFlashingDrawable : BeatSyncedContainer
     {
         private readonly Drawable flashingDrawable;
 

@@ -4,17 +4,16 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DangerousTriangleButton : TriangleButton
+    public partial class DangerousRoundedButton : RoundedButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             BackgroundColour = colours.PinkDark;
-            Triangles.ColourDark = colours.PinkDarker;
-            Triangles.ColourLight = colours.Pink;
         }
     }
 }
