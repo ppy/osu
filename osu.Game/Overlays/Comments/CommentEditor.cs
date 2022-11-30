@@ -194,7 +194,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(14),
+                    Size = new Vector2(16),
                     Depth = -2,
                 });
             }
