@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Newtonsoft.Json;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -59,9 +60,14 @@ namespace osu.Game.Online.Chat
         /// <remarks>The <see cref="Link"/>s' <see cref="Link.Index"/> and <see cref="Link.Length"/>s are according to <see cref="DisplayContent"/></remarks>
         public List<Link> Links;
 
+        private static long constructionOrderStatic;
+        private readonly long constructionOrder;
+
         public Message(long? id)
         {
             Id = id;
+
+            constructionOrder = Interlocked.Increment(ref constructionOrderStatic);
         }
 
         public int CompareTo(Message other)
@@ -69,7 +75,13 @@ namespace osu.Game.Online.Chat
             if (Id.HasValue && other.Id.HasValue)
                 return Id.Value.CompareTo(other.Id.Value);
 
-            return Timestamp.CompareTo(other.Timestamp);
+            int timestampComparison = Timestamp.CompareTo(other.Timestamp);
+
+            if (timestampComparison != 0)
+                return timestampComparison;
+
+            // Timestamp might not be accurate enough to make a stable sorting decision.
+            return constructionOrder.CompareTo(other.constructionOrder);
         }
 
         public virtual bool Equals(Message other)
