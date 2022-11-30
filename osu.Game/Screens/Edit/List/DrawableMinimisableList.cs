@@ -6,10 +6,8 @@ using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
@@ -70,8 +68,7 @@ namespace osu.Game.Screens.Edit.List
         public readonly DrawableList<T>? List;
         public T? RepresentedItem => Model.RepresentedItem;
 
-        private readonly Box box;
-        private readonly OsuSpriteText text;
+        private readonly DrawableListItem<T> representedListItem;
 
         public DrawableMinimisableList(T item)
             : base(new DrawableListRepresetedItem<T>(item))
@@ -86,44 +83,30 @@ namespace osu.Game.Screens.Edit.List
             {
                 // RelativeSizeAxes = Axes.X,
                 // AutoSizeAxes = Axes.Y,
-                // Direction = FillDirection.Vertical,
-                // Spacing = new Vector2(2),
-                // Children = new Drawable[]
                 head = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        box = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 1f,
-                            Height = 1f,
-                            Colour = new Colour4(255, 255, 0, 0.25f),
-                        },
                         headClickableContainer = new ClickableContainer
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Children = new Drawable[]
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Child = icon = new SpriteIcon
                             {
-                                icon = new SpriteIcon
-                                {
-                                    Size = new Vector2(8),
-                                    Icon = FontAwesome.Solid.ChevronRight,
-                                    Margin = new MarginPadding { Left = 3, Right = 3 },
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.CentreLeft,
-                                },
-                                text = new OsuSpriteText
-                                {
-                                    Text = GetName(item),
-                                    X = icon.LayoutSize.X,
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.CentreLeft,
-                                }
+                                Size = new Vector2(8),
+                                Icon = FontAwesome.Solid.ChevronRight,
+                                Margin = new MarginPadding { Left = 3, Right = 3 },
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
                             },
+                        },
+                        representedListItem = new DrawableListItem<T>(Model)
+                        {
+                            X = icon.LayoutSize.X,
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
                         }
                     }
                 },
@@ -145,56 +128,51 @@ namespace osu.Game.Screens.Edit.List
                 }
             };
 
-            if (!((IDrawableListItem<T>)this).EnableSelection)
-            {
-                box.RemoveAndDisposeImmediately();
-                box = new Box();
-            }
-
             if (RepresentedItem is IStateful<SelectionState> selectable)
             {
                 selectable.StateChanged += this.ApplySelectionState;
                 this.ApplySelectionState(selectable.State);
             }
 
-            box.Hide();
-            Enabled.BindValueChanged(v => SetShown(v.NewValue), true);
+            Enabled.BindValueChanged(v =>
+            {
+                if (v.NewValue) ShowList();
+                else HideList();
+            }, true);
+
             Deselect();
-            updateText();
+            representedListItem.UpdateItem();
         }
 
-        public void SetShown(bool value, bool setValue = false)
+        public void ShowList(bool setValue = false)
         {
-            if (value) List?.Show();
-            else List?.Hide();
+            List?.Show();
             UpdateItem();
-            if (setValue) Enabled.Value = value;
+            if (setValue) Enabled.Value = true;
         }
 
-        private void updateText()
+        public void HideList(bool setValue = false)
         {
-            if (RepresentedItem is not null) Scheduler.Add(() => text.Text = GetName(RepresentedItem));
+            List?.Hide();
+            UpdateItem();
+            if (setValue) Enabled.Value = false;
         }
 
         public void UpdateItem()
         {
-            updateText();
+            representedListItem.UpdateItem();
             List?.UpdateItem();
         }
 
         public void Select()
         {
-            if (RepresentedItem is IStateful<SelectionState> selectable)
-                selectable.State = SelectionState.Selected;
-            SelectInternal(false);
+            representedListItem.Select();
             List?.Select();
         }
 
         public void Deselect()
         {
-            if (RepresentedItem is IStateful<SelectionState> selectable)
-                selectable.State = SelectionState.NotSelected;
-            DeselectInternal(false);
+            representedListItem.Deselect();
             List?.Deselect();
         }
 
@@ -204,13 +182,13 @@ namespace osu.Game.Screens.Edit.List
 
         public void SelectInternal(bool passThroughCall = true)
         {
-            Scheduler.Add(box.Show);
+            representedListItem.SelectInternal();
             if (passThroughCall) List?.SelectInternal();
         }
 
         public void DeselectInternal(bool passThroughCall = true)
         {
-            Scheduler.Add(box.Hide);
+            representedListItem.DeselectInternal();
             if (passThroughCall) List?.DeselectInternal();
         }
 
