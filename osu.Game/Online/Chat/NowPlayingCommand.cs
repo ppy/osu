@@ -68,7 +68,15 @@ namespace osu.Game.Online.Chat
                     break;
             }
 
-            channelManager.PostMessage($"is {verb} {getBeatmapPart()} {getModPart()}", true, target);
+            string[] pieces =
+            {
+                "is",
+                verb,
+                getBeatmapPart(),
+                getModPart(),
+            };
+
+            channelManager.PostMessage(string.Join(' ', pieces.Where(p => !string.IsNullOrEmpty(p))), true, target);
             Expire();
 
             string getBeatmapPart()
