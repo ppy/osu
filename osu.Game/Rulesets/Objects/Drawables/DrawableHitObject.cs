@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             comboColourBrightness.BindValueChanged(_ => UpdateComboColour());
 
             // Apply transforms
-            updateStateBasedOnResults();
+            updateStateFromResult();
         }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // If not loaded, the state update happens in LoadComplete().
             if (IsLoaded)
             {
-                updateStateBasedOnResults();
+                updateStateFromResult();
 
                 // Combo colour may have been applied via a bindable flow while no object entry was attached.
                 // Update here to ensure we're in a good state.
@@ -274,7 +274,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        private void updateStateBasedOnResults()
+        private void updateStateFromResult()
         {
             if (Result.IsHit)
                 updateState(ArmedState.Hit, true);
