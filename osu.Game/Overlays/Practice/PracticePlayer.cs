@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Practice
                 base.StartGameplay();
             }
 
-            //set it to false after the last action that depends on it
+            //Set it to false after the last action that depends on it
             loader.IsFirstTry = false;
         }
 
@@ -121,8 +121,16 @@ namespace osu.Game.Overlays.Practice
             LoadComponent(PracticeOverlay = new PracticeOverlay(loader)
             {
                 Restart = () => Restart(),
-                OnHide = () => PauseOverlay.Show(),
-                OnShow = () => PauseOverlay.Hide()
+                OnShow = () =>
+                {
+                    GameplayClockContainer.Hide();
+                    PauseOverlay.Hide();
+                },
+                OnHide = () =>
+                {
+                    GameplayClockContainer.Show();
+                    PauseOverlay.Show();
+                }
             });
         }
 

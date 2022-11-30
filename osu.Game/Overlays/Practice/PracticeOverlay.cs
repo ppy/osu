@@ -66,9 +66,10 @@ namespace osu.Game.Overlays.Practice
                 Child = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Colour4.Black.Opacity(.6f)
+                    Colour = Colour4.Black.Opacity(0.3f)
                 }
             });
+
             Header.Title = PracticeOverlayStrings.PracticeOverlayHeaderTitle;
             Header.Description = PracticeOverlayStrings.PracticeOverlayHeaderDescription;
 
