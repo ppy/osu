@@ -38,7 +38,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private PlacementBlueprint currentPlacement;
 
-
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
         /// in order to handle composer blueprints which are partially offscreen.
