@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace osu.Game.Utils
@@ -56,6 +58,20 @@ namespace osu.Game.Utils
             return bestNumber == 0
                 ? desiredName
                 : $"{desiredName} ({bestNumber})";
+        }
+
+        /// <summary>
+        /// Given a set of <paramref name="existingFilenames"/> and a desired target <paramref name="desiredName"/>
+        /// finds a filename closest to <paramref name="desiredName"/> that is not in <paramref name="existingFilenames"/>
+        /// <remarks>
+        /// <paramref name="desiredName"/> SHOULD NOT CONTAIN the file extension.
+        /// </remarks>
+        /// </summary>
+        public static string GetNextBestFilename(IEnumerable<string> existingFilenames, string desiredName, string fileExtension)
+        {
+            var stripped = existingFilenames.Select(filename => filename.Substring(0, filename.Length - fileExtension.Length));
+
+            return $"{GetNextBestName(stripped, desiredName)}{fileExtension}";
         }
     }
 }
