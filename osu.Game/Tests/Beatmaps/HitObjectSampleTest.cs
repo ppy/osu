@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Beatmaps
                 return fallback.Get(type, info);
             }
 
-            public void Inject<T>(T instance) where T : class
+            public void Inject<T>(T instance) where T : class, IDependencyInjectionCandidate
             {
                 // Never used directly
             }
