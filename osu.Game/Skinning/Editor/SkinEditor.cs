@@ -78,7 +78,6 @@ namespace osu.Game.Skinning.Editor
 
         private readonly EditorSidebar componentsSidebar = new EditorSidebar();
         private readonly EditorSidebar settingsSidebar = new EditorSidebar();
-        private readonly EditorSidebarSection layerSidebarSection = new EditorSidebarSection(@"Layer Editor");
 
         public readonly DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> LayerSidebarList
             = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>(new SkinBlueprint(new BigBlackBox
@@ -101,8 +100,6 @@ namespace osu.Game.Skinning.Editor
         [BackgroundDependencyLoader]
         private void load()
         {
-            EditorSidebar layerSidebar;
-
             RelativeSizeAxes = Axes.Both;
 
             InternalChild = new OsuContextMenuContainer
@@ -202,7 +199,13 @@ namespace osu.Game.Skinning.Editor
                                                 },
                                                 new Drawable[]
                                                 {
-                                                    layerSidebar = new EditorSidebar()
+                                                    new EditorSidebar
+                                                    {
+                                                        Child = new EditorSidebarSection(@"Layer Editor")
+                                                        {
+                                                            Child = LayerSidebarList
+                                                        }
+                                                    }
                                                 }
                                             },
                                         }
@@ -214,15 +217,12 @@ namespace osu.Game.Skinning.Editor
                 }
             };
 
-            layerSidebar.Add(layerSidebarSection);
-            layerSidebarSection.Clear();
             initLayerEditor();
         }
 
         private void initLayerEditor()
         {
             LayerSidebarList.List?.Items.RemoveAll(_ => true);
-            layerSidebarSection.Child = LayerSidebarList;
             LayerSidebarList.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
             LayerSidebarList.SetItemDepth = (blueprint, depth) =>
             {
