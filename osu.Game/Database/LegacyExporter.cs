@@ -23,11 +23,11 @@ namespace osu.Game.Database
 
         protected readonly Storage UserFileStorage;
 
-        private readonly Storage exportStorage;
+        protected readonly Storage ExportStorage;
 
         protected LegacyExporter(Storage storage)
         {
-            exportStorage = storage.GetStorageForDirectory(@"exports");
+            ExportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
         }
 
@@ -35,14 +35,14 @@ namespace osu.Game.Database
         /// Exports an item to a legacy (.zip based) package.
         /// </summary>
         /// <param name="item">The item to export.</param>
-        public void Export(TModel item)
+        public virtual void Export(TModel item)
         {
             string filename = $"{item.GetDisplayString().GetValidFilename()}{FileExtension}";
 
-            using (var stream = exportStorage.CreateFileSafely(filename))
+            using (var stream = ExportStorage.CreateFileSafely(filename))
                 ExportModelTo(item, stream);
 
-            exportStorage.PresentFileExternally(filename);
+            ExportStorage.PresentFileExternally(filename);
         }
 
         /// <summary>
