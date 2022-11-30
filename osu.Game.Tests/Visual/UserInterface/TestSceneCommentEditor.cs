@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("click cancel button", () =>
             {
-                InputManager.MoveMouseTo(cancellableCommentEditor.ButtonsContainer);
+                InputManager.MoveMouseTo(cancellableCommentEditor.ButtonsContainer[1]);
                 InputManager.Click(MouseButton.Left);
             });
 
