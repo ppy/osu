@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override GameplayCursorContainer CreateCursor()
         {
-            if (Mods.Any(m => m is ModRelax))
+            if (Mods != null && Mods.Any(m => m is ModRelax))
                 return new CatchRelaxCursorContainer();
 
             return base.CreateCursor();
