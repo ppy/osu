@@ -43,11 +43,8 @@ namespace osu.Game.Screens.Edit.List
 
         public void UpdateItem();
 
-        /// <summary>
-        /// Selects or Deselects this element. This will also update the referenced item, that is connected to this element.
-        /// </summary>
-        /// <param name="value">if this List Item should be selected or not</param>
-        public void Select(bool value);
+        public void Select();
+        public void Deselect();
 
         public void ApplyAction(Action<IDrawableListItem<T>> action);
 
@@ -58,9 +55,30 @@ namespace osu.Game.Screens.Edit.List
         }
 
         /// <summary>
-        /// Selects or Deselects this element. This will not update the referenced item, in order to prevent call cycles.
+        /// Selects this element. This will not update the referenced item, in order to prevent call cycles.
         /// </summary>
-        /// <param name="value">if this List Item should be selected or not</param>
-        public void SelectInternal(bool value);
+        public void SelectInternal();
+
+        /// <summary>
+        /// Deselects this element. This will not update the referenced item, in order to prevent call cycles.
+        /// </summary>
+        public void DeselectInternal();
+    }
+
+    public static class DrawableListItemInterfaceExtension
+    {
+        public static void ApplySelectionState<T>(this IDrawableListItem<T> item, SelectionState state)
+        {
+            switch (state)
+            {
+                case SelectionState.Selected:
+                    item.SelectInternal();
+                    break;
+
+                case SelectionState.NotSelected:
+                    item.DeselectInternal();
+                    break;
+            }
+        }
     }
 }

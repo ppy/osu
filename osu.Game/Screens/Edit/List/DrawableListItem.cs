@@ -15,8 +15,6 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.List
 {
-    //todo: rework this, to be simpler.
-    //I should probably just implement IStateful<SelectionState>
     public partial class DrawableListItem<T> : RearrangeableListItem<IDrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
         where T : Drawable
     {
@@ -64,8 +62,8 @@ namespace osu.Game.Screens.Edit.List
 
             if (RepresentedItem is IStateful<SelectionState> selectable)
             {
-                selectable.StateChanged += selectionState => ((IDrawableListItem<T>)this).SelectInternal(selectionState == SelectionState.Selected);
-                SelectInternal(selectable.State == SelectionState.Selected);
+                selectable.StateChanged += this.ApplySelectionState;
+                this.ApplySelectionState(selectable.State);
             }
 
             if (!((IDrawableListItem<T>)this).EnableSelection)
@@ -85,7 +83,6 @@ namespace osu.Game.Screens.Edit.List
         }
 
         //imitate the existing SelectionHandler implementation
-        //todo: might want to rework this, to just use the SelectionHandler if possible
         protected override bool OnClick(ClickEvent e)
         {
             Logger.Log("OnClick handler for DrawableListItem triggered");
@@ -93,28 +90,17 @@ namespace osu.Game.Screens.Edit.List
             // while holding control, we only want to add to selection, not replace an existing selection.
             if (e.ControlPressed && e.Button == MouseButton.Left)
             {
-                toggleSelection();
+                if (Selected) Deselect();
+                else Select();
             }
             else
             {
-                ApplyAll(element => element.Select(false));
-                Select(true);
+                ApplyAll(element => element.Deselect());
+                Select();
             }
 
             base.OnClick(e);
             return true;
-        }
-
-        private void toggleSelection()
-        {
-            if (RepresentedItem is IStateful<SelectionState> stateful)
-            {
-                Select(stateful.State != SelectionState.Selected);
-            }
-            else
-            {
-                Select(!Selected);
-            }
         }
 
         public Drawable GetDrawableListItem() => this;
@@ -123,8 +109,12 @@ namespace osu.Game.Screens.Edit.List
         public void UpdateItem()
         {
             updateText(RepresentedItem!);
+
             if (RepresentedItem is IStateful<SelectionState> selectable)
-                SelectInternal(selectable.State == SelectionState.Selected);
+            {
+                if (selectable.State == SelectionState.Selected) SelectInternal();
+                else DeselectInternal();
+            }
         }
 
         private void updateText(T? target)
@@ -134,37 +124,40 @@ namespace osu.Game.Screens.Edit.List
             Scheduler.Add(() => text.Text = getName(target));
         }
 
-        public void Select(bool value)
+        public void Select()
         {
             if (RepresentedItem is IStateful<SelectionState> selectable)
-                selectable.State = value ? SelectionState.Selected : SelectionState.NotSelected;
+                selectable.State = SelectionState.Selected;
 
-            SelectInternal(value);
+            SelectInternal();
+        }
+
+        public void Deselect()
+        {
+            if (RepresentedItem is IStateful<SelectionState> selectable)
+                selectable.State = SelectionState.NotSelected;
+
+            DeselectInternal();
         }
 
         public void ApplyAction(Action<IDrawableListItem<T>> action) => action(this);
 
-        public void SelectInternal(bool value)
+        public void SelectInternal() => Scheduler.Add(() =>
         {
-            Scheduler.Add(() =>
-            {
-                if (value)
-                {
-                    Selected = true;
-                    box.Show();
-                }
-                else
-                {
-                    Selected = false;
-                    box.Hide();
-                }
-            });
-        }
+            Selected = true;
+            box.Show();
+        });
+
+        public void DeselectInternal() => Scheduler.Add(() =>
+        {
+            Selected = false;
+            box.Hide();
+        });
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            ApplyAll(element => element.Select(false));
-            Select(true);
+            ApplyAll(element => element.Deselect());
+            Select();
             return base.OnDragStart(e);
         }
 

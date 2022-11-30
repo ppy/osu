@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private Func<T, LocalisableString> getName;
+        private Func<T, LocalisableString> getName = IDrawableListItem<T>.GetDefaultText;
         private Action<Action<IDrawableListItem<T>>> applyAll1;
         public T? RepresentedItem => null;
 
@@ -67,7 +67,6 @@ namespace osu.Game.Screens.Edit.List
 
         public DrawableList()
         {
-            getName = IDrawableListItem<T>.GetDefaultText;
             onDragAction = default_onDragAction;
             applyAll1 = applyAll;
 
@@ -112,30 +111,8 @@ namespace osu.Game.Screens.Edit.List
             });
         }
 
-        /// <summary>
-        /// Selects obj, if it can be cast to a IDrawableListItem.
-        /// </summary>
-        /// <param name="obj">the object to call Select on</param>
-        /// <param name="value">The value to pass to the Select call of IDrawableListItem</param>
-        /// <returns>If Select was actually called</returns>
-        private static bool select(object obj, bool value)
-        {
-            if (obj is IDrawableListItem<T> item)
-            {
-                item.Select(value);
-                return true;
-            }
-
-            return false;
-        }
-
-        public virtual void Select(bool value)
-        {
-            foreach (var listItem in ItemMap.Values)
-            {
-                select(listItem, value);
-            }
-        }
+        public virtual void Select() => applyAll(t => t.Select());
+        public virtual void Deselect() => applyAll(t => t.Deselect());
 
         public void ApplyAction(Action<IDrawableListItem<T>> action)
         {
@@ -153,7 +130,8 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        public void SelectInternal(bool value) => Select(value);
+        public void SelectInternal() => Select();
+        public void DeselectInternal() => Deselect();
 
         #endregion
 

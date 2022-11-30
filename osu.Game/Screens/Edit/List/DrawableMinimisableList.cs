@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
@@ -16,32 +18,56 @@ namespace osu.Game.Screens.Edit.List
     public partial class DrawableMinimisableList<T> : RearrangeableListItem<IDrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
         where T : Drawable
     {
+        private Action<T, int> setItemDepth = IDrawableListItem<T>.DEFAULT_SET_ITEM_DEPTH;
+
         public Action<T, int> SetItemDepth
         {
-            get => List.SetItemDepth;
-            set => List.SetItemDepth = value;
+            get => setItemDepth;
+            set
+            {
+                setItemDepth = value;
+                if (List is not null) List.SetItemDepth = value;
+            }
         }
+
+        private Action onDragAction = () => { };
 
         public Action OnDragAction
         {
-            get => List.OnDragAction;
-            set => List.OnDragAction = value;
+            get => onDragAction;
+            set
+            {
+                onDragAction = value;
+                if (List is not null) List.OnDragAction = value;
+            }
         }
+
+        private Action<Action<IDrawableListItem<T>>> applyAll;
 
         public Action<Action<IDrawableListItem<T>>> ApplyAll
         {
-            get => List.ApplyAll;
-            set => List.ApplyAll = value;
+            get => applyAll;
+            set
+            {
+                applyAll = value;
+                if (List is not null) List.ApplyAll = value;
+            }
         }
+
+        private Func<T, LocalisableString> getName = IDrawableListItem<T>.GetDefaultText;
 
         public Func<T, LocalisableString> GetName
         {
-            get => List.GetName;
-            set => List.GetName = value;
+            get => getName;
+            set
+            {
+                if (List is not null) List.GetName = value;
+                getName = value;
+            }
         }
 
         public BindableBool Enabled { get; } = new BindableBool();
-        public readonly DrawableList<T> List = new DrawableList<T>();
+        public readonly DrawableList<T>? List;
         public T? RepresentedItem => Model.RepresentedItem;
 
         private readonly Box box;
@@ -125,34 +151,68 @@ namespace osu.Game.Screens.Edit.List
                 box = new Box();
             }
 
+            if (RepresentedItem is IStateful<SelectionState> selectable)
+            {
+                selectable.StateChanged += this.ApplySelectionState;
+                this.ApplySelectionState(selectable.State);
+            }
+
             box.Hide();
             Enabled.BindValueChanged(v => SetShown(v.NewValue), true);
-            Select(false);
+            Deselect();
+            updateText();
         }
 
         public void SetShown(bool value, bool setValue = false)
         {
-            if (value) List.Show();
-            else List.Hide();
+            if (value) List?.Show();
+            else List?.Hide();
             UpdateItem();
             if (setValue) Enabled.Value = value;
         }
 
-        public void UpdateItem() => List.UpdateItem();
-
-        public void Select(bool value)
+        private void updateText()
         {
-            Scheduler.Add(() =>
-            {
-                if (value) box.Show();
-                else box.Hide();
-            });
-            List.Select(value);
+            if (RepresentedItem is not null) Scheduler.Add(() => text.Text = GetName(RepresentedItem));
         }
 
-        public void ApplyAction(Action<IDrawableListItem<T>> action) => List.ApplyAction(action);
+        public void UpdateItem()
+        {
+            updateText();
+            List?.UpdateItem();
+        }
 
-        public void SelectInternal(bool value) => List.SelectInternal(value);
+        public void Select()
+        {
+            if (RepresentedItem is IStateful<SelectionState> selectable)
+                selectable.State = SelectionState.Selected;
+            SelectInternal(false);
+            List?.Select();
+        }
+
+        public void Deselect()
+        {
+            if (RepresentedItem is IStateful<SelectionState> selectable)
+                selectable.State = SelectionState.NotSelected;
+            DeselectInternal(false);
+            List?.Deselect();
+        }
+
+        public void ApplyAction(Action<IDrawableListItem<T>> action) => List?.ApplyAction(action);
+        void IDrawableListItem<T>.SelectInternal() => SelectInternal();
+        void IDrawableListItem<T>.DeselectInternal() => DeselectInternal();
+
+        public void SelectInternal(bool passThroughCall = true)
+        {
+            Scheduler.Add(box.Show);
+            if (passThroughCall) List?.SelectInternal();
+        }
+
+        public void DeselectInternal(bool passThroughCall = true)
+        {
+            Scheduler.Add(box.Hide);
+            if (passThroughCall) List?.DeselectInternal();
+        }
 
         public Drawable GetDrawableListItem() => this;
         public RearrangeableListItem<IDrawableListRepresetedItem<T>> GetRearrangeableListItem() => this;
