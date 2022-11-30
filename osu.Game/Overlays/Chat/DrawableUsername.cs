@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Chat
 {
     public partial class DrawableUsername : OsuClickableContainer, IHasContextMenu
     {
-        public new Color4 Colour { get; private set; }
+        public Color4 AccentColour { get; }
 
         public float FontSize
         {
@@ -45,19 +45,19 @@ namespace osu.Game.Overlays.Chat
             set => base.Width = drawableText.MaxWidth = value;
         }
 
-        [Resolved(canBeNull: false)]
+        [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        [Resolved(canBeNull: false)]
-        private OsuColour osuColours { get; set; } = null!;
-
         [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
+        [Resolved(canBeNull: true)]
         private ChannelManager? chatManager { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private ChatOverlay? chatOverlay { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private UserProfileOverlay? profileOverlay { get; set; }
 
         private readonly APIUser user;
@@ -82,13 +82,13 @@ namespace osu.Game.Overlays.Chat
 
             if (string.IsNullOrWhiteSpace(user.Colour))
             {
-                Colour = default_colours[user.Id % default_colours.Length];
+                AccentColour = default_colours[user.Id % default_colours.Length];
 
                 Child = colouredDrawable = drawableText;
             }
             else
             {
-                Colour = Color4Extensions.FromHex(user.Colour);
+                AccentColour = Color4Extensions.FromHex(user.Colour);
 
                 Child = new Container
                 {
@@ -132,8 +132,8 @@ namespace osu.Game.Overlays.Chat
         {
             base.LoadComplete();
 
-            drawableText.Colour = osuColours.ChatBlue;
-            colouredDrawable.Colour = Colour;
+            drawableText.Colour = colours.ChatBlue;
+            colouredDrawable.Colour = AccentColour;
         }
 
         public MenuItem[] ContextMenuItems
@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.Chat
 
         protected override bool OnHover(HoverEvent e)
         {
-            colouredDrawable.FadeColour(Colour.Lighten(0.4f), 150, Easing.OutQuint);
+            colouredDrawable.FadeColour(AccentColour.Lighten(0.4f), 150, Easing.OutQuint);
 
             return base.OnHover(e);
         }
@@ -177,7 +177,7 @@ namespace osu.Game.Overlays.Chat
         {
             base.OnHoverLost(e);
 
-            colouredDrawable.FadeColour(Colour, 250, Easing.OutQuint);
+            colouredDrawable.FadeColour(AccentColour, 250, Easing.OutQuint);
         }
 
         private static readonly Color4[] default_colours =
