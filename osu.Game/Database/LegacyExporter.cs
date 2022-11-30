@@ -4,8 +4,10 @@
 #nullable disable
 
 using System.IO;
+using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
+using osu.Game.Utils;
 using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Database
@@ -23,11 +25,11 @@ namespace osu.Game.Database
 
         protected readonly Storage UserFileStorage;
 
-        protected readonly Storage ExportStorage;
+        private readonly Storage exportStorage;
 
         protected LegacyExporter(Storage storage)
         {
-            ExportStorage = storage.GetStorageForDirectory(@"exports");
+            exportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
         }
 
@@ -35,14 +37,21 @@ namespace osu.Game.Database
         /// Exports an item to a legacy (.zip based) package.
         /// </summary>
         /// <param name="item">The item to export.</param>
-        public virtual void Export(TModel item)
+        public void Export(TModel item)
         {
-            string filename = $"{item.GetDisplayString().GetValidFilename()}{FileExtension}";
+            var itemFilename = item.GetDisplayString().GetValidFilename();
 
-            using (var stream = ExportStorage.CreateFileSafely(filename))
+            var existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}").ToArray();
+
+            // trim the file extension
+            for (int i = 0; i < existingExports.Length; i++)
+                existingExports[i] = existingExports[i].TrimEnd(FileExtension.ToCharArray());
+
+            string filename = $"{NamingUtils.GetNextBestName(existingExports, itemFilename)}{FileExtension}";
+            using (var stream = exportStorage.CreateFileSafely(filename))
                 ExportModelTo(item, stream);
 
-            ExportStorage.PresentFileExternally(filename);
+            exportStorage.PresentFileExternally(filename);
         }
 
         /// <summary>
