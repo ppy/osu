@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -28,7 +29,8 @@ namespace osu.Game.Rulesets.UI
         {
             base.Dispose(isDisposing);
 
-            rulesetDependencies?.Dispose();
+            if (rulesetDependencies.IsNotNull())
+                rulesetDependencies.Dispose();
         }
     }
 }
