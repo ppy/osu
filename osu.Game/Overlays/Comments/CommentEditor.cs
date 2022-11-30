@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             Name = @"Footer",
                             RelativeSizeAxes = Axes.X,
-                            Height = 35,
+                            Height = 40,
                             Padding = new MarginPadding { Horizontal = side_padding },
                             Children = new Drawable[]
                             {
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Comments
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
                                     Text = FooterText
                                 },
                                 ButtonsContainer = new FillFlowContainer
