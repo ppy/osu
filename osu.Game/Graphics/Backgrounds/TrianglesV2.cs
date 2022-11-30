@@ -52,9 +52,6 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
 
-        [Resolved]
-        private IRenderer renderer { get; set; } = null!;
-
         private Random? stableRandom;
 
         private IShader shader = null!;
