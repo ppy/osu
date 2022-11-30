@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Tests.Visual.Background
 {
@@ -42,8 +43,7 @@ namespace osu.Game.Tests.Visual.Background
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            ColourTop = Color4.White,
-                            ColourBottom = Color4.Red
+                            Colour = ColourInfo.GradientVertical(Color4.White, Color4.Red)
                         }
                     }
                 }
