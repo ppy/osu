@@ -21,6 +21,8 @@ namespace osu.Game.Overlays.Practice
         public Action OnHide = null!;
         public Action OnShow = null!;
 
+        public ShearedButton RestartButton = null!;
+
         private readonly BindableNumber<double> customStart = new BindableNumber<double>
         {
             MinValue = 0,
@@ -102,8 +104,9 @@ namespace osu.Game.Overlays.Practice
                             DefaultStringUpperBound = "End",
                             DefaultTooltipLowerBound = "Start of beatmap",
                             DefaultTooltipUpperBound = "End of beatmap",
+                            TooltipSuffix = "%"
                         },
-                        new ShearedButton(150)
+                        RestartButton = new ShearedButton(150)
                         {
                             Y = -5,
                             Text = "Practice!",
@@ -126,6 +129,9 @@ namespace osu.Game.Overlays.Practice
         {
             base.PopIn();
             OnShow.Invoke();
+
+            //We want to make sure its displaying the correct gameplay initially
+            preview.SeekTo(customStart.Value);
         }
     }
 }

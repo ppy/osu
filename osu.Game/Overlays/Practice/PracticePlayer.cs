@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Practice
 {
     public partial class PracticePlayer : Player
     {
-        private PracticeOverlay practiceOverlay = null!;
+        protected PracticeOverlay PracticeOverlay = null!;
         private readonly PracticePlayerLoader loader;
 
         private const double grace_period = 3000;
@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Practice
         private double customEndTime;
         private double customStartTime;
 
-        private bool blockFail = true;
+        protected bool BlockFail = true;
 
         public PracticePlayer(PracticePlayerLoader loader)
         {
@@ -38,32 +38,10 @@ namespace osu.Game.Overlays.Practice
         private void load(OsuColour colour)
         {
             createPauseOverlay();
+
             addButtons(colour);
 
-            HUDOverlay.Add(new Container
-            {
-                //We don't want it clipping the health bars on the default skins
-                Position = new Vector2(10, 30),
-                AutoSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = 5,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        Colour = colour.B5.Opacity(.5f),
-                        RelativeSizeAxes = Axes.Both,
-                        BypassAutoSizeAxes = Axes.Both
-                    },
-                    new OsuSpriteText
-                    {
-                        Colour = colour.YellowLight,
-                        Font = OsuFont.Torus.With(size: 20, weight: FontWeight.Bold),
-                        Padding = new MarginPadding(10),
-                        Text = $"Practicing {Math.Round(loader.CustomStart.Value * 100)}% to {Math.Round(loader.CustomEnd.Value * 100)}%"
-                    }
-                }
-            });
+            createHUDElements(colour);
         }
 
         [Resolved(CanBeNull = true)]
@@ -109,11 +87,11 @@ namespace osu.Game.Overlays.Practice
         {
             base.LoadComplete();
 
-            practiceOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(practiceOverlay);
+            practiceOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(PracticeOverlay);
 
             if (loader.IsFirstTry)
             {
-                practiceOverlay.Show();
+                PracticeOverlay.Show();
             }
             else
             {
@@ -123,12 +101,12 @@ namespace osu.Game.Overlays.Practice
 
             OnGameplayStarted += () =>
             {
-                //Find a way to make this delay not run when paused
+                //Todo:Find a way to make this delay not run when paused
                 DrawableRuleset.Delay(customEndTime - customStartTime).Then().Schedule(() =>
                 {
                     /* Restart()*/
                 });
-                GameplayClockContainer.Delay(grace_period).Then().Schedule(() => blockFail = false);
+                GameplayClockContainer.Delay(grace_period).Then().Schedule(() => BlockFail = false);
             };
         }
 
@@ -140,7 +118,7 @@ namespace osu.Game.Overlays.Practice
 
         private void createPauseOverlay()
         {
-            LoadComponent(practiceOverlay = new PracticeOverlay(loader)
+            LoadComponent(PracticeOverlay = new PracticeOverlay(loader)
             {
                 Restart = () => Restart(),
                 OnHide = () => PauseOverlay.Show(),
@@ -150,13 +128,44 @@ namespace osu.Game.Overlays.Practice
 
         private void addButtons(OsuColour colour)
         {
-            PauseOverlay.AddButton("Practice", colour.Blue, () => practiceOverlay.Show());
-            FailOverlay.AddButton("Practice", colour.Blue, () => practiceOverlay.Show());
+            PauseOverlay.AddButton("Practice", colour.Blue, () => PracticeOverlay.Show());
+            FailOverlay.AddButton("Practice", colour.Blue, () => PracticeOverlay.Show());
+        }
+
+        private void createHUDElements(OsuColour colour)
+        {
+            HUDOverlay.Add(new Container
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+
+                //We don't want it clipping the health bars on the default skin, this offset also avoids elements on *Most* legacy skins
+                Position = new Vector2(-20, 110),
+                AutoSizeAxes = Axes.Both,
+                Masking = true,
+                CornerRadius = 5,
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = colour.B5.Opacity(.5f),
+                        RelativeSizeAxes = Axes.Both,
+                        BypassAutoSizeAxes = Axes.Both
+                    },
+                    new OsuSpriteText
+                    {
+                        Colour = colour.YellowLight,
+                        Font = OsuFont.Torus.With(size: 20, weight: FontWeight.Bold),
+                        Padding = new MarginPadding(10),
+                        Text = $"Practicing {Math.Round(loader.CustomStart.Value * 100)}% to {Math.Round(loader.CustomEnd.Value * 100)}%"
+                    }
+                }
+            });
         }
 
         protected override bool CheckModsAllowFailure()
         {
-            if (blockFail) return false;
+            if (BlockFail) return false;
 
             return base.CheckModsAllowFailure();
         }
