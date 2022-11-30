@@ -6,6 +6,7 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -79,8 +80,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             Debug.Assert(triangleGradientSecondColour != null);
 
-            Triangles.ColourTop = triangleGradientSecondColour.Value;
-            Triangles.ColourBottom = BackgroundColour;
+            Triangles.Colour = ColourInfo.GradientVertical(triangleGradientSecondColour.Value, BackgroundColour);
         }
 
         protected override bool OnHover(HoverEvent e)
