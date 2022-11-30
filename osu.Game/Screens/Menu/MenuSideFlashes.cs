@@ -22,7 +22,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Screens.Menu
 {
-    public class MenuSideFlashes : BeatSyncedContainer
+    public partial class MenuSideFlashes : BeatSyncedContainer
     {
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 

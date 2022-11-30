@@ -28,7 +28,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneTrianglesSpinnerRotation : TestSceneOsuPlayer
+    public partial class TestSceneTrianglesSpinnerRotation : TestSceneOsuPlayer
     {
         private const double spinner_start_time = 100;
         private const double spinner_duration = 6000;
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         };
 
-        private class ScoreExposedPlayer : TestPlayer
+        private partial class ScoreExposedPlayer : TestPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

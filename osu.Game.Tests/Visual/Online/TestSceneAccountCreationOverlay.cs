@@ -18,7 +18,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneAccountCreationOverlay : OsuTestScene
+    public partial class TestSceneAccountCreationOverlay : OsuTestScene
     {
         private readonly Container userPanelArea;
         private readonly AccountCreationOverlay accountCreation;

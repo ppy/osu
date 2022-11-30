@@ -27,7 +27,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatcher : OsuTestScene
+    public partial class TestSceneCatcher : OsuTestScene
     {
         [Resolved]
         private OsuConfigManager config { get; set; }
@@ -324,7 +324,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
         }
 
-        public class TestCatcher : Catcher
+        public partial class TestCatcher : Catcher
         {
             public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 

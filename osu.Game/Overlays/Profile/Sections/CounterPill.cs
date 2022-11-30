@@ -14,7 +14,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class CounterPill : CircularContainer
+    public partial class CounterPill : CircularContainer
     {
         public readonly BindableInt Current = new BindableInt();
 

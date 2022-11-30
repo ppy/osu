@@ -19,7 +19,7 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuPasswordTextBox : OsuTextBox, ISuppressKeyEventLogging
+    public partial class OsuPasswordTextBox : OsuTextBox, ISuppressKeyEventLogging
     {
         protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
         {
@@ -73,7 +73,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateCapsWarning(bool visible) => warning.FadeTo(visible ? 1 : 0, 250, Easing.OutQuint);
 
-        public class PasswordMaskChar : Container
+        public partial class PasswordMaskChar : Container
         {
             private readonly CircularContainer circle;
 
@@ -110,7 +110,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private class CapsWarning : SpriteIcon, IHasTooltip
+        private partial class CapsWarning : SpriteIcon, IHasTooltip
         {
             public LocalisableString TooltipText => "caps lock is active";
 

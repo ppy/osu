@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class DefaultFollowCircle : FollowCircle
+    public partial class DefaultFollowCircle : FollowCircle
     {
         public DefaultFollowCircle()
         {

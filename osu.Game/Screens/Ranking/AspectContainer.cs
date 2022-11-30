@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class AspectContainer : Container
+    public partial class AspectContainer : Container
     {
         protected override void Update()
         {

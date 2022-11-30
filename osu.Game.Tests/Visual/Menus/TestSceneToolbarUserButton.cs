@@ -14,7 +14,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestSceneToolbarUserButton : OsuManualInputManagerTestScene
+    public partial class TestSceneToolbarUserButton : OsuManualInputManagerTestScene
     {
         public TestSceneToolbarUserButton()
         {

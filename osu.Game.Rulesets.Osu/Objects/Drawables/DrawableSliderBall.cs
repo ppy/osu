@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
+    public partial class DrawableSliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
     {
         public const float FOLLOW_AREA = 2.4f;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Children = new[]
             {
-                new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle())
+                new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle())
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Masking = true
                 },
-                ball = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall())
+                ball = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

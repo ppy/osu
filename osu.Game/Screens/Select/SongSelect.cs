@@ -42,7 +42,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Select
 {
-    public abstract class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
+    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         public static readonly float WEDGE_HEIGHT = 245;
 
@@ -89,6 +89,8 @@ namespace osu.Game.Screens.Select
 
         protected BeatmapCarousel Carousel { get; private set; }
 
+        private ParallaxContainer wedgeBackground;
+
         protected Container LeftArea { get; private set; }
 
         private BeatmapInfoWedge beatmapInfoWedge;
@@ -109,6 +111,8 @@ namespace osu.Game.Screens.Select
         private Container carouselContainer;
 
         protected BeatmapDetailArea BeatmapDetails { get; private set; }
+
+        private FooterButtonOptions beatmapOptionsButton;
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
@@ -165,10 +169,12 @@ namespace osu.Game.Screens.Select
                             {
                                 new Drawable[]
                                 {
-                                    new ParallaxContainer
+                                    wedgeBackground = new ParallaxContainer
                                     {
                                         ParallaxAmount = 0.005f,
                                         RelativeSizeAxes = Axes.Both,
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
                                         Child = new WedgeBackground
                                         {
                                             RelativeSizeAxes = Axes.Both,
@@ -246,7 +252,7 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
-                new SkinnableTargetContainer(SkinnableTarget.SongSelect)
+                new SkinnableTargetContainer(GlobalSkinComponentLookup.LookupType.SongSelect)
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -298,6 +304,16 @@ namespace osu.Game.Screens.Select
             modSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(ModSelect);
         }
 
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // Match stable behaviour of only alt-scroll adjusting volume.
+            // Supporting scroll adjust without a modifier key just feels bad, since there are so many scrollable elements on the screen.
+            if (!e.CurrentState.Keyboard.AltPressed)
+                return true;
+
+            return base.OnScroll(e);
+        }
+
         /// <summary>
         /// Creates the buttons to be displayed in the footer.
         /// </summary>
@@ -310,7 +326,7 @@ namespace osu.Game.Screens.Select
                 NextRandom = () => Carousel.SelectNextRandom(),
                 PreviousRandom = Carousel.SelectPreviousRandom
             }, null),
-            (new FooterButtonOptions(), BeatmapOptions)
+            (beatmapOptionsButton = new FooterButtonOptions(), BeatmapOptions)
         };
 
         protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
@@ -609,9 +625,15 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            this.FadeIn(250);
+            LeftArea.MoveToX(0, 400, Easing.OutQuint);
+            LeftArea.FadeIn(100, Easing.OutQuint);
 
-            this.ScaleTo(1, 250, Easing.OutSine);
+            FilterControl.MoveToY(0, 400, Easing.OutQuint);
+            FilterControl.FadeIn(100, Easing.OutQuint);
+
+            this.FadeIn(250, Easing.OutQuint);
+
+            wedgeBackground.ScaleTo(1, 500, Easing.OutQuint);
 
             FilterControl.Activate();
         }
@@ -623,17 +645,8 @@ namespace osu.Game.Screens.Select
             transferRulesetValue();
 
             ModSelect.SelectedMods.UnbindFrom(selectedMods);
-            ModSelect.Hide();
 
-            BeatmapOptions.Hide();
-
-            endLooping();
-
-            this.ScaleTo(1.1f, 250, Easing.InSine);
-
-            this.FadeOut(250);
-
-            FilterControl.Deactivate();
+            playExitingTransition();
             base.OnSuspending(e);
         }
 
@@ -642,16 +655,31 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(e))
                 return true;
 
-            beatmapInfoWedge.Hide();
+            playExitingTransition();
+            return false;
+        }
+
+        private void playExitingTransition()
+        {
             ModSelect.Hide();
 
-            this.FadeOut(100);
+            BeatmapOptions.Hide();
 
-            FilterControl.Deactivate();
+            Carousel.AllowSelection = false;
 
             endLooping();
 
-            return false;
+            FilterControl.MoveToY(-120, 500, Easing.OutQuint);
+            FilterControl.FadeOut(200, Easing.OutQuint);
+
+            LeftArea.MoveToX(-150, 1800, Easing.OutQuint);
+            LeftArea.FadeOut(200, Easing.OutQuint);
+
+            wedgeBackground.ScaleTo(2.4f, 400, Easing.OutQuint);
+
+            this.FadeOut(400, Easing.OutQuint);
+
+            FilterControl.Deactivate();
         }
 
         private bool isHandlingLooping;
@@ -723,6 +751,16 @@ namespace osu.Game.Screens.Select
             beatmapInfoWedge.Beatmap = beatmap;
 
             BeatmapDetails.Beatmap = beatmap;
+
+            bool beatmapSelected = beatmap is not DummyWorkingBeatmap;
+
+            if (beatmapSelected)
+                beatmapOptionsButton.Enabled.Value = true;
+            else
+            {
+                beatmapOptionsButton.Enabled.Value = false;
+                BeatmapOptions.Hide();
+            }
         }
 
         private readonly WeakReference<ITrack> lastTrack = new WeakReference<ITrack>(null);
@@ -887,7 +925,7 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(e);
         }
 
-        private class VerticalMaskingContainer : Container
+        private partial class VerticalMaskingContainer : Container
         {
             private const float panel_overflow = 1.2f;
 
@@ -910,7 +948,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private class ResetScrollContainer : Container
+        private partial class ResetScrollContainer : Container
         {
             private readonly Action onHoverAction;
 
@@ -926,7 +964,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        internal class SoloModSelectOverlay : UserModSelectOverlay
+        internal partial class SoloModSelectOverlay : UserModSelectOverlay
         {
             protected override bool ShowPresets => true;
         }

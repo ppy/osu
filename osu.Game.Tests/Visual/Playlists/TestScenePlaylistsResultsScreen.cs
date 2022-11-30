@@ -28,7 +28,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsResultsScreen : ScreenTestScene
+    public partial class TestScenePlaylistsResultsScreen : ScreenTestScene
     {
         private const int scores_per_result = 10;
         private const int real_user_position = 200;
@@ -365,7 +365,7 @@ namespace osu.Game.Tests.Visual.Playlists
             };
         }
 
-        private class TestResultsScreen : PlaylistsResultsScreen
+        private partial class TestResultsScreen : PlaylistsResultsScreen
         {
             public new LoadingSpinner LeftSpinner => base.LeftSpinner;
             public new LoadingSpinner CentreSpinner => base.CentreSpinner;

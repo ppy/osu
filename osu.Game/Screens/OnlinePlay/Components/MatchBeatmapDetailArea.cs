@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class MatchBeatmapDetailArea : BeatmapDetailArea
+    public partial class MatchBeatmapDetailArea : BeatmapDetailArea
     {
         public Action CreateNewItem;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                         },
                         new Drawable[]
                         {
-                            new TriangleButton
+                            new RoundedButton
                             {
                                 Text = "Add new playlist entry",
                                 RelativeSizeAxes = Axes.Both,

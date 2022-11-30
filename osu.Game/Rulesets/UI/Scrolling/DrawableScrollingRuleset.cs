@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
     /// A type of <see cref="DrawableRuleset{TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.
     /// <see cref="HitObject"/>s inside this <see cref="DrawableRuleset{TObject}"/> will scroll within the playfield.
     /// </summary>
-    public abstract class DrawableScrollingRuleset<TObject> : DrawableRuleset<TObject>, IKeyBindingHandler<GlobalAction>
+    public abstract partial class DrawableScrollingRuleset<TObject> : DrawableRuleset<TObject>, IDrawableScrollingRuleset, IKeyBindingHandler<GlobalAction>
         where TObject : HitObject
     {
         /// <summary>
@@ -65,6 +65,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
         };
 
         protected virtual ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Sequential;
+
+        ScrollVisualisationMethod IDrawableScrollingRuleset.VisualisationMethod => VisualisationMethod;
 
         /// <summary>
         /// Whether the player can change <see cref="TimeRange"/>.

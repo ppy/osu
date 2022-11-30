@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Edit
     /// A <see cref="SkinProvidingContainer"/> that fires <see cref="ISkinSource.SourceChanged"/> when users have made a change to the beatmap skin
     /// of the map being edited.
     /// </summary>
-    public class EditorSkinProvidingContainer : RulesetSkinProvidingContainer
+    public partial class EditorSkinProvidingContainer : RulesetSkinProvidingContainer
     {
         private readonly EditorBeatmapSkin? beatmapSkin;
 

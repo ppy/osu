@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// A decoupled clock which adds editor-specific functionality, such as snapping to a user-defined beat divisor.
     /// </summary>
-    public class EditorClock : CompositeComponent, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
+    public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
         public IBindable<Track> Track => track;
 
@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Edit
             {
                 IsSeeking &= Transforms.Any();
 
-                if (track.Value?.IsRunning != true)
+                if (!IsRunning)
                 {
                     // seeking in the editor can happen while the track isn't running.
                     // in this case we always want to expose ourselves as seeking (to avoid sample playback).

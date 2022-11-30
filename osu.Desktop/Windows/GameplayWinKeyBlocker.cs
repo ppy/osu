@@ -10,7 +10,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Desktop.Windows
 {
-    public class GameplayWinKeyBlocker : Component
+    public partial class GameplayWinKeyBlocker : Component
     {
         private Bindable<bool> disableWinKey = null!;
         private IBindable<bool> localUserPlaying = null!;

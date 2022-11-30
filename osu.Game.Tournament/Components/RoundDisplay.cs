@@ -10,7 +10,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Components
 {
-    public class RoundDisplay : CompositeDrawable
+    public partial class RoundDisplay : CompositeDrawable
     {
         public RoundDisplay(TournamentMatch match)
         {

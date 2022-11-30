@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Scoring
 {
-    public class ManiaHealthProcessor : DrainingHealthProcessor
+    public partial class ManiaHealthProcessor : DrainingHealthProcessor
     {
         /// <inheritdoc/>
         public ManiaHealthProcessor(double drainStartTime, double drainLenience = 0)

@@ -13,7 +13,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [Description("SongSelect filter control")]
-    public class TestSceneTabControl : OsuTestScene
+    public partial class TestSceneTabControl : OsuTestScene
     {
         public TestSceneTabControl()
         {

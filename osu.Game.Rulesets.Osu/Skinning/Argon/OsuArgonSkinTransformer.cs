@@ -14,14 +14,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         {
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
-                case GameplaySkinComponent<HitResult> resultComponent:
+                case GameplaySkinComponentLookup<HitResult> resultComponent:
                     return new ArgonJudgementPiece(resultComponent.Component);
 
-                case OsuSkinComponent osuComponent:
+                case OsuSkinComponentLookup osuComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (osuComponent.Component)
                     {
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     break;
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// Pool for hit explosions of a specific type.
     /// </summary>
-    internal class HitExplosionPool : DrawablePool<HitExplosion>
+    internal partial class HitExplosionPool : DrawablePool<HitExplosion>
     {
         private readonly HitResult hitResult;
 

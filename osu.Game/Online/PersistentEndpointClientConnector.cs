@@ -23,11 +23,13 @@ namespace osu.Game.Online
         /// </summary>
         public PersistentEndpointClient? CurrentConnection { get; private set; }
 
+        protected readonly IAPIProvider API;
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         private readonly Bindable<bool> isConnected = new Bindable<bool>();
         private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
         private CancellationTokenSource connectCancelSource = new CancellationTokenSource();
-
-        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private bool started;
 
         /// <summary>
         /// Constructs a new <see cref="PersistentEndpointClientConnector"/>.
@@ -35,8 +37,20 @@ namespace osu.Game.Online
         /// <param name="api"> An API provider used to react to connection state changes.</param>
         protected PersistentEndpointClientConnector(IAPIProvider api)
         {
+            API = api;
             apiState.BindTo(api.State);
+        }
+
+        /// <summary>
+        /// Attempts to connect and begins processing messages from the remote endpoint.
+        /// </summary>
+        public void Start()
+        {
+            if (started)
+                return;
+
             apiState.BindValueChanged(_ => Task.Run(connectIfPossible), true);
+            started = true;
         }
 
         public Task Reconnect()
@@ -131,7 +145,9 @@ namespace osu.Game.Online
 
         private async Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)
         {
-            isConnected.Value = false;
+            bool hasBeenCancelled = cancellationToken.IsCancellationRequested;
+
+            await disconnect(true);
 
             if (ex != null)
                 await handleErrorAndDelay(ex, cancellationToken).ConfigureAwait(false);
@@ -139,7 +155,7 @@ namespace osu.Game.Online
                 Logger.Log($"{ClientName} disconnected", LoggingTarget.Network);
 
             // make sure a disconnect wasn't triggered (and this is still the active connection).
-            if (!cancellationToken.IsCancellationRequested)
+            if (!hasBeenCancelled)
                 await Task.Run(connect, default).ConfigureAwait(false);
         }
 
@@ -160,7 +176,9 @@ namespace osu.Game.Online
             }
             finally
             {
+                isConnected.Value = false;
                 CurrentConnection = null;
+
                 if (takeLock)
                     connectionLock.Release();
             }
