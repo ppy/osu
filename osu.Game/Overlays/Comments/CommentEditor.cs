@@ -194,8 +194,8 @@ namespace osu.Game.Overlays.Comments
 
             public EditorCommitButton()
             {
+                Width = 90;
                 Height = 25;
-                AutoSizeAxes = Axes.X;
                 Add(spinner = new LoadingSpinner
                 {
                     Anchor = Anchor.Centre,

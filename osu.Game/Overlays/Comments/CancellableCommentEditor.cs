@@ -31,8 +31,8 @@ namespace osu.Game.Overlays.Comments
         {
             public CancelButton()
             {
+                Width = 90;
                 Height = 25;
-                AutoSizeAxes = Axes.X;
             }
 
             protected override SpriteText CreateText() => new OsuSpriteText
