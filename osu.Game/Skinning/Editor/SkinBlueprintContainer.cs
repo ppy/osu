@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -28,7 +26,7 @@ namespace osu.Game.Skinning.Editor
         private readonly List<BindableList<ISkinnableDrawable>> targetComponents = new List<BindableList<ISkinnableDrawable>>();
 
         [Resolved]
-        private SkinEditor editor { get; set; }
+        private SkinEditor editor { get; set; } = null!;
 
         public SkinBlueprintContainer(Drawable target)
         {
@@ -64,13 +62,13 @@ namespace osu.Game.Skinning.Editor
         protected override void OnBlueprintAdded(SelectionBlueprint<ISkinnableDrawable> item)
         {
             base.OnBlueprintAdded(item);
-            editor.LayerSidebarList.List.Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(item));
+            editor.LayerSidebarList.List?.Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(item));
         }
 
         protected override void OnBlueprintRemoved(SelectionBlueprint<ISkinnableDrawable> item)
         {
             base.OnBlueprintRemoved(item);
-            editor.LayerSidebarList.List.Items.RemoveAll(element => element.RepresentedItem == item);
+            editor.LayerSidebarList.List?.Items.RemoveAll(element => element.RepresentedItem == item);
         }
 
         private void componentsChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
