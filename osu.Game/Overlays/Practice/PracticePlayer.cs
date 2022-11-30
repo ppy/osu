@@ -4,11 +4,16 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Play;
+using osuTK;
 
 namespace osu.Game.Overlays.Practice
 {
@@ -34,6 +39,31 @@ namespace osu.Game.Overlays.Practice
         {
             createPauseOverlay();
             addButtons(colour);
+
+            HUDOverlay.Add(new Container
+            {
+                //We don't want it clipping the health bars on the default skins
+                Position = new Vector2(10, 30),
+                AutoSizeAxes = Axes.Both,
+                Masking = true,
+                CornerRadius = 5,
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = colour.B5.Opacity(.5f),
+                        RelativeSizeAxes = Axes.Both,
+                        BypassAutoSizeAxes = Axes.Both
+                    },
+                    new OsuSpriteText
+                    {
+                        Colour = colour.YellowLight,
+                        Font = OsuFont.Torus.With(size: 20, weight: FontWeight.Bold),
+                        Padding = new MarginPadding(10),
+                        Text = $"Practicing {Math.Round(loader.CustomStart.Value * 100)}% to {Math.Round(loader.CustomEnd.Value * 100)}%"
+                    }
+                }
+            });
         }
 
         [Resolved(CanBeNull = true)]
@@ -93,7 +123,11 @@ namespace osu.Game.Overlays.Practice
 
             OnGameplayStarted += () =>
             {
-                GameplayClockContainer.Delay(customEndTime - customStartTime).Then().Schedule(() => Restart());
+                //Find a way to make this delay not run when paused
+                DrawableRuleset.Delay(customEndTime - customStartTime).Then().Schedule(() =>
+                {
+                    /* Restart()*/
+                });
                 GameplayClockContainer.Delay(grace_period).Then().Schedule(() => blockFail = false);
             };
         }
