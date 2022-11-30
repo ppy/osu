@@ -1,7 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Overlays.Practice
@@ -12,6 +16,20 @@ namespace osu.Game.Overlays.Practice
         {
             //Creating the player this way allows for avoiding DI
             CreatePlayer = () => new PracticePlayer(this);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colour)
+        {
+            MetadataInfo.Add(new OsuSpriteText
+            {
+                Y = 20,
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 25),
+                Colour = colour.Green,
+                Text = "Practice Mode"
+            });
         }
 
         public BindableNumber<double> CustomStart = new BindableNumber<double>
