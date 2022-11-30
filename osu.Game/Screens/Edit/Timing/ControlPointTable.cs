@@ -157,14 +157,12 @@ namespace osu.Game.Screens.Edit.Timing
                 fill.ChildrenEnumerable = controlPoints
                                           .Where(matchFunction)
                                           .Select(createAttribute)
-                                          .Where(c => c != null)
-                                          .Select(c => c!)
                                           // arbitrary ordering to make timing points first.
                                           // probably want to explicitly define order in the future.
                                           .OrderByDescending(c => c.GetType().Name);
             }
 
-            private Drawable? createAttribute(ControlPoint controlPoint)
+            private Drawable createAttribute(ControlPoint controlPoint)
             {
                 switch (controlPoint)
                 {
@@ -179,10 +177,9 @@ namespace osu.Game.Screens.Edit.Timing
 
                     case SampleControlPoint sample:
                         return new SampleRowAttribute(sample);
-
-                    default:
-                        return null;
                 }
+
+                throw new ArgumentOutOfRangeException(nameof(controlPoint), $"Control point type {controlPoint.GetType()} is not supported");
             }
         }
     }
