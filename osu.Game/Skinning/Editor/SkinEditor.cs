@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -44,7 +45,7 @@ namespace osu.Game.Skinning.Editor
 
         protected override bool StartHidden => true;
 
-        private Drawable targetScreen = null!;
+        private Drawable? targetScreen;
 
         private OsuTextFlowContainer headerText = null!;
 
@@ -78,21 +79,22 @@ namespace osu.Game.Skinning.Editor
 
         private readonly EditorSidebar componentsSidebar = new EditorSidebar();
         private readonly EditorSidebar settingsSidebar = new EditorSidebar();
-
-        public readonly DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> LayerSidebarList
-            = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>(new SkinBlueprint(new BigBlackBox
-            {
-                Name = "DrawableMinimisableList"
-            }));
+        public readonly DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> LayerSidebarList;
 
         [Resolved(canBeNull: true)]
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
         public SkinEditor()
         {
+            var listName = new SkinBlueprint(new BigBlackBox
+            {
+                Name = "DrawableMinimisableList"
+            });
+            LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>(listName);
         }
 
         public SkinEditor(Drawable targetScreen)
+            : this()
         {
             UpdateTargetScreen(targetScreen);
         }
@@ -381,26 +383,24 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private IEnumerable<ISkinnableTarget> availableTargets => targetScreen.ChildrenOfType<ISkinnableTarget>();
+        private IEnumerable<ISkinnableTarget>? availableTargets => targetScreen?.ChildrenOfType<ISkinnableTarget>();
 
-        private ISkinnableTarget? getFirstTarget() => availableTargets.FirstOrDefault();
+        private ISkinnableTarget? getFirstTarget() => availableTargets?.FirstOrDefault();
 
         private ISkinnableTarget? getTarget(GlobalSkinComponentLookup.LookupType target)
         {
-            return availableTargets.FirstOrDefault(c => c.Target == target);
+            return availableTargets?.FirstOrDefault(c => c.Target == target);
         }
 
         private void revert()
         {
-            ISkinnableTarget[] targetContainers = availableTargets.ToArray();
-
-            foreach (var t in targetContainers)
+            availableTargets?.ForEach(t =>
             {
                 currentSkin.Value.ResetDrawableTarget(t);
 
                 // add back default components
                 getTarget(t.Target)?.Reload();
-            }
+            });
         }
 
         public void Save()
@@ -408,10 +408,7 @@ namespace osu.Game.Skinning.Editor
             if (!hasBegunMutating)
                 return;
 
-            ISkinnableTarget[] targetContainers = availableTargets.ToArray();
-
-            foreach (var t in targetContainers)
-                currentSkin.Value.UpdateDrawableTarget(t);
+            availableTargets?.ForEach(currentSkin.Value.UpdateDrawableTarget);
 
             skins.Save(skins.CurrentSkin.Value);
             onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString()));
@@ -444,7 +441,7 @@ namespace osu.Game.Skinning.Editor
         {
             foreach (var item in items)
             {
-                availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
+                availableTargets?.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
             }
         }
 
