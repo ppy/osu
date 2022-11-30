@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Comments
         /// <summary>
         /// Whether editor is waiting for submit action to complete.
         /// </summary>
-        public bool IsSubmitting => CommitButton.IsLoading;
+        public bool IsSubmitting => CommitButton.IsLoadingSpinnerShown;
 
         protected abstract LocalisableString FooterText { get; }
 
@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Comments
 
             textBox.OnCommit += (_, _) =>
             {
-                if (CommitButton.IsLoading)
+                if (CommitButton.IsLoadingSpinnerShown)
                     return;
 
                 CommitButton.TriggerClick();
@@ -171,21 +171,21 @@ namespace osu.Game.Overlays.Comments
             private const int duration = 200;
 
             private readonly LoadingSpinner spinner;
-            private OsuSpriteText text = null!;
+            private readonly OsuSpriteText text = null!;
 
             public readonly BindableBool IsBlocked = new BindableBool();
 
-            private bool isLoading;
+            private bool isLoadingSpinnerShown;
 
             /// <summary>
             /// Whether loading spinner shown.
             /// </summary>
-            public bool IsLoading
+            public bool IsLoadingSpinnerShown
             {
-                get => isLoading;
+                get => isLoadingSpinnerShown;
                 set
                 {
-                    isLoading = value;
+                    isLoadingSpinnerShown = value;
                     Enabled.Value = !value && !IsBlocked.Value;
                     spinner.FadeTo(value ? 1f : 0f, duration, Easing.OutQuint);
                     text.FadeTo(value ? 0f : 1f, duration, Easing.OutQuint);
@@ -210,7 +210,7 @@ namespace osu.Game.Overlays.Comments
                 base.LoadComplete();
                 IsBlocked.BindValueChanged(e =>
                 {
-                    Enabled.Value = !IsLoading && !e.NewValue;
+                    Enabled.Value = !IsLoadingSpinnerShown && !e.NewValue;
                 }, true);
             }
         }

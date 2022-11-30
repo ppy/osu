@@ -116,9 +116,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             private void onCommit(string value)
             {
-                CommitButton.IsLoading = true;
+                CommitButton.IsLoadingSpinnerShown = true;
                 CommittedText = value;
-                Scheduler.AddDelayed(() => CommitButton.IsLoading = false, 1000);
+                Scheduler.AddDelayed(() => CommitButton.IsLoadingSpinnerShown = false, 1000);
             }
 
             protected override LocalisableString FooterText => @"Footer text. And it is pretty long. Cool.";
