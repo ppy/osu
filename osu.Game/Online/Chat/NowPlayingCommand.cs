@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 
@@ -28,6 +29,9 @@ namespace osu.Game.Online.Chat
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<RulesetInfo> currentRuleset { get; set; } = null!;
 
         [Resolved]
         private LocalisationManager localisation { get; set; } = null!;
@@ -73,6 +77,7 @@ namespace osu.Game.Online.Chat
                 "is",
                 verb,
                 getBeatmapPart(),
+                getRulesetPart(),
                 getModPart(),
             };
 
@@ -84,6 +89,13 @@ namespace osu.Game.Online.Chat
                 string beatmapInfoString = localisation.GetLocalisedBindableString(beatmapInfo.GetDisplayTitleRomanisable()).Value;
 
                 return beatmapInfo.OnlineID > 0 ? $"[{api.WebsiteRootUrl}/b/{beatmapInfo.OnlineID} {beatmapInfoString}]" : beatmapInfoString;
+            }
+
+            string getRulesetPart()
+            {
+                if (api.Activity.Value is not UserActivity.InGame) return string.Empty;
+
+                return $"<{currentRuleset.Value.Name}>";
             }
 
             string getModPart()
