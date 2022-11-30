@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Platform;
@@ -39,13 +40,11 @@ namespace osu.Game.Database
         /// <param name="item">The item to export.</param>
         public void Export(TModel item)
         {
-            var itemFilename = item.GetDisplayString().GetValidFilename();
+            string itemFilename = item.GetDisplayString().GetValidFilename();
 
-            var existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}").ToArray();
-
-            // trim the file extension
-            for (int i = 0; i < existingExports.Length; i++)
-                existingExports[i] = existingExports[i].TrimEnd(FileExtension.ToCharArray());
+            IEnumerable<string> existingExports = exportStorage
+                                                  .GetFiles("", $"{itemFilename}*{FileExtension}")
+                                                  .Select(export => export.Substring(0, export.Length - FileExtension.Length));
 
             string filename = $"{NamingUtils.GetNextBestName(existingExports, itemFilename)}{FileExtension}";
             using (var stream = exportStorage.CreateFileSafely(filename))
