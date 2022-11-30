@@ -63,7 +63,7 @@ namespace osu.Game.Input
             Schedule(() => PostNotification?.Invoke(new SimpleErrorNotification
             {
                 Icon = FontAwesome.Solid.ExclamationCircle,
-                Text = $"{rulesetName} {variantName}bindings set to default.",
+                Text = $"Key bindings for {rulesetName} {variantName}is set to default.",
             }));
         }
     }
