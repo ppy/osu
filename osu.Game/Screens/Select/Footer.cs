@@ -4,8 +4,11 @@
 #nullable disable
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osuTK;
+using osuTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -17,12 +20,16 @@ namespace osu.Game.Screens.Select
 {
     public partial class Footer : Container
     {
+        private readonly Box modeLight;
+
         public const float HEIGHT = 50;
+
+        public const int TRANSITION_LENGTH = 300;
 
         private const float padding = 80;
 
         private readonly FillFlowContainer<FooterButton> buttons;
-        private readonly Box backgroundColour;
+        private readonly Box footerBar;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -35,6 +42,9 @@ namespace osu.Game.Screens.Select
                 overlays.Add(overlay);
                 button.Action = () => showOverlay(overlay);
             }
+
+            button.Hovered = updateModeLight;
+            button.HoverLost = updateModeLight;
 
             buttons.Add(button);
         }
@@ -56,8 +66,6 @@ namespace osu.Game.Screens.Select
 
             if (selectedButton != null)
             {
-                modeLight.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
-                modeLight.FadeColour(selectedButton.SelectedColour, TRANSITION_LENGTH, Easing.OutQuint);
             }
             else
                 modeLight.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
@@ -69,12 +77,11 @@ namespace osu.Game.Screens.Select
             Height = HEIGHT;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
-                backgroundColour = new Box
+                footerBar = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-
                     Size = Vector2.One,
                     Colour = Color4.Black.Opacity(0.5f),
                 },
@@ -87,30 +94,32 @@ namespace osu.Game.Screens.Select
                 },
                 new FillFlowContainer
                 {
-                    //Buttons need to be larger than ideal size to hide bottom rounded corners, hence the offset on the Y axis
-                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 40),
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, -30),
                     RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(padding, 0),
                     Children = new Drawable[]
                     {
                         buttons = new FillFlowContainer<FooterButton>
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(-FooterButton.SHEAR_WIDTH + 5, 0),
-                            AutoSizeAxes = Axes.Both
+                            AutoSizeAxes = Axes.Both,
                         }
                     }
                 }
             };
+
+            updateModeLight();
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colour)
         {
-            backgroundColour.Colour = colours.B5;
+            footerBar.Colour = colour.B5;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;

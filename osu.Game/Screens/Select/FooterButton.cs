@@ -59,7 +59,6 @@ namespace osu.Game.Screens.Select
             set => sprite.Icon = value;
         }
 
-        protected FillFlowContainer ModsContainer;
         protected Container TextContainer;
 
         private readonly SpriteText spriteText;
@@ -67,7 +66,6 @@ namespace osu.Game.Screens.Select
 
         private readonly Box backgroundColourBox;
         private readonly Box boxColour;
-        private readonly Box flashLayer;
 
         protected FooterButton()
         {
@@ -96,13 +94,6 @@ namespace osu.Game.Screens.Select
                             RelativeSizeAxes = Axes.Both,
                             Colour = colourProvider.Background3
                         },
-                        flashLayer = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Colour4.White.Opacity(0.9f),
-                            Blending = BlendingParameters.Additive,
-                            Alpha = 0
-                        }
                     }
                 },
                 //Elements that cant be sheared
@@ -112,13 +103,6 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        ModsContainer = new FillFlowContainer
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Direction = FillDirection.Horizontal,
-                            Y = -40
-                        },
                         sprite = new SpriteIcon
                         {
                             Anchor = Anchor.TopCentre,
@@ -157,23 +141,13 @@ namespace osu.Game.Screens.Select
                 }
             };
         }
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Enabled.BindValueChanged(_ => updateDisplay(), true);
-        }
 
         public Action Hovered;
         public Action HoverLost;
         public GlobalAction? Hotkey;
 
-        private bool mouseDown;
-
         protected override void UpdateAfterChildren()
         {
-            flashLayer.FadeOutFromOne(800, Easing.OutQuint);
-
-            return base.OnClick(e);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -181,7 +155,6 @@ namespace osu.Game.Screens.Select
             backgroundColourBox.FadeColour(colourProvider.Background3.Lighten(.2f));
             Hovered?.Invoke();
 
-            updateDisplay();
             return true;
         }
 
@@ -189,25 +162,6 @@ namespace osu.Game.Screens.Select
         {
             backgroundColourBox.FadeColour(colourProvider.Background3, 500, Easing.OutQuint);
             HoverLost?.Invoke();
-
-            updateDisplay();
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (!Enabled.Value)
-                return true;
-
-            mouseDown = true;
-            updateDisplay();
-            return base.OnMouseDown(e);
-        }
-
-        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-        {
-            mouseDown = false;
-            updateDisplay();
-            base.OnMouseUp(e);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -215,32 +169,20 @@ namespace osu.Game.Screens.Select
             if (!Enabled.Value)
                 return true;
 
-            box.ClearTransforms();
-            box.Alpha = 1;
-            box.FadeOut(Footer.TRANSITION_LENGTH * 3, Easing.OutQuint);
             return base.OnClick(e);
         }
 
-        public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-        }
+            if (e.Action == Hotkey && !e.Repeat)
+            {
+                TriggerClick();
+                return true;
+            }
 
+            return false;
+        }
 
         public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
-
-        private void updateDisplay()
-        {
-            this.FadeTo(Enabled.Value ? 1 : 0.25f, Footer.TRANSITION_LENGTH, Easing.OutQuint);
-
-            light.ScaleTo(Enabled.Value && IsHovered ? new Vector2(1, 2) : new Vector2(1), Footer.TRANSITION_LENGTH, Easing.OutQuint);
-            light.FadeColour(Enabled.Value && IsHovered ? SelectedColour : DeselectedColour, Footer.TRANSITION_LENGTH, Easing.OutQuint);
-
-            box.FadeTo(Enabled.Value & mouseDown ? 0.3f : 0f, Footer.TRANSITION_LENGTH * 2, Easing.OutQuint);
-
-            if (Enabled.Value && IsHovered)
-                Hovered?.Invoke();
-            else
-                HoverLost?.Invoke();
-        }
     }
 }
