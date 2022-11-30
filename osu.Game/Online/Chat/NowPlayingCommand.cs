@@ -68,6 +68,9 @@ namespace osu.Game.Online.Chat
                     break;
             }
 
+            channelManager.PostMessage($"is {verb} {getBeatmapPart()} {getModPart()}", true, target);
+            Expire();
+
             string getBeatmapPart()
             {
                 string beatmapInfoString = localisation.GetLocalisedBindableString(beatmapInfo.GetDisplayTitleRomanisable()).Value;
@@ -84,23 +87,20 @@ namespace osu.Game.Online.Chat
                     return string.Empty;
                 }
 
-                StringBuilder modS = new StringBuilder();
+                StringBuilder modsString = new StringBuilder();
 
                 foreach (var mod in selectedMods.Value.Where(mod => mod.Type == ModType.DifficultyIncrease))
                 {
-                    modS.Append($"+{mod.Acronym} ");
+                    modsString.Append($"+{mod.Acronym} ");
                 }
 
                 foreach (var mod in selectedMods.Value.Where(mod => mod.Type != ModType.DifficultyIncrease))
                 {
-                    modS.Append($"-{mod.Acronym} ");
+                    modsString.Append($"-{mod.Acronym} ");
                 }
 
-                return modS.ToString();
+                return modsString.ToString().Trim();
             }
-
-            channelManager.PostMessage($"is {verb} {getBeatmapPart()} {getModPart()}", true, target);
-            Expire();
         }
     }
 }
