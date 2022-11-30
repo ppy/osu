@@ -104,6 +104,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             var standardMessage = new Message(messageIdSequence++)
             {
+                Timestamp = DateTimeOffset.Now,
                 Sender = admin,
                 Content = "I am a wang!"
             };
@@ -113,6 +114,7 @@ namespace osu.Game.Tests.Visual.Online
 
             var standardMessage2 = new Message(messageIdSequence++)
             {
+                Timestamp = DateTimeOffset.Now,
                 Sender = admin,
                 Content = "I am a wang!"
             };
