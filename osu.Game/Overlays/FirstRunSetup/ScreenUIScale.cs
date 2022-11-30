@@ -233,7 +233,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 return parentDependencies.Get(type, info);
             }
 
-            public void Inject<T>(T instance) where T : class
+            public void Inject<T>(T instance) where T : class, IDependencyInjectionCandidate
             {
                 parentDependencies.Inject(instance);
             }
