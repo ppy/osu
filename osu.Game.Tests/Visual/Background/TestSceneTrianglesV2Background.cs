@@ -42,8 +42,7 @@ namespace osu.Game.Tests.Visual.Background
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4.White, Color4.Red)
+                            RelativeSizeAxes = Axes.Both
                         }
                     }
                 }
@@ -60,6 +59,10 @@ namespace osu.Game.Tests.Visual.Background
                 triangles.Reset(1234);
             });
             AddSliderStep("Thickness", 0f, 1f, 0.02f, t => triangles.Thickness = t);
+
+            AddStep("White colour", () => triangles.Colour = Color4.White);
+            AddStep("Vertical gradient", () => triangles.Colour = ColourInfo.GradientVertical(Color4.White, Color4.Red));
+            AddStep("Horizontal gradient", () => triangles.Colour = ColourInfo.GradientHorizontal(Color4.White, Color4.Red));
         }
     }
 }
