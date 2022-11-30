@@ -116,13 +116,7 @@ namespace osu.Game.Overlays.Comments
                 }
             });
 
-            textBox.OnCommit += (_, _) =>
-            {
-                if (CommitButton.IsLoadingSpinnerShown)
-                    return;
-
-                CommitButton.TriggerClick();
-            };
+            textBox.OnCommit += (_, _) => CommitButton.TriggerClick();
         }
 
         protected override void LoadComplete()
