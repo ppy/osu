@@ -1,12 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Comments;
 using osuTK;
@@ -44,15 +49,16 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("click on text box", () =>
             {
-                InputManager.MoveMouseTo(commentEditor);
+                InputManager.MoveMouseTo(commentEditor.ChildrenOfType<TextBox>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddStep("enter text", () => commentEditor.Current.Value = "text");
 
             AddStep("press Enter", () => InputManager.Key(Key.Enter));
 
+            AddUntilStep("button is loading", () => commentEditor.ButtonLoading);
             AddAssert("text committed", () => commentEditor.CommittedText == "text");
-            AddAssert("button is loading", () => commentEditor.IsSubmitting);
+            AddUntilStep("button is not loading", () => !commentEditor.ButtonLoading);
         }
 
         [Test]
@@ -60,14 +66,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("click on text box", () =>
             {
-                InputManager.MoveMouseTo(commentEditor);
+                InputManager.MoveMouseTo(commentEditor.ChildrenOfType<TextBox>().Single());
                 InputManager.Click(MouseButton.Left);
             });
 
             AddStep("press Enter", () => InputManager.Key(Key.Enter));
 
+            AddAssert("button is not loading", () => !commentEditor.ButtonLoading);
             AddAssert("no text committed", () => commentEditor.CommittedText.Length == 0);
-            AddAssert("button is not loading", () => !commentEditor.IsSubmitting);
         }
 
         [Test]
@@ -75,7 +81,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("click on text box", () =>
             {
-                InputManager.MoveMouseTo(commentEditor);
+                InputManager.MoveMouseTo(commentEditor.ChildrenOfType<TextBox>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddStep("enter text", () => commentEditor.Current.Value = "some other text");
@@ -86,8 +92,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
+            AddUntilStep("button is loading", () => commentEditor.ButtonLoading);
             AddAssert("text committed", () => commentEditor.CommittedText == "some other text");
-            AddAssert("button is loading", () => commentEditor.IsSubmitting);
+            AddUntilStep("button is not loading", () => !commentEditor.ButtonLoading);
         }
 
         [Test]
@@ -108,6 +115,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
 
             public string CommittedText { get; private set; } = string.Empty;
+
+            public bool ButtonLoading => CommitButton.ChildrenOfType<LoadingSpinner>().Single().IsPresent && !CommitButton.ChildrenOfType<SpriteText>().Single().IsPresent;
 
             public TestCommentEditor()
             {

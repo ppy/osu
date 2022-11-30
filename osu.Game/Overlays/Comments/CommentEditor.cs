@@ -25,11 +25,6 @@ namespace osu.Game.Overlays.Comments
 
         public Action<string>? OnCommit;
 
-        /// <summary>
-        /// Whether editor is waiting for submit action to complete.
-        /// </summary>
-        public bool IsSubmitting => CommitButton.IsLoadingSpinnerShown;
-
         protected abstract LocalisableString FooterText { get; }
 
         protected abstract LocalisableString CommitButtonText { get; }
