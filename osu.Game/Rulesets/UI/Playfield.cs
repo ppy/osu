@@ -93,6 +93,7 @@ namespace osu.Game.Rulesets.UI
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
         [Resolved(CanBeNull = true)]
+        [CanBeNull]
         protected IReadOnlyList<Mod> Mods { get; private set; }
 
         private readonly HitObjectEntryManager entryManager = new HitObjectEntryManager();
