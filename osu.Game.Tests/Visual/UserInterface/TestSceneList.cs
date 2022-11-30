@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
                 else if (value is DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> minimisableList)
                 {
-                    if (!applyToItems(predicate, minimisableList.List.ItemMaps.Values)) return false;
+                    if (!applyToItems(predicate, minimisableList.List?.ItemMaps.Values)) return false;
                 }
             }
 
