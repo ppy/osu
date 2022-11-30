@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.UI
     /// Displays an interactive ruleset gameplay instance.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
-    public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachHUDPieces
+    public abstract partial class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachHUDPieces
         where TObject : HitObject
     {
         public override event Action<JudgementResult> NewResult;
@@ -414,7 +414,7 @@ namespace osu.Game.Rulesets.UI
     /// </remarks>
     /// </summary>
     [Cached(typeof(DrawableRuleset))]
-    public abstract class DrawableRuleset : CompositeDrawable
+    public abstract partial class DrawableRuleset : CompositeDrawable
     {
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.

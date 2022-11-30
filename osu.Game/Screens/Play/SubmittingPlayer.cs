@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// A player instance which supports submitting scores to an online store.
     /// </summary>
-    public abstract class SubmittingPlayer : Player
+    public abstract partial class SubmittingPlayer : Player
     {
         /// <summary>
         /// The token to be used for the current submission. This is fetched via a request created by <see cref="CreateTokenRequest"/>.
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Play
             api.Queue(req);
 
             // Generally a timeout would not happen here as APIAccess will timeout first.
-            if (!tcs.Task.Wait(60000))
+            if (!tcs.Task.Wait(30000))
                 req.TriggerFailure(new InvalidOperationException("Token retrieval timed out (request never run)"));
 
             return true;

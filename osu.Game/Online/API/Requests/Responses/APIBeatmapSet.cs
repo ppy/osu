@@ -149,5 +149,8 @@ namespace osu.Game.Online.API.Requests.Responses
         #endregion
 
         public bool Equals(IBeatmapSetInfo? other) => other is APIBeatmapSet b && this.MatchesOnlineID(b);
+
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        public override int GetHashCode() => OnlineID.GetHashCode();
     }
 }

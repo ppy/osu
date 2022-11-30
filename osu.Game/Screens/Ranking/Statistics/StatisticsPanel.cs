@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
-    public class StatisticsPanel : VisibilityContainer
+    public partial class StatisticsPanel : VisibilityContainer
     {
         public const float SIDE_PADDING = 30;
 

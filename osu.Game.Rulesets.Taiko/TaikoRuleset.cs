@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Rulesets.Taiko.Scoring;
+using osu.Game.Rulesets.Taiko.Skinning.Argon;
 using osu.Game.Rulesets.Taiko.Skinning.Legacy;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
@@ -47,6 +48,9 @@ namespace osu.Game.Rulesets.Taiko
         {
             switch (skin)
             {
+                case ArgonSkin:
+                    return new TaikoArgonSkinTransformer(skin);
+
                 case LegacySkin:
                     return new TaikoLegacySkinTransformer(skin);
             }

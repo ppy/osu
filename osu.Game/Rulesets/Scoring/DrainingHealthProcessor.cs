@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Scoring
     /// At HP=5, the minimum health reached for a perfect play is 70%.<br />
     /// At HP=10, the minimum health reached for a perfect play is 30%.
     /// </summary>
-    public class DrainingHealthProcessor : HealthProcessor
+    public partial class DrainingHealthProcessor : HealthProcessor
     {
         /// <summary>
         /// A reasonable allowable error for the minimum health offset from <see cref="targetMinimumHealth"/>. A 1% error is unnoticeable.

@@ -22,6 +22,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Resources.Localisation.Web;
@@ -31,8 +32,13 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class KeyBindingRow : Container, IFilterable
+    public partial class KeyBindingRow : Container, IFilterable
     {
+        /// <summary>
+        /// Invoked when the binding of this row is updated with a change being written.
+        /// </summary>
+        public Action<KeyBindingRow> BindingUpdated { get; set; }
+
         private readonly object action;
         private readonly IEnumerable<RealmKeyBinding> bindings;
 
@@ -153,7 +159,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                     Spacing = new Vector2(5),
                                     Children = new Drawable[]
                                     {
-                                        new CancelButton { Action = finalise },
+                                        new CancelButton { Action = () => finalise(false) },
                                         new ClearButton { Action = clear },
                                     },
                                 },
@@ -226,7 +232,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             }
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromMouseButton(e.Button));
             return true;
         }
 
@@ -240,7 +246,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
 
             if (bindTarget.IsHovered)
-                finalise();
+                finalise(false);
             // prevent updating bind target before clear button's action
             else if (!cancelAndClearButtons.Any(b => b.IsHovered))
                 updateBindTarget();
@@ -252,7 +258,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 if (bindTarget.IsHovered)
                 {
-                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState, e.ScrollDelta));
+                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState, e.ScrollDelta), KeyCombination.FromScrollDelta(e.ScrollDelta).First());
                     finalise();
                     return true;
                 }
@@ -263,10 +269,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (!HasFocus)
+            if (!HasFocus || e.Repeat)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromKey(e.Key));
             if (!isModifier(e.Key)) finalise();
 
             return true;
@@ -288,7 +294,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromJoystickButton(e.Button));
             finalise();
 
             return true;
@@ -310,7 +316,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromMidiKey(e.Key));
             finalise();
 
             return true;
@@ -332,7 +338,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromTabletAuxiliaryButton(e.Button));
             finalise();
 
             return true;
@@ -354,7 +360,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromTabletPenButton(e.Button));
             finalise();
 
             return true;
@@ -377,10 +383,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 return;
 
             bindTarget.UpdateKeyCombination(InputKey.None);
-            finalise();
+            finalise(false);
         }
 
-        private void finalise()
+        private void finalise(bool hasChanged = true)
         {
             if (bindTarget != null)
             {
@@ -393,6 +399,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     // schedule to ensure we don't instantly get focus back on next OnMouseClick (see AcceptFocus impl.)
                     bindTarget = null;
+                    if (hasChanged)
+                        BindingUpdated?.Invoke(this);
                 });
             }
 
@@ -417,7 +425,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected override void OnFocusLost(FocusLostEvent e)
         {
-            finalise();
+            finalise(false);
             base.OnFocusLost(e);
         }
 
@@ -439,7 +447,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             isDefault.Value = bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
         }
 
-        private class CancelButton : TriangleButton
+        private partial class CancelButton : RoundedButton
         {
             public CancelButton()
             {
@@ -448,7 +456,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
         }
 
-        public class ClearButton : DangerousTriangleButton
+        public partial class ClearButton : DangerousRoundedButton
         {
             public ClearButton()
             {
@@ -457,7 +465,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
         }
 
-        public class KeyButton : Container
+        public partial class KeyButton : Container
         {
             public readonly RealmKeyBinding KeyBinding;
 
@@ -562,6 +570,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Text.FadeColour(IsHovered ? Color4.Black : Color4.White, transition_time, Easing.OutQuint);
                 }
             }
+
+            /// <summary>
+            /// Update from a key combination, only allowing a single non-modifier key to be specified.
+            /// </summary>
+            /// <param name="fullState">A <see cref="KeyCombination"/> generated from the full input state.</param>
+            /// <param name="triggerKey">The key which triggered this update, and should be used as the binding.</param>
+            public void UpdateKeyCombination(KeyCombination fullState, InputKey triggerKey) =>
+                UpdateKeyCombination(new KeyCombination(fullState.Keys.Where(KeyCombination.IsModifierKey).Append(triggerKey)));
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {

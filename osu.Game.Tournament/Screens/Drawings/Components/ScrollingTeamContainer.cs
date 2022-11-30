@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
 {
-    public class ScrollingTeamContainer : Container
+    public partial class ScrollingTeamContainer : Container
     {
         public event Action OnScrollStarted;
         public event Action<TournamentTeam> OnSelected;
@@ -309,7 +309,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             Scrolling
         }
 
-        public class ScrollingTeam : DrawableTournamentTeam
+        public partial class ScrollingTeam : DrawableTournamentTeam
         {
             public const float WIDTH = 58;
             public const float HEIGHT = 44;

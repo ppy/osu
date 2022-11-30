@@ -49,6 +49,9 @@ namespace osu.Game.Online
             this.api = api;
             this.versionHash = versionHash;
             this.preferMessagePack = preferMessagePack;
+
+            // Automatically start these connections.
+            Start();
         }
 
         protected override Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken)

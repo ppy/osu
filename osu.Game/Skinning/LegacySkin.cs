@@ -9,6 +9,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -321,17 +322,17 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (base.GetDrawableComponent(component) is Drawable c)
+            if (base.GetDrawableComponent(lookup) is Drawable c)
                 return c;
 
-            switch (component)
+            switch (lookup)
             {
-                case SkinnableTargetComponent target:
-                    switch (target.Target)
+                case GlobalSkinComponentLookup target:
+                    switch (target.Lookup)
                     {
-                        case SkinnableTarget.MainHUDComponents:
+                        case GlobalSkinComponentLookup.LookupType.MainHUDComponents:
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
@@ -378,13 +379,14 @@ namespace osu.Game.Skinning
 
                     return null;
 
-                case GameplaySkinComponent<HitResult> resultComponent:
-                    // TODO: this should be inside the judgement pieces.
-                    Func<Drawable?> createDrawable = () => getJudgementAnimation(resultComponent.Component);
+                case GameplaySkinComponentLookup<HitResult> resultComponent:
 
                     // kind of wasteful that we throw this away, but should do for now.
-                    if (createDrawable() != null)
+                    if (getJudgementAnimation(resultComponent.Component) != null)
                     {
+                        // TODO: this should be inside the judgement pieces.
+                        Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component).AsNonNull();
+
                         var particle = getParticleTexture(resultComponent.Component);
 
                         if (particle != null)
@@ -394,9 +396,6 @@ namespace osu.Game.Skinning
                     }
 
                     return null;
-
-                case SkinnableSprite.SpriteComponent sprite:
-                    return this.GetAnimation(sprite.LookupName, false, false);
             }
 
             return null;

@@ -10,7 +10,7 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneMedalOverlay : OsuTestScene
+    public partial class TestSceneMedalOverlay : OsuTestScene
     {
         public TestSceneMedalOverlay()
         {

@@ -18,7 +18,7 @@ using osu.Game.Screens.Ranking;
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
-    public class TestSceneHitExplosion : TaikoSkinnableTestScene
+    public partial class TestSceneHitExplosion : TaikoSkinnableTestScene
     {
         protected override double TimePerAction => 100;
 

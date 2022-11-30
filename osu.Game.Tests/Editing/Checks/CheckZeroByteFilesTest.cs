@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.IO;
 using System.Linq;
 using Moq;
@@ -17,8 +15,8 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckZeroByteFilesTest
     {
-        private CheckZeroByteFiles check;
-        private IBeatmap beatmap;
+        private CheckZeroByteFiles check = null!;
+        private IBeatmap beatmap = null!;
 
         [SetUp]
         public void Setup()
@@ -74,7 +72,7 @@ namespace osu.Game.Tests.Editing.Checks
         private BeatmapVerifierContext getContextMissing()
         {
             var mockWorkingBeatmap = new Mock<IWorkingBeatmap>();
-            mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns((Stream)null);
+            mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns((Stream)null!);
 
             return new BeatmapVerifierContext(beatmap, mockWorkingBeatmap.Object);
         }

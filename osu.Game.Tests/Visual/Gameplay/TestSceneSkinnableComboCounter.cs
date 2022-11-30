@@ -14,7 +14,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableComboCounter : SkinnableHUDComponentTestScene
+    public partial class TestSceneSkinnableComboCounter : SkinnableHUDComponentTestScene
     {
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());

@@ -15,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderStreamConversion : TestSceneOsuEditor
+    public partial class TestSceneSliderStreamConversion : TestSceneOsuEditor
     {
         private BindableBeatDivisor beatDivisor => (BindableBeatDivisor)Editor.Dependencies.Get(typeof(BindableBeatDivisor));
 

@@ -19,16 +19,13 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class Nub : Container, IHasCurrentValue<bool>, IHasAccentColour
+    public partial class Nub : Container, IHasCurrentValue<bool>, IHasAccentColour
     {
         public const float HEIGHT = 15;
 
         public const float EXPANDED_SIZE = 50;
 
         private const float border_width = 3;
-
-        private const double animate_in_duration = 200;
-        private const double animate_out_duration = 500;
 
         private readonly Box fill;
         private readonly Container main;
@@ -72,7 +69,7 @@ namespace osu.Game.Graphics.UserInterface
                 Colour = GlowColour.Opacity(0),
                 Type = EdgeEffectType.Glow,
                 Radius = 8,
-                Roundness = 5,
+                Roundness = 4,
             };
         }
 
@@ -94,13 +91,18 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (value)
                 {
-                    main.FadeColour(GlowingAccentColour, animate_in_duration, Easing.OutQuint);
-                    main.FadeEdgeEffectTo(0.2f, animate_in_duration, Easing.OutQuint);
+                    main.FadeColour(GlowingAccentColour.Lighten(0.5f), 40, Easing.OutQuint)
+                        .Then()
+                        .FadeColour(GlowingAccentColour, 800, Easing.OutQuint);
+
+                    main.FadeEdgeEffectTo(Color4.White.Opacity(0.1f), 40, Easing.OutQuint)
+                        .Then()
+                        .FadeEdgeEffectTo(GlowColour.Opacity(0.1f), 800, Easing.OutQuint);
                 }
                 else
                 {
-                    main.FadeEdgeEffectTo(0, animate_out_duration, Easing.OutQuint);
-                    main.FadeColour(AccentColour, animate_out_duration, Easing.OutQuint);
+                    main.FadeEdgeEffectTo(GlowColour.Opacity(0), 800, Easing.OutQuint);
+                    main.FadeColour(AccentColour, 800, Easing.OutQuint);
                 }
             }
         }
@@ -163,14 +165,20 @@ namespace osu.Game.Graphics.UserInterface
 
         private void onCurrentValueChanged(ValueChangedEvent<bool> filled)
         {
-            fill.FadeTo(filled.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            const double duration = 200;
+
+            fill.FadeTo(filled.NewValue ? 1 : 0, duration, Easing.OutQuint);
 
             if (filled.NewValue)
-                main.ResizeWidthTo(1, animate_in_duration, Easing.OutElasticHalf);
+            {
+                main.ResizeWidthTo(1, duration, Easing.OutElasticHalf);
+                main.TransformTo(nameof(BorderThickness), 8.5f, duration, Easing.OutElasticHalf);
+            }
             else
-                main.ResizeWidthTo(0.9f, animate_out_duration, Easing.OutElastic);
-
-            main.TransformTo(nameof(BorderThickness), filled.NewValue ? 8.5f : border_width, 200, Easing.OutQuint);
+            {
+                main.ResizeWidthTo(0.75f, duration, Easing.OutQuint);
+                main.TransformTo(nameof(BorderThickness), border_width, duration, Easing.OutQuint);
+            }
         }
     }
 }

@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
     /// <summary>
     /// Handles playback of the global music track.
     /// </summary>
-    public class MusicController : CompositeDrawable
+    public partial class MusicController : CompositeDrawable
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }

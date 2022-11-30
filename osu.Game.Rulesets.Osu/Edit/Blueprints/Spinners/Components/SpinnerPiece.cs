@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 {
-    public class SpinnerPiece : BlueprintPiece<Spinner>
+    public partial class SpinnerPiece : BlueprintPiece<Spinner>
     {
         private readonly Circle circle;
         private readonly Circle ring;

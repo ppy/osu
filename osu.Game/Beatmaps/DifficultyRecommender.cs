@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps
     /// A class which will recommend the most suitable difficulty for the local user from a beatmap set.
     /// This requires the user to be logged in, as it sources from the user's online profile.
     /// </summary>
-    public class DifficultyRecommender : Component
+    public partial class DifficultyRecommender : Component
     {
         [Resolved]
         private IAPIProvider api { get; set; }

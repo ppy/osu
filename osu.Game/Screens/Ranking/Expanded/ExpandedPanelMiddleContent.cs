@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// <summary>
     /// The content that appears in the middle section of the <see cref="ScorePanel"/>.
     /// </summary>
-    public class ExpandedPanelMiddleContent : CompositeDrawable
+    public partial class ExpandedPanelMiddleContent : CompositeDrawable
     {
         private const float padding = 10;
 
@@ -280,7 +280,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             });
         }
 
-        public class PlayedOnText : OsuSpriteText
+        public partial class PlayedOnText : OsuSpriteText
         {
             private readonly DateTimeOffset time;
             private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();

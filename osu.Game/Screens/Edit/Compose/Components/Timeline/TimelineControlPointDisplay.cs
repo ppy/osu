@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     /// <summary>
     /// The part of the timeline that displays the control points.
     /// </summary>
-    public class TimelineControlPointDisplay : TimelinePart<TimelineControlPointGroup>
+    public partial class TimelineControlPointDisplay : TimelinePart<TimelineControlPointGroup>
     {
         private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 

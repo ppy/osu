@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneStandAloneChatDisplay : OsuManualInputManagerTestScene
+    public partial class TestSceneStandAloneChatDisplay : OsuManualInputManagerTestScene
     {
         private readonly APIUser admin = new APIUser
         {
@@ -56,7 +56,9 @@ namespace osu.Game.Tests.Visual.Online
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Add(channelManager = new ChannelManager(parent.Get<IAPIProvider>()));
+            var api = parent.Get<IAPIProvider>();
+
+            Add(channelManager = new ChannelManager(api));
 
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -399,7 +401,7 @@ namespace osu.Game.Tests.Visual.Online
         private void checkNotScrolledToBottom() =>
             AddUntilStep("not scrolled to bottom", () => !chatDisplay.ScrolledToBottom);
 
-        private class TestStandAloneChatDisplay : StandAloneChatDisplay
+        private partial class TestStandAloneChatDisplay : StandAloneChatDisplay
         {
             public TestStandAloneChatDisplay(bool textBox = false)
                 : base(textBox)

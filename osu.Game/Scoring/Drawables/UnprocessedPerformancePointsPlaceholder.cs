@@ -13,7 +13,7 @@ namespace osu.Game.Scoring.Drawables
     /// <summary>
     /// A placeholder used in PP columns for scores with unprocessed PP value.
     /// </summary>
-    public class UnprocessedPerformancePointsPlaceholder : SpriteIcon, IHasTooltip
+    public partial class UnprocessedPerformancePointsPlaceholder : SpriteIcon, IHasTooltip
     {
         public LocalisableString TooltipText => ScoresStrings.StatusProcessing;
 

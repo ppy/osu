@@ -8,7 +8,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Tournament
 {
-    public class TournamentSpriteText : OsuSpriteText
+    public partial class TournamentSpriteText : OsuSpriteText
     {
         public TournamentSpriteText()
         {

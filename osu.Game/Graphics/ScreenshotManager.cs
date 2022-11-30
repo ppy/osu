@@ -25,7 +25,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace osu.Game.Graphics
 {
-    public class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
+    public partial class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 

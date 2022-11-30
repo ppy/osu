@@ -13,7 +13,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public abstract class ManiaSelectionBlueprint<T> : HitObjectSelectionBlueprint<T>
+    public abstract partial class ManiaSelectionBlueprint<T> : HitObjectSelectionBlueprint<T>
         where T : ManiaHitObject
     {
         [Resolved]

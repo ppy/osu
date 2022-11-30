@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
@@ -27,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
     /// for a usage example.
     /// </para>
     /// </summary>
-    public abstract class CirclePiece : BeatSyncedContainer, IHasAccentColour
+    public abstract partial class CirclePiece : BeatSyncedContainer, IHasAccentColour
     {
         public const float SYMBOL_SIZE = TaikoHitObject.DEFAULT_SIZE;
         public const float SYMBOL_BORDER = 8;
@@ -35,6 +33,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         private const double pre_beat_transition_time = 80;
 
         private const float flash_opacity = 0.3f;
+
+        [Resolved]
+        private DrawableHitObject drawableHitObject { get; set; } = null!;
 
         private Color4 accentColour;
 
@@ -76,7 +77,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         private readonly Container background;
 
-        public Box FlashBox;
+        private readonly Box flashBox;
 
         protected CirclePiece()
         {
@@ -122,7 +123,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                     Masking = true,
                     Children = new[]
                     {
-                        FlashBox = new Box
+                        flashBox = new Box
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -144,6 +145,28 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             });
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            drawableHitObject.ApplyCustomUpdateState += updateStateTransforms;
+            updateStateTransforms(drawableHitObject, drawableHitObject.State.Value);
+        }
+
+        private void updateStateTransforms(DrawableHitObject h, ArmedState state)
+        {
+            if (h.HitObject is not Hit)
+                return;
+
+            switch (state)
+            {
+                case ArmedState.Hit:
+                    using (BeginAbsoluteSequence(h.HitStateUpdateTime))
+                        flashBox.FadeTo(0.9f).FadeOut(300);
+                    break;
+            }
+        }
+
         private const float edge_alpha_kiai = 0.5f;
 
         private void resetEdgeEffects()
@@ -156,9 +179,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             };
         }
 
-        [Resolved]
-        private DrawableHitObject drawableHitObject { get; set; }
-
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (!effectPoint.KiaiMode)
@@ -166,7 +186,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
             if (drawableHitObject.State.Value == ArmedState.Idle)
             {
-                FlashBox
+                flashBox
                     .FadeTo(flash_opacity)
                     .Then()
                     .FadeOut(timingPoint.BeatLength * 0.75, Easing.OutSine);

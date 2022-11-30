@@ -12,7 +12,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class DrawableCatchEditorRuleset : DrawableCatchRuleset
+    public partial class DrawableCatchEditorRuleset : DrawableCatchRuleset
     {
         public readonly BindableDouble TimeRangeMultiplier = new BindableDouble(1);
 

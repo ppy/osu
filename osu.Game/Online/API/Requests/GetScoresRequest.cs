@@ -16,6 +16,8 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetScoresRequest : APIRequest<APIScoresCollection>
     {
+        public const int MAX_SCORES_PER_REQUEST = 50;
+
         private readonly IBeatmapInfo beatmapInfo;
         private readonly BeatmapLeaderboardScope scope;
         private readonly IRulesetInfo ruleset;

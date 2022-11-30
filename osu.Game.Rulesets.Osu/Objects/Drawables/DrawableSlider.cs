@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSlider : DrawableOsuHitObject
+    public partial class DrawableSlider : DrawableOsuHitObject
     {
         public new Slider HitObject => (Slider)base.HitObject;
 
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
+                        Body = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
                         tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
                         tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                         repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
@@ -327,7 +327,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => SliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
-        private class DefaultSliderBody : PlaySliderBody
+        private partial class DefaultSliderBody : PlaySliderBody
         {
         }
     }

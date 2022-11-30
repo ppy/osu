@@ -12,7 +12,7 @@ using osu.Framework.Testing;
 using osu.Framework.Testing.Input;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
@@ -20,15 +20,15 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class OsuManualInputManagerTestScene : OsuTestScene
+    public abstract partial class OsuManualInputManagerTestScene : OsuTestScene
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
         protected readonly ManualInputManager InputManager;
 
-        private readonly TriangleButton buttonTest;
-        private readonly TriangleButton buttonLocal;
+        private readonly RoundedButton buttonTest;
+        private readonly RoundedButton buttonLocal;
 
         /// <summary>
         /// Whether to create a nested container to handle <see cref="GlobalAction"/>s that result from local (manual) test input.
@@ -110,13 +110,13 @@ namespace osu.Game.Tests.Visual
 
                                     Children = new Drawable[]
                                     {
-                                        buttonLocal = new TriangleButton
+                                        buttonLocal = new RoundedButton
                                         {
                                             Text = "local",
                                             Size = new Vector2(50, 30),
                                             Action = returnUserInput
                                         },
-                                        buttonTest = new TriangleButton
+                                        buttonTest = new RoundedButton
                                         {
                                             Text = "test",
                                             Size = new Vector2(50, 30),

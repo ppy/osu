@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneBezierConverter : OsuTestScene
+    public partial class TestSceneBezierConverter : OsuTestScene
     {
         private readonly SmoothPath drawablePath;
         private readonly SmoothPath controlPointDrawablePath;

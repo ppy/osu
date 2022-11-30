@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public readonly Bindable<Room> SelectedRoom = new Bindable<Room>();
         public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();

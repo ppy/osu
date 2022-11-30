@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// Tracks changes to the <see cref="Editor"/>.
     /// </summary>
-    public class EditorChangeHandler : TransactionalCommitComponent, IEditorChangeHandler
+    public partial class EditorChangeHandler : TransactionalCommitComponent, IEditorChangeHandler
     {
         public readonly Bindable<bool> CanUndo = new Bindable<bool>();
         public readonly Bindable<bool> CanRedo = new Bindable<bool>();

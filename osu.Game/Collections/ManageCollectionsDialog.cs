@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Collections
 {
-    public class ManageCollectionsDialog : OsuFocusedOverlayContainer
+    public partial class ManageCollectionsDialog : OsuFocusedOverlayContainer
     {
         private const double enter_duration = 500;
         private const double exit_duration = 200;

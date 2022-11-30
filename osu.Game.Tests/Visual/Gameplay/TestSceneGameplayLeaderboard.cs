@@ -18,11 +18,11 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneGameplayLeaderboard : OsuTestScene
+    public partial class TestSceneGameplayLeaderboard : OsuTestScene
     {
         private TestGameplayLeaderboard leaderboard;
 
-        private readonly BindableDouble playerScore = new BindableDouble();
+        private readonly BindableLong playerScore = new BindableLong();
 
         public TestSceneGameplayLeaderboard()
         {
@@ -76,8 +76,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             createLeaderboard();
             addLocalPlayer();
 
-            var player2Score = new BindableDouble(1234567);
-            var player3Score = new BindableDouble(1111111);
+            var player2Score = new BindableLong(1234567);
+            var player3Score = new BindableLong(1111111);
 
             AddStep("add player 2", () => createLeaderboardScore(player2Score, new APIUser { Username = "Player 2" }));
             AddStep("add player 3", () => createLeaderboardScore(player3Score, new APIUser { Username = "Player 3" }));
@@ -161,15 +161,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void createRandomScore(APIUser user) => createLeaderboardScore(new BindableDouble(RNG.Next(0, 5_000_000)), user);
+        private void createRandomScore(APIUser user) => createLeaderboardScore(new BindableLong(RNG.Next(0, 5_000_000)), user);
 
-        private void createLeaderboardScore(BindableDouble score, APIUser user, bool isTracked = false)
+        private void createLeaderboardScore(BindableLong score, APIUser user, bool isTracked = false)
         {
             var leaderboardScore = leaderboard.Add(user, isTracked);
             leaderboardScore.TotalScore.BindTo(score);
         }
 
-        private class TestGameplayLeaderboard : GameplayLeaderboard
+        private partial class TestGameplayLeaderboard : GameplayLeaderboard
         {
             public float Spacing => Flow.Spacing.Y;
 

@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModPresetTooltip : VisibilityContainer, ITooltip<ModPreset>
+    public partial class ModPresetTooltip : VisibilityContainer, ITooltip<ModPreset>
     {
         protected override Container<Drawable> Content { get; }
 
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Mods
 
         public void Move(Vector2 pos) => Position = pos;
 
-        private class ModPresetRow : FillFlowContainer
+        private partial class ModPresetRow : FillFlowContainer
         {
             public ModPresetRow(Mod mod)
             {

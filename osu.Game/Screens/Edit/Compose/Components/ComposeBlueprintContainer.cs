@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A blueprint container generally displayed as an overlay to a ruleset's playfield.
     /// </summary>
-    public class ComposeBlueprintContainer : EditorBlueprintContainer
+    public partial class ComposeBlueprintContainer : EditorBlueprintContainer
     {
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 

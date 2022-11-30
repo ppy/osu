@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class FooterButtonFreeMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class FooterButtonFreeMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         public Bindable<IReadOnlyList<Mod>> Current
         {

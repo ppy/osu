@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneLeadIn : RateAdjustedBeatmapTestScene
+    public partial class TestSceneLeadIn : RateAdjustedBeatmapTestScene
     {
         private LeadInPlayer player = null!;
 
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player loaded", () => player.IsLoaded && player.Alpha == 1);
         }
 
-        private class LeadInPlayer : TestPlayer
+        private partial class LeadInPlayer : TestPlayer
         {
             public LeadInPlayer()
                 : base(false, false)

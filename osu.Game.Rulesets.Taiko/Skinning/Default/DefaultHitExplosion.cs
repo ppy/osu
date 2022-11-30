@@ -10,11 +10,12 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    internal class DefaultHitExplosion : CircularContainer, IAnimatableHitExplosion
+    internal partial class DefaultHitExplosion : CircularContainer, IAnimatableHitExplosion
     {
         private readonly HitResult result;
 
@@ -74,6 +75,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         public void AnimateSecondHit()
         {
+            this.ResizeTo(new Vector2(TaikoStrongableHitObject.STRONG_SCALE), 50);
         }
     }
 }

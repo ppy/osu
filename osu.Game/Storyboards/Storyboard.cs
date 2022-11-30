@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
@@ -89,12 +90,31 @@ namespace osu.Game.Storyboards
         public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
             new DrawableStoryboard(this, mods);
 
+        private static readonly string[] image_extensions = { @".png", @".jpg" };
+
         public Texture? GetTextureFromPath(string path, TextureStore textureStore)
         {
-            string? storyboardPath = BeatmapInfo.BeatmapSet?.GetPathForFile(path);
+            string? resolvedPath = null;
 
-            if (!string.IsNullOrEmpty(storyboardPath))
-                return textureStore.Get(storyboardPath);
+            if (Path.HasExtension(path))
+            {
+                resolvedPath = BeatmapInfo.BeatmapSet?.GetPathForFile(path);
+            }
+            else
+            {
+                // Just doing this extension logic locally here for simplicity.
+                //
+                // A more "sane" path may be to use the ISkinSource.GetTexture path (which will use the extensions of the underlying TextureStore),
+                // but comes with potential complexity (what happens if the user has beatmap skins disabled?).
+                foreach (string ext in image_extensions)
+                {
+                    if ((resolvedPath = BeatmapInfo.BeatmapSet?.GetPathForFile($"{path}{ext}")) != null)
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(resolvedPath))
+                return textureStore.Get(resolvedPath);
 
             return null;
         }

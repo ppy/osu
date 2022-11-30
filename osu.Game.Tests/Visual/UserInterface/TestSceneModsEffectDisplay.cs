@@ -18,7 +18,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneModsEffectDisplay : OsuTestScene
+    public partial class TestSceneModsEffectDisplay : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("colours are correct", () => testDisplay.Container.Colour == colourProvider.Background5 && background.Colour == colours.ForModType(ModType.DifficultyIncrease));
         }
 
-        private class TestDisplay : ModsEffectDisplay
+        private partial class TestDisplay : ModsEffectDisplay
         {
             public Container<Drawable> Container => Content;
 

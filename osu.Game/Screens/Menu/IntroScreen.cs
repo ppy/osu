@@ -32,7 +32,7 @@ using Realms;
 
 namespace osu.Game.Screens.Menu
 {
-    public abstract class IntroScreen : StartupScreen
+    public abstract partial class IntroScreen : StartupScreen
     {
         /// <summary>
         /// Whether we have loaded the menu previously.

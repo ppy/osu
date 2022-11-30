@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
-    public class DrawableKudosuHistoryItem : CompositeDrawable
+    public partial class DrawableKudosuHistoryItem : CompositeDrawable
     {
         private const int height = 25;
 

@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
@@ -19,13 +20,16 @@ using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit.Compose
 {
-    public class ComposeScreen : EditorScreenWithTimeline
+    public partial class ComposeScreen : EditorScreenWithTimeline, IGameplaySettings
     {
         [Resolved]
         private GameHost host { get; set; }
 
         [Resolved]
         private EditorClock clock { get; set; }
+
+        [Resolved]
+        private IGameplaySettings globalGameplaySettings { get; set; }
 
         private Bindable<string> clipboard { get; set; }
 
@@ -157,5 +161,12 @@ namespace osu.Game.Screens.Edit.Compose
         }
 
         #endregion
+
+        // Combo colour normalisation should not be applied in the editor.
+        // Note this doesn't affect editor test mode.
+        IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => new Bindable<float>();
+
+        // Arguable.
+        IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => globalGameplaySettings.PositionalHitsoundsLevel;
     }
 }

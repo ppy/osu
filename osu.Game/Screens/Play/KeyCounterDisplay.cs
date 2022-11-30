@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterDisplay : Container<KeyCounter>
+    public partial class KeyCounterDisplay : Container<KeyCounter>
     {
         private const int duration = 100;
         private const double key_fade_time = 80;
@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Play
             this.receptor = receptor;
         }
 
-        public class Receptor : Drawable
+        public partial class Receptor : Drawable
         {
             protected readonly KeyCounterDisplay Target;
 

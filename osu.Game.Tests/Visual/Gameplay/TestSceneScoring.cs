@@ -28,7 +28,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneScoring : OsuTestScene
+    public partial class TestSceneScoring : OsuTestScene
     {
         private GraphContainer graphs = null!;
         private SettingsSlider<int> sliderMaxCombo = null!;
@@ -279,7 +279,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
     }
 
-    public class GraphContainer : Container, IHasCustomTooltip<IEnumerable<LineGraph>>
+    public partial class GraphContainer : Container, IHasCustomTooltip<IEnumerable<LineGraph>>
     {
         public readonly BindableList<double> MissLocations = new BindableList<double>();
         public readonly BindableList<double> NonPerfectLocations = new BindableList<double>();
@@ -439,7 +439,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public IEnumerable<LineGraph> TooltipContent => Content.OfType<LineGraph>();
 
-        public class GraphTooltip : CompositeDrawable, ITooltip<IEnumerable<LineGraph>>
+        public partial class GraphTooltip : CompositeDrawable, ITooltip<IEnumerable<LineGraph>>
         {
             private readonly GraphContainer graphContainer;
 

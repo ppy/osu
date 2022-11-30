@@ -23,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerParticipantsList : MultiplayerTestScene
+    public partial class TestSceneMultiplayerParticipantsList : MultiplayerTestScene
     {
         [SetUpSteps]
         public void SetupSteps()

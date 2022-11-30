@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneFruitRandomness : OsuTestScene
+    public partial class TestSceneFruitRandomness : OsuTestScene
     {
         private readonly DrawableFruit drawableFruit;
         private readonly DrawableBanana drawableBanana;

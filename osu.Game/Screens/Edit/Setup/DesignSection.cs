@@ -17,7 +17,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class DesignSection : SetupSection
+    internal partial class DesignSection : SetupSection
     {
         protected LabelledSwitchButton EnableCountdown;
 

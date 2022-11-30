@@ -10,7 +10,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class ProfileRulesetSelector : OverlayRulesetSelector
+    public partial class ProfileRulesetSelector : OverlayRulesetSelector
     {
         public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 

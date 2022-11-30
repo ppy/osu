@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Game.Beatmaps.Formats;
 using osuTK.Graphics;
@@ -52,7 +50,7 @@ namespace osu.Game.Skinning
 
         public List<Color4> CustomComboColours { get; set; } = new List<Color4>();
 
-        public IReadOnlyList<Color4> ComboColours
+        public IReadOnlyList<Color4>? ComboColours
         {
             get
             {

@@ -22,7 +22,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.IPC
 {
-    public class FileBasedIPC : MatchIPCInfo
+    public partial class FileBasedIPC : MatchIPCInfo
     {
         public Storage IPCStorage { get; private set; }
 

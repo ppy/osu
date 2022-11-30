@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonMainCirclePiece : CompositeDrawable
+    public partial class ArgonMainCirclePiece : CompositeDrawable
     {
         public const float BORDER_THICKNESS = (OsuHitObject.OBJECT_RADIUS * 2) * (2f / 58);
 
@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
 
-        private class FlashPiece : Circle
+        private partial class FlashPiece : Circle
         {
             public FlashPiece()
             {

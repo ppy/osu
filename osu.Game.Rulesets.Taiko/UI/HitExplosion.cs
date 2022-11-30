@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// A circle explodes from the hit target to indicate a hitobject has been hit.
     /// </summary>
-    internal class HitExplosion : PoolableDrawable
+    internal partial class HitExplosion : PoolableDrawable
     {
         public override bool RemoveWhenNotAlive => true;
         public override bool RemoveCompletedTransforms => false;
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = skinnable = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(result)), _ => new DefaultHitExplosion(result));
+            InternalChild = skinnable = new SkinnableDrawable(new TaikoSkinComponentLookup(getComponentName(result)), _ => new DefaultHitExplosion(result));
             skinnable.OnSkinChanged += runAnimation;
         }
 
@@ -90,7 +90,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 using (BeginAbsoluteSequence(secondHitTime.Value))
                 {
-                    this.ResizeTo(new Vector2(TaikoStrongableHitObject.DEFAULT_STRONG_SIZE), 50);
                     (skinnable.Drawable as IAnimatableHitExplosion)?.AnimateSecondHit();
                 }
             }

@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinBlueprintContainer : BlueprintContainer<ISkinnableDrawable>
+    public partial class SkinBlueprintContainer : BlueprintContainer<ISkinnableDrawable>
     {
         private readonly Drawable target;
 

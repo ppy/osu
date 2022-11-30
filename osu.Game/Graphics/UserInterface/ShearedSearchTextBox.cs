@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedSearchTextBox : CompositeDrawable, IHasCurrentValue<string>
+    public partial class ShearedSearchTextBox : CompositeDrawable, IHasCurrentValue<string>
     {
         private const float corner_radius = 7;
 
@@ -95,7 +95,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool HandleNonPositionalInput => textBox.HandleNonPositionalInput;
 
-        private class InnerSearchTextBox : SearchTextBox
+        private partial class InnerSearchTextBox : SearchTextBox
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
@@ -112,7 +112,7 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override SpriteText CreatePlaceholder() => new SearchPlaceholder();
 
-            internal class SearchPlaceholder : SpriteText
+            internal partial class SearchPlaceholder : SpriteText
             {
                 public override void Show()
                 {

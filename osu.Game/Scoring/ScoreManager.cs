@@ -99,7 +99,7 @@ namespace osu.Game.Scoring
             var scoreProcessor = ruleset.CreateScoreProcessor();
             scoreProcessor.Mods.Value = score.Mods;
 
-            return (long)Math.Round(scoreProcessor.ComputeScore(mode, score));
+            return scoreProcessor.ComputeScore(mode, score);
         }
 
         /// <summary>

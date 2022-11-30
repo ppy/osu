@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Containers
     /// A container that can scroll to each section inside it.
     /// </summary>
     [Cached]
-    public class SectionsContainer<T> : Container<T>
+    public partial class SectionsContainer<T> : Container<T>
         where T : Drawable
     {
         public Bindable<T> SelectedSection { get; } = new Bindable<T>();

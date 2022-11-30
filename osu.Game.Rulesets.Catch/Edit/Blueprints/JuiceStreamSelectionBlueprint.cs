@@ -22,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public class JuiceStreamSelectionBlueprint : CatchSelectionBlueprint<JuiceStream>
+    public partial class JuiceStreamSelectionBlueprint : CatchSelectionBlueprint<JuiceStream>
     {
         public override Quad SelectionQuad => HitObjectContainer.ToScreenSpace(getBoundingBox().Offset(new Vector2(0, HitObjectContainer.DrawHeight)));
 

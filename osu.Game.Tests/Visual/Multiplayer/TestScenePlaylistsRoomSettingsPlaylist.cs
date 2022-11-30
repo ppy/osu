@@ -25,7 +25,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestScenePlaylistsRoomSettingsPlaylist : OnlinePlayTestScene
+    public partial class TestScenePlaylistsRoomSettingsPlaylist : OnlinePlayTestScene
     {
         private TestPlaylist playlist;
 
@@ -159,7 +159,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
         }
 
-        private class TestPlaylist : PlaylistsRoomSettingsPlaylist
+        private partial class TestPlaylist : PlaylistsRoomSettingsPlaylist
         {
             public new IReadOnlyDictionary<PlaylistItem, RearrangeableListItem<PlaylistItem>> ItemMap => base.ItemMap;
 

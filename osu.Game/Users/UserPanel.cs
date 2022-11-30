@@ -19,7 +19,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users
 {
-    public abstract class UserPanel : OsuClickableContainer, IHasContextMenu
+    public abstract partial class UserPanel : OsuClickableContainer, IHasContextMenu
     {
         public readonly APIUser User;
 

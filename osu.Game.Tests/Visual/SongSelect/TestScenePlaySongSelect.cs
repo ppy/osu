@@ -42,7 +42,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestScenePlaySongSelect : ScreenTestScene
+    public partial class TestScenePlaySongSelect : ScreenTestScene
     {
         private BeatmapManager manager = null!;
         private RulesetStore rulesets = null!;
@@ -1055,6 +1055,18 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("mod overlay hidden", () => songSelect!.ModSelect.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestBeatmapOptionsDisabled()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+
+            AddAssert("options enabled", () => songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+            AddStep("delete all beatmaps", () => manager.Delete());
+            AddAssert("options disabled", () => !songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+        }
+
         private void waitForInitialSelection()
         {
             AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
@@ -1129,7 +1141,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 rulesets.Dispose();
         }
 
-        private class TestSongSelect : PlaySongSelect
+        private partial class TestSongSelect : PlaySongSelect
         {
             public Action? StartRequested;
 

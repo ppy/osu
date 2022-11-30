@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class KeyCounter : Container
+    public abstract partial class KeyCounter : Container
     {
         private Sprite buttonSprite;
         private Sprite glowSprite;

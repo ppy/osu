@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinComponentToolbox : EditorSidebarSection
+    public partial class SkinComponentToolbox : EditorSidebarSection
     {
         public Action<Type>? RequestPlacement;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        public class ToolboxComponentButton : OsuButton
+        public partial class ToolboxComponentButton : OsuButton
         {
             public Action<Type>? RequestPlacement;
 
@@ -171,7 +171,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        public class DependencyBorrowingContainer : Container
+        public partial class DependencyBorrowingContainer : Container
         {
             protected override bool ShouldBeConsideredForInput(Drawable child) => false;
 

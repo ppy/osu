@@ -9,11 +9,11 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class LabelledRomanisedTextBox : LabelledTextBox
+    internal partial class LabelledRomanisedTextBox : LabelledTextBox
     {
         protected override OsuTextBox CreateTextBox() => new RomanisedTextBox();
 
-        private class RomanisedTextBox : OsuTextBox
+        private partial class RomanisedTextBox : OsuTextBox
         {
             protected override bool AllowIme => false;
 
