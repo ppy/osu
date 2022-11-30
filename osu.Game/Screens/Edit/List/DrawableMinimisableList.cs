@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -44,45 +45,79 @@ namespace osu.Game.Screens.Edit.List
         public T? RepresentedItem => Model.RepresentedItem;
 
         private readonly Box box;
+        private readonly OsuSpriteText text;
 
         public DrawableMinimisableList(T item)
             : base(new DrawableListRepresetedItem<T>(item))
         {
+            SpriteIcon icon;
+            Container head;
+            ClickableContainer headClickableContainer;
+            applyAll = ApplyAction;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            InternalChild = new FillFlowContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(2),
-                Children = new Drawable[]
+                // RelativeSizeAxes = Axes.X,
+                // AutoSizeAxes = Axes.Y,
+                // Direction = FillDirection.Vertical,
+                // Spacing = new Vector2(2),
+                // Children = new Drawable[]
+                head = new Container
                 {
-                    new Container
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
+                        box = new Box
                         {
-                            box = new Box
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 1f,
+                            Height = 1f,
+                            Colour = new Colour4(255, 255, 0, 0.25f),
+                        },
+                        headClickableContainer = new ClickableContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Width = 1f,
-                                Height = 1f,
-                                Colour = new Colour4(255, 255, 0, 0.25f),
-                            },
-                            new OsuCheckbox
-                            {
-                                LabelText = @"SkinnableContainer",
-                                Current = Enabled
+                                icon = new SpriteIcon
+                                {
+                                    Size = new Vector2(8),
+                                    Icon = FontAwesome.Solid.ChevronRight,
+                                    Margin = new MarginPadding { Left = 3, Right = 3 },
+                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.CentreLeft,
+                                },
+                                text = new OsuSpriteText
+                                {
+                                    Text = GetName(item),
+                                    X = icon.LayoutSize.X,
+                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.CentreLeft,
+                                }
                             },
                         }
-                    },
-                    List
+                    }
+                },
+                List = new DrawableList<T>()
+            };
+
+            headClickableContainer.Action = () =>
+            {
+                Enabled.Toggle();
+                icon.Icon = Enabled.Value ? FontAwesome.Solid.ChevronDown : FontAwesome.Solid.ChevronRight;
+
+                if (List is not null)
+                {
+                    List.X = icon.LayoutSize.X;
+                    List.Y = head.LayoutSize.Y;
+                    // List.Height = ChildSize.Y - head.LayoutSize.Y;
+                    // List.OriginPosition = new Vector2(icon.LayoutSize.X, head.LayoutSize.Y);
+                    // List.RelativeAnchorPosition = Vector2.Divide(List.Position, List.Parent?.ChildSize ?? Vector2.One * float.MaxValue);
                 }
             };
-            List.X = 10f;
-            List.RelativeAnchorPosition = new Vector2(0.05f, 0);
 
             if (!((IDrawableListItem<T>)this).EnableSelection)
             {
