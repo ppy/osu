@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.Chat
                     CornerRadius = 2f,
                     Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = drawableUsername.Colour.Darken(1f),
+                    Colour = drawableUsername.AccentColour.Darken(1f),
                     Depth = float.MaxValue,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 });
