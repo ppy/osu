@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 => OnlinePlayDependencies?.Get(type, info) ?? parent.Get(type, info);
 
             public void Inject<T>(T instance)
-                where T : class
+                where T : class, IDependencyInjectionCandidate
                 => injectableDependencies.Inject(instance);
         }
     }
