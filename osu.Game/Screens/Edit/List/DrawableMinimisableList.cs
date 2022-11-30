@@ -136,22 +136,22 @@ namespace osu.Game.Screens.Edit.List
 
             Enabled.BindValueChanged(v =>
             {
-                if (v.NewValue) ShowList();
-                else HideList();
+                if (v.NewValue) ShowList(false);
+                else HideList(false);
             }, true);
 
             Deselect();
             representedListItem.UpdateItem();
         }
 
-        public void ShowList(bool setValue = false)
+        public void ShowList(bool setValue = true)
         {
             List?.Show();
             UpdateItem();
             if (setValue) Enabled.Value = true;
         }
 
-        public void HideList(bool setValue = false)
+        public void HideList(bool setValue = true)
         {
             List?.Hide();
             UpdateItem();

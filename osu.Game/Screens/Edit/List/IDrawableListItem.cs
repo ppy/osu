@@ -11,7 +11,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public interface IDrawableListItem<T> : IDrawableListRepresetedItem<T>
+    public interface IDrawableListItem<T> : IDrawableListRepresetedItem<T>, IDrawable
     {
         public static readonly Action<T, int> DEFAULT_SET_ITEM_DEPTH = (t, d) =>
         {
