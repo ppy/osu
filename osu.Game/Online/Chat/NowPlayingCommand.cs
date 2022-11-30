@@ -38,7 +38,7 @@ namespace osu.Game.Online.Chat
         /// Creates a new <see cref="NowPlayingCommand"/> to post the currently-playing beatmap to a parenting <see cref="IChannelPostTarget"/>.
         /// </summary>
         /// <param name="target">The target channel to post to. If <c>null</c>, the currently-selected channel will be posted to.</param>
-        public NowPlayingCommand(Channel? target = null)
+        public NowPlayingCommand(Channel target)
         {
             this.target = target;
         }
