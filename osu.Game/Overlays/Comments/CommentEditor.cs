@@ -194,8 +194,8 @@ namespace osu.Game.Overlays.Comments
 
             public EditorCommitButton()
             {
-                Width = 90;
-                Height = 25;
+                Width = 100;
+                Height = 30;
                 Add(spinner = new LoadingSpinner
                 {
                     Anchor = Anchor.Centre,
@@ -213,15 +213,6 @@ namespace osu.Game.Overlays.Comments
                     Enabled.Value = !IsLoading && !e.NewValue;
                 }, true);
             }
-
-            protected override SpriteText CreateText() => text = new OsuSpriteText
-            {
-                AlwaysPresent = true,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                Margin = new MarginPadding { Horizontal = 20 },
-            };
         }
     }
 }

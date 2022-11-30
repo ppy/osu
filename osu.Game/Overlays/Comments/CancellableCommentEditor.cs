@@ -4,9 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Resources.Localisation.Web;
 
@@ -19,30 +16,15 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load()
         {
-            ButtonsContainer.Add(new CancelButton
+            ButtonsContainer.Add(new RoundedButton
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
-                Action = () => OnCancel?.Invoke()
+                Action = () => OnCancel?.Invoke(),
+                Text = CommonStrings.ButtonsCancel,
+                Width = 100,
+                Height = 30,
             });
-        }
-
-        private sealed partial class CancelButton : RoundedButton
-        {
-            public CancelButton()
-            {
-                Width = 90;
-                Height = 25;
-            }
-
-            protected override SpriteText CreateText() => new OsuSpriteText
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                Margin = new MarginPadding { Horizontal = 20 },
-                Text = CommonStrings.ButtonsCancel
-            };
         }
     }
 }
