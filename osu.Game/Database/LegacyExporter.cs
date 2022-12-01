@@ -43,7 +43,7 @@ namespace osu.Game.Database
 
             IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
 
-            string filename = NamingUtils.GetNextBestFilename(existingExports, itemFilename, FileExtension);
+            string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
             using (var stream = exportStorage.CreateFileSafely(filename))
                 ExportModelTo(item, stream);
 

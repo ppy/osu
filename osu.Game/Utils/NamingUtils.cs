@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace osu.Game.Utils
@@ -40,17 +40,22 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Given a set of <paramref name="existingFilenames"/> and a desired target <paramref name="desiredName"/>
-        /// finds a filename closest to <paramref name="desiredName"/> that is not in <paramref name="existingFilenames"/>
-        /// <remarks>
-        /// <paramref name="desiredName"/> SHOULD NOT CONTAIN the file extension.
-        /// </remarks>
+        /// Given a set of <paramref name="existingFilenames"/> and a desired target <paramref name="desiredFilename"/>
+        /// finds a filename closest to <paramref name="desiredFilename"/> that is not in <paramref name="existingFilenames"/>
         /// </summary>
-        public static string GetNextBestFilename(IEnumerable<string> existingFilenames, string desiredName, string fileExtension)
+        public static string GetNextBestFilename(IEnumerable<string> existingFilenames, string desiredFilename)
         {
-            var stripped = existingFilenames.Select(filename => filename.Substring(0, filename.Length - fileExtension.Length));
+            string name = Path.GetFileNameWithoutExtension(desiredFilename);
+            string extension = Path.GetExtension(desiredFilename);
 
-            return $"{GetNextBestName(stripped, desiredName)}{fileExtension}";
+            string pattern = $@"^(?i){Regex.Escape(name)}(?-i)( \((?<copyNumber>[1-9][0-9]*)\))?(?i){Regex.Escape(extension)}(?-i)$";
+            var regex = new Regex(pattern, RegexOptions.Compiled);
+
+            int bestNumber = findBestNumber(existingFilenames, regex);
+
+            return bestNumber == 0
+                ? desiredFilename
+                : $"{name} ({bestNumber.ToString()}){extension}";
         }
 
         private static int findBestNumber(IEnumerable<string> existingNames, Regex regex)
