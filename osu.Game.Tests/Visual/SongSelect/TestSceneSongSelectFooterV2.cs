@@ -19,6 +19,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
             };
+
+            footer.AddButton(new FooterButtonV2());
         });
 
         [Test]
