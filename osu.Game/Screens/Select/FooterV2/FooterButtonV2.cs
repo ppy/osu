@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -130,23 +129,27 @@ namespace osu.Game.Screens.Select.FooterV2
             };
         }
 
-        public Action Hovered = null!;
-        public Action HoverLost = null!;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Enabled.BindValueChanged(_ => updateDisplay(), true);
+        }
+
         public GlobalAction? Hotkey;
 
-        protected override void UpdateAfterChildren()
-        {
-        }
+        private bool isHovered;
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateHover(true);
+            isHovered = true;
+            updateDisplay();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            updateHover(false);
+            isHovered = false;
+            updateDisplay();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -178,11 +181,16 @@ namespace osu.Game.Screens.Select.FooterV2
 
         public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
 
-        private void updateHover(bool hovered)
+        private void updateDisplay()
         {
-            Colour4 targetColour = hovered ? colourProvider.Background3.Lighten(.3f) : colourProvider.Background3;
+            if (!Enabled.Value)
+            {
+                backGroundBox.FadeColour(colourProvider.Background3.Darken(.3f));
+                return;
+            }
 
-            backGroundBox.FadeColour(targetColour, 500, Easing.OutQuint);
+            //Hover logic.
+            backGroundBox.FadeColour(isHovered && Enabled.Value ? colourProvider.Background3.Lighten(.3f) : colourProvider.Background3, 500, Easing.OutQuint);
         }
     }
 }
