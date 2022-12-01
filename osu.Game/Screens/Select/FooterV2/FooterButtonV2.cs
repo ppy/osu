@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
@@ -48,13 +50,14 @@ namespace osu.Game.Screens.Select.FooterV2
             set => icon.Icon = value;
         }
 
-        protected string Text
+        protected LocalisableString Text
         {
             set => text.Text = value;
         }
 
+        private SpriteText text = null!;
         private SpriteIcon icon = null!;
-        private OsuSpriteText text = null!;
+        protected Container TextContainer = null!;
         private Box bar = null!;
 
         [BackgroundDependencyLoader]
@@ -86,17 +89,23 @@ namespace osu.Game.Screens.Select.FooterV2
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        TextContainer = new Container
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Position = new Vector2(-SHEAR_WIDTH * (52f / button_height), 42),
+                            AutoSizeAxes = Axes.Both,
+                            Child = text = new OsuSpriteText
+                            {
+                                Font = OsuFont.TorusAlternate.With(size: 16),
+                                AlwaysPresent = true
+                            }
+                        },
                         icon = new SpriteIcon
                         {
                             //We want to offset this by the same amount as the text for aesthetic purposes
                             Position = new Vector2(-SHEAR_WIDTH * (52f / button_height), 12),
                             Size = new Vector2(20),
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre
-                        },
-                        text = new OsuSpriteText
-                        {
-                            Position = new Vector2(-SHEAR_WIDTH * (52f / button_height), 42),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre
                         },
@@ -123,11 +132,41 @@ namespace osu.Game.Screens.Select.FooterV2
         public Action HoverLost = null!;
         public GlobalAction? Hotkey;
 
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        protected override void UpdateAfterChildren()
         {
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            Hovered?.Invoke();
+
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            HoverLost?.Invoke();
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (!Enabled.Value)
+                return true;
+
+            return base.OnClick(e);
+        }
+
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Action == Hotkey && !e.Repeat)
+            {
+                TriggerClick();
+                return true;
+            }
+
             return false;
         }
 
-        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
+        public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
     }
 }
