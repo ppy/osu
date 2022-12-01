@@ -31,6 +31,30 @@ namespace osu.Game.Utils
         {
             string pattern = $@"^(?i){Regex.Escape(desiredName)}(?-i)( \((?<copyNumber>[1-9][0-9]*)\))?$";
             var regex = new Regex(pattern, RegexOptions.Compiled);
+
+            int bestNumber = findBestNumber(existingNames, regex);
+
+            return bestNumber == 0
+                ? desiredName
+                : $"{desiredName} ({bestNumber.ToString()})";
+        }
+
+        /// <summary>
+        /// Given a set of <paramref name="existingFilenames"/> and a desired target <paramref name="desiredName"/>
+        /// finds a filename closest to <paramref name="desiredName"/> that is not in <paramref name="existingFilenames"/>
+        /// <remarks>
+        /// <paramref name="desiredName"/> SHOULD NOT CONTAIN the file extension.
+        /// </remarks>
+        /// </summary>
+        public static string GetNextBestFilename(IEnumerable<string> existingFilenames, string desiredName, string fileExtension)
+        {
+            var stripped = existingFilenames.Select(filename => filename.Substring(0, filename.Length - fileExtension.Length));
+
+            return $"{GetNextBestName(stripped, desiredName)}{fileExtension}";
+        }
+
+        private static int findBestNumber(IEnumerable<string> existingNames, Regex regex)
+        {
             var takenNumbers = new HashSet<int>();
 
             foreach (string name in existingNames)
@@ -54,23 +78,7 @@ namespace osu.Game.Utils
             while (takenNumbers.Contains(bestNumber))
                 bestNumber += 1;
 
-            return bestNumber == 0
-                ? desiredName
-                : $"{desiredName} ({bestNumber})";
-        }
-
-        /// <summary>
-        /// Given a set of <paramref name="existingFilenames"/> and a desired target <paramref name="desiredName"/>
-        /// finds a filename closest to <paramref name="desiredName"/> that is not in <paramref name="existingFilenames"/>
-        /// <remarks>
-        /// <paramref name="desiredName"/> SHOULD NOT CONTAIN the file extension.
-        /// </remarks>
-        /// </summary>
-        public static string GetNextBestFilename(IEnumerable<string> existingFilenames, string desiredName, string fileExtension)
-        {
-            var stripped = existingFilenames.Select(filename => filename.Substring(0, filename.Length - fileExtension.Length));
-
-            return $"{GetNextBestName(stripped, desiredName)}{fileExtension}";
+            return bestNumber;
         }
     }
 }
