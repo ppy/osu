@@ -165,7 +165,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     break;
 
                 default:
-                    return;
+                    colour = Color4.Gray;
+                    break;
             }
 
             if (IsSelected)
