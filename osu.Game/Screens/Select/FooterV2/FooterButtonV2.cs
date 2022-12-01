@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -59,6 +60,7 @@ namespace osu.Game.Screens.Select.FooterV2
         private SpriteIcon icon = null!;
         protected Container TextContainer = null!;
         private Box bar = null!;
+        private Box backGroundBox = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -76,7 +78,7 @@ namespace osu.Game.Screens.Select.FooterV2
             CornerRadius = corner_radius;
             InternalChildren = new Drawable[]
             {
-                new Box
+                backGroundBox = new Box
                 {
                     Colour = colourProvider.Background3,
                     RelativeSizeAxes = Axes.Both
@@ -138,14 +140,21 @@ namespace osu.Game.Screens.Select.FooterV2
 
         protected override bool OnHover(HoverEvent e)
         {
-            Hovered?.Invoke();
-
+            updateHover(true);
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            HoverLost?.Invoke();
+            updateHover(false);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (!Enabled.Value)
+                return true;
+
+            return base.OnMouseDown(e);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -168,5 +177,12 @@ namespace osu.Game.Screens.Select.FooterV2
         }
 
         public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
+
+        private void updateHover(bool hovered)
+        {
+            Colour4 targetColour = hovered ? colourProvider.Background3.Lighten(.3f) : colourProvider.Background3;
+
+            backGroundBox.FadeColour(targetColour, 500, Easing.OutQuint);
+        }
     }
 }

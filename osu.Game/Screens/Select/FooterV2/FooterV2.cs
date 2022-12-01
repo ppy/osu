@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Select.FooterV2
 {
-    public partial class FooterV2 : CompositeDrawable
+    public partial class FooterV2 : Container
     {
         //Should be 60, setting to 50 for now for the sake of matching the current BackButton height.
         private const int height = 50;
