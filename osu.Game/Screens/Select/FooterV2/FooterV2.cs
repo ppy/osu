@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Select.FooterV2
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(-FooterButtonV2.SHEAR_WIDTH, 5),
+                            Spacing = new Vector2(-FooterButtonV2.SHEAR_WIDTH + 7, 0),
                             AutoSizeAxes = Axes.Both
                         }
                     }
