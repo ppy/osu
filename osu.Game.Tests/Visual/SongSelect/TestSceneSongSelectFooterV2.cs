@@ -20,7 +20,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Origin = Anchor.Centre
             };
 
-            footer.AddButton(new FooterButtonV2());
+            footer.AddButton(new FooterButtonModsV2());
+            footer.AddButton(new FooterButtonRandomV2());
+            footer.AddButton(new FooterButtonOptionsV2());
         });
 
         [Test]
