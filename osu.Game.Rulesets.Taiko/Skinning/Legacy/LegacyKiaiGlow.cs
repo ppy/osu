@@ -16,8 +16,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     internal partial class LegacyKiaiGlow : BeatSyncedContainer
     {
-        private const float colour_compensation = 1.58f;
-
         public LegacyKiaiGlow()
         {
             AlwaysPresent = true;
@@ -60,7 +58,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (effectPoint.KiaiMode)
-                this.FadeTo(colour_compensation, 180);
+                this.FadeIn(180);
             else
                 this.FadeOut(180);
         }

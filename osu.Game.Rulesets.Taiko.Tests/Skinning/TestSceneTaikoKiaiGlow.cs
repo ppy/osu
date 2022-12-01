@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             var controlPointInfo = new ControlPointInfo();
 
+            controlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
+
             if (withKiai)
                 controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
 
@@ -28,6 +30,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             {
                 ControlPointInfo = controlPointInfo
             });
+
+            Beatmap.Value.Track.Start();
         }
     }
 }
