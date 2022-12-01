@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -76,6 +75,19 @@ namespace osu.Game.Screens.Edit.List
             SpriteIcon icon;
             Container head;
             ClickableContainer headClickableContainer;
+            StateChanged = t =>
+            {
+                switch (t)
+                {
+                    case SelectionState.Selected:
+                        Selected.Invoke();
+                        break;
+
+                    case SelectionState.NotSelected:
+                        Deselected.Invoke();
+                        break;
+                }
+            };
             applyAll = ApplyAction;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -107,6 +119,10 @@ namespace osu.Game.Screens.Edit.List
                             X = icon.LayoutSize.X,
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
+                            ApplyAll = ApplyAll,
+                            GetName = getName,
+                            SetItemDepth = SetItemDepth,
+                            OnDragAction = OnDragAction,
                         }
                     }
                 },
@@ -128,11 +144,33 @@ namespace osu.Game.Screens.Edit.List
                 }
             };
 
-            if (RepresentedItem is IStateful<SelectionState> selectable)
+            List.ItemAdded += t =>
             {
-                selectable.StateChanged += this.ApplySelectionState;
-                this.ApplySelectionState(selectable.State);
-            }
+                if (t is IRearrangableDrawableListItem<T> listItem)
+                {
+                    listItem.Deselected += () =>
+                    {
+                        //If all elements are not selected we want to also deselect this element
+                        if (checkAllSelectedState(SelectionState.NotSelected)) Deselect();
+                        //If some elements are still selected, keep them selected, but deselect the representedListItem.
+                        else representedListItem.Deselect();
+                    };
+                    listItem.Selected += () =>
+                    {
+                        //if all elements of a List are selected, the representedListItem should also be selected
+                        if (checkAllSelectedState(SelectionState.Selected)) Select();
+                    };
+                }
+            };
+            representedListItem.Selected += Select;
+            representedListItem.Deselected += () =>
+            {
+                //if all items are selected, then actually deselect all items.
+                if (checkAllSelectedState(SelectionState.Selected)) Deselect();
+                //else we just want to deselect the representedListItem, because we don't actually know if the representedListItem gotClicked
+                //or we deselected it manually through a deselection of a child element
+                StateChanged.Invoke(SelectionState.NotSelected);
+            };
 
             Enabled.BindValueChanged(v =>
             {
@@ -141,7 +179,19 @@ namespace osu.Game.Screens.Edit.List
             }, true);
 
             Deselect();
-            representedListItem.UpdateItem();
+            Scheduler.Add(UpdateItem);
+        }
+
+        private bool checkAllSelectedState(SelectionState state)
+        {
+            if (List is null) return false;
+
+            foreach (var item in List.ItemMaps.Values)
+            {
+                if (item is IRearrangableDrawableListItem<T> rearrangeableItem && rearrangeableItem.State != state) return false;
+            }
+
+            return true;
         }
 
         public void ShowList(bool setValue = true)
@@ -160,6 +210,10 @@ namespace osu.Game.Screens.Edit.List
 
         public void UpdateItem()
         {
+            representedListItem.ApplyAll = ApplyAll;
+            representedListItem.GetName = getName;
+            representedListItem.SetItemDepth = SetItemDepth;
+            representedListItem.OnDragAction = OnDragAction;
             representedListItem.UpdateItem();
             List?.UpdateItem();
         }
@@ -168,31 +222,53 @@ namespace osu.Game.Screens.Edit.List
         {
             representedListItem.Select();
             List?.Select();
+            StateChanged.Invoke(SelectionState.Selected);
         }
 
         public void Deselect()
         {
             representedListItem.Deselect();
             List?.Deselect();
+            StateChanged.Invoke(SelectionState.NotSelected);
         }
 
         public void ApplyAction(Action<IDrawableListItem<T>> action) => List?.ApplyAction(action);
-        void IDrawableListItem<T>.SelectInternal() => SelectInternal();
-        void IDrawableListItem<T>.DeselectInternal() => DeselectInternal();
 
-        public void SelectInternal(bool passThroughCall = true)
+        public void SelectInternal()
         {
             representedListItem.SelectInternal();
-            if (passThroughCall) List?.SelectInternal();
+            List?.SelectInternal();
         }
 
-        public void DeselectInternal(bool passThroughCall = true)
+        public void DeselectInternal()
         {
             representedListItem.DeselectInternal();
-            if (passThroughCall) List?.DeselectInternal();
+            List?.DeselectInternal();
         }
 
         public Drawable GetDrawableListItem() => this;
         public RearrangeableListItem<IDrawableListRepresetedItem<T>> GetRearrangeableListItem() => this;
+
+        public SelectionState State
+        {
+            get => representedListItem.State;
+            set
+            {
+                switch (value)
+                {
+                    case SelectionState.Selected:
+                        Select();
+                        break;
+
+                    case SelectionState.NotSelected:
+                        Deselect();
+                        break;
+                }
+            }
+        }
+
+        public event Action<SelectionState> StateChanged;
+        public event Action Selected = () => { };
+        public event Action Deselected = () => { };
     }
 }

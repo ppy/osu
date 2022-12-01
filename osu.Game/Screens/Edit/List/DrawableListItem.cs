@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Input;
@@ -20,7 +19,7 @@ namespace osu.Game.Screens.Edit.List
     {
         private readonly OsuSpriteText text = new OsuSpriteText();
         private readonly Box box;
-        public bool Selected { get; private set; }
+        public bool IsSelected { get; private set; }
 
         public Action<T, int> SetItemDepth { get; set; } = IDrawableListItem<T>.DEFAULT_SET_ITEM_DEPTH;
         public Action OnDragAction { get; set; } = () => { };
@@ -42,6 +41,19 @@ namespace osu.Game.Screens.Edit.List
         internal DrawableListItem(IDrawableListRepresetedItem<T> represetedItem, LocalisableString name)
             : base(represetedItem)
         {
+            StateChanged = t =>
+            {
+                switch (t)
+                {
+                    case SelectionState.Selected:
+                        Selected.Invoke();
+                        break;
+
+                    case SelectionState.NotSelected:
+                        Deselected.Invoke();
+                        break;
+                }
+            };
             getName = IDrawableListItem<T>.GetDefaultText;
             ApplyAll = e => e(this);
             text.Text = name;
@@ -85,12 +97,10 @@ namespace osu.Game.Screens.Edit.List
         //imitate the existing SelectionHandler implementation
         protected override bool OnClick(ClickEvent e)
         {
-            Logger.Log("OnClick handler for DrawableListItem triggered");
-
             // while holding control, we only want to add to selection, not replace an existing selection.
             if (e.ControlPressed && e.Button == MouseButton.Left)
             {
-                if (Selected) Deselect();
+                if (IsSelected) Deselect();
                 else Select();
             }
             else
@@ -104,6 +114,7 @@ namespace osu.Game.Screens.Edit.List
         }
 
         public Drawable GetDrawableListItem() => this;
+
         public RearrangeableListItem<IDrawableListRepresetedItem<T>> GetRearrangeableListItem() => this;
 
         public void UpdateItem()
@@ -126,33 +137,43 @@ namespace osu.Game.Screens.Edit.List
 
         public void Select()
         {
+            if (IsSelected) return;
+
+            SelectInternal();
             if (RepresentedItem is IStateful<SelectionState> selectable)
                 selectable.State = SelectionState.Selected;
 
-            SelectInternal();
+            StateChanged.Invoke(SelectionState.Selected);
         }
 
         public void Deselect()
         {
+            if (!IsSelected) return;
+
+            DeselectInternal();
             if (RepresentedItem is IStateful<SelectionState> selectable)
                 selectable.State = SelectionState.NotSelected;
 
-            DeselectInternal();
+            StateChanged.Invoke(SelectionState.NotSelected);
         }
 
         public void ApplyAction(Action<IDrawableListItem<T>> action) => action(this);
 
-        public void SelectInternal() => Scheduler.Add(() =>
+        public void SelectInternal()
         {
-            Selected = true;
-            box.Show();
-        });
+            if (IsSelected) return;
 
-        public void DeselectInternal() => Scheduler.Add(() =>
+            IsSelected = true;
+            Scheduler.Add(box.Show);
+        }
+
+        public void DeselectInternal()
         {
-            Selected = false;
-            box.Hide();
-        });
+            if (!IsSelected) return;
+
+            IsSelected = false;
+            Scheduler.Add(box.Hide);
+        }
 
         protected override bool OnDragStart(DragStartEvent e)
         {
@@ -174,5 +195,27 @@ namespace osu.Game.Screens.Edit.List
         }
 
         public T? RepresentedItem => Model.RepresentedItem;
+
+        public SelectionState State
+        {
+            get => IsSelected ? SelectionState.Selected : SelectionState.NotSelected;
+            set
+            {
+                switch (value)
+                {
+                    case SelectionState.Selected:
+                        Select();
+                        break;
+
+                    case SelectionState.NotSelected:
+                        Deselect();
+                        break;
+                }
+            }
+        }
+
+        public event Action<SelectionState> StateChanged;
+        public event Action Selected = () => { };
+        public event Action Deselected = () => { };
     }
 }

@@ -65,6 +65,8 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
+        public event Action<RearrangeableListItem<IDrawableListRepresetedItem<T>>> ItemAdded = _ => { };
+
         public DrawableList()
         {
             onDragAction = default_onDragAction;
@@ -76,7 +78,13 @@ namespace osu.Game.Screens.Edit.List
             ListContainer.Spacing = new Vector2(2.5f);
             Items.BindCollectionChanged((s, t) =>
             {
-                if (t?.NewItems != null && t.NewItems.Count > 0) UpdateItem();
+                if (t?.NewItems != null && t.NewItems.Count > 0)
+                {
+                    foreach (object item in t.NewItems)
+                        ItemAdded.Invoke(ItemMaps[(IDrawableListRepresetedItem<T>)item]);
+
+                    UpdateItem();
+                }
             });
             UpdateItem();
         }

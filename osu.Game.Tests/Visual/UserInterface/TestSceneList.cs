@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             return true;
         }
 
-        private bool testElementSelected(int element) => ((DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)GetDrawableList(drawableList).ItemMaps[GetDrawableList(drawableList).Items[element]]).Selected;
+        private bool testElementSelected(int element) => ((DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)GetDrawableList(drawableList).ItemMaps[GetDrawableList(drawableList).Items[element]]).IsSelected;
 
         private void listAddItems()
         {
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             listAddItems();
             //start with regular clicks
-            AddAssert("no Item is selected", () => applyToItems(t => !t.Selected, GetDrawableList(drawableList).ItemMaps.Values));
+            AddAssert("no Item is selected", () => applyToItems(t => !t.IsSelected, GetDrawableList(drawableList).ItemMaps.Values));
             AddStep("select first item", () =>
             {
                 InputManager.MoveMouseTo(GetDrawableList(drawableList).ItemMaps[GetDrawableList(drawableList).Items[0]]);
