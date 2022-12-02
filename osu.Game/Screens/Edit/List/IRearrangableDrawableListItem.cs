@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.List
@@ -12,6 +11,5 @@ namespace osu.Game.Screens.Edit.List
     {
         event Action Selected;
         event Action Deselected;
-        public RearrangeableListItem<IDrawableListRepresetedItem<T>> GetRearrangeableListItem();
     }
 }

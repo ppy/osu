@@ -310,7 +310,7 @@ namespace osu.Game.Skinning.Editor
                     blueprintContainer.SelectionBlueprints
                                       .Children
                                       .Select(item =>
-                                          new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(item)
+                                          new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(item, DrawableListEntryType.Item)
                                       ));
 
                 componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)

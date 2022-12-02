@@ -62,7 +62,7 @@ namespace osu.Game.Skinning.Editor
         protected override void OnBlueprintAdded(SelectionBlueprint<ISkinnableDrawable> item)
         {
             base.OnBlueprintAdded(item);
-            editor.LayerSidebarList.List?.Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(item));
+            editor.LayerSidebarList.List?.Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(item, DrawableListEntryType.Item));
         }
 
         protected override void OnBlueprintRemoved(SelectionBlueprint<ISkinnableDrawable> item)

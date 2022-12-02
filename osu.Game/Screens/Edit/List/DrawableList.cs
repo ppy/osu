@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public partial class DrawableList<T> : RearrangeableListContainer<IDrawableListRepresetedItem<T>>, IDrawableListItem<T>
+    public partial class DrawableList<T> : RearrangeableListContainer<DrawableListRepresetedItem<T>>, IDrawableListItem<T>
         where T : Drawable
     {
         private Action<T, int> setItemDepth = IDrawableListItem<T>.DEFAULT_SET_ITEM_DEPTH;
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.List
         private Action<Action<IDrawableListItem<T>>> applyAll1;
         public T? RepresentedItem => null;
 
-        public IReadOnlyDictionary<IDrawableListRepresetedItem<T>, RearrangeableListItem<IDrawableListRepresetedItem<T>>> ItemMaps => ItemMap;
+        public IReadOnlyDictionary<DrawableListRepresetedItem<T>, RearrangeableListItem<DrawableListRepresetedItem<T>>> ItemMaps => ItemMap;
 
         public Func<T, LocalisableString> GetName
         {
@@ -65,12 +65,12 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        public event Action<RearrangeableListItem<IDrawableListRepresetedItem<T>>> ItemAdded = _ => { };
+        public event Action<RearrangeableListItem<DrawableListRepresetedItem<T>>> ItemAdded = _ => { };
 
         public DrawableList()
         {
             onDragAction = default_onDragAction;
-            applyAll1 = applyAll;
+            applyAll1 = ApplyAction;
 
             RelativeSizeAxes = Axes.X;
             //todo: compute this somehow add runtime
@@ -81,7 +81,17 @@ namespace osu.Game.Screens.Edit.List
                 if (t?.NewItems != null && t.NewItems.Count > 0)
                 {
                     foreach (object item in t.NewItems)
-                        ItemAdded.Invoke(ItemMaps[(IDrawableListRepresetedItem<T>)item]);
+                    {
+                        var key = item as DrawableListRepresetedItem<T>;
+                        if (key is null) return;
+
+                        ItemMaps.TryGetValue(key, out var value);
+                        if (value is null) return;
+
+                        ItemAdded.Invoke(value);
+                        //Add new items manually, if they weren't added automatically
+                        if (value.Model != key) ListContainer.Add(value);
+                    }
 
                     UpdateItem();
                 }
@@ -95,8 +105,7 @@ namespace osu.Game.Screens.Edit.List
         {
             for (int i = 0; i < Items.Count; i++)
             {
-                var representedItem = Items[i].RepresentedItem;
-                if (representedItem is null) continue;
+                T representedItem = Items[i].RepresentedItem;
 
                 SetItemDepth.Invoke(representedItem, Items.Count - i);
             }
@@ -119,18 +128,10 @@ namespace osu.Game.Screens.Edit.List
             });
         }
 
-        public virtual void Select() => applyAll(t => t.Select());
-        public virtual void Deselect() => applyAll(t => t.Deselect());
+        public virtual void Select() => ApplyAction(t => t.Select());
+        public virtual void Deselect() => ApplyAction(t => t.Deselect());
 
         public void ApplyAction(Action<IDrawableListItem<T>> action)
-        {
-            for (int i = 0; i < ListContainer.Children.Count; i++)
-            {
-                if (ListContainer.Children[i] is IDrawableListItem<T> item) item.ApplyAction(action);
-            }
-        }
-
-        private void applyAll(Action<IDrawableListItem<T>> action)
         {
             for (int i = 0; i < ListContainer.Children.Count; i++)
             {
@@ -145,25 +146,40 @@ namespace osu.Game.Screens.Edit.List
 
         protected override ScrollContainer<Drawable> CreateScrollContainer() => new OsuScrollContainer();
 
-        protected override RearrangeableListItem<IDrawableListRepresetedItem<T>> CreateDrawable(IDrawableListRepresetedItem<T> item)
+        protected override RearrangeableListItem<DrawableListRepresetedItem<T>> CreateDrawable(DrawableListRepresetedItem<T> item)
         {
             // Logger.Log("CreateDrawable");
 
-            if (item is IRearrangableDrawableListItem<T> listItem)
+            AbstractListItem<T>? newItem = null;
+
+            switch (item.Type)
             {
-                // Logger.Log("Getting RearrangeableListItem");
-                return listItem.GetRearrangeableListItem();
+                case DrawableListEntryType.Item:
+                    newItem = new DrawableListItem<T>(item)
+                    {
+                        ApplyAll = ApplyAll,
+                        GetName = GetName,
+                        SetItemDepth = SetItemDepth,
+                        OnDragAction = OnDragAction,
+                    };
+                    break;
+
+                case DrawableListEntryType.MinimisableList:
+                    newItem = new DrawableMinimisableList<T>(item)
+                    {
+                        ApplyAll = ApplyAll,
+                        GetName = GetName,
+                        SetItemDepth = SetItemDepth,
+                        OnDragAction = OnDragAction,
+                    };
+                    break;
             }
 
-            if (item.RepresentedItem is null) throw new NullReferenceException();
+            //If this hits, implement new enum Variants
+            if (newItem is null) throw new InvalidOperationException();
 
-            // Logger.Log("Making DrawableListItem");
-            return new DrawableListItem<T>(item)
-            {
-                ApplyAll = ApplyAll,
-                GetName = getName,
-            };
-            // drawable.UpdateItem();
+            Scheduler.Add(newItem.UpdateItem);
+            return newItem;
         }
     }
 }

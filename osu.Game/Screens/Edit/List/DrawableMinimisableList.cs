@@ -6,42 +6,17 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public partial class DrawableMinimisableList<T> : RearrangeableListItem<IDrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
+    public partial class DrawableMinimisableList<T> : AbstractListItem<T>
         where T : Drawable
     {
-        private Action<T, int> setItemDepth = IDrawableListItem<T>.DEFAULT_SET_ITEM_DEPTH;
-
-        public Action<T, int> SetItemDepth
-        {
-            get => setItemDepth;
-            set
-            {
-                setItemDepth = value;
-                if (List is not null) List.SetItemDepth = value;
-            }
-        }
-
-        private Action onDragAction = () => { };
-
-        public Action OnDragAction
-        {
-            get => onDragAction;
-            set
-            {
-                onDragAction = value;
-                if (List is not null) List.OnDragAction = value;
-            }
-        }
-
         private Action<Action<IDrawableListItem<T>>> applyAll;
 
-        public Action<Action<IDrawableListItem<T>>> ApplyAll
+        public override Action<Action<IDrawableListItem<T>>> ApplyAll
         {
             get => applyAll;
             set
@@ -51,43 +26,22 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private Func<T, LocalisableString> getName = IDrawableListItem<T>.GetDefaultText;
-
-        public Func<T, LocalisableString> GetName
-        {
-            get => getName;
-            set
-            {
-                if (List is not null) List.GetName = value;
-                getName = value;
-            }
-        }
-
         public BindableBool Enabled { get; } = new BindableBool();
         public readonly DrawableList<T>? List;
-        public T? RepresentedItem => Model.RepresentedItem;
 
         private readonly DrawableListItem<T> representedListItem;
 
         public DrawableMinimisableList(T item)
-            : base(new DrawableListRepresetedItem<T>(item))
+            : this(new DrawableListRepresetedItem<T>(item, DrawableListEntryType.MinimisableList))
+        {
+        }
+
+        public DrawableMinimisableList(DrawableListRepresetedItem<T> item)
+            : base(item)
         {
             SpriteIcon icon;
             Container head;
             ClickableContainer headClickableContainer;
-            StateChanged = t =>
-            {
-                switch (t)
-                {
-                    case SelectionState.Selected:
-                        Selected.Invoke();
-                        break;
-
-                    case SelectionState.NotSelected:
-                        Deselected.Invoke();
-                        break;
-                }
-            };
             applyAll = ApplyAction;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -120,13 +74,19 @@ namespace osu.Game.Screens.Edit.List
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             ApplyAll = ApplyAll,
-                            GetName = getName,
+                            GetName = GetName,
                             SetItemDepth = SetItemDepth,
                             OnDragAction = OnDragAction,
                         }
                     }
                 },
-                List = new DrawableList<T>()
+                List = new DrawableList<T>
+                {
+                    GetName = GetName,
+                    SetItemDepth = SetItemDepth,
+                    OnDragAction = OnDragAction,
+                    ApplyAll = ApplyAll,
+                }
             };
 
             headClickableContainer.Action = () =>
@@ -169,7 +129,7 @@ namespace osu.Game.Screens.Edit.List
                 if (checkAllSelectedState(SelectionState.Selected)) Deselect();
                 //else we just want to deselect the representedListItem, because we don't actually know if the representedListItem gotClicked
                 //or we deselected it manually through a deselection of a child element
-                StateChanged.Invoke(SelectionState.NotSelected);
+                InvokeStateChanged(SelectionState.NotSelected);
             };
 
             Enabled.BindValueChanged(v =>
@@ -208,48 +168,63 @@ namespace osu.Game.Screens.Edit.List
             if (setValue) Enabled.Value = false;
         }
 
-        public void UpdateItem()
+        public override void UpdateItem()
         {
             representedListItem.ApplyAll = ApplyAll;
-            representedListItem.GetName = getName;
+            representedListItem.GetName = GetName;
             representedListItem.SetItemDepth = SetItemDepth;
             representedListItem.OnDragAction = OnDragAction;
             representedListItem.UpdateItem();
-            List?.UpdateItem();
+
+            if (List is not null)
+            {
+                List.ApplyAll = ApplyAll;
+                List.GetName = GetName;
+                List.SetItemDepth = SetItemDepth;
+                List.OnDragAction = OnDragAction;
+                List.UpdateItem();
+            }
         }
 
-        public void Select()
+        public override void Select()
         {
             representedListItem.Select();
             List?.Select();
-            StateChanged.Invoke(SelectionState.Selected);
+            InvokeStateChanged(SelectionState.Selected);
         }
 
-        public void Deselect()
+        public override void Deselect()
         {
             representedListItem.Deselect();
             List?.Deselect();
-            StateChanged.Invoke(SelectionState.NotSelected);
+            InvokeStateChanged(SelectionState.NotSelected);
         }
 
-        public void ApplyAction(Action<IDrawableListItem<T>> action) => List?.ApplyAction(action);
-
-        public void SelectInternal()
+        public override void ApplyAction(Action<IDrawableListItem<T>> action)
         {
-            representedListItem.SelectInternal();
-            List?.SelectInternal();
+            representedListItem.ApplyAction(action);
+            List?.ApplyAction(action);
         }
 
-        public void DeselectInternal()
+        public override void SelectInternal(bool invokeChildMethods = true)
         {
-            representedListItem.DeselectInternal();
-            List?.DeselectInternal();
+            if (invokeChildMethods)
+            {
+                representedListItem.SelectInternal();
+                List?.SelectInternal();
+            }
         }
 
-        public Drawable GetDrawableListItem() => this;
-        public RearrangeableListItem<IDrawableListRepresetedItem<T>> GetRearrangeableListItem() => this;
+        public override void DeselectInternal(bool invokeChildMethods = true)
+        {
+            if (invokeChildMethods)
+            {
+                representedListItem.DeselectInternal();
+                List?.DeselectInternal();
+            }
+        }
 
-        public SelectionState State
+        public override SelectionState State
         {
             get => representedListItem.State;
             set
@@ -267,8 +242,14 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        public event Action<SelectionState> StateChanged;
-        public event Action Selected = () => { };
-        public event Action Deselected = () => { };
+        protected override void OnSetItemDepth(ref Action<T, int> value)
+        {
+            if (List is not null) List.SetItemDepth = value;
+        }
+
+        protected override void OnSetDragAction(ref Action value)
+        {
+            if (List is not null) List.OnDragAction = value;
+        }
     }
 }

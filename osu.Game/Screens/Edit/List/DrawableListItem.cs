@@ -4,7 +4,6 @@
 using System;
 using osu.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -14,47 +13,18 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public partial class DrawableListItem<T> : RearrangeableListItem<IDrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
+    public partial class DrawableListItem<T> : AbstractListItem<T>
         where T : Drawable
     {
         private readonly OsuSpriteText text = new OsuSpriteText();
         private readonly Box box;
         public bool IsSelected { get; private set; }
 
-        public Action<T, int> SetItemDepth { get; set; } = IDrawableListItem<T>.DEFAULT_SET_ITEM_DEPTH;
-        public Action OnDragAction { get; set; } = () => { };
+        public override Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
 
-        public Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
-
-        private Func<T, LocalisableString> getName;
-
-        public Func<T, LocalisableString> GetName
-        {
-            get => getName;
-            set
-            {
-                getName = value;
-                UpdateItem();
-            }
-        }
-
-        internal DrawableListItem(IDrawableListRepresetedItem<T> represetedItem, LocalisableString name)
+        internal DrawableListItem(DrawableListRepresetedItem<T> represetedItem, LocalisableString name)
             : base(represetedItem)
         {
-            StateChanged = t =>
-            {
-                switch (t)
-                {
-                    case SelectionState.Selected:
-                        Selected.Invoke();
-                        break;
-
-                    case SelectionState.NotSelected:
-                        Deselected.Invoke();
-                        break;
-                }
-            };
-            getName = IDrawableListItem<T>.GetDefaultText;
             ApplyAll = e => e(this);
             text.Text = name;
             AutoSizeAxes = Axes.Both;
@@ -87,7 +57,7 @@ namespace osu.Game.Screens.Edit.List
             box.Hide();
         }
 
-        public DrawableListItem(IDrawableListRepresetedItem<T> represetedItem)
+        public DrawableListItem(DrawableListRepresetedItem<T> represetedItem)
             //select the name of the from the drawable as it's name, if it is set
             //otherwise use the
             : this(represetedItem, string.Empty)
@@ -113,11 +83,7 @@ namespace osu.Game.Screens.Edit.List
             return true;
         }
 
-        public Drawable GetDrawableListItem() => this;
-
-        public RearrangeableListItem<IDrawableListRepresetedItem<T>> GetRearrangeableListItem() => this;
-
-        public void UpdateItem()
+        public override void UpdateItem()
         {
             updateText(RepresentedItem!);
 
@@ -132,10 +98,10 @@ namespace osu.Game.Screens.Edit.List
         {
             if (target is null) return;
             //Set the text to the target's name, if set. Else try and get the name of the class that defined T
-            Scheduler.Add(() => text.Text = getName(target));
+            Scheduler.Add(() => text.Text = GetName(target));
         }
 
-        public void Select()
+        public override void Select()
         {
             if (IsSelected) return;
 
@@ -143,10 +109,10 @@ namespace osu.Game.Screens.Edit.List
             if (RepresentedItem is IStateful<SelectionState> selectable)
                 selectable.State = SelectionState.Selected;
 
-            StateChanged.Invoke(SelectionState.Selected);
+            InvokeStateChanged(SelectionState.Selected);
         }
 
-        public void Deselect()
+        public override void Deselect()
         {
             if (!IsSelected) return;
 
@@ -154,12 +120,12 @@ namespace osu.Game.Screens.Edit.List
             if (RepresentedItem is IStateful<SelectionState> selectable)
                 selectable.State = SelectionState.NotSelected;
 
-            StateChanged.Invoke(SelectionState.NotSelected);
+            InvokeStateChanged(SelectionState.NotSelected);
         }
 
-        public void ApplyAction(Action<IDrawableListItem<T>> action) => action(this);
+        public override void ApplyAction(Action<IDrawableListItem<T>> action) => action(this);
 
-        public void SelectInternal()
+        public override void SelectInternal(bool invokeChildMethods = true)
         {
             if (IsSelected) return;
 
@@ -167,7 +133,7 @@ namespace osu.Game.Screens.Edit.List
             Scheduler.Add(box.Show);
         }
 
-        public void DeselectInternal()
+        public override void DeselectInternal(bool invokeChildMethods = true)
         {
             if (!IsSelected) return;
 
@@ -194,9 +160,7 @@ namespace osu.Game.Screens.Edit.List
             base.OnDragEnd(e);
         }
 
-        public T? RepresentedItem => Model.RepresentedItem;
-
-        public SelectionState State
+        public override SelectionState State
         {
             get => IsSelected ? SelectionState.Selected : SelectionState.NotSelected;
             set
@@ -214,8 +178,6 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        public event Action<SelectionState> StateChanged;
-        public event Action Selected = () => { };
-        public event Action Deselected = () => { };
+        protected override void OnSetItemDepth(ref Action<T, int> value) => UpdateItem();
     }
 }
