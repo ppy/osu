@@ -144,6 +144,30 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertCircleCount(6);
         }
 
+        [Test]
+        public void TestConvertToStream()
+        {
+            addMovementStep(new Vector2(210, 10));
+            addSeekStep(4);
+            addClickStep(MouseButton.Right);
+            assertCircleCount(5);
+            AddStep("convert to stream", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.F);
+                InputManager.ReleaseKey(Key.LShift);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            assertPlaced(false);
+            assertHitCircles(Enumerable.Range(0, 5).Select(i => (new Vector2(10 + 50 * i, 10), i)).ToArray());
+            AddStep("select circle creation tool", () => InputManager.Key(Key.Number2));
+            addMovementStep(new Vector2(210));
+            addClickStep(MouseButton.Left);
+            AddStep("undo", () => Editor.Undo());
+            assertHitCircles(Enumerable.Range(0, 5).Select(i => (new Vector2(10 + 50 * i, 10), i)).ToArray());
+        }
+
         private void addMovementStep(Vector2 position) => AddStep($"move mouse to {position}", () => InputManager.MoveMouseTo(playfield.ToScreenSpace(position)));
 
         private void addClickStep(MouseButton button) => AddStep($"click {button}", () => InputManager.Click(button));
