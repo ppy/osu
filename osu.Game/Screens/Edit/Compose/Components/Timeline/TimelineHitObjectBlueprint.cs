@@ -18,6 +18,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -53,6 +54,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public TimelineHitObjectBlueprint(HitObject item)
             : base(item)
@@ -165,7 +169,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     break;
 
                 default:
-                    return;
+                    colour = colourProvider.Highlight1;
+                    break;
             }
 
             if (IsSelected)
