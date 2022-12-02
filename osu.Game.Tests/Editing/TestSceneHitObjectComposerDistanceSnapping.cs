@@ -67,20 +67,7 @@ namespace osu.Game.Tests.Editing
         {
             AddStep($"set slider multiplier = {multiplier}", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = multiplier);
 
-            assertSnapDistance(100 * multiplier, null);
-        }
-
-        [TestCase(1)]
-        [TestCase(2)]
-        public void TestSpeedMultiplierDoesNotChangeDistanceSnap(float multiplier)
-        {
-            assertSnapDistance(100, new HitObject
-            {
-                DifficultyControlPoint = new DifficultyControlPoint
-                {
-                    SliderVelocity = multiplier
-                }
-            });
+            assertSnapDistance(100 * multiplier);
         }
 
         [TestCase(1)]
@@ -89,7 +76,7 @@ namespace osu.Game.Tests.Editing
         {
             AddStep($"set divisor = {divisor}", () => BeatDivisor.Value = divisor);
 
-            assertSnapDistance(100f / divisor, null);
+            assertSnapDistance(100f / divisor);
         }
 
         [Test]
@@ -198,20 +185,20 @@ namespace osu.Game.Tests.Editing
             assertSnappedDistance(400, 400);
         }
 
-        private void assertSnapDistance(float expectedDistance, HitObject? referenceObject)
-            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(referenceObject ?? new HitObject()), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
+        private void assertSnapDistance(float expectedDistance)
+            => AddAssert($"distance is {expectedDistance}", () => composer.BeatSnapDistance, () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
 
         private void assertDurationToDistance(double duration, float expectedDistance, HitObject? referenceObject = null)
-            => AddAssert($"duration = {duration} -> distance = {expectedDistance}", () => composer.DurationToDistance(referenceObject ?? new HitObject(), duration), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
+            => AddAssert($"duration = {duration} -> distance = {expectedDistance}", () => composer.DurationToDistance(referenceObject?.GetEndTime() ?? 0, duration), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
 
         private void assertDistanceToDuration(float distance, double expectedDuration, HitObject? referenceObject = null)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration}", () => composer.DistanceToDuration(referenceObject ?? new HitObject(), distance), () => Is.EqualTo(expectedDuration).Within(Precision.FLOAT_EPSILON));
+            => AddAssert($"distance = {distance} -> duration = {expectedDuration}", () => composer.DistanceToDuration(referenceObject?.GetEndTime() ?? 0, distance), () => Is.EqualTo(expectedDuration).Within(Precision.FLOAT_EPSILON));
 
         private void assertSnappedDuration(float distance, double expectedDuration, HitObject? referenceObject = null)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.FindSnappedDuration(referenceObject ?? new HitObject(), distance), () => Is.EqualTo(expectedDuration).Within(Precision.FLOAT_EPSILON));
+            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.FindSnappedDuration(referenceObject?.GetEndTime() ?? 0, distance), () => Is.EqualTo(expectedDuration).Within(Precision.FLOAT_EPSILON));
 
         private void assertSnappedDistance(float distance, float expectedDistance, HitObject? referenceObject = null)
-            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.FindSnappedDistance(referenceObject ?? new HitObject(), distance), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
+            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.FindSnappedDistance(referenceObject?.GetEndTime() ?? 0, distance), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
 
         private partial class TestHitObjectComposer : OsuHitObjectComposer
         {

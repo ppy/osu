@@ -51,14 +51,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float dx = Math.Max(StartPosition.X, DrawWidth - StartPosition.X);
             float dy = Math.Max(StartPosition.Y, DrawHeight - StartPosition.Y);
             float maxDistance = new Vector2(dx, dy).Length;
-            int requiredCircles = Math.Min(MaxIntervals, (int)(maxDistance / DistanceBetweenTicks));
 
             // We need to offset the drawn lines to the next valid snap for the currently selected divisor.
             //
             // Picture the scenario where the user has just placed an object on a 1/2 snap, then changes to
             // 1/3 snap and expects to be able to place the next object on a valid 1/3 snap, regardless of the
             // fact that the 1/2 snap reference object is not valid for 1/3 snapping.
-            float offset = SnapProvider.FindSnappedDistance(ReferenceObject, 0);
+            float offset = (float)(SnapProvider.FindSnappedDistance(ReferenceObject.GetEndTime(), 0) * DistanceSpacingMultiplier.Value);
+
+            int requiredCircles = Math.Min(MaxIntervals, (int)((maxDistance - offset) / DistanceBetweenTicks) + 1);
 
             for (int i = 0; i < requiredCircles; i++)
             {
@@ -98,17 +99,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (travelLength < DistanceBetweenTicks)
                 travelLength = DistanceBetweenTicks;
 
+            double referenceTime = ReferenceObject.GetEndTime();
+
             // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
             // to allow for snapping at a non-multiplied ratio.
-            float snappedDistance = SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacingMultiplier);
-            double snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
+            float snappedDistance = SnapProvider.FindSnappedDistance(referenceTime, travelLength / distanceSpacingMultiplier);
+            double snappedTime = StartTime + SnapProvider.DistanceToDuration(referenceTime, snappedDistance);
 
             if (snappedTime > LatestEndTime)
             {
                 double tickLength = Beatmap.GetBeatLengthAtTime(StartTime);
 
-                snappedDistance = SnapProvider.DurationToDistance(ReferenceObject, MaxIntervals * tickLength);
-                snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
+                snappedDistance = SnapProvider.DurationToDistance(referenceTime, MaxIntervals * tickLength);
+                snappedTime = StartTime + SnapProvider.DistanceToDuration(referenceTime, snappedDistance);
             }
 
             // The multiplier can then be reapplied to the final position.
@@ -146,9 +149,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
 
                 float distanceSpacingMultiplier = (float)snapProvider.DistanceSpacingMultiplier.Value;
-                double timeFromReferencePoint = editorClock.CurrentTime - referenceObject.GetEndTime();
+                double referenceTime = referenceObject.GetEndTime();
+                double timeFromReferencePoint = editorClock.CurrentTime - referenceTime;
 
-                float distanceForCurrentTime = snapProvider.DurationToDistance(referenceObject, timeFromReferencePoint)
+                float distanceForCurrentTime = snapProvider.DurationToDistance(referenceTime, timeFromReferencePoint)
                                                * distanceSpacingMultiplier;
 
                 float timeBasedAlpha = 1 - Math.Clamp(Math.Abs(distanceForCurrentTime - Size.X / 2) / 30, 0, 1);

@@ -43,6 +43,8 @@ namespace osu.Game.Rulesets.Edit
             Precision = 0.01,
         };
 
+        public virtual float BeatSnapDistance => (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * 1 / BeatSnapProvider.BeatDivisor);
+
         IBindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
 
         private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
@@ -237,42 +239,33 @@ namespace osu.Game.Rulesets.Edit
             return true;
         }
 
-        public virtual float GetBeatSnapDistanceAt(HitObject referenceObject)
+        public virtual float DurationToDistance(double referenceTime, double duration)
         {
-            return (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * 1 / BeatSnapProvider.BeatDivisor);
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            return (float)(duration / beatLength * BeatSnapDistance);
         }
 
-        public virtual float DurationToDistance(HitObject referenceObject, double duration)
+        public virtual double DistanceToDuration(double referenceTime, float distance)
         {
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
-            return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceObject));
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            return distance / BeatSnapDistance * beatLength;
         }
 
-        public virtual double DistanceToDuration(HitObject referenceObject, float distance)
+        public virtual double FindSnappedDuration(double referenceTime, float distance)
+            => BeatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
+
+        public virtual float FindSnappedDistance(double referenceTime, float distance)
         {
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
-            return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength;
-        }
+            double endTime = referenceTime + DistanceToDuration(referenceTime, distance);
 
-        public virtual double FindSnappedDuration(HitObject referenceObject, float distance)
-            => BeatSnapProvider.SnapTime(referenceObject.StartTime + DistanceToDuration(referenceObject, distance), referenceObject.StartTime) - referenceObject.StartTime;
-
-        public virtual float FindSnappedDistance(HitObject referenceObject, float distance)
-        {
-            double startTime = referenceObject.StartTime;
-
-            double actualDuration = startTime + DistanceToDuration(referenceObject, distance);
-
-            double snappedEndTime = BeatSnapProvider.SnapTime(actualDuration, startTime);
-
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(startTime);
+            double snappedEndTime = BeatSnapProvider.SnapTime(endTime, referenceTime);
 
             // we don't want to exceed the actual duration and snap to a point in the future.
             // as we are snapping to beat length via SnapTime (which will round-to-nearest), check for snapping in the forward direction and reverse it.
-            if (snappedEndTime > actualDuration + 1)
-                snappedEndTime -= beatLength;
+            if (snappedEndTime > endTime + 1)
+                snappedEndTime -= BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
 
-            return DurationToDistance(referenceObject, snappedEndTime - startTime);
+            return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
         }
 
         private partial class DistanceSpacingToast : Toast

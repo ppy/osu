@@ -193,15 +193,15 @@ namespace osu.Game.Tests.Visual.Editing
 
             IBindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
 
-            public float GetBeatSnapDistanceAt(HitObject referenceObject) => beat_snap_distance;
+            public float BeatSnapDistance => beat_snap_distance;
 
-            public float DurationToDistance(HitObject referenceObject, double duration) => (float)duration;
+            public float DurationToDistance(double referenceTime, double duration) => (float)duration;
 
-            public double DistanceToDuration(HitObject referenceObject, float distance) => distance;
+            public double DistanceToDuration(double referenceTime, float distance) => distance;
 
-            public double FindSnappedDuration(HitObject referenceObject, float distance) => 0;
+            public double FindSnappedDuration(double referenceTime, float distance) => 0;
 
-            public float FindSnappedDistance(HitObject referenceObject, float distance) => 0;
+            public float FindSnappedDistance(double referenceTime, float distance) => 0;
         }
     }
 }

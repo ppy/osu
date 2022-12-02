@@ -230,7 +230,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateSlider()
         {
-            HitObject.Path.ExpectedDistance.Value = HitObject.DifficultyControlPoint.SliderVelocity * (snapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance);
+            HitObject.SnapTo(snapProvider);
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);

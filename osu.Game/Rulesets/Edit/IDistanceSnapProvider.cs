@@ -6,7 +6,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -24,45 +23,43 @@ namespace osu.Game.Rulesets.Edit
         IBindable<double> DistanceSpacingMultiplier { get; }
 
         /// <summary>
-        /// Retrieves the distance between two points within a timing point that are one beat length apart.
+        /// The distance between two points within a timing point that are one beat length apart.
         /// </summary>
-        /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
-        /// <returns>The distance between two points residing in the timing point that are one beat length apart.</returns>
-        float GetBeatSnapDistanceAt(HitObject referenceObject);
+        float BeatSnapDistance { get; }
 
         /// <summary>
         /// Converts a duration to a distance without applying any snapping.
         /// </summary>
-        /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
+        /// <param name="referenceTime">A time to be used as a reference point for this operation.</param>
         /// <param name="duration">The duration to convert.</param>
         /// <returns>A value that represents <paramref name="duration"/> as a distance in the timing point.</returns>
-        float DurationToDistance(HitObject referenceObject, double duration);
+        float DurationToDistance(double referenceTime, double duration);
 
         /// <summary>
         /// Converts a distance to a duration without applying any snapping.
         /// </summary>
-        /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
+        /// <param name="referenceTime">A time to be used as a reference point for this operation.</param>
         /// <param name="distance">The distance to convert.</param>
         /// <returns>A value that represents <paramref name="distance"/> as a duration in the timing point.</returns>
-        double DistanceToDuration(HitObject referenceObject, float distance);
+        double DistanceToDuration(double referenceTime, float distance);
 
         /// <summary>
         /// Given a distance from the provided hit object, find the valid snapped duration.
         /// </summary>
-        /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
+        /// <param name="referenceTime">A time to be used as a reference point for this operation.</param>
         /// <param name="distance">The distance to convert.</param>
         /// <returns>A value that represents <paramref name="distance"/> as a duration snapped to the closest beat of the timing point.</returns>
-        double FindSnappedDuration(HitObject referenceObject, float distance);
+        double FindSnappedDuration(double referenceTime, float distance);
 
         /// <summary>
         /// Given a distance from the provided hit object, find the valid snapped distance.
         /// </summary>
-        /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
+        /// <param name="referenceTime">A time to be used as a reference point for this operation.</param>
         /// <param name="distance">The distance to convert.</param>
         /// <returns>
         /// A value that represents <paramref name="distance"/> snapped to the closest beat of the timing point.
         /// The distance will always be less than or equal to the provided <paramref name="distance"/>.
         /// </returns>
-        float FindSnappedDistance(HitObject referenceObject, float distance);
+        float FindSnappedDistance(double referenceTime, float distance);
     }
 }

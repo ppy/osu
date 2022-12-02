@@ -81,7 +81,8 @@ namespace osu.Game.Rulesets.Catch.Edit
             //
             // The implementation below is probably correct but should be checked if/when exposed via controls.
 
-            float expectedDistance = DurationToDistance(before, after.StartTime - before.GetEndTime());
+            double beforeTime = before.GetEndTime();
+            float expectedDistance = DurationToDistance(beforeTime, after.StartTime - beforeTime);
             float actualDistance = Math.Abs(((CatchHitObject)before).EffectiveX - ((CatchHitObject)after).EffectiveX);
 
             return actualDistance / expectedDistance;

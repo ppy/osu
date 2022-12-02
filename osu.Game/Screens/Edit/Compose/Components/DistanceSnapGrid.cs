@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -97,14 +96,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void updateSpacing()
         {
             float distanceSpacingMultiplier = (float)DistanceSpacingMultiplier.Value;
-            float beatSnapDistance = SnapProvider.GetBeatSnapDistanceAt(ReferenceObject);
+            float beatSnapDistance = SnapProvider.BeatSnapDistance;
 
             DistanceBetweenTicks = beatSnapDistance * distanceSpacingMultiplier;
 
             if (LatestEndTime == null)
                 MaxIntervals = int.MaxValue;
             else
-                MaxIntervals = (int)((LatestEndTime.Value - StartTime) / SnapProvider.DistanceToDuration(ReferenceObject, beatSnapDistance));
+                MaxIntervals = (int)((LatestEndTime.Value - StartTime) / SnapProvider.DistanceToDuration(StartTime, beatSnapDistance));
 
             gridCache.Invalidate();
         }
@@ -142,7 +141,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             var timingPoint = Beatmap.ControlPointInfo.TimingPointAt(StartTime);
             double beatLength = timingPoint.BeatLength / beatDivisor.Value;
-            int beatIndex = (int)Math.Round((StartTime - timingPoint.Time) / beatLength);
+            int beatIndex = (int)((StartTime - timingPoint.Time) / beatLength);
 
             var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
 
