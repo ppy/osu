@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -41,12 +42,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select stream creation tool", () => InputManager.Key(Key.Number5));
             addMovementStep(new Vector2(10));
             addClickStep(MouseButton.Left);
-            assertPlaced(true);
-            AddStep("get stream", () =>
-            {
-                stream = getStream();
-                visualiser = blueprintContainer.ChildrenOfType<PathControlPointVisualiser<Stream>>().First();
-            });
+            AddStep("get stream", () => stream = getStream());
         }
 
         [Test]
@@ -106,6 +102,19 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addAccelStep(-4f);
             assertControlPointAccel(2, -2);
             assertCircleCount(22);
+            AddStep("get control point visualiser", () => visualiser = blueprintContainer.ChildrenOfType<PathControlPointVisualiser<Stream>>().First());
+            moveMouseToControlPoint(5);
+            addClickStep(MouseButton.Left);
+            addContextMenuCurveTypeItemStep("Perfect curve");
+            assertControlPointCount(5);
+            moveMouseToControlPoint(3);
+            addClickStep(MouseButton.Left);
+            addContextMenuItemStep("Delete control point");
+            assertControlPointCount(4);
+            assertControlPointTime(1, 10);
+            assertControlPointTime(2, 17);
+            assertControlPointTime(3, 24);
+            assertCircleCount(25);
             // Convert to hit circles
             addMovementStep(new Vector2(512, 386));
             AddStep("start drag select", () => InputManager.PressButton(MouseButton.Left));
@@ -204,6 +213,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private void assertControlPointAccel(int index, double amount) =>
             AddAssert($"stream control point {index} accel {amount}", () => stream != null && Precision.AlmostEquals(amount, stream.StreamPath.ControlPoints[index].Acceleration, 1E-3));
 
+        private void assertControlPointCount(int count) => AddAssert($"control point count is {count}", () => stream != null && stream.StreamPath.ControlPoints.Count == count);
+
         private Stream? getStream() => EditorBeatmap.PlacementObject.Value as Stream ?? EditorBeatmap.HitObjects.OfType<Stream>().FirstOrDefault();
 
         private double getTime(int ticks) => firstTimingPointTime() + EditorBeatmap.GetBeatLengthAtTime(firstTimingPointTime()) * ticks;
@@ -249,6 +260,41 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 }
 
                 return true;
+            });
+        }
+
+        private void moveMouseToControlPoint(int index)
+        {
+            AddStep($"move mouse to control point {index}", () =>
+            {
+                if (stream is null || visualiser is null) return;
+
+                Vector2 position = stream.Path.ControlPoints[index].Position + stream.Position;
+                InputManager.MoveMouseTo(playfield.ToScreenSpace(position));
+            });
+        }
+
+        private void addContextMenuItemStep(string contextMenuText)
+        {
+            AddStep($"click context menu item \"{contextMenuText}\"", () =>
+            {
+                if (visualiser is null) return;
+
+                MenuItem? item = visualiser.ContextMenuItems.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
+
+                item?.Action?.Value();
+            });
+        }
+
+        private void addContextMenuCurveTypeItemStep(string contextMenuText)
+        {
+            AddStep($"change curve type to \"{contextMenuText}\"", () =>
+            {
+                if (visualiser is null) return;
+
+                MenuItem? item = visualiser.ContextMenuItems.FirstOrDefault(menuItem => menuItem.Text.Value == "Curve type")?.Items.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
+
+                item?.Action?.Value();
             });
         }
     }
