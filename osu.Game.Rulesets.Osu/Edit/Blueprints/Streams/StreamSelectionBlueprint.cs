@@ -68,14 +68,80 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
             controlPoints.BindTo(HitObject.Path.ControlPoints);
 
+            // Initialize the control point matching
+            initializeControlPointMatching();
+
             pathVersion.BindTo(HitObject.Path.Version);
-            pathVersion.BindValueChanged(_ => editorBeatmap?.Update(HitObject));
+            pathVersion.BindValueChanged(_ => Scheduler.AddOnce(updateStreamControlPointCountAndMatching));
 
             StreamPiece.UpdateFrom(HitObject);
 
             if (editorBeatmap != null)
                 selectedObjects.BindTo(editorBeatmap.SelectedHitObjects);
             selectedObjects.BindCollectionChanged((_, _) => updateVisualDefinition(), true);
+        }
+
+        private Dictionary<PathControlPoint, StreamControlPoint> controlPointMatching = new Dictionary<PathControlPoint, StreamControlPoint>();
+
+        private void initializeControlPointMatching()
+        {
+            int j = 1;
+
+            for (int i = 1; i < controlPoints.Count; i++)
+            {
+                if (j >= HitObject.StreamPath.ControlPoints.Count) break;
+
+                var pathControlPoint = controlPoints[i];
+
+                if (pathControlPoint.Type == null && i != controlPoints.Count - 1) continue;
+
+                controlPointMatching.Add(pathControlPoint, HitObject.StreamPath.ControlPoints[j++]);
+            }
+        }
+
+        private void updateStreamControlPointCountAndMatching()
+        {
+            // Find added/removed path control points which separate segments and update the stream control points to match the changes
+            double beatLength = editorBeatmap?.GetBeatLengthAtTime(HitObject.StartTime) ?? 100;
+            double lastTime = 0;
+            int jMin = 1;
+            var newControlPointMatching = new Dictionary<PathControlPoint, StreamControlPoint>();
+            var newStreamControlPoints = new List<StreamControlPoint>
+            {
+                new StreamControlPoint()
+            };
+
+            for (int i = 1; i < controlPoints.Count; i++)
+            {
+                var pathControlPoint = controlPoints[i];
+                if (pathControlPoint.Type == null && i != controlPoints.Count - 1) continue;
+
+                if (controlPointMatching.ContainsKey(pathControlPoint))
+                {
+                    var streamControlPoint = controlPointMatching[pathControlPoint];
+                    int index = HitObject.StreamPath.ControlPoints.IndexOf(streamControlPoint);
+
+                    if (index >= jMin)
+                    {
+                        newStreamControlPoints.Add(streamControlPoint);
+                        newControlPointMatching.Add(pathControlPoint, streamControlPoint);
+                        jMin = index + 1;
+                        lastTime = streamControlPoint.Time;
+                        continue;
+                    }
+                }
+
+                // Make a new stream control point between the previous and next existing stream control point
+                var newStreamControlPoint = new StreamControlPoint(lastTime + beatLength, beatLength);
+                newStreamControlPoints.Add(newStreamControlPoint);
+                newControlPointMatching.Add(pathControlPoint, newStreamControlPoint);
+                lastTime = newStreamControlPoint.Time;
+            }
+
+            HitObject.StreamPath.ControlPoints.Clear();
+            HitObject.StreamPath.ControlPoints.AddRange(newStreamControlPoints);
+            controlPointMatching = newControlPointMatching;
+            editorBeatmap?.Update(HitObject);
         }
 
         public override bool HandleQuickDeletion()
