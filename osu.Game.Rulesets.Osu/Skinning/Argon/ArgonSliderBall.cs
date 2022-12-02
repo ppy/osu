@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonSliderBall : CircularContainer
+    public partial class ArgonSliderBall : CircularContainer
     {
         private readonly Box fill;
         private readonly SpriteIcon icon;

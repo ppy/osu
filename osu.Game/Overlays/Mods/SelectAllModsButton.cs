@@ -16,7 +16,7 @@ using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class SelectAllModsButton : ShearedButton, IKeyBindingHandler<PlatformAction>
+    public partial class SelectAllModsButton : ShearedButton, IKeyBindingHandler<PlatformAction>
     {
         private readonly Bindable<IReadOnlyList<Mod>> selectedMods = new Bindable<IReadOnlyList<Mod>>();
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<ModState>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>();

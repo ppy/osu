@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    public class ArgonStageBackground : CompositeDrawable
+    public partial class ArgonStageBackground : CompositeDrawable
     {
         public ArgonStageBackground()
         {

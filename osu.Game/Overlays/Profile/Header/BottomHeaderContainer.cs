@@ -23,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class BottomHeaderContainer : CompositeDrawable
+    public partial class BottomHeaderContainer : CompositeDrawable
     {
         public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 

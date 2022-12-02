@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.AccountCreation
 {
-    public class ScreenWarning : AccountCreationScreen
+    public partial class ScreenWarning : AccountCreationScreen
     {
         private OsuTextFlowContainer multiAccountExplanationText;
         private LinkFlowContainer furtherAssistance;

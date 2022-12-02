@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class Bar : Container, IHasAccentColour
+    public partial class Bar : Container, IHasAccentColour
     {
         private readonly Box background;
         private readonly Box bar;

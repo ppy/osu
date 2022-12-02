@@ -14,7 +14,7 @@ using osu.Framework.Utils;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
 {
-    public class VisualiserContainer : Container
+    public partial class VisualiserContainer : Container
     {
         /// <summary>
         /// Number of lines in the visualiser.
@@ -61,7 +61,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             allLines.Remove(allLines.First());
         }
 
-        private class VisualiserLine : Container
+        private partial class VisualiserLine : Container
         {
             /// <summary>
             /// Time offset.

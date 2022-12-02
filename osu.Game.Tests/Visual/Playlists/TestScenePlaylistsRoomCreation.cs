@@ -33,7 +33,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsRoomCreation : OnlinePlayTestScene
+    public partial class TestScenePlaylistsRoomCreation : OnlinePlayTestScene
     {
         private BeatmapManager manager;
 
@@ -219,7 +219,7 @@ namespace osu.Game.Tests.Visual.Playlists
             importedBeatmap = manager.Import(beatmap.BeatmapInfo.BeatmapSet)?.Value.Detach();
         });
 
-        private class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
+        private partial class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
         {
             public new Bindable<PlaylistItem> SelectedItem => base.SelectedItem;
 

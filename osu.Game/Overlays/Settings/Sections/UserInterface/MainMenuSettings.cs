@@ -14,7 +14,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
-    public class MainMenuSettings : SettingsSubsection
+    public partial class MainMenuSettings : SettingsSubsection
     {
         protected override LocalisableString Header => UserInterfaceStrings.MainMenuHeader;
 

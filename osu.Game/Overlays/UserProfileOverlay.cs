@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class UserProfileOverlay : FullscreenOverlay<ProfileHeader>
+    public partial class UserProfileOverlay : FullscreenOverlay<ProfileHeader>
     {
         private ProfileSection lastSection;
         private ProfileSection[] sections;
@@ -152,7 +152,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class ProfileSectionTabControl : OverlayTabControl<ProfileSection>
+        private partial class ProfileSectionTabControl : OverlayTabControl<ProfileSection>
         {
             private const float bar_height = 2;
 
@@ -182,7 +182,7 @@ namespace osu.Game.Overlays
 
             protected override bool OnHover(HoverEvent e) => true;
 
-            private class ProfileSectionTabItem : OverlayTabItem
+            private partial class ProfileSectionTabItem : OverlayTabItem
             {
                 public ProfileSectionTabItem(ProfileSection value)
                     : base(value)
@@ -196,7 +196,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class ProfileSectionsContainer : SectionsContainer<ProfileSection>
+        private partial class ProfileSectionsContainer : SectionsContainer<ProfileSection>
         {
             public ProfileSectionsContainer()
             {

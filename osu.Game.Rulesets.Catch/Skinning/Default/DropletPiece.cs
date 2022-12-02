@@ -7,7 +7,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class DropletPiece : CatchHitObjectPiece
+    public partial class DropletPiece : CatchHitObjectPiece
     {
         protected override Drawable HyperBorderPiece { get; }
 

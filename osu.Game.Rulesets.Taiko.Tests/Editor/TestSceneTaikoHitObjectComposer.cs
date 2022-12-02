@@ -16,7 +16,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Editor
 {
-    public class TestSceneTaikoHitObjectComposer : EditorClockTestScene
+    public partial class TestSceneTaikoHitObjectComposer : EditorClockTestScene
     {
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
         {
         }
 
-        private class TestComposer : CompositeDrawable
+        private partial class TestComposer : CompositeDrawable
         {
             [Cached(typeof(EditorBeatmap))]
             [Cached(typeof(IBeatSnapProvider))]

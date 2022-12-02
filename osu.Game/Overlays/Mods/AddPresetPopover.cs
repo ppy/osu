@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    internal class AddPresetPopover : OsuPopover
+    internal partial class AddPresetPopover : OsuPopover
     {
         private readonly AddPresetButton button;
 

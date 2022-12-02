@@ -13,7 +13,7 @@ using osu.Game.Overlays.Settings.Sections.Audio;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class AudioSection : SettingsSection
+    public partial class AudioSection : SettingsSection
     {
         public override LocalisableString Header => AudioSettingsStrings.AudioSectionHeader;
 

@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ExternalLinkButton : CompositeDrawable, IHasTooltip, IHasContextMenu
+    public partial class ExternalLinkButton : CompositeDrawable, IHasTooltip, IHasContextMenu
     {
         public string? Link { get; set; }
 

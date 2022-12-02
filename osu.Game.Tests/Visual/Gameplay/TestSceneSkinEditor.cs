@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinEditor : PlayerTestScene
+    public partial class TestSceneSkinEditor : PlayerTestScene
     {
         private SkinEditor? skinEditor;
 

@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class PreviousUsernames : CompositeDrawable
+    public partial class PreviousUsernames : CompositeDrawable
     {
         private const int duration = 200;
         private const int margin = 10;
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             this.MoveToY(0, duration, Easing.OutQuint);
         }
 
-        private class HoverIconContainer : Container
+        private partial class HoverIconContainer : Container
         {
             public Action ActivateHover;
 
