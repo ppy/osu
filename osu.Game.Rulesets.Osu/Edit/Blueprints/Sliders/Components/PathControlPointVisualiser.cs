@@ -379,7 +379,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     }
                 };
 
-                if (splittableCount > 0)
+                if (splittableCount > 0 && SplitControlPointsRequested != null)
                 {
                     menuItems.Add(new OsuMenuItem($"Split {"control point".ToQuantity(splittableCount, splittableCount > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}",
                         MenuItemType.Destructive,
