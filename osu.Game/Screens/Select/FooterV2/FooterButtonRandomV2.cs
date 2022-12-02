@@ -26,11 +26,11 @@ namespace osu.Game.Screens.Select.FooterV2
         private bool rewindSearch;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colour)
         {
             //TODO: use https://fontawesome.com/icons/shuffle?s=solid&f=classic when local Fontawesome is updated
             Icon = FontAwesome.Solid.Random;
-            AccentColour = Colour4.FromHex("#66CCFF");
+            AccentColour = colour.Blue1;
             TextContainer.Add(persistentText = new Container
             {
                 Anchor = Anchor.Centre,
