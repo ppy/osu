@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Select.FooterV2
             {
                 overlays.Add(overlay);
                 button.Action = () => showOverlay(overlay);
+                button.OverlayState.BindTo(overlay.State);
             }
 
             buttons.Add(button);

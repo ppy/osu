@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,8 +26,11 @@ namespace osu.Game.Screens.Select.FooterV2
         private const int button_height = 120;
         private const int button_width = 140;
         private const int corner_radius = 10;
+        private const int transition_length = 500;
 
         public const float SHEAR_WIDTH = 16;
+
+        public Bindable<Visibility> OverlayState = new Bindable<Visibility>();
 
         protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / button_height, 0);
 
@@ -133,6 +137,7 @@ namespace osu.Game.Screens.Select.FooterV2
         {
             base.LoadComplete();
             Enabled.BindValueChanged(_ => updateDisplay(), true);
+            OverlayState.BindValueChanged(_ => updateDisplay());
         }
 
         public GlobalAction? Hotkey;
@@ -185,12 +190,23 @@ namespace osu.Game.Screens.Select.FooterV2
         {
             if (!Enabled.Value)
             {
-                backGroundBox.FadeColour(colourProvider.Background3.Darken(.3f));
+                backGroundBox.FadeColour(colourProvider.Background3.Darken(0.3f), transition_length, Easing.OutQuint);
                 return;
             }
 
+            switch (OverlayState.Value)
+            {
+                case Visibility.Visible:
+                    backGroundBox.FadeColour(buttonAccentColour.Darken(0.5f), transition_length, Easing.OutQuint);
+                    return;
+
+                case Visibility.Hidden:
+                    backGroundBox.FadeColour(buttonAccentColour, transition_length, Easing.OutQuint);
+                    break;
+            }
+
             //Hover logic.
-            backGroundBox.FadeColour(isHovered && Enabled.Value ? colourProvider.Background3.Lighten(.3f) : colourProvider.Background3, 500, Easing.OutQuint);
+            backGroundBox.FadeColour(isHovered && Enabled.Value ? colourProvider.Background3.Lighten(.3f) : colourProvider.Background3, transition_length, Easing.OutQuint);
         }
     }
 }

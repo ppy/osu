@@ -3,8 +3,12 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Select.FooterV2;
 using osuTK;
 using osuTK.Input;
@@ -14,9 +18,12 @@ namespace osu.Game.Tests.Visual.SongSelect
     public partial class TestSceneSongSelectFooterV2 : OsuManualInputManagerTestScene
     {
         private FooterButtonRandomV2 randomButton = null!;
+        private FooterButtonModsV2 modsButton = null!;
 
         private bool nextRandomCalled;
         private bool previousRandomCalled;
+
+        private DummyOverlay overlay = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -26,13 +33,17 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             FooterV2 footer;
 
-            Child = footer = new FooterV2
+            Children = new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                footer = new FooterV2
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                },
+                overlay = new DummyOverlay()
             };
 
-            footer.AddButton(new FooterButtonModsV2());
+            footer.AddButton(modsButton = new FooterButtonModsV2(), overlay);
             footer.AddButton(randomButton = new FooterButtonRandomV2
             {
                 NextRandom = () => nextRandomCalled = true,
@@ -41,6 +52,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             footer.AddButton(new FooterButtonOptionsV2());
 
             InputManager.MoveMouseTo(Vector2.Zero);
+
+            overlay.Hide();
         });
 
         [Test]
@@ -102,6 +115,32 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.Click(MouseButton.Right);
             });
             AddAssert("previous random invoked", () => previousRandomCalled && !nextRandomCalled);
+        }
+
+        [Test]
+        public void TestOverlayPresent()
+        {
+            AddStep("Press F1", () =>
+            {
+                InputManager.MoveMouseTo(modsButton);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("Overlay visible", () => overlay.State.Value == Visibility.Visible);
+            AddStep("Hide", () => overlay.Hide());
+        }
+
+        private partial class DummyOverlay : ShearedOverlayContainer
+        {
+            public DummyOverlay()
+                : base(OverlayColourScheme.Green)
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Header.Title = "An overlay";
+            }
         }
     }
 }
