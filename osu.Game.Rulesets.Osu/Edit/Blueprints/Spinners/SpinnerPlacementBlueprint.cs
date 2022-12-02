@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -23,7 +24,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 
         private bool isPlacingEnd;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
+        [CanBeNull]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
         public SpinnerPlacementBlueprint()
@@ -66,7 +68,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
             return true;
         }
 
-        private void updateEndTimeFromCurrent() =>
-            HitObject.EndTime = Math.Max(HitObject.StartTime + beatSnapProvider.GetBeatLengthAtTime(HitObject.StartTime), beatSnapProvider.SnapTime(EditorClock.CurrentTime));
+        private void updateEndTimeFromCurrent()
+        {
+            HitObject.EndTime = beatSnapProvider == null
+                ? Math.Max(HitObject.StartTime, EditorClock.CurrentTime)
+                : Math.Max(HitObject.StartTime + beatSnapProvider.GetBeatLengthAtTime(HitObject.StartTime), beatSnapProvider.SnapTime(EditorClock.CurrentTime));
+        }
     }
 }
