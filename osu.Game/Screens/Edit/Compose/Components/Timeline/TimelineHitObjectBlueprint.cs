@@ -424,9 +424,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 break;
 
                             case IHasDuration endTimeHitObject:
-                                double snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
+                                double snappedTime = Math.Max(hitObject.StartTime + beatSnapProvider.GetBeatLengthAtTime(hitObject.StartTime), beatSnapProvider.SnapTime(time));
 
-                                if (endTimeHitObject.EndTime == snappedTime || Precision.AlmostEquals(snappedTime, hitObject.StartTime, beatmap.GetBeatLengthAtTime(snappedTime)))
+                                if (endTimeHitObject.EndTime == snappedTime)
                                     return;
 
                                 endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
