@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Objects
                 var nextStreamControlPoint = ControlPoints[i + 1];
                 double duration = nextStreamControlPoint.Time - streamControlPoint.Time;
                 double accel = nextStreamControlPoint.Acceleration;
-                int count = Math.Max(nextStreamControlPoint.Count, 1);
+                int count = Math.Max(nextStreamControlPoint.GetCount(duration), 1);
 
                 double segmentStart = segments[i];
                 double segmentEnd = segments[i + 1];

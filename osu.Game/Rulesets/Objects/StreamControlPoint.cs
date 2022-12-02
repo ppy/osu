@@ -27,24 +27,29 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
-        private int count;
+        private double beatLength;
+
+        /// <summary>
+        /// The time between circles in this segment.
+        /// </summary>
+        [JsonProperty]
+        public double BeatLength
+        {
+            get => beatLength;
+            set
+            {
+                if (value == beatLength)
+                    return;
+
+                beatLength = value;
+                Changed?.Invoke();
+            }
+        }
 
         /// <summary>
         /// The number of circles in this segment.
         /// </summary>
-        [JsonProperty]
-        public int Count
-        {
-            get => count;
-            set
-            {
-                if (value == count)
-                    return;
-
-                count = value;
-                Changed?.Invoke();
-            }
-        }
+        public int GetCount(double duration) => (int)Math.Round(duration / beatLength);
 
         private double acceleration;
 
@@ -102,18 +107,18 @@ namespace osu.Game.Rulesets.Objects
         /// Creates a new <see cref="StreamControlPoint"/> with a provided position and type.
         /// </summary>
         /// <param name="time">The initial time.</param>
-        /// <param name="count">The initial count.</param>
+        /// <param name="beatLength">The initial beatLength.</param>
         /// <param name="acceleration">The initial acceleration.</param>
         /// <param name="exponential">The initial acceleration type.</param>
-        public StreamControlPoint(double time, int count, double acceleration = 0, bool exponential = false)
+        public StreamControlPoint(double time, double beatLength, double acceleration = 0, bool exponential = false)
             : this()
         {
             Time = time;
-            Count = count;
+            BeatLength = beatLength;
             Acceleration = acceleration;
             Exponential = exponential;
         }
 
-        public bool Equals(StreamControlPoint other) => Time == other.Time && Count == other.Count && Acceleration == other.Acceleration && Exponential == other.Exponential;
+        public bool Equals(StreamControlPoint other) => Time == other.Time && BeatLength == other.BeatLength && Acceleration == other.Acceleration && Exponential == other.Exponential;
     }
 }

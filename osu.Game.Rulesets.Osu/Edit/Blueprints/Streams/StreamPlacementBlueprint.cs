@@ -262,7 +262,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 
                 double time = EditorClock.CurrentTime;
                 streamCursor.Time = Math.Max(time - HitObject.StartTime, streamSegmentStart.Time + editorBeatmap.GetBeatLengthAtTime(streamSegmentStart.Time));
-                streamCursor.Count = (int)Math.Round((streamCursor.Time - streamSegmentStart.Time) / editorBeatmap.GetBeatLengthAtTime(time));
+                streamCursor.BeatLength = editorBeatmap.GetBeatLengthAtTime(time);
             }
             else if (streamCursor != null)
             {

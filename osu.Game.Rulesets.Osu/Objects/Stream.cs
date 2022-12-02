@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 streamPath.Path = value.Path;
                 streamPath.ControlPoints.Clear();
-                streamPath.ControlPoints.AddRange(value.ControlPoints.Select(c => new StreamControlPoint(c.Time, c.Count, c.Acceleration, c.Exponential)));
+                streamPath.ControlPoints.AddRange(value.ControlPoints.Select(c => new StreamControlPoint(c.Time, c.BeatLength, c.Acceleration, c.Exponential)));
             }
         }
 
@@ -134,7 +134,9 @@ namespace osu.Game.Rulesets.Osu.Objects
                 state.NewCombo = j == 0 && i != positions.Count - 1 && NewCombo;
                 i++;
 
-                if (k >= StreamPath.ControlPoints.Count || ++j < StreamPath.ControlPoints[k].Count) continue;
+                // Check if we reached the end of a segment of the stream
+                if (k >= StreamPath.ControlPoints.Count ||
+                    ++j < StreamPath.ControlPoints[k].GetCount(StreamPath.ControlPoints[k].Time - StreamPath.ControlPoints[k - 1].Time)) continue;
 
                 j = 0;
                 k++;
