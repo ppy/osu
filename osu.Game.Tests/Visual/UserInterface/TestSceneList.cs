@@ -19,19 +19,19 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public partial class TestSceneList : OsuManualInputManagerTestScene
     {
-        private Container skinElements = null!;
-        private IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>> drawableList = null!;
+        protected Container skinElements { get; set; } = null!;
+        protected IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>> BackingDrawableList = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            drawableList = CreateDrawableList();
-            var list = (Drawable)drawableList;
+            BackingDrawableList = CreateDrawableList();
+            var list = (Drawable)BackingDrawableList;
             list.Width = 100;
             list.RelativeSizeAxes = Axes.None;
             list.Anchor = Anchor.CentreRight;
-            drawableList.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
-            drawableList.SetItemDepth = (blueprint, depth) =>
+            BackingDrawableList.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
+            BackingDrawableList.SetItemDepth = (blueprint, depth) =>
             {
                 if (blueprint.Parent is Container<Drawable> container)
                 {
@@ -58,12 +58,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                     list
                 },
             };
+            DrawableList.Height = 500;
         });
 
         protected virtual IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>> CreateDrawableList() => new DrawableList<SelectionBlueprint<ISkinnableDrawable>>();
-        protected virtual DrawableList<SelectionBlueprint<ISkinnableDrawable>> GetDrawableList(IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>> list) => (DrawableList<SelectionBlueprint<ISkinnableDrawable>>)list;
+        protected virtual DrawableList<SelectionBlueprint<ISkinnableDrawable>> DrawableList => (DrawableList<SelectionBlueprint<ISkinnableDrawable>>)BackingDrawableList;
 
-        private void addElement(ISkinnableDrawable skinnableDrawable)
+        protected virtual void AddElement(ISkinnableDrawable skinnableDrawable)
         {
             var skinnable = (Drawable)skinnableDrawable;
             skinnable.Name = "Element" + skinElements.Count;
@@ -71,7 +72,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             //this makes sure I actually can only select a single element
 
             var skinBlueprint = new SkinBlueprint(skinnableDrawable);
-            GetDrawableList(drawableList).Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(skinBlueprint));
+            DrawableList.Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(skinBlueprint, DrawableListEntryType.Item));
 
             skinElements.Add(new Container
             {
@@ -84,7 +85,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         private bool applyToItems(Predicate<DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>> predicate,
-                                  IEnumerable<RearrangeableListItem<IDrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>>>? items)
+                                  IEnumerable<RearrangeableListItem<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>>>? items)
         {
             if (items is null) return false;
 
@@ -96,30 +97,31 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
                 else if (value is DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> minimisableList)
                 {
-                    if (!applyToItems(predicate, minimisableList.List?.ItemMaps.Values)) return false;
+                    if (!applyToItems(predicate, minimisableList.List.ItemMaps.Values)) return false;
                 }
             }
 
             return true;
         }
 
-        private bool testElementSelected(int element) => ((DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)GetDrawableList(drawableList).ItemMaps[GetDrawableList(drawableList).Items[element]]).IsSelected;
+        private bool testElementSelected(int element) => ((DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)DrawableList.ItemMaps[DrawableList.Items[element]]).IsSelected;
 
-        private void listAddItems()
+        protected void ListAddItems()
         {
-            AddAssert("no Items", () => GetDrawableList(drawableList).Items.Count == 0);
+            int before = 0;
+            AddStep("Get Item Count", () => before = DrawableList.Items.Count);
             AddRepeatStep("add item", () =>
             {
                 float pos = skinElements.Count * (50 + 2);
                 //make sure we can fit exactly the number of elements we want in a grid pattern
                 float xwidth = (int)(skinElements.ChildSize.X - 100) / 52 * 52;
-                addElement(new BigBlackBox
+                AddElement(new BigBlackBox
                 {
                     Size = Vector2.One * 50,
                     Position = new Vector2(pos % xwidth, (int)pos / (int)xwidth * (50 + 2)),
                 });
             }, 10);
-            AddAssert("10x items in List", () => GetDrawableList(drawableList).Items.Count == 10);
+            AddAssert("Exactly 10 items were added", () => DrawableList.Items.Count == before + 10);
             checkDepth();
         }
 
@@ -127,12 +129,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddAssert("item positions corrospond to depth", () =>
             {
-                var list = GetDrawableList(drawableList);
-
-                for (int i = 1; i < list.Items.Count; i++)
+                for (int i = 1; i < DrawableList.Items.Count; i++)
                 {
-                    if (list.Items[i - 1].RepresentedItem?.Item is Drawable drawable1
-                        && list.Items[i].RepresentedItem?.Item is Drawable drawable2
+                    if (DrawableList.Items[i - 1].RepresentedItem.Item is Drawable drawable1
+                        && DrawableList.Items[i].RepresentedItem.Item is Drawable drawable2
                         && drawable1.Depth < drawable2.Depth) return false;
                 }
 
@@ -143,19 +143,19 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestListSelection()
         {
-            listAddItems();
+            ListAddItems();
             //start with regular clicks
-            AddAssert("no Item is selected", () => applyToItems(t => !t.IsSelected, GetDrawableList(drawableList).ItemMaps.Values));
+            AddAssert("no Item is selected", () => applyToItems(t => !t.IsSelected, DrawableList.ItemMaps.Values));
             AddStep("select first item", () =>
             {
-                InputManager.MoveMouseTo(GetDrawableList(drawableList).ItemMaps[GetDrawableList(drawableList).Items[0]]);
+                InputManager.MoveMouseTo(DrawableList.ItemMaps[DrawableList.Items[0]]);
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("first item is selected", () => testElementSelected(0));
             //pressing CTRL should allow selection of multiple items
             AddStep("Select second element too", () =>
             {
-                InputManager.MoveMouseTo(GetDrawableList(drawableList).ItemMaps[GetDrawableList(drawableList).Items[1]]);
+                InputManager.MoveMouseTo(DrawableList.ItemMaps[DrawableList.Items[1]]);
                 InputManager.PressKey(Key.LControl);
                 InputManager.Click(MouseButton.Left);
                 InputManager.ReleaseKey(Key.LControl);
@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             //pressing CTRL should also allow deselection of items
             AddStep("Deselect second element too", () =>
             {
-                InputManager.MoveMouseTo(GetDrawableList(drawableList).ItemMaps[GetDrawableList(drawableList).Items[1]]);
+                InputManager.MoveMouseTo(DrawableList.ItemMaps[DrawableList.Items[1]]);
                 InputManager.PressKey(Key.LControl);
                 InputManager.Click(MouseButton.Left);
                 InputManager.ReleaseKey(Key.LControl);
@@ -173,7 +173,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             //pressing CTRL and shift should should allow also allow toggeling the selection of multiple items
             AddStep("Unselect the first item, by clicking on it directly", () =>
             {
-                GetDrawableList(drawableList).Items[0].RepresentedItem?.Deselect();
+                DrawableList.Items[0].RepresentedItem.Deselect();
             });
             AddAssert("first item is not selected", () => !testElementSelected(0));
         }
@@ -181,28 +181,26 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestListDrag()
         {
-            listAddItems();
+            ListAddItems();
             AddStep("Mouse to first element", () =>
             {
-                var first = GetDrawableList(drawableList).ItemMaps[GetDrawableList(drawableList).Items[0]];
+                var first = DrawableList.ItemMaps[DrawableList.Items[0]];
                 InputManager.MoveMouseTo(first);
             });
             AddStep("Mouse Down", () => InputManager.PressButton(MouseButton.Left));
             AddStep("Mouse Move", () =>
             {
-                var last = GetDrawableList(drawableList).ItemMaps[GetDrawableList(drawableList).Items[^1]];
+                var last = DrawableList.ItemMaps[DrawableList.Items[^1]];
                 InputManager.MoveMouseTo(last, Vector2.UnitY * last.LayoutSize.Y * 2 / 3);
             });
             AddStep("Mouse Up", () => InputManager.ReleaseButton(MouseButton.Left));
             AddAssert("Check Elements have been swapped", () =>
             {
-                for (int i = 2; i < GetDrawableList(drawableList).Items.Count; i++)
+                for (int i = 2; i < DrawableList.Items.Count; i++)
                 {
-                    var selectionBlueprint = GetDrawableList(drawableList).ItemMaps[GetDrawableList(drawableList).Items[i]].Model.RepresentedItem;
+                    var selectionBlueprint = DrawableList.ItemMaps[DrawableList.Items[i]].Model.RepresentedItem;
 
-                    if (selectionBlueprint is null) return false;
-
-                    if (((Drawable)selectionBlueprint.Item).Name != $"Element{(i + 1) % GetDrawableList(drawableList).Items.Count}") return false;
+                    if (((Drawable)selectionBlueprint.Item).Name != $"Element{(i + 1) % DrawableList.Items.Count}") return false;
                 }
 
                 return true;

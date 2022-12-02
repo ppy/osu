@@ -224,7 +224,7 @@ namespace osu.Game.Skinning.Editor
 
         private void initLayerEditor()
         {
-            LayerSidebarList.List?.Items.RemoveAll(_ => true);
+            LayerSidebarList.List.Items.RemoveAll(_ => true);
             LayerSidebarList.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
             LayerSidebarList.SetItemDepth = (blueprint, depth) =>
             {
@@ -306,7 +306,7 @@ namespace osu.Game.Skinning.Editor
                 initLayerEditor();
 
                 LayerSidebarList.Enabled.Value = open;
-                LayerSidebarList.List?.Items.AddRange(
+                LayerSidebarList.List.Items.AddRange(
                     blueprintContainer.SelectionBlueprints
                                       .Children
                                       .Select(item =>

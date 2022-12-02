@@ -22,12 +22,12 @@ namespace osu.Game.Screens.Edit.List
             set
             {
                 applyAll = value;
-                if (List is not null) List.ApplyAll = value;
+                List.ApplyAll = value;
             }
         }
 
         public BindableBool Enabled { get; } = new BindableBool();
-        public readonly DrawableList<T>? List;
+        public readonly DrawableList<T> List;
 
         private readonly DrawableListItem<T> representedListItem;
 
@@ -86,6 +86,8 @@ namespace osu.Game.Screens.Edit.List
                     SetItemDepth = SetItemDepth,
                     OnDragAction = OnDragAction,
                     ApplyAll = ApplyAll,
+                    X = icon.LayoutSize.X,
+                    Y = head.LayoutSize.Y,
                 }
             };
 
@@ -94,14 +96,8 @@ namespace osu.Game.Screens.Edit.List
                 Enabled.Toggle();
                 icon.Icon = Enabled.Value ? FontAwesome.Solid.ChevronDown : FontAwesome.Solid.ChevronRight;
 
-                if (List is not null)
-                {
-                    List.X = icon.LayoutSize.X;
-                    List.Y = head.LayoutSize.Y;
-                    // List.Height = ChildSize.Y - head.LayoutSize.Y;
-                    // List.OriginPosition = new Vector2(icon.LayoutSize.X, head.LayoutSize.Y);
-                    // List.RelativeAnchorPosition = Vector2.Divide(List.Position, List.Parent?.ChildSize ?? Vector2.One * float.MaxValue);
-                }
+                List.X = icon.LayoutSize.X;
+                List.Y = head.LayoutSize.Y;
             };
 
             List.ItemAdded += t =>
@@ -144,8 +140,6 @@ namespace osu.Game.Screens.Edit.List
 
         private bool checkAllSelectedState(SelectionState state)
         {
-            if (List is null) return false;
-
             foreach (var item in List.ItemMaps.Values)
             {
                 if (item is IRearrangableDrawableListItem<T> rearrangeableItem && rearrangeableItem.State != state) return false;
@@ -156,14 +150,14 @@ namespace osu.Game.Screens.Edit.List
 
         public void ShowList(bool setValue = true)
         {
-            List?.Show();
+            List.Show();
             UpdateItem();
             if (setValue) Enabled.Value = true;
         }
 
         public void HideList(bool setValue = true)
         {
-            List?.Hide();
+            List.Hide();
             UpdateItem();
             if (setValue) Enabled.Value = false;
         }
@@ -176,34 +170,31 @@ namespace osu.Game.Screens.Edit.List
             representedListItem.OnDragAction = OnDragAction;
             representedListItem.UpdateItem();
 
-            if (List is not null)
-            {
-                List.ApplyAll = ApplyAll;
-                List.GetName = GetName;
-                List.SetItemDepth = SetItemDepth;
-                List.OnDragAction = OnDragAction;
-                List.UpdateItem();
-            }
+            List.ApplyAll = ApplyAll;
+            List.GetName = GetName;
+            List.SetItemDepth = SetItemDepth;
+            List.OnDragAction = OnDragAction;
+            List.UpdateItem();
         }
 
         public override void Select()
         {
             representedListItem.Select();
-            List?.Select();
+            List.Select();
             InvokeStateChanged(SelectionState.Selected);
         }
 
         public override void Deselect()
         {
             representedListItem.Deselect();
-            List?.Deselect();
+            List.Deselect();
             InvokeStateChanged(SelectionState.NotSelected);
         }
 
         public override void ApplyAction(Action<IDrawableListItem<T>> action)
         {
             representedListItem.ApplyAction(action);
-            List?.ApplyAction(action);
+            List.ApplyAction(action);
         }
 
         public override void SelectInternal(bool invokeChildMethods = true)
@@ -211,7 +202,7 @@ namespace osu.Game.Screens.Edit.List
             if (invokeChildMethods)
             {
                 representedListItem.SelectInternal();
-                List?.SelectInternal();
+                List.SelectInternal();
             }
         }
 
@@ -220,7 +211,7 @@ namespace osu.Game.Screens.Edit.List
             if (invokeChildMethods)
             {
                 representedListItem.DeselectInternal();
-                List?.DeselectInternal();
+                List.DeselectInternal();
             }
         }
 
@@ -244,12 +235,12 @@ namespace osu.Game.Screens.Edit.List
 
         protected override void OnSetItemDepth(ref Action<T, int> value)
         {
-            if (List is not null) List.SetItemDepth = value;
+            List.SetItemDepth = value;
         }
 
         protected override void OnSetDragAction(ref Action value)
         {
-            if (List is not null) List.OnDragAction = value;
+            List.OnDragAction = value;
         }
     }
 }
