@@ -135,11 +135,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double clockRate = track.Rate;
 
             double overallDifficulty = (50 - attributes.GreatHitWindow * clockRate) / 3;
-            double goodHitWindow = 0;
+            double goodHitWindow;
             if (overallDifficulty <= 5)
                 goodHitWindow = (120 - 8 * overallDifficulty) / clockRate;
-            if (overallDifficulty > 5)
-                goodHitWindow = 80 - 6 * (overallDifficulty - 5);
+            else
+                goodHitWindow = (80 - 6 * (overallDifficulty - 5)) / clockRate;
 
             double root2 = Math.Sqrt(2);
 
@@ -155,9 +155,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
                 double t1 = countGreat * ((attributes.GreatHitWindow * Math.Exp(-Math.Pow(attributes.GreatHitWindow / root2 * d, 2))) / p300);
 
-                double t2a = Math.Exp(Math.Log(goodHitWindow * Math.Exp(-Math.Pow(goodHitWindow / root2 * d, 2))) - logDiff(lnP300, lnP100));
-                double t2b = Math.Exp(Math.Log(attributes.GreatHitWindow * Math.Exp(-Math.Pow(attributes.GreatHitWindow / root2 * d, 2))) - logDiff(lnP300, lnP100));
-                double t2 = (countOk + 1) * (t2a - t2b);
+                double t2A = Math.Exp(Math.Log(goodHitWindow * Math.Exp(-Math.Pow(goodHitWindow / root2 * d, 2))) - logDiff(lnP300, lnP100));
+                double t2B = Math.Exp(Math.Log(attributes.GreatHitWindow * Math.Exp(-Math.Pow(attributes.GreatHitWindow / root2 * d, 2))) - logDiff(lnP300, lnP100));
+                double t2 = (countOk + 1) * (t2A - t2B);
 
                 double t3 = countMiss * Math.Exp(Math.Log(goodHitWindow * Math.Exp(-Math.Pow(goodHitWindow / root2 * d, 2))) - lnP100);
 
