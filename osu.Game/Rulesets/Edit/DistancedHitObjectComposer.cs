@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Edit
             Precision = 0.01,
         };
 
-        public virtual float BeatSnapDistance => (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * 1 / BeatSnapProvider.BeatDivisor);
+        public virtual float BeatSnapDistance => (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier / BeatSnapProvider.BeatDivisor);
 
         IBindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
 
