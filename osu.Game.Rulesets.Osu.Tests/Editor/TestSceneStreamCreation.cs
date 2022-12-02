@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
@@ -29,6 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private OsuPlayfield playfield = null!;
         private Stream? stream;
         private PathControlPointVisualiser<Stream>? visualiser;
+        private TimelineHitObjectBlueprint? timelineBlueprint;
 
         public override void SetUpSteps()
         {
@@ -89,13 +91,27 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointTime(2, 16);
             assertControlPointTime(3, 24);
             assertControlPointAccel(2, 2);
+            // Edit stream
             assertNewCombo(0);
             AddStep("toggle new combo", () => InputManager.Key(Key.Q));
             assertNewCombo(0, 4, 8);
+            AddStep("get timeline blueprint", () => timelineBlueprint = Editor.ChildrenOfType<TimelineHitObjectBlueprint>().First());
+            addMoveToTimelineDragArea(0);
+            AddStep("start drag", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("drag by 2 ticks", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(13, 0)));
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
+            assertControlPointTime(1, 10);
+            assertControlPointTime(2, 16);
+            addMoveToTimelineDragArea(1);
+            addAccelStep(-4f);
+            assertControlPointAccel(2, -2);
+            assertCircleCount(22);
+            // Convert to hit circles
             addMovementStep(new Vector2(512, 386));
             AddStep("start drag select", () => InputManager.PressButton(MouseButton.Left));
             AddStep("drag 50x50", () => InputManager.MoveMouseTo(playfield.ToScreenSpace(new Vector2(462, 336))));
             AddStep("end drag select", () => InputManager.ReleaseButton(MouseButton.Left));
+            assertPlaced(false);
         }
 
         private void addMovementStep(Vector2 position) => AddStep($"move mouse to {position}", () => InputManager.MoveMouseTo(playfield.ToScreenSpace(position)));
@@ -116,6 +132,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             InputManager.PressKey(Key.ShiftLeft);
             InputManager.Key(Key.Number0 + snap);
             InputManager.ReleaseKey(Key.ShiftLeft);
+        });
+
+        private void addMoveToTimelineDragArea(int index) => AddStep($"move mouse to timeline drag {index}", () =>
+        {
+            var dragArea = timelineBlueprint.ChildrenOfType<TimelineHitObjectBlueprint.DragArea>().OrderBy(o => o.X).Skip(index).First();
+            InputManager.MoveMouseTo(dragArea.ScreenSpaceDrawQuad.Centre);
         });
 
         private void assertPlaced(bool expected) => AddAssert($"stream {(expected ? "placed" : "not placed")}", () => getStream() != null == expected);
@@ -154,7 +176,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void assertNewCombo(params int[] indices)
         {
-            AddAssert($"new combo", () =>
+            AddAssert("new combo", () =>
             {
                 var circles = EditorBeatmap.HitObjects.OfType<HitCircle>().ToArray();
 
