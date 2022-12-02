@@ -537,10 +537,14 @@ namespace osu.Game.Screens.Edit
                     // Seek to last object time, or track end if already there.
                     // Note that in osu-stable subsequent presses when at track end won't return to last object.
                     // This has intentionally been changed to make it more useful.
-                    if (!editorBeatmap.HitObjects.Any() || clock.CurrentTime == editorBeatmap.GetLastObjectTime())
+                    if (!editorBeatmap.HitObjects.Any())
+                    {
                         clock.Seek(clock.TrackLength);
-                    else
-                        clock.Seek(editorBeatmap.GetLastObjectTime());
+                        return true;
+                    }
+
+                    double lastObjectTime = editorBeatmap.GetLastObjectTime();
+                    clock.Seek(clock.CurrentTime == lastObjectTime ? clock.TrackLength : lastObjectTime);
                     return true;
             }
 
