@@ -24,5 +24,5 @@ namespace osu.Game.Screens.Edit.List
     {
         Item,
         MinimisableList,
-    };
+    }
 }
