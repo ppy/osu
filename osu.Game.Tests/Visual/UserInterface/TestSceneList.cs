@@ -85,10 +85,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         private bool applyToItems(Predicate<DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>> predicate,
-                                  IEnumerable<RearrangeableListItem<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>>>? items)
+                                  IEnumerable<RearrangeableListItem<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>>> items)
         {
-            if (items is null) return false;
-
             foreach (var value in items)
             {
                 if (value is DrawableListItem<SelectionBlueprint<ISkinnableDrawable>> item)
