@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// </summary>
         private double? computeEstimatedDeviation(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
-            if (totalSuccessfulHits == 0)
+            if (totalSuccessfulHits == 0 || attributes.GreatHitWindow == 0)
                 return null;
 
             // Create a new track to properly calculate the hit window of 100s.
