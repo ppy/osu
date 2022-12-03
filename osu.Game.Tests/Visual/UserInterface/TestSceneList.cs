@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public partial class TestSceneList : OsuManualInputManagerTestScene
     {
-        protected Container skinElements { get; set; } = null!;
+        protected Container SkinElements { get; set; } = null!;
         protected IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>> BackingDrawableList = null!;
 
         [SetUp]
