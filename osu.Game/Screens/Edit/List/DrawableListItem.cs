@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Edit.List
 
         public override void UpdateItem()
         {
-            updateText(RepresentedItem!);
+            updateText(RepresentedItem);
 
             if (RepresentedItem is IStateful<SelectionState> selectable)
             {

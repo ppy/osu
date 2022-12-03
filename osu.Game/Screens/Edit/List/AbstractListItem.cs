@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.List
             };
         }
 
-        public T? RepresentedItem => Model.RepresentedItem;
+        public T RepresentedItem => Model.RepresentedItem;
         public abstract Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
 
         public Func<T, LocalisableString> GetName
