@@ -3,13 +3,16 @@
 
 #nullable disable
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 
@@ -47,6 +50,14 @@ namespace osu.Game.Rulesets.Catch.UI
         public CatchPlayfield(IBeatmapDifficultyInfo difficulty)
         {
             this.difficulty = difficulty;
+        }
+
+        protected override GameplayCursorContainer CreateCursor()
+        {
+            if (Mods != null && Mods.Any(m => m is ModRelax))
+                return new CatchRelaxCursorContainer();
+
+            return base.CreateCursor();
         }
 
         [BackgroundDependencyLoader]

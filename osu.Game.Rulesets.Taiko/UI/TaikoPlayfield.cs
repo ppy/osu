@@ -112,6 +112,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                             FillMode = FillMode.Fit,
                             Children = new[]
                             {
+                                new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.KiaiGlow), _ => Empty())
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
                                 hitExplosionContainer = new Container<HitExplosion>
                                 {
                                     RelativeSizeAxes = Axes.Both,
