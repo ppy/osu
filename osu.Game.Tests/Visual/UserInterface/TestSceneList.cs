@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Size = new Vector2(500),
                 Children = new[]
                 {
-                    skinElements = new Container
+                    SkinElements = new Container
                     {
                         RelativeSizeAxes = Axes.Both
                     },
@@ -67,14 +67,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         protected virtual void AddElement(ISkinnableDrawable skinnableDrawable)
         {
             var skinnable = (Drawable)skinnableDrawable;
-            skinnable.Name = "Element" + skinElements.Count;
+            skinnable.Name = "Element" + SkinElements.Count;
 
             //this makes sure I actually can only select a single element
 
             var skinBlueprint = new SkinBlueprint(skinnableDrawable);
             DrawableList.Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(skinBlueprint, DrawableListEntryType.Item));
 
-            skinElements.Add(new Container
+            SkinElements.Add(new Container
             {
                 Children = new[]
                 {
@@ -110,9 +110,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Get Item Count", () => before = DrawableList.Items.Count);
             AddRepeatStep("add item", () =>
             {
-                float pos = skinElements.Count * (50 + 2);
+                float pos = SkinElements.Count * (50 + 2);
                 //make sure we can fit exactly the number of elements we want in a grid pattern
-                float xwidth = (int)(skinElements.ChildSize.X - 100) / 52 * 52;
+                float xwidth = (int)(SkinElements.ChildSize.X - 100) / 52 * 52;
                 AddElement(new BigBlackBox
                 {
                     Size = Vector2.One * 50,
