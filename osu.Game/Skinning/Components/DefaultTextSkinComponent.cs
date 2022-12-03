@@ -17,7 +17,7 @@ namespace osu.Game.Skinning.Components
         public bool UsesFixedAnchor { get; set; }
 
         [SettingSource("Font", "Font to use.")]
-        public Bindable<DefaultFont> Font { get; } = new Bindable<DefaultFont>(DefaultFont.Torus);
+        public Bindable<Typeface> Font { get; } = new Bindable<Typeface>(Typeface.Torus);
 
         protected abstract void SetFont(FontUsage font);
 
@@ -26,15 +26,7 @@ namespace osu.Game.Skinning.Components
             base.LoadComplete();
             Font.BindValueChanged(e =>
             {
-                FontUsage f = e.NewValue switch
-                {
-                    DefaultFont.Venera => OsuFont.Numeric,
-                    DefaultFont.Torus => OsuFont.Torus,
-                    DefaultFont.TorusAlt => OsuFont.TorusAlternate,
-                    DefaultFont.Inter => OsuFont.Inter,
-                    _ => OsuFont.Default
-                };
-
+                FontUsage f = OsuFont.GetFont(e.NewValue);
                 SetFont(f);
             }, true);
         }
