@@ -26,7 +26,7 @@ namespace osu.Game.Skinning.Components
             base.LoadComplete();
             Font.BindValueChanged(e =>
             {
-                FontUsage f = OsuFont.GetFont(e.NewValue);
+                FontUsage f = OsuFont.GetFont(e.NewValue, weight: e.NewValue == Typeface.Venera ? FontWeight.Bold : FontWeight.Regular);
                 SetFont(f);
             }, true);
         }
