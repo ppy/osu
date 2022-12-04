@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Changelog
             this.build = build;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(CancellationToken? cancellation, IAPIProvider api, OverlayColourProvider colourProvider)
         {
             bool complete = false;

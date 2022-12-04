@@ -32,10 +32,10 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private LoginOverlay? loginOverlay { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         public UpdateBeatmapSetButton(BeatmapSetInfo beatmapSetInfo)

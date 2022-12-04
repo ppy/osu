@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private SongSelect? songSelect { get; set; }
 
         private IBeatmapInfo? beatmapInfo;

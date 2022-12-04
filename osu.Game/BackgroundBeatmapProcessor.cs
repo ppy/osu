@@ -37,7 +37,7 @@ namespace osu.Game
         [Resolved]
         private IBindable<WorkingBeatmap> gameBeatmap { get; set; } = null!;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private ILocalUserPlayInfo? localUserPlayInfo { get; set; }
 
         protected virtual int TimeToSleepDuringGameplay => 30000;

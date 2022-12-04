@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OverlayColourProvider? colourProvider { get; set; }
 
         public CommentReportButton(Comment comment)

@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private SettingsButton restoreButton = null!;
         private SettingsButton undeleteButton = null!;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
         {
             if (legacyImportManager?.SupportsImportFromStable == true)

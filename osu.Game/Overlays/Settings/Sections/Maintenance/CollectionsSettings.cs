@@ -19,10 +19,10 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private INotificationOverlay? notificationOverlay { get; set; }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
         {
             if (legacyImportManager?.SupportsImportFromStable == true)

@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Toolbar
             AutoSizeAxes = Axes.X;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, IAPIProvider api, LoginOverlay? login)
         {
             Add(new OpaqueBackground { Depth = 1 });

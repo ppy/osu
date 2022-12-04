@@ -33,7 +33,7 @@ namespace osu.Game.Database
         [Resolved]
         private ScoreManager scores { get; set; } = null!;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OsuGame? game { get; set; }
 
         [Resolved]
@@ -42,10 +42,10 @@ namespace osu.Game.Database
         [Resolved]
         private RealmAccess realmAccess { get; set; } = null!;
 
-        [Resolved(canBeNull: true)] // canBeNull required while we remain on mono for mobile platforms.
+        [Resolved(canBeNull: true)]
         private DesktopGameHost? desktopGameHost { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private INotificationOverlay? notifications { get; set; }
 
         private StableStorage? cachedStorage;

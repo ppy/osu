@@ -21,13 +21,13 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private INotificationOverlay? notificationOverlay { get; set; }
 
         private SettingsButton undeleteButton = null!;
         private SettingsButton deleteAllButton = null!;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(IDialogOverlay? dialogOverlay)
         {
             AddRange(new Drawable[]

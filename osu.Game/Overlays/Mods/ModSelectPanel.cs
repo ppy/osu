@@ -162,7 +162,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected abstract void Deselect();
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, ISamplePlaybackDisabler? samplePlaybackDisabler)
         {
             sampleOn = audio.Samples.Get(@"UI/check-on");

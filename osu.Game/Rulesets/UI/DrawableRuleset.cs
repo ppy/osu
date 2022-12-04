@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.UI
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(CancellationToken? cancellationToken)
         {
             AudioContainer audioContainer;

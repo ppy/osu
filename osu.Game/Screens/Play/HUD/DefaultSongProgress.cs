@@ -38,10 +38,10 @@ namespace osu.Game.Screens.Play.HUD
         public override bool HandleNonPositionalInput => AllowSeeking.Value;
         public override bool HandlePositionalInput => AllowSeeking.Value;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private Player? player { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private DrawableRuleset? drawableRuleset { get; set; }
 
         public DefaultSongProgress()

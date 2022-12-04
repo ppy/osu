@@ -129,7 +129,7 @@ namespace osu.Game.Collections
         {
             public Func<Vector2, bool> IsTextBoxHovered = null!;
 
-            [Resolved]
+            [Resolved(canBeNull: true)]
             private IDialogOverlay? dialogOverlay { get; set; }
 
             private readonly Live<BeatmapCollection> collection;

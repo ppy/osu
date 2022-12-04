@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 {
     public abstract partial class FollowCircle : CompositeDrawable
     {
-        [Resolved]
+        [Resolved(canBeNull: true)]
         protected DrawableHitObject? ParentObject { get; private set; }
 
         protected FollowCircle()

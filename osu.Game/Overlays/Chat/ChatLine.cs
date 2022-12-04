@@ -46,10 +46,10 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float UsernameWidth => 130;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private ChannelManager? chatManager { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OverlayColourProvider? colourProvider { get; set; }
 
         private readonly OsuSpriteText drawableTimestamp;

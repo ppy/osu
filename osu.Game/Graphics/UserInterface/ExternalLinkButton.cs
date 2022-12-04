@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.UserInterface
         [Resolved]
         private GameHost host { get; set; } = null!;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
         private readonly SpriteIcon linkIcon;

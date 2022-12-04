@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Size = DRAWABLE_BADGE_SIZE;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(LargeTextureStore textures, ILinkHandler? linkHandler)
         {
             Child = new Sprite

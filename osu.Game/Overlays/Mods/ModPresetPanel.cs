@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Mods
 
         public override BindableBool Active { get; } = new BindableBool();
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]

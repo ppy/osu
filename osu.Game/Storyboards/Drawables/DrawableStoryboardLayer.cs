@@ -46,7 +46,7 @@ namespace osu.Game.Storyboards.Drawables
                 Origin = Anchor.Centre;
             }
 
-            [BackgroundDependencyLoader]
+            [BackgroundDependencyLoader(true)]
             private void load(CancellationToken? cancellationToken)
             {
                 foreach (var element in storyboardLayer.Elements)

@@ -71,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             private PurpleRoundedButton editPlaylistButton = null!;
 
-            [Resolved]
+            [Resolved(canBeNull: true)]
             private IRoomManager? manager { get; set; }
 
             [Resolved]

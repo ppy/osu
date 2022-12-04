@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private SettingsButton importSkinsButton = null!;
         private SettingsButton deleteSkinsButton = null!;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(SkinManager skins, LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
         {
             if (legacyImportManager?.SupportsImportFromStable == true)

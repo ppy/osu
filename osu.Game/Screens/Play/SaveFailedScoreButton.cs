@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
             this.importFailedScore = importFailedScore;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuGame? game, Player? player, RealmAccess realm)
         {
             InternalChild = button = new DownloadButton

@@ -61,10 +61,10 @@ namespace osu.Game.Screens.Edit.Timing
             [Resolved]
             protected EditorBeatmap Beatmap { get; private set; } = null!;
 
-            [Resolved]
+            [Resolved(canBeNull: true)]
             private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
-            [Resolved]
+            [Resolved(canBeNull: true)]
             private IEditorChangeHandler? changeHandler { get; set; }
 
             [BackgroundDependencyLoader]

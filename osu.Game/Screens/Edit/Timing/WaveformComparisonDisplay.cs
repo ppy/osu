@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
         [Resolved]

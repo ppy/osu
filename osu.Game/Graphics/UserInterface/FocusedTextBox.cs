@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private GameHost? host { get; set; }
 
         [BackgroundDependencyLoader(true)]

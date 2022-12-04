@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private FirstRunSetupOverlay? firstRunSetupOverlay { get; set; }
 
         [Resolved]

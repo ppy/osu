@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Mods
                 shader = shaderManager.Load("PositionAndColour", FragmentShader);
             }
 
-            [Resolved]
+            [Resolved(canBeNull: true)]
             private Player? player { get; set; }
 
             private readonly IBindable<bool> isBreakTime = new BindableBool();

@@ -35,7 +35,7 @@ namespace osu.Game.Collections
 
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
         [Resolved]

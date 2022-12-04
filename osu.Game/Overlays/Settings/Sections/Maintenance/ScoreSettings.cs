@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private SettingsButton importScoresButton = null!;
         private SettingsButton deleteScoresButton = null!;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(ScoreManager scores, LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
         {
             if (legacyImportManager?.SupportsImportFromStable == true)

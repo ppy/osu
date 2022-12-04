@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.Cursor
 
         private bool visible;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, ScreenshotManager? screenshotManager, AudioManager audio)
         {
             cursorRotate = config.GetBindable<bool>(OsuSetting.CursorRotation);
@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.Cursor
             Add(mouseInputDetector = new MouseInputDetector());
         }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OsuGame? game { get; set; }
 
         private readonly IBindable<bool> lastInputWasMouse = new BindableBool();
