@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerSpectateButton : MultiplayerRoomComposite
+    public partial class MultiplayerSpectateButton : MultiplayerRoomComposite
     {
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }

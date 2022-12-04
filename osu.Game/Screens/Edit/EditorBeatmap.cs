@@ -20,7 +20,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
 {
-    public class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider
+    public partial class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider
     {
         /// <summary>
         /// Will become <c>true</c> when a new update is queued, and <c>false</c> when all updates have been applied.

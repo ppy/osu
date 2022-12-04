@@ -20,7 +20,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Editing
 {
     [HeadlessTest]
-    public class TestSceneHitObjectComposerDistanceSnapping : EditorClockTestScene
+    public partial class TestSceneHitObjectComposerDistanceSnapping : EditorClockTestScene
     {
         private TestHitObjectComposer composer = null!;
 
@@ -251,7 +251,7 @@ namespace osu.Game.Tests.Editing
         private void assertSnappedDistance(float distance, float expectedDistance, HitObject? referenceObject = null)
             => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.FindSnappedDistance(referenceObject ?? new HitObject(), distance), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
 
-        private class TestHitObjectComposer : OsuHitObjectComposer
+        private partial class TestHitObjectComposer : OsuHitObjectComposer
         {
             public new EditorBeatmap EditorBeatmap => base.EditorBeatmap;
 

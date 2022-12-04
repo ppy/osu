@@ -17,7 +17,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class ProfileSubsectionHeader : CompositeDrawable, IHasCurrentValue<int>
+    public partial class ProfileSubsectionHeader : CompositeDrawable, IHasCurrentValue<int>
     {
         private readonly BindableWithCurrent<int> current = new BindableWithCurrent<int>();
 

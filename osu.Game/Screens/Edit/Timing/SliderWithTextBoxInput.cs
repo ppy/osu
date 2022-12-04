@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class SliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T>
+    public partial class SliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         private readonly SettingsSlider<T> slider;
@@ -58,7 +58,20 @@ namespace osu.Game.Screens.Edit.Timing
 
                 try
                 {
-                    slider.Current.Parse(t.Text);
+                    switch (slider.Current)
+                    {
+                        case Bindable<int> bindableInt:
+                            bindableInt.Value = int.Parse(t.Text);
+                            break;
+
+                        case Bindable<double> bindableDouble:
+                            bindableDouble.Value = double.Parse(t.Text);
+                            break;
+
+                        default:
+                            slider.Current.Parse(t.Text);
+                            break;
+                    }
                 }
                 catch
                 {

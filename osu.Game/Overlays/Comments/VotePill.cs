@@ -24,7 +24,7 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class VotePill : LoadingButton, IHasAccentColour
+    public partial class VotePill : LoadingButton, IHasAccentColour
     {
         private const int duration = 200;
 

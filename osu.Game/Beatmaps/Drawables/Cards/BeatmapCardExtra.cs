@@ -17,7 +17,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardExtra : BeatmapCard
+    public partial class BeatmapCardExtra : BeatmapCard
     {
         protected override Drawable IdleContent => idleBottomContent;
         protected override Drawable DownloadInProgressContent => downloadProgressBar;

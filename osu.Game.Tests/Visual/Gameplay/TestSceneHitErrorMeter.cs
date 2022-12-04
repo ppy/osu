@@ -31,7 +31,7 @@ using osu.Game.Screens.Play.HUD.HitErrorMeters;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneHitErrorMeter : OsuTestScene
+    public partial class TestSceneHitErrorMeter : OsuTestScene
     {
         [Cached(typeof(ScoreProcessor))]
         private TestScoreProcessor scoreProcessor = new TestScoreProcessor();
@@ -263,7 +263,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
-        private class TestDrawableRuleset : DrawableRuleset
+        private partial class TestDrawableRuleset : DrawableRuleset
         {
             public HitWindows HitWindows;
 
@@ -305,7 +305,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override void CancelResume() => throw new NotImplementedException();
         }
 
-        private class TestScoreProcessor : ScoreProcessor
+        private partial class TestScoreProcessor : ScoreProcessor
         {
             public TestScoreProcessor()
                 : base(new OsuRuleset())

@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class DifficultyIcon : CompositeDrawable, IHasCustomTooltip<DifficultyIconTooltipContent>, IHasCurrentValue<StarDifficulty>
+    public partial class DifficultyIcon : CompositeDrawable, IHasCustomTooltip<DifficultyIconTooltipContent>, IHasCurrentValue<StarDifficulty>
     {
         /// <summary>
         /// Size of this difficulty icon.

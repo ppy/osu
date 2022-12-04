@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineTickDisplay : TimelinePart<PointVisualisation>
+    public partial class TimelineTickDisplay : TimelinePart<PointVisualisation>
     {
         [Resolved]
         private EditorBeatmap beatmap { get; set; }

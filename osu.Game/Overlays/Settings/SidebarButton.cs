@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SidebarButton : OsuButton
+    public abstract partial class SidebarButton : OsuButton
     {
         protected const double FADE_DURATION = 500;
 

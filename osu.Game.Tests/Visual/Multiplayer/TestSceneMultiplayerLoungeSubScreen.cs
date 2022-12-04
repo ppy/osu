@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerLoungeSubScreen : OnlinePlayTestScene
+    public partial class TestSceneMultiplayerLoungeSubScreen : OnlinePlayTestScene
     {
         protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 

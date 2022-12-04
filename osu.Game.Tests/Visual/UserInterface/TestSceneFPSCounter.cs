@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneFPSCounter : OsuTestScene
+    public partial class TestSceneFPSCounter : OsuTestScene
     {
         [SetUpSteps]
         public void SetUpSteps()

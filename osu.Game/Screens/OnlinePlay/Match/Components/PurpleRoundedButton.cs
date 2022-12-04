@@ -7,7 +7,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class PurpleRoundedButton : RoundedButton
+    public partial class PurpleRoundedButton : RoundedButton
     {
         [BackgroundDependencyLoader]
         private void load()

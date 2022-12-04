@@ -17,7 +17,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class MouseSettings : SettingsSubsection
+    public partial class MouseSettings : SettingsSubsection
     {
         private readonly MouseHandler mouseHandler;
 
@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }, true);
         }
 
-        public class SensitivitySetting : SettingsSlider<double, SensitivitySlider>
+        public partial class SensitivitySetting : SettingsSlider<double, SensitivitySlider>
         {
             public SensitivitySetting()
             {
@@ -193,7 +193,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
         }
 
-        public class SensitivitySettingY : SettingsSlider<double, SensitivitySliderY>
+        public partial class SensitivitySettingY : SettingsSlider<double, SensitivitySliderY>
         {
             public SensitivitySettingY()
             {
@@ -202,12 +202,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
         }
 
-        public class SensitivitySlider : OsuSliderBar<double>
+        public partial class SensitivitySlider : OsuSliderBar<double>
         {
             public override LocalisableString TooltipText => Current.Disabled ? MouseSettingsStrings.EnableHighPrecisionForSensitivityAdjust : $"{base.TooltipText}x";
         }
 
-        public class SensitivitySliderY : OsuSliderBar<double>
+        public partial class SensitivitySliderY : OsuSliderBar<double>
         {
             public override LocalisableString TooltipText => Current.Disabled ? MouseSettingsStrings.EnableSeparateSensitivity : $"{base.TooltipText}x";
         }

@@ -7,7 +7,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class TestSceneManiaPlayer : PlayerTestScene
+    public partial class TestSceneManiaPlayer : PlayerTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
     }

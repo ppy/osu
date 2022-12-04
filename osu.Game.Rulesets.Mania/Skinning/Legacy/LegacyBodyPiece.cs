@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyBodyPiece : LegacyManiaColumnElement
+    public partial class LegacyBodyPiece : LegacyManiaColumnElement
     {
         private DrawableHoldNote holdNote = null!;
 

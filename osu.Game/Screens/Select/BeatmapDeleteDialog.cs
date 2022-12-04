@@ -7,7 +7,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapDeleteDialog : DeleteConfirmationDialog
+    public partial class BeatmapDeleteDialog : DeleteConfirmationDialog
     {
         private readonly BeatmapSetInfo beatmapSet;
 

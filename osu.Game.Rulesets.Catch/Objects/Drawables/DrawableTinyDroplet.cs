@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableTinyDroplet : DrawableDroplet
+    public partial class DrawableTinyDroplet : DrawableDroplet
     {
         protected override float ScaleFactor => base.ScaleFactor / 2;
 

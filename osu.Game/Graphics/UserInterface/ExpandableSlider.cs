@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// An <see cref="IExpandable"/> implementation for the UI slider bar control.
     /// </summary>
-    public class ExpandableSlider<T, TSlider> : CompositeDrawable, IExpandable, IHasCurrentValue<T>
+    public partial class ExpandableSlider<T, TSlider> : CompositeDrawable, IExpandable, IHasCurrentValue<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
         where TSlider : OsuSliderBar<T>, new()
     {
@@ -130,7 +130,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// An <see cref="IExpandable"/> implementation for the UI slider bar control.
     /// </summary>
-    public class ExpandableSlider<T> : ExpandableSlider<T, OsuSliderBar<T>>
+    public partial class ExpandableSlider<T> : ExpandableSlider<T, OsuSliderBar<T>>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
     }

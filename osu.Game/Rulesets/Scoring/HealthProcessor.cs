@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public abstract class HealthProcessor : JudgementProcessor
+    public abstract partial class HealthProcessor : JudgementProcessor
     {
         /// <summary>
         /// Invoked when the <see cref="ScoreProcessor"/> is in a failed state.

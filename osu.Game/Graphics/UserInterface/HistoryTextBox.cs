@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface
     /// The history of committed text can be navigated using up/down arrows.
     /// This resembles the operation of command-line terminals.
     /// </summary>
-    public class HistoryTextBox : FocusedTextBox
+    public partial class HistoryTextBox : FocusedTextBox
     {
         private readonly LimitedCapacityQueue<string> messageHistory;
 

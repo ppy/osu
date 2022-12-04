@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class PoolableHitExplosion : PoolableDrawable
+    public partial class PoolableHitExplosion : PoolableDrawable
     {
         public const double DURATION = 200;
 

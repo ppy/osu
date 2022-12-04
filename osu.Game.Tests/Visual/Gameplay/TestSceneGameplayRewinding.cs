@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneGameplayRewinding : OsuPlayerTestScene
+    public partial class TestSceneGameplayRewinding : OsuPlayerTestScene
     {
         [Resolved]
         private AudioManager audioManager { get; set; }

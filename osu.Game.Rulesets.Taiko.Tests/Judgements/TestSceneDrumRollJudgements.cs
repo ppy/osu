@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Taiko.Replays;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 {
-    public class TestSceneDrumRollJudgements : JudgementTest
+    public partial class TestSceneDrumRollJudgements : JudgementTest
     {
         [Test]
         public void TestHitAllDrumRoll()

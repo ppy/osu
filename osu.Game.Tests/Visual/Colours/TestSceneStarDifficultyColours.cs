@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Colours
 {
-    public class TestSceneStarDifficultyColours : OsuTestScene
+    public partial class TestSceneStarDifficultyColours : OsuTestScene
     {
         [Resolved]
         private OsuColour colours { get; set; }
