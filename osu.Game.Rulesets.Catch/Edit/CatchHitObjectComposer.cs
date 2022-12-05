@@ -188,7 +188,8 @@ namespace osu.Game.Rulesets.Catch.Edit
                     if (EditorBeatmap.PlacementObject.Value is JuiceStream)
                     {
                         // Juice stream path is not subject to snapping.
-                        return null;
+                        if (((JuiceStream)EditorBeatmap.PlacementObject.Value).Distance != 0)
+                            return null;
                     }
 
                     double timeAtCursor = ((CatchPlayfield)Playfield).TimeAtScreenSpacePosition(inputManager.CurrentState.Mouse.Position);
