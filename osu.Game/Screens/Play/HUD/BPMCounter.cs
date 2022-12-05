@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class BPMCounter : RollingCounter<double>, ISkinnableDrawable
     {
+        protected override double RollingDuration => 750;
+
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
