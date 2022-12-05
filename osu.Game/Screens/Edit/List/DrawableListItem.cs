@@ -94,9 +94,8 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private void updateText(T? target)
+        private void updateText(T target)
         {
-            if (target is null) return;
             //Set the text to the target's name, if set. Else try and get the name of the class that defined T
             Scheduler.Add(() => text.Text = GetName(target));
         }

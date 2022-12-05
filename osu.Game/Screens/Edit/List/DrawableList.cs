@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Edit.List
 
             RelativeSizeAxes = Axes.X;
             //todo: compute this somehow add runtime
-            Height = 100f;
+            Height = ScrollContainer.AvailableContent + 1;
             ListContainer.Spacing = new Vector2(2.5f);
             Items.BindCollectionChanged((s, t) =>
             {
@@ -90,7 +90,10 @@ namespace osu.Game.Screens.Edit.List
 
                         ItemAdded.Invoke(value);
                         //Add new items manually, if they weren't added automatically
+                        //todo: is this still needed?
                         if (value.Model != key) ListContainer.Add(value);
+
+                        Height = ScrollContainer.AvailableContent + 1;
                     }
 
                     UpdateItem();
@@ -126,6 +129,8 @@ namespace osu.Game.Screens.Edit.List
                     rearrangableItem.UpdateItem();
                 }
             });
+            //just one scheduler is not enough
+            Scheduler.Add(() => Scheduler.Add(() => Height = ScrollContainer.AvailableContent + 1));
         }
 
         public virtual void Select() => ApplyAction(t => t.Select());

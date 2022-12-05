@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
@@ -241,6 +242,12 @@ namespace osu.Game.Screens.Edit.List
         protected override void OnSetDragAction(ref Action value)
         {
             List.OnDragAction = value;
+        }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            base.OnScroll(e);
+            return this.FindClosestParent<DrawableList<T>>() != null;
         }
     }
 }

@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
@@ -32,6 +33,12 @@ namespace osu.Game.Screens.Edit.List
                         break;
                 }
             };
+        }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            base.OnScroll(e);
+            return true;
         }
 
         public T RepresentedItem => Model.RepresentedItem;
