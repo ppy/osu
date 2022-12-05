@@ -14,6 +14,8 @@ using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -71,7 +73,14 @@ namespace osu.Game.Graphics.Backgrounds
         private void load(ShaderManager shaders, IRenderer renderer)
         {
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "TriangleBorder");
-            texture = renderer.WhitePixel;
+
+            // HACK: we want to use white pixel as a texture here, but it doesn't work with custom texture coordinates for some reason
+            texture = renderer.CreateTexture(1, 1, true);
+
+            var image = new Image<Rgba32>(1, 1);
+            image[0, 0] = new Rgba32(1f, 1f, 1f);
+
+            texture.SetData(new TextureUpload(image));
         }
 
         protected override void LoadComplete()
@@ -238,28 +247,42 @@ namespace osu.Game.Graphics.Backgrounds
 
                 float relativeHeight = triangleSize.Y / size.Y;
                 float relativeWidth = triangleSize.X / size.X;
+                Vector2 textureSize = texture.GetTextureRect().Size;
+                float xTextureRatio = textureSize.X / relativeWidth;
+                float yTextureRatio = textureSize.Y / relativeHeight;
 
                 foreach (TriangleParticle particle in parts)
                 {
                     Vector2 topLeft = particle.Position - new Vector2(relativeWidth * 0.5f, 0f);
-                    Vector2 topRight = topLeft + new Vector2(relativeWidth, 0f);
-                    Vector2 bottomLeft = topLeft + new Vector2(0f, relativeHeight);
-                    Vector2 bottomRight = bottomLeft + new Vector2(relativeWidth, 0f);
+
+                    Vector2 topLeftClipped = clipToDrawable(topLeft);
+                    Vector2 topRightClipped = clipToDrawable(topLeft + new Vector2(relativeWidth, 0f));
+                    Vector2 bottomLeftClipped = clipToDrawable(topLeft + new Vector2(0f, relativeHeight));
+                    Vector2 bottomRightClipped = clipToDrawable(topLeft + new Vector2(relativeWidth, relativeHeight));
 
                     var drawQuad = new Quad(
-                        Vector2Extensions.Transform(topLeft * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(topRight * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(bottomLeft * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(bottomRight * size, DrawInfo.Matrix)
+                        Vector2Extensions.Transform(topLeftClipped * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(topRightClipped * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(bottomLeftClipped * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(bottomRightClipped * size, DrawInfo.Matrix)
                     );
 
-                    ColourInfo colourInfo = triangleColourInfo(DrawColourInfo.Colour, new Quad(topLeft, topRight, bottomLeft, bottomRight));
+                    ColourInfo colourInfo = triangleColourInfo(DrawColourInfo.Colour, new Quad(topLeftClipped, topRightClipped, bottomLeftClipped, bottomRightClipped));
 
-                    renderer.DrawQuad(texture, drawQuad, colourInfo, vertexAction: vertexBatch.AddAction);
+                    var textureCoords = new Framework.Graphics.Primitives.RectangleF(
+                        (topLeftClipped.X - topLeft.X) * xTextureRatio,
+                        (topLeftClipped.Y - topLeft.Y) * yTextureRatio,
+                        (topRightClipped.X - topLeftClipped.X) * xTextureRatio,
+                        (bottomLeftClipped.Y - topLeftClipped.Y) * yTextureRatio
+                    );
+
+                    renderer.DrawQuad(texture, drawQuad, colourInfo, vertexAction: vertexBatch.AddAction, textureCoords: textureCoords);
                 }
 
                 shader.Unbind();
             }
+
+            private static Vector2 clipToDrawable(Vector2 input) => new Vector2(Math.Clamp(input.X, 0f, 1f), Math.Clamp(input.Y, 0f, 1f));
 
             private static ColourInfo triangleColourInfo(ColourInfo source, Quad quad)
             {
