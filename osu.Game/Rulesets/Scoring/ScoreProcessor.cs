@@ -285,7 +285,7 @@ namespace osu.Game.Rulesets.Scoring
             // We only extract scoring values from the score's statistics. This is because accuracy is always relative to the point of pass or fail rather than relative to the whole beatmap.
             extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
 
-            return maximum.BaseScore > 0 ? current.BaseScore / maximum.BaseScore : 1;
+            return maximum.BaseScore > 0 ? (double)current.BaseScore / maximum.BaseScore : 1;
         }
 
         /// <summary>
