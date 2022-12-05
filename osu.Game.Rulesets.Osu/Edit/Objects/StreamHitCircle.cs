@@ -2,8 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Game.Rulesets.Osu.Objects;
 
-namespace osu.Game.Rulesets.Osu.Objects
+namespace osu.Game.Rulesets.Osu.Edit.Objects
 {
     public class StreamHitCircle : HitCircle
     {

@@ -9,12 +9,13 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Edit.Objects;
+using osu.Game.Rulesets.Osu.Edit.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Tests
+namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     [TestFixture]
     public partial class TestSceneStream : OsuSkinnableTestScene
@@ -31,9 +32,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var playfield = new TestOsuPlayfield();
 
-            Vector2 pos = new Vector2(0, 0);
-
-            playfield.Add(createSingle(circleSize, auto, 0, pos, hitOffset));
+            for (double t = 0; t < 60000; t += 4000)
+                playfield.Add(createSingle(circleSize, auto, t, Vector2.Zero, hitOffset));
 
             return playfield;
         }
@@ -55,8 +55,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 }, new[]
                 {
                     new StreamControlPoint(),
-                    new StreamControlPoint(100, 4, 1.5),
-                    new StreamControlPoint(200, 8, 1)
+                    new StreamControlPoint(500, 100, 1.5),
+                    new StreamControlPoint(1000, 50, 1)
                 })
             };
 

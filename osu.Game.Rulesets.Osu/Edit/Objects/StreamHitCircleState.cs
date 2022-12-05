@@ -8,7 +8,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Objects
+namespace osu.Game.Rulesets.Osu.Edit.Objects
 {
     public class StreamHitCircleState : IHasComboInformation, IHasPosition
     {
