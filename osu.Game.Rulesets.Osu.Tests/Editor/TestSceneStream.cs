@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Objects;
 using osu.Game.Rulesets.Osu.Edit.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
