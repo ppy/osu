@@ -166,9 +166,9 @@ namespace osu.Game.Rulesets.Osu.Utils
         }
 
         /// <summary>
-        /// Flips the slider about its start position.
+        /// Flips the slider about its start position horizontally.
         /// </summary>
-        public static void FlipSlider(Slider slider)
+        public static void FlipSliderHorizontally(Slider slider)
         {
             void flipNestedObject(OsuHitObject nested) => nested.Position = new Vector2(slider.Position.X - (nested.X - slider.Position.X), nested.Y);
             static void flipControlPoint(PathControlPoint point) => point.Position = new Vector2(-point.Position.X, point.Position.Y);
