@@ -3,11 +3,13 @@
 
 using System;
 using osu.Framework;
+using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.List
 {
     public interface IRearrangableDrawableListItem<T> : IDrawableListItem<T>, IStateful<SelectionState>
+        where T : Drawable
     {
         event Action Selected;
         event Action Deselected;

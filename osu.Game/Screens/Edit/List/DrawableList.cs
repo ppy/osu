@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
@@ -15,63 +14,25 @@ namespace osu.Game.Screens.Edit.List
     public partial class DrawableList<T> : RearrangeableListContainer<DrawableListRepresetedItem<T>>, IDrawableListItem<T>
         where T : Drawable
     {
-        private Action<T, int> setItemDepth = IDrawableListItem<T>.DEFAULT_SET_ITEM_DEPTH;
+        private DrawableListProperties<T> properties;
 
-        public Action<T, int> SetItemDepth
+        public DrawableListProperties<T> Properties
         {
-            get => setItemDepth;
-            set
+            get => properties;
+            internal set
             {
-                setItemDepth = value;
+                properties = value;
                 UpdateItem();
             }
         }
 
-        private Action onDragAction;
-
-        public Action OnDragAction
-        {
-            get => onDragAction;
-            set
-            {
-                onDragAction = value;
-                UpdateItem();
-            }
-        }
-
-        public Action<Action<IDrawableListItem<T>>> ApplyAll
-        {
-            get => applyAll1;
-            set
-            {
-                applyAll1 = value;
-                UpdateItem();
-            }
-        }
-
-        private Func<T, LocalisableString> getName = IDrawableListItem<T>.GetDefaultText;
-        private Action<Action<IDrawableListItem<T>>> applyAll1;
         public T? RepresentedItem => null;
-
         public IReadOnlyDictionary<DrawableListRepresetedItem<T>, RearrangeableListItem<DrawableListRepresetedItem<T>>> ItemMaps => ItemMap;
-
-        public Func<T, LocalisableString> GetName
-        {
-            get => getName;
-            set
-            {
-                getName = value;
-                UpdateItem();
-            }
-        }
-
         public event Action<RearrangeableListItem<DrawableListRepresetedItem<T>>> ItemAdded = _ => { };
 
-        public DrawableList()
+        public DrawableList(DrawableListProperties<T> properties)
         {
-            onDragAction = default_onDragAction;
-            applyAll1 = ApplyAction;
-
+            this.properties = properties;
             RelativeSizeAxes = Axes.X;
             //todo: compute this somehow add runtime
             Height = ScrollContainer.AvailableContent + 1;
@@ -102,19 +63,32 @@ namespace osu.Game.Screens.Edit.List
             UpdateItem();
         }
 
+        public DrawableList()
+            //cannot access this here
+            : this(new DrawableListProperties<T>())
+        {
+            Properties.TopLevelItem = this;
+        }
+
         public virtual Drawable GetDrawableListItem() => this;
 
-        private void default_onDragAction()
+        internal void default_onDragAction()
         {
             for (int i = 0; i < Items.Count; i++)
             {
                 T representedItem = Items[i].RepresentedItem;
 
-                SetItemDepth.Invoke(representedItem, Items.Count - i);
+                Properties.SetItemDepth.Invoke(representedItem, Items.Count - i);
             }
         }
 
         #region IDrawableListItem<T>
+
+        DrawableListProperties<T> IDrawableListItem<T>.Properties
+        {
+            get => Properties;
+            set => Properties = value;
+        }
 
         public void UpdateItem()
         {
@@ -122,10 +96,7 @@ namespace osu.Game.Screens.Edit.List
             {
                 if (item is IDrawableListItem<T> rearrangableItem)
                 {
-                    rearrangableItem.ApplyAll = ApplyAll;
-                    rearrangableItem.GetName = getName;
-                    rearrangableItem.SetItemDepth = SetItemDepth;
-                    rearrangableItem.OnDragAction = OnDragAction;
+                    rearrangableItem.Properties = Properties;
                     rearrangableItem.UpdateItem();
                 }
             });
@@ -160,23 +131,11 @@ namespace osu.Game.Screens.Edit.List
             switch (item.Type)
             {
                 case DrawableListEntryType.Item:
-                    newItem = new DrawableListItem<T>(item)
-                    {
-                        ApplyAll = ApplyAll,
-                        GetName = GetName,
-                        SetItemDepth = SetItemDepth,
-                        OnDragAction = OnDragAction,
-                    };
+                    newItem = new DrawableListItem<T>(item, Properties);
                     break;
 
                 case DrawableListEntryType.MinimisableList:
-                    newItem = new DrawableMinimisableList<T>(item)
-                    {
-                        ApplyAll = ApplyAll,
-                        GetName = GetName,
-                        SetItemDepth = SetItemDepth,
-                        OnDragAction = OnDragAction,
-                    };
+                    newItem = new DrawableMinimisableList<T>(item, Properties);
                     break;
             }
 

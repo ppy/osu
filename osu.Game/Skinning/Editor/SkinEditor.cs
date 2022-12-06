@@ -225,8 +225,8 @@ namespace osu.Game.Skinning.Editor
         private void initLayerEditor()
         {
             LayerSidebarList.List.Items.RemoveAll(_ => true);
-            LayerSidebarList.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
-            LayerSidebarList.SetItemDepth = (blueprint, depth) =>
+            LayerSidebarList.Properties.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
+            LayerSidebarList.Properties.SetItemDepth = (blueprint, depth) =>
             {
                 if (blueprint.Parent is Container<Drawable> container)
                 {
@@ -240,7 +240,7 @@ namespace osu.Game.Skinning.Editor
                     containerM.Invalidate();
                 }
             };
-            LayerSidebarList.OnDragAction();
+            LayerSidebarList.Properties.OnDragAction();
         }
 
         protected override void LoadComplete()

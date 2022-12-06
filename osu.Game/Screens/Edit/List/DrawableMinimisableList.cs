@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
@@ -15,35 +14,34 @@ namespace osu.Game.Screens.Edit.List
     public partial class DrawableMinimisableList<T> : AbstractListItem<T>
         where T : Drawable
     {
-        private Action<Action<IDrawableListItem<T>>> applyAll;
-
-        public override Action<Action<IDrawableListItem<T>>> ApplyAll
-        {
-            get => applyAll;
-            set
-            {
-                applyAll = value;
-                List.ApplyAll = value;
-            }
-        }
-
         public BindableBool Enabled { get; } = new BindableBool();
         public readonly DrawableList<T> List;
 
         private readonly DrawableListItem<T> representedListItem;
 
         public DrawableMinimisableList(T item)
-            : this(new DrawableListRepresetedItem<T>(item, DrawableListEntryType.MinimisableList))
+            : this(item, new DrawableListProperties<T>())
+        {
+            setProperties();
+        }
+
+        public DrawableMinimisableList(T item, DrawableListProperties<T> properties)
+            : this(new DrawableListRepresetedItem<T>(item, DrawableListEntryType.MinimisableList), properties)
         {
         }
 
         public DrawableMinimisableList(DrawableListRepresetedItem<T> item)
-            : base(item)
+            : this(item, new DrawableListProperties<T>())
+        {
+            setProperties();
+        }
+
+        public DrawableMinimisableList(DrawableListRepresetedItem<T> item, DrawableListProperties<T> properties)
+            : base(item, properties)
         {
             SpriteIcon icon;
             Container head;
             ClickableContainer headClickableContainer;
-            applyAll = ApplyAction;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             InternalChildren = new Drawable[]
@@ -69,24 +67,16 @@ namespace osu.Game.Screens.Edit.List
                                 Anchor = Anchor.CentreLeft,
                             },
                         },
-                        representedListItem = new DrawableListItem<T>(Model)
+                        representedListItem = new DrawableListItem<T>(Model, Properties)
                         {
                             X = icon.LayoutSize.X,
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
-                            ApplyAll = ApplyAll,
-                            GetName = GetName,
-                            SetItemDepth = SetItemDepth,
-                            OnDragAction = OnDragAction,
                         }
                     }
                 },
-                List = new DrawableList<T>
+                List = new DrawableList<T>(Properties)
                 {
-                    GetName = GetName,
-                    SetItemDepth = SetItemDepth,
-                    OnDragAction = OnDragAction,
-                    ApplyAll = ApplyAll,
                     X = icon.LayoutSize.X,
                     Y = head.LayoutSize.Y,
                 }
@@ -139,6 +129,12 @@ namespace osu.Game.Screens.Edit.List
             Scheduler.Add(UpdateItem);
         }
 
+        private void setProperties()
+        {
+            Properties.TopLevelItem = this;
+            Properties.OnDragAction = List.default_onDragAction;
+        }
+
         private bool checkAllSelectedState(SelectionState state)
         {
             foreach (var item in List.ItemMaps.Values)
@@ -165,16 +161,10 @@ namespace osu.Game.Screens.Edit.List
 
         public override void UpdateItem()
         {
-            representedListItem.ApplyAll = ApplyAll;
-            representedListItem.GetName = GetName;
-            representedListItem.SetItemDepth = SetItemDepth;
-            representedListItem.OnDragAction = OnDragAction;
+            representedListItem.Properties = Properties;
             representedListItem.UpdateItem();
 
-            List.ApplyAll = ApplyAll;
-            List.GetName = GetName;
-            List.SetItemDepth = SetItemDepth;
-            List.OnDragAction = OnDragAction;
+            List.Properties = Properties;
             List.UpdateItem();
         }
 
@@ -232,22 +222,6 @@ namespace osu.Game.Screens.Edit.List
                         break;
                 }
             }
-        }
-
-        protected override void OnSetItemDepth(ref Action<T, int> value)
-        {
-            List.SetItemDepth = value;
-        }
-
-        protected override void OnSetDragAction(ref Action value)
-        {
-            List.OnDragAction = value;
-        }
-
-        protected override bool OnScroll(ScrollEvent e)
-        {
-            base.OnScroll(e);
-            return this.FindClosestParent<DrawableList<T>>() != null;
         }
     }
 }

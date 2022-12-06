@@ -12,6 +12,7 @@ using osu.Game.Graphics.UserInterface;
 namespace osu.Game.Screens.Edit.List
 {
     public interface IDrawableListItem<T> : IDrawableListRepresetedItem<T>, IDrawable
+        where T : Drawable
     {
         public static readonly Action<T, int> DEFAULT_SET_ITEM_DEPTH = (t, d) =>
         {
@@ -33,12 +34,8 @@ namespace osu.Game.Screens.Edit.List
             }
         };
 
-        //Applied a function onto all elements in this list.
-        //(If there are nested lists, this will always affect EVERY item)
-        public Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
-        public Func<T, LocalisableString> GetName { get; set; }
-        public Action<T, int> SetItemDepth { get; set; }
-        public Action OnDragAction { get; set; }
+        public DrawableListProperties<T> Properties { get; internal set; }
+
         public bool EnableSelection => typeof(T).GetInterfaces().Contains(typeof(IStateful<SelectionState>));
 
         public void UpdateItem();
@@ -68,6 +65,7 @@ namespace osu.Game.Screens.Edit.List
     public static class DrawableListItemInterfaceExtension
     {
         public static void ApplySelectionState<T>(this IDrawableListItem<T> item, SelectionState state)
+            where T : Drawable
         {
             switch (state)
             {

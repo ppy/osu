@@ -20,12 +20,9 @@ namespace osu.Game.Screens.Edit.List
         private readonly Box box;
         public bool IsSelected { get; private set; }
 
-        public override Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
-
-        internal DrawableListItem(DrawableListRepresetedItem<T> represetedItem, LocalisableString name)
-            : base(represetedItem)
+        internal DrawableListItem(DrawableListRepresetedItem<T> represetedItem, DrawableListProperties<T> properties, LocalisableString name)
+            : base(represetedItem, properties)
         {
-            ApplyAll = e => e(this);
             text.Text = name;
             AutoSizeAxes = Axes.Both;
 
@@ -57,10 +54,10 @@ namespace osu.Game.Screens.Edit.List
             box.Hide();
         }
 
-        public DrawableListItem(DrawableListRepresetedItem<T> represetedItem)
+        public DrawableListItem(DrawableListRepresetedItem<T> represetedItem, DrawableListProperties<T> properties)
             //select the name of the from the drawable as it's name, if it is set
             //otherwise use the
-            : this(represetedItem, string.Empty)
+            : this(represetedItem, properties, string.Empty)
         {
         }
 
@@ -75,7 +72,7 @@ namespace osu.Game.Screens.Edit.List
             }
             else
             {
-                ApplyAll(element => element.Deselect());
+                Properties.ApplyAll(element => element.Deselect());
                 Select();
             }
 
@@ -97,7 +94,7 @@ namespace osu.Game.Screens.Edit.List
         private void updateText(T target)
         {
             //Set the text to the target's name, if set. Else try and get the name of the class that defined T
-            Scheduler.Add(() => text.Text = GetName(target));
+            Scheduler.Add(() => text.Text = Properties.GetName(target));
         }
 
         public override void Select()
@@ -142,20 +139,20 @@ namespace osu.Game.Screens.Edit.List
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            ApplyAll(element => element.Deselect());
+            Properties.ApplyAll(element => element.Deselect());
             Select();
             return base.OnDragStart(e);
         }
 
         protected override void OnDrag(DragEvent e)
         {
-            OnDragAction();
+            Properties.OnDragAction();
             base.OnDrag(e);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            OnDragAction();
+            Properties.OnDragAction();
             base.OnDragEnd(e);
         }
 
@@ -176,7 +173,5 @@ namespace osu.Game.Screens.Edit.List
                 }
             }
         }
-
-        protected override void OnSetItemDepth(ref Action<T, int> value) => UpdateItem();
     }
 }

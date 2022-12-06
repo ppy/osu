@@ -4,8 +4,6 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.List
@@ -13,11 +11,15 @@ namespace osu.Game.Screens.Edit.List
     public abstract partial class AbstractListItem<T> : RearrangeableListItem<DrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
         where T : Drawable
     {
-        private Action<T, int> setItemDepth = IDrawableListItem<T>.DEFAULT_SET_ITEM_DEPTH;
-        private Action onDragAction = () => { };
-        private Func<T, LocalisableString> getName = IDrawableListItem<T>.GetDefaultText;
+        public DrawableListProperties<T> Properties { get; internal set; }
 
-        protected AbstractListItem(DrawableListRepresetedItem<T> item)
+        DrawableListProperties<T> IDrawableListItem<T>.Properties
+        {
+            get => Properties;
+            set => Properties = value;
+        }
+
+        protected AbstractListItem(DrawableListRepresetedItem<T> item, DrawableListProperties<T> properties)
             : base(item)
         {
             StateChanged = t =>
@@ -33,52 +35,10 @@ namespace osu.Game.Screens.Edit.List
                         break;
                 }
             };
-        }
-
-        protected override bool OnScroll(ScrollEvent e)
-        {
-            base.OnScroll(e);
-            return true;
+            Properties = properties;
         }
 
         public T RepresentedItem => Model.RepresentedItem;
-        public abstract Action<Action<IDrawableListItem<T>>> ApplyAll { get; set; }
-
-        public Func<T, LocalisableString> GetName
-        {
-            get => getName;
-            set
-            {
-                getName = value;
-                OnSetGetName(ref value);
-            }
-        }
-
-        protected virtual void OnSetGetName(ref Func<T, LocalisableString> value) { }
-
-        public Action<T, int> SetItemDepth
-        {
-            get => setItemDepth;
-            set
-            {
-                setItemDepth = value;
-                OnSetItemDepth(ref value);
-            }
-        }
-
-        protected virtual void OnSetItemDepth(ref Action<T, int> value) { }
-
-        public Action OnDragAction
-        {
-            get => onDragAction;
-            set
-            {
-                onDragAction = value;
-                OnSetDragAction(ref value);
-            }
-        }
-
-        protected virtual void OnSetDragAction(ref Action value) { }
 
         public abstract void UpdateItem();
         public abstract void Select();

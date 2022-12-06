@@ -30,8 +30,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             list.Width = 100;
             list.RelativeSizeAxes = Axes.None;
             list.Anchor = Anchor.CentreRight;
-            BackingDrawableList.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
-            BackingDrawableList.SetItemDepth = (blueprint, depth) =>
+            BackingDrawableList.Properties.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
+            BackingDrawableList.Properties.SetItemDepth = (blueprint, depth) =>
             {
                 if (blueprint.Parent is Container<Drawable> container)
                 {
