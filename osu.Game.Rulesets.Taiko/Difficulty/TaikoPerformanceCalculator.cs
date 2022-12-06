@@ -153,13 +153,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 double lnP300 = lnErfcApprox(attributes.GreatHitWindow / root2 * d);
                 double lnP100 = lnErfcApprox(goodHitWindow / root2 * d);
 
-                double t1 = countGreat * ((attributes.GreatHitWindow * Math.Exp(-Math.Pow(attributes.GreatHitWindow / root2 * d, 2))) / p300);
+                double t1 = countGreat * (Math.Exp(Math.Log(attributes.GreatHitWindow) + -Math.Pow(attributes.GreatHitWindow / root2 * d, 2)) / p300);
 
-                double t2A = Math.Exp(Math.Log(goodHitWindow * Math.Exp(-Math.Pow(goodHitWindow / root2 * d, 2))) - logDiff(lnP300, lnP100));
-                double t2B = Math.Exp(Math.Log(attributes.GreatHitWindow * Math.Exp(-Math.Pow(attributes.GreatHitWindow / root2 * d, 2))) - logDiff(lnP300, lnP100));
+                double t2A = Math.Exp(Math.Log(goodHitWindow) + -Math.Pow(goodHitWindow / root2 * d, 2) - logDiff(lnP300, lnP100));
+                double t2B = Math.Exp(Math.Log(attributes.GreatHitWindow) + -Math.Pow(attributes.GreatHitWindow / root2 * d, 2) - logDiff(lnP300, lnP100));
                 double t2 = (countOk + 1) * (t2A - t2B);
 
-                double t3 = countMiss * Math.Exp(Math.Log(goodHitWindow * Math.Exp(-Math.Pow(goodHitWindow / root2 * d, 2))) - lnP100);
+                double t3 = countMiss * Math.Exp(Math.Log(goodHitWindow) + -Math.Pow(goodHitWindow / root2 * d, 2) - lnP100);
 
                 return t1 + t2 - t3;
             }
