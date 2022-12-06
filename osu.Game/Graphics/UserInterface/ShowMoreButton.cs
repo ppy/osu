@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,11 +13,13 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
 using System.Collections.Generic;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShowMoreButton : LoadingButton
+    public partial class ShowMoreButton : LoadingButton
     {
         private const int duration = 200;
 
@@ -80,7 +84,7 @@ namespace osu.Game.Graphics.UserInterface
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                            Text = "show more".ToUpper(),
+                            Text = CommonStrings.ButtonsShowMore.ToUpper(),
                         },
                         rightIcon = new ChevronIcon
                         {
@@ -111,7 +115,7 @@ namespace osu.Game.Graphics.UserInterface
             rightIcon.SetHoveredState(false);
         }
 
-        public class ChevronIcon : SpriteIcon
+        public partial class ChevronIcon : SpriteIcon
         {
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }

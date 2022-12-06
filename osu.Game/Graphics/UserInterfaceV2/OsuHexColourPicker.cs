@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class OsuHexColourPicker : HexColourPicker
+    public partial class OsuHexColourPicker : HexColourPicker
     {
         public OsuHexColourPicker()
         {
@@ -23,13 +25,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] OverlayColourProvider overlayColourProvider, OsuColour osuColour)
         {
-            Background.Colour = overlayColourProvider?.Dark6 ?? osuColour.GreySeafoamDarker;
+            Background.Colour = overlayColourProvider?.Dark6 ?? osuColour.GreySeaFoamDarker;
         }
 
         protected override TextBox CreateHexCodeTextBox() => new OsuTextBox();
         protected override ColourPreview CreateColourPreview() => new OsuColourPreview();
 
-        private class OsuColourPreview : ColourPreview
+        private partial class OsuColourPreview : ColourPreview
         {
             private readonly Box preview;
 

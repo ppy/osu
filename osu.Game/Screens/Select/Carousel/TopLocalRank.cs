@@ -6,85 +6,88 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Threading;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
+using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osuTK;
+using Realms;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class TopLocalRank : UpdateableRank
+    public partial class TopLocalRank : CompositeDrawable
     {
         private readonly BeatmapInfo beatmapInfo;
 
         [Resolved]
-        private ScoreManager scores { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private ScoreManager scoreManager { get; set; } = null!;
 
-        private IBindable<WeakReference<ScoreInfo>> itemUpdated;
-        private IBindable<WeakReference<ScoreInfo>> itemRemoved;
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        private IDisposable? scoreSubscription;
+
+        private readonly UpdateableRank updateable;
+
+        public ScoreRank? DisplayedRank => updateable.Rank;
 
         public TopLocalRank(BeatmapInfo beatmapInfo)
-            : base(null)
         {
             this.beatmapInfo = beatmapInfo;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            itemUpdated = scores.ItemUpdated.GetBoundCopy();
-            itemUpdated.BindValueChanged(scoreChanged);
+            AutoSizeAxes = Axes.Both;
 
-            itemRemoved = scores.ItemRemoved.GetBoundCopy();
-            itemRemoved.BindValueChanged(scoreChanged);
-
-            ruleset.ValueChanged += _ => fetchAndLoadTopScore();
-
-            fetchAndLoadTopScore();
-        }
-
-        private void scoreChanged(ValueChangedEvent<WeakReference<ScoreInfo>> weakScore)
-        {
-            if (weakScore.NewValue.TryGetTarget(out var score))
+            InternalChild = updateable = new UpdateableRank
             {
-                if (score.BeatmapInfoID == beatmapInfo.ID)
-                    fetchAndLoadTopScore();
+                Size = new Vector2(40, 20),
+                Alpha = 0,
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ruleset.BindValueChanged(_ =>
+            {
+                scoreSubscription?.Dispose();
+                scoreSubscription = realm.RegisterForNotifications(r =>
+                        r.All<ScoreInfo>()
+                         .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
+                                 + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
+                                 + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
+                                 + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName),
+                    localScoresChanged);
+            }, true);
+
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, Exception _)
+            {
+                // This subscription may fire from changes to linked beatmaps, which we don't care about.
+                // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
+                if (changes?.HasCollectionChanges() == false)
+                    return;
+
+                ScoreInfo? topScore = scoreManager.OrderByTotalScore(sender.Detach()).FirstOrDefault();
+
+                updateable.Rank = topScore?.Rank;
+                updateable.Alpha = topScore != null ? 1 : 0;
             }
         }
 
-        private ScheduledDelegate scheduledRankUpdate;
-
-        private void fetchAndLoadTopScore()
+        protected override void Dispose(bool isDisposing)
         {
-            var rank = fetchTopScore()?.Rank;
-            scheduledRankUpdate = Schedule(() =>
-            {
-                Rank = rank;
-
-                // Required since presence is changed via IsPresent override
-                Invalidate(Invalidation.Presence);
-            });
-        }
-
-        // We're present if a rank is set, or if there is a pending rank update (IsPresent = true is required for the scheduler to run).
-        public override bool IsPresent => base.IsPresent && (Rank != null || scheduledRankUpdate?.Completed == false);
-
-        private ScoreInfo fetchTopScore()
-        {
-            if (scores == null || beatmapInfo == null || ruleset?.Value == null || api?.LocalUser.Value == null)
-                return null;
-
-            return scores.QueryScores(s => s.UserID == api.LocalUser.Value.Id && s.BeatmapInfoID == beatmapInfo.ID && s.RulesetID == ruleset.Value.ID && !s.DeletePending)
-                         .OrderByDescending(s => s.TotalScore)
-                         .FirstOrDefault();
+            base.Dispose(isDisposing);
+            scoreSubscription?.Dispose();
         }
     }
 }

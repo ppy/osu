@@ -1,43 +1,29 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Textures;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Legacy;
-using static osu.Game.Skinning.LegacySkinConfiguration;
+using static osu.Game.Skinning.SkinConfiguration;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
     /// Transformer used to handle support of legacy features for individual rulesets.
     /// </summary>
-    public abstract class LegacySkinTransformer : ISkin
+    public abstract class LegacySkinTransformer : SkinTransformer
     {
         /// <summary>
-        /// The <see cref="ISkin"/> which is being transformed.
+        /// Whether the skin being transformed is able to provide legacy resources for the ruleset.
         /// </summary>
-        [NotNull]
-        protected ISkin Skin { get; }
+        public virtual bool IsProvidingLegacyResources => this.HasFont(LegacyFont.Combo);
 
-        protected LegacySkinTransformer([NotNull] ISkin skin)
+        protected LegacySkinTransformer(ISkin skin)
+            : base(skin)
         {
-            Skin = skin ?? throw new ArgumentNullException(nameof(skin));
         }
 
-        public virtual Drawable GetDrawableComponent(ISkinComponent component) => Skin.GetDrawableComponent(component);
-
-        public Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
-
-        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
-            => Skin.GetTexture(componentName, wrapModeS, wrapModeT);
-
-        public virtual ISample GetSample(ISampleInfo sampleInfo)
+        public override ISample? GetSample(ISampleInfo sampleInfo)
         {
             if (!(sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample))
                 return Skin.GetSample(sampleInfo);
@@ -46,9 +32,7 @@ namespace osu.Game.Skinning
             if (legacySample.IsLayered && playLayeredHitSounds?.Value == false)
                 return new SampleVirtual();
 
-            return Skin.GetSample(sampleInfo);
+            return base.GetSample(sampleInfo);
         }
-
-        public virtual IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => Skin.GetConfig<TLookup, TValue>(lookup);
     }
 }

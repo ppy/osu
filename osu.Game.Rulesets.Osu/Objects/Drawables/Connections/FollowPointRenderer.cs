@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// Visualises connections between <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPointRenderer : PooledDrawableWithLifetimeContainer<FollowPointLifetimeEntry, FollowPointConnection>
+    public partial class FollowPointRenderer : PooledDrawableWithLifetimeContainer<FollowPointLifetimeEntry, FollowPointConnection>
     {
         public new IReadOnlyList<FollowPointLifetimeEntry> Entries => lifetimeEntries;
 
@@ -30,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             InternalChildren = new Drawable[]
             {
-                connectionPool = new DrawablePool<FollowPointConnection>(1, 200),
+                connectionPool = new DrawablePool<FollowPointConnection>(10, 200),
                 pointPool = new DrawablePool<FollowPoint>(50, 1000)
             };
         }
@@ -56,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             var newEntry = new FollowPointLifetimeEntry(hitObject);
 
-            var index = lifetimeEntries.AddInPlace(newEntry, Comparer<FollowPointLifetimeEntry>.Create((e1, e2) =>
+            int index = lifetimeEntries.AddInPlace(newEntry, Comparer<FollowPointLifetimeEntry>.Create((e1, e2) =>
             {
                 int comp = e1.Start.StartTime.CompareTo(e2.Start.StartTime);
 

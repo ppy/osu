@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -17,7 +19,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultHealthDisplay : HealthDisplay, IHasAccentColour, ISkinnableDrawable
+    public partial class DefaultHealthDisplay : HealthDisplay, IHasAccentColour, ISkinnableDrawable
     {
         /// <summary>
         /// The base opacity of the glow.

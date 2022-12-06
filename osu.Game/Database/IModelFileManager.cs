@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 
 namespace osu.Game.Database
@@ -15,8 +17,7 @@ namespace osu.Game.Database
         /// <param name="model">The item to operate on.</param>
         /// <param name="file">The existing file to be replaced.</param>
         /// <param name="contents">The new file contents.</param>
-        /// <param name="filename">An optional filename for the new file. Will use the previous filename if not specified.</param>
-        void ReplaceFile(TModel model, TFileModel file, Stream contents, string filename = null);
+        void ReplaceFile(TModel model, TFileModel file, Stream contents);
 
         /// <summary>
         /// Delete an existing file.
@@ -26,7 +27,7 @@ namespace osu.Game.Database
         void DeleteFile(TModel model, TFileModel file);
 
         /// <summary>
-        /// Add a new file.
+        /// Add a new file. If the file already exists, it is overwritten.
         /// </summary>
         /// <param name="model">The item to operate on.</param>
         /// <param name="contents">The new file contents.</param>

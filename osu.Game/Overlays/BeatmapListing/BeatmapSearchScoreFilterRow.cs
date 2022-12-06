@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
@@ -10,7 +12,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapSearchScoreFilterRow : BeatmapSearchMultipleSelectionFilterRow<ScoreRank>
+    public partial class BeatmapSearchScoreFilterRow : BeatmapSearchMultipleSelectionFilterRow<ScoreRank>
     {
         public BeatmapSearchScoreFilterRow()
             : base(BeatmapsStrings.ListingSearchFiltersRank)
@@ -19,14 +21,14 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override MultipleSelectionFilter CreateMultipleSelectionFilter() => new RankFilter();
 
-        private class RankFilter : MultipleSelectionFilter
+        private partial class RankFilter : MultipleSelectionFilter
         {
             protected override MultipleSelectionFilterTabItem CreateTabItem(ScoreRank value) => new RankItem(value);
 
-            protected override IEnumerable<ScoreRank> GetValues() => base.GetValues().Reverse();
+            protected override IEnumerable<ScoreRank> GetValues() => base.GetValues().Where(r => r > ScoreRank.F).Reverse();
         }
 
-        private class RankItem : MultipleSelectionFilterTabItem
+        private partial class RankItem : MultipleSelectionFilterTabItem
         {
             public RankItem(ScoreRank value)
                 : base(value)

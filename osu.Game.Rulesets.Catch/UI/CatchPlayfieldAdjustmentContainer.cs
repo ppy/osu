@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.UI;
@@ -8,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
+    public partial class CatchPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         private const float playfield_size_adjust = 0.8f;
 
@@ -40,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// A <see cref="Container"/> which scales its content relative to a target width.
         /// </summary>
-        private class ScalingContainer : Container
+        private partial class ScalingContainer : Container
         {
             protected override void Update()
             {

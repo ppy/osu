@@ -1,16 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsHeader : Container
+    public partial class SettingsHeader : Container
     {
         private readonly LocalisableString heading;
         private readonly LocalisableString subheading;
@@ -29,36 +31,26 @@ namespace osu.Game.Overlays.Settings
 
             Children = new Drawable[]
             {
-                new FillFlowContainer
+                new OsuTextFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    Padding = new MarginPadding
                     {
-                        new OsuSpriteText
-                        {
-                            Text = heading,
-                            Font = OsuFont.TorusAlternate.With(size: 40),
-                            Margin = new MarginPadding
-                            {
-                                Left = SettingsPanel.CONTENT_MARGINS,
-                                Top = Toolbar.Toolbar.TOOLTIP_HEIGHT
-                            },
-                        },
-                        new OsuSpriteText
-                        {
-                            Colour = colourProvider.Content2,
-                            Text = subheading,
-                            Font = OsuFont.GetFont(size: 18),
-                            Margin = new MarginPadding
-                            {
-                                Left = SettingsPanel.CONTENT_MARGINS,
-                                Bottom = 30
-                            },
-                        },
+                        Horizontal = SettingsPanel.CONTENT_MARGINS,
+                        Top = Toolbar.Toolbar.TOOLTIP_HEIGHT,
+                        Bottom = 30
                     }
-                }
+                }.With(flow =>
+                {
+                    flow.AddText(heading, header => header.Font = OsuFont.TorusAlternate.With(size: 40));
+                    flow.NewLine();
+                    flow.AddText(subheading, subheader =>
+                    {
+                        subheader.Colour = colourProvider.Content2;
+                        subheader.Font = OsuFont.GetFont(size: 18);
+                    });
+                })
             };
         }
     }

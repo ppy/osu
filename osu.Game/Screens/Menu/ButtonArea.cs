@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework;
 using osu.Framework.Graphics;
@@ -11,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Menu
 {
-    public class ButtonArea : Container, IStateful<Visibility>
+    public partial class ButtonArea : Container, IStateful<Visibility>
     {
         public FlowContainerWithOrigin Flow;
 
@@ -88,7 +90,7 @@ namespace osu.Game.Screens.Menu
 
         public event Action<Visibility> StateChanged;
 
-        private class ButtonAreaBackground : Box, IStateful<ButtonAreaBackgroundState>
+        private partial class ButtonAreaBackground : Box, IStateful<ButtonAreaBackgroundState>
         {
             private ButtonAreaBackgroundState state;
 

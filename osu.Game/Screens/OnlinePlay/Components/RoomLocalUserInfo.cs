@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,9 +12,12 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class RoomLocalUserInfo : OnlinePlayComposite
+    public partial class RoomLocalUserInfo : OnlinePlayComposite
     {
         private OsuSpriteText attemptDisplay;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public RoomLocalUserInfo()
         {
@@ -54,6 +59,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 {
                     int remaining = MaxAttempts.Value.Value - UserScore.Value.PlaylistItemAttempts.Sum(a => a.Attempts);
                     attemptDisplay.Text += $" ({remaining} remaining)";
+
+                    if (remaining == 0)
+                        attemptDisplay.Colour = colours.RedLight;
                 }
             }
             else

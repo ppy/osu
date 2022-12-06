@@ -11,19 +11,19 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyReverseArrow : CompositeDrawable
+    public partial class LegacyReverseArrow : CompositeDrawable
     {
         [Resolved(canBeNull: true)]
-        private DrawableHitObject drawableHitObject { get; set; }
+        private DrawableHitObject? drawableHitObject { get; set; }
 
-        private Drawable proxy;
+        private Drawable proxy = null!;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skinSource)
         {
             AutoSizeAxes = Axes.Both;
 
-            string lookupName = new OsuSkinComponent(OsuSkinComponents.ReverseArrow).LookupName;
+            string lookupName = new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow).LookupName;
 
             var skin = skinSource.FindProvider(s => s.GetTexture(lookupName) != null);
             InternalChild = skin?.GetAnimation(lookupName, true, true) ?? Empty();

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.IO;
@@ -27,10 +29,10 @@ namespace osu.Game.Tests.Skins
                     new Color4(142, 199, 255, 255),
                     new Color4(255, 128, 128, 255),
                     new Color4(128, 255, 255, 255),
-                    new Color4(100, 100, 100, 100),
+                    new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
                 };
 
-                Assert.AreEqual(expectedColors.Count, comboColors.Count);
+                Assert.AreEqual(expectedColors.Count, comboColors?.Count);
                 for (int i = 0; i < expectedColors.Count; i++)
                     Assert.AreEqual(expectedColors[i], comboColors[i]);
             }
@@ -47,7 +49,7 @@ namespace osu.Game.Tests.Skins
                 var comboColors = decoder.Decode(stream).ComboColours;
                 var expectedColors = SkinConfiguration.DefaultComboColours;
 
-                Assert.AreEqual(expectedColors.Count, comboColors.Count);
+                Assert.AreEqual(expectedColors.Count, comboColors?.Count);
                 for (int i = 0; i < expectedColors.Count; i++)
                     Assert.AreEqual(expectedColors[i], comboColors[i]);
             }
@@ -106,7 +108,7 @@ namespace osu.Game.Tests.Skins
             var decoder = new LegacySkinDecoder();
             using (var resStream = TestResources.OpenResource("skin-latest.ini"))
             using (var stream = new LineBufferedReader(resStream))
-                Assert.AreEqual(LegacySkinConfiguration.LATEST_VERSION, decoder.Decode(stream).LegacyVersion);
+                Assert.AreEqual(SkinConfiguration.LATEST_VERSION, decoder.Decode(stream).LegacyVersion);
         }
 
         [Test]

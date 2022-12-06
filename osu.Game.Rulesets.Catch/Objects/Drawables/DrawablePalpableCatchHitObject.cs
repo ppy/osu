@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,9 +14,11 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     [Cached(typeof(IHasCatchObjectState))]
-    public abstract class DrawablePalpableCatchHitObject : DrawableCatchHitObject, IHasCatchObjectState
+    public abstract partial class DrawablePalpableCatchHitObject : DrawableCatchHitObject, IHasCatchObjectState
     {
         public new PalpableCatchHitObject HitObject => (PalpableCatchHitObject)base.HitObject;
+
+        public double DisplayStartTime => LifetimeStart;
 
         Bindable<Color4> IHasCatchObjectState.AccentColour => AccentColour;
 

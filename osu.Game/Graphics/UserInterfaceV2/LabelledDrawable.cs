@@ -1,20 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public abstract class LabelledDrawable<T> : CompositeDrawable
+    public abstract partial class LabelledDrawable<T> : CompositeDrawable
         where T : Drawable
     {
         private float? fixedLabelWidth;
@@ -40,7 +39,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected const float CONTENT_PADDING_VERTICAL = 10;
         protected const float CONTENT_PADDING_HORIZONTAL = 15;
-        protected const float CORNER_RADIUS = 15;
+
+        public const float CORNER_RADIUS = 15;
 
         /// <summary>
         /// The component that is being displayed.
@@ -152,22 +152,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load(OverlayColourProvider? colourProvider, OsuColour osuColour)
         {
-            background.Colour = colourProvider?.Background4 ?? Color4Extensions.FromHex(@"1c2125");
+            background.Colour = colourProvider?.Background5 ?? Color4Extensions.FromHex(@"1c2125");
             descriptionText.Colour = osuColour.Yellow;
         }
 
-        public string Label
+        public LocalisableString Label
         {
             set => labelText.Text = value;
         }
 
-        public string Description
+        public LocalisableString Description
         {
             set
             {
                 descriptionText.Text = value;
 
-                if (!string.IsNullOrEmpty(value))
+                if (!string.IsNullOrEmpty(value.ToString()))
                     descriptionText.Show();
                 else
                     descriptionText.Hide();

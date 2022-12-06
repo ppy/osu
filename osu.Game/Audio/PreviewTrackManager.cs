@@ -1,13 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -17,29 +12,25 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Audio
 {
-    public class PreviewTrackManager : Component
+    public partial class PreviewTrackManager : Component
     {
+        private readonly IAdjustableAudioComponent mainTrackAdjustments;
+
         private readonly BindableDouble muteBindable = new BindableDouble();
 
-        [Resolved]
-        private AudioManager audio { get; set; }
+        private ITrackStore trackStore = null!;
 
-        private PreviewTrackStore trackStore;
+        protected TrackManagerPreviewTrack? CurrentTrack;
 
-        protected TrackManagerPreviewTrack CurrentTrack;
-
-        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(OsuGameBase.GLOBAL_TRACK_VOLUME_ADJUST);
+        public PreviewTrackManager(IAdjustableAudioComponent mainTrackAdjustments)
+        {
+            this.mainTrackAdjustments = mainTrackAdjustments;
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audioManager)
         {
-            // this is a temporary solution to get around muting ourselves.
-            // todo: update this once we have a BackgroundTrackManager or similar.
-            trackStore = new PreviewTrackStore(audioManager.TrackMixer, new OnlineStore());
-
-            audio.AddItem(trackStore);
-            trackStore.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
-            trackStore.AddAdjustment(AdjustableProperty.Volume, audio.VolumeTrack);
+            trackStore = audioManager.GetTrackStore(new OnlineStore());
         }
 
         /// <summary>
@@ -55,7 +46,7 @@ namespace osu.Game.Audio
             {
                 CurrentTrack?.Stop();
                 CurrentTrack = track;
-                audio.Tracks.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+                mainTrackAdjustments.AddAdjustment(AdjustableProperty.Volume, muteBindable);
             });
 
             track.Stopped += () => Schedule(() =>
@@ -64,7 +55,7 @@ namespace osu.Game.Audio
                     return;
 
                 CurrentTrack = null;
-                audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+                mainTrackAdjustments.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
             });
 
             return track;
@@ -94,10 +85,10 @@ namespace osu.Game.Audio
         protected virtual TrackManagerPreviewTrack CreatePreviewTrack(IBeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) =>
             new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
-        public class TrackManagerPreviewTrack : PreviewTrack
+        public partial class TrackManagerPreviewTrack : PreviewTrack
         {
-            [Resolved(canBeNull: true)]
-            public IPreviewTrackOwner Owner { get; private set; }
+            [Resolved]
+            public IPreviewTrackOwner? Owner { get; private set; }
 
             private readonly IBeatmapSetInfo beatmapSetInfo;
             private readonly ITrackStore trackManager;
@@ -111,57 +102,12 @@ namespace osu.Game.Audio
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Logger.Log($"A {nameof(PreviewTrack)} was created without a containing {nameof(IPreviewTrackOwner)}. An owner should be added for correct behaviour.");
+
+                if (Owner == null)
+                    Logger.Log($"A {nameof(PreviewTrack)} was created without a containing {nameof(IPreviewTrackOwner)}. An owner should be added for correct behaviour.");
             }
 
             protected override Track GetTrack() => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo.OnlineID}.mp3");
-        }
-
-        private class PreviewTrackStore : AudioCollectionManager<AdjustableAudioComponent>, ITrackStore
-        {
-            private readonly AudioMixer defaultMixer;
-            private readonly IResourceStore<byte[]> store;
-
-            internal PreviewTrackStore(AudioMixer defaultMixer, IResourceStore<byte[]> store)
-            {
-                this.defaultMixer = defaultMixer;
-                this.store = store;
-            }
-
-            public Track GetVirtual(double length = double.PositiveInfinity)
-            {
-                if (IsDisposed) throw new ObjectDisposedException($"Cannot retrieve items for an already disposed {nameof(PreviewTrackStore)}");
-
-                var track = new TrackVirtual(length);
-                AddItem(track);
-                return track;
-            }
-
-            public Track Get(string name)
-            {
-                if (IsDisposed) throw new ObjectDisposedException($"Cannot retrieve items for an already disposed {nameof(PreviewTrackStore)}");
-
-                if (string.IsNullOrEmpty(name)) return null;
-
-                var dataStream = store.GetStream(name);
-
-                if (dataStream == null)
-                    return null;
-
-                // Todo: This is quite unsafe. TrackBass shouldn't be exposed as public.
-                Track track = new TrackBass(dataStream);
-
-                defaultMixer.Add(track);
-                AddItem(track);
-
-                return track;
-            }
-
-            public Task<Track> GetAsync(string name) => Task.Run(() => Get(name));
-
-            public Stream GetStream(string name) => store.GetStream(name);
-
-            public IEnumerable<string> GetAvailableResources() => store.GetAvailableResources();
         }
     }
 }

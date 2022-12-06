@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using osu.Framework;
@@ -14,7 +16,7 @@ namespace osu.Game.Graphics.Containers
     /// A FillFlowContainer that provides functionality to cycle selection between children
     /// The selection wraps around when overflowing past the first or last child.
     /// </summary>
-    public class SelectionCycleFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable, IStateful<SelectionState>
+    public partial class SelectionCycleFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable, IStateful<SelectionState>
     {
         public T Selected => (selectedIndex >= 0 && selectedIndex < Count) ? this[selectedIndex.Value] : null;
 
@@ -40,7 +42,7 @@ namespace osu.Game.Graphics.Containers
 
         public void Select(T item)
         {
-            var newIndex = IndexOf(item);
+            int newIndex = IndexOf(item);
 
             if (newIndex < 0)
                 setSelected(null);
@@ -57,7 +59,7 @@ namespace osu.Game.Graphics.Containers
             drawable.StateChanged += state => selectionChanged(drawable, state);
         }
 
-        public override bool Remove(T drawable)
+        public override bool Remove(T drawable, bool disposeImmediately)
             => throw new NotSupportedException($"Cannot remove drawables from {nameof(SelectionCycleFillFlowContainer<T>)}");
 
         private void setSelected(int? value)

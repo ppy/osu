@@ -13,16 +13,16 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
-    public class EffectPointVisualisation : CompositeDrawable
+    public partial class EffectPointVisualisation : CompositeDrawable, IControlPointVisualisation
     {
         private readonly EffectControlPoint effect;
-        private Bindable<bool> kiai;
+        private Bindable<bool> kiai = null!;
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         public EffectPointVisualisation(EffectControlPoint point)
         {
@@ -36,37 +36,64 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         private void load()
         {
             kiai = effect.KiaiModeBindable.GetBoundCopy();
-            kiai.BindValueChanged(_ =>
-            {
-                ClearInternal();
-
-                AddInternal(new ControlPointVisualisation(effect));
-
-                if (!kiai.Value)
-                    return;
-
-                var endControlPoint = beatmap.ControlPointInfo.EffectPoints.FirstOrDefault(c => c.Time > effect.Time && !c.KiaiMode);
-
-                // handle kiai duration
-                // eventually this will be simpler when we have control points with durations.
-                if (endControlPoint != null)
-                {
-                    RelativeSizeAxes = Axes.Both;
-                    Origin = Anchor.TopLeft;
-
-                    Width = (float)(endControlPoint.Time - effect.Time);
-
-                    AddInternal(new PointVisualisation
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Origin = Anchor.TopLeft,
-                        Width = 1,
-                        Height = 0.25f,
-                        Depth = float.MaxValue,
-                        Colour = effect.GetRepresentingColour(colours).Darken(0.5f),
-                    });
-                }
-            }, true);
+            kiai.BindValueChanged(_ => refreshDisplay(), true);
         }
+
+        private EffectControlPoint? nextControlPoint;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Due to the limitations of ControlPointInfo, it's impossible to know via event flow when the next kiai point has changed.
+            // This is due to the fact that an EffectPoint can be added to an existing group. We would need to bind to ItemAdded on *every*
+            // future group to track this.
+            //
+            // I foresee this being a potential performance issue on beatmaps with many control points, so let's limit how often we check
+            // for changes. ControlPointInfo needs a refactor to make this flow better, but it should do for now.
+            Scheduler.AddDelayed(() =>
+            {
+                var next = beatmap.ControlPointInfo.EffectPoints.FirstOrDefault(c => c.Time > effect.Time);
+
+                if (!ReferenceEquals(nextControlPoint, next))
+                {
+                    nextControlPoint = next;
+                    refreshDisplay();
+                }
+            }, 100, true);
+        }
+
+        private void refreshDisplay()
+        {
+            ClearInternal();
+
+            AddInternal(new ControlPointVisualisation(effect));
+
+            if (!kiai.Value)
+                return;
+
+            // handle kiai duration
+            // eventually this will be simpler when we have control points with durations.
+            if (nextControlPoint != null)
+            {
+                RelativeSizeAxes = Axes.Both;
+                Origin = Anchor.TopLeft;
+
+                Width = (float)(nextControlPoint.Time - effect.Time);
+
+                AddInternal(new PointVisualisation
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.TopLeft,
+                    Width = 1,
+                    Height = 0.25f,
+                    Depth = float.MaxValue,
+                    Colour = effect.GetRepresentingColour(colours).Darken(0.5f),
+                });
+            }
+        }
+
+        // kiai sections display duration, so are required to be visualised.
+        public bool IsVisuallyRedundant(ControlPoint other) => other is EffectControlPoint otherEffect && effect.KiaiMode == otherEffect.KiaiMode;
     }
 }

@@ -3,50 +3,52 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using Realms;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
+    public partial class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
     {
-        public Action<ScoreInfo> ScoreSelected;
+        public Action<ScoreInfo>? ScoreSelected;
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private BeatmapInfo? beatmapInfo;
 
-        private BeatmapInfo beatmapInfo;
-
-        public BeatmapInfo BeatmapInfo
+        public BeatmapInfo? BeatmapInfo
         {
             get => beatmapInfo;
             set
             {
-                if (beatmapInfo == value)
+                if (beatmapInfo == null && value == null)
+                    return;
+
+                if (beatmapInfo?.Equals(value) == true)
                     return;
 
                 beatmapInfo = value;
-                Scores = null;
 
-                UpdateScores();
+                // Refetch is scheduled, which can cause scores to be outdated if the leaderboard is not currently updating.
+                // As scores are potentially used by other components, clear them eagerly to ensure a more correct state.
+                SetScores(null);
+
+                RefetchScores();
             }
         }
 
         private bool filterMods;
-
-        private IBindable<WeakReference<ScoreInfo>> itemRemoved;
-
-        private IBindable<WeakReference<ScoreInfo>> itemAdded;
 
         /// <summary>
         /// Whether to apply the game's currently selected mods as a filter when retrieving scores.
@@ -61,126 +63,88 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 filterMods = value;
 
-                UpdateScores();
+                RefetchScores();
             }
         }
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; }
+        private ScoreManager scoreManager { get; set; } = null!;
 
         [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private RulesetStore rulesets { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        private IDisposable? scoreSubscription;
+
+        private GetScoresRequest? scoreRetrievalRequest;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            ruleset.ValueChanged += _ => UpdateScores();
+            ruleset.ValueChanged += _ => RefetchScores();
             mods.ValueChanged += _ =>
             {
                 if (filterMods)
-                    UpdateScores();
+                    RefetchScores();
             };
-
-            itemRemoved = scoreManager.ItemRemoved.GetBoundCopy();
-            itemRemoved.BindValueChanged(onScoreRemoved);
-
-            itemAdded = scoreManager.ItemUpdated.GetBoundCopy();
-            itemAdded.BindValueChanged(onScoreAdded);
-        }
-
-        protected override void Reset()
-        {
-            base.Reset();
-            TopScore = null;
-        }
-
-        private void onScoreRemoved(ValueChangedEvent<WeakReference<ScoreInfo>> score) =>
-            scoreStoreChanged(score);
-
-        private void onScoreAdded(ValueChangedEvent<WeakReference<ScoreInfo>> score) =>
-            scoreStoreChanged(score);
-
-        private void scoreStoreChanged(ValueChangedEvent<WeakReference<ScoreInfo>> score)
-        {
-            if (Scope != BeatmapLeaderboardScope.Local)
-                return;
-
-            if (score.NewValue.TryGetTarget(out var scoreInfo))
-            {
-                if (BeatmapInfo?.ID != scoreInfo.BeatmapInfoID)
-                    return;
-            }
-
-            RefreshScores();
         }
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
-        private CancellationTokenSource loadCancellationSource;
-
-        protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+        protected override APIRequest? FetchScores(CancellationToken cancellationToken)
         {
-            loadCancellationSource?.Cancel();
-            loadCancellationSource = new CancellationTokenSource();
+            var fetchBeatmapInfo = BeatmapInfo;
 
-            if (BeatmapInfo == null)
+            if (fetchBeatmapInfo == null)
             {
-                PlaceholderState = PlaceholderState.NoneSelected;
+                SetErrorState(LeaderboardState.NoneSelected);
                 return null;
             }
+
+            var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
 
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                var scores = scoreManager
-                    .QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == BeatmapInfo.ID && s.Ruleset.ID == ruleset.Value.ID);
-
-                if (filterMods && !mods.Value.Any())
-                {
-                    // we need to filter out all scores that have any mods to get all local nomod scores
-                    scores = scores.Where(s => !s.Mods.Any());
-                }
-                else if (filterMods)
-                {
-                    // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
-                    // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
-                    var selectedMods = mods.Value.Select(m => m.Acronym);
-                    scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
-                }
-
-                scoreManager.OrderByTotalScoreAsync(scores.ToArray(), loadCancellationSource.Token)
-                            .ContinueWith(ordered => scoresCallback?.Invoke(ordered.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
-
+                subscribeToLocalScores(fetchBeatmapInfo, cancellationToken);
                 return null;
             }
 
-            if (api?.IsLoggedIn != true)
+            if (!api.IsLoggedIn)
             {
-                PlaceholderState = PlaceholderState.NotLoggedIn;
+                SetErrorState(LeaderboardState.NotLoggedIn);
                 return null;
             }
 
-            if (BeatmapInfo.OnlineBeatmapID == null || BeatmapInfo?.Status <= BeatmapSetOnlineStatus.Pending)
+            if (!fetchRuleset.IsLegacyRuleset())
             {
-                PlaceholderState = PlaceholderState.Unavailable;
+                SetErrorState(LeaderboardState.RulesetUnavailable);
+                return null;
+            }
+
+            if (fetchBeatmapInfo.OnlineID <= 0 || fetchBeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
+            {
+                SetErrorState(LeaderboardState.BeatmapUnavailable);
                 return null;
             }
 
             if (!api.LocalUser.Value.IsSupporter && (Scope != BeatmapLeaderboardScope.Global || filterMods))
             {
-                PlaceholderState = PlaceholderState.NotSupporter;
+                SetErrorState(LeaderboardState.NotSupporter);
                 return null;
             }
 
-            IReadOnlyList<Mod> requestMods = null;
+            IReadOnlyList<Mod>? requestMods = null;
 
             if (filterMods && !mods.Value.Any())
                 // add nomod for the request
@@ -188,22 +152,14 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            var req = new GetScoresRequest(BeatmapInfo, ruleset.Value ?? BeatmapInfo.Ruleset, Scope, requestMods);
+            scoreRetrievalRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
 
-            req.Success += r =>
-            {
-                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToArray(), loadCancellationSource.Token)
-                            .ContinueWith(ordered => Schedule(() =>
-                            {
-                                if (loadCancellationSource.IsCancellationRequested)
-                                    return;
+            scoreRetrievalRequest.Success += response => SetScores(
+                scoreManager.OrderByTotalScore(response.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
+                response.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
+            );
 
-                                scoresCallback?.Invoke(ordered.Result);
-                                TopScore = r.UserScore?.CreateScoreInfo(rulesets);
-                            }), TaskContinuationOptions.OnlyOnRanToCompletion);
-            };
-
-            return req;
+            return scoreRetrievalRequest;
         }
 
         protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope)
@@ -215,5 +171,58 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             Action = () => ScoreSelected?.Invoke(model)
         };
+
+        private void subscribeToLocalScores(BeatmapInfo beatmapInfo, CancellationToken cancellationToken)
+        {
+            Debug.Assert(beatmapInfo != null);
+
+            scoreSubscription?.Dispose();
+            scoreSubscription = null;
+
+            scoreSubscription = realm.RegisterForNotifications(r =>
+                r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
+                                          + $" AND {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
+                                          + $" AND {nameof(ScoreInfo.DeletePending)} == false"
+                    , beatmapInfo.ID, ruleset.Value.ShortName), localScoresChanged);
+
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, Exception exception)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                // This subscription may fire from changes to linked beatmaps, which we don't care about.
+                // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
+                if (changes?.HasCollectionChanges() == false)
+                    return;
+
+                var scores = sender.AsEnumerable();
+
+                if (filterMods && !mods.Value.Any())
+                {
+                    // we need to filter out all scores that have any mods to get all local nomod scores
+                    scores = scores.Where(s => !s.Mods.Any());
+                }
+                else if (filterMods)
+                {
+                    // otherwise find all the scores that have all of the currently selected mods (similar to how web applies mod filters)
+                    // we're creating and using a string HashSet representation of selected mods so that it can be translated into the DB query itself
+                    var selectedMods = mods.Value.Select(m => m.Acronym).ToHashSet();
+
+                    scores = scores.Where(s => selectedMods.SetEquals(s.Mods.Select(m => m.Acronym)));
+                }
+
+                scores = scoreManager.OrderByTotalScore(scores.Detach());
+
+                SetScores(scores);
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            scoreSubscription?.Dispose();
+            scoreRetrievalRequest?.Cancel();
+        }
     }
 }

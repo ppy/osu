@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,12 +18,12 @@ namespace osu.Game.Tournament.Components
     /// <summary>
     /// Mod icon displayed in tournament usages, allowing user overridden graphics.
     /// </summary>
-    public class TournamentModIcon : CompositeDrawable
+    public partial class TournamentModIcon : CompositeDrawable
     {
         private readonly string modAcronym;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         public TournamentModIcon(string modAcronym)
         {
@@ -31,7 +33,7 @@ namespace osu.Game.Tournament.Components
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, LadderInfo ladderInfo)
         {
-            var customTexture = textures.Get($"mods/{modAcronym}");
+            var customTexture = textures.Get($"Mods/{modAcronym}");
 
             if (customTexture != null)
             {
@@ -47,7 +49,7 @@ namespace osu.Game.Tournament.Components
                 return;
             }
 
-            var ruleset = rulesets.GetRuleset(ladderInfo.Ruleset.Value?.ID ?? 0);
+            var ruleset = rulesets.GetRuleset(ladderInfo.Ruleset.Value?.OnlineID ?? 0);
             var modIcon = ruleset?.CreateInstance().CreateModFromAcronym(modAcronym);
 
             if (modIcon == null)

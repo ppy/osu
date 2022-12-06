@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using Markdig.Syntax.Inlines;
@@ -19,7 +21,7 @@ using osu.Game.Overlays.Wiki.Markdown;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneWikiMarkdownContainer : OsuTestScene
+    public partial class TestSceneWikiMarkdownContainer : OsuTestScene
     {
         private TestMarkdownContainer markdownContainer;
 
@@ -187,7 +189,17 @@ Line after image";
             });
         }
 
-        private class TestMarkdownContainer : WikiMarkdownContainer
+        [Test]
+        public void TestFlag()
+        {
+            AddStep("Add flag", () =>
+            {
+                markdownContainer.CurrentPath = @"https://dev.ppy.sh";
+                markdownContainer.Text = "::{flag=\"AU\"}:: ::{flag=\"ZZ\"}::";
+            });
+        }
+
+        private partial class TestMarkdownContainer : WikiMarkdownContainer
         {
             public LinkInline Link;
 
@@ -196,7 +208,7 @@ Line after image";
                 UrlAdded = link => Link = link,
             };
 
-            private class TestMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
+            private partial class TestMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
             {
                 public Action<LinkInline> UrlAdded;
 

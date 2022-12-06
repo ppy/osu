@@ -4,12 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -41,29 +43,28 @@ namespace osu.Game.Rulesets.UI
         public ShaderManager ShaderManager { get; }
 
         /// <summary>
-        /// The ruleset config manager.
+        /// The ruleset config manager. May be null if ruleset does not expose a configuration manager.
         /// </summary>
-        public IRulesetConfigManager RulesetConfigManager { get; private set; }
+        public IRulesetConfigManager? RulesetConfigManager { get; }
 
         public DrawableRulesetDependencies(Ruleset ruleset, IReadOnlyDependencyContainer parent)
             : base(parent)
         {
             var resources = ruleset.CreateResourceStore();
 
-            if (resources != null)
-            {
-                TextureStore = new TextureStore(parent.Get<GameHost>().CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
-                CacheAs(TextureStore = new FallbackTextureStore(TextureStore, parent.Get<TextureStore>()));
+            var host = parent.Get<GameHost>();
 
-                SampleStore = parent.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
-                SampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
-                CacheAs(SampleStore = new FallbackSampleStore(SampleStore, parent.Get<ISampleStore>()));
+            TextureStore = new TextureStore(host.Renderer, parent.Get<GameHost>().CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
+            CacheAs(TextureStore = new FallbackTextureStore(host.Renderer, TextureStore, parent.Get<TextureStore>()));
 
-                ShaderManager = new ShaderManager(new NamespacedResourceStore<byte[]>(resources, @"Shaders"));
-                CacheAs(ShaderManager = new FallbackShaderManager(ShaderManager, parent.Get<ShaderManager>()));
-            }
+            SampleStore = parent.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
+            SampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+            CacheAs(SampleStore = new FallbackSampleStore(SampleStore, parent.Get<ISampleStore>()));
 
-            RulesetConfigManager = parent.Get<RulesetConfigCache>().GetConfigFor(ruleset);
+            ShaderManager = new ShaderManager(host.Renderer, new NamespacedResourceStore<byte[]>(resources, @"Shaders"));
+            CacheAs(ShaderManager = new FallbackShaderManager(host.Renderer, ShaderManager, parent.Get<ShaderManager>()));
+
+            RulesetConfigManager = parent.Get<IRulesetConfigCache>().GetConfigFor(ruleset);
             if (RulesetConfigManager != null)
                 Cache(RulesetConfigManager);
         }
@@ -91,10 +92,9 @@ namespace osu.Game.Rulesets.UI
 
             isDisposed = true;
 
-            SampleStore?.Dispose();
-            TextureStore?.Dispose();
-            ShaderManager?.Dispose();
-            RulesetConfigManager = null;
+            if (ShaderManager.IsNotNull()) SampleStore.Dispose();
+            if (TextureStore.IsNotNull()) TextureStore.Dispose();
+            if (ShaderManager.IsNotNull()) ShaderManager.Dispose();
         }
 
         #endregion
@@ -115,7 +115,11 @@ namespace osu.Game.Rulesets.UI
 
             public Sample Get(string name) => primary.Get(name) ?? fallback.Get(name);
 
-            public Task<Sample> GetAsync(string name) => primary.GetAsync(name) ?? fallback.GetAsync(name);
+            public async Task<Sample> GetAsync(string name, CancellationToken cancellationToken = default)
+            {
+                return await primary.GetAsync(name, cancellationToken).ConfigureAwait(false)
+                       ?? await fallback.GetAsync(name, cancellationToken).ConfigureAwait(false);
+            }
 
             public Stream GetStream(string name) => primary.GetStream(name) ?? fallback.GetStream(name);
 
@@ -155,7 +159,7 @@ namespace osu.Game.Rulesets.UI
 
             public void Dispose()
             {
-                primary?.Dispose();
+                if (primary.IsNotNull()) primary.Dispose();
             }
         }
 
@@ -167,7 +171,8 @@ namespace osu.Game.Rulesets.UI
             private readonly TextureStore primary;
             private readonly TextureStore fallback;
 
-            public FallbackTextureStore(TextureStore primary, TextureStore fallback)
+            public FallbackTextureStore(IRenderer renderer, TextureStore primary, TextureStore fallback)
+                : base(renderer)
             {
                 this.primary = primary;
                 this.fallback = fallback;
@@ -179,7 +184,7 @@ namespace osu.Game.Rulesets.UI
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing);
-                primary?.Dispose();
+                if (primary.IsNotNull()) primary.Dispose();
             }
         }
 
@@ -188,19 +193,19 @@ namespace osu.Game.Rulesets.UI
             private readonly ShaderManager primary;
             private readonly ShaderManager fallback;
 
-            public FallbackShaderManager(ShaderManager primary, ShaderManager fallback)
-                : base(new ResourceStore<byte[]>())
+            public FallbackShaderManager(IRenderer renderer, ShaderManager primary, ShaderManager fallback)
+                : base(renderer, new ResourceStore<byte[]>())
             {
                 this.primary = primary;
                 this.fallback = fallback;
             }
 
-            public override byte[] LoadRaw(string name) => primary.LoadRaw(name) ?? fallback.LoadRaw(name);
+            public override byte[]? LoadRaw(string name) => primary.LoadRaw(name) ?? fallback.LoadRaw(name);
 
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing);
-                primary?.Dispose();
+                if (primary.IsNotNull()) primary.Dispose();
             }
         }
     }

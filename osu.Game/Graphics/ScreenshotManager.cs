@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -24,7 +25,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace osu.Game.Graphics
 {
-    public class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
+    public partial class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 
@@ -43,7 +44,7 @@ namespace osu.Game.Graphics
         private Storage storage;
 
         [Resolved]
-        private NotificationOverlay notificationOverlay { get; set; }
+        private INotificationOverlay notificationOverlay { get; set; }
 
         private Sample shutter;
 
@@ -60,6 +61,9 @@ namespace osu.Game.Graphics
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.TakeScreenshot:
@@ -99,7 +103,9 @@ namespace osu.Game.Graphics
                             framesWaitedEvent.Set();
                     }, 10, true);
 
-                    framesWaitedEvent.Wait();
+                    if (!framesWaitedEvent.Wait(1000))
+                        throw new TimeoutException("Screenshot data did not arrive in a timely fashion");
+
                     waitDelegate.Cancel();
                 }
             }
@@ -109,11 +115,13 @@ namespace osu.Game.Graphics
                 if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
                     cursorVisibility.Value = true;
 
+                host.GetClipboard()?.SetImage(image);
+
                 string filename = getFilename();
 
                 if (filename == null) return;
 
-                using (var stream = storage.GetStream(filename, FileAccess.Write))
+                using (var stream = storage.CreateFileSafely(filename))
                 {
                     switch (screenshotFormat.Value)
                     {
@@ -147,15 +155,15 @@ namespace osu.Game.Graphics
         private string getFilename()
         {
             var dt = DateTime.Now;
-            var fileExt = screenshotFormat.ToString().ToLowerInvariant();
+            string fileExt = screenshotFormat.ToString().ToLowerInvariant();
 
-            var withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
+            string withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
             if (!storage.Exists(withoutIndex))
                 return withoutIndex;
 
             for (ulong i = 1; i < ulong.MaxValue; i++)
             {
-                var indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
+                string indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
                 if (!storage.Exists(indexedName))
                     return indexedName;
             }

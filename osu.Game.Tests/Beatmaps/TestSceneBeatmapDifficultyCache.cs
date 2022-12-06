@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -8,6 +10,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -19,14 +22,13 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Beatmaps
 {
     [HeadlessTest]
-    public class TestSceneBeatmapDifficultyCache : OsuTestScene
+    public partial class TestSceneBeatmapDifficultyCache : OsuTestScene
     {
         public const double BASE_STARS = 5.55;
 
-        private BeatmapSetInfo importedSet;
+        private static readonly Guid guid = Guid.NewGuid();
 
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapSetInfo importedSet;
 
         private TestBeatmapDifficultyCache difficultyCache;
 
@@ -35,7 +37,7 @@ namespace osu.Game.Tests.Beatmaps
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osu)
         {
-            importedSet = ImportBeatmapTest.LoadQuickOszIntoOsu(osu).Result;
+            importedSet = BeatmapImportHelper.LoadQuickOszIntoOsu(osu).GetResultSafely();
         }
 
         [SetUpSteps]
@@ -100,8 +102,8 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestKeyEqualsWithDifferentModInstances()
         {
-            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
-            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
+            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
+            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
 
             Assert.That(key1, Is.EqualTo(key2));
             Assert.That(key1.GetHashCode(), Is.EqualTo(key2.GetHashCode()));
@@ -110,8 +112,8 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestKeyEqualsWithDifferentModOrder()
         {
-            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
-            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModHidden(), new OsuModHardRock() });
+            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
+            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModHidden(), new OsuModHardRock() });
 
             Assert.That(key1, Is.EqualTo(key2));
             Assert.That(key1.GetHashCode(), Is.EqualTo(key2.GetHashCode()));
@@ -120,8 +122,8 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestKeyDoesntEqualWithDifferentModSettings()
         {
-            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.1 } } });
-            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.9 } } });
+            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.1 } } });
+            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.9 } } });
 
             Assert.That(key1, Is.Not.EqualTo(key2));
             Assert.That(key1.GetHashCode(), Is.Not.EqualTo(key2.GetHashCode()));
@@ -130,8 +132,8 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestKeyEqualWithMatchingModSettings()
         {
-            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.25 } } });
-            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.25 } } });
+            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.25 } } });
+            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.25 } } });
 
             Assert.That(key1, Is.EqualTo(key2));
             Assert.That(key1.GetHashCode(), Is.EqualTo(key2.GetHashCode()));
@@ -155,18 +157,18 @@ namespace osu.Game.Tests.Beatmaps
         [TestCase(8.3, DifficultyRating.ExpertPlus)]
         public void TestDifficultyRatingMapping(double starRating, DifficultyRating expectedBracket)
         {
-            var actualBracket = BeatmapDifficultyCache.GetDifficultyRating(starRating);
+            var actualBracket = StarDifficulty.GetDifficultyRating(starRating);
 
             Assert.AreEqual(expectedBracket, actualBracket);
         }
 
-        private class TestBeatmapDifficultyCache : BeatmapDifficultyCache
+        private partial class TestBeatmapDifficultyCache : BeatmapDifficultyCache
         {
             public Func<DifficultyCacheLookup, StarDifficulty> ComputeDifficulty { get; set; }
 
-            protected override Task<StarDifficulty> ComputeValueAsync(DifficultyCacheLookup lookup, CancellationToken token = default)
+            protected override Task<StarDifficulty?> ComputeValueAsync(DifficultyCacheLookup lookup, CancellationToken token = default)
             {
-                return Task.FromResult(ComputeDifficulty?.Invoke(lookup) ?? new StarDifficulty(BASE_STARS, 0));
+                return Task.FromResult<StarDifficulty?>(ComputeDifficulty?.Invoke(lookup) ?? new StarDifficulty(BASE_STARS, 0));
             }
         }
     }

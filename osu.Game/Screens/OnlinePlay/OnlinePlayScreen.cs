@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,7 +21,7 @@ using osu.Game.Users;
 namespace osu.Game.Screens.OnlinePlay
 {
     [Cached]
-    public abstract class OnlinePlayScreen : OsuScreen, IHasSubScreenStack
+    public abstract partial class OnlinePlayScreen : OsuScreen, IHasSubScreenStack
     {
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
@@ -40,17 +42,8 @@ namespace osu.Game.Screens.OnlinePlay
         [Cached]
         private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
-        [Resolved(CanBeNull = true)]
-        private MusicController music { get; set; }
-
-        [Resolved]
-        private OsuGameBase game { get; set; }
-
         [Resolved]
         protected IAPIProvider API { get; private set; }
-
-        [Resolved(CanBeNull = true)]
-        private OsuLogo logo { get; set; }
 
         protected OnlinePlayScreen()
         {
@@ -104,54 +97,59 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void forcefullyExit()
         {
+            Logger.Log($"{this} forcefully exiting due to loss of API connection");
+
             // This is temporary since we don't currently have a way to force screens to be exited
             if (this.IsCurrentScreen())
             {
                 while (this.IsCurrentScreen())
                     this.Exit();
             }
-            else
+            // Also handle the case where a child screen is current (ie. gameplay).
+            else if (this.GetChildScreen() != null)
             {
                 this.MakeCurrent();
                 Schedule(forcefullyExit);
             }
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
             this.FadeIn();
             waves.Show();
 
+            Mods.SetDefault();
+
             if (loungeSubScreen.IsCurrentScreen())
-                loungeSubScreen.OnEntering(last);
+                loungeSubScreen.OnEntering(e);
             else
                 loungeSubScreen.MakeCurrent();
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
             Debug.Assert(screenStack.CurrentScreen != null);
-            screenStack.CurrentScreen.OnResuming(last);
+            screenStack.CurrentScreen.OnResuming(e);
 
-            base.OnResuming(last);
+            base.OnResuming(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
 
             Debug.Assert(screenStack.CurrentScreen != null);
-            screenStack.CurrentScreen.OnSuspending(next);
+            screenStack.CurrentScreen.OnSuspending(e);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             var subScreen = screenStack.CurrentScreen as Drawable;
-            if (subScreen?.IsLoaded == true && screenStack.CurrentScreen.OnExiting(next))
+            if (subScreen?.IsLoaded == true && screenStack.CurrentScreen.OnExiting(e))
                 return true;
 
             RoomManager.PartRoom();
@@ -160,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
-            base.OnExiting(next);
+            base.OnExiting(e);
             return false;
         }
 
@@ -211,7 +209,7 @@ namespace osu.Game.Screens.OnlinePlay
                 ((IBindable<UserActivity>)Activity).BindTo(newOsuScreen.Activity);
         }
 
-        protected IScreen CurrentSubScreen => screenStack.CurrentScreen;
+        public IScreen CurrentSubScreen => screenStack.CurrentScreen;
 
         protected abstract string ScreenTitle { get; }
 
@@ -219,7 +217,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected abstract LoungeSubScreen CreateLounge();
 
-        private class MultiplayerWaveContainer : WaveContainer
+        private partial class MultiplayerWaveContainer : WaveContainer
         {
             protected override bool StartHidden => true;
 

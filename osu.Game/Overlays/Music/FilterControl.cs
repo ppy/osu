@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -11,12 +13,12 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Music
 {
-    public class FilterControl : Container
+    public partial class FilterControl : Container
     {
         public Action<FilterCriteria> FilterChanged;
 
         public readonly FilterTextBox Search;
-        private readonly CollectionDropdown collectionDropdown;
+        private readonly NowPlayingCollectionDropdown collectionDropdown;
 
         public FilterControl()
         {
@@ -34,7 +36,7 @@ namespace osu.Game.Overlays.Music
                             RelativeSizeAxes = Axes.X,
                             Height = 40,
                         },
-                        collectionDropdown = new CollectionDropdown { RelativeSizeAxes = Axes.X }
+                        collectionDropdown = new NowPlayingCollectionDropdown { RelativeSizeAxes = Axes.X }
                     },
                 },
             };
@@ -56,7 +58,7 @@ namespace osu.Game.Overlays.Music
             Collection = collectionDropdown.Current.Value?.Collection
         };
 
-        public class FilterTextBox : SearchTextBox
+        public partial class FilterTextBox : BasicSearchTextBox
         {
             protected override bool AllowCommit => true;
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,11 +34,11 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 
         public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
         {
-            var objectLength = relativePositionAt(endTime, timeRange) - relativePositionAt(startTime, timeRange);
+            double objectLength = relativePositionAt(endTime, timeRange) - relativePositionAt(startTime, timeRange);
             return (float)(objectLength * scrollLength);
         }
 
-        public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
+        public float PositionAt(double time, double currentTime, double timeRange, float scrollLength, double? originTime = null)
         {
             double timelineLength = relativePositionAt(time, timeRange) - relativePositionAt(currentTime, timeRange);
             return (float)(timelineLength * scrollLength);
@@ -90,7 +92,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
         {
             generatePositionMappings(timeRange);
 
-            var mappingIndex = positionMappings.BinarySearch(search, comparer ?? Comparer<PositionMapping>.Default);
+            int mappingIndex = positionMappings.BinarySearch(search, comparer ?? Comparer<PositionMapping>.Default);
 
             if (mappingIndex < 0)
             {
@@ -119,7 +121,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             if (controlPoints.Count == 0)
                 return;
 
-            positionMappings.Add(new PositionMapping(controlPoints[0].StartTime, controlPoints[0]));
+            positionMappings.Add(new PositionMapping(controlPoints[0].Time, controlPoints[0]));
 
             for (int i = 0; i < controlPoints.Count - 1; i++)
             {
@@ -127,9 +129,9 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                 var next = controlPoints[i + 1];
 
                 // Figure out how much of the time range the duration represents, and adjust it by the speed multiplier
-                float length = (float)((next.StartTime - current.StartTime) / timeRange * current.Multiplier);
+                float length = (float)((next.Time - current.Time) / timeRange * current.Multiplier);
 
-                positionMappings.Add(new PositionMapping(next.StartTime, next, positionMappings[^1].Position + length));
+                positionMappings.Add(new PositionMapping(next.Time, next, positionMappings[^1].Position + length));
             }
         }
 

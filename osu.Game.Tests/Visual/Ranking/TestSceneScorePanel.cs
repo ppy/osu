@@ -1,23 +1,27 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneScorePanel : OsuTestScene
+    public partial class TestSceneScorePanel : OsuTestScene
     {
         private ScorePanel panel;
 
         [Test]
         public void TestDRank()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Accuracy = 0.5, Rank = ScoreRank.D };
+            var score = TestResources.CreateTestScoreInfo();
+            score.Accuracy = 0.5;
+            score.Rank = ScoreRank.D;
 
             addPanelStep(score);
         }
@@ -25,7 +29,9 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestCRank()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Accuracy = 0.75, Rank = ScoreRank.C };
+            var score = TestResources.CreateTestScoreInfo();
+            score.Accuracy = 0.75;
+            score.Rank = ScoreRank.C;
 
             addPanelStep(score);
         }
@@ -33,7 +39,9 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestBRank()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Accuracy = 0.85, Rank = ScoreRank.B };
+            var score = TestResources.CreateTestScoreInfo();
+            score.Accuracy = 0.85;
+            score.Rank = ScoreRank.B;
 
             addPanelStep(score);
         }
@@ -41,7 +49,9 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestARank()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Accuracy = 0.925, Rank = ScoreRank.A };
+            var score = TestResources.CreateTestScoreInfo();
+            score.Accuracy = 0.925;
+            score.Rank = ScoreRank.A;
 
             addPanelStep(score);
         }
@@ -49,7 +59,9 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestSRank()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Accuracy = 0.975, Rank = ScoreRank.S };
+            var score = TestResources.CreateTestScoreInfo();
+            score.Accuracy = 0.975;
+            score.Rank = ScoreRank.S;
 
             addPanelStep(score);
         }
@@ -57,7 +69,9 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestAlmostSSRank()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Accuracy = 0.9999, Rank = ScoreRank.S };
+            var score = TestResources.CreateTestScoreInfo();
+            score.Accuracy = 0.9999;
+            score.Rank = ScoreRank.S;
 
             addPanelStep(score);
         }
@@ -65,7 +79,9 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestSSRank()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Accuracy = 1, Rank = ScoreRank.X };
+            var score = TestResources.CreateTestScoreInfo();
+            score.Accuracy = 1;
+            score.Rank = ScoreRank.X;
 
             addPanelStep(score);
         }
@@ -73,7 +89,9 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestAllHitResults()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Statistics = { [HitResult.Perfect] = 350, [HitResult.Ok] = 200 } };
+            var score = TestResources.CreateTestScoreInfo();
+            score.Statistics[HitResult.Perfect] = 350;
+            score.Statistics[HitResult.Ok] = 200;
 
             addPanelStep(score);
         }
@@ -81,7 +99,9 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestContractedPanel()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Accuracy = 0.925, Rank = ScoreRank.A };
+            var score = TestResources.CreateTestScoreInfo();
+            score.Accuracy = 0.925;
+            score.Rank = ScoreRank.A;
 
             addPanelStep(score, PanelState.Contracted);
         }
@@ -89,7 +109,9 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestExpandAndContract()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Accuracy = 0.925, Rank = ScoreRank.A };
+            var score = TestResources.CreateTestScoreInfo();
+            score.Accuracy = 0.925;
+            score.Rank = ScoreRank.A;
 
             addPanelStep(score, PanelState.Contracted);
             AddWaitStep("wait for transition", 10);

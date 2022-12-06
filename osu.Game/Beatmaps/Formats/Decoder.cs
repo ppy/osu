@@ -1,11 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Game.IO;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -38,6 +42,15 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         /// <summary>
+        /// Register dependencies for use with static decoder classes.
+        /// </summary>
+        /// <param name="rulesets">A store containing all available rulesets (used by <see cref="LegacyBeatmapDecoder"/>).</param>
+        public static void RegisterDependencies([NotNull] RulesetStore rulesets)
+        {
+            LegacyBeatmapDecoder.RulesetStore = rulesets ?? throw new ArgumentNullException(nameof(rulesets));
+        }
+
+        /// <summary>
         /// Retrieves a <see cref="Decoder"/> to parse a <see cref="Beatmap"/>.
         /// </summary>
         /// <param name="stream">A stream pointing to the <see cref="Beatmap"/>.</param>
@@ -61,7 +74,7 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             if (line == null)
-                throw new IOException("Unknown file format (null)");
+                throw new IOException("Unknown file format (no content)");
 
             var decoder = typedDecoders.Where(d => line.StartsWith(d.Key, StringComparison.InvariantCulture)).Select(d => d.Value).FirstOrDefault();
 

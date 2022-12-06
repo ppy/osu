@@ -1,19 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChatLineTruncation : OsuTestScene
+    public partial class TestSceneChatLineTruncation : OsuTestScene
     {
         private readonly TestChatLineContainer textContainer;
 
@@ -55,14 +57,14 @@ namespace osu.Game.Tests.Visual.Online
         {
             private static long messageCounter;
 
-            internal static readonly User TEST_SENDER_BACKGROUND = new User
+            internal static readonly APIUser TEST_SENDER_BACKGROUND = new APIUser
             {
                 Username = @"i-am-important",
                 Id = 42,
                 Colour = "#250cc9",
             };
 
-            internal static readonly User TEST_SENDER = new User
+            internal static readonly APIUser TEST_SENDER = new APIUser
             {
                 Username = @"Somebody",
                 Id = 1,
@@ -75,7 +77,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Content = text;
                 IsAction = isAction;
-                Sender = new User
+                Sender = new APIUser
                 {
                     Username = username ?? $"user {number}",
                     Id = number,
@@ -84,7 +86,7 @@ namespace osu.Game.Tests.Visual.Online
             }
         }
 
-        private class TestChatLineContainer : FillFlowContainer<ChatLine>
+        private partial class TestChatLineContainer : FillFlowContainer<ChatLine>
         {
             protected override int Compare(Drawable x, Drawable y)
             {

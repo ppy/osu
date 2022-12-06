@@ -3,16 +3,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Audio;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
 
@@ -20,38 +23,85 @@ namespace osu.Game.Skinning
 {
     public abstract class Skin : IDisposable, ISkin
     {
-        public readonly SkinInfo SkinInfo;
+        /// <summary>
+        /// A texture store which can be used to perform user file lookups for this skin.
+        /// </summary>
+        protected TextureStore? Textures { get; }
 
-        public SkinConfiguration Configuration { get; protected set; }
+        /// <summary>
+        /// A sample store which can be used to perform user file lookups for this skin.
+        /// </summary>
+        protected ISampleStore? Samples { get; }
 
-        public IDictionary<SkinnableTarget, SkinnableInfo[]> DrawableComponentInfo => drawableComponentInfo;
+        public readonly Live<SkinInfo> SkinInfo;
 
-        private readonly Dictionary<SkinnableTarget, SkinnableInfo[]> drawableComponentInfo = new Dictionary<SkinnableTarget, SkinnableInfo[]>();
+        public SkinConfiguration Configuration { get; set; }
 
-        public abstract ISample GetSample(ISampleInfo sampleInfo);
+        public IDictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]> DrawableComponentInfo => drawableComponentInfo;
 
-        public Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
+        private readonly Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]> drawableComponentInfo = new Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]>();
 
-        public abstract Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
+        public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
-        public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
+        public Texture? GetTexture(string componentName) => GetTexture(componentName, default, default);
 
-        protected Skin(SkinInfo skin, IStorageResourceProvider resources)
+        public abstract Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
+
+        public abstract IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
+            where TLookup : notnull
+            where TValue : notnull;
+
+        private readonly RealmBackedResourceStore<SkinInfo>? realmBackedStorage;
+
+        /// <summary>
+        /// Construct a new skin.
+        /// </summary>
+        /// <param name="skin">The skin's metadata. Usually a live realm object.</param>
+        /// <param name="resources">Access to game-wide resources.</param>
+        /// <param name="storage">An optional store which will *replace* all file lookups that are usually sourced from <paramref name="skin"/>.</param>
+        /// <param name="configurationFilename">An optional filename to read the skin configuration from. If not provided, the configuration will be retrieved from the storage using "skin.ini".</param>
+        protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage = null, string configurationFilename = @"skin.ini")
         {
-            SkinInfo = skin;
+            if (resources != null)
+            {
+                SkinInfo = skin.ToLive(resources.RealmAccess);
 
-            // we may want to move this to some kind of async operation in the future.
-            foreach (SkinnableTarget skinnableTarget in Enum.GetValues(typeof(SkinnableTarget)))
+                storage ??= realmBackedStorage = new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess);
+
+                var samples = resources.AudioManager?.GetSampleStore(storage);
+                if (samples != null)
+                    samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+
+                // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
+                // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
+                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
+
+                Samples = samples;
+                Textures = new TextureStore(resources.Renderer, resources.CreateTextureLoaderStore(storage));
+            }
+            else
+            {
+                // Generally only used for tests.
+                SkinInfo = skin.ToLiveUnmanaged();
+            }
+
+            var configurationStream = storage?.GetStream(configurationFilename);
+
+            if (configurationStream != null)
+            {
+                // stream will be closed after use by LineBufferedReader.
+                ParseConfigurationStream(configurationStream);
+                Debug.Assert(Configuration != null);
+            }
+            else
+                Configuration = new SkinConfiguration();
+
+            // skininfo files may be null for default skin.
+            foreach (GlobalSkinComponentLookup.LookupType skinnableTarget in Enum.GetValues(typeof(GlobalSkinComponentLookup.LookupType)))
             {
                 string filename = $"{skinnableTarget}.json";
 
-                // skininfo files may be null for default skin.
-                var fileInfo = SkinInfo.Files?.FirstOrDefault(f => f.Filename == filename);
-
-                if (fileInfo == null)
-                    continue;
-
-                var bytes = resources?.Files.Get(fileInfo.FileInfo.StoragePath);
+                byte[]? bytes = storage?.Get(filename);
 
                 if (bytes == null)
                     continue;
@@ -59,6 +109,13 @@ namespace osu.Game.Skinning
                 try
                 {
                     string jsonContent = Encoding.UTF8.GetString(bytes);
+
+                    // handle namespace changes...
+
+                    // can be removed 2023-01-31
+                    jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.SongProgress", @"osu.Game.Screens.Play.HUD.DefaultSongProgress");
+                    jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
+
                     var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
 
                     if (deserializedContent == null)
@@ -71,6 +128,12 @@ namespace osu.Game.Skinning
                     Logger.Error(ex, "Failed to load skin configuration.");
                 }
             }
+        }
+
+        protected virtual void ParseConfigurationStream(Stream stream)
+        {
+            using (LineBufferedReader reader = new LineBufferedReader(stream, true))
+                Configuration = new LegacySkinDecoder().Decode(reader);
         }
 
         /// <summary>
@@ -91,17 +154,26 @@ namespace osu.Game.Skinning
             DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSkinnableInfo().ToArray();
         }
 
-        public virtual Drawable GetDrawableComponent(ISkinComponent component)
+        public virtual Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
-                case SkinnableTargetComponent target:
-                    if (!DrawableComponentInfo.TryGetValue(target.Target, out var skinnableInfo))
+                // This fallback is important for user skins which use SkinnableSprites.
+                case SkinnableSprite.SpriteComponentLookup sprite:
+                    return this.GetAnimation(sprite.LookupName, false, false);
+
+                case GlobalSkinComponentLookup target:
+                    if (!DrawableComponentInfo.TryGetValue(target.Lookup, out var skinnableInfo))
                         return null;
+
+                    var components = new List<Drawable>();
+
+                    foreach (var i in skinnableInfo)
+                        components.Add(i.CreateInstance());
 
                     return new SkinnableTargetComponentsContainer
                     {
-                        ChildrenEnumerable = skinnableInfo.Select(i => i.CreateInstance())
+                        Children = components,
                     };
             }
 
@@ -130,6 +202,11 @@ namespace osu.Game.Skinning
                 return;
 
             isDisposed = true;
+
+            Textures?.Dispose();
+            Samples?.Dispose();
+
+            realmBackedStorage?.Dispose();
         }
 
         #endregion

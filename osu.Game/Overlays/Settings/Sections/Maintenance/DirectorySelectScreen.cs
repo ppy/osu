@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using System.IO;
 using osu.Framework.Allocation;
@@ -11,16 +13,15 @@ using osuTK;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public abstract class DirectorySelectScreen : OsuScreen
+    public abstract partial class DirectorySelectScreen : OsuScreen
     {
-        private TriangleButton selectionButton;
+        private RoundedButton selectionButton;
 
         private OsuDirectorySelector directorySelector;
 
@@ -63,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeafoamDark
+                        Colour = colours.GreySeaFoamDark
                     },
                     new GridContainer
                     {
@@ -83,7 +84,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     cp.Font = OsuFont.Default.With(size: 24);
                                 })
                                 {
-                                    Text = HeaderText.ToString(),
+                                    Text = HeaderText,
                                     TextAnchor = Anchor.TopCentre,
                                     Margin = new MarginPadding(10),
                                     RelativeSizeAxes = Axes.X,
@@ -99,7 +100,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             },
                             new Drawable[]
                             {
-                                selectionButton = new TriangleButton
+                                selectionButton = new RoundedButton
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -124,9 +125,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             base.LoadComplete();
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
 
             this.FadeOut(250);
         }

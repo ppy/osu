@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -14,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuTextBox : ThemeComparisonTestScene
+    public partial class TestSceneOsuTextBox : ThemeComparisonTestScene
     {
         private IEnumerable<OsuNumberBox> numberBoxes => this.ChildrenOfType<OsuNumberBox>();
 
@@ -62,6 +64,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         private void clearTextboxes(IEnumerable<OsuTextBox> textBoxes) => AddStep("clear textbox", () => textBoxes.ForEach(textBox => textBox.Text = null));
-        private void expectedValue(IEnumerable<OsuTextBox> textBoxes, string value) => AddAssert("expected textbox value", () => textBoxes.All(textbox => textbox.Text == value));
+        private void expectedValue(IEnumerable<OsuTextBox> textBoxes, string value) => AddAssert("expected textbox value", () => textBoxes.All(textBox => textBox.Text == value));
     }
 }

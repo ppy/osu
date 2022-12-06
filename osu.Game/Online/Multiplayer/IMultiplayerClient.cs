@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using osu.Game.Online.API;
@@ -93,18 +95,42 @@ namespace osu.Game.Online.Multiplayer
         Task UserModsChanged(int userId, IEnumerable<APIMod> mods);
 
         /// <summary>
-        /// Signals that a match is to be started. This will *only* be sent to clients which are to begin loading at this point.
+        /// Signals that the match is starting and the loading of gameplay should be started. This will *only* be sent to clients which are to begin loading at this point.
         /// </summary>
         Task LoadRequested();
 
         /// <summary>
-        /// Signals that a match has started. All users in the <see cref="MultiplayerUserState.Loaded"/> state should begin gameplay as soon as possible.
+        /// Signals that loading of gameplay is to be aborted.
         /// </summary>
-        Task MatchStarted();
+        Task LoadAborted();
+
+        /// <summary>
+        /// Signals that gameplay has started.
+        /// All users in the <see cref="MultiplayerUserState.Loaded"/> or <see cref="MultiplayerUserState.ReadyForGameplay"/> states should begin gameplay as soon as possible.
+        /// </summary>
+        Task GameplayStarted();
 
         /// <summary>
         /// Signals that the match has ended, all players have finished and results are ready to be displayed.
         /// </summary>
         Task ResultsReady();
+
+        /// <summary>
+        /// Signals that an item has been added to the playlist.
+        /// </summary>
+        /// <param name="item">The added item.</param>
+        Task PlaylistItemAdded(MultiplayerPlaylistItem item);
+
+        /// <summary>
+        /// Signals that an item has been removed from the playlist.
+        /// </summary>
+        /// <param name="playlistItemId">The removed item.</param>
+        Task PlaylistItemRemoved(long playlistItemId);
+
+        /// <summary>
+        /// Signals that an item has been changed in the playlist.
+        /// </summary>
+        /// <param name="item">The changed item.</param>
+        Task PlaylistItemChanged(MultiplayerPlaylistItem item);
     }
 }

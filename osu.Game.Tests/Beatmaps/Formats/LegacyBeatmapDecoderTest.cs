@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -60,7 +62,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
                 Assert.AreEqual(164471, metadata.PreviewTime);
                 Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
-                Assert.IsTrue(beatmapInfo.RulesetID == 0);
+                Assert.IsTrue(beatmapInfo.Ruleset.OnlineID == 0);
                 Assert.IsFalse(beatmapInfo.LetterboxInBreaks);
                 Assert.IsFalse(beatmapInfo.SpecialStyle);
                 Assert.IsFalse(beatmapInfo.WidescreenStoryboard);
@@ -112,12 +114,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Renatus", metadata.TitleUnicode);
                 Assert.AreEqual("Soleily", metadata.Artist);
                 Assert.AreEqual("Soleily", metadata.ArtistUnicode);
-                Assert.AreEqual("Gamu", metadata.AuthorString);
-                Assert.AreEqual("Insane", beatmapInfo.Version);
+                Assert.AreEqual("Gamu", metadata.Author.Username);
+                Assert.AreEqual("Insane", beatmapInfo.DifficultyName);
                 Assert.AreEqual(string.Empty, metadata.Source);
                 Assert.AreEqual("MBC7 Unisphere 地球ヤバイEP Chikyu Yabai", metadata.Tags);
-                Assert.AreEqual(557821, beatmapInfo.OnlineBeatmapID);
-                Assert.AreEqual(241526, beatmapInfo.BeatmapSet.OnlineBeatmapSetID);
+                Assert.AreEqual(557821, beatmapInfo.OnlineID);
+                Assert.AreEqual(241526, beatmapInfo.BeatmapSet?.OnlineID);
             }
         }
 
@@ -178,17 +180,17 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var timingPoint = controlPoints.TimingPointAt(0);
                 Assert.AreEqual(956, timingPoint.Time);
                 Assert.AreEqual(329.67032967033, timingPoint.BeatLength);
-                Assert.AreEqual(TimeSignatures.SimpleQuadruple, timingPoint.TimeSignature);
+                Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
 
                 timingPoint = controlPoints.TimingPointAt(48428);
                 Assert.AreEqual(956, timingPoint.Time);
                 Assert.AreEqual(329.67032967033d, timingPoint.BeatLength);
-                Assert.AreEqual(TimeSignatures.SimpleQuadruple, timingPoint.TimeSignature);
+                Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
 
                 timingPoint = controlPoints.TimingPointAt(119637);
                 Assert.AreEqual(119637, timingPoint.Time);
                 Assert.AreEqual(659.340659340659, timingPoint.BeatLength);
-                Assert.AreEqual(TimeSignatures.SimpleQuadruple, timingPoint.TimeSignature);
+                Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
 
                 var difficultyPoint = controlPoints.DifficultyPointAt(0);
                 Assert.AreEqual(0, difficultyPoint.Time);
@@ -304,11 +306,29 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(128, 255, 128, 255),
                     new Color4(255, 187, 255, 255),
                     new Color4(255, 177, 140, 255),
-                    new Color4(100, 100, 100, 100),
+                    new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
                 };
-                Assert.AreEqual(expectedColors.Length, comboColors.Count);
+                Assert.AreEqual(expectedColors.Length, comboColors?.Count);
                 for (int i = 0; i < expectedColors.Length; i++)
                     Assert.AreEqual(expectedColors[i], comboColors[i]);
+            }
+        }
+
+        [Test]
+        public void TestGetLastObjectTime()
+        {
+            var decoder = new LegacyBeatmapDecoder();
+
+            using (var resStream = TestResources.OpenResource("mania-last-object-not-latest.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+
+                Assert.That(beatmap.HitObjects.Last().StartTime, Is.EqualTo(2494));
+                Assert.That(beatmap.HitObjects.Last().GetEndTime(), Is.EqualTo(2494));
+
+                Assert.That(beatmap.HitObjects.Max(h => h.GetEndTime()), Is.EqualTo(2582));
+                Assert.That(beatmap.GetLastObjectTime(), Is.EqualTo(2582));
             }
         }
 
@@ -547,7 +567,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
                 Assert.IsNotNull(beatmap);
                 Assert.AreEqual("Beatmap with corrupted header", beatmap.Metadata.Title);
-                Assert.AreEqual("Evil Hacker", beatmap.Metadata.AuthorString);
+                Assert.AreEqual("Evil Hacker", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -565,7 +585,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
                 Assert.IsNotNull(beatmap);
                 Assert.AreEqual("Beatmap with no header", beatmap.Metadata.Title);
-                Assert.AreEqual("Incredibly Evil Hacker", beatmap.Metadata.AuthorString);
+                Assert.AreEqual("Incredibly Evil Hacker", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -583,7 +603,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
                 Assert.IsNotNull(beatmap);
                 Assert.AreEqual("Empty lines at start", beatmap.Metadata.Title);
-                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.AuthorString);
+                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -601,7 +621,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
                 Assert.IsNotNull(beatmap);
                 Assert.AreEqual("The dog ate the file header", beatmap.Metadata.Title);
-                Assert.AreEqual("Why does this keep happening", beatmap.Metadata.AuthorString);
+                Assert.AreEqual("Why does this keep happening", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -619,7 +639,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
                 Assert.IsNotNull(beatmap);
                 Assert.AreEqual("No empty line delimiting header from contents", beatmap.Metadata.Title);
-                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.AuthorString);
+                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -673,6 +693,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(first.ControlPoints[1].Position, Is.EqualTo(new Vector2(161, -244)));
                 Assert.That(first.ControlPoints[1].Type, Is.EqualTo(null));
 
+                // ReSharper disable once HeuristicUnreachableCode
+                // weird one, see https://youtrack.jetbrains.com/issue/RIDER-70159.
                 Assert.That(first.ControlPoints[2].Position, Is.EqualTo(new Vector2(376, -3)));
                 Assert.That(first.ControlPoints[2].Type, Is.EqualTo(PathType.Bezier));
                 Assert.That(first.ControlPoints[3].Position, Is.EqualTo(new Vector2(68, 15)));
@@ -790,6 +812,154 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.That(path.ExpectedDistance.Value, Is.EqualTo(2));
                 Assert.That(path.Distance, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void TestLegacyDefaultsPreserved()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var memoryStream = new MemoryStream())
+            using (var stream = new LineBufferedReader(memoryStream))
+            {
+                var decoded = decoder.Decode(stream);
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(decoded.BeatmapInfo.AudioLeadIn, Is.EqualTo(0));
+                    Assert.That(decoded.BeatmapInfo.StackLeniency, Is.EqualTo(0.7f));
+                    Assert.That(decoded.BeatmapInfo.SpecialStyle, Is.False);
+                    Assert.That(decoded.BeatmapInfo.LetterboxInBreaks, Is.False);
+                    Assert.That(decoded.BeatmapInfo.WidescreenStoryboard, Is.False);
+                    Assert.That(decoded.BeatmapInfo.EpilepsyWarning, Is.False);
+                    Assert.That(decoded.BeatmapInfo.SamplesMatchPlaybackRate, Is.False);
+                    Assert.That(decoded.BeatmapInfo.Countdown, Is.EqualTo(CountdownType.Normal));
+                    Assert.That(decoded.BeatmapInfo.CountdownOffset, Is.EqualTo(0));
+                    Assert.That(decoded.BeatmapInfo.Metadata.PreviewTime, Is.EqualTo(-1));
+                    Assert.That(decoded.BeatmapInfo.Ruleset.OnlineID, Is.EqualTo(0));
+                });
+            }
+        }
+
+        [Test]
+        public void TestUndefinedApproachRateInheritsOverallDifficulty()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("undefined-approach-rate.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                Assert.That(decoded.Difficulty.ApproachRate, Is.EqualTo(1));
+                Assert.That(decoded.Difficulty.OverallDifficulty, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void TestApproachRateDefinedBeforeOverallDifficulty()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("approach-rate-before-overall-difficulty.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                Assert.That(decoded.Difficulty.ApproachRate, Is.EqualTo(9));
+                Assert.That(decoded.Difficulty.OverallDifficulty, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void TestApproachRateDefinedAfterOverallDifficulty()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("approach-rate-after-overall-difficulty.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                Assert.That(decoded.Difficulty.ApproachRate, Is.EqualTo(9));
+                Assert.That(decoded.Difficulty.OverallDifficulty, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void TestLegacyAdjacentImplicitCatmullSegmentsAreMerged()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("adjacent-catmull-segments.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
+
+                Assert.That(controlPoints.Count, Is.EqualTo(6));
+                Assert.That(controlPoints.Single(c => c.Type != null).Type, Is.EqualTo(PathType.Catmull));
+            }
+        }
+
+        [Test]
+        public void TestNonLegacyAdjacentImplicitCatmullSegmentsAreNotMerged()
+        {
+            var decoder = new LegacyBeatmapDecoder(LegacyBeatmapEncoder.FIRST_LAZER_VERSION) { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("adjacent-catmull-segments.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
+
+                Assert.That(controlPoints.Count, Is.EqualTo(4));
+                Assert.That(controlPoints[0].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[1].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[2].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[3].Type, Is.Null);
+            }
+        }
+
+        [Test]
+        public void TestLegacyDuplicateInitialCatmullPointIsMerged()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("catmull-duplicate-initial-controlpoint.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
+
+                Assert.That(controlPoints.Count, Is.EqualTo(4));
+                Assert.That(controlPoints[0].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[0].Position, Is.EqualTo(Vector2.Zero));
+                Assert.That(controlPoints[1].Type, Is.Null);
+                Assert.That(controlPoints[1].Position, Is.Not.EqualTo(Vector2.Zero));
+            }
+        }
+
+        [Test]
+        public void TestNaNControlPoints()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("nan-control-points.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.TimingPoints.Count, Is.EqualTo(1));
+                Assert.That(controlPoints.DifficultyPoints.Count, Is.EqualTo(2));
+
+                Assert.That(controlPoints.TimingPointAt(1000).BeatLength, Is.EqualTo(500));
+
+                Assert.That(controlPoints.DifficultyPointAt(2000).SliderVelocity, Is.EqualTo(1));
+                Assert.That(controlPoints.DifficultyPointAt(3000).SliderVelocity, Is.EqualTo(1));
+
+#pragma warning disable 618
+                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(2000)).GenerateTicks, Is.False);
+                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(3000)).GenerateTicks, Is.True);
+#pragma warning restore 618
             }
         }
     }

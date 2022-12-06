@@ -1,12 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    public class EpilepsyWarning : VisibilityContainer
+    public partial class EpilepsyWarning : VisibilityContainer
     {
         public const double FADE_DURATION = 250;
 
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IBindable<WorkingBeatmap> beatmap)
+        private void load(OsuColour colours)
         {
             Children = new Drawable[]
             {

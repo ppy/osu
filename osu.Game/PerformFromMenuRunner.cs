@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,17 +18,17 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game
 {
-    internal class PerformFromMenuRunner : Component
+    internal partial class PerformFromMenuRunner : Component
     {
         private readonly Action<IScreen> finalAction;
         private readonly Type[] validScreens;
         private readonly Func<IScreen> getCurrentScreen;
 
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         [Resolved]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
@@ -87,6 +89,10 @@ namespace osu.Game
             // check if we are already at a valid target screen.
             if (validScreens.Any(t => t.IsAssignableFrom(type)))
             {
+                if (!((Drawable)current).IsLoaded)
+                    // wait until screen is loaded before invoking action.
+                    return true;
+
                 finalAction(current);
                 Cancel();
                 return true;
@@ -97,11 +103,14 @@ namespace osu.Game
                 // if this has a sub stack, recursively check the screens within it.
                 if (current is IHasSubScreenStack currentSubScreen)
                 {
-                    if (findValidTarget(currentSubScreen.SubScreenStack.CurrentScreen))
+                    var nestedCurrent = currentSubScreen.SubScreenStack.CurrentScreen;
+
+                    if (nestedCurrent != null)
                     {
                         // should be correct in theory, but currently untested/unused in existing implementations.
-                        current.MakeCurrent();
-                        return true;
+                        // note that calling findValidTarget actually performs the final operation.
+                        if (findValidTarget(nestedCurrent))
+                            return true;
                     }
                 }
 
@@ -125,6 +134,18 @@ namespace osu.Game
         /// <returns>Whether a dialog blocked interaction.</returns>
         private bool checkForDialog(IScreen current)
         {
+            // An exit process may traverse multiple levels.
+            // When checking for dismissing dialogs, let's also consider sub screens.
+            while (current is IHasSubScreenStack currentWithSubScreenStack)
+            {
+                var nestedCurrent = currentWithSubScreenStack.SubScreenStack.CurrentScreen;
+
+                if (nestedCurrent == null)
+                    break;
+
+                current = nestedCurrent;
+            }
+
             var currentDialog = dialogOverlay.CurrentDialog;
 
             if (lastEncounteredDialog != null)

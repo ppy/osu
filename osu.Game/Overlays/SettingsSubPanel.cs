@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public abstract class SettingsSubPanel : SettingsPanel
+    public abstract partial class SettingsSubPanel : SettingsPanel
     {
         protected SettingsSubPanel()
             : base(true)
@@ -32,14 +34,14 @@ namespace osu.Game.Overlays
 
         protected override bool DimMainContent => false; // dimming is handled by main overlay
 
-        private class BackButton : SidebarButton
+        public partial class BackButton : SidebarButton
         {
             private Container content;
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Size = new Vector2(Sidebar.DEFAULT_WIDTH);
+                Size = new Vector2(SettingsSidebar.DEFAULT_WIDTH);
 
                 AddRange(new Drawable[]
                 {

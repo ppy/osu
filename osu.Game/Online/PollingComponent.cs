@@ -1,9 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 
@@ -12,7 +16,7 @@ namespace osu.Game.Online
     /// <summary>
     /// A component which requires a constant polling process.
     /// </summary>
-    public abstract class PollingComponent : CompositeDrawable // switch away from Component because InternalChildren are used in usages.
+    public abstract partial class PollingComponent : CompositeComponent
     {
         private double? lastTimePolled;
 
@@ -66,6 +70,8 @@ namespace osu.Game.Online
 
         private void doPoll()
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             scheduledPoll = null;
             pollingActive = true;
             Poll().ContinueWith(_ => pollComplete());
@@ -96,13 +102,13 @@ namespace osu.Game.Online
 
             if (!lastTimePolled.HasValue)
             {
-                doPoll();
+                Scheduler.AddOnce(doPoll);
                 return;
             }
 
             if (Time.Current - lastTimePolled.Value > TimeBetweenPolls.Value)
             {
-                doPoll();
+                Scheduler.AddOnce(doPoll);
                 return;
             }
 

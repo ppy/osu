@@ -7,6 +7,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -23,10 +24,10 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Nightcore";
         public override string Acronym => "NC";
         public override IconUsage? Icon => OsuIcon.ModNightcore;
-        public override string Description => "Uguuuuuuuu...";
+        public override LocalisableString Description => "Uguuuuuuuu...";
     }
 
-    public abstract class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
+    public abstract partial class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
         where TObject : HitObject
     {
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Mods
             }, true);
         }
 
-        public override void ApplyToTrack(ITrack track)
+        public override void ApplyToTrack(IAdjustableAudioComponent track)
         {
             // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
             track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
@@ -53,12 +54,12 @@ namespace osu.Game.Rulesets.Mods
             drawableRuleset.Overlays.Add(new NightcoreBeatContainer());
         }
 
-        public class NightcoreBeatContainer : BeatSyncedContainer
+        public partial class NightcoreBeatContainer : BeatSyncedContainer
         {
-            private PausableSkinnableSound hatSample;
-            private PausableSkinnableSound clapSample;
-            private PausableSkinnableSound kickSample;
-            private PausableSkinnableSound finishSample;
+            private PausableSkinnableSound? hatSample;
+            private PausableSkinnableSound? clapSample;
+            private PausableSkinnableSound? kickSample;
+            private PausableSkinnableSound? finishSample;
 
             private int? firstBeat;
 
@@ -85,7 +86,7 @@ namespace osu.Game.Rulesets.Mods
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                int beatsPerBar = (int)timingPoint.TimeSignature;
+                int beatsPerBar = timingPoint.TimeSignature.Numerator;
                 int segmentLength = beatsPerBar * Divisor * bars_per_segment;
 
                 if (!IsBeatSyncedWithTrack)
@@ -102,14 +103,14 @@ namespace osu.Game.Rulesets.Mods
                     playBeatFor(beatIndex % segmentLength, timingPoint.TimeSignature);
             }
 
-            private void playBeatFor(int beatIndex, TimeSignatures signature)
+            private void playBeatFor(int beatIndex, TimeSignature signature)
             {
                 if (beatIndex == 0)
                     finishSample?.Play();
 
-                switch (signature)
+                switch (signature.Numerator)
                 {
-                    case TimeSignatures.SimpleTriple:
+                    case 3:
                         switch (beatIndex % 6)
                         {
                             case 0:
@@ -127,7 +128,7 @@ namespace osu.Game.Rulesets.Mods
 
                         break;
 
-                    case TimeSignatures.SimpleQuadruple:
+                    case 4:
                         switch (beatIndex % 4)
                         {
                             case 0:

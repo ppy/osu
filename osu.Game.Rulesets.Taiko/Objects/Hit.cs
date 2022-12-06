@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
 
@@ -12,18 +15,20 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class Hit : TaikoStrongableHitObject, IHasDisplayColour
     {
-        public readonly Bindable<HitType> TypeBindable = new Bindable<HitType>();
+        private HitObjectProperty<HitType> type;
 
-        public Bindable<Color4> DisplayColour { get; } = new Bindable<Color4>(COLOUR_CENTRE);
+        public Bindable<HitType> TypeBindable => type.Bindable;
 
         /// <summary>
         /// The <see cref="HitType"/> that actuates this <see cref="Hit"/>.
         /// </summary>
         public HitType Type
         {
-            get => TypeBindable.Value;
-            set => TypeBindable.Value = value;
+            get => type.Value;
+            set => type.Value = value;
         }
+
+        public Bindable<Color4> DisplayColour { get; } = new Bindable<Color4>(COLOUR_CENTRE);
 
         public static readonly Color4 COLOUR_CENTRE = Color4Extensions.FromHex(@"bb1177");
         public static readonly Color4 COLOUR_RIM = Color4Extensions.FromHex(@"2299bb");
@@ -36,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 DisplayColour.Value = Type == HitType.Centre ? COLOUR_CENTRE : COLOUR_RIM;
             });
 
-            SamplesBindable.BindCollectionChanged((_, __) => updateTypeFromSamples());
+            SamplesBindable.BindCollectionChanged((_, _) => updateTypeFromSamples());
         }
 
         private void updateTypeFromSamples()

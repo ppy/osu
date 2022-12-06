@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,7 @@ using static osu.Game.Overlays.News.Sidebar.YearsPanel;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneNewsSidebar : OsuTestScene
+    public partial class TestSceneNewsSidebar : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -36,6 +38,14 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Add data with no posts", () => sidebar.Metadata.Value = metadata_with_no_posts);
             AddUntilStep("No month sections were created", () => !sidebar.ChildrenOfType<MonthSection>().Any());
+        }
+
+        [Test]
+        public void TestMetadataWithMultipleYears()
+        {
+            AddStep("Add data spanning multiple years", () => sidebar.Metadata.Value = metadata_with_multiple_years);
+            AddUntilStep("2022 month sections exist", () => sidebar.ChildrenOfType<MonthSection>().Any(s => s.Year == 2022));
+            AddUntilStep("2021 month sections exist", () => sidebar.ChildrenOfType<MonthSection>().Any(s => s.Year == 2021));
         }
 
         [Test]
@@ -133,7 +143,75 @@ namespace osu.Game.Tests.Visual.Online
             NewsPosts = Array.Empty<APINewsPost>()
         };
 
-        private class TestNewsSidebar : NewsSidebar
+        // see https://osu.ppy.sh/docs/index.html#get-news-listing:
+        // "NewsPost collections queried by year will also include posts published in November and December of the previous year if the current date is the same year and before April."
+        private static readonly APINewsSidebar metadata_with_multiple_years = new APINewsSidebar
+        {
+            CurrentYear = 2022,
+            Years = new[]
+            {
+                2022,
+                2021,
+                2020,
+                2019,
+                2018,
+                2017,
+                2016,
+                2015,
+                2014,
+                2013
+            },
+            NewsPosts = new List<APINewsPost>
+            {
+                new APINewsPost
+                {
+                    Title = "(Mar 2022) Short title",
+                    PublishedAt = new DateTime(2022, 3, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Mar 2022) Oh boy that's a long post title I wonder if it will break anything",
+                    PublishedAt = new DateTime(2022, 3, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Feb 2022) Medium title, nothing to see here",
+                    PublishedAt = new DateTime(2022, 2, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Feb 2022) Short title",
+                    PublishedAt = new DateTime(2022, 2, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Jan 2022) Oh boy that's a long post title I wonder if it will break anything",
+                    PublishedAt = new DateTime(2022, 1, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Jan 2022) Medium title, nothing to see here",
+                    PublishedAt = new DateTime(2022, 1, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Jan 2022) Short title",
+                    PublishedAt = new DateTime(2022, 1, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Dec 2021) Surprise, the last year's not gone yet",
+                    PublishedAt = new DateTime(2021, 12, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Nov 2021) Same goes for November",
+                    PublishedAt = new DateTime(2021, 11, 1)
+                }
+            }
+        };
+
+        private partial class TestNewsSidebar : NewsSidebar
         {
             public Action<int> YearChanged;
 
@@ -141,7 +219,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 base.LoadComplete();
 
-                Metadata.BindValueChanged(metadata =>
+                Metadata.BindValueChanged(_ =>
                 {
                     foreach (var b in this.ChildrenOfType<YearButton>())
                         b.Action = () => YearChanged?.Invoke(b.Year);

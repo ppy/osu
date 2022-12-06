@@ -3,176 +3,103 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Extensions;
+using osu.Game.Models;
+using Realms;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A realm model containing metadata for a beatmap set (containing multiple <see cref="BeatmapInfo"/>s).
+    /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo, IBeatmapSetOnlineInfo
+    [MapTo("BeatmapSet")]
+    public class BeatmapSetInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
     {
-        public int ID { get; set; }
+        [PrimaryKey]
+        public Guid ID { get; set; }
 
-        private int? onlineBeatmapSetID;
-
-        public int? OnlineBeatmapSetID
-        {
-            get => onlineBeatmapSetID;
-            set => onlineBeatmapSetID = value > 0 ? value : null;
-        }
+        [Indexed]
+        public int OnlineID { get; set; } = -1;
 
         public DateTimeOffset DateAdded { get; set; }
 
-        public BeatmapMetadata Metadata { get; set; }
-
-        public List<BeatmapInfo> Beatmaps { get; set; }
-
-        [NotNull]
-        public List<BeatmapSetFileInfo> Files { get; set; } = new List<BeatmapSetFileInfo>();
-
-        [NotMapped]
-        public APIBeatmapSet OnlineInfo { get; set; }
+        /// <summary>
+        /// The date this beatmap set was first submitted.
+        /// </summary>
+        public DateTimeOffset? DateSubmitted { get; set; }
 
         /// <summary>
-        /// The maximum star difficulty of all beatmaps in this set.
+        /// The date this beatmap set was ranked.
         /// </summary>
-        public double MaxStarDifficulty => Beatmaps?.Max(b => b.StarDifficulty) ?? 0;
+        public DateTimeOffset? DateRanked { get; set; }
 
-        /// <summary>
-        /// The maximum playable length in milliseconds of all beatmaps in this set.
-        /// </summary>
-        public double MaxLength => Beatmaps?.Max(b => b.Length) ?? 0;
+        [JsonIgnore]
+        public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
 
-        /// <summary>
-        /// The maximum BPM of all beatmaps in this set.
-        /// </summary>
-        public double MaxBPM => Beatmaps?.Max(b => b.BPM) ?? 0;
+        public IList<BeatmapInfo> Beatmaps { get; } = null!;
 
-        [NotMapped]
-        public bool DeletePending { get; set; }
+        public IList<RealmNamedFileUsage> Files { get; } = null!;
 
-        public string Hash { get; set; }
-
-        /// <summary>
-        /// Returns the storage path for the file in this beatmapset with the given filename, if any exists, otherwise null.
-        /// The path returned is relative to the user file storage.
-        /// </summary>
-        /// <param name="filename">The name of the file to get the storage path of.</param>
-        public string GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
-
-        public override string ToString() => Metadata?.ToString() ?? base.ToString();
-
-        public bool Protected { get; set; }
-
-        public bool Equals(BeatmapSetInfo other)
+        [Ignored]
+        public BeatmapOnlineStatus Status
         {
-            if (other == null)
-                return false;
-
-            if (ID != 0 && other.ID != 0)
-                return ID == other.ID;
-
-            if (OnlineBeatmapSetID.HasValue && other.OnlineBeatmapSetID.HasValue)
-                return OnlineBeatmapSetID == other.OnlineBeatmapSetID;
-
-            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
-                return Hash == other.Hash;
-
-            return ReferenceEquals(this, other);
+            get => (BeatmapOnlineStatus)StatusInt;
+            set => StatusInt = (int)value;
         }
 
-        #region Implementation of IHasOnlineID
+        [MapTo(nameof(Status))]
+        public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
 
-        public int OnlineID => OnlineBeatmapSetID ?? -1;
+        public bool DeletePending { get; set; }
 
-        #endregion
+        public string Hash { get; set; } = string.Empty;
 
-        #region Implementation of IBeatmapSetInfo
+        /// <summary>
+        /// Whether deleting this beatmap set should be prohibited (due to it being a system requirement to be present).
+        /// </summary>
+        public bool Protected { get; set; }
 
-        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata;
+        public double MaxStarDifficulty => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.StarRating);
+
+        public double MaxLength => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.Length);
+
+        public double MaxBPM => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.BPM);
+
+        public BeatmapSetInfo(IEnumerable<BeatmapInfo>? beatmaps = null)
+            : this()
+        {
+            ID = Guid.NewGuid();
+            if (beatmaps != null)
+                Beatmaps.AddRange(beatmaps);
+        }
+
+        [UsedImplicitly] // Realm
+        private BeatmapSetInfo()
+        {
+        }
+
+        public bool Equals(BeatmapSetInfo? other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
+
+            return ID == other.ID;
+        }
+
+        public override string ToString() => Metadata.GetDisplayString();
+
+        public bool Equals(IBeatmapSetInfo? other) => other is BeatmapSetInfo b && Equals(b);
+
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
-        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;
 
-        #endregion
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
-        #region Delegation for IBeatmapSetOnlineInfo
-
-        [NotMapped]
-        [JsonIgnore]
-        public DateTimeOffset Submitted => OnlineInfo.Submitted;
-
-        [NotMapped]
-        [JsonIgnore]
-        public DateTimeOffset? Ranked => OnlineInfo.Ranked;
-
-        [NotMapped]
-        [JsonIgnore]
-        public DateTimeOffset? LastUpdated => OnlineInfo.LastUpdated;
-
-        [JsonIgnore]
-        public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
-
-        [NotMapped]
-        [JsonIgnore]
-        public bool HasExplicitContent => OnlineInfo.HasExplicitContent;
-
-        [NotMapped]
-        [JsonIgnore]
-        public bool HasVideo => OnlineInfo.HasVideo;
-
-        [NotMapped]
-        [JsonIgnore]
-        public bool HasStoryboard => OnlineInfo.HasStoryboard;
-
-        [NotMapped]
-        [JsonIgnore]
-        public BeatmapSetOnlineCovers Covers => OnlineInfo.Covers;
-
-        [NotMapped]
-        [JsonIgnore]
-        public string Preview => OnlineInfo.Preview;
-
-        [NotMapped]
-        [JsonIgnore]
-        public double BPM => OnlineInfo.BPM;
-
-        [NotMapped]
-        [JsonIgnore]
-        public int PlayCount => OnlineInfo.PlayCount;
-
-        [NotMapped]
-        [JsonIgnore]
-        public int FavouriteCount => OnlineInfo.FavouriteCount;
-
-        [NotMapped]
-        [JsonIgnore]
-        public bool HasFavourited => OnlineInfo.HasFavourited;
-
-        [NotMapped]
-        [JsonIgnore]
-        public BeatmapSetOnlineAvailability Availability => OnlineInfo.Availability;
-
-        [NotMapped]
-        [JsonIgnore]
-        public BeatmapSetOnlineGenre Genre => OnlineInfo.Genre;
-
-        [NotMapped]
-        [JsonIgnore]
-        public BeatmapSetOnlineLanguage Language => OnlineInfo.Language;
-
-        [NotMapped]
-        [JsonIgnore]
-        public int? TrackId => OnlineInfo?.TrackId;
-
-        [NotMapped]
-        [JsonIgnore]
-        public int[] Ratings => OnlineInfo?.Ratings;
-
-        #endregion
+        public bool AllBeatmapsUpToDate => Beatmaps.All(b => b.MatchesOnlineVersion);
     }
 }

@@ -1,25 +1,27 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public class DrawableMostPlayedBeatmap : CompositeDrawable
+    public partial class DrawableMostPlayedBeatmap : CompositeDrawable
     {
         private const int cover_width = 100;
         private const int corner_radius = 6;
@@ -46,7 +48,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = cover_width,
-                    BeatmapSet = mostPlayed.BeatmapSet,
+                    OnlineInfo = mostPlayed.BeatmapSet,
                 },
                 new Container
                 {
@@ -108,7 +110,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             });
         }
 
-        private class MostPlayedBeatmapContainer : ProfileItemContainer
+        private partial class MostPlayedBeatmapContainer : ProfileItemContainer
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
@@ -118,7 +120,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             }
         }
 
-        private class MostPlayedBeatmapMetadataContainer : BeatmapMetadataContainer
+        private partial class MostPlayedBeatmapMetadataContainer : BeatmapMetadataContainer
         {
             public MostPlayedBeatmapMetadataContainer(IBeatmapInfo beatmapInfo)
                 : base(beatmapInfo)
@@ -157,7 +159,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             }
         }
 
-        private class PlayCountText : CompositeDrawable, IHasTooltip
+        private partial class PlayCountText : CompositeDrawable, IHasTooltip
         {
             public LocalisableString TooltipText => UsersStrings.ShowExtraHistoricalMostPlayedCount;
 

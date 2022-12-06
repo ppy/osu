@@ -7,11 +7,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
     {
         SliderBorderSize,
         SliderPathRadius,
-        AllowSliderBallTint,
         CursorCentre,
         CursorExpand,
         CursorRotate,
         HitCircleOverlayAboveNumber,
+
+        // ReSharper disable once IdentifierTypo
         HitCircleOverlayAboveNumer, // Some old skins will have this typo
         SpinnerFrequencyModulate,
         SpinnerNoBlink

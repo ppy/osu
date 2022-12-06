@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,7 +16,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play.Break
 {
-    public class BreakInfoLine<T> : Container
+    public partial class BreakInfoLine<T> : Container
         where T : struct
     {
         private const int margin = 2;
@@ -26,7 +28,7 @@ namespace osu.Game.Screens.Play.Break
 
         private readonly string prefix;
 
-        public BreakInfoLine(string name, string prefix = @"")
+        public BreakInfoLine(LocalisableString name, string prefix = @"")
         {
             this.prefix = prefix;
 
@@ -56,7 +58,7 @@ namespace osu.Game.Screens.Play.Break
 
         private void currentValueChanged(ValueChangedEvent<T> e)
         {
-            var newText = prefix + Format(e.NewValue);
+            string newText = prefix + Format(e.NewValue);
 
             if (valueText.Text == newText)
                 return;
@@ -80,9 +82,9 @@ namespace osu.Game.Screens.Play.Break
         }
     }
 
-    public class PercentageBreakInfoLine : BreakInfoLine<double>
+    public partial class PercentageBreakInfoLine : BreakInfoLine<double>
     {
-        public PercentageBreakInfoLine(string name, string prefix = "")
+        public PercentageBreakInfoLine(LocalisableString name, string prefix = "")
             : base(name, prefix)
         {
         }

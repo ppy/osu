@@ -3,6 +3,8 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects;
@@ -10,21 +12,36 @@ using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
+using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneComboCounter : CatchSkinnableTestScene
+    public partial class TestSceneComboCounter : CatchSkinnableTestScene
     {
-        private ScoreProcessor scoreProcessor;
+        private ScoreProcessor scoreProcessor = null!;
 
         private Color4 judgedObjectColour = Color4.White;
+
+        private readonly Bindable<bool> showHud = new Bindable<bool>(true);
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.CacheAs<Player>(new TestPlayer
+            {
+                ShowingOverlayComponents = { BindTarget = showHud },
+            });
+        }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            scoreProcessor = new ScoreProcessor();
+            scoreProcessor = new ScoreProcessor(new CatchRuleset());
+
+            showHud.Value = true;
 
             SetContents(_ => new CatchComboDisplay
             {
@@ -49,9 +66,15 @@ namespace osu.Game.Rulesets.Catch.Tests
                     1f
                 );
             });
+
+            AddStep("set hud to never show", () => showHud.Value = false);
+            AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 5);
+
+            AddStep("set hud to show", () => showHud.Value = true);
+            AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 5);
         }
 
-        private void performJudgement(HitResult type, Judgement judgement = null)
+        private void performJudgement(HitResult type, Judgement? judgement = null)
         {
             var judgedObject = new DrawableFruit(new Fruit()) { AccentColour = { Value = judgedObjectColour } };
 

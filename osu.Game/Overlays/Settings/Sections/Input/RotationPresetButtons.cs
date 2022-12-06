@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -13,7 +15,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    internal class RotationPresetButtons : CompositeDrawable
+    internal partial class RotationPresetButtons : CompositeDrawable
     {
         public new MarginPadding Padding
         {
@@ -59,7 +61,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             for (int i = 0; i < preset_count; i++)
             {
-                var rotationValue = i * 90;
+                int rotationValue = i * 90;
 
                 var rotationPreset = new RotationButton(rotationValue)
                 {
@@ -84,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }, true);
         }
 
-        public class RotationButton : RoundedButton
+        public partial class RotationButton : RoundedButton
         {
             [Resolved]
             private OsuColour colours { get; set; }

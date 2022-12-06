@@ -3,231 +3,264 @@
             "StartTime": 369,
             "Objects": [{
                 "StartTime": 369,
-                "Position": 258
+                "Position": 258,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 450,
             "Objects": [{
                 "StartTime": 450,
-                "Position": 254
+                "Position": 254,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 532,
             "Objects": [{
                 "StartTime": 532,
-                "Position": 241
+                "Position": 241,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 614,
             "Objects": [{
                 "StartTime": 614,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 696,
             "Objects": [{
                 "StartTime": 696,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 778,
             "Objects": [{
                 "StartTime": 778,
-                "Position": 278
+                "Position": 278,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 860,
             "Objects": [{
                 "StartTime": 860,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 942,
             "Objects": [{
                 "StartTime": 942,
-                "Position": 278
+                "Position": 278,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1024,
             "Objects": [{
                 "StartTime": 1024,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1106,
             "Objects": [{
                 "StartTime": 1106,
-                "Position": 278
+                "Position": 278,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1188,
             "Objects": [{
                 "StartTime": 1188,
-                "Position": 278
+                "Position": 278,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1270,
             "Objects": [{
                 "StartTime": 1270,
-                "Position": 278
+                "Position": 278,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1352,
             "Objects": [{
                 "StartTime": 1352,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1434,
             "Objects": [{
                 "StartTime": 1434,
-                "Position": 258
+                "Position": 258,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1516,
             "Objects": [{
                 "StartTime": 1516,
-                "Position": 253
+                "Position": 253,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1598,
             "Objects": [{
                 "StartTime": 1598,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1680,
             "Objects": [{
                 "StartTime": 1680,
-                "Position": 260
+                "Position": 260,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1762,
             "Objects": [{
                 "StartTime": 1762,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1844,
             "Objects": [{
                 "StartTime": 1844,
-                "Position": 278
+                "Position": 278,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 1926,
             "Objects": [{
                 "StartTime": 1926,
-                "Position": 278
+                "Position": 278,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2008,
             "Objects": [{
                 "StartTime": 2008,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2090,
             "Objects": [{
                 "StartTime": 2090,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2172,
             "Objects": [{
                 "StartTime": 2172,
-                "Position": 243
+                "Position": 243,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2254,
             "Objects": [{
                 "StartTime": 2254,
-                "Position": 278
+                "Position": 278,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2336,
             "Objects": [{
                 "StartTime": 2336,
-                "Position": 278
+                "Position": 278,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2418,
             "Objects": [{
                 "StartTime": 2418,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2500,
             "Objects": [{
                 "StartTime": 2500,
-                "Position": 258
+                "Position": 258,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2582,
             "Objects": [{
                 "StartTime": 2582,
-                "Position": 256
+                "Position": 256,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2664,
             "Objects": [{
                 "StartTime": 2664,
-                "Position": 242
+                "Position": 242,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2746,
             "Objects": [{
                 "StartTime": 2746,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2828,
             "Objects": [{
                 "StartTime": 2828,
-                "Position": 238
+                "Position": 238,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2909,
             "Objects": [{
                 "StartTime": 2909,
-                "Position": 271
+                "Position": 271,
+                "HyperDash": false
             }]
         },
         {
             "StartTime": 2991,
             "Objects": [{
                 "StartTime": 2991,
-                "Position": 254
+                "Position": 254,
+                "HyperDash": false
             }]
         }
     ]

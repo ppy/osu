@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -25,7 +27,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public class TestSceneManiaHitObjectComposer : EditorClockTestScene
+    public partial class TestSceneManiaHitObjectComposer : EditorClockTestScene
     {
         private TestComposer composer;
 
@@ -33,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         public void Setup() => Schedule(() =>
         {
             BeatDivisor.Value = 8;
-            Clock.Seek(0);
+            EditorClock.Seek(0);
 
             Child = composer = new TestComposer { RelativeSizeAxes = Axes.Both };
         });
@@ -51,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             {
                 lastObject = this.ChildrenOfType<DrawableHitObject>().Single(d => d.HitObject == composer.EditorBeatmap.HitObjects.Last());
                 originalTime = lastObject.HitObject.StartTime;
-                Clock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
+                EditorClock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
             });
 
             AddStep("select all objects", () => composer.EditorBeatmap.SelectedHitObjects.AddRange(composer.EditorBeatmap.HitObjects));
@@ -88,7 +90,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             {
                 lastObject = this.ChildrenOfType<DrawableHitObject>().Single(d => d.HitObject == composer.EditorBeatmap.HitObjects.Last());
                 originalTime = lastObject.HitObject.StartTime;
-                Clock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
+                EditorClock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
             });
 
             AddStep("select all objects", () => composer.EditorBeatmap.SelectedHitObjects.AddRange(composer.EditorBeatmap.HitObjects));
@@ -123,7 +125,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             AddStep("seek to last object", () =>
             {
                 lastObject = this.ChildrenOfType<DrawableHitObject>().Single(d => d.HitObject == composer.EditorBeatmap.HitObjects.Last());
-                Clock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
+                EditorClock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
             });
 
             AddStep("select all objects", () => composer.EditorBeatmap.SelectedHitObjects.AddRange(composer.EditorBeatmap.HitObjects));
@@ -191,7 +193,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private void setScrollStep(ScrollingDirection direction)
             => AddStep($"set scroll direction = {direction}", () => ((Bindable<ScrollingDirection>)composer.Composer.ScrollingInfo.Direction).Value = direction);
 
-        private class TestComposer : CompositeDrawable
+        private partial class TestComposer : CompositeDrawable
         {
             [Cached(typeof(EditorBeatmap))]
             [Cached(typeof(IBeatSnapProvider))]
@@ -203,10 +205,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             {
                 InternalChildren = new Drawable[]
                 {
-                    EditorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 }))
+                    EditorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition(4))
                     {
                         BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo }
-                    },
+                    }),
                     Composer = new ManiaHitObjectComposer(new ManiaRuleset())
                 };
 

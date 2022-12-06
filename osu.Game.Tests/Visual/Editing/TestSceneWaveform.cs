@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -18,9 +20,9 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneWaveform : OsuTestScene
+    public partial class TestSceneWaveform : OsuTestScene
     {
-        private WorkingBeatmap waveformBeatmap;
+        private IWorkingBeatmap waveformBeatmap;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -102,7 +104,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("wait for load", () => graph.Loaded.IsSet);
         }
 
-        public class TestWaveformGraph : WaveformGraph
+        public partial class TestWaveformGraph : WaveformGraph
         {
             public readonly ManualResetEventSlim Loaded = new ManualResetEventSlim();
 

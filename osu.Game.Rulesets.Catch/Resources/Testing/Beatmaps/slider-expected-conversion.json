@@ -1,1 +1,71 @@
-{"Mappings":[{"StartTime":19184.0,"Objects":[{"StartTime":19184.0,"Position":320.0},{"StartTime":19263.0,"Position":311.730255},{"StartTime":19343.0,"Position":324.6205},{"StartTime":19423.0,"Position":343.0907},{"StartTime":19503.0,"Position":372.2917},{"StartTime":19582.0,"Position":385.194733},{"StartTime":19662.0,"Position":379.0426},{"StartTime":19742.0,"Position":385.1066},{"StartTime":19822.0,"Position":391.624664},{"StartTime":19919.0,"Position":386.27832},{"StartTime":20016.0,"Position":380.117035},{"StartTime":20113.0,"Position":381.664154},{"StartTime":20247.0,"Position":370.872864}]}]}
+{
+    "Mappings": [{
+        "StartTime": 19184,
+        "Objects": [{
+                "StartTime": 19184,
+                "Position": 320,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 19263,
+                "Position": 311.730255,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 19343,
+                "Position": 324.6205,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 19423,
+                "Position": 343.0907,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 19503,
+                "Position": 372.2917,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 19582,
+                "Position": 385.194733,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 19662,
+                "Position": 379.0426,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 19742,
+                "Position": 385.1066,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 19822,
+                "Position": 391.624664,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 19919,
+                "Position": 386.27832,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 20016,
+                "Position": 380.117035,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 20113,
+                "Position": 381.664154,
+                "HyperDash": false
+            },
+            {
+                "StartTime": 20247,
+                "Position": 370.872864,
+                "HyperDash": false
+            }
+        ]
+    }]
+}

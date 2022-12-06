@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,24 +13,25 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile
 {
-    public abstract class ProfileSection : Container
+    public abstract partial class ProfileSection : Container
     {
         public abstract LocalisableString Title { get; }
 
         public abstract string Identifier { get; }
 
-        private readonly FillFlowContainer content;
+        private readonly FillFlowContainer<Drawable> content;
         private readonly Box background;
         private readonly Box underscore;
 
         protected override Container<Drawable> Content => content;
 
-        public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 
         protected ProfileSection()
         {
@@ -79,7 +82,9 @@ namespace osu.Game.Overlays.Profile
                                 }
                             }
                         },
-                        content = new FillFlowContainer
+                        // reverse ID flow is required for correct Z-ordering of the content (last item should be front-most).
+                        // particularly important in BeatmapsSection, as it uses beatmap cards, which have expandable overhanging content.
+                        content = new ReverseChildIDFillFlowContainer<Drawable>
                         {
                             Direction = FillDirection.Vertical,
                             AutoSizeAxes = Axes.Y,
@@ -102,7 +107,7 @@ namespace osu.Game.Overlays.Profile
             underscore.Colour = colourProvider.Highlight1;
         }
 
-        private class SectionTriangles : Container
+        private partial class SectionTriangles : Container
         {
             private readonly Triangles triangles;
             private readonly Box foreground;

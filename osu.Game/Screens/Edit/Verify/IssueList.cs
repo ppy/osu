@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -10,7 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks.Components;
@@ -19,12 +21,9 @@ using osuTK;
 namespace osu.Game.Screens.Edit.Verify
 {
     [Cached]
-    public class IssueList : CompositeDrawable
+    public partial class IssueList : CompositeDrawable
     {
         private IssueTable table;
-
-        [Resolved]
-        private EditorClock clock { get; set; }
 
         [Resolved]
         private IBindable<WorkingBeatmap> workingBeatmap { get; set; }
@@ -43,7 +42,7 @@ namespace osu.Game.Screens.Edit.Verify
         private void load(OverlayColourProvider colours)
         {
             generalVerifier = new BeatmapVerifier();
-            rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
+            rulesetVerifier = beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapVerifier();
 
             context = new BeatmapVerifierContext(beatmap, workingBeatmap.Value, verify.InterpretedDifficulty.Value);
             verify.InterpretedDifficulty.BindValueChanged(difficulty => context.InterpretedDifficulty = difficulty.NewValue);
@@ -54,7 +53,7 @@ namespace osu.Game.Screens.Edit.Verify
             {
                 new Box
                 {
-                    Colour = colours.Background2,
+                    Colour = colours.Background3,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new OsuScrollContainer
@@ -70,7 +69,7 @@ namespace osu.Game.Screens.Edit.Verify
                     Margin = new MarginPadding(20),
                     Children = new Drawable[]
                     {
-                        new TriangleButton
+                        new RoundedButton
                         {
                             Text = "Refresh",
                             Action = refresh,
@@ -88,7 +87,7 @@ namespace osu.Game.Screens.Edit.Verify
             base.LoadComplete();
 
             verify.InterpretedDifficulty.BindValueChanged(_ => refresh());
-            verify.HiddenIssueTypes.BindCollectionChanged((_, __) => refresh());
+            verify.HiddenIssueTypes.BindCollectionChanged((_, _) => refresh());
 
             refresh();
         }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,7 +18,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
-    public class TestSceneDrawableBarLine : TaikoSkinnableTestScene
+    public partial class TestSceneDrawableBarLine : TaikoSkinnableTestScene
     {
         [Cached(typeof(IScrollingInfo))]
         private ScrollingTestContainer.TestScrollingInfo info = new ScrollingTestContainer.TestScrollingInfo
@@ -35,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 var cont = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.8f,
+                    Height = 0.2f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
@@ -61,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 var cont = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.8f,
+                    Height = 0.2f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
@@ -83,18 +85,18 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
         private BarLine createBarLineAtCurrentTime(bool major = false)
         {
-            var barline = new BarLine
+            var barLine = new BarLine
             {
                 Major = major,
-                StartTime = Time.Current + 2000,
+                StartTime = Time.Current + 5000,
             };
 
             var cpi = new ControlPointInfo();
             cpi.Add(0, new TimingControlPoint { BeatLength = 500 });
 
-            barline.ApplyDefaults(cpi, new BeatmapDifficulty());
+            barLine.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            return barline;
+            return barLine;
         }
     }
 }

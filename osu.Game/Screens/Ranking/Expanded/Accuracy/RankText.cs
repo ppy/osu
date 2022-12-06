@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,7 +19,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// <summary>
     /// The text that appears in the middle of the <see cref="AccuracyCircle"/> displaying the user's rank.
     /// </summary>
-    public class RankText : CompositeDrawable
+    public partial class RankText : CompositeDrawable
     {
         private readonly ScoreRank rank;
 
@@ -51,13 +53,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Font = OsuFont.Numeric.With(size: 76),
                     UseFullGlyphHeight = false
                 },
-                superFlash = new BufferedContainer
+                superFlash = new BufferedContainer(cachedFrameBuffer: true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BlurSigma = new Vector2(85),
                     Size = new Vector2(600),
-                    CacheDrawnFrameBuffer = true,
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
                     Children = new[]
@@ -71,14 +72,13 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         },
                     },
                 },
-                flash = new BufferedContainer
+                flash = new BufferedContainer(cachedFrameBuffer: true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BlurSigma = new Vector2(35),
                     BypassAutoSizeAxes = Axes.Both,
                     Size = new Vector2(200),
-                    CacheDrawnFrameBuffer = true,
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
                     Scale = new Vector2(1.8f),

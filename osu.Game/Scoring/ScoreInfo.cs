@@ -3,208 +3,272 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using osu.Framework.Localisation;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Models;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using osu.Game.Utils;
+using Realms;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>, IDeepCloneable<ScoreInfo>
+    [ExcludeFromDynamicCompile]
+    [MapTo("Score")]
+    public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreInfo
     {
-        public int ID { get; set; }
+        [PrimaryKey]
+        public Guid ID { get; set; }
 
-        [JsonProperty("rank")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ScoreRank Rank { get; set; }
+        public BeatmapInfo BeatmapInfo { get; set; } = null!;
 
-        [JsonProperty("total_score")]
+        public RulesetInfo Ruleset { get; set; } = null!;
+
+        public IList<RealmNamedFileUsage> Files { get; } = null!;
+
+        public string Hash { get; set; } = string.Empty;
+
+        public bool DeletePending { get; set; }
+
         public long TotalScore { get; set; }
 
-        [JsonProperty("accuracy")]
-        [Column(TypeName = "DECIMAL(1,4)")] // TODO: This data type is wrong (should contain more precision). But at the same time, we probably don't need to be storing this in the database.
-        public double Accuracy { get; set; }
-
-        [JsonIgnore]
-        public LocalisableString DisplayAccuracy => Accuracy.FormatAccuracy();
-
-        [JsonProperty(@"pp")]
-        public double? PP { get; set; }
-
-        [JsonProperty("max_combo")]
         public int MaxCombo { get; set; }
 
-        [JsonIgnore]
-        public int Combo { get; set; } // Todo: Shouldn't exist in here
+        public double Accuracy { get; set; }
 
-        [JsonProperty("ruleset_id")]
-        public int RulesetID { get; set; }
+        public bool HasReplay => !string.IsNullOrEmpty(Hash);
 
-        [JsonProperty("passed")]
-        [NotMapped]
-        public bool Passed { get; set; } = true;
-
-        [JsonIgnore]
-        public virtual RulesetInfo Ruleset { get; set; }
-
-        private APIMod[] localAPIMods;
-        private Mod[] mods;
-
-        [JsonIgnore]
-        [NotMapped]
-        public Mod[] Mods
-        {
-            get
-            {
-                var rulesetInstance = Ruleset?.CreateInstance();
-                if (rulesetInstance == null)
-                    return mods ?? Array.Empty<Mod>();
-
-                Mod[] scoreMods = Array.Empty<Mod>();
-
-                if (mods != null)
-                    scoreMods = mods;
-                else if (localAPIMods != null)
-                    scoreMods = apiMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
-
-                return scoreMods;
-            }
-            set
-            {
-                localAPIMods = null;
-                mods = value;
-            }
-        }
-
-        // Used for API serialisation/deserialisation.
-        [JsonProperty("mods")]
-        [NotMapped]
-        private APIMod[] apiMods
-        {
-            get
-            {
-                if (localAPIMods != null)
-                    return localAPIMods;
-
-                if (mods == null)
-                    return Array.Empty<APIMod>();
-
-                return localAPIMods = mods.Select(m => new APIMod(m)).ToArray();
-            }
-            set
-            {
-                localAPIMods = value;
-
-                // We potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
-                mods = null;
-            }
-        }
-
-        // Used for database serialisation/deserialisation.
-        [JsonIgnore]
-        [Column("Mods")]
-        public string ModsJson
-        {
-            get => JsonConvert.SerializeObject(apiMods);
-            set => apiMods = JsonConvert.DeserializeObject<APIMod[]>(value);
-        }
-
-        [NotMapped]
-        [JsonProperty("user")]
-        public User User { get; set; }
-
-        [JsonIgnore]
-        [Column("User")]
-        public string UserString
-        {
-            get => User?.Username;
-            set
-            {
-                User ??= new User();
-                User.Username = value;
-            }
-        }
-
-        [JsonIgnore]
-        [Column("UserID")]
-        public int? UserID
-        {
-            get => User?.Id ?? 1;
-            set
-            {
-                User ??= new User();
-                User.Id = value ?? 1;
-            }
-        }
-
-        [JsonIgnore]
-        public int BeatmapInfoID { get; set; }
-
-        [JsonIgnore]
-        [Column("Beatmap")]
-        public virtual BeatmapInfo BeatmapInfo { get; set; }
-
-        [JsonIgnore]
-        public long? OnlineScoreID { get; set; }
-
-        [JsonIgnore]
         public DateTimeOffset Date { get; set; }
 
-        [JsonProperty("statistics")]
-        public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
+        public double? PP { get; set; }
 
-        [JsonIgnore]
-        [Column("Statistics")]
-        public string StatisticsJson
+        [Indexed]
+        public long OnlineID { get; set; } = -1;
+
+        [MapTo("User")]
+        public RealmUser RealmUser { get; set; } = null!;
+
+        [MapTo("Mods")]
+        public string ModsJson { get; set; } = string.Empty;
+
+        [MapTo("Statistics")]
+        public string StatisticsJson { get; set; } = string.Empty;
+
+        [MapTo("MaximumStatistics")]
+        public string MaximumStatisticsJson { get; set; } = string.Empty;
+
+        public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
         {
-            get => JsonConvert.SerializeObject(Statistics);
+            Ruleset = ruleset ?? new RulesetInfo();
+            BeatmapInfo = beatmap ?? new BeatmapInfo();
+            RealmUser = realmUser ?? new RealmUser();
+            ID = Guid.NewGuid();
+        }
+
+        [UsedImplicitly] // Realm
+        private ScoreInfo()
+        {
+        }
+
+        // TODO: this is a bit temporary to account for the fact that this class is used to ferry API user data to certain UI components.
+        // Eventually we should either persist enough information to realm to not require the API lookups, or perform the API lookups locally.
+        private APIUser? user;
+
+        [Ignored]
+        public APIUser User
+        {
+            get => user ??= new APIUser
+            {
+                Id = RealmUser.OnlineID,
+                Username = RealmUser.Username,
+                CountryCode = RealmUser.CountryCode,
+            };
             set
             {
-                if (value == null)
-                {
-                    Statistics.Clear();
-                    return;
-                }
+                user = value;
 
-                Statistics = JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(value);
+                RealmUser = new RealmUser
+                {
+                    OnlineID = user.OnlineID,
+                    Username = user.Username,
+                    CountryCode = user.CountryCode,
+                };
             }
         }
 
-        [NotMapped]
-        [JsonIgnore]
-        public List<HitEvent> HitEvents { get; set; }
+        [Ignored]
+        public ScoreRank Rank
+        {
+            get => (ScoreRank)RankInt;
+            set => RankInt = (int)value;
+        }
 
-        [JsonIgnore]
-        public List<ScoreFileInfo> Files { get; set; }
+        [MapTo(nameof(Rank))]
+        public int RankInt { get; set; }
 
-        [JsonIgnore]
-        public string Hash { get; set; }
+        IRulesetInfo IScoreInfo.Ruleset => Ruleset;
+        IBeatmapInfo IScoreInfo.Beatmap => BeatmapInfo;
+        IUser IScoreInfo.User => User;
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
-        [JsonIgnore]
-        public bool DeletePending { get; set; }
+        #region Properties required to make things work with existing usages
+
+        public Guid BeatmapInfoID => BeatmapInfo.ID;
+
+        public int UserID => RealmUser.OnlineID;
+
+        public int RulesetID => Ruleset.OnlineID;
+
+        [Ignored]
+        public List<HitEvent> HitEvents { get; set; } = new List<HitEvent>();
+
+        public ScoreInfo DeepClone()
+        {
+            var clone = (ScoreInfo)this.Detach().MemberwiseClone();
+
+            clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
+            clone.MaximumStatistics = new Dictionary<HitResult, int>(clone.MaximumStatistics);
+
+            // Ensure we have fresh mods to avoid any references (ie. after gameplay).
+            clone.clearAllMods();
+            clone.ModsJson = ModsJson;
+
+            clone.RealmUser = new RealmUser
+            {
+                OnlineID = RealmUser.OnlineID,
+                Username = RealmUser.Username,
+                CountryCode = RealmUser.CountryCode,
+            };
+
+            return clone;
+        }
+
+        [Ignored]
+        public bool Passed { get; set; } = true;
+
+        public int Combo { get; set; }
 
         /// <summary>
         /// The position of this score, starting at 1.
         /// </summary>
-        [NotMapped]
-        [JsonProperty("position")]
-        public int? Position { get; set; }
+        [Ignored]
+        public int? Position { get; set; } // TODO: remove after all calls to `CreateScoreInfo` are gone.
+
+        [Ignored]
+        public LocalisableString DisplayAccuracy => Accuracy.FormatAccuracy();
 
         /// <summary>
         /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
         /// </summary>
-        [JsonIgnore]
-        [NotMapped]
+        [Ignored]
         public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
+
+        private Dictionary<HitResult, int>? statistics;
+
+        [Ignored]
+        public Dictionary<HitResult, int> Statistics
+        {
+            get
+            {
+                if (statistics != null)
+                    return statistics;
+
+                if (!string.IsNullOrEmpty(StatisticsJson))
+                    statistics = JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(StatisticsJson);
+
+                return statistics ??= new Dictionary<HitResult, int>();
+            }
+            set => statistics = value;
+        }
+
+        private Dictionary<HitResult, int>? maximumStatistics;
+
+        [Ignored]
+        public Dictionary<HitResult, int> MaximumStatistics
+        {
+            get
+            {
+                if (maximumStatistics != null)
+                    return maximumStatistics;
+
+                if (!string.IsNullOrEmpty(MaximumStatisticsJson))
+                    maximumStatistics = JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(MaximumStatisticsJson);
+
+                return maximumStatistics ??= new Dictionary<HitResult, int>();
+            }
+            set => maximumStatistics = value;
+        }
+
+        private Mod[]? mods;
+
+        [Ignored]
+        public Mod[] Mods
+        {
+            get
+            {
+                if (mods != null)
+                    return mods;
+
+                return APIMods.Select(m => m.ToMod(Ruleset.CreateInstance())).ToArray();
+            }
+            set
+            {
+                clearAllMods();
+                mods = value;
+                updateModsJson();
+            }
+        }
+
+        private APIMod[]? apiMods;
+
+        // Used for API serialisation/deserialisation.
+        [Ignored]
+        public APIMod[] APIMods
+        {
+            get
+            {
+                if (apiMods != null) return apiMods;
+
+                // prioritise reading from realm backing
+                if (!string.IsNullOrEmpty(ModsJson))
+                    apiMods = JsonConvert.DeserializeObject<APIMod[]>(ModsJson);
+
+                // then check mods set via Mods property.
+                if (mods != null)
+                    apiMods ??= mods.Select(m => new APIMod(m)).ToArray();
+
+                return apiMods ?? Array.Empty<APIMod>();
+            }
+            set
+            {
+                clearAllMods();
+                apiMods = value;
+                updateModsJson();
+            }
+        }
+
+        private void clearAllMods()
+        {
+            ModsJson = string.Empty;
+            mods = null;
+            apiMods = null;
+        }
+
+        private void updateModsJson()
+        {
+            ModsJson = APIMods.Length > 0
+                ? JsonConvert.SerializeObject(APIMods)
+                : string.Empty;
+        }
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
         {
@@ -232,6 +296,13 @@ namespace osu.Game.Scoring
                         break;
                     }
 
+                    case HitResult.LargeBonus:
+                    case HitResult.SmallBonus:
+                        if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)
+                            yield return new HitResultDisplayStatistic(r.result, value, null, r.displayName);
+
+                        break;
+
                     case HitResult.SmallTickMiss:
                     case HitResult.LargeTickMiss:
                         break;
@@ -244,32 +315,10 @@ namespace osu.Game.Scoring
             }
         }
 
-        public ScoreInfo DeepClone()
-        {
-            var clone = (ScoreInfo)MemberwiseClone();
+        #endregion
 
-            clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
+        public bool Equals(ScoreInfo other) => other.ID == ID;
 
-            return clone;
-        }
-
-        public override string ToString() => $"{User} playing {BeatmapInfo}";
-
-        public bool Equals(ScoreInfo other)
-        {
-            if (other == null)
-                return false;
-
-            if (ID != 0 && other.ID != 0)
-                return ID == other.ID;
-
-            if (OnlineScoreID.HasValue && other.OnlineScoreID.HasValue)
-                return OnlineScoreID == other.OnlineScoreID;
-
-            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
-                return Hash == other.Hash;
-
-            return ReferenceEquals(this, other);
-        }
+        public override string ToString() => this.GetDisplayTitle();
     }
 }

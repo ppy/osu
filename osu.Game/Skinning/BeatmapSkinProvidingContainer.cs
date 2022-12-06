@@ -1,18 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Configuration;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
     /// A container which overrides existing skin options with beatmap-local values.
     /// </summary>
-    public class BeatmapSkinProvidingContainer : SkinProvidingContainer
+    public partial class BeatmapSkinProvidingContainer : SkinProvidingContainer
     {
         private Bindable<bool> beatmapSkins;
         private Bindable<bool> beatmapColours;
@@ -40,7 +43,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        protected override bool AllowDrawableLookup(ISkinComponent component)
+        protected override bool AllowDrawableLookup(ISkinComponentLookup lookup)
         {
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
@@ -56,17 +59,20 @@ namespace osu.Game.Skinning
             return beatmapSkins.Value;
         }
 
-        protected override bool AllowSampleLookup(ISampleInfo componentName)
+        protected override bool AllowSampleLookup(ISampleInfo sampleInfo)
         {
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
-            return beatmapHitsounds.Value;
+            return sampleInfo is StoryboardSampleInfo || beatmapHitsounds.Value;
         }
+
+        private readonly ISkin skin;
 
         public BeatmapSkinProvidingContainer(ISkin skin)
             : base(skin)
         {
+            this.skin = skin;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -81,11 +87,21 @@ namespace osu.Game.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(SkinManager skins)
         {
             beatmapSkins.BindValueChanged(_ => TriggerSourceChanged());
             beatmapColours.BindValueChanged(_ => TriggerSourceChanged());
             beatmapHitsounds.BindValueChanged(_ => TriggerSourceChanged());
+
+            // If the beatmap skin looks to have skinnable resources, add the default classic skin as a fallback opportunity.
+            if (skin is LegacySkinTransformer legacySkin && legacySkin.IsProvidingLegacyResources)
+            {
+                SetSources(new[]
+                {
+                    skin,
+                    skins.DefaultClassicSkin
+                });
+            }
         }
     }
 }

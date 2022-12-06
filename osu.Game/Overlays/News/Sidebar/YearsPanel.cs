@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
-    public class YearsPanel : CompositeDrawable
+    public partial class YearsPanel : CompositeDrawable
     {
         private readonly Bindable<APINewsSidebar> metadata = new Bindable<APINewsSidebar>();
 
@@ -69,15 +71,15 @@ namespace osu.Game.Overlays.News.Sidebar
                 return;
             }
 
-            var currentYear = metadata.Value.CurrentYear;
+            int currentYear = metadata.Value.CurrentYear;
 
-            foreach (var y in metadata.Value.Years)
+            foreach (int y in metadata.Value.Years)
                 yearsFlow.Add(new YearButton(y, y == currentYear));
 
             Show();
         }
 
-        public class YearButton : OsuHoverContainer
+        public partial class YearButton : OsuHoverContainer
         {
             public int Year { get; }
 

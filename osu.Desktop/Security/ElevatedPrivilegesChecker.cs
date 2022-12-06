@@ -16,10 +16,10 @@ namespace osu.Desktop.Security
     /// <summary>
     /// Checks if the game is running with elevated privileges (as admin in Windows, root in Unix) and displays a warning notification if so.
     /// </summary>
-    public class ElevatedPrivilegesChecker : Component
+    public partial class ElevatedPrivilegesChecker : Component
     {
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; } = null!;
 
         private bool elevated;
 
@@ -63,7 +63,7 @@ namespace osu.Desktop.Security
             return false;
         }
 
-        private class ElevatedPrivilegesNotification : SimpleNotification
+        private partial class ElevatedPrivilegesNotification : SimpleNotification
         {
             public override bool IsImportant => true;
 
@@ -73,10 +73,10 @@ namespace osu.Desktop.Security
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay)
+            private void load(OsuColour colours)
             {
                 Icon = FontAwesome.Solid.ShieldAlt;
-                IconBackgound.Colour = colours.YellowDark;
+                IconContent.Colour = colours.YellowDark;
             }
         }
     }

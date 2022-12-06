@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -12,14 +14,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class DrawableRoomParticipantsList : OnlinePlayComposite
+    public partial class DrawableRoomParticipantsList : OnlinePlayComposite
     {
         private const float avatar_size = 36;
 
@@ -195,12 +197,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (var added in e.NewItems.OfType<User>())
+                    foreach (var added in e.NewItems.OfType<APIUser>())
                         addUser(added);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (var removed in e.OldItems.OfType<User>())
+                    foreach (var removed in e.OldItems.OfType<APIUser>())
                         removeUser(removed);
                     break;
 
@@ -222,15 +224,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private int displayedCircles => avatarFlow.Count + (hiddenUsers.Count > 0 ? 1 : 0);
 
-        private void addUser(User user)
+        private void addUser(APIUser user)
         {
             if (displayedCircles < NumberOfCircles)
                 avatarFlow.Add(new CircularAvatar { User = user });
         }
 
-        private void removeUser(User user)
+        private void removeUser(APIUser user)
         {
-            avatarFlow.RemoveAll(a => a.User == user);
+            avatarFlow.RemoveAll(a => a.User == user, true);
         }
 
         private void clearUsers()
@@ -248,7 +250,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             hiddenUsers.Count = hiddenCount;
 
             if (displayedCircles > NumberOfCircles)
-                avatarFlow.Remove(avatarFlow.Last());
+                avatarFlow.Remove(avatarFlow.Last(), true);
             else if (displayedCircles < NumberOfCircles)
             {
                 var nextUser = RecentParticipants.FirstOrDefault(u => avatarFlow.All(a => a.User != u));
@@ -256,7 +258,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private void onHostChanged(ValueChangedEvent<User> host)
+        private void onHostChanged(ValueChangedEvent<APIUser> host)
         {
             hostAvatar.User = host.NewValue;
             hostText.Clear();
@@ -268,9 +270,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private class CircularAvatar : CompositeDrawable
+        private partial class CircularAvatar : CompositeDrawable
         {
-            public User User
+            public APIUser User
             {
                 get => avatar.User;
                 set => avatar.User = value;
@@ -300,7 +302,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        public class HiddenUserCount : CompositeDrawable
+        public partial class HiddenUserCount : CompositeDrawable
         {
             public int Count
             {

@@ -6,22 +6,25 @@ using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class LanguageSettings : SettingsSubsection
+    public partial class LanguageSettings : SettingsSubsection
     {
-        private SettingsDropdown<Language> languageSelection;
-        private Bindable<string> frameworkLocale;
+        private SettingsDropdown<Language> languageSelection = null!;
+        private Bindable<string> frameworkLocale = null!;
+        private IBindable<LocalisationParameters> localisationParameters = null!;
 
         protected override LocalisableString Header => GeneralSettingsStrings.LanguageHeader;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig)
+        private void load(FrameworkConfigManager frameworkConfig, OsuConfigManager config, LocalisationManager localisation)
         {
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
+            localisationParameters = localisation.CurrentParameters.GetBoundCopy();
 
             Children = new Drawable[]
             {
@@ -34,11 +37,15 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     LabelText = GeneralSettingsStrings.PreferOriginalMetadataLanguage,
                     Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = GeneralSettingsStrings.Prefer24HourTimeDisplay,
+                    Current = config.GetBindable<bool>(OsuSetting.Prefer24HourTime)
+                },
             };
 
-            if (!LanguageExtensions.TryParseCultureCode(frameworkLocale.Value, out var locale))
-                locale = Language.en;
-            languageSelection.Current.Value = locale;
+            localisationParameters.BindValueChanged(p
+                => languageSelection.Current.Value = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, p.NewValue), true);
 
             languageSelection.Current.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
         }

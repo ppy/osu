@@ -3,57 +3,93 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Extensions.ObjectExtensions;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
+using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Models;
+using Realms;
 
 namespace osu.Game.Skinning
 {
-    public class SkinInfo : IHasFiles<SkinFileInfo>, IEquatable<SkinInfo>, IHasPrimaryKey, ISoftDelete
+    [ExcludeFromDynamicCompile]
+    [MapTo("Skin")]
+    [JsonObject(MemberSerialization.OptIn)]
+    public class SkinInfo : RealmObject, IHasRealmFiles, IEquatable<SkinInfo>, IHasGuidPrimaryKey, ISoftDelete, IHasNamedFiles
     {
-        internal const int DEFAULT_SKIN = 0;
-        internal const int CLASSIC_SKIN = -1;
-        internal const int RANDOM_SKIN = -2;
+        internal static readonly Guid TRIANGLES_SKIN = new Guid("2991CFD8-2140-469A-BCB9-2EC23FBCE4AD");
+        internal static readonly Guid ARGON_SKIN = new Guid("CFFA69DE-B3E3-4DEE-8563-3C4F425C05D0");
+        internal static readonly Guid CLASSIC_SKIN = new Guid("81F02CD3-EEC6-4865-AC23-FAE26A386187");
+        internal static readonly Guid RANDOM_SKIN = new Guid("D39DFEFB-477C-4372-B1EA-2BCEA5FB8908");
 
-        public int ID { get; set; }
+        [PrimaryKey]
+        [JsonProperty]
+        public Guid ID { get; set; }
 
-        public string Name { get; set; }
+        [JsonProperty]
+        public string Name { get; set; } = null!;
 
-        public string Hash { get; set; }
+        [JsonProperty]
+        public string Creator { get; set; } = null!;
 
-        public string Creator { get; set; }
+        [JsonProperty]
+        public string InstantiationInfo { get; set; } = null!;
 
-        public string InstantiationInfo { get; set; }
+        public string Hash { get; set; } = string.Empty;
+
+        public bool Protected { get; set; }
 
         public virtual Skin CreateInstance(IStorageResourceProvider resources)
         {
             var type = string.IsNullOrEmpty(InstantiationInfo)
                 // handle the case of skins imported before InstantiationInfo was added.
                 ? typeof(LegacySkin)
-                : Type.GetType(InstantiationInfo).AsNonNull();
+                : Type.GetType(InstantiationInfo);
+
+            if (type == null)
+            {
+                // Since the class was renamed from "DefaultSkin" to "TrianglesSkin", the type retrieval would fail
+                // for user modified skins. This aims to amicably handle that.
+                // If we ever add more default skins in the future this will need some kind of proper migration rather than
+                // a single fallback.
+                return new TrianglesSkin(this, resources);
+            }
 
             return (Skin)Activator.CreateInstance(type, this, resources);
         }
 
-        public List<SkinFileInfo> Files { get; set; } = new List<SkinFileInfo>();
+        public IList<RealmNamedFileUsage> Files { get; } = null!;
 
         public bool DeletePending { get; set; }
 
-        public static SkinInfo Default { get; } = new SkinInfo
+        public SkinInfo(string? name = null, string? creator = null, string? instantiationInfo = null)
         {
-            ID = DEFAULT_SKIN,
-            Name = "osu! (triangles)",
-            Creator = "team osu!",
-            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
-        };
+            Name = name ?? string.Empty;
+            Creator = creator ?? string.Empty;
+            InstantiationInfo = instantiationInfo ?? string.Empty;
+            ID = Guid.NewGuid();
+        }
 
-        public bool Equals(SkinInfo other) => other != null && ID == other.ID;
+        [UsedImplicitly] // Realm
+        private SkinInfo()
+        {
+        }
+
+        public bool Equals(SkinInfo? other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
+
+            return ID == other.ID;
+        }
 
         public override string ToString()
         {
-            string author = Creator == null ? string.Empty : $"({Creator})";
+            string author = string.IsNullOrEmpty(Creator) ? string.Empty : $"({Creator})";
             return $"{Name} {author}".Trim();
         }
+
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
     }
 }

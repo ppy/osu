@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -13,7 +15,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public class UserRatings : Container
+    public partial class UserRatings : Container
     {
         private readonly FillFlowContainer header;
         private readonly Bar ratingsBar;
@@ -45,8 +47,8 @@ namespace osu.Game.Screens.Select.Details
                 {
                     var usableRange = Ratings.Skip(1).Take(rating_range); // adjust for API returning weird empty data at 0.
 
-                    var negativeCount = usableRange.Take(rating_range / 2).Sum();
-                    var totalCount = usableRange.Sum();
+                    int negativeCount = usableRange.Take(rating_range / 2).Sum();
+                    int totalCount = usableRange.Sum();
 
                     negativeRatings.Text = negativeCount.ToLocalisableString(@"N0");
                     positiveRatings.Text = (totalCount - negativeCount).ToLocalisableString(@"N0");

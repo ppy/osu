@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,13 +23,13 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Overlays
 {
     [Cached]
-    public abstract class SettingsPanel : OsuFocusedOverlayContainer
+    public abstract partial class SettingsPanel : OsuFocusedOverlayContainer
     {
         public const float CONTENT_MARGINS = 20;
 
         public const float TRANSITION_LENGTH = 600;
 
-        private const float sidebar_width = Sidebar.DEFAULT_WIDTH;
+        private const float sidebar_width = SettingsSidebar.DEFAULT_WIDTH;
 
         /// <summary>
         /// The width of the settings panel content, excluding the sidebar.
@@ -43,7 +45,7 @@ namespace osu.Game.Overlays
 
         protected override Container<Drawable> Content => ContentContainer;
 
-        protected Sidebar Sidebar;
+        protected SettingsSidebar Sidebar;
         private SidebarIconButton selectedSidebarButton;
 
         public SettingsSectionsContainer SectionsContainer { get; private set; }
@@ -129,7 +131,7 @@ namespace osu.Game.Overlays
 
             if (showSidebar)
             {
-                AddInternal(Sidebar = new Sidebar { Width = sidebar_width });
+                AddInternal(Sidebar = new SettingsSidebar { Width = sidebar_width });
             }
 
             CreateSections()?.ForEach(AddSection);
@@ -163,6 +165,7 @@ namespace osu.Game.Overlays
             Sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
 
+            searchTextBox.TakeFocus();
             searchTextBox.HoldFocus = true;
         }
 
@@ -197,7 +200,7 @@ namespace osu.Game.Overlays
             ContentContainer.Margin = new MarginPadding { Left = Sidebar?.DrawWidth ?? 0 };
         }
 
-        private const double fade_in_duration = 1000;
+        private const double fade_in_duration = 500;
 
         private void loadSections()
         {
@@ -213,7 +216,6 @@ namespace osu.Game.Overlays
                 loading.Hide();
 
                 searchTextBox.Current.BindValueChanged(term => SectionsContainer.SearchTerm = term.NewValue, true);
-                searchTextBox.TakeFocus();
 
                 loadSidebarButtons();
             });
@@ -244,7 +246,7 @@ namespace osu.Game.Overlays
                     if (selectedSidebarButton != null)
                         selectedSidebarButton.Selected = false;
 
-                    selectedSidebarButton = Sidebar.Children.FirstOrDefault(b => b.Section == section.NewValue);
+                    selectedSidebarButton = Sidebar.Children.OfType<SidebarIconButton>().FirstOrDefault(b => b.Section == section.NewValue);
 
                     if (selectedSidebarButton != null)
                         selectedSidebarButton.Selected = true;
@@ -265,30 +267,26 @@ namespace osu.Game.Overlays
                             return;
 
                         SectionsContainer.ScrollTo(section);
-                        Sidebar.State = ExpandedState.Contracted;
+                        Sidebar.Expanded.Value = false;
                     },
                 };
             }
         }
 
-        private class NonMaskedContent : Container<Drawable>
+        private partial class NonMaskedContent : Container<Drawable>
         {
             // masking breaks the pan-out transform with nested sub-settings panels.
             protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
         }
 
-        public class SettingsSectionsContainer : SectionsContainer<SettingsSection>
+        public partial class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
             public SearchContainer<SettingsSection> SearchContainer;
 
             public string SearchTerm
             {
                 get => SearchContainer.SearchTerm;
-                set
-                {
-                    SearchContainer.SearchTerm = value;
-                    InvalidateScrollPosition();
-                }
+                set => SearchContainer.SearchTerm = value;
             }
 
             protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
@@ -307,6 +305,8 @@ namespace osu.Game.Overlays
                     Colour = colourProvider.Background4,
                     RelativeSizeAxes = Axes.Both
                 };
+
+                SearchContainer.FilterCompleted += InvalidateScrollPosition;
             }
 
             protected override void UpdateAfterChildren()

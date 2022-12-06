@@ -5,14 +5,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Taiko.Objects;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public class RimHitCirclePiece : CirclePiece
+    public partial class RimHitCirclePiece : CirclePiece
     {
         public RimHitCirclePiece()
         {
@@ -20,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             AccentColour = Hit.COLOUR_RIM;
         }
@@ -28,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         /// <summary>
         /// The symbol used for rim hit pieces.
         /// </summary>
-        public class RimHitSymbolPiece : CircularContainer
+        public partial class RimHitSymbolPiece : CircularContainer
         {
             public RimHitSymbolPiece()
             {

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -9,7 +11,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneBreadcrumbControlHeader : OsuTestScene
+    public partial class TestSceneBreadcrumbControlHeader : OsuTestScene
     {
         private static readonly string[] items = { "first", "second", "third", "fourth", "fifth" };
 
@@ -31,22 +33,22 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestAddAndRemoveItem()
         {
-            foreach (var item in items.Skip(1))
+            foreach (string item in items.Skip(1))
                 AddStep($"Add {item} item", () => header.AddItem(item));
 
-            foreach (var item in items.Reverse().SkipLast(3))
+            foreach (string item in items.Reverse().SkipLast(3))
                 AddStep($"Remove {item} item", () => header.RemoveItem(item));
 
             AddStep("Clear items", () => header.ClearItems());
 
-            foreach (var item in items)
+            foreach (string item in items)
                 AddStep($"Add {item} item", () => header.AddItem(item));
 
-            foreach (var item in items)
+            foreach (string item in items)
                 AddStep($"Remove {item} item", () => header.RemoveItem(item));
         }
 
-        private class TestHeader : BreadcrumbControlOverlayHeader
+        private partial class TestHeader : BreadcrumbControlOverlayHeader
         {
             public TestHeader()
             {
@@ -75,7 +77,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             protected override OverlayTitle CreateTitle() => new TestTitle();
         }
 
-        private class TestTitle : OverlayTitle
+        private partial class TestTitle : OverlayTitle
         {
             public TestTitle()
             {

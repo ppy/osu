@@ -3,20 +3,18 @@
 
 using osu.Game.Skinning;
 
-#nullable enable
-
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
     /// A <see cref="SkinProvidingContainer"/> that fires <see cref="ISkinSource.SourceChanged"/> when users have made a change to the beatmap skin
     /// of the map being edited.
     /// </summary>
-    public class EditorSkinProvidingContainer : RulesetSkinProvidingContainer
+    public partial class EditorSkinProvidingContainer : RulesetSkinProvidingContainer
     {
         private readonly EditorBeatmapSkin? beatmapSkin;
 
         public EditorSkinProvidingContainer(EditorBeatmap editorBeatmap)
-            : base(editorBeatmap.PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin)
+            : base(editorBeatmap.PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin?.Skin)
         {
             beatmapSkin = editorBeatmap.BeatmapSkin;
         }

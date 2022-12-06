@@ -3,30 +3,27 @@
 
 using System;
 using System.Threading;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class UserTopScoreContainer<TScoreInfo> : VisibilityContainer
+    public partial class UserTopScoreContainer<TScoreInfo> : VisibilityContainer
     {
         private const int duration = 500;
 
-        public Bindable<TScoreInfo> Score = new Bindable<TScoreInfo>();
+        public Bindable<TScoreInfo?> Score = new Bindable<TScoreInfo?>();
 
         private readonly Container scoreContainer;
         private readonly Func<TScoreInfo, LeaderboardScore> createScoreDelegate;
 
         protected override bool StartHidden => true;
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private CancellationTokenSource? loadScoreCancellation;
 
         public UserTopScoreContainer(Func<TScoreInfo, LeaderboardScore> createScoreDelegate)
         {
@@ -51,7 +48,7 @@ namespace osu.Game.Online.Leaderboards
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = @"your personal best".ToUpper(),
+                            Text = @"your personal best".ToUpperInvariant(),
                             Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
                         },
                         scoreContainer = new Container
@@ -68,9 +65,7 @@ namespace osu.Game.Online.Leaderboards
             Score.BindValueChanged(onScoreChanged);
         }
 
-        private CancellationTokenSource loadScoreCancellation;
-
-        private void onScoreChanged(ValueChangedEvent<TScoreInfo> score)
+        private void onScoreChanged(ValueChangedEvent<TScoreInfo?> score)
         {
             var newScore = score.NewValue;
 

@@ -1,26 +1,27 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class BeatmapSetOnlineStatusPill : CircularContainer
+    public partial class BeatmapSetOnlineStatusPill : CircularContainer, IHasTooltip
     {
-        private BeatmapSetOnlineStatus status;
+        private BeatmapOnlineStatus status;
 
-        public BeatmapSetOnlineStatus Status
+        public BeatmapOnlineStatus Status
         {
             get => status;
             set
@@ -75,7 +76,7 @@ namespace osu.Game.Beatmaps.Drawables
                 },
             };
 
-            Status = BeatmapSetOnlineStatus.None;
+            Status = BeatmapOnlineStatus.None;
             TextPadding = new MarginPadding { Horizontal = 5, Bottom = 1 };
         }
 
@@ -87,16 +88,30 @@ namespace osu.Game.Beatmaps.Drawables
 
         private void updateState()
         {
-            Alpha = Status == BeatmapSetOnlineStatus.None ? 0 : 1;
+            Alpha = Status == BeatmapOnlineStatus.None ? 0 : 1;
 
             statusText.Text = Status.GetLocalisableDescription().ToUpper();
 
             if (colourProvider != null)
-                statusText.Colour = status == BeatmapSetOnlineStatus.Graveyard ? colourProvider.Background1 : colourProvider.Background3;
+                statusText.Colour = status == BeatmapOnlineStatus.Graveyard ? colourProvider.Background1 : colourProvider.Background3;
             else
-                statusText.Colour = status == BeatmapSetOnlineStatus.Graveyard ? colours.GreySeafoamLight : Color4.Black;
+                statusText.Colour = status == BeatmapOnlineStatus.Graveyard ? colours.GreySeaFoamLight : Color4.Black;
 
-            background.Colour = OsuColour.ForBeatmapSetOnlineStatus(Status) ?? colourProvider?.Light1 ?? colours.GreySeafoamLighter;
+            background.Colour = OsuColour.ForBeatmapSetOnlineStatus(Status) ?? colourProvider?.Light1 ?? colours.GreySeaFoamLighter;
+        }
+
+        public LocalisableString TooltipText
+        {
+            get
+            {
+                switch (Status)
+                {
+                    case BeatmapOnlineStatus.LocallyModified:
+                        return SongSelectStrings.LocallyModifiedTooltip;
+                }
+
+                return string.Empty;
+            }
         }
     }
 }

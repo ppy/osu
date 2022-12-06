@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -13,7 +16,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     /// <summary>
     /// A <see cref="StatisticDisplay"/> to display general numeric values.
     /// </summary>
-    public class CounterStatistic : StatisticDisplay
+    public partial class CounterStatistic : StatisticDisplay
     {
         private readonly int count;
         private readonly int? maxCount;
@@ -26,7 +29,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         /// <param name="header">The name of the statistic.</param>
         /// <param name="count">The value to display.</param>
         /// <param name="maxCount">The maximum value of <paramref name="count"/>. Not displayed if null.</param>
-        public CounterStatistic(string header, int count, int? maxCount = null)
+        public CounterStatistic(LocalisableString header, int count, int? maxCount = null)
             : base(header)
         {
             this.count = count;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,7 @@ namespace osu.Game.Rulesets.Scoring
     /// At HP=5, the minimum health reached for a perfect play is 70%.<br />
     /// At HP=10, the minimum health reached for a perfect play is 30%.
     /// </summary>
-    public class DrainingHealthProcessor : HealthProcessor
+    public partial class DrainingHealthProcessor : HealthProcessor
     {
         /// <summary>
         /// A reasonable allowable error for the minimum health offset from <see cref="targetMinimumHealth"/>. A 1% error is unnoticeable.
@@ -27,17 +29,17 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The minimum health target at an HP drain rate of 0.
         /// </summary>
-        private const double min_health_target = 0.95;
+        private const double min_health_target = 0.99;
 
         /// <summary>
         /// The minimum health target at an HP drain rate of 5.
         /// </summary>
-        private const double mid_health_target = 0.70;
+        private const double mid_health_target = 0.9;
 
         /// <summary>
         /// The minimum health target at an HP drain rate of 10.
         /// </summary>
-        private const double max_health_target = 0.30;
+        private const double max_health_target = 0.4;
 
         private IBeatmap beatmap;
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -19,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneFollowPoints : OsuTestScene
+    public partial class TestSceneFollowPoints : OsuTestScene
     {
         private Container<DrawableOsuHitObject> hitObjectContainer;
         private FollowPointRenderer followPointRenderer;
@@ -193,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var drawableObject = getFunc.Invoke();
 
-                hitObjectContainer.Remove(drawableObject);
+                hitObjectContainer.Remove(drawableObject, false);
                 followPointRenderer.RemoveFollowPoints(drawableObject.HitObject);
             });
         }
@@ -210,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 else
                     targetTime = getObject(hitObjectContainer.Count - 1).HitObject.StartTime + 1;
 
-                hitObjectContainer.Remove(toReorder);
+                hitObjectContainer.Remove(toReorder, false);
                 toReorder.HitObject.StartTime = targetTime;
                 hitObjectContainer.Add(toReorder);
             });
@@ -276,7 +278,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private FollowPointConnection getGroup(int index) => followPointRenderer.ChildrenOfType<FollowPointConnection>().Single(c => c.Entry == getEntry(index));
 
-        private class TestHitObjectContainer : Container<DrawableOsuHitObject>
+        private partial class TestHitObjectContainer : Container<DrawableOsuHitObject>
         {
             protected override int Compare(Drawable x, Drawable y)
             {

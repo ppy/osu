@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System;
@@ -130,7 +132,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         if (i >= adds.Length)
                             break;
 
-                        int.TryParse(adds[i], out var sound);
+                        int.TryParse(adds[i], out int sound);
                         nodeSoundTypes[i] = (LegacyHitSoundType)sound;
                     }
                 }
@@ -188,17 +190,17 @@ namespace osu.Game.Rulesets.Objects.Legacy
             string[] split = str.Split(':');
 
             var bank = (LegacySampleBank)Parsing.ParseInt(split[0]);
-            var addbank = (LegacySampleBank)Parsing.ParseInt(split[1]);
+            var addBank = (LegacySampleBank)Parsing.ParseInt(split[1]);
 
             string stringBank = bank.ToString().ToLowerInvariant();
             if (stringBank == @"none")
                 stringBank = null;
-            string stringAddBank = addbank.ToString().ToLowerInvariant();
+            string stringAddBank = addBank.ToString().ToLowerInvariant();
             if (stringAddBank == @"none")
                 stringAddBank = null;
 
-            bankInfo.Normal = stringBank;
-            bankInfo.Add = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
+            bankInfo.BankForNormal = stringBank;
+            bankInfo.BankForAdditions = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
 
             if (split.Length > 2)
                 bankInfo.CustomSampleBank = Parsing.ParseInt(split[2]);
@@ -336,8 +338,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             while (++endIndex < vertices.Length - endPointLength)
             {
-                // Keep incrementing while an implicit segment doesn't need to be started
+                // Keep incrementing while an implicit segment doesn't need to be started.
                 if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
+                    continue;
+
+                // Legacy Catmull sliders don't support multiple segments, so adjacent Catmull segments should be treated as a single one.
+                // Importantly, this is not applied to the first control point, which may duplicate the slider path's position
+                // resulting in a duplicate (0,0) control point in the resultant list.
+                if (type == PathType.Catmull && endIndex > 1 && FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
                     continue;
 
                 // The last control point of each segment is not allowed to start a new implicit segment.
@@ -408,7 +416,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
         protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
-                                                  List<IList<HitSampleInfo>> nodeSamples);
+                                                  IList<IList<HitSampleInfo>> nodeSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
@@ -439,32 +447,54 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             var soundTypes = new List<HitSampleInfo>
             {
-                new LegacyHitSampleInfo(HitSampleInfo.HIT_NORMAL, bankInfo.Normal, bankInfo.Volume, bankInfo.CustomSampleBank,
+                new LegacyHitSampleInfo(HitSampleInfo.HIT_NORMAL, bankInfo.BankForNormal, bankInfo.Volume, bankInfo.CustomSampleBank,
                     // if the sound type doesn't have the Normal flag set, attach it anyway as a layered sample.
                     // None also counts as a normal non-layered sample: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#hitsounds
                     type != LegacyHitSoundType.None && !type.HasFlagFast(LegacyHitSoundType.Normal))
             };
 
             if (type.HasFlagFast(LegacyHitSoundType.Finish))
-                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_FINISH, bankInfo.Add, bankInfo.Volume, bankInfo.CustomSampleBank));
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_FINISH, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.CustomSampleBank));
 
             if (type.HasFlagFast(LegacyHitSoundType.Whistle))
-                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_WHISTLE, bankInfo.Add, bankInfo.Volume, bankInfo.CustomSampleBank));
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_WHISTLE, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.CustomSampleBank));
 
             if (type.HasFlagFast(LegacyHitSoundType.Clap))
-                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_CLAP, bankInfo.Add, bankInfo.Volume, bankInfo.CustomSampleBank));
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_CLAP, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.CustomSampleBank));
 
             return soundTypes;
         }
 
         private class SampleBankInfo
         {
+            /// <summary>
+            /// An optional overriding filename which causes all bank/sample specifications to be ignored.
+            /// </summary>
             public string Filename;
 
-            public string Normal;
-            public string Add;
+            /// <summary>
+            /// The bank identifier to use for the base ("hitnormal") sample.
+            /// Transferred to <see cref="HitSampleInfo.Bank"/> when appropriate.
+            /// </summary>
+            public string BankForNormal;
+
+            /// <summary>
+            /// The bank identifier to use for additions ("hitwhistle", "hitfinish", "hitclap").
+            /// Transferred to <see cref="HitSampleInfo.Bank"/> when appropriate.
+            /// </summary>
+            public string BankForAdditions;
+
+            /// <summary>
+            /// Hit sample volume (0-100).
+            /// See <see cref="HitSampleInfo.Volume"/>.
+            /// </summary>
             public int Volume;
 
+            /// <summary>
+            /// The index of the custom sample bank. Is only used if 2 or above for "reasons".
+            /// This will add a suffix to lookups, allowing extended bank lookups (ie. "normal-hitnormal-2").
+            /// See <see cref="HitSampleInfo.Suffix"/>.
+            /// </summary>
             public int CustomSampleBank;
 
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
@@ -481,7 +511,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// </summary>
             /// <remarks>
             /// Layered hit samples are automatically added in all modes (except osu!mania), but can be disabled
-            /// using the <see cref="LegacySkinConfiguration.LegacySetting.LayeredHitSounds"/> skin config option.
+            /// using the <see cref="SkinConfiguration.LegacySetting.LayeredHitSounds"/> skin config option.
             /// </remarks>
             public readonly bool IsLayered;
 
@@ -495,11 +525,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
                 => With(newName, newBank, newVolume);
 
-            public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default, Optional<int> newCustomSampleBank = default,
+            public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default,
+                                                    Optional<int> newCustomSampleBank = default,
                                                     Optional<bool> newIsLayered = default)
                 => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newVolume.GetOr(Volume), newCustomSampleBank.GetOr(CustomSampleBank), newIsLayered.GetOr(IsLayered));
 
             public bool Equals(LegacyHitSampleInfo? other)
+                // The additions to equality checks here are *required* to ensure that pooling works correctly.
+                // Of note, `IsLayered` may cause the usage of `SampleVirtual` instead of an actual sample (in cases playback is not required).
+                // Removing it would cause samples which may actually require playback to potentially source for a `SampleVirtual` sample pool.
                 => base.Equals(other) && CustomSampleBank == other.CustomSampleBank && IsLayered == other.IsLayered;
 
             public override bool Equals(object? obj)
@@ -526,7 +560,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 Path.ChangeExtension(Filename, null)
             };
 
-            public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default, Optional<int> newCustomSampleBank = default,
+            public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default,
+                                                            Optional<int> newCustomSampleBank = default,
                                                             Optional<bool> newIsLayered = default)
                 => new FileHitSampleInfo(Filename, newVolume.GetOr(Volume));
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.UI;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Edit
     /// <summary>
     /// A grid which displays coloured beat divisor lines in proximity to the selection or placement cursor.
     /// </summary>
-    public class ManiaBeatSnapGrid : Component
+    public partial class ManiaBeatSnapGrid : Component
     {
         private const double visible_range = 750;
 
@@ -45,12 +46,6 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
-
-        [Resolved]
-        private IScrollingInfo scrollingInfo { get; set; }
-
-        [Resolved]
-        private Bindable<WorkingBeatmap> working { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -171,7 +166,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             }
         }
 
-        private class DrawableGridLine : DrawableHitObject
+        private partial class DrawableGridLine : DrawableHitObject
         {
             [Resolved]
             private IScrollingInfo scrollingInfo { get; set; }

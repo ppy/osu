@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -16,11 +17,11 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Spun Out";
         public override string Acronym => "SO";
-        public override IconUsage? Icon => OsuIcon.ModSpunout;
+        public override IconUsage? Icon => OsuIcon.ModSpunOut;
         public override ModType Type => ModType.Automation;
-        public override string Description => @"Spinners will be automatically completed.";
+        public override LocalisableString Description => @"Spinners will be automatically completed.";
         public override double ScoreMultiplier => 0.9;
-        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAutopilot) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAutopilot), typeof(OsuModTargetPractice) };
 
         public void ApplyToDrawableHitObject(DrawableHitObject hitObject)
         {
@@ -44,8 +45,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             // because the spinner is under the gameplay clock, it is affected by rate adjustments on the track;
             // for that reason using ElapsedFrameTime directly leads to fewer SPM with Half Time and more SPM with Double Time.
             // for spinners we want the real (wall clock) elapsed time; to achieve that, unapply the clock rate locally here.
-            var rateIndependentElapsedTime = spinner.Clock.ElapsedFrameTime / spinner.Clock.Rate;
-            spinner.RotationTracker.AddRotation(MathUtils.RadiansToDegrees((float)rateIndependentElapsedTime * 0.03f));
+            double rateIndependentElapsedTime = spinner.Clock.ElapsedFrameTime / spinner.Clock.Rate;
+
+            // multiply the SPM by 1.01 to ensure that the spinner is completed. if the calculation is left exact,
+            // some spinners may not complete due to very minor decimal loss during calculation
+            float rotationSpeed = (float)(1.01 * spinner.HitObject.SpinsRequired / spinner.HitObject.Duration);
+            spinner.RotationTracker.AddRotation(MathUtils.RadiansToDegrees((float)rateIndependentElapsedTime * rotationSpeed * MathF.PI * 2.0f));
         }
     }
 }

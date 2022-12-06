@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -16,7 +18,7 @@ namespace osu.Game.Graphics
     /// <summary>
     /// An explosion of textured particles based on how osu-stable randomises the explosion pattern.
     /// </summary>
-    public class ParticleExplosion : Sprite
+    public partial class ParticleExplosion : Sprite
     {
         private readonly int particleCount;
         private readonly double duration;
@@ -87,9 +89,9 @@ namespace osu.Game.Graphics
                 currentTime = source.Time.Current;
             }
 
-            protected override void Blit(Action<TexturedVertex2D> vertexAction)
+            protected override void Blit(IRenderer renderer)
             {
-                var time = currentTime - startTime;
+                double time = currentTime - startTime;
 
                 foreach (var p in parts)
                 {
@@ -110,9 +112,9 @@ namespace osu.Game.Graphics
                         Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
                     );
 
-                    DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null, vertexAction,
-                        new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
-                        null, TextureCoords);
+                    renderer.DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha),
+                        inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
+                        textureCoords: TextureCoords);
                 }
             }
 
@@ -136,7 +138,7 @@ namespace osu.Game.Graphics
 
             public Vector2 PositionAtTime(double time)
             {
-                var travelledDistance = distance * progressAtTime(time);
+                float travelledDistance = distance * progressAtTime(time);
                 return new Vector2(0.5f) + travelledDistance * new Vector2(MathF.Sin(direction), MathF.Cos(direction));
             }
 

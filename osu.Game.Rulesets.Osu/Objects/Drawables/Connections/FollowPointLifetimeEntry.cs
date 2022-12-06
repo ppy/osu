@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Diagnostics;
 using osu.Framework.Bindables;
@@ -93,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             // The lifetime start will match the fade-in time of the first follow point.
             float fraction = (int)(FollowPointConnection.SPACING * 1.5) / distanceVector.Length;
-            FollowPointConnection.GetFadeTimes(Start, End, fraction, out var fadeInTime, out _);
+            FollowPointConnection.GetFadeTimes(Start, End, fraction, out double fadeInTime, out _);
 
             LifetimeStart = fadeInTime;
             LifetimeEnd = double.MaxValue; // This will be set by the connection.

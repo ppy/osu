@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="DeepEqual" Version="2.0.0" />
-    <PackageReference Include="Moq" Version="4.16.1" />
+    <PackageReference Include="Moq" Version="4.17.2" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

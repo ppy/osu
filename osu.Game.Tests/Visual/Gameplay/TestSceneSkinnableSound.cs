@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,21 +13,19 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableSound : OsuTestScene
+    public partial class TestSceneSkinnableSound : OsuTestScene
     {
         private TestSkinSourceContainer skinSource;
         private PausableSkinnableSound skinnableSound;
 
-        [SetUp]
+        [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("setup hierarchy", () =>
@@ -131,8 +131,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Cached(typeof(ISkinSource))]
-        [Cached(typeof(ISamplePlaybackDisabler))]
-        private class TestSkinSourceContainer : Container, ISkinSource, ISamplePlaybackDisabler
+        private partial class TestSkinSourceContainer : Container, ISkinSource, ISamplePlaybackDisabler
         {
             [Resolved]
             private ISkinSource source { get; set; }
@@ -143,7 +142,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => SamplePlaybackDisabled;
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => source?.GetDrawableComponent(component);
+            public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => source?.GetDrawableComponent(lookup);
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => source?.GetTexture(componentName, wrapModeS, wrapModeT);
             public ISample GetSample(ISampleInfo sampleInfo) => source?.GetSample(sampleInfo);
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source?.GetConfig<TLookup, TValue>(lookup);

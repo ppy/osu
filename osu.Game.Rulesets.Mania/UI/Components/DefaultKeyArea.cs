@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -17,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class DefaultKeyArea : CompositeDrawable, IKeyBindingHandler<ManiaAction>
+    public partial class DefaultKeyArea : CompositeDrawable, IKeyBindingHandler<ManiaAction>
     {
         private const float key_icon_size = 10;
         private const float key_icon_corner_radius = 3;
@@ -27,6 +29,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         private Container directionContainer;
         private Container keyIcon;
         private Drawable gradient;
+
+        private Bindable<Color4> accentColour;
 
         [Resolved]
         private Column column { get; set; }
@@ -69,19 +73,23 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                                 AlwaysPresent = true
                             }
                         }
-                    }
+                    },
                 }
-            };
-
-            keyIcon.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Radius = 5,
-                Colour = column.AccentColour.Opacity(0.5f),
             };
 
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
+
+            accentColour = column.AccentColour.GetBoundCopy();
+            accentColour.BindValueChanged(colour =>
+            {
+                keyIcon.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 5,
+                    Colour = colour.NewValue.Opacity(0.5f),
+                };
+            }, true);
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)

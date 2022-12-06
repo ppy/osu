@@ -1,7 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
@@ -12,13 +16,17 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 {
-    public class SpinnerPlacementBlueprint : PlacementBlueprint
+    public partial class SpinnerPlacementBlueprint : PlacementBlueprint
     {
         public new Spinner HitObject => (Spinner)base.HitObject;
 
         private readonly SpinnerPiece piece;
 
         private bool isPlacingEnd;
+
+        [Resolved(CanBeNull = true)]
+        [CanBeNull]
+        private IBeatSnapProvider beatSnapProvider { get; set; }
 
         public SpinnerPlacementBlueprint()
             : base(new Spinner { Position = OsuPlayfield.BASE_SIZE / 2 })
@@ -31,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
             base.Update();
 
             if (isPlacingEnd)
-                HitObject.EndTime = Math.Max(HitObject.StartTime, EditorClock.CurrentTime);
+                updateEndTimeFromCurrent();
 
             piece.UpdateFrom(HitObject);
         }
@@ -43,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
                 if (e.Button != MouseButton.Right)
                     return false;
 
-                HitObject.EndTime = EditorClock.CurrentTime;
+                updateEndTimeFromCurrent();
                 EndPlacement(true);
             }
             else
@@ -58,6 +66,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
             }
 
             return true;
+        }
+
+        private void updateEndTimeFromCurrent()
+        {
+            HitObject.EndTime = beatSnapProvider == null
+                ? Math.Max(HitObject.StartTime, EditorClock.CurrentTime)
+                : Math.Max(HitObject.StartTime + beatSnapProvider.GetBeatLengthAtTime(HitObject.StartTime), beatSnapProvider.SnapTime(EditorClock.CurrentTime));
         }
     }
 }

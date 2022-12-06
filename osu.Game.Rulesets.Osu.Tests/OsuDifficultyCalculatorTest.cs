@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -15,17 +17,22 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
-        [TestCase(6.5867229481955389d, "diffcalc-test")]
-        [TestCase(1.0416315570967911d, "zero-length-sliders")]
-        public void Test(double expected, string name)
-            => base.Test(expected, name);
+        [TestCase(6.7115569159190587d, 206, "diffcalc-test")]
+        [TestCase(1.4391311903612753d, 45, "zero-length-sliders")]
+        public void Test(double expectedStarRating, int expectedMaxCombo, string name)
+            => base.Test(expectedStarRating, expectedMaxCombo, name);
 
-        [TestCase(8.2730989071947896d, "diffcalc-test")]
-        [TestCase(1.2726413186221039d, "zero-length-sliders")]
-        public void TestClockRateAdjusted(double expected, string name)
-            => Test(expected, name, new OsuModDoubleTime());
+        [TestCase(8.9757300665532966d, 206, "diffcalc-test")]
+        [TestCase(1.7437232654020756d, 45, "zero-length-sliders")]
+        public void TestClockRateAdjusted(double expectedStarRating, int expectedMaxCombo, string name)
+            => Test(expectedStarRating, expectedMaxCombo, name, new OsuModDoubleTime());
 
-        protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset(), beatmap);
+        [TestCase(6.7115569159190587d, 239, "diffcalc-test")]
+        [TestCase(1.4391311903612753d, 54, "zero-length-sliders")]
+        public void TestClassicMod(double expectedStarRating, int expectedMaxCombo, string name)
+            => Test(expectedStarRating, expectedMaxCombo, name, new OsuModClassic());
+
+        protected override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset().RulesetInfo, beatmap);
 
         protected override Ruleset CreateRuleset() => new OsuRuleset();
     }

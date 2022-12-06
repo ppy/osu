@@ -10,6 +10,7 @@ using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -17,6 +18,7 @@ using osu.Framework.Utils;
 using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Graphics;
@@ -27,28 +29,29 @@ namespace osu.Game.Screens.Play
     /// Manage the animation to be applied when a player fails.
     /// Single use and automatically disposed after use.
     /// </summary>
-    public class FailAnimation : Container
+    public partial class FailAnimation : Container
     {
-        public Action OnComplete;
+        public Action? OnComplete;
 
         private readonly DrawableRuleset drawableRuleset;
         private readonly BindableDouble trackFreq = new BindableDouble(1);
+        private readonly BindableDouble volumeAdjustment = new BindableDouble(0.5);
 
-        private Container filters;
+        private Container filters = null!;
 
-        private Box redFlashLayer;
+        private Box redFlashLayer = null!;
 
-        private Track track;
+        private Track track = null!;
 
-        private AudioFilter failLowPassFilter;
-        private AudioFilter failHighPassFilter;
+        private AudioFilter failLowPassFilter = null!;
+        private AudioFilter failHighPassFilter = null!;
 
         private const float duration = 2500;
 
-        private Sample failSample;
+        private Sample? failSample;
 
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
         protected override Container<Drawable> Content { get; } = new Container
         {
@@ -56,6 +59,11 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.Centre,
             RelativeSizeAxes = Axes.Both,
         };
+
+        /// <summary>
+        /// The player screen background, used to adjust appearance on failing.
+        /// </summary>
+        public BackgroundScreen? Background { private get; set; }
 
         public FailAnimation(DrawableRuleset drawableRuleset)
         {
@@ -83,7 +91,7 @@ namespace osu.Game.Screens.Play
                 Content,
                 redFlashLayer = new Box
                 {
-                    Colour = Color4.Red,
+                    Colour = Color4.Red.Opacity(0.6f),
                     RelativeSizeAxes = Axes.Both,
                     Blending = BlendingParameters.Additive,
                     Depth = float.MinValue,
@@ -93,6 +101,7 @@ namespace osu.Game.Screens.Play
         }
 
         private bool started;
+        private bool filtersRemoved;
 
         /// <summary>
         /// Start the fail animation playing.
@@ -101,20 +110,23 @@ namespace osu.Game.Screens.Play
         public void Start()
         {
             if (started) throw new InvalidOperationException("Animation cannot be started more than once.");
+            if (filtersRemoved) throw new InvalidOperationException("Animation cannot be started after filters have been removed.");
 
             started = true;
 
             this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
             {
-                RemoveFilters();
+                // Don't reset frequency as the pause screen may appear post transform, causing a second frequency sweep.
+                RemoveFilters(false);
                 OnComplete?.Invoke();
             });
 
             failHighPassFilter.CutoffTo(300);
             failLowPassFilter.CutoffTo(300, duration, Easing.OutCubic);
-            failSample.Play();
+            failSample?.Play();
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
+            track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             applyToPlayfield(drawableRuleset.Playfield);
             drawableRuleset.Playfield.HitObjectContainer.FadeOut(duration / 2);
@@ -134,17 +146,27 @@ namespace osu.Game.Screens.Play
             Content.ScaleTo(0.85f, duration, Easing.OutQuart);
             Content.RotateTo(1, duration, Easing.OutQuart);
             Content.FadeColour(Color4.Gray, duration);
+
+            // Will be restored by `ApplyToBackground` logic in `SongSelect`.
+            Background?.FadeColour(OsuColour.Gray(0.3f), 60);
         }
 
-        public void RemoveFilters()
+        public void RemoveFilters(bool resetTrackFrequency = true)
         {
+            filtersRemoved = true;
+
+            if (!started)
+                return;
+
+            if (resetTrackFrequency)
+                track.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+
+            track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
+
             if (filters.Parent == null)
                 return;
 
-            RemoveInternal(filters);
-            filters.Dispose();
-
-            track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+            RemoveInternal(filters, true);
         }
 
         protected override void Update()
@@ -178,7 +200,7 @@ namespace osu.Game.Screens.Play
                 dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
 
                 // need to reapply the fail drop after judgement state changes
-                obj.ApplyCustomUpdateState += (o, _) => dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
+                obj.ApplyCustomUpdateState += (_, _) => dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
 
                 appliedObjects.Add(obj);
             }

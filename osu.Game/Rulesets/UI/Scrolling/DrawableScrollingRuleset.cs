@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,6 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
-using osu.Game.Extensions;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
     /// A type of <see cref="DrawableRuleset{TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.
     /// <see cref="HitObject"/>s inside this <see cref="DrawableRuleset{TObject}"/> will scroll within the playfield.
     /// </summary>
-    public abstract class DrawableScrollingRuleset<TObject> : DrawableRuleset<TObject>, IKeyBindingHandler<GlobalAction>
+    public abstract partial class DrawableScrollingRuleset<TObject> : DrawableRuleset<TObject>, IDrawableScrollingRuleset, IKeyBindingHandler<GlobalAction>
         where TObject : HitObject
     {
         /// <summary>
@@ -59,12 +60,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         protected readonly BindableDouble TimeRange = new BindableDouble(time_span_default)
         {
-            Default = time_span_default,
             MinValue = time_span_min,
             MaxValue = time_span_max
         };
 
         protected virtual ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Sequential;
+
+        ScrollVisualisationMethod IDrawableScrollingRuleset.VisualisationMethod => VisualisationMethod;
 
         /// <summary>
         /// Whether the player can change <see cref="TimeRange"/>.
@@ -112,30 +114,16 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     break;
             }
 
-            double lastObjectTime = Objects.LastOrDefault()?.GetEndTime() ?? double.MaxValue;
+            double lastObjectTime = Beatmap.HitObjects.Any() ? Beatmap.GetLastObjectTime() : double.MaxValue;
             double baseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
             if (RelativeScaleBeatLengths)
             {
-                IReadOnlyList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
-                double maxDuration = 0;
+                baseBeatLength = Beatmap.GetMostCommonBeatLength();
 
-                for (int i = 0; i < timingPoints.Count; i++)
-                {
-                    if (timingPoints[i].Time > lastObjectTime)
-                        break;
-
-                    double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastObjectTime;
-                    double duration = endTime - timingPoints[i].Time;
-
-                    if (duration > maxDuration)
-                    {
-                        maxDuration = duration;
-                        // The slider multiplier is post-multiplied to determine the final velocity, but for relative scale beat lengths
-                        // the multiplier should not affect the effective timing point (the longest in the beatmap), so it is factored out here
-                        baseBeatLength = timingPoints[i].BeatLength / Beatmap.Difficulty.SliderMultiplier;
-                    }
-                }
+                // The slider multiplier is post-multiplied to determine the final velocity, but for relative scale beat lengths
+                // the multiplier should not affect the effective timing point (the longest in the beatmap), so it is factored out here
+                baseBeatLength /= Beatmap.Difficulty.SliderMultiplier;
             }
 
             // Merge sequences of timing and difficulty control points to create the aggregate "multiplier" control point
@@ -172,9 +160,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // Trim unwanted sequences of timing changes
             timingChanges = timingChanges
                             // Collapse sections after the last hit object
-                            .Where(s => s.StartTime <= lastObjectTime)
+                            .Where(s => s.Time <= lastObjectTime)
                             // Collapse sections with the same start time
-                            .GroupBy(s => s.StartTime).Select(g => g.Last()).OrderBy(s => s.StartTime);
+                            .GroupBy(s => s.Time).Select(g => g.Last()).OrderBy(s => s.Time);
 
             ControlPoints.AddRange(timingChanges);
 
@@ -204,11 +192,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
             switch (e.Action)
             {
                 case GlobalAction.IncreaseScrollSpeed:
-                    scheduleScrollSpeedAdjustment(1);
+                    AdjustScrollSpeed(1);
                     return true;
 
                 case GlobalAction.DecreaseScrollSpeed:
-                    scheduleScrollSpeedAdjustment(-1);
+                    AdjustScrollSpeed(-1);
                     return true;
             }
 
@@ -221,12 +209,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             scheduledScrollSpeedAdjustment?.Cancel();
             scheduledScrollSpeedAdjustment = null;
-        }
-
-        private void scheduleScrollSpeedAdjustment(int amount)
-        {
-            scheduledScrollSpeedAdjustment?.Cancel();
-            scheduledScrollSpeedAdjustment = this.BeginKeyRepeat(Scheduler, () => AdjustScrollSpeed(amount));
         }
 
         private class LocalScrollingInfo : IScrollingInfo

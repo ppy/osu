@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -17,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class DefaultHitExplosion : CompositeDrawable, IHitExplosion
+    public partial class DefaultHitExplosion : CompositeDrawable, IHitExplosion
     {
         private const float default_large_faint_size = 0.8f;
 
@@ -30,6 +32,10 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private CircularContainer largeFaint;
         private CircularContainer mainGlow1;
+        private CircularContainer mainGlow2;
+        private CircularContainer mainGlow3;
+
+        private Bindable<Color4> accentColour;
 
         public DefaultHitExplosion()
         {
@@ -42,11 +48,9 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load(IScrollingInfo scrollingInfo)
         {
-            const float angle_variangle = 15; // should be less than 45
+            const float angle_variance = 15; // should be less than 45
             const float roundness = 80;
             const float initial_height = 10;
-
-            var colour = Interpolation.ValueAt(0.4f, column.AccentColour, Color4.White, 0, 1);
 
             InternalChildren = new Drawable[]
             {
@@ -59,13 +63,6 @@ namespace osu.Game.Rulesets.Mania.UI
                     // we want our size to be very small so the glow dominates it.
                     Size = new Vector2(default_large_faint_size),
                     Blending = BlendingParameters.Additive,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Colour = Interpolation.ValueAt(0.1f, column.AccentColour, Color4.White, 0, 1).Opacity(0.3f),
-                        Roundness = 160,
-                        Radius = 200,
-                    },
                 },
                 mainGlow1 = new CircularContainer
                 {
@@ -74,15 +71,8 @@ namespace osu.Game.Rulesets.Mania.UI
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     Blending = BlendingParameters.Additive,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Colour = Interpolation.ValueAt(0.6f, column.AccentColour, Color4.White, 0, 1),
-                        Roundness = 20,
-                        Radius = 50,
-                    },
                 },
-                new CircularContainer
+                mainGlow2 = new CircularContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -90,16 +80,9 @@ namespace osu.Game.Rulesets.Mania.UI
                     Masking = true,
                     Size = new Vector2(0.01f, initial_height),
                     Blending = BlendingParameters.Additive,
-                    Rotation = RNG.NextSingle(-angle_variangle, angle_variangle),
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Colour = colour,
-                        Roundness = roundness,
-                        Radius = 40,
-                    },
+                    Rotation = RNG.NextSingle(-angle_variance, angle_variance),
                 },
-                new CircularContainer
+                mainGlow3 = new CircularContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -107,19 +90,45 @@ namespace osu.Game.Rulesets.Mania.UI
                     Masking = true,
                     Size = new Vector2(0.01f, initial_height),
                     Blending = BlendingParameters.Additive,
-                    Rotation = RNG.NextSingle(-angle_variangle, angle_variangle),
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Colour = colour,
-                        Roundness = roundness,
-                        Radius = 40,
-                    },
+                    Rotation = RNG.NextSingle(-angle_variance, angle_variance),
                 }
             };
 
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
+
+            accentColour = column.AccentColour.GetBoundCopy();
+            accentColour.BindValueChanged(colour =>
+            {
+                largeFaint.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = Interpolation.ValueAt(0.1f, colour.NewValue, Color4.White, 0, 1).Opacity(0.3f),
+                    Roundness = 160,
+                    Radius = 200,
+                };
+                mainGlow1.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = Interpolation.ValueAt(0.6f, colour.NewValue, Color4.White, 0, 1),
+                    Roundness = 20,
+                    Radius = 50,
+                };
+                mainGlow2.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = Interpolation.ValueAt(0.4f, colour.NewValue, Color4.White, 0, 1),
+                    Roundness = roundness,
+                    Radius = 40,
+                };
+                mainGlow3.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = Interpolation.ValueAt(0.4f, colour.NewValue, Color4.White, 0, 1),
+                    Roundness = roundness,
+                    Radius = 40,
+                };
+            }, true);
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -22,7 +24,8 @@ namespace osu.Game.Tests.NonVisual.Ranking
 
             var unstableRate = new UnstableRate(events);
 
-            Assert.IsTrue(Precision.AlmostEquals(unstableRate.Value, 10 * Math.Sqrt(10)));
+            Assert.IsNotNull(unstableRate.Value);
+            Assert.IsTrue(Precision.AlmostEquals(unstableRate.Value.Value, 10 * Math.Sqrt(10)));
         }
 
         [Test]

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects;
@@ -13,38 +14,42 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// Visualises the <see cref="FollowPoint"/>s between two <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPointConnection : PoolableDrawableWithLifetime<FollowPointLifetimeEntry>
+    public partial class FollowPointConnection : PoolableDrawableWithLifetime<FollowPointLifetimeEntry>
     {
         // Todo: These shouldn't be constants
         public const int SPACING = 32;
         public const double PREEMPT = 800;
 
-        public DrawablePool<FollowPoint> Pool;
+        public DrawablePool<FollowPoint>? Pool { private get; set; }
 
         protected override void OnApply(FollowPointLifetimeEntry entry)
         {
             base.OnApply(entry);
 
-            entry.Invalidated += onEntryInvalidated;
-            refreshPoints();
+            entry.Invalidated += scheduleRefresh;
+
+            // Our clock may not be correct at this point if `LoadComplete` has not run yet.
+            // Without a schedule, animations referencing FollowPoint's clock (see `IAnimationTimeReference`) would be incorrect on first pool usage.
+            scheduleRefresh();
         }
 
         protected override void OnFree(FollowPointLifetimeEntry entry)
         {
             base.OnFree(entry);
 
-            entry.Invalidated -= onEntryInvalidated;
+            entry.Invalidated -= scheduleRefresh;
             // Return points to the pool.
             ClearInternal(false);
         }
 
-        private void onEntryInvalidated() => Scheduler.AddOnce(refreshPoints);
-
-        private void refreshPoints()
+        private void scheduleRefresh() => Scheduler.AddOnce(() =>
         {
+            Debug.Assert(Pool != null);
+
             ClearInternal(false);
 
             var entry = Entry;
+
             if (entry?.End == null) return;
 
             OsuHitObject start = entry.Start;
@@ -67,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 Vector2 pointStartPosition = startPosition + (fraction - 0.1f) * distanceVector;
                 Vector2 pointEndPosition = startPosition + fraction * distanceVector;
 
-                GetFadeTimes(start, end, (float)d / distance, out var fadeInTime, out var fadeOutTime);
+                GetFadeTimes(start, end, (float)d / distance, out double fadeInTime, out double fadeOutTime);
 
                 FollowPoint fp;
 
@@ -93,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }
 
             entry.LifetimeEnd = finalTransformEndTime;
-        }
+        });
 
         /// <summary>
         /// Computes the fade time of follow point positioned between two hitobjects.

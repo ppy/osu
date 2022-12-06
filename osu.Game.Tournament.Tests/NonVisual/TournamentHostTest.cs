@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +22,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
             return tournament;
         }
 
-        public static void WaitForOrAssert(Func<bool> result, string failureMessage, int timeout = 90000)
+        public static void WaitForOrAssert(Func<bool> result, string failureMessage, int timeout = 30000)
         {
             Task task = Task.Run(() =>
             {

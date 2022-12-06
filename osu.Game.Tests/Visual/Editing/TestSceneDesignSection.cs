@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Globalization;
 using System.Linq;
@@ -11,13 +13,14 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneDesignSection : OsuManualInputManagerTestScene
+    public partial class TestSceneDesignSection : OsuManualInputManagerTestScene
     {
         private TestDesignSection designSection;
         private EditorBeatmap editorBeatmap { get; set; }
@@ -25,7 +28,13 @@ namespace osu.Game.Tests.Visual.Editing
         [SetUpSteps]
         public void SetUp()
         {
-            AddStep("create blank beatmap", () => editorBeatmap = new EditorBeatmap(new Beatmap()));
+            AddStep("create blank beatmap", () => editorBeatmap = new EditorBeatmap(new Beatmap
+            {
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo
+                }
+            }));
             AddStep("create section", () => Child = new DependencyProvidingContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -88,7 +97,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert($"beatmap value is {expectedFinalValue}", () => editorBeatmap.BeatmapInfo.CountdownOffset == expectedFinalValue);
         }
 
-        private class TestDesignSection : DesignSection
+        private partial class TestDesignSection : DesignSection
         {
             public new LabelledSwitchButton EnableCountdown => base.EnableCountdown;
 

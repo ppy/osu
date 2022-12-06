@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
@@ -15,7 +18,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Beatmaps
 {
     [HeadlessTest]
-    public class TestSceneEditorBeatmap : EditorClockTestScene
+    public partial class TestSceneEditorBeatmap : EditorClockTestScene
     {
         /// <summary>
         /// Tests that the addition event is correctly invoked after a hitobject is added.
@@ -30,7 +33,13 @@ namespace osu.Game.Tests.Beatmaps
 
             AddStep("add beatmap", () =>
             {
-                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap
+                {
+                    BeatmapInfo =
+                    {
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                    },
+                });
                 editorBeatmap.HitObjectAdded += h => addedObject = h;
             });
 
@@ -49,7 +58,14 @@ namespace osu.Game.Tests.Beatmaps
             EditorBeatmap editorBeatmap = null;
             AddStep("add beatmap", () =>
             {
-                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap
+                {
+                    BeatmapInfo =
+                    {
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                    },
+                    HitObjects = { hitCircle }
+                });
                 editorBeatmap.HitObjectRemoved += h => removedObject = h;
             });
             AddStep("remove hitobject", () => editorBeatmap.Remove(editorBeatmap.HitObjects.First()));
@@ -71,7 +87,14 @@ namespace osu.Game.Tests.Beatmaps
             {
                 EditorBeatmap editorBeatmap;
 
-                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap
+                {
+                    BeatmapInfo =
+                    {
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                    },
+                    HitObjects = { hitCircle }
+                });
                 editorBeatmap.HitObjectUpdated += h => changedObject = h;
             });
 
@@ -91,7 +114,13 @@ namespace osu.Game.Tests.Beatmaps
 
             AddStep("add beatmap", () =>
             {
-                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap
+                {
+                    BeatmapInfo =
+                    {
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                    },
+                });
                 editorBeatmap.HitObjectUpdated += h => changedObject = h;
             });
 
@@ -111,7 +140,14 @@ namespace osu.Game.Tests.Beatmaps
         public void TestRemovedHitObjectStartTimeChangeEvent()
         {
             var hitCircle = new HitCircle();
-            var editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
+            var editorBeatmap = new EditorBeatmap(new OsuBeatmap
+            {
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                },
+                HitObjects = { hitCircle }
+            });
 
             HitObject changedObject = null;
             editorBeatmap.HitObjectUpdated += h => changedObject = h;
@@ -131,6 +167,10 @@ namespace osu.Game.Tests.Beatmaps
         {
             var editorBeatmap = new EditorBeatmap(new OsuBeatmap
             {
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                },
                 HitObjects =
                 {
                     new HitCircle(),
@@ -156,6 +196,10 @@ namespace osu.Game.Tests.Beatmaps
 
             var editorBeatmap = new EditorBeatmap(new OsuBeatmap
             {
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                },
                 HitObjects =
                 {
                     new HitCircle(),
@@ -185,7 +229,13 @@ namespace osu.Game.Tests.Beatmaps
             {
                 updatedObjects.Clear();
 
-                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap
+                {
+                    BeatmapInfo =
+                    {
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                    },
+                });
 
                 for (int i = 0; i < 10; i++)
                 {
@@ -220,7 +270,13 @@ namespace osu.Game.Tests.Beatmaps
             {
                 updatedObjects.Clear();
 
-                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap
+                {
+                    BeatmapInfo =
+                    {
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                    },
+                });
                 editorBeatmap.Add(new HitCircle());
             });
 

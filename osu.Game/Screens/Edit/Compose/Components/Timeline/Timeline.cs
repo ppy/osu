@@ -1,9 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,16 +16,19 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    [Cached(typeof(IPositionSnapProvider))]
     [Cached]
-    public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
+    public partial class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
+        private const float timeline_height = 72;
+        private const float timeline_expanded_height = 94;
+
         private readonly Drawable userContent;
+
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
 
         public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
@@ -35,6 +39,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         [Resolved]
         private EditorClock editorClock { get; set; }
+
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; }
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
@@ -56,10 +63,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         private bool trackWasPlaying;
 
-        private Track track;
-
-        private const float timeline_height = 72;
-        private const float timeline_expanded_height = 94;
+        /// <summary>
+        /// The timeline zoom level at a 1x zoom scale.
+        /// </summary>
+        private float defaultTimelineZoom;
 
         public Timeline(Drawable userContent)
         {
@@ -82,6 +89,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Container mainContent;
 
         private Bindable<float> waveformOpacity;
+
+        private double trackLengthForZoom;
 
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
@@ -134,26 +143,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Beatmap.BindValueChanged(b =>
             {
                 waveform.Waveform = b.NewValue.Waveform;
-                track = b.NewValue.Track;
-
-                // todo: i don't think this is safe, the track may not be loaded yet.
-                if (track.Length > 0)
-                {
-                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
-                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                    Zoom = getZoomLevelForVisibleMilliseconds(2000);
-                }
             }, true);
+
+            Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            WaveformVisible.BindValueChanged(_ => updateWaveformOpacity());
             waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
 
-            WaveformVisible.ValueChanged += _ => updateWaveformOpacity();
-            TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            TicksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
+
             ControlPointsVisible.BindValueChanged(visible =>
             {
                 if (visible.NewValue)
@@ -178,8 +181,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void updateWaveformOpacity() =>
             waveform.FadeTo(WaveformVisible.Value ? waveformOpacity.Value : 0, 200, Easing.OutQuint);
 
-        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => Math.Max(1, (float)(track.Length / milliseconds));
-
         protected override void Update()
         {
             base.Update();
@@ -190,6 +191,22 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // This needs to happen after transforms are updated, but before the scroll position is updated in base.UpdateAfterChildren
             if (editorClock.IsRunning)
                 scrollToTrackTime();
+
+            if (editorClock.TrackLength != trackLengthForZoom)
+            {
+                defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
+
+                float minimumZoom = getZoomLevelForVisibleMilliseconds(10000);
+                float maximumZoom = getZoomLevelForVisibleMilliseconds(500);
+
+                float initialZoom = (float)Math.Clamp(defaultTimelineZoom * (editorBeatmap.BeatmapInfo.TimelineZoom == 0 ? 1 : editorBeatmap.BeatmapInfo.TimelineZoom), minimumZoom, maximumZoom);
+
+                SetupZoom(initialZoom, minimumZoom, maximumZoom);
+
+                float getZoomLevelForVisibleMilliseconds(double milliseconds) => Math.Max(1, (float)(editorClock.TrackLength / milliseconds));
+
+                trackLengthForZoom = editorClock.TrackLength;
+            }
         }
 
         protected override bool OnScroll(ScrollEvent e)
@@ -199,6 +216,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 return false;
 
             return base.OnScroll(e);
+        }
+
+        protected override void OnZoomChanged()
+        {
+            base.OnZoomChanged();
+            editorBeatmap.BeatmapInfo.TimelineZoom = Zoom / defaultTimelineZoom;
         }
 
         protected override void UpdateAfterChildren()
@@ -228,16 +251,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void seekTrackToCurrent()
         {
-            if (!track.IsLoaded)
-                return;
-
-            double target = Current / Content.DrawWidth * track.Length;
-            editorClock.Seek(Math.Min(track.Length, target));
+            double target = TimeAtPosition(Current);
+            editorClock.Seek(Math.Min(editorClock.TrackLength, target));
         }
 
         private void scrollToTrackTime()
         {
-            if (!track.IsLoaded || track.Length == 0)
+            if (editorClock.TrackLength == 0)
                 return;
 
             // covers the case where the user starts playback after a drag is in progress.
@@ -245,18 +265,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (handlingDragInput)
                 editorClock.Stop();
 
-            ScrollTo((float)(editorClock.CurrentTime / track.Length) * Content.DrawWidth, false);
+            float position = PositionAtTime(editorClock.CurrentTime);
+            ScrollTo(position, false);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (base.OnMouseDown(e))
-            {
                 beginUserDrag();
-                return true;
-            }
 
-            return false;
+            // handling right button as well breaks context menus inside the timeline, only handle left button for now.
+            return e.Button == MouseButton.Left;
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
@@ -280,33 +299,27 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
-
-        [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
         /// <summary>
         /// The total amount of time visible on the timeline.
         /// </summary>
-        public double VisibleRange => track.Length / Zoom;
+        public double VisibleRange => editorClock.TrackLength / Zoom;
 
-        public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
-            new SnapResult(screenSpacePosition, null);
+        public double TimeAtPosition(float x)
+        {
+            return x / Content.DrawWidth * editorClock.TrackLength;
+        }
 
-        public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) =>
-            new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(screenSpacePosition))));
+        public float PositionAtTime(double time)
+        {
+            return (float)(time / editorClock.TrackLength * Content.DrawWidth);
+        }
 
-        private double getTimeFromPosition(Vector2 localPosition) =>
-            (localPosition.X / Content.DrawWidth) * track.Length;
-
-        public float GetBeatSnapDistanceAt(HitObject referenceObject) => throw new NotImplementedException();
-
-        public float DurationToDistance(HitObject referenceObject, double duration) => throw new NotImplementedException();
-
-        public double DistanceToDuration(HitObject referenceObject, float distance) => throw new NotImplementedException();
-
-        public double GetSnappedDurationFromDistance(HitObject referenceObject, float distance) => throw new NotImplementedException();
-
-        public float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance) => throw new NotImplementedException();
+        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
+        {
+            double time = TimeAtPosition(Content.ToLocalSpace(screenSpacePosition).X);
+            return new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(time));
+        }
     }
 }

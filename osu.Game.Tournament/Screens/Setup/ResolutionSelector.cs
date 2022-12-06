@@ -1,13 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    internal class ResolutionSelector : ActionableInfo
+    internal partial class ResolutionSelector : ActionableInfo
     {
         private const int minimum_window_height = 480;
         private const int maximum_window_height = 2160;
@@ -31,7 +33,7 @@ namespace osu.Game.Tournament.Screens.Setup
                     return;
 
                 // box contains text
-                if (!int.TryParse(numberBox.Text, out var number))
+                if (!int.TryParse(numberBox.Text, out int number))
                 {
                     // at this point, the only reason we can arrive here is if the input number was too big to parse into an int
                     // so clamp to max allowed value

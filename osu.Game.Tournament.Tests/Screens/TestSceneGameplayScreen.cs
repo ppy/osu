@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -13,7 +15,7 @@ using osu.Game.Tournament.Screens.Gameplay.Components;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneGameplayScreen : TournamentTestScene
+    public partial class TestSceneGameplayScreen : TournamentTestScene
     {
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay { Width = 0.5f };
@@ -51,7 +53,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("setup screen", () =>
             {
-                Remove(chat);
+                Remove(chat, false);
 
                 Children = new Drawable[]
                 {

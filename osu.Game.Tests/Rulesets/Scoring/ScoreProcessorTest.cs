@@ -1,21 +1,29 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Rulesets.Scoring
 {
-    public class ScoreProcessorTest
+    public partial class ScoreProcessorTest
     {
         private ScoreProcessor scoreProcessor;
         private IBeatmap beatmap;
@@ -23,7 +31,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [SetUp]
         public void SetUp()
         {
-            scoreProcessor = new ScoreProcessor();
+            scoreProcessor = new ScoreProcessor(new TestRuleset());
             beatmap = new TestBeatmap(new RulesetInfo())
             {
                 HitObjects = new List<HitObject>
@@ -36,9 +44,9 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.Meh, 750_000)]
         [TestCase(ScoringMode.Standardised, HitResult.Ok, 800_000)]
         [TestCase(ScoringMode.Standardised, HitResult.Great, 1_000_000)]
-        [TestCase(ScoringMode.Classic, HitResult.Meh, 41)]
-        [TestCase(ScoringMode.Classic, HitResult.Ok, 46)]
-        [TestCase(ScoringMode.Classic, HitResult.Great, 72)]
+        [TestCase(ScoringMode.Classic, HitResult.Meh, 20)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, 23)]
+        [TestCase(ScoringMode.Classic, HitResult.Great, 36)]
         public void TestSingleOsuHit(ScoringMode scoringMode, HitResult hitResult, int expectedScore)
         {
             scoreProcessor.Mode.Value = scoringMode;
@@ -86,17 +94,17 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 1_000_030)] // 1 * 300_000 + 700_000 (max combo 0) + 3 * 10 (bonus points)
         [TestCase(ScoringMode.Standardised, HitResult.LargeBonus, HitResult.LargeBonus, 1_000_150)] // 1 * 300_000 + 700_000 (max combo 0) + 3 * 50 (bonus points)
         [TestCase(ScoringMode.Classic, HitResult.Miss, HitResult.Great, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 68)]
-        [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 81)]
-        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 109)]
-        [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 149)]
-        [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 149)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, HitResult.SmallTickHit, 9)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 15)]
+        [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 86)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 104)]
+        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 140)]
+        [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 190)]
+        [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 190)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, HitResult.SmallTickHit, 18)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 31)]
         [TestCase(ScoringMode.Classic, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 149)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 18)]
-        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 18)]
+        [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 12)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 36)]
+        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 36)]
         public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
         {
             var minResult = new TestJudgement(hitResult).MinResult;
@@ -128,8 +136,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
         /// </remarks>
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, 978_571)] // (3 * 10 + 100) / (4 * 10 + 100) * 300_000 + (1 / 1) * 700_000
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, 914_286)] // (3 * 0 + 100) / (4 * 10 + 100) * 300_000 + (1 / 1) * 700_000
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, 69)] // (((3 * 10 + 100) / (4 * 10 + 100)) * 1 * 300) * (1 + 0 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, 60)] // (((3 * 0 + 100) / (4 * 10 + 100)) * 1 * 300) * (1 + 0 / 25)
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, 34)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, 30)]
         public void TestSmallTicksAccuracy(ScoringMode scoringMode, HitResult hitResult, int expectedScore)
         {
             IEnumerable<HitObject> hitObjects = Enumerable
@@ -300,7 +308,88 @@ namespace osu.Game.Tests.Rulesets.Scoring
                 HitObjects = { new TestHitObject(result) }
             });
 
-            Assert.That(scoreProcessor.GetImmediateScore(ScoringMode.Standardised, result.AffectsCombo() ? 1 : 0, statistic), Is.EqualTo(expectedScore).Within(0.5d));
+            Assert.That(scoreProcessor.ComputeScore(ScoringMode.Standardised, new ScoreInfo
+            {
+                Ruleset = new TestRuleset().RulesetInfo,
+                MaxCombo = result.AffectsCombo() ? 1 : 0,
+                Statistics = statistic
+            }), Is.EqualTo(expectedScore).Within(0.5d));
+        }
+
+#pragma warning disable CS0618
+        [Test]
+        public void TestLegacyComboIncrease()
+        {
+            Assert.That(HitResult.LegacyComboIncrease.IncreasesCombo(), Is.True);
+            Assert.That(HitResult.LegacyComboIncrease.BreaksCombo(), Is.False);
+            Assert.That(HitResult.LegacyComboIncrease.AffectsCombo(), Is.True);
+            Assert.That(HitResult.LegacyComboIncrease.AffectsAccuracy(), Is.False);
+            Assert.That(HitResult.LegacyComboIncrease.IsBasic(), Is.False);
+            Assert.That(HitResult.LegacyComboIncrease.IsTick(), Is.False);
+            Assert.That(HitResult.LegacyComboIncrease.IsBonus(), Is.False);
+            Assert.That(HitResult.LegacyComboIncrease.IsHit(), Is.True);
+            Assert.That(HitResult.LegacyComboIncrease.IsScorable(), Is.True);
+            Assert.That(HitResultExtensions.ALL_TYPES, Does.Not.Contain(HitResult.LegacyComboIncrease));
+
+            // Cannot be used to apply results.
+            Assert.Throws<ArgumentException>(() => scoreProcessor.ApplyBeatmap(new Beatmap
+            {
+                HitObjects = { new TestHitObject(HitResult.LegacyComboIncrease) }
+            }));
+
+            ScoreInfo testScore = new ScoreInfo
+            {
+                MaxCombo = 1,
+                Statistics = new Dictionary<HitResult, int>
+                {
+                    { HitResult.Great, 1 }
+                },
+                MaximumStatistics = new Dictionary<HitResult, int>
+                {
+                    { HitResult.Great, 1 },
+                    { HitResult.LegacyComboIncrease, 1 }
+                }
+            };
+
+            double totalScore = new TestScoreProcessor().ComputeScore(ScoringMode.Standardised, testScore);
+            Assert.That(totalScore, Is.EqualTo(750_000)); // 500K from accuracy (100%), and 250K from combo (50%).
+        }
+#pragma warning restore CS0618
+
+        [Test]
+        public void TestAccuracyWhenNearPerfect()
+        {
+            const int count_judgements = 1000;
+            const int count_misses = 1;
+
+            double actual = new TestScoreProcessor().ComputeAccuracy(new ScoreInfo
+            {
+                Statistics = new Dictionary<HitResult, int>
+                {
+                    { HitResult.Great, count_judgements - count_misses },
+                    { HitResult.Miss, count_misses }
+                }
+            });
+
+            const double expected = (count_judgements - count_misses) / (double)count_judgements;
+
+            Assert.That(actual, Is.Not.EqualTo(0.0));
+            Assert.That(actual, Is.Not.EqualTo(1.0));
+            Assert.That(actual, Is.EqualTo(expected).Within(Precision.FLOAT_EPSILON));
+        }
+
+        private class TestRuleset : Ruleset
+        {
+            public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
+
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
+
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
+
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
+
+            public override string Description => string.Empty;
+            public override string ShortName => string.Empty;
         }
 
         private class TestJudgement : Judgement
@@ -325,6 +414,34 @@ namespace osu.Game.Tests.Rulesets.Scoring
             public TestHitObject(HitResult maxResult)
             {
                 this.maxResult = maxResult;
+            }
+        }
+
+        private partial class TestScoreProcessor : ScoreProcessor
+        {
+            protected override double DefaultAccuracyPortion => 0.5;
+            protected override double DefaultComboPortion => 0.5;
+
+            public TestScoreProcessor()
+                : base(new TestRuleset())
+            {
+            }
+
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            private class TestRuleset : Ruleset
+            {
+                protected override IEnumerable<HitResult> GetValidHitResults() => new[] { HitResult.Great };
+
+                public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
+
+                public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
+
+                public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
+
+                public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
+
+                public override string Description => string.Empty;
+                public override string ShortName => string.Empty;
             }
         }
     }

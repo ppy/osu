@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Testing;
@@ -14,13 +16,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
     /// Taiko has some interesting rules for legacy mappings.
     /// </summary>
     [HeadlessTest]
-    public class TestSceneSampleOutput : TestSceneTaikoPlayer
+    public partial class TestSceneSampleOutput : TestSceneTaikoPlayer
     {
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            var expectedSampleNames = new[]
+            string[] expectedSampleNames =
             {
                 string.Empty,
                 string.Empty,
@@ -31,6 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 HitSampleInfo.HIT_WHISTLE,
                 HitSampleInfo.HIT_WHISTLE,
             };
+
             var actualSampleNames = new List<string>();
 
             // due to pooling we can't access all samples right away due to object re-use,

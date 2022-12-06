@@ -1,24 +1,31 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Notifications;
+using osu.Game.Tests;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class DummyAPIAccess : Component, IAPIProvider
+    public partial class DummyAPIAccess : Component, IAPIProvider
     {
-        public Bindable<User> LocalUser { get; } = new Bindable<User>(new User
+        public const int DUMMY_USER_ID = 1001;
+
+        public Bindable<APIUser> LocalUser { get; } = new Bindable<APIUser>(new APIUser
         {
             Username = @"Dummy",
-            Id = 1001,
+            Id = DUMMY_USER_ID,
         });
 
-        public BindableList<User> Friends { get; } = new BindableList<User>();
+        public BindableList<APIUser> Friends { get; } = new BindableList<APIUser>();
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
@@ -31,6 +38,8 @@ namespace osu.Game.Online.API
         public string APIEndpointUrl => "http://localhost";
 
         public string WebsiteRootUrl => "http://localhost";
+
+        public int APIVersion => int.Parse(DateTime.Now.ToString("yyyyMMdd"));
 
         public Exception LastLoginError { get; private set; }
 
@@ -60,12 +69,13 @@ namespace osu.Game.Online.API
 
         public virtual void Queue(APIRequest request)
         {
-            if (HandleRequest?.Invoke(request) != true)
+            Schedule(() =>
             {
-                // this will fail due to not receiving an APIAccess, and trigger a failure on the request.
-                // this is intended - any request in testing that needs non-failures should use HandleRequest.
-                request.Perform(this);
-            }
+                if (HandleRequest?.Invoke(request) != true)
+                {
+                    request.Fail(new InvalidOperationException($@"{nameof(DummyAPIAccess)} cannot process this request."));
+                }
+            });
         }
 
         public void Perform(APIRequest request) => HandleRequest?.Invoke(request);
@@ -90,7 +100,7 @@ namespace osu.Game.Online.API
             }
 
             LastLoginError = null;
-            LocalUser.Value = new User
+            LocalUser.Value = new APIUser
             {
                 Username = username,
                 Id = 1001,
@@ -107,6 +117,8 @@ namespace osu.Game.Online.API
 
         public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
 
+        public NotificationsClientConnector GetNotificationsConnector() => new PollingNotificationsClientConnector(this);
+
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
             Thread.Sleep(200);
@@ -115,10 +127,18 @@ namespace osu.Game.Online.API
 
         public void SetState(APIState newState) => state.Value = newState;
 
-        IBindable<User> IAPIProvider.LocalUser => LocalUser;
-        IBindableList<User> IAPIProvider.Friends => Friends;
+        IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
+        IBindableList<APIUser> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
 
         public void FailNextLogin() => shouldFailNextLogin = true;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // Ensure (as much as we can) that any pending tasks are run.
+            Scheduler.Update();
+        }
     }
 }

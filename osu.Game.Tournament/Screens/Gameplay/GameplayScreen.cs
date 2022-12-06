@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -20,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
 {
-    public class GameplayScreen : BeatmapInfoScreen, IProvideVideo
+    public partial class GameplayScreen : BeatmapInfoScreen
     {
         private readonly BindableBool warmup = new BindableBool();
 
@@ -37,7 +38,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private Drawable chroma;
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc, Storage storage)
+        private void load(LadderInfo ladder, MatchIPCInfo ipc)
         {
             this.ipc = ipc;
 
@@ -198,16 +199,19 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     case TourneyState.Idle:
                         contract();
 
-                        const float delay_before_progression = 4000;
-
-                        // if we've returned to idle and the last screen was ranking
-                        // we should automatically proceed after a short delay
-                        if (lastState == TourneyState.Ranking && !warmup.Value)
+                        if (LadderInfo.AutoProgressScreens.Value)
                         {
-                            if (CurrentMatch.Value?.Completed.Value == true)
-                                scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, delay_before_progression);
-                            else if (CurrentMatch.Value?.Completed.Value == false)
-                                scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, delay_before_progression);
+                            const float delay_before_progression = 4000;
+
+                            // if we've returned to idle and the last screen was ranking
+                            // we should automatically proceed after a short delay
+                            if (lastState == TourneyState.Ranking && !warmup.Value)
+                            {
+                                if (CurrentMatch.Value?.Completed.Value == true)
+                                    scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, delay_before_progression);
+                                else if (CurrentMatch.Value?.Completed.Value == false)
+                                    scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, delay_before_progression);
+                            }
                         }
 
                         break;
@@ -228,7 +232,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             }
         }
 
-        private class ChromaArea : CompositeDrawable
+        private partial class ChromaArea : CompositeDrawable
         {
             [Resolved]
             private LadderInfo ladder { get; set; }

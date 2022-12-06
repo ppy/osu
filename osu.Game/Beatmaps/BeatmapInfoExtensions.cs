@@ -11,18 +11,18 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// A user-presentable display title representing this beatmap.
         /// </summary>
-        public static string GetDisplayTitle(this IBeatmapInfo beatmapInfo) => $"{getClosestMetadata(beatmapInfo)} {getVersionString(beatmapInfo)}".Trim();
+        public static string GetDisplayTitle(this IBeatmapInfo beatmapInfo) => $"{beatmapInfo.Metadata.GetDisplayTitle()} {getVersionString(beatmapInfo)}".Trim();
 
         /// <summary>
         /// A user-presentable display title representing this beatmap, with localisation handling for potentially romanisable fields.
         /// </summary>
-        public static RomanisableString GetDisplayTitleRomanisable(this IBeatmapInfo beatmapInfo, bool includeDifficultyName = true)
+        public static RomanisableString GetDisplayTitleRomanisable(this IBeatmapInfo beatmapInfo, bool includeDifficultyName = true, bool includeCreator = true)
         {
-            var metadata = getClosestMetadata(beatmapInfo).GetDisplayTitleRomanisable();
+            var metadata = beatmapInfo.Metadata.GetDisplayTitleRomanisable(includeCreator);
 
             if (includeDifficultyName)
             {
-                var versionString = getVersionString(beatmapInfo);
+                string versionString = getVersionString(beatmapInfo);
                 return new RomanisableString($"{metadata.GetPreferred(true)} {versionString}".Trim(), $"{metadata.GetPreferred(false)} {versionString}".Trim());
             }
 
@@ -32,12 +32,8 @@ namespace osu.Game.Beatmaps
         public static string[] GetSearchableTerms(this IBeatmapInfo beatmapInfo) => new[]
         {
             beatmapInfo.DifficultyName
-        }.Concat(getClosestMetadata(beatmapInfo).GetSearchableTerms()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
+        }.Concat(beatmapInfo.Metadata.GetSearchableTerms()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
 
         private static string getVersionString(IBeatmapInfo beatmapInfo) => string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? string.Empty : $"[{beatmapInfo.DifficultyName}]";
-
-        // temporary helper methods until we figure which metadata should be where.
-        private static IBeatmapMetadataInfo getClosestMetadata(IBeatmapInfo beatmapInfo) =>
-            beatmapInfo.Metadata ?? beatmapInfo.BeatmapSet?.Metadata ?? new BeatmapMetadata();
     }
 }

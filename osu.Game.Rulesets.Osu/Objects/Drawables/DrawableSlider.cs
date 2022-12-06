@@ -1,36 +1,39 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using osuTK;
-using osu.Framework.Graphics;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu.Skinning;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
-using osuTK.Graphics;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSlider : DrawableOsuHitObject
+    public partial class DrawableSlider : DrawableOsuHitObject
     {
         public new Slider HitObject => (Slider)base.HitObject;
 
         public DrawableSliderHead HeadCircle => headContainer.Child;
         public DrawableSliderTail TailCircle => tailContainer.Child;
 
-        public SliderBall Ball { get; private set; }
+        [Cached]
+        public DrawableSliderBall Ball { get; private set; }
+
         public SkinnableDrawable Body { get; private set; }
+
+        private ShakeContainer shakeContainer;
 
         /// <summary>
         /// A target container which can be used to add top level elements to the slider's display.
@@ -60,28 +63,38 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSlider([CanBeNull] Slider s = null)
             : base(s)
         {
+            Ball = new DrawableSliderBall
+            {
+                GetInitialHitAction = () => HeadCircle.HitAction,
+                BypassAutoSizeAxes = Axes.Both,
+                AlwaysPresent = true,
+                Alpha = 0
+            };
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
-                Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
-                tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
-                tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
-                repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
+                shakeContainer = new ShakeContainer
+                {
+                    ShakeDuration = 30,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        Body = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
+                        tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
+                        tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
+                        repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
+                    }
+                },
+                // slider head is not included in shake as it handles hit detection, and handles its own shaking.
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
                 OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both, },
-                Ball = new SliderBall(this)
-                {
-                    GetInitialHitAction = () => HeadCircle.HitAction,
-                    BypassAutoSizeAxes = Axes.Both,
-                    AlwaysPresent = true,
-                    Alpha = 0
-                },
+                Ball,
                 slidingSample = new PausableSkinnableSound { Looping = true }
-            };
+            });
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
@@ -91,7 +104,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
-                updateBallTint();
             }, true);
 
             Tracking.BindValueChanged(updateSlidingSample);
@@ -105,6 +117,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             pathVersion.Value = int.MaxValue;
             PathVersion.BindTo(HitObject.Path.Version);
         }
+
+        public override void Shake() => shakeContainer.Shake();
 
         protected override void OnFree()
         {
@@ -126,18 +140,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             Samples.Samples = HitObject.TailSamples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
-
-            var slidingSamples = new List<ISampleInfo>();
-
-            var normalSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
-            if (normalSample != null)
-                slidingSamples.Add(HitObject.SampleControlPoint.ApplyTo(normalSample).With("sliderslide"));
-
-            var whistleSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_WHISTLE);
-            if (whistleSample != null)
-                slidingSamples.Add(HitObject.SampleControlPoint.ApplyTo(whistleSample).With("sliderwhistle"));
-
-            slidingSample.Samples = slidingSamples.ToArray();
+            slidingSample.Samples = HitObject.CreateSlidingSamples().Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
         }
 
         public override void StopAllSamples()
@@ -220,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (Tracking.Value && slidingSample != null)
                 // keep the sliding sample playing at the current tracking position
-                slidingSample.Balance.Value = CalculateSamplePlaybackBalance(Ball.X / OsuPlayfield.BASE_SIZE.X);
+                slidingSample.Balance.Value = CalculateSamplePlaybackBalance(CalculateDrawableRelativePosition(Ball));
 
             double completionProgress = Math.Clamp((Time.Current - HitObject.StartTime) / HitObject.Duration, 0, 1);
 
@@ -249,22 +252,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.OnKilled();
             SliderBody?.RecyclePath();
-        }
-
-        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
-        {
-            base.ApplySkin(skin, allowFallback);
-
-            updateBallTint();
-        }
-
-        private void updateBallTint()
-        {
-            if (CurrentSkin == null)
-                return;
-
-            bool allowBallTint = CurrentSkin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.AllowSliderBallTint)?.Value ?? false;
-            Ball.AccentColour = allowBallTint ? AccentColour.Value : Color4.White;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -325,26 +312,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateHitStateTransforms(state);
 
-            const float fade_out_time = 450;
-
-            // intentionally pile on an extra FadeOut to make it happen much faster.
-            Ball.FadeOut(fade_out_time / 4, Easing.Out);
+            const float fade_out_time = 240;
 
             switch (state)
             {
                 case ArmedState.Hit:
-                    Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
                     if (SliderBody?.SnakingOut.Value == true)
                         Body.FadeOut(40); // short fade to allow for any body colour to smoothly disappear.
                     break;
             }
 
-            this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
+            this.FadeOut(fade_out_time).Expire();
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => SliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
-        private class DefaultSliderBody : PlaySliderBody
+        private partial class DefaultSliderBody : PlaySliderBody
         {
         }
     }

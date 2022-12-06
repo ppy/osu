@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -14,7 +16,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogBuild : FillFlowContainer
+    public partial class ChangelogBuild : FillFlowContainer
     {
         public const float HORIZONTAL_PADDING = 70;
 
@@ -46,7 +48,7 @@ namespace osu.Game.Overlays.Changelog
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OverlayColourProvider colourProvider)
+        private void load()
         {
             foreach (var categoryEntries in Build.ChangelogEntries.GroupBy(b => b.Category).OrderBy(c => c.Key))
             {

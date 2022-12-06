@@ -5,18 +5,20 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Editing.Checks
 {
     [TestFixture]
     public class CheckAudioQualityTest
     {
-        private CheckAudioQuality check;
-        private IBeatmap beatmap;
+        private CheckAudioQuality check = null!;
+        private IBeatmap beatmap = null!;
 
         [SetUp]
         public void Setup()
@@ -35,11 +37,11 @@ namespace osu.Game.Tests.Editing.Checks
         public void TestMissing()
         {
             // While this is a problem, it is out of scope for this check and is caught by a different one.
-            beatmap.Metadata.AudioFile = null;
+            beatmap.Metadata.AudioFile = string.Empty;
 
             var mock = new Mock<IWorkingBeatmap>();
             mock.SetupGet(w => w.Beatmap).Returns(beatmap);
-            mock.SetupGet(w => w.Track).Returns((Track)null);
+            mock.SetupGet(w => w.Track).Returns((Track)null!);
 
             Assert.That(check.Run(new BeatmapVerifierContext(beatmap, mock.Object)), Is.Empty);
         }
@@ -107,7 +109,7 @@ namespace osu.Game.Tests.Editing.Checks
         /// <param name="audioBitrate">The bitrate of the audio file the beatmap uses.</param>
         private Mock<IWorkingBeatmap> getMockWorkingBeatmap(int? audioBitrate)
         {
-            var mockTrack = new Mock<Track>();
+            var mockTrack = new Mock<OsuTestScene.ClockBackedTestWorkingBeatmap.TrackVirtualManual>(new FramedClock(), "virtual");
             mockTrack.SetupGet(t => t.Bitrate).Returns(audioBitrate);
 
             var mockWorkingBeatmap = new Mock<IWorkingBeatmap>();

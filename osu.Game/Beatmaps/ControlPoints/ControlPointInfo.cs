@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -164,7 +166,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             int closestDivisor = 0;
             double closestTime = double.MaxValue;
 
-            foreach (int divisor in BindableBeatDivisor.VALID_DIVISORS)
+            foreach (int divisor in BindableBeatDivisor.PREDEFINED_DIVISORS)
             {
                 double distanceFromSnap = Math.Abs(time - getClosestSnappedTime(timingPoint, time, divisor));
 
@@ -180,8 +182,8 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         private static double getClosestSnappedTime(TimingControlPoint timingPoint, double time, int beatDivisor)
         {
-            var beatLength = timingPoint.BeatLength / beatDivisor;
-            var beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
+            double beatLength = timingPoint.BeatLength / beatDivisor;
+            int beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
 
             return timingPoint.Time + beatLengths * beatLength;
         }
@@ -194,8 +196,8 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the control point at.</param>
         /// <param name="fallback">The control point to use when <paramref name="time"/> is before any control points.</param>
         /// <returns>The active control point at <paramref name="time"/>, or a fallback <see cref="ControlPoint"/> if none found.</returns>
-        protected T BinarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T fallback)
-            where T : ControlPoint
+        public static T BinarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T fallback)
+            where T : class, IControlPoint
         {
             return BinarySearch(list, time) ?? fallback;
         }
@@ -205,9 +207,9 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="list">The list to search.</param>
         /// <param name="time">The time to find the control point at.</param>
-        /// <returns>The active control point at <paramref name="time"/>.</returns>
-        protected virtual T BinarySearch<T>(IReadOnlyList<T> list, double time)
-            where T : ControlPoint
+        /// <returns>The active control point at <paramref name="time"/>. Will return <c>null</c> if there are no control points, or if the time is before the first control point.</returns>
+        public static T BinarySearch<T>(IReadOnlyList<T> list, double time)
+            where T : class, IControlPoint
         {
             if (list == null)
                 throw new ArgumentNullException(nameof(list));
@@ -252,12 +254,12 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             switch (newPoint)
             {
-                case TimingControlPoint _:
+                case TimingControlPoint:
                     // Timing points are a special case and need to be added regardless of fallback availability.
                     existing = BinarySearch(TimingPoints, time);
                     break;
 
-                case EffectControlPoint _:
+                case EffectControlPoint:
                     existing = EffectPointAt(time);
                     break;
             }

@@ -3,14 +3,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Rulesets;
-using osu.Game.Users;
-
-#nullable enable
+using osu.Game.Extensions;
+using osu.Game.Models;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -23,7 +20,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int OnlineID { get; set; }
 
         [JsonProperty(@"status")]
-        public BeatmapSetOnlineStatus Status { get; set; }
+        public BeatmapOnlineStatus Status { get; set; }
 
         [JsonProperty(@"preview_url")]
         public string Preview { get; set; } = string.Empty;
@@ -42,6 +39,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"nsfw")]
         public bool HasExplicitContent { get; set; }
+
+        [JsonProperty(@"spotlight")]
+        public bool FeaturedInSpotlight { get; set; }
 
         [JsonProperty(@"video")]
         public bool HasVideo { get; set; }
@@ -64,6 +64,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"track_id")]
         public int? TrackId { get; set; }
 
+        [JsonProperty(@"hype")]
+        public BeatmapSetHypeStatus? HypeStatus { get; set; }
+
+        [JsonProperty(@"nominations_summary")]
+        public BeatmapSetNominationStatus? NominationStatus { get; set; }
+
         public string Title { get; set; } = string.Empty;
 
         [JsonProperty("title_unicode")]
@@ -74,34 +80,26 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("artist_unicode")]
         public string ArtistUnicode { get; set; } = string.Empty;
 
-        public User? Author = new User();
+        public APIUser Author = new APIUser();
 
         /// <summary>
-        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// Helper property to deserialize a username to <see cref="APIUser"/>.
         /// </summary>
         [JsonProperty(@"user_id")]
         public int AuthorID
         {
-            get => Author?.Id ?? 1;
-            set
-            {
-                Author ??= new User();
-                Author.Id = value;
-            }
+            get => Author.Id;
+            set => Author.Id = value;
         }
 
         /// <summary>
-        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// Helper property to deserialize a username to <see cref="APIUser"/>.
         /// </summary>
         [JsonProperty(@"creator")]
         public string AuthorString
         {
-            get => Author?.Username ?? string.Empty;
-            set
-            {
-                Author ??= new User();
-                Author.Username = value;
-            }
+            get => Author.Username;
+            set => Author.Username = value;
         }
 
         [JsonProperty(@"availability")]
@@ -119,28 +117,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public string Tags { get; set; } = string.Empty;
 
         [JsonProperty(@"beatmaps")]
-        public IEnumerable<APIBeatmap> Beatmaps { get; set; } = Array.Empty<APIBeatmap>();
-
-        public virtual BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
-        {
-            var beatmapSet = new BeatmapSetInfo
-            {
-                OnlineBeatmapSetID = OnlineID,
-                Metadata = metadata,
-                Status = Status,
-                OnlineInfo = this
-            };
-
-            beatmapSet.Beatmaps = Beatmaps.Select(b =>
-            {
-                var beatmap = b.ToBeatmapInfo(rulesets);
-                beatmap.BeatmapSet = beatmapSet;
-                beatmap.Metadata = beatmapSet.Metadata;
-                return beatmap;
-            }).ToList();
-
-            return beatmapSet;
-        }
+        public APIBeatmap[] Beatmaps { get; set; } = Array.Empty<APIBeatmap>();
 
         private BeatmapMetadata metadata => new BeatmapMetadata
         {
@@ -148,8 +125,11 @@ namespace osu.Game.Online.API.Requests.Responses
             TitleUnicode = TitleUnicode,
             Artist = Artist,
             ArtistUnicode = ArtistUnicode,
-            AuthorID = AuthorID,
-            Author = Author,
+            Author = new RealmUser
+            {
+                OnlineID = Author.OnlineID,
+                Username = Author.Username
+            },
             Source = Source,
             Tags = Tags,
         };
@@ -161,11 +141,16 @@ namespace osu.Game.Online.API.Requests.Responses
         IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => metadata;
 
         DateTimeOffset IBeatmapSetInfo.DateAdded => throw new NotImplementedException();
-        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => throw new NotImplementedException();
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxStarDifficulty => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxLength => throw new NotImplementedException();
-        double IBeatmapSetInfo.MaxBPM => throw new NotImplementedException();
+        double IBeatmapSetInfo.MaxBPM => BPM;
 
         #endregion
+
+        public bool Equals(IBeatmapSetInfo? other) => other is APIBeatmapSet b && this.MatchesOnlineID(b);
+
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        public override int GetHashCode() => OnlineID.GetHashCode();
     }
 }

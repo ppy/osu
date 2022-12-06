@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,21 +11,21 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
-using osu.Game.Users;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Taiko;
 
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserRequest : OsuTestScene
+    public partial class TestSceneUserRequest : OsuTestScene
     {
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private readonly Bindable<User> user = new Bindable<User>();
+        private readonly Bindable<APIUser> user = new Bindable<APIUser>();
         private GetUserRequest request;
         private readonly LoadingLayer loading;
 
@@ -69,9 +71,9 @@ namespace osu.Game.Tests.Visual.Online
             api.Queue(request);
         }
 
-        private class UserTestContainer : FillFlowContainer
+        private partial class UserTestContainer : FillFlowContainer
         {
-            public readonly Bindable<User> User = new Bindable<User>();
+            public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 
             public UserTestContainer()
             {
@@ -85,7 +87,7 @@ namespace osu.Game.Tests.Visual.Online
                 User.BindValueChanged(onUserUpdate, true);
             }
 
-            private void onUserUpdate(ValueChangedEvent<User> user)
+            private void onUserUpdate(ValueChangedEvent<APIUser> user)
             {
                 Clear();
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -20,6 +22,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -32,9 +35,11 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
     [Cached]
-    public abstract class LoungeSubScreen : OnlinePlaySubScreen
+    public abstract partial class LoungeSubScreen : OnlinePlaySubScreen
     {
         public override string Title => "Lounge";
+
+        protected override bool PlayExitSound => false;
 
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {
@@ -62,6 +67,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         [CanBeNull]
         private IDisposable joiningRoomOperation { get; set; }
@@ -125,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = Header.HEIGHT,
-                            Child = searchTextBox = new SearchTextBox
+                            Child = searchTextBox = new BasicSearchTextBox
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
@@ -234,15 +242,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         #endregion
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             onReturning();
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
             Debug.Assert(selectionLease != null);
 
@@ -257,16 +265,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             onReturning();
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             onLeaving();
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             onLeaving();
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -296,7 +304,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            RoomManager?.JoinRoom(room, password, r =>
+            RoomManager?.JoinRoom(room, password, _ =>
             {
                 Open(room);
                 joiningRoomOperation?.Dispose();
@@ -309,6 +317,46 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 onFailure?.Invoke(error);
             });
         });
+
+        /// <summary>
+        /// Copies a room and opens it as a fresh (not-yet-created) one.
+        /// </summary>
+        /// <param name="room">The room to copy.</param>
+        public void OpenCopy(Room room)
+        {
+            Debug.Assert(room.RoomID.Value != null);
+
+            if (joiningRoomOperation != null)
+                return;
+
+            joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
+
+            var req = new GetRoomRequest(room.RoomID.Value.Value);
+
+            req.Success += r =>
+            {
+                // ID must be unset as we use this as a marker for whether this is a client-side (not-yet-created) room or not.
+                r.RoomID.Value = null;
+
+                // Null out dates because end date is not supported client-side and the settings overlay will populate a duration.
+                r.EndDate.Value = null;
+                r.Duration.Value = null;
+
+                Open(r);
+
+                joiningRoomOperation?.Dispose();
+                joiningRoomOperation = null;
+            };
+
+            req.Failure += exception =>
+            {
+                Logger.Error(exception, "Couldn't create a copy of this room.");
+                joiningRoomOperation?.Dispose();
+                joiningRoomOperation = null;
+            };
+
+            api.Queue(req);
+        }
 
         /// <summary>
         /// Push a room as a new subscreen.

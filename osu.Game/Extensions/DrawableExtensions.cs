@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
@@ -14,30 +13,6 @@ namespace osu.Game.Extensions
 {
     public static class DrawableExtensions
     {
-        public const double REPEAT_INTERVAL = 70;
-        public const double INITIAL_DELAY = 250;
-
-        /// <summary>
-        /// Helper method that is used while <see cref="IKeyBindingHandler"/> doesn't support repetitions of <see cref="IKeyBindingHandler{T}.OnPressed"/>.
-        /// Simulates repetitions by continually invoking a delegate according to the default key repeat rate.
-        /// </summary>
-        /// <remarks>
-        /// The returned delegate can be cancelled to stop repeat events from firing (usually in <see cref="IKeyBindingHandler{T}.OnReleased"/>).
-        /// </remarks>
-        /// <param name="handler">The <see cref="IKeyBindingHandler{T}"/> which is handling the repeat.</param>
-        /// <param name="scheduler">The <see cref="Scheduler"/> to schedule repetitions on.</param>
-        /// <param name="action">The <see cref="Action"/> to be invoked once immediately and with every repetition.</param>
-        /// <param name="initialRepeatDelay">The delay imposed on the first repeat. Defaults to <see cref="INITIAL_DELAY"/>.</param>
-        /// <returns>A <see cref="ScheduledDelegate"/> which can be cancelled to stop the repeat events from firing.</returns>
-        public static ScheduledDelegate BeginKeyRepeat(this IKeyBindingHandler handler, Scheduler scheduler, Action action, double initialRepeatDelay = INITIAL_DELAY)
-        {
-            action();
-
-            ScheduledDelegate repeatDelegate = new ScheduledDelegate(action, handler.Time.Current + initialRepeatDelay, REPEAT_INTERVAL);
-            scheduler.Add(repeatDelegate);
-            return repeatDelegate;
-        }
-
         /// <summary>
         /// Shakes this drawable.
         /// </summary>
@@ -86,7 +61,17 @@ namespace osu.Game.Extensions
             component.Origin = info.Origin;
 
             if (component is ISkinnableDrawable skinnable)
+            {
                 skinnable.UsesFixedAnchor = info.UsesFixedAnchor;
+
+                foreach (var (_, property) in component.GetSettingsSourceProperties())
+                {
+                    if (!info.Settings.TryGetValue(property.Name.ToSnakeCase(), out object settingValue))
+                        continue;
+
+                    skinnable.CopyAdjustedSetting((IBindable)property.GetValue(component), settingValue);
+                }
+            }
 
             if (component is Container container)
             {

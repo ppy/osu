@@ -1,27 +1,29 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.IO.Archives;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class EditorTestScene : ScreenTestScene
+    public abstract partial class EditorTestScene : ScreenTestScene
     {
         private TestEditorLoader editorLoader;
 
@@ -43,32 +45,33 @@ namespace osu.Game.Tests.Visual
             Alpha = 0
         };
 
+        private TestBeatmapManager testBeatmapManager;
+
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio, RulesetStore rulesets)
         {
             Add(logo);
 
-            var working = CreateWorkingBeatmap(Ruleset.Value);
-
-            Beatmap.Value = working;
-
             if (IsolateSavingFromDatabase)
-                Dependencies.CacheAs<BeatmapManager>(new TestBeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default, working));
+                Dependencies.CacheAs<BeatmapManager>(testBeatmapManager = new TestBeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
         }
-
-        protected virtual bool EditorComponentsReady => Editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
-                                                        && Editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true;
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
             AddStep("load editor", LoadEditor);
-            AddUntilStep("wait for editor to load", () => EditorComponentsReady);
+            AddUntilStep("wait for editor to load", () => Editor?.ReadyForUse == true);
+            AddUntilStep("wait for beatmap updated", () => !Beatmap.IsDefault);
         }
 
         protected virtual void LoadEditor()
         {
+            Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
+
+            if (testBeatmapManager != null)
+                testBeatmapManager.TestBeatmap = Beatmap.Value;
+
             LoadScreen(editorLoader = new TestEditorLoader());
         }
 
@@ -80,7 +83,7 @@ namespace osu.Game.Tests.Visual
 
         protected sealed override Ruleset CreateRuleset() => CreateEditorRuleset();
 
-        protected class TestEditorLoader : EditorLoader
+        protected partial class TestEditorLoader : EditorLoader
         {
             public TestEditor Editor { get; private set; }
 
@@ -89,13 +92,17 @@ namespace osu.Game.Tests.Visual
             protected virtual TestEditor CreateTestEditor(EditorLoader loader) => new TestEditor(loader);
         }
 
-        protected class TestEditor : Editor
+        protected partial class TestEditor : Editor
         {
+            [Resolved(canBeNull: true)]
+            [CanBeNull]
+            private IDialogOverlay dialogOverlay { get; set; }
+
             public new void Undo() => base.Undo();
 
             public new void Redo() => base.Redo();
 
-            public new void Save() => base.Save();
+            public new bool Save() => base.Save();
 
             public new void Cut() => base.Cut();
 
@@ -103,9 +110,25 @@ namespace osu.Game.Tests.Visual
 
             public new void Paste() => base.Paste();
 
+            public new void Clone() => base.Clone();
+
             public new void SwitchToDifficulty(BeatmapInfo beatmapInfo) => base.SwitchToDifficulty(beatmapInfo);
 
+            public new void CreateNewDifficulty(RulesetInfo rulesetInfo) => base.CreateNewDifficulty(rulesetInfo);
+
             public new bool HasUnsavedChanges => base.HasUnsavedChanges;
+
+            public override bool OnExiting(ScreenExitEvent e)
+            {
+                // For testing purposes allow the screen to exit without saving on second attempt.
+                if (!ExitConfirmed && dialogOverlay?.CurrentDialog is PromptForSaveDialog saveDialog)
+                {
+                    saveDialog.PerformAction<PopupDialogDangerousButton>();
+                    return true;
+                }
+
+                return base.OnExiting(e);
+            }
 
             public TestEditor(EditorLoader loader = null)
                 : base(loader)
@@ -115,17 +138,11 @@ namespace osu.Game.Tests.Visual
 
         private class TestBeatmapManager : BeatmapManager
         {
-            private readonly WorkingBeatmap testBeatmap;
+            public WorkingBeatmap TestBeatmap;
 
-            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host, WorkingBeatmap defaultBeatmap, WorkingBeatmap testBeatmap)
-                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
+            public TestBeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host, WorkingBeatmap defaultBeatmap)
+                : base(storage, realm, api, audioManager, resources, host, defaultBeatmap)
             {
-                this.testBeatmap = testBeatmap;
-            }
-
-            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host)
-            {
-                return new TestBeatmapModelManager(storage, contextFactory, rulesets, api, host);
             }
 
             protected override WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host)
@@ -133,29 +150,30 @@ namespace osu.Game.Tests.Visual
                 return new TestWorkingBeatmapCache(this, audioManager, resources, storage, defaultBeatmap, host);
             }
 
+            public override WorkingBeatmap CreateNewDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap, RulesetInfo rulesetInfo)
+            {
+                // don't actually care about properly creating a difficulty for this context.
+                return TestBeatmap;
+            }
+
+            public override WorkingBeatmap CopyExistingDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap)
+            {
+                // don't actually care about properly creating a difficulty for this context.
+                return TestBeatmap;
+            }
+
             private class TestWorkingBeatmapCache : WorkingBeatmapCache
             {
                 private readonly TestBeatmapManager testBeatmapManager;
 
                 public TestWorkingBeatmapCache(TestBeatmapManager testBeatmapManager, AudioManager audioManager, IResourceStore<byte[]> resourceStore, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost gameHost)
-                    : base(audioManager, resourceStore, storage, defaultBeatmap, gameHost)
+                    : base(testBeatmapManager.BeatmapTrackStore, audioManager, resourceStore, storage, defaultBeatmap, gameHost)
                 {
                     this.testBeatmapManager = testBeatmapManager;
                 }
 
                 public override WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
-                    => testBeatmapManager.testBeatmap;
-            }
-
-            internal class TestBeatmapModelManager : BeatmapModelManager
-            {
-                public TestBeatmapModelManager(Storage storage, IDatabaseContextFactory databaseContextFactory, RulesetStore rulesetStore, IAPIProvider apiProvider, GameHost gameHost)
-                    : base(storage, databaseContextFactory, rulesetStore, gameHost)
-                {
-                }
-
-                protected override string ComputeHash(BeatmapSetInfo item, ArchiveReader reader = null)
-                    => string.Empty;
+                    => testBeatmapManager.TestBeatmap;
             }
 
             public override void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)

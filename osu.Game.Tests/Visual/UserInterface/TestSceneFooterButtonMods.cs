@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +14,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneFooterButtonMods : OsuTestScene
+    public partial class TestSceneFooterButtonMods : OsuTestScene
     {
         private readonly TestFooterButtonMods footerButtonMods;
 
@@ -73,13 +75,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private bool assertModsMultiplier(IEnumerable<Mod> mods)
         {
-            var multiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
-            var expectedValue = multiplier.Equals(1.0) ? string.Empty : $"{multiplier:N2}x";
+            double multiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            string expectedValue = multiplier.Equals(1.0) ? string.Empty : $"{multiplier:N2}x";
 
             return expectedValue == footerButtonMods.MultiplierText.Current.Value;
         }
 
-        private class TestFooterButtonMods : FooterButtonMods
+        private partial class TestFooterButtonMods : FooterButtonMods
         {
             public new OsuSpriteText MultiplierText => base.MultiplierText;
         }

@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Mods
         public virtual ModType Type => ModType.Fun;
 
         [JsonIgnore]
-        public abstract string Description { get; }
+        public abstract LocalisableString Description { get; }
 
         /// <summary>
         /// The tooltip to display for this mod when used in a <see cref="ModIcon"/>.
@@ -94,8 +95,11 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool UserPlayable => true;
 
-        [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override and set UserPlayable to false.")] // Can be removed 20211009
-        public virtual bool Ranked => false;
+        [JsonIgnore]
+        public virtual bool ValidForMultiplayer => true;
+
+        [JsonIgnore]
+        public virtual bool ValidForMultiplayerAsFreeMod => true;
 
         /// <summary>
         /// Whether this mod requires configuration to apply changes to the game.
@@ -109,7 +113,7 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual Type[] IncompatibleMods => Array.Empty<Type>();
 
-        private IReadOnlyList<IBindable> settingsBacking;
+        private IReadOnlyList<IBindable>? settingsBacking;
 
         /// <summary>
         /// A list of the all <see cref="IBindable"/> settings within this mod.
@@ -119,6 +123,11 @@ namespace osu.Game.Rulesets.Mods
                                     .Select(p => p.Item2.GetValue(this))
                                     .Cast<IBindable>()
                                     .ToList();
+
+        /// <summary>
+        /// Whether all settings in this mod are set to their default state.
+        /// </summary>
+        protected virtual bool UsesDefaultConfiguration => Settings.All(s => s.IsDefault);
 
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
@@ -192,7 +201,7 @@ namespace osu.Game.Rulesets.Mods
             hashCode.Add(GetType());
 
             foreach (var setting in Settings)
-                hashCode.Add(ModUtils.GetSettingUnderlyingValue(setting));
+                hashCode.Add(setting.GetUnderlyingSettingValue());
 
             return hashCode.ToHashCode();
         }
@@ -208,13 +217,13 @@ namespace osu.Game.Rulesets.Mods
 
             public bool Equals(IBindable x, IBindable y)
             {
-                object xValue = x == null ? null : ModUtils.GetSettingUnderlyingValue(x);
-                object yValue = y == null ? null : ModUtils.GetSettingUnderlyingValue(y);
+                object xValue = x.GetUnderlyingSettingValue();
+                object yValue = y.GetUnderlyingSettingValue();
 
                 return EqualityComparer<object>.Default.Equals(xValue, yValue);
             }
 
-            public int GetHashCode(IBindable obj) => ModUtils.GetSettingUnderlyingValue(obj).GetHashCode();
+            public int GetHashCode(IBindable obj) => obj.GetUnderlyingSettingValue().GetHashCode();
         }
     }
 }

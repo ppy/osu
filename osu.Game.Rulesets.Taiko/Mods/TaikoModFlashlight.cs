@@ -12,51 +12,63 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModFlashlight : ModFlashlight<TaikoHitObject>
+    public partial class TaikoModFlashlight : ModFlashlight<TaikoHitObject>
     {
-        public override double ScoreMultiplier => 1.12;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
-        private const float default_flashlight_size = 250;
+        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
+        {
+            MinValue = 0.5f,
+            MaxValue = 1.5f,
+            Precision = 0.1f
+        };
 
-        public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield);
+        public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        private TaikoPlayfield playfield;
+        public override float DefaultFlashlightSize => 200;
+
+        protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, Playfield);
+
+        protected TaikoPlayfield Playfield { get; private set; } = null!;
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
-            playfield = (TaikoPlayfield)drawableRuleset.Playfield;
+            Playfield = (TaikoPlayfield)drawableRuleset.Playfield;
             base.ApplyToDrawableRuleset(drawableRuleset);
         }
 
-        private class TaikoFlashlight : Flashlight
+        public partial class TaikoFlashlight : Flashlight
         {
-            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
+            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
             private readonly TaikoPlayfield taikoPlayfield;
 
-            public TaikoFlashlight(TaikoPlayfield taikoPlayfield)
+            public TaikoFlashlight(TaikoModFlashlight modFlashlight, TaikoPlayfield taikoPlayfield)
+                : base(modFlashlight)
             {
                 this.taikoPlayfield = taikoPlayfield;
-                FlashlightSize = getSizeFor(0);
+
+                FlashlightSize = adjustSizeForPlayfieldAspectRatio(GetSize());
+                FlashlightSmoothness = 1.4f;
 
                 AddLayout(flashlightProperties);
             }
 
-            private Vector2 getSizeFor(int combo)
+            /// <summary>
+            /// Returns the aspect ratio-adjusted size of the flashlight.
+            /// This ensures that the size of the flashlight remains independent of taiko-specific aspect ratio adjustments.
+            /// </summary>
+            /// <param name="size">
+            /// The size of the flashlight.
+            /// The value provided here should always come from <see cref="ModFlashlight{T}.Flashlight.GetSize"/>.
+            /// </param>
+            private Vector2 adjustSizeForPlayfieldAspectRatio(float size)
             {
-                float size = default_flashlight_size;
-
-                if (combo > 200)
-                    size *= 0.8f;
-                else if (combo > 100)
-                    size *= 0.9f;
-
-                // Preserve flashlight size through the playfield's aspect adjustment.
                 return new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
             }
 
-            protected override void OnComboChange(ValueChangedEvent<int> e)
+            protected override void UpdateFlashlightSize(float size)
             {
-                this.TransformTo(nameof(FlashlightSize), getSizeFor(e.NewValue), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), adjustSizeForPlayfieldAspectRatio(size), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
@@ -70,7 +82,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
 
                     ClearTransforms(targetMember: nameof(FlashlightSize));
-                    FlashlightSize = getSizeFor(Combo.Value);
+                    FlashlightSize = adjustSizeForPlayfieldAspectRatio(GetSize());
 
                     flashlightProperties.Validate();
                 }

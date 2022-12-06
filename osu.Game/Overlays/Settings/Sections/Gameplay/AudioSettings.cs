@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -9,25 +11,29 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class AudioSettings : SettingsSubsection
+    public partial class AudioSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.AudioHeader;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, OsuConfigManager osuConfig)
         {
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                new SettingsSlider<float>
                 {
-                    LabelText = GameplaySettingsStrings.PositionalHitsounds,
-                    Current = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
+                    LabelText = AudioSettingsStrings.PositionalLevel,
+                    Keywords = new[] { @"positional", @"balance" },
+                    Current = osuConfig.GetBindable<float>(OsuSetting.PositionalHitsoundsLevel),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
                 },
                 new SettingsCheckbox
                 {
+                    ClassicDefault = false,
                     LabelText = GameplaySettingsStrings.AlwaysPlayFirstComboBreak,
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
-                },
+                }
             };
         }
     }

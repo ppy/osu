@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -55,7 +57,29 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original, cancellationToken);
 
-            if (original.BeatmapInfo.RulesetID == 3)
+            if (original.BeatmapInfo.Ruleset.OnlineID == 0)
+            {
+                // Post processing step to transform standard slider velocity changes into scroll speed changes
+                double lastScrollSpeed = 1;
+
+                foreach (HitObject hitObject in original.HitObjects)
+                {
+                    double nextScrollSpeed = hitObject.DifficultyControlPoint.SliderVelocity;
+                    EffectControlPoint currentEffectPoint = converted.ControlPointInfo.EffectPointAt(hitObject.StartTime);
+
+                    if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed, acceptableDifference: currentEffectPoint.ScrollSpeedBindable.Precision))
+                    {
+                        converted.ControlPointInfo.Add(hitObject.StartTime, new EffectControlPoint
+                        {
+                            KiaiMode = currentEffectPoint.KiaiMode,
+                            OmitFirstBarLine = currentEffectPoint.OmitFirstBarLine,
+                            ScrollSpeed = lastScrollSpeed = nextScrollSpeed,
+                        });
+                    }
+                }
+            }
+
+            if (original.BeatmapInfo.Ruleset.OnlineID == 3)
             {
                 // Post processing step to transform mania hit objects with the same start time into strong hits
                 converted.HitObjects = converted.HitObjects.GroupBy(t => t.StartTime).Select(x =>
@@ -79,9 +103,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             {
                 case IHasDistance distanceData:
                 {
-                    if (shouldConvertSliderToHits(obj, beatmap, distanceData, out var taikoDuration, out var tickSpacing))
+                    if (shouldConvertSliderToHits(obj, beatmap, distanceData, out int taikoDuration, out double tickSpacing))
                     {
-                        List<IList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
+                        IList<IList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
 
                         int i = 0;
 
@@ -191,7 +215,10 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         protected override Beatmap<TaikoHitObject> CreateBeatmap() => new TaikoBeatmap();
 
-        private class TaikoMultiplierAppliedDifficulty : BeatmapDifficulty
+        // Important to note that this is subclassing a realm object.
+        // Realm doesn't allow this, but for now this can work since we aren't (in theory?) persisting this to the database.
+        // It is only used during beatmap conversion and processing.
+        internal class TaikoMultiplierAppliedDifficulty : BeatmapDifficulty
         {
             public TaikoMultiplierAppliedDifficulty(IBeatmapDifficultyInfo difficulty)
             {
@@ -205,11 +232,13 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             #region Overrides of BeatmapDifficulty
 
+            public override BeatmapDifficulty Clone() => new TaikoMultiplierAppliedDifficulty(this);
+
             public override void CopyTo(BeatmapDifficulty other)
             {
                 base.CopyTo(other);
                 if (!(other is TaikoMultiplierAppliedDifficulty))
-                    SliderMultiplier /= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+                    other.SliderMultiplier /= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
             }
 
             public override void CopyFrom(IBeatmapDifficultyInfo other)

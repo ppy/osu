@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +24,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    public class TestSceneStage : ManiaInputTestScene
+    public partial class TestSceneStage : ManiaInputTestScene
     {
         private const int columns = 4;
 
@@ -133,7 +135,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var specialAction = ManiaAction.Special1;
 
-            var stage = new Stage(0, new StageDefinition { Columns = 2 }, ref action, ref specialAction);
+            var stage = new Stage(0, new StageDefinition(2), ref action, ref specialAction);
             stages.Add(stage);
 
             return new ScrollingTestContainer(direction)

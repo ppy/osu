@@ -1,17 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit
 {
-    public abstract class EditorRoundedScreenSettingsSection : CompositeDrawable
+    public abstract partial class EditorRoundedScreenSettingsSection : CompositeDrawable
     {
         private const int header_height = 50;
 
@@ -20,7 +21,7 @@ namespace osu.Game.Screens.Edit
         protected FillFlowContainer Flow { get; private set; }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colours)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

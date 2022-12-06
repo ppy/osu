@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public class ClockWithMods
     {
-        protected IApplicableToRate Mod;
+        protected IApplicableToRate? Mod;
 
         public ClockWithMods(Mod[] mods)
         {

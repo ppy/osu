@@ -1,6 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -40,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public override IEnumerable<BeatmapStatistic> GetStatistics()
         {
             int notes = HitObjects.Count(s => s is Note);
-            int holdnotes = HitObjects.Count(s => s is HoldNote);
+            int holdNotes = HitObjects.Count(s => s is HoldNote);
 
             return new[]
             {
@@ -54,9 +57,22 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 {
                     Name = @"Hold Note Count",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
-                    Content = holdnotes.ToString(),
+                    Content = holdNotes.ToString(),
                 },
             };
+        }
+
+        public StageDefinition GetStageForColumnIndex(int column)
+        {
+            foreach (var stage in Stages)
+            {
+                if (column < stage.Columns)
+                    return stage;
+
+                column -= stage.Columns;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(column), "Provided index exceeds all available stages");
         }
     }
 }

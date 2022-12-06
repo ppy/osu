@@ -1,16 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Edit;
@@ -18,21 +23,24 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class CatchHitObjectComposer : HitObjectComposer<CatchHitObject>
+    public partial class CatchHitObjectComposer : DistancedHitObjectComposer<CatchHitObject>
     {
         private const float distance_snap_radius = 50;
 
         private CatchDistanceSnapGrid distanceSnapGrid;
 
-        private readonly Bindable<TernaryState> distanceSnapToggle = new Bindable<TernaryState>();
-
         private InputManager inputManager;
+
+        private readonly BindableDouble timeRangeMultiplier = new BindableDouble(1)
+        {
+            MinValue = 1,
+            MaxValue = 10,
+        };
 
         public CatchHitObjectComposer(CatchRuleset ruleset)
             : base(ruleset)
@@ -42,17 +50,24 @@ namespace osu.Game.Rulesets.Catch.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
+            // todo: enable distance spacing once catch supports applying it to its existing distance snap grid implementation.
+            RightSideToolboxContainer.Alpha = 0;
+            DistanceSpacingMultiplier.Disabled = true;
+
             LayerBelowRuleset.Add(new PlayfieldBorder
             {
-                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                RelativeSizeAxes = Axes.X,
+                Height = CatchPlayfield.HEIGHT,
                 PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Corners }
             });
 
             LayerBelowRuleset.Add(distanceSnapGrid = new CatchDistanceSnapGrid(new[]
             {
                 0.0,
-                Catcher.BASE_SPEED, -Catcher.BASE_SPEED,
-                Catcher.BASE_SPEED / 2, -Catcher.BASE_SPEED / 2,
+                Catcher.BASE_DASH_SPEED, -Catcher.BASE_DASH_SPEED,
+                Catcher.BASE_WALK_SPEED, -Catcher.BASE_WALK_SPEED,
             }));
         }
 
@@ -63,6 +78,19 @@ namespace osu.Game.Rulesets.Catch.Edit
             inputManager = GetContainingInputManager();
         }
 
+        protected override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
+        {
+            // osu!catch's distance snap implementation is limited, in that a custom spacing cannot be specified.
+            // Therefore this functionality is not currently used.
+            //
+            // The implementation below is probably correct but should be checked if/when exposed via controls.
+
+            float expectedDistance = DurationToDistance(before, after.StartTime - before.GetEndTime());
+            float actualDistance = Math.Abs(((CatchHitObject)before).EffectiveX - ((CatchHitObject)after).EffectiveX);
+
+            return actualDistance / expectedDistance;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -70,8 +98,30 @@ namespace osu.Game.Rulesets.Catch.Edit
             updateDistanceSnapGrid();
         }
 
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                // Note that right now these are hard to use as the default key bindings conflict with existing editor key bindings.
+                // In the future we will want to expose this via UI and potentially change the key bindings to be editor-specific.
+                // May be worth considering standardising "zoom" behaviour with what the timeline uses (ie. alt-wheel) but that may cause new conflicts.
+                case GlobalAction.IncreaseScrollSpeed:
+                    this.TransformBindableTo(timeRangeMultiplier, timeRangeMultiplier.Value - 1, 200, Easing.OutQuint);
+                    break;
+
+                case GlobalAction.DecreaseScrollSpeed:
+                    this.TransformBindableTo(timeRangeMultiplier, timeRangeMultiplier.Value + 1, 200, Easing.OutQuint);
+                    break;
+            }
+
+            return base.OnPressed(e);
+        }
+
         protected override DrawableRuleset<CatchHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null) =>
-            new DrawableCatchEditorRuleset(ruleset, beatmap, mods);
+            new DrawableCatchEditorRuleset(ruleset, beatmap, mods)
+            {
+                TimeRangeMultiplier = { BindTarget = timeRangeMultiplier, }
+            };
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
@@ -80,20 +130,19 @@ namespace osu.Game.Rulesets.Catch.Edit
             new BananaShowerCompositionTool()
         };
 
-        protected override IEnumerable<TernaryButton> CreateTernaryButtons() => base.CreateTernaryButtons().Concat(new[]
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
-            new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
-        });
+            var result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
-        {
-            var result = base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
             result.ScreenSpacePosition.X = screenSpacePosition.X;
 
-            if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
-                Vector2.Distance(snapResult.ScreenSpacePosition, result.ScreenSpacePosition) < distance_snap_radius)
+            if (snapType.HasFlagFast(SnapType.Grids))
             {
-                result = snapResult;
+                if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
+                    Vector2.Distance(snapResult.ScreenSpacePosition, result.ScreenSpacePosition) < distance_snap_radius)
+                {
+                    result = snapResult;
+                }
             }
 
             return result;
@@ -124,15 +173,15 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             switch (BlueprintContainer.CurrentTool)
             {
-                case SelectTool _:
+                case SelectTool:
                     if (EditorBeatmap.SelectedHitObjects.Count == 0)
                         return null;
 
                     double minTime = EditorBeatmap.SelectedHitObjects.Min(hitObject => hitObject.StartTime);
                     return getLastSnappableHitObject(minTime);
 
-                case FruitCompositionTool _:
-                case JuiceStreamCompositionTool _:
+                case FruitCompositionTool:
+                case JuiceStreamCompositionTool:
                     if (!CursorInPlacementArea)
                         return null;
 
@@ -152,7 +201,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         private void updateDistanceSnapGrid()
         {
-            if (distanceSnapToggle.Value != TernaryState.True)
+            if (DistanceSnapToggle.Value != TernaryState.True)
             {
                 distanceSnapGrid.Hide();
                 return;

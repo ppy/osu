@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -15,7 +16,7 @@ using osu.Game.Screens.Select.Details;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneBeatmapSetOverlayDetails : OsuTestScene
+    public partial class TestSceneBeatmapSetOverlayDetails : OsuTestScene
     {
         private RatingsExposingDetails details;
 
@@ -44,31 +45,25 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set second set", () => details.BeatmapSet = secondSet);
             AddAssert("ratings set", () => details.Ratings.Ratings == secondSet.Ratings);
 
-            static BeatmapSetInfo createSet() => new BeatmapSetInfo
+            static APIBeatmapSet createSet() => new APIBeatmapSet
             {
-                Beatmaps = new List<BeatmapInfo>
+                Beatmaps = new[]
                 {
-                    new BeatmapInfo
+                    new APIBeatmap
                     {
-                        OnlineInfo = new APIBeatmap
+                        FailTimes = new APIFailTimes
                         {
-                            FailTimes = new APIFailTimes
-                            {
-                                Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
-                                Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
-                            },
-                        }
+                            Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
+                            Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
+                        },
                     }
                 },
-                OnlineInfo = new APIBeatmapSet
-                {
-                    Ratings = Enumerable.Range(0, 11).Select(_ => RNG.Next(10)).ToArray(),
-                    Status = BeatmapSetOnlineStatus.Ranked
-                }
+                Ratings = Enumerable.Range(0, 11).Select(_ => RNG.Next(10)).ToArray(),
+                Status = BeatmapOnlineStatus.Ranked
             };
         }
 
-        private class RatingsExposingDetails : Details
+        private partial class RatingsExposingDetails : Details
         {
             public new UserRatings Ratings => base.Ratings;
         }

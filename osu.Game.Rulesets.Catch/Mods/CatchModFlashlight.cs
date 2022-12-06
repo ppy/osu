@@ -11,15 +11,24 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModFlashlight : ModFlashlight<CatchHitObject>
+    public partial class CatchModFlashlight : ModFlashlight<CatchHitObject>
     {
-        public override double ScoreMultiplier => 1.12;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
-        private const float default_flashlight_size = 350;
+        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
+        {
+            MinValue = 0.5f,
+            MaxValue = 1.5f,
+            Precision = 0.1f
+        };
 
-        public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield);
+        public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        private CatchPlayfield playfield;
+        public override float DefaultFlashlightSize => 325;
+
+        protected override Flashlight CreateFlashlight() => new CatchFlashlight(this, playfield);
+
+        private CatchPlayfield playfield = null!;
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
@@ -27,14 +36,27 @@ namespace osu.Game.Rulesets.Catch.Mods
             base.ApplyToDrawableRuleset(drawableRuleset);
         }
 
-        private class CatchFlashlight : Flashlight
+        private partial class CatchFlashlight : Flashlight
         {
             private readonly CatchPlayfield playfield;
 
-            public CatchFlashlight(CatchPlayfield playfield)
+            public CatchFlashlight(CatchModFlashlight modFlashlight, CatchPlayfield playfield)
+                : base(modFlashlight)
             {
                 this.playfield = playfield;
-                FlashlightSize = new Vector2(0, getSizeFor(0));
+
+                FlashlightSize = new Vector2(0, GetSize());
+                FlashlightSmoothness = 1.4f;
+            }
+
+            protected override float GetComboScaleFor(int combo)
+            {
+                if (combo >= 200)
+                    return 0.770f;
+                if (combo >= 100)
+                    return 0.885f;
+
+                return 1.0f;
             }
 
             protected override void Update()
@@ -44,19 +66,9 @@ namespace osu.Game.Rulesets.Catch.Mods
                 FlashlightPosition = playfield.CatcherArea.ToSpaceOfOtherDrawable(playfield.Catcher.DrawPosition, this);
             }
 
-            private float getSizeFor(int combo)
+            protected override void UpdateFlashlightSize(float size)
             {
-                if (combo > 200)
-                    return default_flashlight_size * 0.8f;
-                else if (combo > 100)
-                    return default_flashlight_size * 0.9f;
-                else
-                    return default_flashlight_size;
-            }
-
-            protected override void OnComboChange(ValueChangedEvent<int> e)
-            {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, getSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, size), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";

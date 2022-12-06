@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
@@ -10,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public class CatchPlacementBlueprint<THitObject> : PlacementBlueprint
+    public partial class CatchPlacementBlueprint<THitObject> : PlacementBlueprint
         where THitObject : CatchHitObject, new()
     {
         protected new THitObject HitObject => (THitObject)base.HitObject;

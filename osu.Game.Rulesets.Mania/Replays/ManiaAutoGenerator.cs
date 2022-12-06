@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
@@ -55,11 +56,11 @@ namespace osu.Game.Rulesets.Mania.Replays
                 {
                     switch (point)
                     {
-                        case HitPoint _:
+                        case HitPoint:
                             actions.Add(columnActions[point.Column]);
                             break;
 
-                        case ReleasePoint _:
+                        case ReleasePoint:
                             actions.Remove(columnActions[point.Column]);
                             break;
                     }
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             {
                 var currentObject = Beatmap.HitObjects[i];
                 var nextObjectInColumn = GetNextObject(i); // Get the next object that requires pressing the same button
-                var releaseTime = calculateReleaseTime(currentObject, nextObjectInColumn);
+                double releaseTime = calculateReleaseTime(currentObject, nextObjectInColumn);
 
                 yield return new HitPoint { Time = currentObject.StartTime, Column = currentObject.Column };
 
@@ -83,7 +84,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             }
         }
 
-        private double calculateReleaseTime(HitObject currentObject, HitObject nextObject)
+        private double calculateReleaseTime(HitObject currentObject, HitObject? nextObject)
         {
             double endTime = currentObject.GetEndTime();
 
@@ -94,10 +95,10 @@ namespace osu.Game.Rulesets.Mania.Replays
             bool canDelayKeyUpFully = nextObject == null ||
                                       nextObject.StartTime > endTime + RELEASE_DELAY;
 
-            return endTime + (canDelayKeyUpFully ? RELEASE_DELAY : (nextObject.StartTime - endTime) * 0.9);
+            return endTime + (canDelayKeyUpFully ? RELEASE_DELAY : (nextObject.AsNonNull().StartTime - endTime) * 0.9);
         }
 
-        protected override HitObject GetNextObject(int currentIndex)
+        protected override HitObject? GetNextObject(int currentIndex)
         {
             int desiredColumn = Beatmap.HitObjects[currentIndex].Column;
 

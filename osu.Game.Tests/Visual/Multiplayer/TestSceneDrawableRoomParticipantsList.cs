@@ -1,45 +1,51 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
-using osu.Game.Users;
 using osu.Game.Users.Drawables;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneDrawableRoomParticipantsList : OnlinePlayTestScene
+    public partial class TestSceneDrawableRoomParticipantsList : OnlinePlayTestScene
     {
         private DrawableRoomParticipantsList list;
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            SelectedRoom.Value = new Room
-            {
-                Name = { Value = "test room" },
-                Host =
-                {
-                    Value = new User
-                    {
-                        Id = 2,
-                        Username = "peppy",
-                    }
-                }
-            };
+            base.SetUpSteps();
 
-            Child = list = new DrawableRoomParticipantsList
+            AddStep("create list", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                NumberOfCircles = 4
-            };
-        });
+                SelectedRoom.Value = new Room
+                {
+                    Name = { Value = "test room" },
+                    Host =
+                    {
+                        Value = new APIUser
+                        {
+                            Id = 2,
+                            Username = "peppy",
+                        }
+                    }
+                };
+
+                Child = list = new DrawableRoomParticipantsList
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    NumberOfCircles = 4
+                };
+            });
+        }
 
         [Test]
         public void TestCircleCountNearLimit()
@@ -137,7 +143,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void addUser(int id)
         {
-            SelectedRoom.Value.RecentParticipants.Add(new User
+            SelectedRoom.Value.RecentParticipants.Add(new APIUser
             {
                 Id = id,
                 Username = $"User {id}"

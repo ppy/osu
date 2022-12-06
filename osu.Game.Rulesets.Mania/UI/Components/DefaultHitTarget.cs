@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -14,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class DefaultHitTarget : CompositeDrawable
+    public partial class DefaultHitTarget : CompositeDrawable
     {
         private const float hit_target_bar_height = 2;
 
@@ -22,6 +24,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         private Container hitTargetLine;
         private Drawable hitTargetBar;
+
+        private Bindable<Color4> accentColour;
 
         [Resolved]
         private Column column { get; set; }
@@ -52,12 +56,16 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 },
             };
 
-            hitTargetLine.EdgeEffect = new EdgeEffectParameters
+            accentColour = column.AccentColour.GetBoundCopy();
+            accentColour.BindValueChanged(colour =>
             {
-                Type = EdgeEffectType.Glow,
-                Radius = 5,
-                Colour = column.AccentColour.Opacity(0.5f),
-            };
+                hitTargetLine.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 5,
+                    Colour = colour.NewValue.Opacity(0.5f),
+                };
+            }, true);
 
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);

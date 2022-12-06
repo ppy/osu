@@ -1,8 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Collections.Generic;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -11,6 +16,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -23,15 +29,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class DrawableRoom : CompositeDrawable
+    public partial class DrawableRoom : CompositeDrawable
     {
         protected const float CORNER_RADIUS = 10;
         private const float height = 100;
 
         public readonly Room Room;
-
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
 
         protected Container ButtonsContainer { get; private set; }
 
@@ -187,20 +190,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(5),
-                                            Children = new Drawable[]
-                                            {
-                                                new PlaylistCountPill
-                                                {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                },
-                                                new StarRatingRangeDisplay
-                                                {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                    Scale = new Vector2(0.8f)
-                                                }
-                                            }
+                                            ChildrenEnumerable = CreateBottomDetails()
                                         }
                                     }
                                 },
@@ -249,7 +239,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 roomCategory.BindTo(Room.Category);
                 roomCategory.BindValueChanged(c =>
                 {
-                    if (c.NewValue == RoomCategory.Spotlight)
+                    if (c.NewValue > RoomCategory.Normal)
                         specialCategoryPill.Show();
                     else
                         specialCategoryPill.Hide();
@@ -290,7 +280,38 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected virtual Drawable CreateBackground() => new OnlinePlayBackgroundSprite();
 
-        private class RoomNameText : OsuSpriteText
+        protected virtual IEnumerable<Drawable> CreateBottomDetails()
+        {
+            var pills = new List<Drawable>();
+
+            if (Room.Type.Value != MatchType.Playlists)
+            {
+                pills.AddRange(new OnlinePlayComposite[]
+                {
+                    new MatchTypePill(),
+                    new QueueModePill(),
+                });
+            }
+
+            pills.AddRange(new Drawable[]
+            {
+                new PlaylistCountPill
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                new StarRatingRangeDisplay
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Scale = new Vector2(0.8f)
+                }
+            });
+
+            return pills;
+        }
+
+        private partial class RoomNameText : OsuSpriteText
         {
             [Resolved(typeof(Room), nameof(Online.Rooms.Room.Name))]
             private Bindable<string> name { get; set; }
@@ -307,10 +328,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private class RoomStatusText : OnlinePlayComposite
+        private partial class RoomStatusText : OnlinePlayComposite
         {
             [Resolved]
             private OsuColour colours { get; set; }
+
+            [Resolved]
+            private BeatmapLookupCache beatmapLookupCache { get; set; }
 
             private SpriteText statusText;
             private LinkFlowContainer beatmapText;
@@ -353,7 +377,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             })
                             {
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
+                                // workaround to ensure only the first line of text shows, emulating truncation (but without ellipsis at the end).
+                                // TODO: remove when text/link flow can support truncation with ellipsis natively.
+                                Height = 16,
+                                Masking = true
                             }
                         }
                     }
@@ -363,11 +390,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                SelectedItem.BindValueChanged(onSelectedItemChanged, true);
+                CurrentPlaylistItem.BindValueChanged(onSelectedItemChanged, true);
             }
+
+            private CancellationTokenSource beatmapLookupCancellation;
 
             private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
             {
+                beatmapLookupCancellation?.Cancel();
                 beatmapText.Clear();
 
                 if (Type.Value == MatchType.Playlists)
@@ -376,22 +406,35 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     return;
                 }
 
-                if (item.NewValue?.Beatmap.Value != null)
-                {
-                    statusText.Text = "Currently playing ";
-                    beatmapText.AddLink(item.NewValue.Beatmap.Value.GetDisplayTitleRomanisable(),
-                        LinkAction.OpenBeatmap,
-                        item.NewValue.Beatmap.Value.OnlineBeatmapID.ToString(),
-                        creationParameters: s =>
-                        {
-                            s.Truncate = true;
-                            s.RelativeSizeAxes = Axes.X;
-                        });
-                }
+                var beatmap = item.NewValue?.Beatmap;
+                if (beatmap == null)
+                    return;
+
+                var cancellationSource = beatmapLookupCancellation = new CancellationTokenSource();
+                beatmapLookupCache.GetBeatmapAsync(beatmap.OnlineID, cancellationSource.Token)
+                                  .ContinueWith(task => Schedule(() =>
+                                  {
+                                      if (cancellationSource.IsCancellationRequested)
+                                          return;
+
+                                      var retrievedBeatmap = task.GetResultSafely();
+
+                                      statusText.Text = "Currently playing ";
+
+                                      if (retrievedBeatmap != null)
+                                      {
+                                          beatmapText.AddLink(retrievedBeatmap.GetDisplayTitleRomanisable(),
+                                              LinkAction.OpenBeatmap,
+                                              retrievedBeatmap.OnlineID.ToString(),
+                                              creationParameters: s => s.Truncate = true);
+                                      }
+                                      else
+                                          beatmapText.AddText("unknown beatmap");
+                                  }), cancellationSource.Token);
             }
         }
 
-        public class PasswordProtectedIcon : CompositeDrawable
+        public partial class PasswordProtectedIcon : CompositeDrawable
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)

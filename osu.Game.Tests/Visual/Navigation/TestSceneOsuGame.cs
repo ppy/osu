@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -12,11 +14,9 @@ using osu.Framework.Platform;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
-using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
@@ -25,21 +25,20 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
-using osu.Game.Utils;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
     [TestFixture]
-    public class TestSceneOsuGame : OsuGameTestScene
+    public partial class TestSceneOsuGame : OsuGameTestScene
     {
         private IReadOnlyList<Type> requiredGameDependencies => new[]
         {
             typeof(OsuGame),
-            typeof(SentryLogger),
             typeof(OsuLogo),
             typeof(IdleTracker),
             typeof(OnScreenDisplay),
-            typeof(NotificationOverlay),
+            typeof(INotificationOverlay),
             typeof(BeatmapListingOverlay),
             typeof(DashboardOverlay),
             typeof(NewsOverlay),
@@ -51,14 +50,13 @@ namespace osu.Game.Tests.Visual.Navigation
             typeof(LoginOverlay),
             typeof(MusicController),
             typeof(AccountCreationOverlay),
-            typeof(DialogOverlay),
+            typeof(IDialogOverlay),
             typeof(ScreenshotManager)
         };
 
         private IReadOnlyList<Type> requiredGameBaseDependencies => new[]
         {
             typeof(OsuGameBase),
-            typeof(DatabaseContextFactory),
             typeof(Bindable<RulesetInfo>),
             typeof(IBindable<RulesetInfo>),
             typeof(Bindable<IReadOnlyList<Mod>>),
@@ -69,10 +67,9 @@ namespace osu.Game.Tests.Visual.Navigation
             typeof(ISkinSource),
             typeof(IAPIProvider),
             typeof(RulesetStore),
-            typeof(FileStore),
             typeof(ScoreManager),
             typeof(BeatmapManager),
-            typeof(RulesetConfigCache),
+            typeof(IRulesetConfigCache),
             typeof(OsuColour),
             typeof(IBindable<WorkingBeatmap>),
             typeof(Bindable<WorkingBeatmap>),
@@ -83,8 +80,15 @@ namespace osu.Game.Tests.Visual.Navigation
         [Resolved]
         private OsuGameBase gameBase { get; set; }
 
-        [Resolved]
-        private GameHost host { get; set; }
+        [Test]
+        public void TestCursorHidesWhenIdle()
+        {
+            AddStep("click mouse", () => InputManager.Click(MouseButton.Left));
+            AddUntilStep("wait until idle", () => Game.IsIdle.Value);
+            AddUntilStep("menu cursor hidden", () => Game.GlobalCursorDisplay.MenuCursor.ActiveCursor.Alpha == 0);
+            AddStep("click mouse", () => InputManager.Click(MouseButton.Left));
+            AddUntilStep("menu cursor shown", () => Game.GlobalCursorDisplay.MenuCursor.ActiveCursor.Alpha == 1);
+        }
 
         [Test]
         public void TestNullRulesetHandled()

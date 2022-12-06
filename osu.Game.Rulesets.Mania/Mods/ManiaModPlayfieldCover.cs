@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 HitObjectContainer hoc = column.HitObjectArea.HitObjectContainer;
                 Container hocParent = (Container)hoc.Parent;
 
-                hocParent.Remove(hoc);
+                hocParent.Remove(hoc, false);
                 hocParent.Add(new PlayfieldCoveringWrapper(hoc).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;

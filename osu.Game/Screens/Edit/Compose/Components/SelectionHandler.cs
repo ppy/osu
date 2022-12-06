@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +17,11 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Input;
 
@@ -26,7 +30,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A component which outlines items and handles movement of selections.
     /// </summary>
-    public abstract class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
+    public abstract partial class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHasContextMenu
     {
         /// <summary>
         /// The currently selected blueprints.
@@ -56,11 +60,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             InternalChild = SelectionBox = CreateSelectionBox();
 
-            SelectedItems.CollectionChanged += (sender, args) =>
+            SelectedItems.CollectionChanged += (_, _) =>
             {
                 Scheduler.AddOnce(updateVisibility);
             };
@@ -96,6 +100,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region User Input Handling
 
+        /// <remarks>
+        /// Positional input must be received outside the container's bounds,
+        /// in order to handle blueprints which are partially offscreen.
+        /// </remarks>
+        /// <seealso cref="ComposeBlueprintContainer.ReceivePositionalInputAt"/>
+        /// <seealso cref="TimelineBlueprintContainer.ReceivePositionalInputAt"/>
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
         /// <summary>
         /// Handles the selected items being moved.
         /// </summary>
@@ -127,15 +139,37 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Handles the selected items being flipped.
         /// </summary>
-        /// <param name="direction">The direction to flip</param>
+        /// <param name="direction">The direction to flip.</param>
+        /// <param name="flipOverOrigin">Whether the flip operation should be global to the playfield's origin or local to the selected pattern.</param>
         /// <returns>Whether any items could be flipped.</returns>
-        public virtual bool HandleFlip(Direction direction) => false;
+        public virtual bool HandleFlip(Direction direction, bool flipOverOrigin) => false;
 
         /// <summary>
         /// Handles the selected items being reversed pattern-wise.
         /// </summary>
         /// <returns>Whether any items could be reversed.</returns>
         public virtual bool HandleReverse() => false;
+
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.EditorFlipHorizontally:
+                    return HandleFlip(Direction.Horizontal, true);
+
+                case GlobalAction.EditorFlipVertically:
+                    return HandleFlip(Direction.Vertical, true);
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
@@ -271,7 +305,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected void DeleteSelected()
         {
-            DeleteItems(selectedBlueprints.Select(b => b.Item));
+            DeleteItems(SelectedItems.ToArray());
         }
 
         #endregion
@@ -336,7 +370,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (SelectedBlueprints.Count == 1)
                     items.AddRange(SelectedBlueprints[0].ContextMenuItems);
 
-                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, DeleteSelected));
+                items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, DeleteSelected));
 
                 return items.ToArray();
             }

@@ -1,13 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Skinning;
@@ -16,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Beatmaps
 {
-    public abstract class LegacyBeatmapSkinColourTest : ScreenTestScene
+    public abstract partial class LegacyBeatmapSkinColourTest : ScreenTestScene
     {
         protected readonly Bindable<bool> BeatmapSkins = new Bindable<bool>();
         protected readonly Bindable<bool> BeatmapColours = new Bindable<bool>();
@@ -59,7 +60,7 @@ namespace osu.Game.Tests.Beatmaps
 
         protected virtual ExposedPlayer CreateTestPlayer(bool userHasCustomColours) => new ExposedPlayer(userHasCustomColours);
 
-        protected class ExposedPlayer : TestPlayer
+        protected partial class ExposedPlayer : TestPlayer
         {
             protected readonly bool UserHasCustomColours;
 
@@ -112,7 +113,7 @@ namespace osu.Game.Tests.Beatmaps
             public static readonly Color4 HYPER_DASH_FRUIT_COLOUR = Color4.DarkGoldenrod;
 
             public TestBeatmapSkin(BeatmapInfo beatmapInfo, bool hasColours)
-                : base(beatmapInfo, new ResourceStore<byte[]>(), null)
+                : base(beatmapInfo, null)
             {
                 if (hasColours)
                 {
@@ -141,7 +142,7 @@ namespace osu.Game.Tests.Beatmaps
             public static readonly Color4 HYPER_DASH_FRUIT_COLOUR = Color4.LightCyan;
 
             public TestSkin(bool hasCustomColours)
-                : base(new SkinInfo(), new ResourceStore<byte[]>(), null, string.Empty)
+                : base(new SkinInfo(), null, null)
             {
                 if (hasCustomColours)
                 {

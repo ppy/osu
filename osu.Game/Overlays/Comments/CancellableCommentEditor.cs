@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -10,10 +12,12 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
-    public abstract class CancellableCommentEditor : CommentEditor
+    public abstract partial class CancellableCommentEditor : CommentEditor
     {
         public Action OnCancel;
 
@@ -28,13 +32,14 @@ namespace osu.Game.Overlays.Comments
             });
         }
 
-        private class CancelButton : OsuHoverContainer
+        private partial class CancelButton : OsuHoverContainer
         {
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
             private readonly Box background;
 
             public CancelButton()
+                : base(HoverSampleSet.Button)
             {
                 AutoSizeAxes = Axes.Both;
                 Child = new CircularContainer
@@ -54,7 +59,7 @@ namespace osu.Game.Overlays.Comments
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                             Margin = new MarginPadding { Horizontal = 20 },
-                            Text = @"Cancel"
+                            Text = CommonStrings.ButtonsCancel
                         }
                     }
                 };

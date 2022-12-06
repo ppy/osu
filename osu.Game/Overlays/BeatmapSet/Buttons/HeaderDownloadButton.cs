@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,20 +11,22 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class HeaderDownloadButton : BeatmapDownloadTrackingComposite, IHasTooltip
+    public partial class HeaderDownloadButton : CompositeDrawable, IHasTooltip
     {
         private const int text_size = 12;
 
@@ -30,14 +34,18 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         public LocalisableString TooltipText => BeatmapsetsStrings.ShowDetailsDownloadDefault;
 
-        private readonly IBindable<User> localUser = new Bindable<User>();
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
         private ShakeContainer shakeContainer;
         private HeaderButton button;
 
-        public HeaderDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
-            : base(beatmapSet)
+        private BeatmapDownloadTracker downloadTracker;
+
+        private readonly APIBeatmapSet beatmapSet;
+
+        public HeaderDownloadButton(APIBeatmapSet beatmapSet, bool noVideo = false)
         {
+            this.beatmapSet = beatmapSet;
             this.noVideo = noVideo;
 
             Width = 120;
@@ -45,17 +53,21 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, BeatmapManager beatmaps)
+        private void load(IAPIProvider api, BeatmapModelDownloader beatmaps)
         {
             FillFlowContainer textSprites;
 
-            AddInternal(shakeContainer = new ShakeContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = 5,
-                Child = button = new HeaderButton { RelativeSizeAxes = Axes.Both },
-            });
+                shakeContainer = new ShakeContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 5,
+                    Child = button = new HeaderButton { RelativeSizeAxes = Axes.Both },
+                },
+                downloadTracker = new BeatmapDownloadTracker(beatmapSet),
+            };
 
             button.AddRange(new Drawable[]
             {
@@ -83,7 +95,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         },
                     }
                 },
-                new DownloadProgressBar(BeatmapSet.Value)
+                new DownloadProgressBar(beatmapSet)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -92,20 +104,20 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             button.Action = () =>
             {
-                if (State.Value != DownloadState.NotDownloaded)
+                if (downloadTracker.State.Value != DownloadState.NotDownloaded)
                 {
                     shakeContainer.Shake();
                     return;
                 }
 
-                beatmaps.Download(BeatmapSet.Value, noVideo);
+                beatmaps.Download(beatmapSet, noVideo);
             };
 
             localUser.BindTo(api.LocalUser);
             localUser.BindValueChanged(userChanged, true);
             button.Enabled.BindValueChanged(enabledChanged, true);
 
-            State.BindValueChanged(state =>
+            downloadTracker.State.BindValueChanged(state =>
             {
                 switch (state.NewValue)
                 {
@@ -114,7 +126,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = Localisation.CommonStrings.Downloading,
+                                Text = CommonStrings.Downloading,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -125,7 +137,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = Localisation.CommonStrings.Importing,
+                                Text = CommonStrings.Importing,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -155,13 +167,13 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             }, true);
         }
 
-        private void userChanged(ValueChangedEvent<User> e) => button.Enabled.Value = !(e.NewValue is GuestUser);
+        private void userChanged(ValueChangedEvent<APIUser> e) => button.Enabled.Value = !(e.NewValue is GuestUser);
 
         private void enabledChanged(ValueChangedEvent<bool> e) => this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
 
         private LocalisableString getVideoSuffixText()
         {
-            if (!BeatmapSet.Value.OnlineInfo.HasVideo)
+            if (!beatmapSet.HasVideo)
                 return string.Empty;
 
             return noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo;

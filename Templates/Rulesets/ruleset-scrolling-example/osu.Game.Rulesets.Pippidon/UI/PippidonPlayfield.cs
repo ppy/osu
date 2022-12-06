@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -17,7 +16,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Pippidon.UI
 {
     [Cached]
-    public class PippidonPlayfield : ScrollingPlayfield
+    public partial class PippidonPlayfield : ScrollingPlayfield
     {
         public const float LANE_HEIGHT = 70;
 
@@ -28,7 +27,7 @@ namespace osu.Game.Rulesets.Pippidon.UI
         private PippidonCharacter pippidon;
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load()
         {
             AddRangeInternal(new Drawable[]
             {
@@ -61,7 +60,7 @@ namespace osu.Game.Rulesets.Pippidon.UI
             });
         }
 
-        private class LaneContainer : BeatSyncedContainer
+        private partial class LaneContainer : BeatSyncedContainer
         {
             private OsuColour colours;
             private FillFlowContainer fill;
@@ -100,7 +99,7 @@ namespace osu.Game.Rulesets.Pippidon.UI
                 }
             }
 
-            private class Lane : CompositeDrawable
+            private partial class Lane : CompositeDrawable
             {
                 public Lane()
                 {

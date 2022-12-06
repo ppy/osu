@@ -1,12 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -14,21 +15,22 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Users;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class AuthorInfo : Container
+    public partial class AuthorInfo : Container
     {
         private const float height = 50;
 
         private UpdateableAvatar avatar;
         private FillFlowContainer fields;
 
-        private BeatmapSetInfo beatmapSet;
+        private APIBeatmapSet beatmapSet;
 
-        public BeatmapSetInfo BeatmapSet
+        public APIBeatmapSet BeatmapSet
         {
             get => beatmapSet;
             set
@@ -78,34 +80,32 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            avatar.User = BeatmapSet?.Metadata.Author;
+            avatar.User = BeatmapSet?.Author;
 
             fields.Clear();
             if (BeatmapSet == null)
                 return;
 
-            var online = BeatmapSet.OnlineInfo;
-
             fields.Children = new Drawable[]
             {
-                new Field("mapped by", BeatmapSet.Metadata.Author, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
-                new Field("submitted", online.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
+                new Field("mapped by", BeatmapSet.Author, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
+                new Field("submitted", BeatmapSet.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
                 {
                     Margin = new MarginPadding { Top = 5 },
                 },
             };
 
-            if (online.Ranked.HasValue)
+            if (BeatmapSet.Ranked.HasValue)
             {
-                fields.Add(new Field(online.Status.ToString().ToLowerInvariant(), online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(new Field(BeatmapSet.Status.ToString().ToLowerInvariant(), BeatmapSet.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
             }
-            else if (online.LastUpdated.HasValue)
+            else if (BeatmapSet.LastUpdated.HasValue)
             {
-                fields.Add(new Field("last updated", online.LastUpdated.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(new Field("last updated", BeatmapSet.LastUpdated.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
             }
         }
 
-        private class Field : FillFlowContainer
+        private partial class Field : FillFlowContainer
         {
             public Field(string first, string second, FontUsage secondFont)
             {
@@ -146,7 +146,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 };
             }
 
-            public Field(string first, User second, FontUsage secondFont)
+            public Field(string first, APIUser second, FontUsage secondFont)
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;

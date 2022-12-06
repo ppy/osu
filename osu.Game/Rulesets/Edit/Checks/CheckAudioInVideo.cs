@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using osu.Game.Beatmaps;
 using osu.Game.IO.FileAbstraction;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Storyboards;
@@ -40,9 +41,9 @@ namespace osu.Game.Rulesets.Edit.Checks
                 }
             }
 
-            foreach (var filename in videoPaths)
+            foreach (string filename in videoPaths)
             {
-                string storagePath = beatmapSet.GetPathForFile(filename);
+                string? storagePath = beatmapSet?.GetPathForFile(filename);
 
                 if (storagePath == null)
                 {

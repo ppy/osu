@@ -1,14 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osu.Game.Skinning;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards
@@ -77,29 +75,48 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                var backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
-                if (backgroundPath == null)
+                string backgroundPath = BeatmapInfo.Metadata.BackgroundFile;
+
+                if (string.IsNullOrEmpty(backgroundPath))
                     return false;
+
+                // Importantly, do this after the NullOrEmpty because EF may have stored the non-nullable value as null to the database, bypassing compile-time constraints.
+                backgroundPath = backgroundPath.ToLowerInvariant();
 
                 return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
             }
         }
 
-        public DrawableStoryboard CreateDrawable(WorkingBeatmap working = null) =>
-            new DrawableStoryboard(this);
+        public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
+            new DrawableStoryboard(this, mods);
 
-        public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
+        private static readonly string[] image_extensions = { @".png", @".jpg" };
+
+        public Texture? GetTextureFromPath(string path, TextureStore textureStore)
         {
-            Drawable drawable = null;
-            var storyboardPath = BeatmapInfo.BeatmapSet?.Files.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            string? resolvedPath = null;
 
-            if (storyboardPath != null)
-                drawable = new Sprite { Texture = textureStore.Get(storyboardPath) };
-            // if the texture isn't available locally in the beatmap, some storyboards choose to source from the underlying skin lookup hierarchy.
-            else if (UseSkinSprites)
-                drawable = new SkinnableSprite(path);
+            if (Path.HasExtension(path))
+            {
+                resolvedPath = BeatmapInfo.BeatmapSet?.GetPathForFile(path);
+            }
+            else
+            {
+                // Just doing this extension logic locally here for simplicity.
+                //
+                // A more "sane" path may be to use the ISkinSource.GetTexture path (which will use the extensions of the underlying TextureStore),
+                // but comes with potential complexity (what happens if the user has beatmap skins disabled?).
+                foreach (string ext in image_extensions)
+                {
+                    if ((resolvedPath = BeatmapInfo.BeatmapSet?.GetPathForFile($"{path}{ext}")) != null)
+                        break;
+                }
+            }
 
-            return drawable;
+            if (!string.IsNullOrEmpty(resolvedPath))
+                return textureStore.Get(resolvedPath);
+
+            return null;
         }
     }
 }

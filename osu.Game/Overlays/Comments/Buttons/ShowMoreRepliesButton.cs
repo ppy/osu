@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -9,10 +11,11 @@ using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
 using osuTK;
 using osu.Framework.Allocation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
-    public class ShowMoreRepliesButton : LoadingButton
+    public partial class ShowMoreRepliesButton : LoadingButton
     {
         protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
@@ -38,7 +41,7 @@ namespace osu.Game.Overlays.Comments.Buttons
             {
                 AlwaysPresent = true,
                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                Text = "show more"
+                Text = CommonStrings.ButtonsShowMore
             }
         };
 

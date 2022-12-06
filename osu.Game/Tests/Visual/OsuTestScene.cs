@@ -1,10 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -26,29 +30,25 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
     [ExcludeFromDynamicCompile]
-    public abstract class OsuTestScene : TestScene
+    public abstract partial class OsuTestScene : TestScene
     {
-        protected Bindable<WorkingBeatmap> Beatmap { get; private set; }
+        [Cached]
+        protected Bindable<WorkingBeatmap> Beatmap { get; } = new Bindable<WorkingBeatmap>();
 
-        protected Bindable<RulesetInfo> Ruleset;
+        [Cached]
+        protected Bindable<RulesetInfo> Ruleset { get; } = new Bindable<RulesetInfo>();
 
-        protected Bindable<IReadOnlyList<Mod>> SelectedMods;
+        [Cached]
+        protected Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        protected new OsuScreenDependencies Dependencies { get; private set; }
-
-        private DrawableRulesetDependencies rulesetDependencies;
-
-        private Lazy<Storage> localStorage;
-        protected Storage LocalStorage => localStorage.Value;
-
-        private Lazy<DatabaseContextFactory> contextFactory;
+        protected new DependencyContainer Dependencies { get; private set; }
 
         protected IResourceStore<byte[]> Resources;
 
@@ -65,8 +65,6 @@ namespace osu.Game.Tests.Visual
 
         private DummyAPIAccess dummyAPI;
 
-        protected DatabaseContextFactory ContextFactory => contextFactory.Value;
-
         /// <summary>
         /// Whether this test scene requires real-world API access.
         /// If true, this will bypass the local <see cref="DummyAPIAccess"/> and use the <see cref="OsuGameBase"/> provided one.
@@ -74,49 +72,81 @@ namespace osu.Game.Tests.Visual
         protected virtual bool UseOnlineAPI => false;
 
         /// <summary>
-        /// When running headless, there is an opportunity to use the host storage rather than creating a second isolated one.
-        /// This is because the host is recycled per TestScene execution in headless at an nunit level.
+        /// A database context factory to be used by test runs. Can be isolated and reset by setting <see cref="UseFreshStoragePerRun"/> to <c>true</c>.
         /// </summary>
-        private Storage isolatedHostStorage;
+        /// <remarks>
+        /// In interactive runs (ie. VisualTests) this will use the user's database if <see cref="UseFreshStoragePerRun"/> is not set to <c>true</c>.
+        /// </remarks>
+        protected RealmAccess Realm => realm.Value;
+
+        private Lazy<RealmAccess> realm;
+
+        /// <summary>
+        /// Whether a fresh storage should be initialised per test (method) run.
+        /// </summary>
+        /// <remarks>
+        /// By default (ie. if not set to <c>true</c>):
+        /// - in interactive runs, the user's storage will be used
+        /// - in headless runs, a shared temporary storage will be used per test class.
+        /// </remarks>
+        protected virtual bool UseFreshStoragePerRun => false;
+
+        /// <summary>
+        /// A storage to be used by test runs. Can be isolated by setting <see cref="UseFreshStoragePerRun"/> to <c>true</c>.
+        /// </summary>
+        /// <remarks>
+        /// In interactive runs (ie. VisualTests) this will use the user's storage if <see cref="UseFreshStoragePerRun"/> is not set to <c>true</c>.
+        /// </remarks>
+        protected Storage LocalStorage => localStorage.Value;
+
+        /// <summary>
+        /// A cache for ruleset configurations to be used in this test scene.
+        /// </summary>
+        /// <remarks>
+        /// This <see cref="IRulesetConfigCache"/> instance is provided to the children of this test scene via DI.
+        /// It is only exposed so that test scenes themselves can access the ruleset config cache in a safe manner
+        /// (<see cref="OsuTestScene"/>s cannot use DI themselves, as they will end up accessing the real cached instance from <see cref="OsuGameBase"/>).
+        /// </remarks>
+        protected IRulesetConfigCache RulesetConfigs { get; private set; }
+
+        private Lazy<Storage> localStorage;
+
+        private Storage headlessHostStorage;
+
+        private DrawableRulesetDependencies rulesetDependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            if (!UseFreshStoragePerRun)
-                isolatedHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
+            var host = parent.Get<GameHost>();
+
+            headlessHostStorage = (host as HeadlessGameHost)?.Storage;
 
             Resources = parent.Get<OsuGameBase>().Resources;
 
-            contextFactory = new Lazy<DatabaseContextFactory>(() =>
-            {
-                var factory = new DatabaseContextFactory(LocalStorage);
-
-                // only reset the database if not using the host storage.
-                // if we reset the host storage, it will delete global key bindings.
-                if (isolatedHostStorage == null)
-                    factory.ResetDatabase();
-
-                using (var usage = factory.Get())
-                    usage.Migrate();
-                return factory;
-            });
+            realm = new Lazy<RealmAccess>(() => new RealmAccess(LocalStorage, OsuGameBase.CLIENT_DATABASE_FILENAME, host.UpdateThread));
 
             RecycleLocalStorage(false);
 
             var baseDependencies = base.CreateChildDependencies(parent);
 
+            // to isolate ruleset configs in tests from the actual database and avoid state pollution problems,
+            // as well as problems due to the implementation details of the "real" implementation (the configs only being available at `LoadComplete()`),
+            // cache a test implementation of the ruleset config cache over the "real" one.
+            var isolatedBaseDependencies = new DependencyContainer(baseDependencies);
+            isolatedBaseDependencies.CacheAs(RulesetConfigs = new TestRulesetConfigCache());
+            baseDependencies = isolatedBaseDependencies;
+
             var providedRuleset = CreateRuleset();
             if (providedRuleset != null)
-                baseDependencies = rulesetDependencies = new DrawableRulesetDependencies(providedRuleset, baseDependencies);
+                isolatedBaseDependencies = rulesetDependencies = new DrawableRulesetDependencies(providedRuleset, baseDependencies);
 
-            Dependencies = new OsuScreenDependencies(false, baseDependencies);
+            Dependencies = isolatedBaseDependencies;
 
-            Beatmap = Dependencies.Beatmap;
+            Beatmap.Default = parent.Get<Bindable<WorkingBeatmap>>().Default;
             Beatmap.SetDefault();
 
-            Ruleset = Dependencies.Ruleset;
-            Ruleset.SetDefault();
+            Ruleset.Value = CreateRuleset()?.RulesetInfo ?? parent.Get<RulesetStore>().AvailableRulesets.First();
 
-            SelectedMods = Dependencies.Mods;
             SelectedMods.SetDefault();
 
             if (!UseOnlineAPI)
@@ -129,6 +159,23 @@ namespace osu.Game.Tests.Visual
             return Dependencies;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            var parentBeatmap = Parent.Dependencies.Get<Bindable<WorkingBeatmap>>();
+            parentBeatmap.Value = Beatmap.Value;
+            Beatmap.BindTo(parentBeatmap);
+
+            var parentRuleset = Parent.Dependencies.Get<Bindable<RulesetInfo>>();
+            parentRuleset.Value = Ruleset.Value;
+            Ruleset.BindTo(parentRuleset);
+
+            var parentMods = Parent.Dependencies.Get<Bindable<IReadOnlyList<Mod>>>();
+            parentMods.Value = SelectedMods.Value;
+            SelectedMods.BindTo(parentMods);
+        }
+
         protected override Container<Drawable> Content => content ?? base.Content;
 
         private readonly Container content;
@@ -137,8 +184,6 @@ namespace osu.Game.Tests.Visual
         {
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
-
-        protected virtual bool UseFreshStoragePerRun => false;
 
         public virtual void RecycleLocalStorage(bool isDisposing)
         {
@@ -154,8 +199,16 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
-            localStorage =
-                new Lazy<Storage>(() => isolatedHostStorage ?? new TemporaryNativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            localStorage = new Lazy<Storage>(() =>
+            {
+                // When running headless, there is an opportunity to use the host storage rather than creating a second isolated one.
+                // This is because the host is recycled per TestScene execution in headless at an nunit level.
+                // Importantly, we can't use this optimisation when `UseFreshStoragePerRun` is true, as it doesn't reset per test method.
+                if (!UseFreshStoragePerRun && headlessHostStorage != null)
+                    return headlessHostStorage;
+
+                return new TemporaryNativeStorage($"{GetType().Name}-{Guid.NewGuid()}");
+            });
         }
 
         [Resolved]
@@ -175,51 +228,77 @@ namespace osu.Game.Tests.Visual
 
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
-        protected APIBeatmapSet CreateAPIBeatmapSet(RulesetInfo ruleset)
+        /// <summary>
+        /// Returns a sample API beatmap with a populated beatmap set.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to create the sample model using. osu! ruleset will be used if not specified.</param>
+        protected APIBeatmap CreateAPIBeatmap(RulesetInfo ruleset = null) => CreateAPIBeatmap(CreateBeatmap(ruleset ?? Ruleset.Value).BeatmapInfo);
+
+        /// <summary>
+        /// Constructs a sample API beatmap set containing a beatmap.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to create the sample model using. osu! ruleset will be used if not specified.</param>
+        protected APIBeatmapSet CreateAPIBeatmapSet(RulesetInfo ruleset = null) => CreateAPIBeatmapSet(CreateBeatmap(ruleset ?? Ruleset.Value).BeatmapInfo);
+
+        /// <summary>
+        /// Constructs a sample API beatmap with a populated beatmap set from a given source beatmap.
+        /// </summary>
+        /// <param name="original">The source beatmap.</param>
+        public static APIBeatmap CreateAPIBeatmap(IBeatmapInfo original)
         {
-            var beatmap = CreateBeatmap(ruleset).BeatmapInfo;
+            var beatmapSet = CreateAPIBeatmapSet(original);
+
+            // Avoid circular reference.
+            var beatmap = beatmapSet.Beatmaps.First();
+            beatmapSet.Beatmaps = Array.Empty<APIBeatmap>();
+
+            // Populate the set as that's generally what we expect from the API.
+            beatmap.BeatmapSet = beatmapSet;
+
+            return beatmap;
+        }
+
+        /// <summary>
+        /// Constructs a sample API beatmap set containing a beatmap from a given source beatmap.
+        /// </summary>
+        /// <param name="original">The source beatmap.</param>
+        public static APIBeatmapSet CreateAPIBeatmapSet(IBeatmapInfo original)
+        {
+            Debug.Assert(original.BeatmapSet != null);
 
             return new APIBeatmapSet
             {
-                Covers = beatmap.BeatmapSet.Covers,
-                OnlineID = beatmap.BeatmapSet.OnlineID,
-                Status = beatmap.BeatmapSet.Status,
-                Preview = beatmap.BeatmapSet.Preview,
-                HasFavourited = beatmap.BeatmapSet.HasFavourited,
-                PlayCount = beatmap.BeatmapSet.PlayCount,
-                FavouriteCount = beatmap.BeatmapSet.FavouriteCount,
-                BPM = beatmap.BeatmapSet.BPM,
-                HasExplicitContent = beatmap.BeatmapSet.HasExplicitContent,
-                HasVideo = beatmap.BeatmapSet.HasVideo,
-                HasStoryboard = beatmap.BeatmapSet.HasStoryboard,
-                Submitted = beatmap.BeatmapSet.Submitted,
-                Ranked = beatmap.BeatmapSet.Ranked,
-                LastUpdated = beatmap.BeatmapSet.LastUpdated,
-                TrackId = beatmap.BeatmapSet.TrackId,
-                Title = beatmap.BeatmapSet.Metadata.Title,
-                TitleUnicode = beatmap.BeatmapSet.Metadata.TitleUnicode,
-                Artist = beatmap.BeatmapSet.Metadata.Artist,
-                ArtistUnicode = beatmap.BeatmapSet.Metadata.ArtistUnicode,
-                Author = beatmap.BeatmapSet.Metadata.Author,
-                AuthorID = beatmap.BeatmapSet.Metadata.AuthorID,
-                AuthorString = beatmap.BeatmapSet.Metadata.AuthorString,
-                Availability = beatmap.BeatmapSet.Availability,
-                Genre = beatmap.BeatmapSet.Genre,
-                Language = beatmap.BeatmapSet.Language,
-                Source = beatmap.BeatmapSet.Metadata.Source,
-                Tags = beatmap.BeatmapSet.Metadata.Tags,
+                OnlineID = original.BeatmapSet.OnlineID,
+                Status = BeatmapOnlineStatus.Ranked,
+                Covers = new BeatmapSetOnlineCovers
+                {
+                    Cover = "https://assets.ppy.sh/beatmaps/163112/covers/cover.jpg",
+                    Card = "https://assets.ppy.sh/beatmaps/163112/covers/card.jpg",
+                    List = "https://assets.ppy.sh/beatmaps/163112/covers/list.jpg"
+                },
+                Title = original.Metadata.Title,
+                TitleUnicode = original.Metadata.TitleUnicode,
+                Artist = original.Metadata.Artist,
+                ArtistUnicode = original.Metadata.ArtistUnicode,
+                Author = new APIUser
+                {
+                    Username = original.Metadata.Author.Username,
+                    Id = original.Metadata.Author.OnlineID
+                },
+                Source = original.Metadata.Source,
+                Tags = original.Metadata.Tags,
                 Beatmaps = new[]
                 {
                     new APIBeatmap
                     {
-                        OnlineID = beatmap.OnlineID,
-                        OnlineBeatmapSetID = beatmap.BeatmapSet.OnlineID,
-                        Status = beatmap.Status,
-                        Checksum = beatmap.MD5Hash,
-                        AuthorID = beatmap.Metadata.AuthorID,
-                        RulesetID = beatmap.RulesetID,
-                        StarRating = beatmap.StarDifficulty,
-                        DifficultyName = beatmap.Version,
+                        OnlineID = original.OnlineID,
+                        OnlineBeatmapSetID = original.BeatmapSet.OnlineID,
+                        Status = ((BeatmapInfo)original).Status,
+                        Checksum = original.MD5Hash,
+                        AuthorID = original.Metadata.Author.OnlineID,
+                        RulesetID = original.Ruleset.OnlineID,
+                        StarRating = original.StarRating,
+                        DifficultyName = original.DifficultyName,
                     }
                 }
             };
@@ -231,12 +310,6 @@ namespace osu.Game.Tests.Visual
         protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
             new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, Audio);
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
-        {
-            Ruleset.Value = CreateRuleset()?.RulesetInfo ?? rulesets.AvailableRulesets.First();
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -245,9 +318,6 @@ namespace osu.Game.Tests.Visual
 
             if (MusicController?.TrackLoaded == true)
                 MusicController.Stop();
-
-            if (contextFactory?.IsValueCreated == true)
-                contextFactory.Value.ResetDatabase();
 
             RecycleLocalStorage(true);
         }
@@ -295,6 +365,11 @@ namespace osu.Game.Tests.Visual
                 }
                 else
                     track = audio?.Tracks.GetVirtual(trackLength);
+
+                // We are guaranteed to have a virtual track.
+                // To ease testability, ensure the track is available from point of construction.
+                // (Usually this would be done by MusicController for us).
+                LoadTrack();
             }
 
             ~ClockBackedTestWorkingBeatmap()
@@ -304,6 +379,13 @@ namespace osu.Game.Tests.Visual
             }
 
             protected override Track GetBeatmapTrack() => track;
+
+            public override bool TryTransferTrack(WorkingBeatmap target)
+            {
+                // Our track comes from a local track store that's disposed on finalizer,
+                // therefore it's unsafe to transfer it to another working beatmap.
+                return false;
+            }
 
             public class TrackVirtualStore : AudioCollectionManager<Track>, ITrackStore
             {
@@ -316,15 +398,15 @@ namespace osu.Game.Tests.Visual
 
                 public Track Get(string name) => throw new NotImplementedException();
 
-                public Task<Track> GetAsync(string name) => throw new NotImplementedException();
+                public Task<Track> GetAsync(string name, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
                 public Stream GetStream(string name) => throw new NotImplementedException();
 
                 public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
 
-                public Track GetVirtual(double length = double.PositiveInfinity)
+                public Track GetVirtual(double length = double.PositiveInfinity, string name = "virtual")
                 {
-                    var track = new TrackVirtualManual(referenceClock) { Length = length };
+                    var track = new TrackVirtualManual(referenceClock, name) { Length = length };
                     AddItem(track);
                     return track;
                 }
@@ -339,7 +421,8 @@ namespace osu.Game.Tests.Visual
 
                 private bool running;
 
-                public TrackVirtualManual(IFrameBasedClock referenceClock)
+                public TrackVirtualManual(IFrameBasedClock referenceClock, string name = "virtual")
+                    : base(name)
                 {
                     this.referenceClock = referenceClock;
                     Length = double.PositiveInfinity;
@@ -353,9 +436,17 @@ namespace osu.Game.Tests.Visual
                     return accumulated == seek;
                 }
 
+                public override Task<bool> SeekAsync(double seek) => Task.FromResult(Seek(seek));
+
                 public override void Start()
                 {
                     running = true;
+                }
+
+                public override Task StartAsync()
+                {
+                    Start();
+                    return Task.CompletedTask;
                 }
 
                 public override void Reset()
@@ -371,6 +462,12 @@ namespace osu.Game.Tests.Visual
                         running = false;
                         lastReferenceTime = null;
                     }
+                }
+
+                public override Task StopAsync()
+                {
+                    Stop();
+                    return Task.CompletedTask;
                 }
 
                 public override bool IsRunning => running;
@@ -406,7 +503,7 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        public class OsuTestSceneTestRunner : OsuGameBase, ITestSceneTestRunner
+        public partial class OsuTestSceneTestRunner : OsuGameBase, ITestSceneTestRunner
         {
             private TestSceneTestRunner.TestRunner runner;
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -13,14 +15,15 @@ using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class LeaderboardModSelector : CompositeDrawable
+    public partial class LeaderboardModSelector : CompositeDrawable
     {
         public readonly BindableList<IMod> SelectedMods = new BindableList<IMod>();
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public readonly Bindable<IRulesetInfo> Ruleset = new Bindable<IRulesetInfo>();
 
         private readonly FillFlowContainer<ModButton> modsContainer;
 
@@ -45,7 +48,10 @@ namespace osu.Game.Overlays.BeatmapSet
             Ruleset.BindValueChanged(onRulesetChanged, true);
         }
 
-        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
+        [Resolved]
+        private IRulesetStore rulesets { get; set; }
+
+        private void onRulesetChanged(ValueChangedEvent<IRulesetInfo> ruleset)
         {
             SelectedMods.Clear();
             modsContainer.Clear();
@@ -53,8 +59,13 @@ namespace osu.Game.Overlays.BeatmapSet
             if (ruleset.NewValue == null)
                 return;
 
+            var rulesetInstance = rulesets.GetRuleset(ruleset.NewValue.OnlineID)?.CreateInstance();
+
+            if (rulesetInstance == null)
+                return;
+
             modsContainer.Add(new ModButton(new ModNoMod()));
-            modsContainer.AddRange(ruleset.NewValue.CreateInstance().AllMods.Where(m => m.UserPlayable).Select(m => new ModButton(m)));
+            modsContainer.AddRange(rulesetInstance.AllMods.Where(m => m.UserPlayable).Select(m => new ModButton(m)));
 
             modsContainer.ForEach(button =>
             {
@@ -96,7 +107,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public void DeselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
 
-        private class ModButton : ModIcon
+        private partial class ModButton : ModIcon
         {
             private const int duration = 200;
 

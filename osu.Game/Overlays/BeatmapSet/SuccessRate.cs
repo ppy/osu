@@ -1,38 +1,42 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Select.Details;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class SuccessRate : Container
+    public partial class SuccessRate : Container
     {
         protected readonly FailRetryGraph Graph;
 
         private readonly FillFlowContainer header;
-        private readonly OsuSpriteText successPercent;
+        private readonly SuccessRatePercentage successPercent;
         private readonly Bar successRate;
         private readonly Container percentContainer;
 
-        private BeatmapInfo beatmapInfo;
+        private APIBeatmap beatmap;
 
-        public BeatmapInfo BeatmapInfo
+        public APIBeatmap Beatmap
         {
-            get => beatmapInfo;
+            get => beatmap;
             set
             {
-                if (value == beatmapInfo) return;
+                if (value == beatmap) return;
 
-                beatmapInfo = value;
+                beatmap = value;
 
                 updateDisplay();
             }
@@ -40,15 +44,16 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            int passCount = beatmapInfo?.OnlineInfo?.PassCount ?? 0;
-            int playCount = beatmapInfo?.OnlineInfo?.PlayCount ?? 0;
+            int passCount = beatmap?.PassCount ?? 0;
+            int playCount = beatmap?.PlayCount ?? 0;
 
-            var rate = playCount != 0 ? (float)passCount / playCount : 0;
+            float rate = playCount != 0 ? (float)passCount / playCount : 0;
             successPercent.Text = rate.ToLocalisableString(@"0.#%");
+            successPercent.TooltipText = $"{passCount} / {playCount}";
             successRate.Length = rate;
             percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
 
-            Graph.FailTimes = beatmapInfo?.FailTimes;
+            Graph.FailTimes = beatmap?.FailTimes;
         }
 
         public SuccessRate()
@@ -80,7 +85,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Width = 0f,
-                            Child = successPercent = new OsuSpriteText
+                            Child = successPercent = new SuccessRatePercentage
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopCentre,
@@ -120,6 +125,11 @@ namespace osu.Game.Overlays.BeatmapSet
             base.UpdateAfterChildren();
 
             Graph.Padding = new MarginPadding { Top = header.DrawHeight };
+        }
+
+        private partial class SuccessRatePercentage : OsuSpriteText, IHasTooltip
+        {
+            public LocalisableString TooltipText { get; set; }
         }
     }
 }

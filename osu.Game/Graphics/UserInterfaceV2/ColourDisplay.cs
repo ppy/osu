@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,6 +16,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -21,7 +24,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
     /// <summary>
     /// A component which displays a colour along with related description text.
     /// </summary>
-    public class ColourDisplay : CompositeDrawable, IHasCurrentValue<Colour4>
+    public partial class ColourDisplay : CompositeDrawable, IHasCurrentValue<Colour4>
     {
         /// <summary>
         /// Invoked when the user has requested the colour corresponding to this <see cref="ColourDisplay"/>
@@ -83,7 +86,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             };
         }
 
-        private class ColourCircle : OsuClickableContainer, IHasPopover, IHasContextMenu
+        private partial class ColourCircle : OsuClickableContainer, IHasPopover, IHasContextMenu
         {
             public Bindable<Colour4> Current { get; } = new Bindable<Colour4>();
 
@@ -139,7 +142,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             public MenuItem[] ContextMenuItems => new MenuItem[]
             {
-                new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke())
+                new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => DeleteRequested?.Invoke())
             };
         }
     }

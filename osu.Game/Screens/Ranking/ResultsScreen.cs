@@ -1,10 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -25,7 +29,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public abstract class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
+    public abstract partial class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         protected const float BACKGROUND_BLUR = 20;
         private static readonly float screen_height = 768 - TwoLayerButton.SIZE_EXTENDED.Y;
@@ -58,6 +62,8 @@ namespace osu.Game.Screens.Ranking
         private readonly bool allowRetry;
         private readonly bool allowWatchingReplay;
 
+        private Sample popInSample;
+
         protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
         {
             Score = score;
@@ -68,9 +74,11 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             FillFlowContainer buttons;
+
+            popInSample = audio.Samples.Get(@"UI/overlay-pop-in");
 
             InternalChild = new GridContainer
             {
@@ -169,7 +177,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        player?.Restart();
+                        player?.Restart(true);
                     },
                 });
             }
@@ -231,9 +239,9 @@ namespace osu.Game.Screens.Ranking
             lastFetchCompleted = true;
         });
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             ApplyToBackground(b =>
             {
@@ -242,11 +250,13 @@ namespace osu.Game.Screens.Ranking
             });
 
             bottomPanel.FadeTo(1, 250);
+
+            popInSample?.Play();
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            if (base.OnExiting(next))
+            if (base.OnExiting(e))
                 return true;
 
             this.FadeOut(100);
@@ -287,7 +297,7 @@ namespace osu.Game.Screens.Ranking
                 detachedPanelContainer.Add(expandedPanel);
 
                 // Move into its original location in the local container first, then to the final location.
-                var origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos).X;
+                float origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos).X;
                 expandedPanel.MoveToX(origLocation)
                              .Then()
                              .MoveToX(StatisticsPanel.SIDE_PADDING, 150, Easing.OutQuint);
@@ -307,14 +317,14 @@ namespace osu.Game.Screens.Ranking
                 var screenSpacePos = detachedPanel.ScreenSpaceDrawQuad.TopLeft;
 
                 // Remove from the local container and re-attach.
-                detachedPanelContainer.Remove(detachedPanel);
+                detachedPanelContainer.Remove(detachedPanel, false);
                 ScorePanelList.Attach(detachedPanel);
 
                 // Move into its original location in the attached container first, then to the final location.
-                var origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos);
-                detachedPanel.MoveTo(origLocation)
+                float origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos).X;
+                detachedPanel.MoveToX(origLocation)
                              .Then()
-                             .MoveTo(new Vector2(0, origLocation.Y), 150, Easing.OutQuint);
+                             .MoveToX(0, 150, Easing.OutQuint);
 
                 // Show contracted panels.
                 foreach (var contracted in ScorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
@@ -330,6 +340,9 @@ namespace osu.Game.Screens.Ranking
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.Select:
@@ -344,7 +357,7 @@ namespace osu.Game.Screens.Ranking
         {
         }
 
-        protected class VerticalScrollContainer : OsuScrollContainer
+        protected partial class VerticalScrollContainer : OsuScrollContainer
         {
             protected override Container<Drawable> Content => content;
 

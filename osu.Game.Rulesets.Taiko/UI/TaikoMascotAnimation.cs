@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public sealed class TaikoMascotAnimation : BeatSyncedContainer
+    public sealed partial class TaikoMascotAnimation : BeatSyncedContainer
     {
         private readonly TextureAnimation textureAnimation;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        private class ManualMascotTextureAnimation : TextureAnimation
+        private partial class ManualMascotTextureAnimation : TextureAnimation
         {
             private readonly TaikoMascotAnimationState state;
 
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             [BackgroundDependencyLoader]
             private void load(ISkinSource source)
             {
-                ISkin skin = source.FindProvider(s => getAnimationFrame(s, state, 0) != null);
+                ISkin? skin = source.FindProvider(s => getAnimationFrame(s, state, 0) != null);
 
                 if (skin == null) return;
 
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        private class ClearMascotTextureAnimation : TextureAnimation
+        private partial class ClearMascotTextureAnimation : TextureAnimation
         {
             private const float clear_animation_speed = 1000 / 10f;
 
@@ -118,11 +118,11 @@ namespace osu.Game.Rulesets.Taiko.UI
             [BackgroundDependencyLoader]
             private void load(ISkinSource source)
             {
-                ISkin skin = source.FindProvider(s => getAnimationFrame(s, TaikoMascotAnimationState.Clear, 0) != null);
+                ISkin? skin = source.FindProvider(s => getAnimationFrame(s, TaikoMascotAnimationState.Clear, 0) != null);
 
                 if (skin == null) return;
 
-                foreach (var frameIndex in clear_animation_sequence)
+                foreach (int frameIndex in clear_animation_sequence)
                 {
                     var texture = getAnimationFrame(skin, TaikoMascotAnimationState.Clear, frameIndex);
 
@@ -135,12 +135,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        private static Texture getAnimationFrame(ISkin skin, TaikoMascotAnimationState state, int frameIndex)
+        private static Texture? getAnimationFrame(ISkin skin, TaikoMascotAnimationState state, int frameIndex)
         {
-            var texture = skin.GetTexture($"pippidon{state.ToString().ToLower()}{frameIndex}");
+            var texture = skin.GetTexture($"pippidon{state.ToString().ToLowerInvariant()}{frameIndex}");
 
             if (frameIndex == 0 && texture == null)
-                texture = skin.GetTexture($"pippidon{state.ToString().ToLower()}");
+                texture = skin.GetTexture($"pippidon{state.ToString().ToLowerInvariant()}");
 
             return texture;
         }

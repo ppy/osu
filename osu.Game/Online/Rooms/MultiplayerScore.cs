@@ -1,17 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Online.Rooms
 {
@@ -21,7 +25,7 @@ namespace osu.Game.Online.Rooms
         public long ID { get; set; }
 
         [JsonProperty("user")]
-        public User User { get; set; }
+        public APIUser User { get; set; }
 
         [JsonProperty("rank")]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -61,19 +65,21 @@ namespace osu.Game.Online.Rooms
         [CanBeNull]
         public MultiplayerScoresAround ScoresAround { get; set; }
 
-        public ScoreInfo CreateScoreInfo(PlaylistItem playlistItem)
+        public ScoreInfo CreateScoreInfo(ScoreManager scoreManager, RulesetStore rulesets, PlaylistItem playlistItem, [NotNull] BeatmapInfo beatmap)
         {
-            var rulesetInstance = playlistItem.Ruleset.Value.CreateInstance();
+            var ruleset = rulesets.GetRuleset(playlistItem.RulesetID);
+            if (ruleset == null)
+                throw new InvalidOperationException($"Couldn't create score with unknown ruleset: {playlistItem.RulesetID}");
+
+            var rulesetInstance = ruleset.CreateInstance();
 
             var scoreInfo = new ScoreInfo
             {
-                OnlineScoreID = ID,
+                OnlineID = ID,
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
-                BeatmapInfo = playlistItem.Beatmap.Value,
-                BeatmapInfoID = playlistItem.BeatmapID,
-                Ruleset = playlistItem.Ruleset.Value,
-                RulesetID = playlistItem.RulesetID,
+                BeatmapInfo = beatmap,
+                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {playlistItem.RulesetID} not found locally"),
                 Statistics = Statistics,
                 User = User,
                 Accuracy = Accuracy,
@@ -83,6 +89,8 @@ namespace osu.Game.Online.Rooms
                 Mods = Mods?.Select(m => m.ToMod(rulesetInstance)).ToArray() ?? Array.Empty<Mod>(),
                 Position = Position,
             };
+
+            scoreManager.PopulateMaximumStatistics(scoreInfo);
 
             return scoreInfo;
         }

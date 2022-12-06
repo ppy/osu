@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -16,11 +19,9 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens.Edit;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -30,9 +31,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     /// <summary>
     /// A visualisation of a single <see cref="PathControlPoint"/> in a <see cref="Slider"/>.
     /// </summary>
-    public class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
+    public partial class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
     {
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
+
+        public Action<PathControlPoint> DragStarted;
+        public Action<DragEvent> DragInProgress;
+        public Action DragEnded;
+
         public List<PathControlPoint> PointsInSegment;
 
         public readonly BindableBool IsSelected = new BindableBool();
@@ -42,17 +48,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private readonly Container marker;
         private readonly Drawable markerRing;
 
-        [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler changeHandler { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private IPositionSnapProvider snapProvider { get; set; }
-
         [Resolved]
         private OsuColour colours { get; set; }
 
         private IBindable<Vector2> sliderPosition;
         private IBindable<float> sliderScale;
+
+        [UsedImplicitly]
+        private readonly IBindable<int> sliderVersion;
 
         public PathControlPointPiece(Slider slider, PathControlPoint controlPoint)
         {
@@ -62,11 +65,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             // we don't want to run the path type update on construction as it may inadvertently change the slider.
             cachePoints(slider);
 
-            slider.Path.Version.BindValueChanged(_ =>
+            sliderVersion = slider.Path.Version.GetBoundCopy();
+
+            // schedule ensure that updates are only applied after all operations from a single frame are applied.
+            // this avoids inadvertently changing the slider path type for batch operations.
+            sliderVersion.BindValueChanged(_ => Scheduler.AddOnce(() =>
             {
                 cachePoints(slider);
                 updatePathType();
-            });
+            }));
 
             controlPoint.Changed += updateMarkerDisplay;
 
@@ -138,6 +145,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             updateMarkerDisplay();
         }
 
+        // Used to pair up mouse down/drag events with their corresponding mouse up events,
+        // to avoid deselecting the piece by accident when the mouse up corresponding to the mouse down/drag fires.
+        private bool keepSelection;
+
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (RequestSelection == null)
@@ -146,22 +157,41 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (e.Button)
             {
                 case MouseButton.Left:
+                    // if control is pressed, do not do anything as the user may be adding to current selection
+                    // or dragging all currently selected control points.
+                    // if it isn't and the user's intent is to deselect, deselection will happen on mouse up.
+                    if (e.ControlPressed && IsSelected.Value)
+                        return true;
+
                     RequestSelection.Invoke(this, e);
+                    keepSelection = true;
+
                     return true;
 
                 case MouseButton.Right:
                     if (!IsSelected.Value)
                         RequestSelection.Invoke(this, e);
+
+                    keepSelection = true;
                     return false; // Allow context menu to show
             }
 
             return false;
         }
 
-        protected override bool OnClick(ClickEvent e) => RequestSelection != null;
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            base.OnMouseUp(e);
 
-        private Vector2 dragStartPosition;
-        private PathType? dragPathType;
+            // ctrl+click deselects this piece, but only if this event
+            // wasn't immediately preceded by a matching mouse down or drag.
+            if (IsSelected.Value && e.ControlPressed && !keepSelection)
+                IsSelected.Value = false;
+
+            keepSelection = false;
+        }
+
+        protected override bool OnClick(ClickEvent e) => RequestSelection != null;
 
         protected override bool OnDragStart(DragStartEvent e)
         {
@@ -170,54 +200,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             if (e.Button == MouseButton.Left)
             {
-                dragStartPosition = ControlPoint.Position;
-                dragPathType = PointsInSegment[0].Type;
-
-                changeHandler?.BeginChange();
+                DragStarted?.Invoke(ControlPoint);
+                keepSelection = true;
                 return true;
             }
 
             return false;
         }
 
-        protected override void OnDrag(DragEvent e)
-        {
-            Vector2[] oldControlPoints = slider.Path.ControlPoints.Select(cp => cp.Position).ToArray();
-            var oldPosition = slider.Position;
-            var oldStartTime = slider.StartTime;
+        protected override void OnDrag(DragEvent e) => DragInProgress?.Invoke(e);
 
-            if (ControlPoint == slider.Path.ControlPoints[0])
-            {
-                // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
-                var result = snapProvider?.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition);
-
-                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? e.ScreenSpaceMousePosition) - slider.Position;
-
-                slider.Position += movementDelta;
-                slider.StartTime = result?.Time ?? slider.StartTime;
-
-                // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
-                for (int i = 1; i < slider.Path.ControlPoints.Count; i++)
-                    slider.Path.ControlPoints[i].Position -= movementDelta;
-            }
-            else
-                ControlPoint.Position = dragStartPosition + (e.MousePosition - e.MouseDownPosition);
-
-            if (!slider.Path.HasValidLength)
-            {
-                for (var i = 0; i < slider.Path.ControlPoints.Count; i++)
-                    slider.Path.ControlPoints[i].Position = oldControlPoints[i];
-
-                slider.Position = oldPosition;
-                slider.StartTime = oldStartTime;
-                return;
-            }
-
-            // Maintain the path type in case it got defaulted to bezier at some point during the drag.
-            PointsInSegment[0].Type = dragPathType;
-        }
-
-        protected override void OnDragEnd(DragEndEvent e) => changeHandler?.EndChange();
+        protected override void OnDragEnd(DragEndEvent e) => DragEnded?.Invoke();
 
         private void cachePoints(Slider slider) => PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
 
@@ -267,7 +260,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (pathType)
             {
                 case PathType.Catmull:
-                    return colours.Seafoam;
+                    return colours.SeaFoam;
 
                 case PathType.Bezier:
                     return colours.Pink;

@@ -3,54 +3,46 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using static osu.Game.Skinning.LegacySkinConfiguration;
+using static osu.Game.Skinning.SkinConfiguration;
 
 namespace osu.Game.Skinning
 {
-    public static class LegacySkinExtensions
+    public static partial class LegacySkinExtensions
     {
-        [CanBeNull]
-        public static Drawable GetAnimation(this ISkin source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-",
-                                            bool startAtCurrentTime = true, double? frameLength = null)
+        public static Drawable? GetAnimation(this ISkin? source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-",
+                                             bool startAtCurrentTime = true, double? frameLength = null)
             => source.GetAnimation(componentName, default, default, animatable, looping, applyConfigFrameRate, animationSeparator, startAtCurrentTime, frameLength);
 
-        [CanBeNull]
-        public static Drawable GetAnimation(this ISkin source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, bool looping, bool applyConfigFrameRate = false,
-                                            string animationSeparator = "-",
-                                            bool startAtCurrentTime = true, double? frameLength = null)
+        public static Drawable? GetAnimation(this ISkin? source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, bool looping, bool applyConfigFrameRate = false,
+                                             string animationSeparator = "-", bool startAtCurrentTime = true, double? frameLength = null)
         {
-            Texture texture;
-
-            // find the first source which provides either the animated or non-animated version.
-            ISkin skin = (source as ISkinSource)?.FindProvider(s =>
-            {
-                if (animatable && s.GetTexture(getFrameName(0)) != null)
-                    return true;
-
-                return s.GetTexture(componentName, wrapModeS, wrapModeT) != null;
-            }) ?? source;
-
-            if (skin == null)
+            if (source == null)
                 return null;
 
-            if (animatable)
-            {
-                var textures = getTextures().ToArray();
+            var textures = GetTextures(source, componentName, wrapModeS, wrapModeT, animatable, animationSeparator, out var retrievalSource);
 
-                if (textures.Length > 0)
-                {
+            switch (textures.Length)
+            {
+                case 0:
+                    return null;
+
+                case 1:
+                    return new Sprite { Texture = textures[0] };
+
+                default:
+                    Debug.Assert(retrievalSource != null);
+
                     var animation = new SkinnableTextureAnimation(startAtCurrentTime)
                     {
-                        DefaultFrameLength = frameLength ?? getFrameLength(skin, applyConfigFrameRate, textures),
+                        DefaultFrameLength = frameLength ?? getFrameLength(retrievalSource, applyConfigFrameRate, textures),
                         Loop = looping,
                     };
 
@@ -58,19 +50,46 @@ namespace osu.Game.Skinning
                         animation.AddFrame(t);
 
                     return animation;
-                }
+            }
+        }
+
+        public static Texture[] GetTextures(this ISkin? source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, string animationSeparator, out ISkin? retrievalSource)
+        {
+            retrievalSource = null;
+
+            if (source == null)
+                return Array.Empty<Texture>();
+
+            // find the first source which provides either the animated or non-animated version.
+            retrievalSource = (source as ISkinSource)?.FindProvider(s =>
+            {
+                if (animatable && s.GetTexture(getFrameName(0)) != null)
+                    return true;
+
+                return s.GetTexture(componentName, wrapModeS, wrapModeT) != null;
+            }) ?? source;
+
+            if (animatable)
+            {
+                var textures = getTextures(retrievalSource).ToArray();
+
+                if (textures.Length > 0)
+                    return textures;
             }
 
             // if an animation was not allowed or not found, fall back to a sprite retrieval.
-            if ((texture = skin.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
-                return new Sprite { Texture = texture };
+            var singleTexture = retrievalSource.GetTexture(componentName, wrapModeS, wrapModeT);
 
-            return null;
+            return singleTexture != null
+                ? new[] { singleTexture }
+                : Array.Empty<Texture>();
 
-            IEnumerable<Texture> getTextures()
+            IEnumerable<Texture> getTextures(ISkin skin)
             {
                 for (int i = 0; true; i++)
                 {
+                    Texture? texture;
+
                     if ((texture = skin.GetTexture(getFrameName(i), wrapModeS, wrapModeT)) == null)
                         break;
 
@@ -127,10 +146,10 @@ namespace osu.Game.Skinning
             }
         }
 
-        public class SkinnableTextureAnimation : TextureAnimation
+        public partial class SkinnableTextureAnimation : TextureAnimation
         {
             [Resolved(canBeNull: true)]
-            private IAnimationTimeReference timeReference { get; set; }
+            private IAnimationTimeReference? timeReference { get; set; }
 
             private readonly Bindable<double> animationStartTime = new BindableDouble();
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -17,7 +19,7 @@ using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Screens
 {
-    public class Loader : StartupScreen
+    public partial class Loader : StartupScreen
     {
         private bool showDisclaimer;
 
@@ -63,11 +65,12 @@ namespace osu.Game.Screens
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             LoadComponentAsync(precompiler = CreateShaderPrecompiler(), AddInternal);
+
             LoadComponentAsync(loadableScreen = CreateLoadableScreen());
 
             LoadComponentAsync(spinner = new LoadingSpinner(true, true)
@@ -86,7 +89,7 @@ namespace osu.Game.Screens
 
         private void checkIfLoaded()
         {
-            if (loadableScreen.LoadState != LoadState.Ready || !precompiler.FinishedCompiling)
+            if (loadableScreen?.LoadState != LoadState.Ready || !precompiler.FinishedCompiling)
             {
                 Schedule(checkIfLoaded);
                 return;
@@ -113,7 +116,7 @@ namespace osu.Game.Screens
         /// <summary>
         /// Compiles a set of shaders before continuing. Attempts to draw some frames between compilation by limiting to one compile per draw frame.
         /// </summary>
-        public class ShaderPrecompiler : Drawable
+        public partial class ShaderPrecompiler : Drawable
         {
             private readonly List<IShader> loadTargets = new List<IShader>();
 
@@ -122,13 +125,11 @@ namespace osu.Game.Screens
             [BackgroundDependencyLoader]
             private void load(ShaderManager manager)
             {
-                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED));
-                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.BLUR));
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE));
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.BLUR));
 
                 loadTargets.Add(manager.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE));
 
-                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE_ROUNDED));
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE));
             }
 

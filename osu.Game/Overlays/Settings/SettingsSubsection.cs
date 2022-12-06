@@ -1,12 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
@@ -15,7 +16,7 @@ using osu.Game.Graphics;
 namespace osu.Game.Overlays.Settings
 {
     [ExcludeFromDynamicCompile]
-    public abstract class SettingsSubsection : FillFlowContainer, IHasFilterableChildren
+    public abstract partial class SettingsSubsection : FillFlowContainer, IFilterable
     {
         protected override Container<Drawable> Content => FlowContent;
 
@@ -23,13 +24,7 @@ namespace osu.Game.Overlays.Settings
 
         protected abstract LocalisableString Header { get; }
 
-        public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
-
-        // FilterTerms should contains both original string and localised string for user to search.
-        // Since LocalisableString is unable to get original string at this time (2021-08-14),
-        // only call .ToString() to use localised one.
-        // TODO: Update here when FilterTerms accept LocalisableString.
-        public virtual IEnumerable<string> FilterTerms => new[] { Header.ToString() };
+        public virtual IEnumerable<LocalisableString> FilterTerms => new[] { Header };
 
         public bool MatchingFilter
         {

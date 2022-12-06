@@ -8,9 +8,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-
-#nullable enable
 
 namespace osu.Game.Screens.Play
 {
@@ -39,6 +38,23 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public readonly Score Score;
 
+        public readonly ScoreProcessor ScoreProcessor;
+
+        /// <summary>
+        /// Whether gameplay completed without the user failing.
+        /// </summary>
+        public bool HasPassed { get; set; }
+
+        /// <summary>
+        /// Whether the user failed during gameplay.
+        /// </summary>
+        public bool HasFailed { get; set; }
+
+        /// <summary>
+        /// Whether the user quit gameplay without having either passed or failed.
+        /// </summary>
+        public bool HasQuit { get; set; }
+
         /// <summary>
         /// A bindable tracking the last judgement result applied to any hit object.
         /// </summary>
@@ -46,12 +62,20 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
 
-        public GameplayState(IBeatmap beatmap, Ruleset ruleset, IReadOnlyList<Mod>? mods = null, Score? score = null)
+        public GameplayState(IBeatmap beatmap, Ruleset ruleset, IReadOnlyList<Mod>? mods = null, Score? score = null, ScoreProcessor? scoreProcessor = null)
         {
             Beatmap = beatmap;
             Ruleset = ruleset;
-            Score = score ?? new Score();
-            Mods = mods ?? ArraySegment<Mod>.Empty;
+            Score = score ?? new Score
+            {
+                ScoreInfo =
+                {
+                    BeatmapInfo = beatmap.BeatmapInfo,
+                    Ruleset = ruleset.RulesetInfo
+                }
+            };
+            Mods = mods ?? Array.Empty<Mod>();
+            ScoreProcessor = scoreProcessor ?? ruleset.CreateScoreProcessor();
         }
 
         /// <summary>

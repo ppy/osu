@@ -1,18 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class Info : Container
+    public partial class Info : Container
     {
         private const float metadata_width = 175;
         private const float spacing = 20;
@@ -22,12 +24,12 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box background;
         private readonly SuccessRate successRate;
 
-        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+        public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 
-        public BeatmapInfo BeatmapInfo
+        public APIBeatmap BeatmapInfo
         {
-            get => successRate.BeatmapInfo;
-            set => successRate.BeatmapInfo = value;
+            get => successRate.Beatmap;
+            set => successRate.Beatmap = value;
         }
 
         public Info()
@@ -68,6 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Width = metadata_width,
                             Padding = new MarginPadding { Horizontal = 10 },
                             Margin = new MarginPadding { Right = BeatmapSetOverlay.RIGHT_WIDTH + spacing },
+                            Masking = true,
                             Child = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -115,11 +118,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.ValueChanged += b =>
             {
-                source.Text = b.NewValue?.Metadata.Source ?? string.Empty;
-                tags.Text = b.NewValue?.Metadata.Tags ?? string.Empty;
-                genre.Text = b.NewValue?.OnlineInfo?.Genre.Name ?? string.Empty;
-                language.Text = b.NewValue?.OnlineInfo?.Language.Name ?? string.Empty;
-                var setHasLeaderboard = b.NewValue?.OnlineInfo?.Status > 0;
+                source.Text = b.NewValue?.Source ?? string.Empty;
+                tags.Text = b.NewValue?.Tags ?? string.Empty;
+                genre.Text = b.NewValue?.Genre.Name ?? string.Empty;
+                language.Text = b.NewValue?.Language.Name ?? string.Empty;
+                bool setHasLeaderboard = b.NewValue?.Status > 0;
                 successRate.Alpha = setHasLeaderboard ? 1 : 0;
                 notRankedPlaceholder.Alpha = setHasLeaderboard ? 0 : 1;
                 Height = setHasLeaderboard ? 270 : base_height;

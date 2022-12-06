@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,22 +16,19 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyStageBackground : CompositeDrawable
+    public partial class LegacyStageBackground : CompositeDrawable
     {
-        private readonly StageDefinition stageDefinition;
-
         private Drawable leftSprite;
         private Drawable rightSprite;
         private ColumnFlow<Drawable> columnBackgrounds;
 
-        public LegacyStageBackground(StageDefinition stageDefinition)
+        public LegacyStageBackground()
         {
-            this.stageDefinition = stageDefinition;
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load(ISkinSource skin, StageDefinition stageDefinition)
         {
             string leftImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.LeftStageImage)?.Value
                                ?? "mania-stage-left";
@@ -78,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 rightSprite.Scale = new Vector2(1, DrawHeight / rightSprite.Height);
         }
 
-        private class ColumnBackground : CompositeDrawable
+        private partial class ColumnBackground : CompositeDrawable
         {
             private readonly int columnIndex;
             private readonly bool isLastColumn;
@@ -98,8 +97,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 float rightLineWidth = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.RightLineWidth, columnIndex)?.Value ?? 1;
 
                 bool hasLeftLine = leftLineWidth > 0;
-                bool hasRightLine = rightLineWidth > 0 && skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.4m
-                                    || isLastColumn;
+                bool hasRightLine = (rightLineWidth > 0 && skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value >= 2.4m) || isLastColumn;
 
                 Color4 lineColour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnLineColour, columnIndex)?.Value ?? Color4.White;
                 Color4 backgroundColour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour, columnIndex)?.Value ?? Color4.Black;

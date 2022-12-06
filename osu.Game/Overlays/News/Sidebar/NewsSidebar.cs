@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -11,7 +13,7 @@ using System.Linq;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
-    public class NewsSidebar : OverlaySidebar
+    public partial class NewsSidebar : OverlaySidebar
     {
         [Cached]
         public readonly Bindable<APINewsSidebar> Metadata = new Bindable<APINewsSidebar>();
@@ -56,19 +58,17 @@ namespace osu.Game.Overlays.News.Sidebar
             if (allPosts?.Any() != true)
                 return;
 
-            var lookup = metadata.NewValue.NewsPosts.ToLookup(post => post.PublishedAt.Month);
+            var lookup = metadata.NewValue.NewsPosts.ToLookup(post => (post.PublishedAt.Month, post.PublishedAt.Year));
 
             var keys = lookup.Select(kvp => kvp.Key);
-            var sortedKeys = keys.OrderByDescending(k => k).ToList();
-
-            var year = metadata.NewValue.CurrentYear;
+            var sortedKeys = keys.OrderByDescending(k => k.Year).ThenByDescending(k => k.Month).ToList();
 
             for (int i = 0; i < sortedKeys.Count; i++)
             {
-                var month = sortedKeys[i];
-                var posts = lookup[month];
+                var key = sortedKeys[i];
+                var posts = lookup[key];
 
-                monthsFlow.Add(new MonthSection(month, year, posts)
+                monthsFlow.Add(new MonthSection(key.Month, key.Year, posts)
                 {
                     Expanded = { Value = i == 0 }
                 });

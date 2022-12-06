@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -12,7 +14,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -20,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneSliderApplication : OsuTestScene
+    public partial class TestSceneSliderApplication : OsuTestScene
     {
         [Resolved]
         private SkinManager skinManager { get; set; }
@@ -67,10 +69,10 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("create slider", () =>
             {
-                var tintingSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
-                tintingSkin.Configuration.ConfigDictionary["AllowSliderBallTint"] = "1";
+                var skin = skinManager.GetSkin(DefaultLegacySkin.CreateInfo());
+                var provider = Ruleset.Value.CreateInstance().CreateSkinTransformer(skin, Beatmap.Value.Beatmap);
 
-                Child = new SkinProvidingContainer(tintingSkin)
+                Child = new SkinProvidingContainer(provider)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = dho = new DrawableSlider(prepareObject(new Slider
@@ -89,10 +91,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             AddStep("set accent white", () => dho.AccentColour.Value = Color4.White);
-            AddAssert("ball is white", () => dho.ChildrenOfType<SliderBall>().Single().AccentColour == Color4.White);
+            AddAssert("ball is white", () => dho.ChildrenOfType<LegacySliderBall>().Single().BallColour == Color4.White);
 
             AddStep("set accent red", () => dho.AccentColour.Value = Color4.Red);
-            AddAssert("ball is red", () => dho.ChildrenOfType<SliderBall>().Single().AccentColour == Color4.Red);
+            AddAssert("ball is red", () => dho.ChildrenOfType<LegacySliderBall>().Single().BallColour == Color4.Red);
         }
 
         private Slider prepareObject(Slider slider)

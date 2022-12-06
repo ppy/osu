@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -9,14 +11,14 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuContextMenuSamples : Component
+    public partial class OsuContextMenuSamples : Component
     {
         private Sample sampleClick;
         private Sample sampleOpen;
         private Sample sampleClose;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(AudioManager audio)
         {
             sampleClick = audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
             sampleOpen = audio.Samples.Get(@"UI/dropdown-open");

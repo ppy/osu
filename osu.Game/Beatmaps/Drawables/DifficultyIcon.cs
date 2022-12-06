@@ -1,10 +1,6 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -14,19 +10,17 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class DifficultyIcon : CompositeDrawable, IHasCustomTooltip<DifficultyIconTooltipContent>
+    public partial class DifficultyIcon : CompositeDrawable, IHasCustomTooltip<DifficultyIconTooltipContent>, IHasCurrentValue<StarDifficulty>
     {
-        private readonly Container iconContainer;
-
         /// <summary>
         /// Size of this difficulty icon.
         /// </summary>
@@ -36,51 +30,51 @@ namespace osu.Game.Beatmaps.Drawables
             set => iconContainer.Size = value;
         }
 
-        [NotNull]
-        private readonly BeatmapInfo beatmapInfo;
+        /// <summary>
+        /// Whether to display a tooltip on hover. Only works if a beatmap was provided at construction time.
+        /// </summary>
+        public bool ShowTooltip { get; set; } = true;
 
-        [CanBeNull]
-        private readonly RulesetInfo ruleset;
+        private readonly IBeatmapInfo? beatmap;
 
-        [CanBeNull]
-        private readonly IReadOnlyList<Mod> mods;
+        private readonly IRulesetInfo ruleset;
 
-        private readonly bool shouldShowTooltip;
+        private Drawable background = null!;
 
-        private readonly bool performBackgroundDifficultyLookup;
+        private readonly Container iconContainer;
 
-        private readonly Bindable<StarDifficulty> difficultyBindable = new Bindable<StarDifficulty>();
+        private readonly BindableWithCurrent<StarDifficulty> difficulty = new BindableWithCurrent<StarDifficulty>();
 
-        private Drawable background;
+        public virtual Bindable<StarDifficulty> Current
+        {
+            get => difficulty.Current;
+            set => difficulty.Current = value;
+        }
+
+        [Resolved]
+        private IRulesetStore rulesets { get; set; } = null!;
 
         /// <summary>
-        /// Creates a new <see cref="DifficultyIcon"/> with a given <see cref="RulesetInfo"/> and <see cref="Mod"/> combination.
+        /// Creates a new <see cref="DifficultyIcon"/>. Will use provided beatmap's <see cref="BeatmapInfo.StarRating"/> for initial value.
         /// </summary>
-        /// <param name="beatmapInfo">The beatmap to show the difficulty of.</param>
-        /// <param name="ruleset">The ruleset to show the difficulty with.</param>
-        /// <param name="mods">The mods to show the difficulty with.</param>
-        /// <param name="shouldShowTooltip">Whether to display a tooltip when hovered.</param>
-        public DifficultyIcon([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo ruleset, [CanBeNull] IReadOnlyList<Mod> mods, bool shouldShowTooltip = true)
-            : this(beatmapInfo, shouldShowTooltip)
+        /// <param name="beatmap">The beatmap to be displayed in the tooltip, and to be used for the initial star rating value.</param>
+        /// <param name="ruleset">An optional ruleset to be used for the icon display, in place of the beatmap's ruleset.</param>
+        public DifficultyIcon(IBeatmapInfo beatmap, IRulesetInfo? ruleset = null)
+            : this(ruleset ?? beatmap.Ruleset)
         {
-            this.ruleset = ruleset ?? beatmapInfo.Ruleset;
-            this.mods = mods ?? Array.Empty<Mod>();
+            this.beatmap = beatmap;
+            Current.Value = new StarDifficulty(beatmap.StarRating, 0);
         }
 
         /// <summary>
-        /// Creates a new <see cref="DifficultyIcon"/> that follows the currently-selected ruleset and mods.
+        /// Creates a new <see cref="DifficultyIcon"/> without an associated beatmap.
         /// </summary>
-        /// <param name="beatmapInfo">The beatmap to show the difficulty of.</param>
-        /// <param name="shouldShowTooltip">Whether to display a tooltip when hovered.</param>
-        /// <param name="performBackgroundDifficultyLookup">Whether to perform difficulty lookup (including calculation if necessary).</param>
-        public DifficultyIcon([NotNull] BeatmapInfo beatmapInfo, bool shouldShowTooltip = true, bool performBackgroundDifficultyLookup = true)
+        /// <param name="ruleset">The ruleset to be used for the icon display.</param>
+        public DifficultyIcon(IRulesetInfo ruleset)
         {
-            this.beatmapInfo = beatmapInfo ?? throw new ArgumentNullException(nameof(beatmapInfo));
-            this.shouldShowTooltip = shouldShowTooltip;
-            this.performBackgroundDifficultyLookup = performBackgroundDifficultyLookup;
+            this.ruleset = ruleset;
 
             AutoSizeAxes = Axes.Both;
-
             InternalChild = iconContainer = new Container { Size = new Vector2(20f) };
         }
 
@@ -105,7 +99,6 @@ namespace osu.Game.Beatmaps.Drawables
                     Child = background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.ForStarDifficulty(beatmapInfo.StarDifficulty) // Default value that will be re-populated once difficulty calculation completes
                     },
                 },
                 new ConstrainedIconContainer
@@ -114,63 +107,27 @@ namespace osu.Game.Beatmaps.Drawables
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
-                    Icon = (ruleset ?? beatmapInfo.Ruleset)?.CreateInstance()?.CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }
+                    Icon = getRulesetIcon()
                 },
             };
 
-            if (performBackgroundDifficultyLookup)
-                iconContainer.Add(new DelayedLoadUnloadWrapper(() => new DifficultyRetriever(beatmapInfo, ruleset, mods) { StarDifficulty = { BindTarget = difficultyBindable } }, 0));
-            else
-                difficultyBindable.Value = new StarDifficulty(beatmapInfo.StarDifficulty, 0);
-
-            difficultyBindable.BindValueChanged(difficulty => background.Colour = colours.ForStarDifficulty(difficulty.NewValue.Stars));
+            Current.BindValueChanged(difficulty => background.Colour = colours.ForStarDifficulty(difficulty.NewValue.Stars), true);
         }
 
-        ITooltip<DifficultyIconTooltipContent> IHasCustomTooltip<DifficultyIconTooltipContent>.GetCustomTooltip() => new DifficultyIconTooltip();
-
-        DifficultyIconTooltipContent IHasCustomTooltip<DifficultyIconTooltipContent>.TooltipContent => shouldShowTooltip ? new DifficultyIconTooltipContent(beatmapInfo, difficultyBindable) : null;
-
-        private class DifficultyRetriever : Component
+        private Drawable getRulesetIcon()
         {
-            public readonly Bindable<StarDifficulty> StarDifficulty = new Bindable<StarDifficulty>();
+            int? onlineID = ruleset.OnlineID;
 
-            private readonly BeatmapInfo beatmapInfo;
-            private readonly RulesetInfo ruleset;
-            private readonly IReadOnlyList<Mod> mods;
+            if (onlineID >= 0 && rulesets.GetRuleset(onlineID.Value)?.CreateInstance() is Ruleset rulesetInstance)
+                return rulesetInstance.CreateIcon();
 
-            private CancellationTokenSource difficultyCancellation;
-
-            [Resolved]
-            private BeatmapDifficultyCache difficultyCache { get; set; }
-
-            public DifficultyRetriever(BeatmapInfo beatmapInfo, RulesetInfo ruleset, IReadOnlyList<Mod> mods)
-            {
-                this.beatmapInfo = beatmapInfo;
-                this.ruleset = ruleset;
-                this.mods = mods;
-            }
-
-            private IBindable<StarDifficulty?> localStarDifficulty;
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                difficultyCancellation = new CancellationTokenSource();
-                localStarDifficulty = ruleset != null
-                    ? difficultyCache.GetBindableDifficulty(beatmapInfo, ruleset, mods, difficultyCancellation.Token)
-                    : difficultyCache.GetBindableDifficulty(beatmapInfo, difficultyCancellation.Token);
-                localStarDifficulty.BindValueChanged(d =>
-                {
-                    if (d.NewValue is StarDifficulty diff)
-                        StarDifficulty.Value = diff;
-                });
-            }
-
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
-                difficultyCancellation?.Cancel();
-            }
+            return new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle };
         }
+
+        ITooltip<DifficultyIconTooltipContent> IHasCustomTooltip<DifficultyIconTooltipContent>.
+            GetCustomTooltip() => new DifficultyIconTooltip();
+
+        DifficultyIconTooltipContent IHasCustomTooltip<DifficultyIconTooltipContent>.
+            TooltipContent => (ShowTooltip && beatmap != null ? new DifficultyIconTooltipContent(beatmap, Current) : null)!;
     }
 }

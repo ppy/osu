@@ -1,17 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Ranking.Expanded;
+using osu.Game.Tests.Resources;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneExpandedPanelTopContent : OsuTestScene
+    public partial class TestSceneExpandedPanelTopContent : OsuTestScene
     {
         public TestSceneExpandedPanelTopContent()
         {
@@ -27,7 +29,7 @@ namespace osu.Game.Tests.Visual.Ranking
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4Extensions.FromHex("#444"),
                     },
-                    new ExpandedPanelTopContent(new TestScoreInfo(new OsuRuleset().RulesetInfo).User),
+                    new ExpandedPanelTopContent(TestResources.CreateTestScoreInfo().User),
                 }
             };
         }

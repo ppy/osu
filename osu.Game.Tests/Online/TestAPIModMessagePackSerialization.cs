@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using MessagePack;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
@@ -90,7 +93,7 @@ namespace osu.Game.Tests.Online
 
             public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new System.NotImplementedException();
 
-            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new System.NotImplementedException();
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new System.NotImplementedException();
 
             public override string Description { get; } = string.Empty;
             public override string ShortName { get; } = string.Empty;
@@ -100,7 +103,7 @@ namespace osu.Game.Tests.Online
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TM";
-            public override string Description => "This is a test mod.";
+            public override LocalisableString Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Test")]
@@ -117,42 +120,34 @@ namespace osu.Game.Tests.Online
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TMTR";
-            public override string Description => "This is a test mod.";
+            public override LocalisableString Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Initial rate", "The starting speed of the track")]
-            public override BindableNumber<double> InitialRate { get; } = new BindableDouble
+            public override BindableNumber<double> InitialRate { get; } = new BindableDouble(1.5)
             {
                 MinValue = 1,
                 MaxValue = 2,
-                Default = 1.5,
-                Value = 1.5,
                 Precision = 0.01,
             };
 
             [SettingSource("Final rate", "The speed increase to ramp towards")]
-            public override BindableNumber<double> FinalRate { get; } = new BindableDouble
+            public override BindableNumber<double> FinalRate { get; } = new BindableDouble(0.5)
             {
                 MinValue = 0,
                 MaxValue = 1,
-                Default = 0.5,
-                Value = 0.5,
                 Precision = 0.01,
             };
 
             [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
-            public override BindableBool AdjustPitch { get; } = new BindableBool
-            {
-                Default = true,
-                Value = true
-            };
+            public override BindableBool AdjustPitch { get; } = new BindableBool(true);
         }
 
         private class TestModEnum : Mod
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TM";
-            public override string Description => "This is a test mod.";
+            public override LocalisableString Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Test")]

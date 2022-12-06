@@ -1,17 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Screens;
+using osu.Game.Screens.Edit.Components;
+using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -19,21 +23,25 @@ namespace osu.Game.Skinning.Editor
     /// A container which handles loading a skin editor on user request for a specified target.
     /// This also handles the scaling / positioning adjustment of the target.
     /// </summary>
-    public class SkinEditorOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class SkinEditorOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
-        private readonly ScalingContainer target;
+        private readonly ScalingContainer scalingContainer;
+
+        protected override bool BlockNonPositionalInput => true;
 
         [CanBeNull]
         private SkinEditor skinEditor;
 
-        public const float VISIBLE_TARGET_SCALE = 0.8f;
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuScreen lastTargetScreen;
 
-        public SkinEditorOverlay(ScalingContainer target)
+        private Vector2 lastDrawSize;
+
+        public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
-            this.target = target;
+            this.scalingContainer = scalingContainer;
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -47,71 +55,85 @@ namespace osu.Game.Skinning.Editor
 
                     Hide();
                     return true;
-
-                case GlobalAction.ToggleSkinEditor:
-                    Toggle();
-                    return true;
             }
 
             return false;
         }
 
-        public void Toggle()
+        protected override void PopIn()
         {
-            if (skinEditor == null)
-                Show();
-            else
-                skinEditor.ToggleVisibility();
-        }
-
-        public override void Hide()
-        {
-            // base call intentionally omitted.
-            skinEditor?.Hide();
-        }
-
-        public override void Show()
-        {
-            // base call intentionally omitted.
-            if (skinEditor == null)
+            if (skinEditor != null)
             {
-                skinEditor = new SkinEditor(target);
-                skinEditor.State.BindValueChanged(editorVisibilityChanged);
-
-                Debug.Assert(skinEditor != null);
-
-                LoadComponentAsync(skinEditor, AddInternal);
-            }
-            else
                 skinEditor.Show();
+                return;
+            }
+
+            var editor = new SkinEditor();
+
+            editor.State.BindValueChanged(_ => updateComponentVisibility());
+
+            skinEditor = editor;
+
+            LoadComponentAsync(editor, _ =>
+            {
+                if (editor != skinEditor)
+                    return;
+
+                AddInternal(editor);
+
+                SetTarget(lastTargetScreen);
+            });
         }
 
-        private void editorVisibilityChanged(ValueChangedEvent<Visibility> visibility)
-        {
-            if (visibility.NewValue == Visibility.Visible)
-            {
-                updateMasking();
-                target.AllowScaling = false;
-                target.RelativePositionAxes = Axes.Both;
+        protected override void PopOut() => skinEditor?.Hide();
 
-                target.ScaleTo(VISIBLE_TARGET_SCALE, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
-                target.MoveToX(0.095f, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
+        protected override void Update()
+        {
+            base.Update();
+
+            if (game.DrawSize != lastDrawSize)
+            {
+                lastDrawSize = game.DrawSize;
+                updateScreenSizing();
+            }
+        }
+
+        private void updateScreenSizing()
+        {
+            if (skinEditor?.State.Value != Visibility.Visible) return;
+
+            const float padding = 10;
+
+            float relativeSidebarWidth = (EditorSidebar.WIDTH + padding) / DrawWidth;
+            float relativeToolbarHeight = (SkinEditorSceneLibrary.HEIGHT + SkinEditor.MENU_HEIGHT + padding) / DrawHeight;
+
+            var rect = new RectangleF(
+                relativeSidebarWidth,
+                relativeToolbarHeight,
+                1 - relativeSidebarWidth * 2,
+                1f - relativeToolbarHeight - padding / DrawHeight);
+
+            scalingContainer.SetCustomRect(rect, true);
+        }
+
+        private void updateComponentVisibility()
+        {
+            Debug.Assert(skinEditor != null);
+
+            if (skinEditor.State.Value == Visibility.Visible)
+            {
+                Scheduler.AddOnce(updateScreenSizing);
+
+                game?.Toolbar.Hide();
+                game?.CloseAllOverlays();
             }
             else
             {
-                target.AllowScaling = true;
+                scalingContainer.SetCustomRect(null);
 
-                target.ScaleTo(1, SkinEditor.TRANSITION_DURATION, Easing.OutQuint).OnComplete(_ => updateMasking());
-                target.MoveToX(0f, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
+                if (lastTargetScreen?.HideOverlaysOnEnter != true)
+                    game?.Toolbar.Show();
             }
-        }
-
-        private void updateMasking()
-        {
-            if (skinEditor == null)
-                return;
-
-            target.Masking = skinEditor.State.Value == Visibility.Visible;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
@@ -119,15 +141,44 @@ namespace osu.Game.Skinning.Editor
         }
 
         /// <summary>
-        /// Exit any existing skin editor due to the game state changing.
+        /// Set a new target screen which will be used to find skinnable components.
         /// </summary>
-        public void Reset()
+        public void SetTarget(OsuScreen screen)
         {
-            skinEditor?.Save();
-            skinEditor?.Hide();
-            skinEditor?.Expire();
+            lastTargetScreen = screen;
 
-            skinEditor = null;
+            if (skinEditor == null) return;
+
+            skinEditor.Save();
+
+            // ensure the toolbar is re-hidden even if a new screen decides to try and show it.
+            updateComponentVisibility();
+
+            // AddOnce with parameter will ensure the newest target is loaded if there is any overlap.
+            Scheduler.AddOnce(setTarget, screen);
+        }
+
+        private void setTarget(OsuScreen target)
+        {
+            if (target == null)
+                return;
+
+            Debug.Assert(skinEditor != null);
+
+            if (!target.IsLoaded)
+            {
+                Scheduler.AddOnce(setTarget, target);
+                return;
+            }
+
+            if (skinEditor.State.Value == Visibility.Visible)
+                skinEditor.UpdateTargetScreen(target);
+            else
+            {
+                skinEditor.Hide();
+                skinEditor.Expire();
+                skinEditor = null;
+            }
         }
     }
 }

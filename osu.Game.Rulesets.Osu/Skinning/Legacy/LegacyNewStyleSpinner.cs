@@ -19,17 +19,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     /// Legacy skinned spinner with two main spinning layers, one fixed overlay and one final spinning overlay.
     /// No background layer.
     /// </summary>
-    public class LegacyNewStyleSpinner : LegacySpinner
+    public partial class LegacyNewStyleSpinner : LegacySpinner
     {
-        private Sprite glow;
-        private Sprite discBottom;
-        private Sprite discTop;
-        private Sprite spinningMiddle;
-        private Sprite fixedMiddle;
+        private Sprite glow = null!;
+        private Sprite discBottom = null!;
+        private Sprite discTop = null!;
+        private Sprite spinningMiddle = null!;
+        private Sprite fixedMiddle = null!;
 
         private readonly Color4 glowColour = new Color4(3, 151, 255, 255);
 
-        private Container scaleContainer;
+        private Container scaleContainer = null!;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
@@ -78,7 +78,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 }
             });
 
-            if (!(source.FindProvider(s => s.GetTexture("spinner-top") != null) is DefaultLegacySkin))
+            var topProvider = source.FindProvider(s => s.GetTexture("spinner-top") != null);
+
+            if (topProvider is ISkinTransformer transformer && !(transformer.Skin is DefaultLegacySkin))
             {
                 AddInternal(ApproachCircle = new Sprite
                 {
@@ -103,8 +105,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                         this.FadeOut();
 
-                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2))
-                        this.FadeInFromZero(spinner.TimeFadeIn / 2);
+                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn))
+                        this.FadeInFromZero(spinner.TimeFadeIn);
 
                     using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                     {
@@ -122,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                     break;
 
-                case DrawableSpinnerBonusTick _:
+                case DrawableSpinnerBonusTick:
                     if (state == ArmedState.Hit)
                         glow.FlashColour(Color4.White, 200);
 

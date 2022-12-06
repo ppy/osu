@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
     {
         private static readonly Vector2 playfield_centre = OsuPlayfield.BASE_SIZE * 0.5f;
 
-        private CheckOffscreenObjects check;
+        private CheckOffscreenObjects check = null!;
 
         [SetUp]
         public void Setup()

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -15,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class ExpandDetailsButton : ProfileHeaderButton
+    public partial class ExpandDetailsButton : ProfileHeaderButton
     {
         public readonly BindableBool DetailsVisible = new BindableBool();
 
@@ -25,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private Sample sampleOpen;
         private Sample sampleClose;
 
-        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds();
 
         public ExpandDetailsButton()
         {

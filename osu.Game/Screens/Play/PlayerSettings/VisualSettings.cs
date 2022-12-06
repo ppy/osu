@@ -4,48 +4,42 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class VisualSettings : PlayerSettingsGroup
+    public partial class VisualSettings : PlayerSettingsGroup
     {
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
+        private readonly PlayerSliderBar<float> comboColourNormalisationSliderBar;
         private readonly PlayerCheckbox showStoryboardToggle;
         private readonly PlayerCheckbox beatmapSkinsToggle;
         private readonly PlayerCheckbox beatmapColorsToggle;
-        private readonly PlayerCheckbox beatmapHitsoundsToggle;
 
         public VisualSettings()
             : base("Visual Settings")
         {
             Children = new Drawable[]
             {
-                new OsuSpriteText
-                {
-                    Text = "Background dim:"
-                },
                 dimSliderBar = new PlayerSliderBar<double>
                 {
+                    LabelText = GameplaySettingsStrings.BackgroundDim,
                     DisplayAsPercentage = true
-                },
-                new OsuSpriteText
-                {
-                    Text = "Background blur:"
                 },
                 blurSliderBar = new PlayerSliderBar<double>
                 {
+                    LabelText = GameplaySettingsStrings.BackgroundBlur,
                     DisplayAsPercentage = true
                 },
-                new OsuSpriteText
+                showStoryboardToggle = new PlayerCheckbox { LabelText = GraphicsSettingsStrings.StoryboardVideo },
+                beatmapSkinsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapSkins },
+                beatmapColorsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapColours },
+                comboColourNormalisationSliderBar = new PlayerSliderBar<float>
                 {
-                    Text = "Toggles:"
+                    LabelText = GraphicsSettingsStrings.ComboColourNormalisation,
+                    DisplayAsPercentage = true,
                 },
-                showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboard / Video" },
-                beatmapSkinsToggle = new PlayerCheckbox { LabelText = "Beatmap skins" },
-                beatmapColorsToggle = new PlayerCheckbox { LabelText = "Beatmap colours" },
-                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" }
             };
         }
 
@@ -57,7 +51,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             showStoryboardToggle.Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
             beatmapSkinsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
             beatmapColorsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapColours);
-            beatmapHitsoundsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
+            comboColourNormalisationSliderBar.Current = config.GetBindable<float>(OsuSetting.ComboColourNormalisationAmount);
         }
     }
 }

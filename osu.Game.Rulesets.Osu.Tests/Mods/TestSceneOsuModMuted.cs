@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModMuted : OsuModTestScene
+    public partial class TestSceneOsuModMuted : OsuModTestScene
     {
         /// <summary>
         /// Ensures that a final volume combo of 0 (i.e. "always muted" mode) constantly plays metronome and completely mutes track.
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 MuteComboCount = { Value = 0 },
             },
             PassCondition = () => Beatmap.Value.Track.AggregateVolume.Value == 0.0 &&
-                                  Player.ChildrenOfType<Metronome>().SingleOrDefault()?.AggregateVolume.Value == 1.0,
+                                  Player.ChildrenOfType<MetronomeBeat>().SingleOrDefault()?.AggregateVolume.Value == 1.0,
         });
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void TestModCopy()
         {
-            OsuModMuted muted = null;
+            OsuModMuted muted = null!;
 
             AddStep("create inversed mod", () => muted = new OsuModMuted
             {
@@ -45,8 +45,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 InverseMuting = { Value = false },
             }));
 
-            AddAssert("mute combo count = 0", () => muted.MuteComboCount.Value == 0);
-            AddAssert("inverse muting = false", () => muted.InverseMuting.Value == false);
+            AddAssert("mute combo count copied", () => muted.MuteComboCount.Value, () => Is.EqualTo(0));
+            AddAssert("inverse muting copied", () => muted.InverseMuting.Value, () => Is.False);
         }
     }
 }

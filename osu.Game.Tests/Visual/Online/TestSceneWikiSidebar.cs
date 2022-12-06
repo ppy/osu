@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Markdig.Parsers;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
@@ -12,7 +14,7 @@ using osu.Game.Overlays.Wiki;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneWikiSidebar : OsuTestScene
+    public partial class TestSceneWikiSidebar : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Orange);
@@ -36,7 +38,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Add TOC", () =>
             {
-                for (var i = 0; i < 10; i++)
+                for (int i = 0; i < 10; i++)
                     addTitle($"This is a very long title {i + 1}");
             });
         }
@@ -46,7 +48,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Add TOC", () =>
             {
-                for (var i = 0; i < 10; i++)
+                for (int i = 0; i < 10; i++)
                     addTitle($"This is a very long title {i + 1}", i % 4 != 0);
             });
         }

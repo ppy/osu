@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -12,8 +14,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
-using osu.Game.Extensions;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public readonly Bindable<Room> SelectedRoom = new Bindable<Room>();
         public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
@@ -33,9 +33,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         [Resolved]
         private IRoomManager roomManager { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private LoungeSubScreen loungeSubScreen { get; set; }
 
         // handle deselection
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
@@ -82,14 +79,37 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     bool matchingFilter = true;
 
-                    matchingFilter &= r.Room.Playlist.Count == 0 || criteria.Ruleset == null || r.Room.Playlist.Any(i => i.Ruleset.Value.Equals(criteria.Ruleset));
+                    matchingFilter &= criteria.Ruleset == null || r.Room.PlaylistItemStats.Value?.RulesetIDs.Any(id => id == criteria.Ruleset.OnlineID) != false;
 
                     if (!string.IsNullOrEmpty(criteria.SearchString))
-                        matchingFilter &= r.FilterTerms.Any(term => term.Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
+                    {
+                        // Room name isn't translatable, so ToString() is used here for simplicity.
+                        matchingFilter &= r.FilterTerms.Any(term => term.ToString().Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
+                    }
+
+                    matchingFilter &= matchPermissions(r, criteria.Permissions);
 
                     r.MatchingFilter = matchingFilter;
                 }
             });
+
+            static bool matchPermissions(DrawableLoungeRoom room, RoomPermissionsFilter accessType)
+            {
+                switch (accessType)
+                {
+                    case RoomPermissionsFilter.All:
+                        return true;
+
+                    case RoomPermissionsFilter.Public:
+                        return !room.Room.HasPassword.Value;
+
+                    case RoomPermissionsFilter.Private:
+                        return room.Room.HasPassword.Value;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(accessType), accessType, $"Unsupported {nameof(RoomPermissionsFilter)} in filter");
+                }
+            }
         }
 
         private void roomsChanged(object sender, NotifyCollectionChangedEventArgs args)
@@ -118,7 +138,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             foreach (var r in rooms)
             {
-                roomFlow.RemoveAll(d => d.Room == r);
+                roomFlow.RemoveAll(d => d.Room == r, true);
 
                 // selection may have a lease due to being in a sub screen.
                 if (!SelectedRoom.Disabled)
@@ -129,7 +149,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void updateSorting()
         {
             foreach (var room in roomFlow)
-                roomFlow.SetLayoutPosition(room, -(room.Room.RoomID.Value ?? 0));
+            {
+                roomFlow.SetLayoutPosition(room, room.Room.Category.Value > RoomCategory.Normal
+                    // Always show spotlight playlists at the top of the listing.
+                    ? float.MinValue
+                    : -(room.Room.RoomID.Value ?? 0));
+            }
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -139,18 +164,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             return base.OnClick(e);
         }
 
-        #region Key selection logic (shared with BeatmapCarousel)
+        #region Key selection logic (shared with BeatmapCarousel and DrawableRoomPlaylist)
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
                 case GlobalAction.SelectNext:
-                    beginRepeatSelection(() => selectNext(1), e.Action);
+                    selectNext(1);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                    beginRepeatSelection(() => selectNext(-1), e.Action);
+                    selectNext(-1);
                     return true;
             }
 
@@ -159,40 +184,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            switch (e.Action)
-            {
-                case GlobalAction.SelectNext:
-                case GlobalAction.SelectPrevious:
-                    endRepeatSelection(e.Action);
-                    break;
-            }
-        }
-
-        private ScheduledDelegate repeatDelegate;
-        private object lastRepeatSource;
-
-        /// <summary>
-        /// Begin repeating the specified selection action.
-        /// </summary>
-        /// <param name="action">The action to perform.</param>
-        /// <param name="source">The source of the action. Used in conjunction with <see cref="endRepeatSelection"/> to only cancel the correct action (most recently pressed key).</param>
-        private void beginRepeatSelection(Action action, object source)
-        {
-            endRepeatSelection();
-
-            lastRepeatSource = source;
-            repeatDelegate = this.BeginKeyRepeat(Scheduler, action);
-        }
-
-        private void endRepeatSelection(object source = null)
-        {
-            // only the most recent source should be able to cancel the current action.
-            if (source != null && !EqualityComparer<object>.Default.Equals(lastRepeatSource, source))
-                return;
-
-            repeatDelegate?.Cancel();
-            repeatDelegate = null;
-            lastRepeatSource = null;
         }
 
         private void selectNext(int direction)

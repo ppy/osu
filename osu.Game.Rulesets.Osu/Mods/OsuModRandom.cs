@@ -4,16 +4,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics.Primitives;
+using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Osu.Utils;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -22,285 +24,137 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// </summary>
     public class OsuModRandom : ModRandom, IApplicableToBeatmap
     {
-        public override string Description => "It never gets boring!";
+        public override LocalisableString Description => "It never gets boring!";
+
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModTargetPractice)).ToArray();
+
+        [SettingSource("Angle sharpness", "How sharp angles should be", SettingControlType = typeof(SettingsSlider<float>))]
+        public BindableFloat AngleSharpness { get; } = new BindableFloat(7)
+        {
+            MinValue = 1,
+            MaxValue = 10,
+            Precision = 0.1f
+        };
 
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
-        /// <summary>
-        /// Number of previous hitobjects to be shifted together when another object is being moved.
-        /// </summary>
-        private const int preceding_hitobjects_to_shift = 10;
-
-        private Random rng;
+        private Random random = null!;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            if (!(beatmap is OsuBeatmap osuBeatmap))
+            if (beatmap is not OsuBeatmap osuBeatmap)
                 return;
-
-            var hitObjects = osuBeatmap.HitObjects;
 
             Seed.Value ??= RNG.Next();
 
-            rng = new Random((int)Seed.Value);
+            random = new Random((int)Seed.Value);
 
-            RandomObjectInfo previous = null;
+            var positionInfos = OsuHitObjectGenerationUtils.GeneratePositionInfos(osuBeatmap.HitObjects);
 
-            float rateOfChangeMultiplier = 0;
+            // Offsets the angles of all hit objects in a "section" by the same amount.
+            float sectionOffset = 0;
 
-            for (int i = 0; i < hitObjects.Count; i++)
+            // Whether the angles are positive or negative (clockwise or counter-clockwise flow).
+            bool flowDirection = false;
+
+            for (int i = 0; i < positionInfos.Count; i++)
             {
-                var hitObject = hitObjects[i];
-
-                var current = new RandomObjectInfo(hitObject);
-
-                // rateOfChangeMultiplier only changes every 5 iterations in a combo
-                // to prevent shaky-line-shaped streams
-                if (hitObject.IndexInCurrentCombo % 5 == 0)
-                    rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
-
-                if (hitObject is Spinner)
+                if (shouldStartNewSection(osuBeatmap, positionInfos, i))
                 {
-                    previous = null;
-                    continue;
+                    sectionOffset = getRandomOffset(0.0008f);
+                    flowDirection = !flowDirection;
                 }
 
-                applyRandomisation(rateOfChangeMultiplier, previous, current);
-
-                // Move hit objects back into the playfield if they are outside of it
-                Vector2 shift = Vector2.Zero;
-
-                switch (hitObject)
+                if (i == 0)
                 {
-                    case HitCircle circle:
-                        shift = clampHitCircleToPlayfield(circle, current);
-                        break;
-
-                    case Slider slider:
-                        shift = clampSliderToPlayfield(slider, current);
-                        break;
+                    positionInfos[i].DistanceFromPrevious = (float)(random.NextDouble() * OsuPlayfield.BASE_SIZE.Y / 2);
+                    positionInfos[i].RelativeAngle = (float)(random.NextDouble() * 2 * Math.PI - Math.PI);
                 }
-
-                if (shift != Vector2.Zero)
+                else
                 {
-                    var toBeShifted = new List<OsuHitObject>();
+                    // Offsets only the angle of the current hit object if a flow change occurs.
+                    float flowChangeOffset = 0;
 
-                    for (int j = i - 1; j >= i - preceding_hitobjects_to_shift && j >= 0; j--)
+                    // Offsets only the angle of the current hit object.
+                    float oneTimeOffset = getRandomOffset(0.002f);
+
+                    if (shouldApplyFlowChange(positionInfos, i))
                     {
-                        // only shift hit circles
-                        if (!(hitObjects[j] is HitCircle)) break;
-
-                        toBeShifted.Add(hitObjects[j]);
+                        flowChangeOffset = getRandomOffset(0.002f);
+                        flowDirection = !flowDirection;
                     }
 
-                    if (toBeShifted.Count > 0)
-                        applyDecreasingShift(toBeShifted, shift);
+                    float totalOffset =
+                        // sectionOffset and oneTimeOffset should mainly affect patterns with large spacing.
+                        (sectionOffset + oneTimeOffset) * positionInfos[i].DistanceFromPrevious +
+                        // flowChangeOffset should mainly affect streams.
+                        flowChangeOffset * (playfield_diagonal - positionInfos[i].DistanceFromPrevious);
+
+                    positionInfos[i].RelativeAngle = getRelativeTargetAngle(positionInfos[i].DistanceFromPrevious, totalOffset, flowDirection);
                 }
-
-                previous = current;
-            }
-        }
-
-        /// <summary>
-        /// Returns the final position of the hit object
-        /// </summary>
-        /// <returns>Final position of the hit object</returns>
-        private void applyRandomisation(float rateOfChangeMultiplier, RandomObjectInfo previous, RandomObjectInfo current)
-        {
-            if (previous == null)
-            {
-                var playfieldSize = OsuPlayfield.BASE_SIZE;
-
-                current.AngleRad = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
-                current.PositionRandomised = new Vector2((float)rng.NextDouble() * playfieldSize.X, (float)rng.NextDouble() * playfieldSize.Y);
-
-                return;
             }
 
-            float distanceToPrev = Vector2.Distance(previous.EndPositionOriginal, current.PositionOriginal);
-
-            // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
-            // is proportional to the distance between the last and the current hit object
-            // to allow jumps and prevent too sharp turns during streams.
-
-            // Allow maximum jump angle when jump distance is more than half of playfield diagonal length
-            var randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * Math.Min(1f, distanceToPrev / (playfield_diagonal * 0.5f));
-
-            current.AngleRad = (float)randomAngleRad + previous.AngleRad;
-            if (current.AngleRad < 0)
-                current.AngleRad += 2 * (float)Math.PI;
-
-            var posRelativeToPrev = new Vector2(
-                distanceToPrev * (float)Math.Cos(current.AngleRad),
-                distanceToPrev * (float)Math.Sin(current.AngleRad)
-            );
-
-            posRelativeToPrev = OsuHitObjectGenerationUtils.RotateAwayFromEdge(previous.EndPositionRandomised, posRelativeToPrev);
-
-            current.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
-
-            current.PositionRandomised = previous.EndPositionRandomised + posRelativeToPrev;
+            osuBeatmap.HitObjects = OsuHitObjectGenerationUtils.RepositionHitObjects(positionInfos);
         }
 
-        /// <summary>
-        /// Move the randomised position of a hit circle so that it fits inside the playfield.
-        /// </summary>
-        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
-        private Vector2 clampHitCircleToPlayfield(HitCircle circle, RandomObjectInfo objectInfo)
+        private float getRandomOffset(float stdDev)
         {
-            var previousPosition = objectInfo.PositionRandomised;
-            objectInfo.EndPositionRandomised = objectInfo.PositionRandomised = clampToPlayfieldWithPadding(
-                objectInfo.PositionRandomised,
-                (float)circle.Radius
-            );
+            // Range: [0.5, 2]
+            // Higher angle sharpness -> lower multiplier
+            float customMultiplier = (1.5f * AngleSharpness.MaxValue - AngleSharpness.Value) / (1.5f * AngleSharpness.MaxValue - AngleSharpness.Default);
 
-            circle.Position = objectInfo.PositionRandomised;
-
-            return objectInfo.PositionRandomised - previousPosition;
+            return OsuHitObjectGenerationUtils.RandomGaussian(random, 0, stdDev * customMultiplier);
         }
 
-        /// <summary>
-        /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
-        /// </summary>
-        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
-        private Vector2 clampSliderToPlayfield(Slider slider, RandomObjectInfo objectInfo)
+        /// <param name="targetDistance">The target distance between the previous and the current <see cref="OsuHitObject"/>.</param>
+        /// <param name="offset">The angle (in rad) by which the target angle should be offset.</param>
+        /// <param name="flowDirection">Whether the relative angle should be positive or negative.</param>
+        private float getRelativeTargetAngle(float targetDistance, float offset, bool flowDirection)
         {
-            var possibleMovementBounds = calculatePossibleMovementBounds(slider);
+            // Range: [0.1, 1]
+            float angleSharpness = AngleSharpness.Value / AngleSharpness.MaxValue;
+            // Range: [0, 0.9]
+            float angleWideness = 1 - angleSharpness;
 
-            var previousPosition = objectInfo.PositionRandomised;
+            // Range: [-60, 30]
+            float customOffsetX = angleSharpness * 100 - 70;
+            // Range: [-0.075, 0.15]
+            float customOffsetY = angleWideness * 0.25f - 0.075f;
 
-            // Clamp slider position to the placement area
-            // If the slider is larger than the playfield, force it to stay at the original position
-            var newX = possibleMovementBounds.Width < 0
-                ? objectInfo.PositionOriginal.X
-                : Math.Clamp(previousPosition.X, possibleMovementBounds.Left, possibleMovementBounds.Right);
+            targetDistance += customOffsetX;
+            float angle = (float)(2.16 / (1 + 200 * Math.Exp(0.036 * (targetDistance - 310 + customOffsetX))) + 0.5);
+            angle += offset + customOffsetY;
 
-            var newY = possibleMovementBounds.Height < 0
-                ? objectInfo.PositionOriginal.Y
-                : Math.Clamp(previousPosition.Y, possibleMovementBounds.Top, possibleMovementBounds.Bottom);
+            float relativeAngle = (float)Math.PI - angle;
 
-            slider.Position = objectInfo.PositionRandomised = new Vector2(newX, newY);
-            objectInfo.EndPositionRandomised = slider.EndPosition;
-
-            shiftNestedObjects(slider, objectInfo.PositionRandomised - objectInfo.PositionOriginal);
-
-            return objectInfo.PositionRandomised - previousPosition;
+            return flowDirection ? -relativeAngle : relativeAngle;
         }
 
-        /// <summary>
-        /// Decreasingly shift a list of <see cref="OsuHitObject"/>s by a specified amount.
-        /// The first item in the list is shifted by the largest amount, while the last item is shifted by the smallest amount.
-        /// </summary>
-        /// <param name="hitObjects">The list of hit objects to be shifted.</param>
-        /// <param name="shift">The amount to be shifted.</param>
-        private void applyDecreasingShift(IList<OsuHitObject> hitObjects, Vector2 shift)
+        /// <returns>Whether a new section should be started at the current <see cref="OsuHitObject"/>.</returns>
+        private bool shouldStartNewSection(OsuBeatmap beatmap, IReadOnlyList<OsuHitObjectGenerationUtils.ObjectPositionInfo> positionInfos, int i)
         {
-            for (int i = 0; i < hitObjects.Count; i++)
-            {
-                var hitObject = hitObjects[i];
-                // The first object is shifted by a vector slightly smaller than shift
-                // The last object is shifted by a vector slightly larger than zero
-                Vector2 position = hitObject.Position + shift * ((hitObjects.Count - i) / (float)(hitObjects.Count + 1));
+            if (i == 0)
+                return true;
 
-                hitObject.Position = clampToPlayfieldWithPadding(position, (float)hitObject.Radius);
-            }
+            // Exclude new-combo-spam and 1-2-combos.
+            bool previousObjectStartedCombo = positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 &&
+                                              positionInfos[i - 1].HitObject.NewCombo;
+            bool previousObjectWasOnDownbeat = OsuHitObjectGenerationUtils.IsHitObjectOnBeat(beatmap, positionInfos[i - 1].HitObject, true);
+            bool previousObjectWasOnBeat = OsuHitObjectGenerationUtils.IsHitObjectOnBeat(beatmap, positionInfos[i - 1].HitObject);
+
+            return (previousObjectStartedCombo && random.NextDouble() < 0.6f) ||
+                   previousObjectWasOnDownbeat ||
+                   (previousObjectWasOnBeat && random.NextDouble() < 0.4f);
         }
 
-        /// <summary>
-        /// Calculates a <see cref="RectangleF"/> which contains all of the possible movements of the slider (in relative X/Y coordinates)
-        /// such that the entire slider is inside the playfield.
-        /// </summary>
-        /// <remarks>
-        /// If the slider is larger than the playfield, the returned <see cref="RectangleF"/> may have negative width/height.
-        /// </remarks>
-        private RectangleF calculatePossibleMovementBounds(Slider slider)
+        /// <returns>Whether a flow change should be applied at the current <see cref="OsuHitObject"/>.</returns>
+        private bool shouldApplyFlowChange(IReadOnlyList<OsuHitObjectGenerationUtils.ObjectPositionInfo> positionInfos, int i)
         {
-            var pathPositions = new List<Vector2>();
-            slider.Path.GetPathToProgress(pathPositions, 0, 1);
+            // Exclude new-combo-spam and 1-2-combos.
+            bool previousObjectStartedCombo = positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 &&
+                                              positionInfos[i - 1].HitObject.NewCombo;
 
-            float minX = float.PositiveInfinity;
-            float maxX = float.NegativeInfinity;
-
-            float minY = float.PositiveInfinity;
-            float maxY = float.NegativeInfinity;
-
-            // Compute the bounding box of the slider.
-            foreach (var pos in pathPositions)
-            {
-                minX = MathF.Min(minX, pos.X);
-                maxX = MathF.Max(maxX, pos.X);
-
-                minY = MathF.Min(minY, pos.Y);
-                maxY = MathF.Max(maxY, pos.Y);
-            }
-
-            // Take the circle radius into account.
-            var radius = (float)slider.Radius;
-
-            minX -= radius;
-            minY -= radius;
-
-            maxX += radius;
-            maxY += radius;
-
-            // Given the bounding box of the slider (via min/max X/Y),
-            // the amount that the slider can move to the left is minX (with the sign flipped, since positive X is to the right),
-            // and the amount that it can move to the right is WIDTH - maxX.
-            // Same calculation applies for the Y axis.
-            float left = -minX;
-            float right = OsuPlayfield.BASE_SIZE.X - maxX;
-            float top = -minY;
-            float bottom = OsuPlayfield.BASE_SIZE.Y - maxY;
-
-            return new RectangleF(left, top, right - left, bottom - top);
-        }
-
-        /// <summary>
-        /// Shifts all nested <see cref="SliderTick"/>s and <see cref="SliderRepeat"/>s by the specified shift.
-        /// </summary>
-        /// <param name="slider"><see cref="Slider"/> whose nested <see cref="SliderTick"/>s and <see cref="SliderRepeat"/>s should be shifted</param>
-        /// <param name="shift">The <see cref="Vector2"/> the <see cref="Slider"/>'s nested <see cref="SliderTick"/>s and <see cref="SliderRepeat"/>s should be shifted by</param>
-        private void shiftNestedObjects(Slider slider, Vector2 shift)
-        {
-            foreach (var hitObject in slider.NestedHitObjects.Where(o => o is SliderTick || o is SliderRepeat))
-            {
-                if (!(hitObject is OsuHitObject osuHitObject))
-                    continue;
-
-                osuHitObject.Position += shift;
-            }
-        }
-
-        /// <summary>
-        /// Clamp a position to playfield, keeping a specified distance from the edges.
-        /// </summary>
-        /// <param name="position">The position to be clamped.</param>
-        /// <param name="padding">The minimum distance allowed from playfield edges.</param>
-        /// <returns>The clamped position.</returns>
-        private Vector2 clampToPlayfieldWithPadding(Vector2 position, float padding)
-        {
-            return new Vector2(
-                Math.Clamp(position.X, padding, OsuPlayfield.BASE_SIZE.X - padding),
-                Math.Clamp(position.Y, padding, OsuPlayfield.BASE_SIZE.Y - padding)
-            );
-        }
-
-        private class RandomObjectInfo
-        {
-            public float AngleRad { get; set; }
-
-            public Vector2 PositionOriginal { get; }
-            public Vector2 PositionRandomised { get; set; }
-
-            public Vector2 EndPositionOriginal { get; }
-            public Vector2 EndPositionRandomised { get; set; }
-
-            public RandomObjectInfo(OsuHitObject hitObject)
-            {
-                PositionRandomised = PositionOriginal = hitObject.Position;
-                EndPositionRandomised = EndPositionOriginal = hitObject.EndPosition;
-                AngleRad = 0;
-            }
+            return previousObjectStartedCombo && random.NextDouble() < 0.6f;
         }
     }
 }

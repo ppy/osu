@@ -2,20 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsSongSelect : OnlinePlaySongSelect
+    public partial class PlaylistsSongSelect : OnlinePlaySongSelect
     {
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
-
         public PlaylistsSongSelect(Room room)
             : base(room)
         {
@@ -26,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             CreateNewItem = createNewItem
         };
 
-        protected override void SelectItem(PlaylistItem item)
+        protected override bool SelectItem(PlaylistItem item)
         {
             switch (Playlist.Count)
             {
@@ -35,35 +31,26 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     break;
 
                 case 1:
-                    populateItemFromCurrent(Playlist.Single());
+                    Playlist.Clear();
+                    createNewItem();
                     break;
             }
 
             this.Exit();
+            return true;
         }
 
         private void createNewItem()
         {
-            PlaylistItem item = new PlaylistItem
+            PlaylistItem item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
             {
-                ID = Playlist.Count == 0 ? 0 : Playlist.Max(p => p.ID) + 1
+                ID = Playlist.Count == 0 ? 0 : Playlist.Max(p => p.ID) + 1,
+                RulesetID = Ruleset.Value.OnlineID,
+                RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
+                AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray()
             };
 
-            populateItemFromCurrent(item);
-
             Playlist.Add(item);
-        }
-
-        private void populateItemFromCurrent(PlaylistItem item)
-        {
-            item.Beatmap.Value = Beatmap.Value.BeatmapInfo;
-            item.Ruleset.Value = Ruleset.Value;
-
-            item.RequiredMods.Clear();
-            item.RequiredMods.AddRange(Mods.Value.Select(m => m.DeepClone()));
-
-            item.AllowedMods.Clear();
-            item.AllowedMods.AddRange(FreeMods.Value.Select(m => m.DeepClone()));
         }
     }
 }

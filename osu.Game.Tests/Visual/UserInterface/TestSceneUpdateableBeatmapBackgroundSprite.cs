@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -12,30 +15,25 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Rulesets;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneUpdateableBeatmapBackgroundSprite : OsuTestScene
+    public partial class TestSceneUpdateableBeatmapBackgroundSprite : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 
         private BeatmapSetInfo testBeatmap;
         private IAPIProvider api;
-        private RulesetStore rulesets;
-
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osu, IAPIProvider api, RulesetStore rulesets)
+        private void load(OsuGameBase osu, IAPIProvider api)
         {
             this.api = api;
-            this.rulesets = rulesets;
 
-            testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu).Result;
+            testBeatmap = BeatmapImportHelper.LoadOszIntoOsu(osu).GetResultSafely();
         }
 
         [Test]
@@ -81,7 +79,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Child = background = new TestUpdateableBeatmapBackgroundSprite
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Beatmap = { Value = new BeatmapInfo { BeatmapSet = req.Response?.ToBeatmapSet(rulesets) } }
+                        Beatmap = { Value = new APIBeatmap { BeatmapSet = req.Response } }
                     };
                 });
 
@@ -140,7 +138,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("all unloaded", () => !loadedBackgrounds.Any());
         }
 
-        private class TestUpdateableBeatmapBackgroundSprite : UpdateableBeatmapBackgroundSprite
+        private partial class TestUpdateableBeatmapBackgroundSprite : UpdateableBeatmapBackgroundSprite
         {
             protected override double UnloadDelay => 2000;
 

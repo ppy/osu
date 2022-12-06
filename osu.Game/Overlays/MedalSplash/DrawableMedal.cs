@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework;
 using osuTK;
@@ -17,7 +19,7 @@ using osu.Game.Users;
 namespace osu.Game.Overlays.MedalSplash
 {
     [LongRunningLoad]
-    public class DrawableMedal : Container, IStateful<DisplayState>
+    public partial class DrawableMedal : Container, IStateful<DisplayState>
     {
         private const float scale_when_unlocked = 0.76f;
         private const float scale_when_full = 0.6f;
@@ -110,7 +112,7 @@ namespace osu.Game.Overlays.MedalSplash
                 s.Font = s.Font.With(size: 16);
             });
 
-            medalContainer.OnLoadComplete += d =>
+            medalContainer.OnLoadComplete += _ =>
             {
                 unlocked.Position = new Vector2(0f, medalContainer.DrawSize.Y / 2 + 10);
                 infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);

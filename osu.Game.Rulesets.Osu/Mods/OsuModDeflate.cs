@@ -3,7 +3,7 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Configuration;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -15,15 +15,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override IconUsage? Icon => FontAwesome.Solid.CompressArrowsAlt;
 
-        public override string Description => "Hit them at the right size!";
+        public override LocalisableString Description => "Hit them at the right size!";
 
-        [SettingSource("Starting Size", "The initial size multiplier applied to all objects.")]
-        public override BindableNumber<float> StartScale { get; } = new BindableFloat
+        public override BindableNumber<float> StartScale { get; } = new BindableFloat(2)
         {
             MinValue = 1f,
             MaxValue = 25f,
-            Default = 2f,
-            Value = 2f,
             Precision = 0.1f,
         };
     }

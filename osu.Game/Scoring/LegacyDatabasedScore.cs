@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
 
@@ -16,13 +19,18 @@ namespace osu.Game.Scoring
         {
             ScoreInfo = score;
 
-            var replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+            string replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase))?.File.GetStoragePath();
 
             if (replayFilename == null)
                 return;
 
             using (var stream = store.GetStream(replayFilename))
+            {
+                if (stream == null)
+                    return;
+
                 Replay = new DatabasedLegacyScoreDecoder(rulesets, beatmaps).Parse(stream).Replay;
+            }
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,15 +13,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
-using osu.Game.Configuration;
+using osu.Framework.Platform;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
+using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class SkinSection : SettingsSection
+    public partial class SkinSection : SettingsSection
     {
         private SkinSettingsDropdown skinDropdown;
 
@@ -30,145 +35,111 @@ namespace osu.Game.Overlays.Settings.Sections
             Icon = FontAwesome.Solid.PaintBrush
         };
 
-        private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
-        private readonly Bindable<int> configBindable = new Bindable<int>();
-
-        private static readonly SkinInfo random_skin_info = new SkinInfo
+        private static readonly Live<SkinInfo> random_skin_info = new SkinInfo
         {
             ID = SkinInfo.RANDOM_SKIN,
             Name = "<Random Skin>",
-        };
+        }.ToLiveUnmanaged();
 
-        private List<SkinInfo> skinItems;
-
-        private int firstNonDefaultSkinIndex
-        {
-            get
-            {
-                var index = skinItems.FindIndex(s => s.ID > 0);
-                if (index < 0)
-                    index = skinItems.Count;
-
-                return index;
-            }
-        }
+        private readonly List<Live<SkinInfo>> dropdownItems = new List<Live<SkinInfo>>();
 
         [Resolved]
         private SkinManager skins { get; set; }
 
-        private IBindable<WeakReference<SkinInfo>> managerUpdated;
-        private IBindable<WeakReference<SkinInfo>> managerRemoved;
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        private IDisposable realmSubscription;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuConfigManager config, [CanBeNull] SkinEditorOverlay skinEditor)
+        private void load([CanBeNull] SkinEditorOverlay skinEditor)
         {
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown
                 {
-                    LabelText = SkinSettingsStrings.CurrentSkin
+                    LabelText = SkinSettingsStrings.CurrentSkin,
+                    Current = skins.CurrentSkinInfo,
+                    Keywords = new[] { @"skins" }
                 },
                 new SettingsButton
                 {
                     Text = SkinSettingsStrings.SkinLayoutEditor,
-                    Action = () => skinEditor?.Toggle(),
+                    Action = () => skinEditor?.ToggleVisibility(),
                 },
                 new ExportSkinButton(),
+                new DeleteSkinButton(),
             };
+        }
 
-            managerUpdated = skins.ItemUpdated.GetBoundCopy();
-            managerUpdated.BindValueChanged(itemUpdated);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
-            managerRemoved = skins.ItemRemoved.GetBoundCopy();
-            managerRemoved.BindValueChanged(itemRemoved);
+            realmSubscription = realm.RegisterForNotifications(_ => realm.Realm.All<SkinInfo>()
+                                                                         .Where(s => !s.DeletePending)
+                                                                         .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase), skinsChanged);
 
-            config.BindWith(OsuSetting.Skin, configBindable);
-
-            skinDropdown.Current = dropdownBindable;
-            updateItems();
-
-            // Todo: This should not be necessary when OsuConfigManager is databased
-            if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
-                configBindable.Value = 0;
-
-            configBindable.BindValueChanged(id => Scheduler.AddOnce(updateSelectedSkinFromConfig), true);
-            dropdownBindable.BindValueChanged(skin =>
+            skinDropdown.Current.BindValueChanged(skin =>
             {
                 if (skin.NewValue == random_skin_info)
                 {
+                    // before selecting random, set the skin back to the previous selection.
+                    // this is done because at this point it will be random_skin_info, and would
+                    // cause SelectRandomSkin to be unable to skip the previous selection.
+                    skins.CurrentSkinInfo.Value = skin.OldValue;
                     skins.SelectRandomSkin();
-                    return;
                 }
-
-                configBindable.Value = skin.NewValue.ID;
             });
         }
 
-        private void updateSelectedSkinFromConfig()
+        private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes, Exception error)
         {
-            int id = configBindable.Value;
+            // This can only mean that realm is recycling, else we would see the protected skins.
+            // Because we are using `Live<>` in this class, we don't need to worry about this scenario too much.
+            if (!sender.Any())
+                return;
 
-            var skin = skinDropdown.Items.FirstOrDefault(s => s.ID == id);
+            // For simplicity repopulate the full list.
+            // In the future we should change this to properly handle ChangeSet events.
+            dropdownItems.Clear();
 
-            if (skin == null)
+            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.ARGON_SKIN).ToLive(realm));
+            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.TRIANGLES_SKIN).ToLive(realm));
+            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.CLASSIC_SKIN).ToLive(realm));
+
+            dropdownItems.Add(random_skin_info);
+
+            foreach (var skin in sender.Where(s => !s.Protected))
+                dropdownItems.Add(skin.ToLive(realm));
+
+            Schedule(() => skinDropdown.Items = dropdownItems);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            realmSubscription?.Dispose();
+        }
+
+        private partial class SkinSettingsDropdown : SettingsDropdown<Live<SkinInfo>>
+        {
+            protected override OsuDropdown<Live<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
+
+            private partial class SkinDropdownControl : DropdownControl
             {
-                // there may be a thread race condition where an item is selected that hasn't yet been added to the dropdown.
-                // to avoid adding complexity, let's just ensure the item is added so we can perform the selection.
-                skin = skins.Query(s => s.ID == id);
-                addItem(skin);
-            }
-
-            dropdownBindable.Value = skin;
-        }
-
-        private void updateItems()
-        {
-            skinItems = skins.GetAllUsableSkins();
-            skinItems.Insert(firstNonDefaultSkinIndex, random_skin_info);
-            sortUserSkins(skinItems);
-            skinDropdown.Items = skinItems;
-        }
-
-        private void itemUpdated(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
-        {
-            if (weakItem.NewValue.TryGetTarget(out var item))
-                Schedule(() => addItem(item));
-        }
-
-        private void addItem(SkinInfo item)
-        {
-            List<SkinInfo> newDropdownItems = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToList();
-            sortUserSkins(newDropdownItems);
-            skinDropdown.Items = newDropdownItems;
-        }
-
-        private void itemRemoved(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
-        {
-            if (weakItem.NewValue.TryGetTarget(out var item))
-                Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != item.ID).ToArray());
-        }
-
-        private void sortUserSkins(List<SkinInfo> skinsList)
-        {
-            // Sort user skins separately from built-in skins
-            skinsList.Sort(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex,
-                Comparer<SkinInfo>.Create((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase)));
-        }
-
-        private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>
-        {
-            protected override OsuDropdown<SkinInfo> CreateDropdown() => new SkinDropdownControl();
-
-            private class SkinDropdownControl : DropdownControl
-            {
-                protected override LocalisableString GenerateItemText(SkinInfo item) => item.ToString();
+                protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
             }
         }
 
-        private class ExportSkinButton : SettingsButton
+        public partial class ExportSkinButton : SettingsButton
         {
             [Resolved]
             private SkinManager skins { get; set; }
+
+            [Resolved]
+            private Storage storage { get; set; }
 
             private Bindable<Skin> currentSkin;
 
@@ -177,21 +148,57 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 Text = SkinSettingsStrings.ExportSkinButton;
                 Action = export;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
 
                 currentSkin = skins.CurrentSkin.GetBoundCopy();
-                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.ID > 0, true);
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
             }
 
             private void export()
             {
                 try
                 {
-                    skins.Export(currentSkin.Value.SkinInfo);
+                    currentSkin.Value.SkinInfo.PerformRead(s => new LegacySkinExporter(storage).Export(s));
                 }
                 catch (Exception e)
                 {
                     Logger.Log($"Could not export current skin: {e.Message}", level: LogLevel.Error);
                 }
+            }
+        }
+
+        public partial class DeleteSkinButton : DangerousSettingsButton
+        {
+            [Resolved]
+            private SkinManager skins { get; set; }
+
+            [Resolved(CanBeNull = true)]
+            private IDialogOverlay dialogOverlay { get; set; }
+
+            private Bindable<Skin> currentSkin;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Text = SkinSettingsStrings.DeleteSkinButton;
+                Action = delete;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                currentSkin = skins.CurrentSkin.GetBoundCopy();
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
+            }
+
+            private void delete()
+            {
+                dialogOverlay?.Push(new SkinDeleteDialog(currentSkin.Value));
             }
         }
     }

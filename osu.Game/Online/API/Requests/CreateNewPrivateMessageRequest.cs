@@ -1,19 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Net.Http;
 using osu.Framework.IO.Network;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests
 {
     public class CreateNewPrivateMessageRequest : APIRequest<CreateNewPrivateMessageResponse>
     {
-        private readonly User user;
+        private readonly APIUser user;
         private readonly Message message;
 
-        public CreateNewPrivateMessageRequest(User user, Message message)
+        public CreateNewPrivateMessageRequest(APIUser user, Message message)
         {
             this.user = user;
             this.message = message;
@@ -26,6 +28,7 @@ namespace osu.Game.Online.API.Requests
             req.AddParameter(@"target_id", user.Id.ToString());
             req.AddParameter(@"message", message.Content);
             req.AddParameter(@"is_action", message.IsAction.ToString().ToLowerInvariant());
+            req.AddParameter(@"uuid", message.Uuid);
             return req;
         }
 

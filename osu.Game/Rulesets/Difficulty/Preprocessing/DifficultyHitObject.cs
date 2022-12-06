@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Mods;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Difficulty.Preprocessing
@@ -11,6 +13,13 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
     /// </summary>
     public class DifficultyHitObject
     {
+        private readonly IReadOnlyList<DifficultyHitObject> difficultyHitObjects;
+
+        /// <summary>
+        /// The index of this <see cref="DifficultyHitObject"/> in the list of all <see cref="DifficultyHitObject"/>s.
+        /// </summary>
+        public int Index;
+
         /// <summary>
         /// The <see cref="HitObject"/> this <see cref="DifficultyHitObject"/> wraps.
         /// </summary>
@@ -42,13 +51,21 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// <param name="hitObject">The <see cref="HitObject"/> which this <see cref="DifficultyHitObject"/> wraps.</param>
         /// <param name="lastObject">The last <see cref="HitObject"/> which occurs before <paramref name="hitObject"/> in the beatmap.</param>
         /// <param name="clock">The rate-adjusted gameplay clock.</param>
-        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, ClockWithMods clock)
+        /// <param name="objects">The list of <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
+        /// <param name="index">The index of this <see cref="DifficultyHitObject"/> in <paramref name="objects"/> list.</param>
+        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, ClockWithMods clock, List<DifficultyHitObject> objects, int index)
         {
+            difficultyHitObjects = objects;
+            Index = index;
             StartTime = clock.GetTimeAt(hitObject.StartTime);
             EndTime = clock.GetTimeAt(hitObject.GetEndTime());
             BaseObject = hitObject;
             LastObject = lastObject;
             DeltaTime = StartTime - clock.GetTimeAt(lastObject.StartTime);
         }
+
+        public DifficultyHitObject Previous(int backwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Index - (backwardsIndex + 1));
+
+        public DifficultyHitObject Next(int forwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Index + (forwardsIndex + 1));
     }
 }

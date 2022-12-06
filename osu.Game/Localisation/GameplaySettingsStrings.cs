@@ -65,11 +65,6 @@ namespace osu.Game.Localisation
         public static LocalisableString HUDVisibilityMode => new TranslatableString(getKey(@"hud_visibility_mode"), @"HUD overlay visibility mode");
 
         /// <summary>
-        /// "Show difficulty graph on progress bar"
-        /// </summary>
-        public static LocalisableString ShowDifficultyGraph => new TranslatableString(getKey(@"show_difficulty_graph"), @"Show difficulty graph on progress bar");
-
-        /// <summary>
         /// "Show health display even when you can't fail"
         /// </summary>
         public static LocalisableString ShowHealthDisplayWhenCantFail => new TranslatableString(getKey(@"show_health_display_when_cant_fail"), @"Show health display even when you can't fail");
@@ -85,9 +80,9 @@ namespace osu.Game.Localisation
         public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");
 
         /// <summary>
-        /// "Positional hitsounds"
+        /// "Always show gameplay leaderboard"
         /// </summary>
-        public static LocalisableString PositionalHitsounds => new TranslatableString(getKey(@"positional_hitsounds"), @"Positional hitsounds");
+        public static LocalisableString AlwaysShowGameplayLeaderboard => new TranslatableString(getKey(@"gameplay_leaderboard"), @"Always show gameplay leaderboard");
 
         /// <summary>
         /// "Always play first combo break sound"
@@ -113,6 +108,31 @@ namespace osu.Game.Localisation
         /// "Increase visibility of first object when visual impairment mods are enabled"
         /// </summary>
         public static LocalisableString IncreaseFirstObjectVisibility => new TranslatableString(getKey(@"increase_first_object_visibility"), @"Increase visibility of first object when visual impairment mods are enabled");
+
+        /// <summary>
+        /// "Hide during gameplay"
+        /// </summary>
+        public static LocalisableString HideDuringGameplay => new TranslatableString(getKey(@"hide_during_gameplay"), @"Hide during gameplay");
+
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString AlwaysShowHUD => new TranslatableString(getKey(@"always_show_hud"), @"Always");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString NeverShowHUD => new TranslatableString(getKey(@"never_show_hud"), @"Never");
+
+        /// <summary>
+        /// "Standardised"
+        /// </summary>
+        public static LocalisableString StandardisedScoreDisplay => new TranslatableString(getKey(@"standardised_score_display"), @"Standardised");
+
+        /// <summary>
+        /// "Classic"
+        /// </summary>
+        public static LocalisableString ClassicScoreDisplay => new TranslatableString(getKey(@"classic_score_display"), @"Classic");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

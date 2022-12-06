@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Graphics;
 
@@ -9,7 +11,7 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// A component that tracks a batch change, only applying after all active changes are completed.
     /// </summary>
-    public abstract class TransactionalCommitComponent : Component
+    public abstract partial class TransactionalCommitComponent : Component
     {
         /// <summary>
         /// Fires whenever a transaction begins. Will not fire on nested transactions.

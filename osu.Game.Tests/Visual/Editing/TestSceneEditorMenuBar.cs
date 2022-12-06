@@ -1,18 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Components.Menus;
 
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneEditorMenuBar : OsuTestScene
+    public partial class TestSceneEditorMenuBar : OsuTestScene
     {
+        [Cached]
+        private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         public TestSceneEditorMenuBar()
         {
             Add(new Container

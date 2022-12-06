@@ -1,12 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using osu.Framework.Allocation;
+using osu.Game.Graphics;
 using osu.Game.Resources.Localisation.Web;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapSearchGeneralFilterRow : BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>
+    public partial class BeatmapSearchGeneralFilterRow : BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>
     {
         public BeatmapSearchGeneralFilterRow()
             : base(BeatmapsStrings.ListingSearchFiltersGeneral)
@@ -15,7 +19,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override MultipleSelectionFilter CreateMultipleSelectionFilter() => new GeneralFilter();
 
-        private class GeneralFilter : MultipleSelectionFilter
+        private partial class GeneralFilter : MultipleSelectionFilter
         {
             protected override MultipleSelectionFilterTabItem CreateTabItem(SearchGeneral value)
             {
@@ -26,14 +30,17 @@ namespace osu.Game.Overlays.BeatmapListing
             }
         }
 
-        private class FeaturedArtistsTabItem : MultipleSelectionFilterTabItem
+        private partial class FeaturedArtistsTabItem : MultipleSelectionFilterTabItem
         {
             public FeaturedArtistsTabItem()
                 : base(SearchGeneral.FeaturedArtists)
             {
             }
 
-            protected override Color4 GetStateColour() => OverlayColourProvider.Orange.Colour1;
+            [Resolved]
+            private OsuColour colours { get; set; }
+
+            protected override Color4 GetStateColour() => colours.Orange1;
         }
     }
 }

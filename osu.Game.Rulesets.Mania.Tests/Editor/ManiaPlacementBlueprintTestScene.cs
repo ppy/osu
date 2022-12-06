@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -8,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -18,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public abstract class ManiaPlacementBlueprintTestScene : PlacementBlueprintTestScene
+    public abstract partial class ManiaPlacementBlueprintTestScene : PlacementBlueprintTestScene
     {
         private readonly Column column;
 
@@ -28,22 +31,25 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Cached(typeof(IScrollingInfo))]
         private IScrollingInfo scrollingInfo;
 
+        [Cached]
+        private readonly StageDefinition stage = new StageDefinition(5);
+
         protected ManiaPlacementBlueprintTestScene()
         {
             scrollingInfo = ((ScrollingTestContainer)HitObjectContainer).ScrollingInfo;
 
-            Add(column = new Column(0)
+            Add(column = new Column(0, false)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                AccentColour = Color4.OrangeRed,
+                AccentColour = { Value = Color4.OrangeRed },
                 Clock = new FramedClock(new StopwatchClock()), // No scroll
             });
         }
 
         protected override SnapResult SnapForBlueprint(PlacementBlueprint blueprint)
         {
-            var time = column.TimeAtScreenSpacePosition(InputManager.CurrentState.Mouse.Position);
+            double time = column.TimeAtScreenSpacePosition(InputManager.CurrentState.Mouse.Position);
             var pos = column.ScreenSpacePositionAtTime(time);
 
             return new SnapResult(pos, time, column);

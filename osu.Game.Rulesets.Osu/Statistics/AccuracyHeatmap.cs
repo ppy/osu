@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -18,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Statistics
 {
-    public class AccuracyHeatmap : CompositeDrawable
+    public partial class AccuracyHeatmap : CompositeDrawable
     {
         /// <summary>
         /// Size of the inner circle containing the "hit" points, relative to the size of this <see cref="AccuracyHeatmap"/>.
@@ -136,10 +138,9 @@ namespace osu.Game.Rulesets.Osu.Statistics
                             }
                         }
                     },
-                    bufferedGrid = new BufferedContainer
+                    bufferedGrid = new BufferedContainer(cachedFrameBuffer: true)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        CacheDrawnFrameBuffer = true,
                         BackgroundColour = Color4Extensions.FromHex("#202624").Opacity(0),
                         Child = pointGrid = new GridContainer
                         {
@@ -175,7 +176,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
             pointGrid.Content = points;
 
-            if (score.HitEvents == null || score.HitEvents.Count == 0)
+            if (score.HitEvents.Count == 0)
                 return;
 
             // Todo: This should probably not be done like this.
@@ -216,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             // Likewise sin(pi/2)=1 and sin(3pi/2)=-1, whereas we actually want these values to appear on the bottom/top respectively, so the y-coordinate also needs to be inverted.
             //
             // We also need to apply the anti-clockwise rotation.
-            var rotatedAngle = finalAngle - MathUtils.DegreesToRadians(rotation);
+            double rotatedAngle = finalAngle - MathUtils.DegreesToRadians(rotation);
             var rotatedCoordinate = -1 * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
 
             Vector2 localCentre = new Vector2(points_per_dimension - 1) / 2;
@@ -232,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             bufferedGrid.ForceRedraw();
         }
 
-        private class HitPoint : Circle
+        private partial class HitPoint : Circle
         {
             /// <summary>
             /// The base colour which will be lightened/darkened depending on the value of this <see cref="HitPoint"/>.

@@ -1,22 +1,24 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Scoring;
 using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawableProfileWeightedScore : DrawableProfileScore
+    public partial class DrawableProfileWeightedScore : DrawableProfileScore
     {
         private readonly double weight;
 
-        public DrawableProfileWeightedScore(ScoreInfo score, double weight)
+        public DrawableProfileWeightedScore(SoloScoreInfo score, double weight)
             : base(score)
         {
             this.weight = weight;
@@ -40,12 +42,11 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         CreateDrawableAccuracy(),
                         new Container
                         {
-                            AutoSizeAxes = Axes.Y,
-                            Width = 50,
+                            Size = new Vector2(50, 14),
                             Child = new OsuSpriteText
                             {
                                 Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                                Text = $"{Score.PP * weight:0}pp",
+                                Text = Score.PP.HasValue ? $"{Score.PP * weight:0}pp" : string.Empty,
                             },
                         }
                     }

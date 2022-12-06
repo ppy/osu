@@ -16,14 +16,14 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Rulesets;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Select.Details;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapDetails : Container
+    public partial class BeatmapDetails : Container
     {
         private const float spacing = 10;
         private const float transition_duration = 250;
@@ -36,18 +36,18 @@ namespace osu.Game.Screens.Select
         private readonly LoadingLayer loading;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private SongSelect? songSelect { get; set; }
 
-        private BeatmapInfo beatmapInfo;
+        private IBeatmapInfo? beatmapInfo;
 
-        private APIFailTimes failTimes;
+        private APIFailTimes? failTimes;
 
-        private int[] ratings;
+        private int[]? ratings;
 
-        public BeatmapInfo BeatmapInfo
+        public IBeatmapInfo? BeatmapInfo
         {
             get => beatmapInfo;
             set
@@ -56,8 +56,11 @@ namespace osu.Game.Screens.Select
 
                 beatmapInfo = value;
 
-                failTimes = beatmapInfo?.OnlineInfo?.FailTimes;
-                ratings = beatmapInfo?.BeatmapSet?.Ratings;
+                var onlineInfo = beatmapInfo as IBeatmapOnlineInfo;
+                var onlineSetInfo = beatmapInfo?.BeatmapSet as IBeatmapSetOnlineInfo;
+
+                failTimes = onlineInfo?.FailTimes;
+                ratings = onlineSetInfo?.Ratings;
 
                 Scheduler.AddOnce(updateStatistics);
             }
@@ -138,9 +141,9 @@ namespace osu.Game.Screens.Select
                                                     LayoutEasing = Easing.OutQuad,
                                                     Children = new[]
                                                     {
-                                                        description = new MetadataSection(MetadataType.Description),
-                                                        source = new MetadataSection(MetadataType.Source),
-                                                        tags = new MetadataSection(MetadataType.Tags),
+                                                        description = new MetadataSection(MetadataType.Description, searchOnSongSelect),
+                                                        source = new MetadataSection(MetadataType.Source, searchOnSongSelect),
+                                                        tags = new MetadataSection(MetadataType.Tags, searchOnSongSelect),
                                                     },
                                                 },
                                             },
@@ -156,7 +159,7 @@ namespace osu.Game.Screens.Select
                                         {
                                             new OsuSpriteText
                                             {
-                                                Text = "Points of Failure",
+                                                Text = BeatmapsetsStrings.ShowInfoPointsOfFailure,
                                                 Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                                             },
                                             failRetryGraph = new FailRetryGraph
@@ -173,24 +176,30 @@ namespace osu.Game.Screens.Select
                 },
                 loading = new LoadingLayer(true)
             };
+
+            void searchOnSongSelect(string text)
+            {
+                if (songSelect != null)
+                    songSelect.FilterControl.CurrentTextSearch.Value = text;
+            }
         }
 
         private void updateStatistics()
         {
             advanced.BeatmapInfo = BeatmapInfo;
-            description.Text = BeatmapInfo?.Version;
-            source.Text = BeatmapInfo?.Metadata?.Source;
-            tags.Text = BeatmapInfo?.Metadata?.Tags;
+            description.Text = BeatmapInfo?.DifficultyName;
+            source.Text = BeatmapInfo?.Metadata.Source;
+            tags.Text = BeatmapInfo?.Metadata.Tags;
 
-            // metrics may have been previously fetched
+            // failTimes may have been previously fetched
             if (ratings != null && failTimes != null)
             {
                 updateMetrics();
                 return;
             }
 
-            // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
-            if (BeatmapInfo?.OnlineBeatmapID == null || api.State.Value == APIState.Offline)
+            // for now, let's early abort if an OnlineID is not present (should have been populated at import time).
+            if (BeatmapInfo == null || BeatmapInfo.OnlineID <= 0 || api.State.Value == APIState.Offline)
             {
                 updateMetrics();
                 return;
@@ -215,7 +224,7 @@ namespace osu.Game.Screens.Select
                 });
             };
 
-            lookup.Failure += e =>
+            lookup.Failure += _ =>
             {
                 Schedule(() =>
                 {
@@ -233,7 +242,7 @@ namespace osu.Game.Screens.Select
 
         private void updateMetrics()
         {
-            var hasMetrics = (failTimes?.Retries?.Any() ?? false) || (failTimes?.Fails?.Any() ?? false);
+            bool hasMetrics = (failTimes?.Retries?.Any() ?? false) || (failTimes?.Fails?.Any() ?? false);
 
             if (ratings?.Any() ?? false)
             {
@@ -264,7 +273,7 @@ namespace osu.Game.Screens.Select
             loading.Hide();
         }
 
-        private class DetailBox : Container
+        private partial class DetailBox : Container
         {
             private readonly Container content;
             protected override Container<Drawable> Content => content;

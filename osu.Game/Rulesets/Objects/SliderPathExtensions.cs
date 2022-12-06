@@ -2,15 +2,23 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
-
-#nullable enable
 
 namespace osu.Game.Rulesets.Objects
 {
     public static class SliderPathExtensions
     {
+        /// <summary>
+        /// Snaps the provided <paramref name="hitObject"/>'s duration using the <paramref name="snapProvider"/>.
+        /// </summary>
+        public static void SnapTo<THitObject>(this THitObject hitObject, IDistanceSnapProvider? snapProvider)
+            where THitObject : HitObject, IHasPath
+        {
+            hitObject.Path.ExpectedDistance.Value = snapProvider?.FindSnappedDistance(hitObject, (float)hitObject.Path.CalculatedDistance) ?? hitObject.Path.CalculatedDistance;
+        }
+
         /// <summary>
         /// Reverse the direction of this path.
         /// </summary>
@@ -25,7 +33,7 @@ namespace osu.Game.Rulesets.Objects
 
             PathType? lastType = null;
 
-            for (var i = 0; i < points.Length; i++)
+            for (int i = 0; i < points.Length; i++)
             {
                 var p = points[i];
                 p.Position -= positionalOffset;

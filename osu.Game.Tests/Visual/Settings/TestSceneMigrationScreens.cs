@@ -1,34 +1,73 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using System.Threading;
+using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    public class TestSceneMigrationScreens : ScreenTestScene
+    public partial class TestSceneMigrationScreens : ScreenTestScene
     {
+        [Cached(typeof(INotificationOverlay))]
+        private readonly NotificationOverlay notifications;
+
         public TestSceneMigrationScreens()
         {
-            AddStep("Push screen", () => Stack.Push(new TestMigrationSelectScreen()));
+            Children = new Drawable[]
+            {
+                notifications = new NotificationOverlay
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                }
+            };
         }
 
-        private class TestMigrationSelectScreen : MigrationSelectScreen
+        [Test]
+        public void TestDeleteSuccess()
         {
-            protected override void BeginMigration(DirectoryInfo target) => this.Push(new TestMigrationRunScreen());
+            AddStep("Push screen", () => Stack.Push(new TestMigrationSelectScreen(true)));
+        }
 
-            private class TestMigrationRunScreen : MigrationRunScreen
+        [Test]
+        public void TestDeleteFails()
+        {
+            AddStep("Push screen", () => Stack.Push(new TestMigrationSelectScreen(false)));
+        }
+
+        private partial class TestMigrationSelectScreen : MigrationSelectScreen
+        {
+            private readonly bool deleteSuccess;
+
+            public TestMigrationSelectScreen(bool deleteSuccess)
             {
-                protected override void PerformMigration()
-                {
-                    Thread.Sleep(3000);
-                }
+                this.deleteSuccess = deleteSuccess;
+            }
 
-                public TestMigrationRunScreen()
+            protected override void BeginMigration(DirectoryInfo target) => this.Push(new TestMigrationRunScreen(deleteSuccess));
+
+            private partial class TestMigrationRunScreen : MigrationRunScreen
+            {
+                private readonly bool success;
+
+                public TestMigrationRunScreen(bool success)
                     : base(null)
                 {
+                    this.success = success;
+                }
+
+                protected override bool PerformMigration()
+                {
+                    Thread.Sleep(3000);
+                    return success;
                 }
             }
         }

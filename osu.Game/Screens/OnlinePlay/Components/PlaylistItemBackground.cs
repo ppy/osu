@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
@@ -11,13 +9,13 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class PlaylistItemBackground : Background
+    public partial class PlaylistItemBackground : Background
     {
-        public readonly BeatmapInfo? BeatmapInfo;
+        public readonly IBeatmapInfo? Beatmap;
 
         public PlaylistItemBackground(PlaylistItem? playlistItem)
         {
-            BeatmapInfo = playlistItem?.Beatmap.Value;
+            Beatmap = playlistItem?.Beatmap;
         }
 
         [BackgroundDependencyLoader]
@@ -26,8 +24,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
             Texture? texture = null;
 
             // prefer online cover where available.
-            if (BeatmapInfo?.BeatmapSet?.OnlineInfo?.Covers.Cover != null)
-                texture = textures.Get(BeatmapInfo.BeatmapSet.OnlineInfo.Covers.Cover);
+            if (Beatmap?.BeatmapSet is IBeatmapSetOnlineInfo online)
+                texture = textures.Get(online.Covers.Cover);
 
             Sprite.Texture = texture ?? beatmaps.DefaultBeatmap.Background;
         }
@@ -38,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             if (ReferenceEquals(this, other)) return true;
 
             return other.GetType() == GetType()
-                   && ((PlaylistItemBackground)other).BeatmapInfo == BeatmapInfo;
+                   && ((PlaylistItemBackground)other).Beatmap == Beatmap;
         }
     }
 }

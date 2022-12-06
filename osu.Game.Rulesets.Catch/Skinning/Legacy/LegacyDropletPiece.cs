@@ -6,7 +6,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyDropletPiece : LegacyCatchHitObjectPiece
+    public partial class LegacyDropletPiece : LegacyCatchHitObjectPiece
     {
         public LegacyDropletPiece()
         {
@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             base.LoadComplete();
 
-            Texture texture = Skin.GetTexture("fruit-drop");
-            Texture overlayTexture = Skin.GetTexture("fruit-drop-overlay");
+            Texture? texture = Skin.GetTexture("fruit-drop");
+            Texture? overlayTexture = Skin.GetTexture("fruit-drop-overlay");
 
             SetTexture(texture, overlayTexture);
         }

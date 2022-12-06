@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
-using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Utils;
 
 namespace osu.Game.Tests.NonVisual
 {
@@ -30,7 +32,7 @@ namespace osu.Game.Tests.NonVisual
             Assert.Throws<InvalidOperationException>(() => _ = queue.Dequeue());
 
             int count = 0;
-            foreach (var _ in queue)
+            foreach (int _ in queue)
                 count++;
 
             Assert.AreEqual(0, count);
@@ -50,7 +52,7 @@ namespace osu.Game.Tests.NonVisual
                 Assert.AreEqual(i, queue[i]);
 
             int j = 0;
-            foreach (var item in queue)
+            foreach (int item in queue)
                 Assert.AreEqual(j++, item);
 
             for (int i = queue.Count; i < queue.Count + capacity; i++)
@@ -71,7 +73,7 @@ namespace osu.Game.Tests.NonVisual
                 Assert.AreEqual(count - capacity + i, queue[i]);
 
             int j = count - capacity;
-            foreach (var item in queue)
+            foreach (int item in queue)
                 Assert.AreEqual(j++, item);
 
             for (int i = queue.Count; i < queue.Count + capacity; i++)

@@ -1,16 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    internal class VisibilitySection : EditorRoundedScreenSettingsSection
+    internal partial class VisibilitySection : EditorRoundedScreenSettingsSection
     {
         private readonly IssueType[] configurableIssueTypes =
         {
@@ -24,7 +25,7 @@ namespace osu.Game.Screens.Edit.Verify
         protected override string HeaderText => "Visibility";
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colours, VerifyScreen verify)
+        private void load(VerifyScreen verify)
         {
             hiddenIssueTypes = verify.HiddenIssueTypes.GetBoundCopy();
 

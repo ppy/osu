@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -15,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class OsuPopover : Popover, IKeyBindingHandler<GlobalAction>
+    public partial class OsuPopover : Popover, IKeyBindingHandler<GlobalAction>
     {
         private const float fade_duration = 250;
         private const double scale_duration = 500;
@@ -39,7 +41,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour colours)
         {
-            Background.Colour = Arrow.Colour = colourProvider?.Background4 ?? colours.GreySeafoamDarker;
+            Background.Colour = Arrow.Colour = colourProvider?.Background4 ?? colours.GreySeaFoamDarker;
         }
 
         protected override Drawable CreateArrow() => Empty();
@@ -58,6 +60,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (State.Value == Visibility.Hidden)
                 return false;
 

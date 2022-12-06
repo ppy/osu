@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapSetOnlineStatusPill : ThemeComparisonTestScene
+    public partial class TestSceneBeatmapSetOnlineStatusPill : ThemeComparisonTestScene
     {
         protected override Drawable CreateContent() => new FillFlowContainer
         {
@@ -26,7 +28,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             Origin = Anchor.Centre,
             Direction = FillDirection.Vertical,
             Spacing = new Vector2(0, 10),
-            ChildrenEnumerable = Enum.GetValues(typeof(BeatmapSetOnlineStatus)).Cast<BeatmapSetOnlineStatus>().Select(status => new BeatmapSetOnlineStatusPill
+            ChildrenEnumerable = Enum.GetValues(typeof(BeatmapOnlineStatus)).Cast<BeatmapOnlineStatus>().Select(status => new BeatmapSetOnlineStatusPill
             {
                 AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,

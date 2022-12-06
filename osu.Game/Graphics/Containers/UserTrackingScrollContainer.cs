@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class UserTrackingScrollContainer : UserTrackingScrollContainer<Drawable>
+    public partial class UserTrackingScrollContainer : UserTrackingScrollContainer<Drawable>
     {
         public UserTrackingScrollContainer()
         {
@@ -17,15 +19,13 @@ namespace osu.Game.Graphics.Containers
         }
     }
 
-    public class UserTrackingScrollContainer<T> : OsuScrollContainer<T>
+    public partial class UserTrackingScrollContainer<T> : OsuScrollContainer<T>
         where T : Drawable
     {
         /// <summary>
         /// Whether the last scroll event was user triggered, directly on the scroll container.
         /// </summary>
         public bool UserScrolling { get; private set; }
-
-        public void CancelUserScroll() => UserScrolling = false;
 
         public UserTrackingScrollContainer()
         {

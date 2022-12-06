@@ -1,14 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
@@ -16,10 +20,11 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestScenePresentScore : OsuGameTestScene
+    public partial class TestScenePresentScore : OsuGameTestScene
     {
         private BeatmapSetInfo beatmap;
 
@@ -28,37 +33,38 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddStep("import beatmap", () =>
             {
-                var difficulty = new BeatmapDifficulty();
-                var metadata = new BeatmapMetadata
-                {
-                    Artist = "SomeArtist",
-                    AuthorString = "SomeAuthor",
-                    Title = "import"
-                };
-
                 beatmap = Game.BeatmapManager.Import(new BeatmapSetInfo
                 {
                     Hash = Guid.NewGuid().ToString(),
-                    OnlineBeatmapSetID = 1,
-                    Metadata = metadata,
-                    Beatmaps = new List<BeatmapInfo>
+                    OnlineID = 1,
+                    Beatmaps =
                     {
                         new BeatmapInfo
                         {
-                            OnlineBeatmapID = 1 * 1024,
-                            Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            OnlineID = 1 * 1024,
+                            Metadata = new BeatmapMetadata
+                            {
+                                Artist = "SomeArtist",
+                                Author = { Username = "SomeAuthor" },
+                                Title = "import"
+                            },
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                         new BeatmapInfo
                         {
-                            OnlineBeatmapID = 1 * 2048,
-                            Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            OnlineID = 1 * 2048,
+                            Metadata = new BeatmapMetadata
+                            {
+                                Artist = "SomeArtist",
+                                Author = { Username = "SomeAuthor" },
+                                Title = "import"
+                            },
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                     }
-                }).Result.Value;
+                })?.Value;
             });
         }
 
@@ -66,11 +72,11 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestFromMainMenu([Values] ScorePresentType type)
         {
             var firstImport = importScore(1);
-            var secondimport = importScore(3);
+            var secondImport = importScore(3);
 
             presentAndConfirm(firstImport, type);
             returnToMenu();
-            presentAndConfirm(secondimport, type);
+            presentAndConfirm(secondImport, type);
             returnToMenu();
             returnToMenu();
         }
@@ -79,33 +85,64 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestFromMainMenuDifferentRuleset([Values] ScorePresentType type)
         {
             var firstImport = importScore(1);
-            var secondimport = importScore(3, new ManiaRuleset().RulesetInfo);
+            var secondImport = importScore(3, new ManiaRuleset().RulesetInfo);
 
             presentAndConfirm(firstImport, type);
             returnToMenu();
-            presentAndConfirm(secondimport, type);
+            presentAndConfirm(secondImport, type);
             returnToMenu();
             returnToMenu();
+        }
+
+        [Test]
+        public void TestFromSongSelectWithFilter([Values] ScorePresentType type)
+        {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
+            AddStep("filter to nothing", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).FilterControl.CurrentTextSearch.Value = "fdsajkl;fgewq");
+            AddUntilStep("wait for no results", () => Beatmap.IsDefault);
+
+            var firstImport = importScore(1, new CatchRuleset().RulesetInfo);
+            presentAndConfirm(firstImport, type);
+        }
+
+        [Test]
+        public void TestFromSongSelectWithConvertRulesetChange([Values] ScorePresentType type)
+        {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
+            AddStep("set convert to false", () => Game.LocalConfig.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            var firstImport = importScore(1, new CatchRuleset().RulesetInfo);
+            presentAndConfirm(firstImport, type);
         }
 
         [Test]
         public void TestFromSongSelect([Values] ScorePresentType type)
         {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
             var firstImport = importScore(1);
             presentAndConfirm(firstImport, type);
 
-            var secondimport = importScore(3);
-            presentAndConfirm(secondimport, type);
+            var secondImport = importScore(3);
+            presentAndConfirm(secondImport, type);
         }
 
         [Test]
         public void TestFromSongSelectDifferentRuleset([Values] ScorePresentType type)
         {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
             var firstImport = importScore(1);
             presentAndConfirm(firstImport, type);
 
-            var secondimport = importScore(3, new ManiaRuleset().RulesetInfo);
-            presentAndConfirm(secondimport, type);
+            var secondImport = importScore(3, new ManiaRuleset().RulesetInfo);
+            presentAndConfirm(secondImport, type);
         }
 
         private void returnToMenu()
@@ -129,10 +166,11 @@ namespace osu.Game.Tests.Visual.Navigation
                 imported = Game.ScoreManager.Import(new ScoreInfo
                 {
                     Hash = Guid.NewGuid().ToString(),
-                    OnlineScoreID = i,
+                    OnlineID = i,
                     BeatmapInfo = beatmap.Beatmaps.First(),
-                    Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
-                }).Result.Value;
+                    Ruleset = ruleset ?? new OsuRuleset().RulesetInfo,
+                    User = new GuestUser(),
+                }).Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);
@@ -155,15 +193,15 @@ namespace osu.Game.Tests.Visual.Navigation
                 case ScorePresentType.Results:
                     AddUntilStep("wait for results", () => lastWaitedScreen != Game.ScreenStack.CurrentScreen && Game.ScreenStack.CurrentScreen is ResultsScreen);
                     AddStep("store last waited screen", () => lastWaitedScreen = Game.ScreenStack.CurrentScreen);
-                    AddUntilStep("correct score displayed", () => ((ResultsScreen)Game.ScreenStack.CurrentScreen).Score.ID == getImport().ID);
-                    AddAssert("correct ruleset selected", () => Game.Ruleset.Value.ID == getImport().Ruleset.ID);
+                    AddUntilStep("correct score displayed", () => ((ResultsScreen)Game.ScreenStack.CurrentScreen).Score.Equals(getImport()));
+                    AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Ruleset));
                     break;
 
                 case ScorePresentType.Gameplay:
                     AddUntilStep("wait for player loader", () => lastWaitedScreen != Game.ScreenStack.CurrentScreen && Game.ScreenStack.CurrentScreen is ReplayPlayerLoader);
                     AddStep("store last waited screen", () => lastWaitedScreen = Game.ScreenStack.CurrentScreen);
-                    AddUntilStep("correct score displayed", () => ((ReplayPlayerLoader)Game.ScreenStack.CurrentScreen).Score.ID == getImport().ID);
-                    AddAssert("correct ruleset selected", () => Game.Ruleset.Value.ID == getImport().Ruleset.ID);
+                    AddUntilStep("correct score displayed", () => ((ReplayPlayerLoader)Game.ScreenStack.CurrentScreen).Score.Equals(getImport()));
+                    AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Ruleset));
                     break;
             }
         }

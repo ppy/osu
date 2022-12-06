@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -25,7 +27,9 @@ namespace osu.Game.Storyboards
         public void Add(Easing easing, double startTime, double endTime, T startValue, T endValue)
         {
             if (endTime < startTime)
-                return;
+            {
+                endTime = startTime;
+            }
 
             commands.Add(new TypedCommand { Easing = easing, StartTime = startTime, EndTime = endTime, StartValue = startValue, EndValue = endValue });
 
@@ -57,7 +61,7 @@ namespace osu.Game.Storyboards
 
             public int CompareTo(ICommand other)
             {
-                var result = StartTime.CompareTo(other.StartTime);
+                int result = StartTime.CompareTo(other.StartTime);
                 if (result != 0) return result;
 
                 return EndTime.CompareTo(other.EndTime);

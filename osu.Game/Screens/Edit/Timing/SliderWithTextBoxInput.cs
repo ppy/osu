@@ -1,24 +1,30 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Globalization;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
+using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class SliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T>
+    public partial class SliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         private readonly SettingsSlider<T> slider;
 
-        public SliderWithTextBoxInput(string labelText)
+        public SliderWithTextBoxInput(LocalisableString labelText)
         {
-            LabelledTextBox textbox;
+            LabelledTextBox textBox;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -30,9 +36,10 @@ namespace osu.Game.Screens.Edit.Timing
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(20),
                     Children = new Drawable[]
                     {
-                        textbox = new LabelledTextBox
+                        textBox = new LabelledTextBox
                         {
                             Label = labelText,
                         },
@@ -45,13 +52,26 @@ namespace osu.Game.Screens.Edit.Timing
                 },
             };
 
-            textbox.OnCommit += (t, isNew) =>
+            textBox.OnCommit += (t, isNew) =>
             {
                 if (!isNew) return;
 
                 try
                 {
-                    slider.Current.Parse(t.Text);
+                    switch (slider.Current)
+                    {
+                        case Bindable<int> bindableInt:
+                            bindableInt.Value = int.Parse(t.Text);
+                            break;
+
+                        case Bindable<double> bindableDouble:
+                            bindableDouble.Value = double.Parse(t.Text);
+                            break;
+
+                        default:
+                            slider.Current.Parse(t.Text);
+                            break;
+                    }
                 }
                 catch
                 {
@@ -63,9 +83,10 @@ namespace osu.Game.Screens.Edit.Timing
                 Current.TriggerChange();
             };
 
-            Current.BindValueChanged(val =>
+            Current.BindValueChanged(_ =>
             {
-                textbox.Text = val.NewValue.ToString();
+                decimal decimalValue = slider.Current.Value.ToDecimal(NumberFormatInfo.InvariantInfo);
+                textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
             }, true);
         }
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,12 +14,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsResultsScreen : ResultsScreen
+    public partial class PlaylistsResultsScreen : ResultsScreen
     {
         private readonly long roomId;
         private readonly PlaylistItem playlistItem;
@@ -34,6 +37,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         public PlaylistsResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
             : base(score, allowRetry, allowWatchingReplay)
@@ -82,6 +88,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             userScoreReq.Success += userScore =>
             {
                 var allScores = new List<MultiplayerScore> { userScore };
+
+                // Other scores could have arrived between score submission and entering the results screen. Ensure the local player score position is up to date.
+                if (Score != null)
+                {
+                    Score.Position = userScore.Position;
+                    ScorePanelList.GetPanelForScore(Score).ScorePosition.Value = userScore.Position;
+                }
 
                 if (userScore.ScoresAround?.Higher != null)
                 {
@@ -167,31 +180,26 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="callback">The callback to invoke with the final <see cref="ScoreInfo"/>s.</param>
         /// <param name="scores">The <see cref="MultiplayerScore"/>s that were retrieved from <see cref="APIRequest"/>s.</param>
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
-        private void performSuccessCallback([NotNull] Action<IEnumerable<ScoreInfo>> callback, [NotNull] List<MultiplayerScore> scores, [CanBeNull] MultiplayerScores pivot = null)
+        private void performSuccessCallback([NotNull] Action<IEnumerable<ScoreInfo>> callback, [NotNull] List<MultiplayerScore> scores, [CanBeNull] MultiplayerScores pivot = null) => Schedule(() =>
         {
-            var scoreInfos = scores.Select(s => s.CreateScoreInfo(playlistItem)).ToArray();
+            var scoreInfos = scoreManager.OrderByTotalScore(scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, Beatmap.Value.BeatmapInfo))).ToArray();
 
-            // Score panels calculate total score before displaying, which can take some time. In order to count that calculation as part of the loading spinner display duration,
-            // calculate the total scores locally before invoking the success callback.
-            scoreManager.OrderByTotalScoreAsync(scoreInfos).ContinueWith(_ => Schedule(() =>
+            // Select a score if we don't already have one selected.
+            // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).
+            if (SelectedScore.Value == null)
             {
-                // Select a score if we don't already have one selected.
-                // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).
-                if (SelectedScore.Value == null)
+                Schedule(() =>
                 {
-                    Schedule(() =>
-                    {
-                        // Prefer selecting the local user's score, or otherwise default to the first visible score.
-                        SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.Id == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
-                    });
-                }
+                    // Prefer selecting the local user's score, or otherwise default to the first visible score.
+                    SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.OnlineID == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
+                });
+            }
 
-                // Invoke callback to add the scores. Exclude the user's current score which was added previously.
-                callback.Invoke(scoreInfos.Where(s => s.OnlineScoreID != Score?.OnlineScoreID));
+            // Invoke callback to add the scores. Exclude the user's current score which was added previously.
+            callback.Invoke(scoreInfos.Where(s => s.OnlineID != Score?.OnlineID));
 
-                hideLoadingSpinners(pivot);
-            }));
-        }
+            hideLoadingSpinners(pivot);
+        });
 
         private void hideLoadingSpinners([CanBeNull] MultiplayerScores pivot = null)
         {
@@ -227,7 +235,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         }
 
-        private class PanelListLoadingSpinner : LoadingSpinner
+        private partial class PanelListLoadingSpinner : LoadingSpinner
         {
             private readonly ScorePanelList list;
 
