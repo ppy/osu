@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Edit.List
 
         public virtual Drawable GetDrawableListItem() => this;
 
-        internal void default_onDragAction()
+        internal void Default_onDragAction()
         {
             for (int i = 0; i < Items.Count; i++)
             {

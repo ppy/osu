@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Edit.List
         private void setProperties()
         {
             Properties.TopLevelItem = this;
-            Properties.OnDragAction = List.default_onDragAction;
+            Properties.OnDragAction = List.Default_onDragAction;
         }
 
         private bool checkAllSelectedState(SelectionState state)
