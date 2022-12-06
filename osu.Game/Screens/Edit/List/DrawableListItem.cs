@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit.List
             box.Hide();
         }
 
-        public DrawableListItem(DrawableListRepresetedItem<T> represetedItem, DrawableListProperties<T> properties)
+        internal DrawableListItem(DrawableListRepresetedItem<T> represetedItem, DrawableListProperties<T> properties)
             //select the name of the from the drawable as it's name, if it is set
             //otherwise use the
             : this(represetedItem, properties, string.Empty)

@@ -4,11 +4,13 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.List
 {
-    public abstract partial class AbstractListItem<T> : RearrangeableListItem<DrawableListRepresetedItem<T>>, IRearrangableDrawableListItem<T>
+    public abstract partial class AbstractListItem<T> : CompositeDrawable, IRearrangableDrawableListItem<T>
         where T : Drawable
     {
         public DrawableListProperties<T> Properties { get; internal set; }
@@ -20,8 +22,8 @@ namespace osu.Game.Screens.Edit.List
         }
 
         protected AbstractListItem(DrawableListRepresetedItem<T> item, DrawableListProperties<T> properties)
-            : base(item)
         {
+            Model = item;
             StateChanged = t =>
             {
                 switch (t)
@@ -55,5 +57,46 @@ namespace osu.Game.Screens.Edit.List
         public event Action<SelectionState> StateChanged;
         public virtual event Action Selected = () => { };
         public virtual event Action Deselected = () => { };
+
+        #region RearrangableListItem reimplementation
+
+        public readonly DrawableListRepresetedItem<T> Model;
+
+        /// <summary>
+        /// Invoked on drag start, if an arrangement should be started.
+        /// </summary>
+        internal Action<AbstractListItem<T>, DragStartEvent> StartArrangement = (_, _) => { };
+
+        /// <summary>
+        /// Invoked on drag, if this item is being arranged.
+        /// </summary>
+        internal Action<AbstractListItem<T>, DragEvent> Arrange = (_, _) => { };
+
+        /// <summary>
+        /// Invoked on drag end, if this item is being arranged.
+        /// </summary>
+        internal Action<AbstractListItem<T>, DragEndEvent> EndArrangement = (_, _) => { };
+
+        /// <summary>
+        /// Whether the item is able to be dragged at the given screen-space position.
+        /// </summary>
+        protected virtual bool IsDraggableAt(Vector2 screenSpacePos) => true;
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (IsDraggableAt(e.ScreenSpaceMouseDownPosition))
+            {
+                StartArrangement.Invoke(this, e);
+                return true;
+            }
+
+            return false;
+        }
+
+        protected override void OnDrag(DragEvent e) => Arrange.Invoke(this, e);
+
+        protected override void OnDragEnd(DragEndEvent e) => EndArrangement.Invoke(this, e);
+
+        #endregion
     }
 }

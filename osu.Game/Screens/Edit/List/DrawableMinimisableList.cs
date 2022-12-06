@@ -19,24 +19,24 @@ namespace osu.Game.Screens.Edit.List
 
         private readonly DrawableListItem<T> representedListItem;
 
-        public DrawableMinimisableList(T item)
+        internal DrawableMinimisableList(T item)
             : this(item, new DrawableListProperties<T>())
         {
             setProperties();
         }
 
-        public DrawableMinimisableList(T item, DrawableListProperties<T> properties)
+        internal DrawableMinimisableList(T item, DrawableListProperties<T> properties)
             : this(new DrawableListRepresetedItem<T>(item, DrawableListEntryType.MinimisableList), properties)
         {
         }
 
-        public DrawableMinimisableList(DrawableListRepresetedItem<T> item)
+        internal DrawableMinimisableList(DrawableListRepresetedItem<T> item)
             : this(item, new DrawableListProperties<T>())
         {
             setProperties();
         }
 
-        public DrawableMinimisableList(DrawableListRepresetedItem<T> item, DrawableListProperties<T> properties)
+        internal DrawableMinimisableList(DrawableListRepresetedItem<T> item, DrawableListProperties<T> properties)
             : base(item, properties)
         {
             SpriteIcon icon;
