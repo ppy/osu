@@ -4,12 +4,15 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -46,7 +49,48 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override LocalisableString FormatCount(double count)
         {
-            return $@"{count:0} BPM";
+            return $@"{count:0}";
+        }
+
+        protected override IHasText CreateText() => new TextComponent();
+
+        private partial class TextComponent : CompositeDrawable, IHasText
+        {
+            public LocalisableString Text
+            {
+                get => text.Text;
+                set => text.Text = value;
+            }
+
+            private readonly OsuSpriteText text;
+
+            public TextComponent()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                InternalChild = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Spacing = new Vector2(2),
+                    Children = new Drawable[]
+                    {
+                        text = new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = OsuFont.Numeric.With(size: 16, fixedWidth: true)
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = OsuFont.Numeric.With(size: 8, fixedWidth: true),
+                            Text = @"BPM",
+                            Padding = new MarginPadding { Bottom = 1.5f }, // align baseline better
+                        }
+                    }
+                };
+            }
         }
 
         public bool UsesFixedAnchor { get; set; }
