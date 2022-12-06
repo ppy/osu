@@ -160,14 +160,31 @@ namespace osu.Game.Rulesets.Osu.Utils
         public static void RotateSlider(Slider slider, float rotation)
         {
             void rotateNestedObject(OsuHitObject nested) => nested.Position = rotateVector(nested.Position - slider.Position, rotation) + slider.Position;
+            void rotateControlPoint(PathControlPoint point) => point.Position = rotateVector(point.Position, rotation);
 
+            modifySlider(slider, rotateNestedObject, rotateControlPoint);
+        }
+
+        /// <summary>
+        /// Flips the slider about its start position.
+        /// </summary>
+        public static void FlipSlider(Slider slider)
+        {
+            void flipNestedObject(OsuHitObject nested) => nested.Position = new Vector2(slider.Position.X - (nested.X - slider.Position.X), nested.Y);
+            static void flipControlPoint(PathControlPoint point) => point.Position = new Vector2(-point.Position.X, point.Position.Y);
+
+            modifySlider(slider, flipNestedObject, flipControlPoint);
+        }
+
+        private static void modifySlider(Slider slider, Action<OsuHitObject> modifyNestedObject, Action<PathControlPoint> modifyControlPoint)
+        {
             // No need to update the head and tail circles, since slider handles that when the new slider path is set
-            slider.NestedHitObjects.OfType<SliderTick>().ForEach(rotateNestedObject);
-            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(rotateNestedObject);
+            slider.NestedHitObjects.OfType<SliderTick>().ForEach(modifyNestedObject);
+            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(modifyNestedObject);
 
             var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
             foreach (var point in controlPoints)
-                point.Position = rotateVector(point.Position, rotation);
+                modifyControlPoint(point);
 
             slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
         }
