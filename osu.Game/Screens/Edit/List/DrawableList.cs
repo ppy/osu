@@ -1,13 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-//todo: remove this preprocessor statement completely, once the implementation is done.
-//right now I still sometimes want logging statements
-
-#if false
-#define VERBOSE_LOGS
-#endif
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,10 +11,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
-#if VERBOSE_LOGS
-using osu.Framework.Logging;
-#endif
 using osu.Game.Utils;
 using osuTK;
 
@@ -331,18 +322,24 @@ namespace osu.Game.Screens.Edit.List
                 ScrollContainer.ScrollBy(scrollSpeed);
         }
 
-        private void updateArrangement()
+        /// <summary>
+        /// Gives a Value back, to which the currentlyDragged item should be moved.
+        /// If the currentlyDragged item doesn't need to be moved, or is removed from this list, an empty Value is returned
+        /// </summary>
+        /// <returns>A index to which the currentlyDraggedItem should be moved, or an empty Optional</returns>
+        private Optional<int> checkArrangement()
         {
-            if (currentlyDraggedItem is null) return;
+            if (currentlyDraggedItem is null) return default;
 
-            var localPos = ListItems.ToLocalSpace(screenSpaceDragPosition);
             int srcIndex = Items.IndexOf(currentlyDraggedItem.Model);
+            var localPos = ListItems.ToLocalSpace(screenSpaceDragPosition);
+
+            if (localPos.Y > currentlyDraggedItem.BoundingBox.Top && localPos.Y < currentlyDraggedItem.BoundingBox.Bottom) return default;
 
             // Find the last item with position < mouse position. Note we can't directly use
             // the item positions as they are being transformed
             float heightAccumulator = 0;
             int dstIndex = 0;
-            bool itemWasMovedOut = false;
 
             for (; dstIndex < Items.Count; dstIndex++)
             {
@@ -354,17 +351,15 @@ namespace osu.Game.Screens.Edit.List
                 // Using BoundingBox here takes care of scale, paddings, etc...
                 float height = drawable.BoundingBox.Height;
 
-#if true
                 if (drawable is DrawableMinimisableList<T> minimisableListChild
-                    && heightAccumulator + minimisableListChild.ListHeadBoundingBox.Height / 2 > localPos.Y)
+                    && heightAccumulator + getBoundingBox(minimisableListChild).Height / 2 < localPos.Y
+                    && heightAccumulator + drawable.BoundingBox.Height - getBoundingBox(minimisableListChild).Height / 2 > localPos.Y)
                 {
-#if VERBOSE_LOGS
-                    Logger.Log($"moving item into list {minimisableListChild.ListHeadText}");
-#endif
-                    itemWasMovedOut = insertElementIntoList(currentlyDraggedItem, 0, srcIndex, minimisableListChild.List);
+                    if (insertElementIntoList(currentlyDraggedItem, 0, srcIndex, minimisableListChild.List))
+                        return default;
+
                     break;
                 }
-#endif
 
                 // Rearrangement should occur only after the mid-point of items is crossed
                 heightAccumulator += height / 2;
@@ -386,34 +381,14 @@ namespace osu.Game.Screens.Edit.List
                 // Add the remainder of the height of the current item
                 heightAccumulator += height / 2 + ListItems.Spacing.Y;
             }
-#if VERBOSE_LOGS
-            if (dstIndex < 0) Logger.Log("destination index < 0");
-            if (dstIndex > ListItems.Count - 1) Logger.Log("destination index >= ListItems.Count");
-#endif
-            if (!itemWasMovedOut && Parent is DrawableMinimisableList<T> minimisableList && minimisableList.Parent?.Parent is DrawableList<T> list)
+
+            if (Parent is DrawableMinimisableList<T> minimisableList
+                && minimisableList.Parent?.Parent is DrawableList<T> list)
             {
-#if VERBOSE_LOGS
-                Logger.Log($"Testing parent moving conditions for {minimisableList.ListHeadText}");
-                if (list.Parent is DrawableMinimisableList<T> parentMinimisableListLogTest) Logger.Log($"and {parentMinimisableListLogTest.ListHeadText}");
-#endif
-                int index = list.Items.IndexOf(minimisableList.Model);
-                Optional<int> parentDstIndex = default;
-                var parentListLocalPosition = list.ToLocalSpace(screenSpaceDragPosition);
+                var posInList = list.ListItems.ToLocalSpace(screenSpaceDragPosition);
+                int parentIndex = list.Items.IndexOf(minimisableList.Model);
 
-                // var lastItem = ItemMap[Items[^1]];
-                //
-                // if (dstIndex < 0)
-                //     parentDstIndex = index;
-                // else
-                if (parentListLocalPosition.Y < list.ToLocalSpace(minimisableList.ToScreenSpace(Vector2.Zero)).Y - minimisableList.ListHeadBoundingBox.Height / 2)
-                    parentDstIndex = index;
-                else if (dstIndex > ListItems.Count - 1 && heightAccumulator + list.ListItems.Spacing.Y + list.ItemMap[list.Items[index + 1]].BoundingBox.Height / 2 < localPos.Y)
-                    parentDstIndex = index + 1;
-
-                // else if (list.ToLocalSpace(ListItems.ToScreenSpace(Vector2.UnitY * (heightAccumulator - ListItems.Spacing.Y))).Y + list.ListItems.Spacing.Y + list.ItemMap[list.Items[index + 1]].BoundingBox.Height / 2 > parentListLocalPosition.Y)
-                //     parentDstIndex = index + 1;
-
-                if (index < 0)
+                if (parentIndex < 0)
                 {
                     const string fail_message = "DrawableMinimisableList is Child of DrawableList, but it's Model is not registered in the Items of the DrawableList";
                     Debug.Fail(fail_message);
@@ -421,24 +396,33 @@ namespace osu.Game.Screens.Edit.List
                     throw new ArgumentOutOfRangeException(fail_message);
                 }
 
-                if (parentDstIndex.HasValue)
-                {
-#if VERBOSE_LOGS
-                    Logger.Log($"moving item out of list {minimisableList.ListHeadText}");
-                    if (list.Parent is DrawableMinimisableList<T> parentMinimisableListLogMove) Logger.Log($"moving into list {parentMinimisableListLogMove.ListHeadText}");
-#endif
-                    itemWasMovedOut = insertElementIntoList(currentlyDraggedItem, Math.Clamp(parentDstIndex.Value, 0, list.Items.Count), srcIndex, list);
-                }
+                if (posInList.Y < ToSpaceOfOtherDrawable(BoundingBox.TopLeft, list.ListItems).Y
+                    && insertElementIntoList(currentlyDraggedItem, parentIndex, srcIndex, list))
+                    return default;
+                if (posInList.Y > ToSpaceOfOtherDrawable(BoundingBox.BottomLeft, list.ListItems).Y
+                    && insertElementIntoList(currentlyDraggedItem, parentIndex + 1, srcIndex, list))
+                    return default;
             }
 
-            //If Items.Count == 0, then this will throw errors!
-            dstIndex = Math.Clamp(dstIndex, 0, Math.Max(0, Items.Count - 1));
+            return dstIndex;
+        }
 
-            if (srcIndex == dstIndex && !itemWasMovedOut)
-                return;
+        private void updateArrangement()
+        {
+            var index = checkArrangement();
 
-            if (!itemWasMovedOut)
+            if (index.HasValue && currentlyDraggedItem is not null)
+            {
+                int srcIndex = Items.IndexOf(currentlyDraggedItem.Model);
+
+                //If Items.Count == 0, then this will throw errors!
+                int dstIndex = Math.Clamp(index.Value, 0, Math.Max(0, Items.Count - 1));
+
+                if (srcIndex == dstIndex)
+                    return;
+
                 Items.Move(srcIndex, dstIndex);
+            }
 
             // Todo: this could be optimised, but it's a very simple iteration over all the items
             sortItems();
@@ -474,6 +458,8 @@ namespace osu.Game.Screens.Edit.List
             list.startArrangement(list.ItemMap[item.Model], screenSpaceDragPosition);
             return true;
         }
+
+        private Quad getBoundingBox(DrawableMinimisableList<T> item) => item.ToSpaceOfOtherDrawable(item.ListHeadBoundingBox, ListItems);
 
         #endregion
 

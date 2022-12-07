@@ -20,18 +20,18 @@ namespace osu.Game.Tests.Visual.UserInterface
     public partial class TestSceneList : OsuManualInputManagerTestScene
     {
         protected Container SkinElements { get; set; } = null!;
-        protected IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>> BackingDrawableList = null!;
+        protected DrawableList<SelectionBlueprint<ISkinnableDrawable>> BackingDrawableList = null!;
 
         [SetUp]
-        public void SetUp() => Schedule(() =>
+        public void SetUp()
         {
-            BackingDrawableList = CreateDrawableList();
-            var list = (Drawable)BackingDrawableList;
-            list.Width = 100;
-            list.RelativeSizeAxes = Axes.None;
-            list.Anchor = Anchor.CentreRight;
-            BackingDrawableList.Properties.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
-            BackingDrawableList.Properties.SetItemDepth = (blueprint, depth) =>
+            CreateDrawableList();
+            var drawable = GetContent();
+            drawable.Width = 100;
+            drawable.RelativeSizeAxes = Axes.None;
+            drawable.Anchor = Anchor.CentreRight;
+            ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)drawable).Properties.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
+            ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)drawable).Properties.SetItemDepth = (blueprint, depth) =>
             {
                 if (blueprint.Parent is Container<Drawable> container)
                 {
@@ -46,22 +46,26 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             };
 
-            Child = new Container
+            Scheduler.Add(()=>
             {
-                Size = new Vector2(500),
-                Children = new[]
+                Child = new Container
                 {
-                    SkinElements = new Container
+                    Size = new Vector2(500),
+                    Children = new[]
                     {
-                        RelativeSizeAxes = Axes.Both
+                        SkinElements = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        GetContent()
                     },
-                    list
-                },
-            };
-        });
+                };
+            });
+        }
 
-        protected virtual IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>> CreateDrawableList() => new DrawableList<SelectionBlueprint<ISkinnableDrawable>>();
-        protected virtual DrawableList<SelectionBlueprint<ISkinnableDrawable>> DrawableList => (DrawableList<SelectionBlueprint<ISkinnableDrawable>>)BackingDrawableList;
+        protected virtual Drawable GetContent() => BackingDrawableList;
+        protected virtual void CreateDrawableList() => BackingDrawableList = new DrawableList<SelectionBlueprint<ISkinnableDrawable>>();
+        protected virtual DrawableList<SelectionBlueprint<ISkinnableDrawable>> DrawableList => BackingDrawableList;
 
         protected virtual void AddElement(ISkinnableDrawable skinnableDrawable, DrawableList<SelectionBlueprint<ISkinnableDrawable>> list)
         {
@@ -71,7 +75,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             //this makes sure I actually can only select a single element
 
             var skinBlueprint = new SkinBlueprint(skinnableDrawable);
-            DrawableList.Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(skinBlueprint, DrawableListEntryType.Item));
+            list.Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(skinBlueprint, DrawableListEntryType.Item));
 
             SkinElements.Add(new Container
             {
@@ -103,13 +107,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private bool testElementSelected(int element) => ((DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)DrawableList.ItemMaps[DrawableList.Items[element]]).IsSelected;
 
-        protected void ListAddItems(DrawableList<SelectionBlueprint<ISkinnableDrawable>> list)
+        protected void ListAddItems(Func<DrawableList<SelectionBlueprint<ISkinnableDrawable>>> listSupplier)
         {
             int before = 0;
-            AddStep("Get Item Count", () => before = DrawableList.Items.Count);
+            AddStep("Get Item Count", () => before = listSupplier().Items.Count);
             AddRepeatStep("add item", () =>
             {
-                float pos = SkinElements.Count * (50 + 2);
+                var list = listSupplier();
+                float pos = list.Items.Count * (50 + 2);
                 //make sure we can fit exactly the number of elements we want in a grid pattern
                 float xwidth = (int)(SkinElements.ChildSize.X - 100) / 52 * 52;
                 AddElement(new BigBlackBox
@@ -118,7 +123,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Position = new Vector2(pos % xwidth, (int)pos / (int)xwidth * (50 + 2)),
                 }, list);
             }, 10);
-            AddAssert("Exactly 10 items were added", () => DrawableList.Items.Count == before + 10);
+            AddAssert("Exactly 10 items were added", () => listSupplier().Items.Count == before + 10);
             checkDepth();
         }
 
@@ -140,7 +145,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestListSelection()
         {
-            ListAddItems(DrawableList);
+            ListAddItems(() => DrawableList);
             //start with regular clicks
             AddAssert("no Item is selected", () => applyToItems(t => !t.IsSelected, DrawableList.ItemMaps.Values));
             AddStep("select first item", () =>
@@ -178,7 +183,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestListDrag()
         {
-            ListAddItems(DrawableList);
+            ListAddItems(() => DrawableList);
             AddStep("Mouse to first element", () =>
             {
                 var first = DrawableList.ItemMaps[DrawableList.Items[0]];

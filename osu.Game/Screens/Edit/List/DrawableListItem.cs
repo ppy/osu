@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Input;
@@ -174,12 +173,6 @@ namespace osu.Game.Screens.Edit.List
                         break;
                 }
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            Logger.Log("DrawableListItem is disposing!");
-            base.Dispose(isDisposing);
         }
     }
 }
