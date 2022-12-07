@@ -15,10 +15,10 @@ namespace osu.Game.Localisation
         public static LocalisableString Header => new TranslatableString(getKey(@"header"), @"Import");
 
         /// <summary>
-        /// "If you have an installation of a previous osu! version, you can choose to migrate your existing content. Note that this will create a copy, and not affect your existing installation."
+        /// "If you have an installation of a previous osu! version, you can choose to migrate your existing content. Note that this will not affect your existing installation's files in any way."
         /// </summary>
         public static LocalisableString Description => new TranslatableString(getKey(@"description"),
-            @"If you have an installation of a previous osu! version, you can choose to migrate your existing content. Note that this will create a copy, and not affect your existing installation.");
+            @"If you have an installation of a previous osu! version, you can choose to migrate your existing content. Note that this will not affect your existing installation's files in any way.");
 
         /// <summary>
         /// "previous osu! install"

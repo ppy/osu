@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -40,6 +41,8 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private StableLocatorLabelledTextBox stableLocatorTextBox = null!;
 
+        private OsuTextFlowContainer copyInformation = null!;
+
         private IEnumerable<ImportCheckbox> contentCheckboxes => Content.Children.OfType<ImportCheckbox>();
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -63,6 +66,12 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new ImportCheckbox(CommonStrings.Scores, StableContent.Scores),
                 new ImportCheckbox(CommonStrings.Skins, StableContent.Skins),
                 new ImportCheckbox(CommonStrings.Collections, StableContent.Collections),
+                copyInformation = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
+                {
+                    Colour = OverlayColourProvider.Content1,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y
+                },
                 importButton = new ProgressRoundedButton
                 {
                     Size = button_size,
@@ -109,6 +118,18 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             bool available = legacyImportManager.CheckHardLinkAvailability();
             Logger.Log($"Hard link support is {available}");
+
+            if (available)
+            {
+                copyInformation.Text = "Data migration will use \"hard links\". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation.";
+            }
+            else if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+                copyInformation.Text = "Hard links are not supported on this operating system, so a copy of all files will be made during import.";
+            else
+            {
+                copyInformation.Text =
+                    "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install and the file system is NTFS.";
+            }
         }
 
         private void runImport()
