@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Specialized;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -51,6 +52,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Container colouredComponents;
         private readonly OsuSpriteText comboIndexText;
+
+        private readonly IBindableList<StreamControlPoint> streamControlPoints = new BindableList<StreamControlPoint>();
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
@@ -107,13 +110,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             switch (item)
             {
                 case IHasStreamPath streamHitObject:
-                    for (int i = 1; i < streamHitObject.StreamPath.ControlPoints.Count; i++)
-                    {
-                        colouredComponents.Add(new DragArea(item, i)
-                        {
-                            OnDragHandled = e => OnDragHandled?.Invoke(e)
-                        });
-                    }
+                    streamControlPoints.BindTo(streamHitObject.StreamPath.ControlPoints);
+                    streamControlPoints.BindCollectionChanged(recreateDragComponents, true);
 
                     break;
 
@@ -123,6 +121,25 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         OnDragHandled = e => OnDragHandled?.Invoke(e)
                     });
                     break;
+            }
+        }
+
+        private void recreateDragComponents(object o, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        {
+            colouredComponents.Clear();
+            addDragComponents(Item);
+        }
+
+        private void addDragComponents(HitObject item)
+        {
+            if (item is not IHasStreamPath streamHitObject) return;
+
+            for (int i = 1; i < streamHitObject.StreamPath.ControlPoints.Count; i++)
+            {
+                colouredComponents.Add(new DragArea(item, i)
+                {
+                    OnDragHandled = e => OnDragHandled?.Invoke(e)
+                });
             }
         }
 
@@ -541,10 +558,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 var controlPoints = streamHitObject.StreamPath.ControlPoints;
                                 double prevTime = index > 0 ? controlPoints[index.Value - 1].Time : 0;
                                 double nextTime = index < controlPoints.Count - 1 ? controlPoints[index.Value + 1].Time : double.PositiveInfinity;
-                                double clippedTime = MathHelper.Clamp(time - hitObject.StartTime, prevTime + beatmap.GetBeatLengthAtTime(time), nextTime - beatmap.GetBeatLengthAtTime(time));
-                                double oldTime = controlPoints[index.Value].Time;
+                                double beatLength = beatmap.GetBeatLengthAtTime(time);
+                                double minTime = prevTime + beatLength;
+                                double maxTime = nextTime - beatLength;
+                                double clippedTime = MathHelper.Clamp(time - hitObject.StartTime, minTime, maxTime);
 
-                                if (clippedTime == oldTime) return;
+                                if (clippedTime == controlPoints[index.Value].Time || Precision.DefinitelyBigger(clippedTime, maxTime) || Precision.DefinitelyBigger(minTime, clippedTime)) return;
 
                                 controlPoints[index.Value].Time = clippedTime;
                                 controlPoints[index.Value].BeatLength = beatmap.GetBeatLengthAtTime(clippedTime);
