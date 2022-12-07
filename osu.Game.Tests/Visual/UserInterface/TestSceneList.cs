@@ -58,7 +58,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                     list
                 },
             };
-            DrawableList.Height = 500;
         });
 
         protected virtual IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>> CreateDrawableList() => new DrawableList<SelectionBlueprint<ISkinnableDrawable>>();
@@ -85,7 +84,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         private bool applyToItems(Predicate<DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>> predicate,
-                                  IEnumerable<RearrangeableListItem<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>>> items)
+                                  IEnumerable<AbstractListItem<SelectionBlueprint<ISkinnableDrawable>>> items)
         {
             foreach (var value in items)
             {
