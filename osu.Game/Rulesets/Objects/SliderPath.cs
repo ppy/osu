@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets.Objects
 
         private readonly List<Vector2> calculatedPath = new List<Vector2>();
         private readonly List<double> cumulativeLength = new List<double>();
+        private readonly List<int> segmentEnds = new List<int>();
         private readonly Cached pathCache = new Cached();
 
         private double calculatedLength;
@@ -191,6 +192,16 @@ namespace osu.Game.Rulesets.Objects
             return pointsInCurrentSegment;
         }
 
+        /// <summary>
+        /// Returns the progress values at which segments of the path end.
+        /// </summary>
+        public IEnumerable<double> GetSegmentEnds()
+        {
+            ensureValid();
+
+            return segmentEnds.Select(i => cumulativeLength[i] / calculatedLength);
+        }
+
         private void invalidate()
         {
             pathCache.Invalidate();
@@ -211,6 +222,7 @@ namespace osu.Game.Rulesets.Objects
         private void calculatePath()
         {
             calculatedPath.Clear();
+            segmentEnds.Clear();
 
             if (ControlPoints.Count == 0)
                 return;
@@ -235,6 +247,9 @@ namespace osu.Game.Rulesets.Objects
                     if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
                         calculatedPath.Add(t);
                 }
+
+                // Remember the index of the segment end
+                segmentEnds.Add(calculatedPath.Count - 1);
 
                 // Start the new segment at the current vertex
                 start = i;
