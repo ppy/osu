@@ -42,8 +42,8 @@ namespace osu.Game.Database
         [Resolved]
         private RealmAccess realmAccess { get; set; } = null!;
 
-        [Resolved(canBeNull: true)] // canBeNull required while we remain on mono for mobile platforms.
-        private DesktopGameHost? desktopGameHost { get; set; }
+        [Resolved]
+        private GameHost gameHost { get; set; } = null!;
 
         [Resolved]
         private INotificationOverlay? notifications { get; set; }
@@ -52,7 +52,7 @@ namespace osu.Game.Database
 
         public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
-        public void UpdateStorage(string stablePath) => cachedStorage = new StableStorage(stablePath, desktopGameHost);
+        public void UpdateStorage(string stablePath) => cachedStorage = new StableStorage(stablePath, gameHost as DesktopGameHost);
 
         public virtual async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
         {
