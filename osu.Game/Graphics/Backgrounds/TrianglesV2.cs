@@ -5,7 +5,6 @@ using osu.Framework.Utils;
 using osuTK;
 using System;
 using osu.Framework.Graphics.Shaders;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
@@ -14,8 +13,6 @@ using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -57,7 +54,6 @@ namespace osu.Game.Graphics.Backgrounds
         private Random? stableRandom;
 
         private IShader shader = null!;
-        private Texture texture = null!;
 
         /// <summary>
         /// Construct a new triangle visualisation.
@@ -73,14 +69,6 @@ namespace osu.Game.Graphics.Backgrounds
         private void load(ShaderManager shaders, IRenderer renderer)
         {
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "TriangleBorder");
-
-            // HACK: we want to use white pixel as a texture here, but it doesn't work with custom texture coordinates for some reason
-            texture = renderer.CreateTexture(1, 1, true);
-
-            var image = new Image<Rgba32>(1, 1);
-            image[0, 0] = new Rgba32(1f, 1f, 1f);
-
-            texture.SetData(new TextureUpload(image));
         }
 
         protected override void LoadComplete()
@@ -189,7 +177,6 @@ namespace osu.Game.Graphics.Backgrounds
             protected new TrianglesV2 Source => (TrianglesV2)base.Source;
 
             private IShader shader = null!;
-            private Texture texture = null!;
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
 
@@ -211,7 +198,6 @@ namespace osu.Game.Graphics.Backgrounds
                 base.ApplyState();
 
                 shader = Source.shader;
-                texture = Source.texture;
                 size = Source.DrawSize;
                 thickness = Source.Thickness;
 
@@ -247,9 +233,6 @@ namespace osu.Game.Graphics.Backgrounds
 
                 float relativeHeight = triangleSize.Y / size.Y;
                 float relativeWidth = triangleSize.X / size.X;
-                Vector2 textureSize = texture.GetTextureRect().Size;
-                float xTextureRatio = textureSize.X / relativeWidth;
-                float yTextureRatio = textureSize.Y / relativeHeight;
 
                 foreach (TriangleParticle particle in parts)
                 {
@@ -269,14 +252,14 @@ namespace osu.Game.Graphics.Backgrounds
 
                     ColourInfo colourInfo = triangleColourInfo(DrawColourInfo.Colour, new Quad(topLeftClipped, topRightClipped, bottomLeftClipped, bottomRightClipped));
 
-                    var textureCoords = new Framework.Graphics.Primitives.RectangleF(
-                        (topLeftClipped.X - topLeft.X) * xTextureRatio,
-                        (topLeftClipped.Y - topLeft.Y) * yTextureRatio,
-                        (topRightClipped.X - topLeftClipped.X) * xTextureRatio,
-                        (bottomLeftClipped.Y - topLeftClipped.Y) * yTextureRatio
+                    var textureCoords = new RectangleF(
+                        (topLeftClipped.X - topLeft.X) / relativeWidth,
+                        (topLeftClipped.Y - topLeft.Y) / relativeHeight,
+                        (topRightClipped.X - topLeftClipped.X) / relativeWidth,
+                        (bottomLeftClipped.Y - topLeftClipped.Y) / relativeHeight
                     );
 
-                    renderer.DrawQuad(texture, drawQuad, colourInfo, vertexAction: vertexBatch.AddAction, textureCoords: textureCoords);
+                    renderer.DrawQuad(drawQuad, colourInfo, vertexAction: vertexBatch.AddAction, textureCoords: textureCoords);
                 }
 
                 shader.Unbind();
