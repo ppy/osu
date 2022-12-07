@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Objects
     /// HitObjects may contain more properties for which you should be checking through the IHas* types.
     /// </para>
     /// </summary>
-    public class HitObject : IHasStartTime
+    public class HitObject
     {
         /// <summary>
         /// A small adjustment to the start time of control points to account for rounding/precision errors.

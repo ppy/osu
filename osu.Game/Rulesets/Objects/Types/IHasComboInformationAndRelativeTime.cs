@@ -3,11 +3,7 @@
 
 namespace osu.Game.Rulesets.Objects.Types
 {
-    /// <summary>
-    /// This object has a start time.
-    /// </summary>
-    public interface IHasStartTime
+    public interface IHasComboInformationAndRelativeTime : IHasComboInformation, IHasRelativeTime
     {
-        double StartTime { get; set; }
     }
 }

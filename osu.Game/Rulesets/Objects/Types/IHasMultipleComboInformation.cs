@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Objects.Types
     /// </summary>
     public interface IHasMultipleComboInformation : IHasDuration
     {
-        IReadOnlyList<IHasStartTimeAndComboInformation> ComboObjects { get; }
+        IReadOnlyList<IHasComboInformationAndRelativeTime> ComboObjects { get; }
     }
 }

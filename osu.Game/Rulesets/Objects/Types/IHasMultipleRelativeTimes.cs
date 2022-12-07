@@ -6,10 +6,10 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Objects.Types
 {
-    public interface IHasMultipleDurations : IHasDuration
+    public interface IHasMultipleRelativeTimes : IHasDuration
     {
-        IReadOnlyList<IHasDuration> DurationObjects { get; }
+        IReadOnlyList<IHasRelativeTime> TimeObjects { get; }
 
-        event Action DurationsUpdated;
+        event Action TimesUpdates;
     }
 }
