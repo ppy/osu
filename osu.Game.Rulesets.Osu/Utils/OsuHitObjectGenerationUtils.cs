@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             if (osuObject is not Slider slider)
                 return;
 
-            void flipNestedObject(OsuHitObject nested) => nested.Position = new Vector2(nested.X, slider.Y - (nested.Y - slider.Y));
+            void flipNestedObject(OsuHitObject nested) => nested.Position = new Vector2(nested.Position.X, OsuPlayfield.BASE_SIZE.Y - nested.Position.Y);
             static void flipControlPoint(PathControlPoint point) => point.Position = new Vector2(point.Position.X, -point.Position.Y);
 
             modifySlider(slider, flipNestedObject, flipControlPoint);
