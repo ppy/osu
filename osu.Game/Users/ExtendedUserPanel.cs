@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,7 +17,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users
 {
-    public abstract class ExtendedUserPanel : UserPanel
+    public abstract partial class ExtendedUserPanel : UserPanel
     {
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
@@ -51,9 +53,9 @@ namespace osu.Game.Users
 
         protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
 
-        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.Country)
+        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.CountryCode)
         {
-            Size = new Vector2(39, 26),
+            Size = new Vector2(36, 26),
             Action = Action,
         };
 

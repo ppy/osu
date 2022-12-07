@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
@@ -12,7 +14,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// A component which can trigger the most appropriate hit sound for a given point in time, based on the state of a <see cref="HitObjectContainer"/>
     /// </summary>
-    public class GameplaySampleTriggerSource : CompositeDrawable
+    public partial class GameplaySampleTriggerSource : CompositeDrawable
     {
         /// <summary>
         /// The number of concurrent samples allowed to be played concurrently so that it feels better when spam-pressing a key.
@@ -56,12 +58,12 @@ namespace osu.Game.Rulesets.UI
             PlaySamples(samples);
         }
 
-        protected void PlaySamples(ISampleInfo[] samples)
+        protected void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
         {
             var hitSound = getNextSample();
             hitSound.Samples = samples;
             hitSound.Play();
-        }
+        });
 
         protected HitObject GetMostValidObject()
         {

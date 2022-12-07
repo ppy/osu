@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -18,7 +20,7 @@ namespace osu.Game.Updater
     /// An update manager that shows notifications if a newer release is detected.
     /// Installation is left up to the user.
     /// </summary>
-    public class SimpleUpdateManager : UpdateManager
+    public partial class SimpleUpdateManager : UpdateManager
     {
         private string version;
 

@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
@@ -18,7 +21,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogEntry : FillFlowContainer
+    public partial class ChangelogEntry : FillFlowContainer
     {
         private readonly APIChangelogEntry entry;
 
@@ -91,7 +94,7 @@ namespace osu.Game.Overlays.Changelog
                 t.Colour = entryColour;
             });
 
-            if (!string.IsNullOrEmpty(entry.Repository))
+            if (!string.IsNullOrEmpty(entry.Repository) && !string.IsNullOrEmpty(entry.GithubUrl))
                 addRepositoryReference(title, entryColour);
 
             if (entry.GithubUser != null)
@@ -102,17 +105,22 @@ namespace osu.Game.Overlays.Changelog
 
         private void addRepositoryReference(LinkFlowContainer title, Color4 entryColour)
         {
+            Debug.Assert(!string.IsNullOrEmpty(entry.Repository));
+            Debug.Assert(!string.IsNullOrEmpty(entry.GithubUrl));
+
             title.AddText(" (", t =>
             {
                 t.Font = fontLarge;
                 t.Colour = entryColour;
             });
+
             title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", entry.GithubUrl,
                 t =>
                 {
                     t.Font = fontLarge;
                     t.Colour = entryColour;
                 });
+
             title.AddText(")", t =>
             {
                 t.Font = fontLarge;

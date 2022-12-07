@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Globalization;
 using osu.Framework.Bindables;
@@ -21,7 +23,7 @@ namespace osu.Game.Screens.Edit.Timing
     /// where multiple objects with multiple different property values are selected
     /// by providing an "indeterminate state".
     /// </summary>
-    public class IndeterminateSliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T?>
+    public partial class IndeterminateSliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T?>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         /// <summary>
@@ -92,7 +94,20 @@ namespace osu.Game.Screens.Edit.Timing
 
                 try
                 {
-                    slider.Current.Parse(t.Text);
+                    switch (slider.Current)
+                    {
+                        case Bindable<int> bindableInt:
+                            bindableInt.Value = int.Parse(t.Text);
+                            break;
+
+                        case Bindable<double> bindableDouble:
+                            bindableDouble.Value = double.Parse(t.Text);
+                            break;
+
+                        default:
+                            slider.Current.Parse(t.Text);
+                            break;
+                    }
                 }
                 catch
                 {

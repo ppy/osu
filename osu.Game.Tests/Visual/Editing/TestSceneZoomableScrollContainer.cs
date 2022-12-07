@@ -1,6 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -18,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneZoomableScrollContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneZoomableScrollContainer : OsuManualInputManagerTestScene
     {
         private ZoomableScrollContainer scrollContainer;
         private Drawable innerBox;
@@ -44,7 +47,7 @@ namespace osu.Game.Tests.Visual.Editing
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = OsuColour.Gray(30)
                             },
-                            scrollContainer = new ZoomableScrollContainer
+                            scrollContainer = new ZoomableScrollContainer(1, 60, 1)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -52,7 +55,7 @@ namespace osu.Game.Tests.Visual.Editing
                             }
                         }
                     },
-                    new MenuCursor()
+                    new MenuCursorContainer()
                 };
 
                 scrollContainer.Add(innerBox = new Box
@@ -62,6 +65,18 @@ namespace osu.Game.Tests.Visual.Editing
                 });
             });
             AddUntilStep("Scroll container is loaded", () => scrollContainer.LoadState >= LoadState.Loaded);
+        }
+
+        [Test]
+        public void TestInitialZoomOutOfRange()
+        {
+            AddStep("Invalid ZoomableScrollContainer throws ArgumentException", () =>
+            {
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    _ = new ZoomableScrollContainer(1, 60, 0);
+                });
+            });
         }
 
         [Test]

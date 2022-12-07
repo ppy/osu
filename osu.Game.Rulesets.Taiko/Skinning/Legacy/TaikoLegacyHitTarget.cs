@@ -11,9 +11,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class TaikoLegacyHitTarget : CompositeDrawable
+    public partial class TaikoLegacyHitTarget : CompositeDrawable
     {
-        private Container content;
+        private Container content = null!;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public abstract class BeatmapCard : OsuClickableContainer
+    public abstract partial class BeatmapCard : OsuClickableContainer
     {
         public const float TRANSITION_DURATION = 400;
         public const float CORNER_RADIUS = 10;

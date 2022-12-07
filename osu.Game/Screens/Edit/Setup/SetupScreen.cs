@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,7 +12,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class SetupScreen : EditorScreen
+    public partial class SetupScreen : EditorScreen
     {
         [Cached]
         private SectionsContainer<SetupSection> sections { get; } = new SetupScreenSectionsContainer();
@@ -53,7 +55,7 @@ namespace osu.Game.Screens.Edit.Setup
             }));
         }
 
-        private class SetupScreenSectionsContainer : SectionsContainer<SetupSection>
+        private partial class SetupScreenSectionsContainer : SectionsContainer<SetupSection>
         {
             protected override UserTrackingScrollContainer CreateScrollContainer()
             {

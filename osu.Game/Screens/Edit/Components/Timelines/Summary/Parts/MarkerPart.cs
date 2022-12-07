@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,7 +18,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// The part of the timeline that displays the current position of the song.
     /// </summary>
-    public class MarkerPart : TimelinePart
+    public partial class MarkerPart : TimelinePart
     {
         private Drawable marker;
 
@@ -69,7 +71,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             // block base call so we don't clear our marker (can be reused on beatmap change).
         }
 
-        private class MarkerVisualisation : CompositeDrawable
+        private partial class MarkerVisualisation : CompositeDrawable
         {
             public MarkerVisualisation()
             {

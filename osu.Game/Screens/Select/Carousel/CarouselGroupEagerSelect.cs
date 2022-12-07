@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,7 @@ using System.Linq;
 namespace osu.Game.Screens.Select.Carousel
 {
     /// <summary>
-    /// A group which ensures at least one child is selected (if the group itself is selected).
+    /// A group which ensures at least one item is selected (if the group itself is selected).
     /// </summary>
     public class CarouselGroupEagerSelect : CarouselGroup
     {
@@ -33,46 +35,46 @@ namespace osu.Game.Screens.Select.Carousel
 
         /// <summary>
         /// To avoid overhead during filter operations, we don't attempt any selections until after all
-        /// children have been filtered. This bool will be true during the base <see cref="Filter(FilterCriteria)"/>
+        /// items have been filtered. This bool will be true during the base <see cref="Filter(FilterCriteria)"/>
         /// operation.
         /// </summary>
-        private bool filteringChildren;
+        private bool filteringItems;
 
         public override void Filter(FilterCriteria criteria)
         {
-            filteringChildren = true;
+            filteringItems = true;
             base.Filter(criteria);
-            filteringChildren = false;
+            filteringItems = false;
 
             attemptSelection();
         }
 
-        public override void RemoveChild(CarouselItem i)
+        public override void RemoveItem(CarouselItem i)
         {
-            base.RemoveChild(i);
+            base.RemoveItem(i);
 
             if (i != LastSelected)
                 updateSelectedIndex();
         }
 
-        private bool addingChildren;
+        private bool addingItems;
 
-        public void AddChildren(IEnumerable<CarouselItem> items)
+        public void AddItems(IEnumerable<CarouselItem> items)
         {
-            addingChildren = true;
+            addingItems = true;
 
             foreach (var i in items)
-                AddChild(i);
+                AddItem(i);
 
-            addingChildren = false;
+            addingItems = false;
 
             attemptSelection();
         }
 
-        public override void AddChild(CarouselItem i)
+        public override void AddItem(CarouselItem i)
         {
-            base.AddChild(i);
-            if (!addingChildren)
+            base.AddItem(i);
+            if (!addingItems)
                 attemptSelection();
         }
 
@@ -95,21 +97,46 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void attemptSelection()
         {
-            if (filteringChildren) return;
+            if (filteringItems) return;
 
             // we only perform eager selection if we are a currently selected group.
             if (State.Value != CarouselItemState.Selected) return;
 
-            // we only perform eager selection if none of our children are in a selected state already.
-            if (Children.Any(i => i.State.Value == CarouselItemState.Selected)) return;
+            // we only perform eager selection if none of our items are in a selected state already.
+            if (Items.Any(i => i.State.Value == CarouselItemState.Selected)) return;
 
             PerformSelection();
         }
 
+        /// <summary>
+        /// Finds the item this group would select next if it attempted selection
+        /// </summary>
+        /// <returns>An unfiltered item nearest to the last selected one or null if all items are filtered</returns>
         protected virtual CarouselItem GetNextToSelect()
         {
-            return Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value) ??
-                   Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value);
+            if (Items.Count == 0)
+                return null;
+
+            int forwardsIndex = lastSelectedIndex;
+            int backwardsIndex = Math.Min(lastSelectedIndex, Items.Count - 1);
+
+            while (true)
+            {
+                bool hasBackwards = backwardsIndex >= 0 && backwardsIndex < Items.Count;
+                bool hasForwards = forwardsIndex < Items.Count;
+
+                if (!hasBackwards && !hasForwards)
+                    return null;
+
+                if (hasForwards && !Items[forwardsIndex].Filtered.Value)
+                    return Items[forwardsIndex];
+
+                if (hasBackwards && !Items[backwardsIndex].Filtered.Value)
+                    return Items[backwardsIndex];
+
+                forwardsIndex++;
+                backwardsIndex--;
+            }
         }
 
         protected virtual void PerformSelection()
@@ -129,6 +156,6 @@ namespace osu.Game.Screens.Select.Carousel
             updateSelectedIndex();
         }
 
-        private void updateSelectedIndex() => lastSelectedIndex = LastSelected == null ? 0 : Math.Max(0, InternalChildren.IndexOf(LastSelected));
+        private void updateSelectedIndex() => lastSelectedIndex = LastSelected == null ? 0 : Math.Max(0, GetIndexOfItem(LastSelected));
     }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -12,7 +14,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal abstract class LabelledTextBoxWithPopover : LabelledTextBox, IHasPopover
+    internal abstract partial class LabelledTextBoxWithPopover : LabelledTextBox, IHasPopover
     {
         public abstract Popover GetPopover();
 
@@ -26,7 +28,7 @@ namespace osu.Game.Screens.Edit.Setup
                 OnFocused = this.ShowPopover
             };
 
-        internal class PopoverTextBox : OsuTextBox
+        internal partial class PopoverTextBox : OsuTextBox
         {
             public Action OnFocused;
 

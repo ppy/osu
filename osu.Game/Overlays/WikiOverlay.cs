@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -15,7 +17,7 @@ using osu.Game.Overlays.Wiki;
 
 namespace osu.Game.Overlays
 {
-    public class WikiOverlay : OnlineOverlay<WikiHeader>
+    public partial class WikiOverlay : OnlineOverlay<WikiHeader>
     {
         private const string index_path = @"main_page";
 
@@ -98,6 +100,11 @@ namespace osu.Game.Overlays
 
         private void onPathChanged(ValueChangedEvent<string> e)
         {
+            // the path could change as a result of redirecting to a newer location of the same page.
+            // we already have the correct wiki data, so we can safely return here.
+            if (e.NewValue == wikiData.Value?.Path)
+                return;
+
             cancellationToken?.Cancel();
             request?.Cancel();
 
@@ -119,6 +126,7 @@ namespace osu.Game.Overlays
         private void onSuccess(APIWikiPage response)
         {
             wikiData.Value = response;
+            path.Value = response.Path;
 
             if (response.Layout == index_path)
             {

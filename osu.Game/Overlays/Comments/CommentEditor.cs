@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
@@ -18,7 +20,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Comments
 {
-    public abstract class CommentEditor : CompositeDrawable
+    public abstract partial class CommentEditor : CompositeDrawable
     {
         private const int side_padding = 8;
 
@@ -115,7 +117,7 @@ namespace osu.Game.Overlays.Comments
                 }
             });
 
-            textBox.OnCommit += (u, v) =>
+            textBox.OnCommit += (_, _) =>
             {
                 if (commitButton.IsBlocked.Value)
                     return;
@@ -131,7 +133,7 @@ namespace osu.Game.Overlays.Comments
             Current.BindValueChanged(text => commitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
         }
 
-        private class EditorTextBox : BasicTextBox
+        private partial class EditorTextBox : BasicTextBox
         {
             protected override float LeftRightPadding => side_padding;
 
@@ -165,7 +167,7 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
-        private class CommitButton : LoadingButton
+        private partial class CommitButton : LoadingButton
         {
             private const int duration = 200;
 

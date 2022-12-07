@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -15,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class FilterTabItem<T> : TabItem<T>
+    public partial class FilterTabItem<T> : TabItem<T>
     {
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }

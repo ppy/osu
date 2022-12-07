@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -10,7 +12,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeControlReceptor : Container, IScrollBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
+    public partial class VolumeControlReceptor : Container, IScrollBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         public Func<GlobalAction, bool> ActionRequested;
         public Func<GlobalAction, float, bool, bool> ScrollActionRequested;
@@ -21,10 +23,14 @@ namespace osu.Game.Overlays.Volume
             {
                 case GlobalAction.DecreaseVolume:
                 case GlobalAction.IncreaseVolume:
+                    ActionRequested?.Invoke(e.Action);
+                    return true;
+
                 case GlobalAction.ToggleMute:
                 case GlobalAction.NextVolumeMeter:
                 case GlobalAction.PreviousVolumeMeter:
-                    ActionRequested?.Invoke(e.Action);
+                    if (!e.Repeat)
+                        ActionRequested?.Invoke(e.Action);
                     return true;
             }
 

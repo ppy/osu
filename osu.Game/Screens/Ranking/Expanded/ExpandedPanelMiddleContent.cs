@@ -1,16 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -27,7 +31,7 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// <summary>
     /// The content that appears in the middle section of the <see cref="ScorePanel"/>.
     /// </summary>
-    public class ExpandedPanelMiddleContent : CompositeDrawable
+    public partial class ExpandedPanelMiddleContent : CompositeDrawable
     {
         private const float padding = 10;
 
@@ -65,12 +69,10 @@ namespace osu.Game.Screens.Ranking.Expanded
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             string creator = metadata.Author.Username;
 
-            int? beatmapMaxCombo = scoreManager.GetMaximumAchievableComboAsync(score).GetResultSafely();
-
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, beatmapMaxCombo),
+                new ComboStatistic(score.MaxCombo, scoreManager.GetMaximumAchievableCombo(score)),
                 new PerformanceStatistic(score),
             };
 
@@ -131,7 +133,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     FillMode = FillMode.Fit,
                                 }
                             },
-                            scoreCounter = new TotalScoreCounter
+                            scoreCounter = new TotalScoreCounter(!withFlair)
                             {
                                 Margin = new MarginPadding { Top = 0, Bottom = 5 },
                                 Current = { Value = 0 },
@@ -278,14 +280,36 @@ namespace osu.Game.Screens.Ranking.Expanded
             });
         }
 
-        public class PlayedOnText : OsuSpriteText
+        public partial class PlayedOnText : OsuSpriteText
         {
+            private readonly DateTimeOffset time;
+            private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
+
             public PlayedOnText(DateTimeOffset time)
             {
+                this.time = time;
+
                 Anchor = Anchor.BottomCentre;
                 Origin = Anchor.BottomCentre;
                 Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold);
-                Text = $"Played on {time.ToLocalTime():d MMMM yyyy HH:mm}";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager configManager)
+            {
+                configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                prefer24HourTime.BindValueChanged(_ => updateDisplay(), true);
+            }
+
+            private void updateDisplay()
+            {
+                Text = prefer24HourTime.Value ? $"Played on {time.ToLocalTime():d MMMM yyyy HH:mm}" : $"Played on {time.ToLocalTime():d MMMM yyyy h:mm tt}";
             }
         }
     }

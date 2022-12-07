@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -11,7 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public abstract class ChartProfileSubsection : ProfileSubsection
+    public abstract partial class ChartProfileSubsection : ProfileSubsection
     {
         private ProfileLineChart chart;
 

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,10 +15,9 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
-    public class DownloadButton : BeatmapCardIconButton
+    public partial class DownloadButton : BeatmapCardIconButton
     {
-        public IBindable<DownloadState> State => state;
-        private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
+        public Bindable<DownloadState> State { get; } = new Bindable<DownloadState>();
 
         private readonly APIBeatmapSet beatmapSet;
 
@@ -50,14 +47,19 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         {
             base.LoadComplete();
             preferNoVideo.BindValueChanged(_ => updateState());
-            state.BindValueChanged(_ => updateState(), true);
+            State.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
         }
 
         private void updateState()
         {
-            switch (state.Value)
+            switch (State.Value)
             {
+                case DownloadState.Unknown:
+                    Action = null;
+                    TooltipText = string.Empty;
+                    break;
+
                 case DownloadState.Downloading:
                 case DownloadState.Importing:
                     Action = null;

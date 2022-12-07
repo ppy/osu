@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -15,7 +17,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A wrapper for a <see cref="DrawableRuleset{TObject}"/>. Handles adding visual representations of <see cref="HitObject"/>s to the underlying <see cref="DrawableRuleset{TObject}"/>.
     /// </summary>
-    internal class DrawableEditorRulesetWrapper<TObject> : CompositeDrawable
+    internal partial class DrawableEditorRulesetWrapper<TObject> : CompositeDrawable
         where TObject : HitObject
     {
         public Playfield Playfield => drawableRuleset.Playfield;

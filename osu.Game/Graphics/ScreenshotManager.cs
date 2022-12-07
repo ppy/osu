@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +25,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace osu.Game.Graphics
 {
-    public class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
+    public partial class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 
@@ -101,7 +103,9 @@ namespace osu.Game.Graphics
                             framesWaitedEvent.Set();
                     }, 10, true);
 
-                    framesWaitedEvent.Wait();
+                    if (!framesWaitedEvent.Wait(1000))
+                        throw new TimeoutException("Screenshot data did not arrive in a timely fashion");
+
                     waitDelegate.Cancel();
                 }
             }

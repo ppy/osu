@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Users;
 using osuTK;
@@ -19,7 +22,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Login
 {
-    public class LoginPanel : FillFlowContainer
+    public partial class LoginPanel : FillFlowContainer
     {
         private bool bounding = true;
         private LoginForm form;
@@ -107,7 +110,7 @@ namespace osu.Game.Overlays.Login
                             Origin = Anchor.TopCentre,
                             TextAnchor = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both,
-                            Text = state.NewValue == APIState.Failing ? "Connection is failing, will attempt to reconnect... " : "Attempting to connect... ",
+                            Text = state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting,
                             Margin = new MarginPadding { Top = 10, Bottom = 10 },
                         },
                     };

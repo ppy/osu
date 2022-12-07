@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -11,7 +13,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
-    public class TimingRowAttribute : RowAttribute
+    public partial class TimingRowAttribute : RowAttribute
     {
         private readonly BindableNumber<double> beatLength;
         private readonly Bindable<TimeSignature> timeSignature;

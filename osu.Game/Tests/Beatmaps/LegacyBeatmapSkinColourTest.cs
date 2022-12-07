@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Beatmaps
 {
-    public abstract class LegacyBeatmapSkinColourTest : ScreenTestScene
+    public abstract partial class LegacyBeatmapSkinColourTest : ScreenTestScene
     {
         protected readonly Bindable<bool> BeatmapSkins = new Bindable<bool>();
         protected readonly Bindable<bool> BeatmapColours = new Bindable<bool>();
@@ -58,7 +60,7 @@ namespace osu.Game.Tests.Beatmaps
 
         protected virtual ExposedPlayer CreateTestPlayer(bool userHasCustomColours) => new ExposedPlayer(userHasCustomColours);
 
-        protected class ExposedPlayer : TestPlayer
+        protected partial class ExposedPlayer : TestPlayer
         {
             protected readonly bool UserHasCustomColours;
 

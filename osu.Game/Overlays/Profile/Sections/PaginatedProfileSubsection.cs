@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -20,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class PaginatedProfileSubsection<TModel> : ProfileSubsection
+    public abstract partial class PaginatedProfileSubsection<TModel> : ProfileSubsection
     {
         /// <summary>
         /// The number of items displayed per page.

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -19,7 +21,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen, IOsuScreen, IHasDescription
+    public abstract partial class OsuScreen : Screen, IOsuScreen, IHasDescription
     {
         /// <summary>
         /// The amount of negative padding that should be applied to game background content which touches both the left and right sides of the screen.
@@ -38,10 +40,9 @@ namespace osu.Game.Screens
 
         public virtual bool AllowExternalScreenChange => false;
 
-        /// <summary>
-        /// Whether all overlays should be hidden when this screen is entered or resumed.
-        /// </summary>
         public virtual bool HideOverlaysOnEnter => false;
+
+        public virtual bool HideMenuCursorOnNonMouseInput => false;
 
         /// <summary>
         /// The initial overlay activation mode to use when this screen is entered for the first time.
@@ -77,7 +78,7 @@ namespace osu.Game.Screens
 
         private Sample sampleExit;
 
-        protected virtual bool PlayResumeSound => true;
+        protected virtual bool PlayExitSound => true;
 
         public virtual float BackgroundParallaxAmount => 1;
 
@@ -173,9 +174,6 @@ namespace osu.Game.Screens
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
-            if (PlayResumeSound)
-                sampleExit?.Play();
-
             applyArrivingDefaults(true);
 
             // it's feasible to resume to a screen if the target screen never loaded successfully.
@@ -215,6 +213,9 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(ScreenExitEvent e)
         {
+            if (ValidForResume && PlayExitSound)
+                sampleExit?.Play();
+
             if (ValidForResume && logo != null)
                 onExitingLogo();
 

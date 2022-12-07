@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -24,7 +26,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Catch.UI
 {
     [Cached]
-    public class Catcher : SkinReloadableDrawable
+    public partial class Catcher : SkinReloadableDrawable
     {
         /// <summary>
         /// The size of the catcher at 1x scale.
@@ -269,8 +271,8 @@ namespace osu.Game.Rulesets.Catch.UI
                     SetHyperDashState();
             }
 
-            caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
-            droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject);
+            caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject, false);
+            droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject, false);
         }
 
         /// <summary>
@@ -387,13 +389,13 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             switch (source)
             {
-                case Fruit _:
+                case Fruit:
                     return caughtFruitPool.Get();
 
-                case Banana _:
+                case Banana:
                     return caughtBananaPool.Get();
 
-                case Droplet _:
+                case Droplet:
                     return caughtDropletPool.Get();
 
                 default:
@@ -428,7 +430,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             var droppedObject = getDroppedObject(caughtObject);
 
-            caughtObjectContainer.Remove(caughtObject);
+            caughtObjectContainer.Remove(caughtObject, false);
 
             droppedObjectTarget.Add(droppedObject);
 

@@ -13,10 +13,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyHitExplosion : CompositeDrawable, IHitExplosion
+    public partial class LegacyHitExplosion : CompositeDrawable, IHitExplosion
     {
         [Resolved]
-        private Catcher catcher { get; set; }
+        private Catcher catcher { get; set; } = null!;
 
         private const float catch_margin = (1 - Catcher.ALLOWED_CATCH_RANGE) / 2;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(SkinManager skins)
         {
-            var defaultLegacySkin = skins.DefaultLegacySkin;
+            var defaultLegacySkin = skins.DefaultClassicSkin;
 
             // sprite names intentionally swapped to match stable member naming / ease of cross-referencing
             explosion1.Texture = defaultLegacySkin.GetTexture("scoreboard-explosion-2");

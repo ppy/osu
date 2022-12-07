@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +10,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Utility.SampleComponents
 {
-    public abstract class LatencySampleComponent : CompositeDrawable
+    public abstract partial class LatencySampleComponent : CompositeDrawable
     {
         protected readonly BindableDouble SampleBPM = new BindableDouble();
         protected readonly BindableDouble SampleApproachRate = new BindableDouble();

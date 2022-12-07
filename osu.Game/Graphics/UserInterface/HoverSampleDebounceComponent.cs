@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +14,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// Handles debouncing hover sounds at a global level to ensure the effects are not overwhelming.
     /// </summary>
-    public abstract class HoverSampleDebounceComponent : CompositeDrawable
+    public abstract partial class HoverSampleDebounceComponent : CompositeDrawable
     {
         private Bindable<double?> lastPlaybackTime;
 

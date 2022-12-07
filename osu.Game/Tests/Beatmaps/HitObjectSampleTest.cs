@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,8 +12,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -29,13 +33,16 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Beatmaps
 {
     [HeadlessTest]
-    public abstract class HitObjectSampleTest : PlayerTestScene, IStorageResourceProvider
+    public abstract partial class HitObjectSampleTest : PlayerTestScene, IStorageResourceProvider
     {
         protected abstract IResourceStore<byte[]> RulesetResources { get; }
         protected LegacySkin Skin { get; private set; }
 
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         private readonly SkinInfo userSkinInfo = new SkinInfo();
 
@@ -121,6 +128,7 @@ namespace osu.Game.Tests.Beatmaps
 
         #region IResourceStorageProvider
 
+        public IRenderer Renderer => host.Renderer;
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => userSkinResourceStore;
         public new IResourceStore<byte[]> Resources => base.Resources;
@@ -156,7 +164,7 @@ namespace osu.Game.Tests.Beatmaps
                 return fallback.Get(type, info);
             }
 
-            public void Inject<T>(T instance) where T : class
+            public void Inject<T>(T instance) where T : class, IDependencyInjectionCandidate
             {
                 // Never used directly
             }
@@ -210,6 +218,7 @@ namespace osu.Game.Tests.Beatmaps
 
             protected internal override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, this);
 
+            public IRenderer Renderer => resources.Renderer;
             public AudioManager AudioManager => resources.AudioManager;
 
             public IResourceStore<byte[]> Files { get; }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +32,7 @@ using osuTK;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.UIScaling))]
-    public class ScreenUIScale : FirstRunSetupScreen
+    public partial class ScreenUIScale : FirstRunSetupScreen
     {
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -78,7 +80,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             };
         }
 
-        private class InverseScalingDrawSizePreservingFillContainer : ScalingContainer.ScalingDrawSizePreservingFillContainer
+        private partial class InverseScalingDrawSizePreservingFillContainer : ScalingContainer.ScalingDrawSizePreservingFillContainer
         {
             private Vector2 initialSize;
 
@@ -100,14 +102,14 @@ namespace osu.Game.Overlays.FirstRunSetup
             }
         }
 
-        private class NestedSongSelect : PlaySongSelect
+        private partial class NestedSongSelect : PlaySongSelect
         {
             protected override bool ControlGlobalMusic => false;
 
             public override bool? AllowTrackAdjustments => false;
         }
 
-        private class PinnedMainMenu : MainMenu
+        private partial class PinnedMainMenu : MainMenu
         {
             public override void OnEntering(ScreenTransitionEvent e)
             {
@@ -118,12 +120,12 @@ namespace osu.Game.Overlays.FirstRunSetup
             }
         }
 
-        private class UIScaleSlider : OsuSliderBar<float>
+        private partial class UIScaleSlider : OsuSliderBar<float>
         {
             public override LocalisableString TooltipText => base.TooltipText + "x";
         }
 
-        private class SampleScreenContainer : CompositeDrawable
+        private partial class SampleScreenContainer : CompositeDrawable
         {
             private readonly OsuScreen screen;
 
@@ -159,7 +161,6 @@ namespace osu.Game.Overlays.FirstRunSetup
             private void load(AudioManager audio, TextureStore textures, RulesetStore rulesets)
             {
                 Beatmap.Value = new DummyWorkingBeatmap(audio, textures);
-                Beatmap.Value.LoadTrack();
 
                 Ruleset.Value = rulesets.AvailableRulesets.First();
 
@@ -232,7 +233,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 return parentDependencies.Get(type, info);
             }
 
-            public void Inject<T>(T instance) where T : class
+            public void Inject<T>(T instance) where T : class, IDependencyInjectionCandidate
             {
                 parentDependencies.Inject(instance);
             }

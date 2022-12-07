@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
@@ -14,11 +16,15 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
+using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.Select.Details;
 using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneBeatmapSetOverlay : OsuTestScene
+    public partial class TestSceneBeatmapSetOverlay : OsuTestScene
     {
         private readonly TestBeatmapSetOverlay overlay;
 
@@ -31,6 +37,9 @@ namespace osu.Game.Tests.Visual.Online
 
         [Resolved]
         private IRulesetStore rulesets { get; set; }
+
+        [SetUp]
+        public void SetUp() => Schedule(() => SelectedMods.Value = Array.Empty<Mod>());
 
         [Test]
         public void TestLoading()
@@ -204,6 +213,21 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestSelectedModsDontAffectStatistics()
+        {
+            AddStep("show map", () => overlay.ShowBeatmapSet(getBeatmapSet()));
+            AddAssert("AR displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == BeatmapsetsStrings.ShowStatsAr).Value == (0, null));
+            AddStep("set AR10 diff adjust", () => SelectedMods.Value = new[]
+            {
+                new OsuModDifficultyAdjust
+                {
+                    ApproachRate = { Value = 10 }
+                }
+            });
+            AddAssert("AR still displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == BeatmapsetsStrings.ShowStatsAr).Value == (0, null));
+        }
+
+        [Test]
         public void TestHide()
         {
             AddStep(@"hide", overlay.Hide);
@@ -259,7 +283,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.HeaderContent.DownloadButtonsVisible == shown);
         }
 
-        private class TestBeatmapSetOverlay : BeatmapSetOverlay
+        private partial class TestBeatmapSetOverlay : BeatmapSetOverlay
         {
             public new BeatmapSetHeader Header => base.Header;
         }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -15,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class CentreHeaderContainer : CompositeDrawable
+    public partial class CentreHeaderContainer : CompositeDrawable
     {
         public readonly BindableBool DetailsVisible = new BindableBool(true);
         public readonly Bindable<APIUser> User = new Bindable<APIUser>();

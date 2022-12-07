@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -20,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Utility
 {
-    public class CircleGameplay : LatencySampleComponent
+    public partial class CircleGameplay : LatencySampleComponent
     {
         private int nextLocation;
 
@@ -113,7 +111,7 @@ namespace osu.Game.Screens.Utility
             hitEvents.Add(h);
         }
 
-        public class SampleHitCircle : LatencySampleComponent
+        public partial class SampleHitCircle : LatencySampleComponent
         {
             public HitEvent? HitEvent;
 

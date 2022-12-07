@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +23,7 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Overlays
 {
     [Cached]
-    public abstract class SettingsPanel : OsuFocusedOverlayContainer
+    public abstract partial class SettingsPanel : OsuFocusedOverlayContainer
     {
         public const float CONTENT_MARGINS = 20;
 
@@ -271,13 +273,13 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class NonMaskedContent : Container<Drawable>
+        private partial class NonMaskedContent : Container<Drawable>
         {
             // masking breaks the pan-out transform with nested sub-settings panels.
             protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
         }
 
-        public class SettingsSectionsContainer : SectionsContainer<SettingsSection>
+        public partial class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
             public SearchContainer<SettingsSection> SearchContainer;
 

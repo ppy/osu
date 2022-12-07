@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,7 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users.Drawables
 {
-    public class ClickableAvatar : Container
+    public partial class ClickableAvatar : Container
     {
         private const string default_tooltip_text = "view profile";
 
@@ -69,7 +71,7 @@ namespace osu.Game.Users.Drawables
                 game?.ShowUser(user);
         }
 
-        private class ClickableArea : OsuClickableContainer
+        private partial class ClickableArea : OsuClickableContainer
         {
             private LocalisableString tooltip = default_tooltip_text;
 

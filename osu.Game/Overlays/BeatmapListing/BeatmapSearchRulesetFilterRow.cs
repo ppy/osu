@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -9,7 +11,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapSearchRulesetFilterRow : BeatmapSearchFilterRow<RulesetInfo>
+    public partial class BeatmapSearchRulesetFilterRow : BeatmapSearchFilterRow<RulesetInfo>
     {
         public BeatmapSearchRulesetFilterRow()
             : base(BeatmapsStrings.ListingSearchFiltersMode)
@@ -18,7 +20,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override Drawable CreateFilter() => new RulesetFilter();
 
-        private class RulesetFilter : BeatmapSearchFilter
+        private partial class RulesetFilter : BeatmapSearchFilter
         {
             [BackgroundDependencyLoader]
             private void load(RulesetStore rulesets)
@@ -30,7 +32,7 @@ namespace osu.Game.Overlays.BeatmapListing
             }
         }
 
-        private class RulesetFilterTabItemAny : FilterTabItem<RulesetInfo>
+        private partial class RulesetFilterTabItemAny : FilterTabItem<RulesetInfo>
         {
             protected override LocalisableString LabelFor(RulesetInfo info) => BeatmapsStrings.ModeAny;
 

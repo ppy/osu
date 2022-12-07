@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -21,7 +23,7 @@ namespace osu.Game.Skinning.Editor
     /// A container which handles loading a skin editor on user request for a specified target.
     /// This also handles the scaling / positioning adjustment of the target.
     /// </summary>
-    public class SkinEditorOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
+    public partial class SkinEditorOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly ScalingContainer scalingContainer;
 
@@ -68,7 +70,7 @@ namespace osu.Game.Skinning.Editor
 
             var editor = new SkinEditor();
 
-            editor.State.BindValueChanged(visibility => updateComponentVisibility());
+            editor.State.BindValueChanged(_ => updateComponentVisibility());
 
             skinEditor = editor;
 

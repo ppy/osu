@@ -5,8 +5,6 @@ using System;
 using MessagePack;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 
-#nullable enable
-
 namespace osu.Game.Online.Multiplayer
 {
     /// <summary>

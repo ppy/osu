@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -21,7 +23,7 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
-    public class MonthSection : CompositeDrawable
+    public partial class MonthSection : CompositeDrawable
     {
         public int Year { get; private set; }
         public int Month { get; private set; }
@@ -77,7 +79,7 @@ namespace osu.Game.Overlays.News.Sidebar
             sampleClose = audio.Samples.Get(@"UI/dropdown-close");
         }
 
-        private class DropdownHeader : OsuClickableContainer
+        private partial class DropdownHeader : OsuClickableContainer
         {
             public readonly BindableBool Expanded = new BindableBool();
 
@@ -120,7 +122,7 @@ namespace osu.Game.Overlays.News.Sidebar
             }
         }
 
-        private class PostButton : OsuHoverContainer
+        private partial class PostButton : OsuHoverContainer
         {
             protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
@@ -152,7 +154,7 @@ namespace osu.Game.Overlays.News.Sidebar
             }
         }
 
-        private class PostsContainer : Container
+        private partial class PostsContainer : Container
         {
             public readonly BindableBool Expanded = new BindableBool();
 

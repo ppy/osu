@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -10,7 +12,7 @@ using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerRoomSounds : MultiplayerRoomComposite
+    public partial class MultiplayerRoomSounds : MultiplayerRoomComposite
     {
         private Sample hostChangedSample;
         private Sample userJoinedSample;

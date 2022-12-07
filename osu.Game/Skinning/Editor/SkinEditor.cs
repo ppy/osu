@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,21 +13,26 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Overlays.OSD;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 
 namespace osu.Game.Skinning.Editor
 {
     [Cached(typeof(SkinEditor))]
-    public class SkinEditor : VisibilityContainer, ICanAcceptFiles
+    public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
     {
         public const double TRANSITION_DURATION = 500;
 
@@ -65,6 +72,9 @@ namespace osu.Game.Skinning.Editor
 
         private EditorSidebar componentsSidebar;
         private EditorSidebar settingsSidebar;
+
+        [Resolved(canBeNull: true)]
+        private OnScreenDisplay onScreenDisplay { get; set; }
 
         public SkinEditor()
         {
@@ -188,13 +198,32 @@ namespace osu.Game.Skinning.Editor
             // schedule ensures this only happens when the skin editor is visible.
             // also avoid some weird endless recursion / bindable feedback loop (something to do with tracking skins across three different bindable types).
             // probably something which will be factored out in a future database refactor so not too concerning for now.
-            currentSkin.BindValueChanged(skin =>
+            currentSkin.BindValueChanged(_ =>
             {
                 hasBegunMutating = false;
                 Scheduler.AddOnce(skinChanged);
             }, true);
 
-            SelectedComponents.BindCollectionChanged((_, __) => Scheduler.AddOnce(populateSettings), true);
+            SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+        {
+            switch (e.Action)
+            {
+                case PlatformAction.Save:
+                    if (e.Repeat)
+                        return false;
+
+                    Save();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
+        {
         }
 
         public void UpdateTargetScreen(Drawable targetScreen)
@@ -285,7 +314,7 @@ namespace osu.Game.Skinning.Editor
 
         private ISkinnableTarget getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private ISkinnableTarget getTarget(SkinnableTarget target)
+        private ISkinnableTarget getTarget(GlobalSkinComponentLookup.LookupType target)
         {
             return availableTargets.FirstOrDefault(c => c.Target == target);
         }
@@ -314,11 +343,18 @@ namespace osu.Game.Skinning.Editor
                 currentSkin.Value.UpdateDrawableTarget(t);
 
             skins.Save(skins.CurrentSkin.Value);
+            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString()));
         }
 
         protected override bool OnHover(HoverEvent e) => true;
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+        public override void Hide()
+        {
+            base.Hide();
+            SelectedComponents.Clear();
+        }
 
         protected override void PopIn()
         {
@@ -386,6 +422,14 @@ namespace osu.Game.Skinning.Editor
             base.Dispose(isDisposing);
 
             game?.UnregisterImportHandler(this);
+        }
+
+        private partial class SkinEditorToast : Toast
+        {
+            public SkinEditorToast(LocalisableString value, string skinDisplayName)
+                : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName)
+            {
+            }
         }
     }
 }

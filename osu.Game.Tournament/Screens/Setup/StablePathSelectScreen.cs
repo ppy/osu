@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -19,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    public class StablePathSelectScreen : TournamentScreen
+    public partial class StablePathSelectScreen : TournamentScreen
     {
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
@@ -91,7 +93,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                         Spacing = new Vector2(20),
                                         Children = new Drawable[]
                                         {
-                                            new TriangleButton
+                                            new RoundedButton
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
@@ -99,7 +101,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                                 Text = "Select stable path",
                                                 Action = ChangePath
                                             },
-                                            new TriangleButton
+                                            new RoundedButton
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,

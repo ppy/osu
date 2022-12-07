@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -11,7 +13,7 @@ using System.Linq;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
-    public class NewsSidebar : OverlaySidebar
+    public partial class NewsSidebar : OverlaySidebar
     {
         [Cached]
         public readonly Bindable<APINewsSidebar> Metadata = new Bindable<APINewsSidebar>();

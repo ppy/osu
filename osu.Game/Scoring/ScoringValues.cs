@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using MessagePack;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -18,13 +20,13 @@ namespace osu.Game.Scoring
         /// The sum of all "basic" <see cref="HitObject"/> scoring values. See: <see cref="HitResultExtensions.IsBasic"/> and <see cref="Judgement.ToNumericResult"/>.
         /// </summary>
         [Key(0)]
-        public double BaseScore;
+        public long BaseScore;
 
         /// <summary>
         /// The sum of all "bonus" <see cref="HitObject"/> scoring values. See: <see cref="HitResultExtensions.IsBonus"/> and <see cref="Judgement.ToNumericResult"/>.
         /// </summary>
         [Key(1)]
-        public double BonusScore;
+        public long BonusScore;
 
         /// <summary>
         /// The highest achieved combo.

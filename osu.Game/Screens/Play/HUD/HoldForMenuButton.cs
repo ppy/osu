@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -23,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class HoldForMenuButton : FillFlowContainer
+    public partial class HoldForMenuButton : FillFlowContainer
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
+        private partial class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
         {
             private SpriteIcon icon;
             private CircularProgress circularProgress;
@@ -216,7 +218,7 @@ namespace osu.Game.Screens.Play.HUD
 
                 overlayCircle.ScaleTo(0, 100)
                              .Then().FadeOut().ScaleTo(1).FadeIn(500)
-                             .OnComplete(a =>
+                             .OnComplete(_ =>
                              {
                                  icon.ScaleTo(1, 100);
                                  circularProgress.FadeOut(100).OnComplete(_ =>

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Input;
 
@@ -27,7 +30,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A component which outlines items and handles movement of selections.
     /// </summary>
-    public abstract class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHasContextMenu
+    public abstract partial class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHasContextMenu
     {
         /// <summary>
         /// The currently selected blueprints.
@@ -61,7 +64,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             InternalChild = SelectionBox = CreateSelectionBox();
 
-            SelectedItems.CollectionChanged += (sender, args) =>
+            SelectedItems.CollectionChanged += (_, _) =>
             {
                 Scheduler.AddOnce(updateVisibility);
             };
@@ -96,6 +99,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         #region User Input Handling
+
+        /// <remarks>
+        /// Positional input must be received outside the container's bounds,
+        /// in order to handle blueprints which are partially offscreen.
+        /// </remarks>
+        /// <seealso cref="ComposeBlueprintContainer.ReceivePositionalInputAt"/>
+        /// <seealso cref="TimelineBlueprintContainer.ReceivePositionalInputAt"/>
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         /// <summary>
         /// Handles the selected items being moved.
@@ -294,7 +305,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected void DeleteSelected()
         {
-            DeleteItems(selectedBlueprints.Select(b => b.Item));
+            DeleteItems(SelectedItems.ToArray());
         }
 
         #endregion

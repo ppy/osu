@@ -1,6 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,7 +18,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class ProfileHeader : TabControlOverlayHeader<LocalisableString>
+    public partial class ProfileHeader : TabControlOverlayHeader<LocalisableString>
     {
         private UserCoverBackground coverContainer;
 
@@ -34,6 +37,10 @@ namespace osu.Game.Overlays.Profile
 
             // todo: pending implementation.
             // TabControl.AddItem(LayoutStrings.HeaderUsersModding);
+
+            // Haphazardly guaranteed by OverlayHeader constructor (see CreateBackground / CreateContent).
+            Debug.Assert(centreHeaderContainer != null);
+            Debug.Assert(detailHeaderContainer != null);
 
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
@@ -97,7 +104,7 @@ namespace osu.Game.Overlays.Profile
 
         private void updateDisplay(APIUser user) => coverContainer.User = user;
 
-        private class ProfileHeaderTitle : OverlayTitle
+        private partial class ProfileHeaderTitle : OverlayTitle
         {
             public ProfileHeaderTitle()
             {
@@ -106,7 +113,7 @@ namespace osu.Game.Overlays.Profile
             }
         }
 
-        private class ProfileCoverBackground : UserCoverBackground
+        private partial class ProfileCoverBackground : UserCoverBackground
         {
             protected override double LoadDelay => 0;
         }

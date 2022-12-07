@@ -7,10 +7,10 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class ControlPointGroup : IComparable<ControlPointGroup>
+    public class ControlPointGroup : IComparable<ControlPointGroup>, IEquatable<ControlPointGroup>
     {
-        public event Action<ControlPoint> ItemAdded;
-        public event Action<ControlPoint> ItemRemoved;
+        public event Action<ControlPoint>? ItemAdded;
+        public event Action<ControlPoint>? ItemRemoved;
 
         /// <summary>
         /// The time at which the control point takes effect.
@@ -45,6 +45,24 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             controlPoints.Remove(point);
             ItemRemoved?.Invoke(point);
+        }
+
+        public sealed override bool Equals(object? obj)
+            => obj is ControlPointGroup otherGroup
+               && Equals(otherGroup);
+
+        public virtual bool Equals(ControlPointGroup? other)
+            => other != null
+               && Time == other.Time
+               && ControlPoints.SequenceEqual(other.ControlPoints);
+
+        public override int GetHashCode()
+        {
+            HashCode hashCode = new HashCode();
+            hashCode.Add(Time);
+            foreach (var point in controlPoints)
+                hashCode.Add(point);
+            return hashCode.ToHashCode();
         }
     }
 }

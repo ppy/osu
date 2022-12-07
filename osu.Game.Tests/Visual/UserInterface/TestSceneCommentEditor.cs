@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneCommentEditor : OsuManualInputManagerTestScene
+    public partial class TestSceneCommentEditor : OsuManualInputManagerTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -101,7 +103,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("cancel action fired", () => cancellableCommentEditor.Cancelled);
         }
 
-        private class TestCommentEditor : CommentEditor
+        private partial class TestCommentEditor : CommentEditor
         {
             public new Bindable<string> Current => base.Current;
             public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
@@ -124,7 +126,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             protected override string TextBoxPlaceholder => @"This text box is empty";
         }
 
-        private class TestCancellableCommentEditor : CancellableCommentEditor
+        private partial class TestCancellableCommentEditor : CancellableCommentEditor
         {
             public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
             protected override string FooterText => @"Wow, another one. Sicc";

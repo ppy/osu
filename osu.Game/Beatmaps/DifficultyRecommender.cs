@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,7 @@ namespace osu.Game.Beatmaps
     /// A class which will recommend the most suitable difficulty for the local user from a beatmap set.
     /// This requires the user to be logged in, as it sources from the user's online profile.
     /// </summary>
-    public class DifficultyRecommender : Component
+    public partial class DifficultyRecommender : Component
     {
         [Resolved]
         private IAPIProvider api { get; set; }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -8,7 +10,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneReplayPlayer : RateAdjustedBeatmapTestScene
+    public partial class TestSceneReplayPlayer : RateAdjustedBeatmapTestScene
     {
         protected TestReplayPlayer Player;
 

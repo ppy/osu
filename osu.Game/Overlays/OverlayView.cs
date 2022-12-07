@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,7 +18,7 @@ namespace osu.Game.Overlays
     /// Automatically performs a data fetch on load.
     /// </remarks>
     /// <typeparam name="T">The type of the API response.</typeparam>
-    public abstract class OverlayView<T> : CompositeDrawable
+    public abstract partial class OverlayView<T> : CompositeDrawable
         where T : class
     {
         [Resolved]

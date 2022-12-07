@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
@@ -21,7 +23,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class CommentsContainer : CompositeDrawable
+    public partial class CommentsContainer : CompositeDrawable
     {
         private readonly Bindable<CommentableType> type = new Bindable<CommentableType>();
         private readonly BindableLong id = new BindableLong();
@@ -249,8 +251,8 @@ namespace osu.Game.Overlays.Comments
                     if (bundle.HasMore)
                     {
                         int loadedTopLevelComments = 0;
-                        pinnedContent.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
-                        content.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
+                        pinnedContent.Children.OfType<DrawableComment>().ForEach(_ => loadedTopLevelComments++);
+                        content.Children.OfType<DrawableComment>().ForEach(_ => loadedTopLevelComments++);
 
                         moreButton.Current.Value = bundle.TopLevelCount - loadedTopLevelComments;
                         moreButton.IsLoading = false;
@@ -315,7 +317,7 @@ namespace osu.Game.Overlays.Comments
             base.Dispose(isDisposing);
         }
 
-        private class NoCommentsPlaceholder : CompositeDrawable
+        private partial class NoCommentsPlaceholder : CompositeDrawable
         {
             [BackgroundDependencyLoader]
             private void load()

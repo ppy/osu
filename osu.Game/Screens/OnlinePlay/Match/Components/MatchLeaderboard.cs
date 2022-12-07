@@ -11,10 +11,10 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIUserScoreAggregate>
+    public partial class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIUserScoreAggregate>
     {
         [Resolved(typeof(Room), nameof(Room.RoomID))]
-        private Bindable<long?> roomId { get; set; }
+        private Bindable<long?> roomId { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -31,7 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected override bool IsOnlineScope => true;
 
-        protected override APIRequest FetchScores(CancellationToken cancellationToken)
+        protected override APIRequest? FetchScores(CancellationToken cancellationToken)
         {
             if (roomId.Value == null)
                 return null;

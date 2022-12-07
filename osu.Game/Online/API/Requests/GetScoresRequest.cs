@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -14,6 +16,8 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetScoresRequest : APIRequest<APIScoresCollection>
     {
+        public const int MAX_SCORES_PER_REQUEST = 50;
+
         private readonly IBeatmapInfo beatmapInfo;
         private readonly BeatmapLeaderboardScope scope;
         private readonly IRulesetInfo ruleset;
@@ -33,7 +37,7 @@ namespace osu.Game.Online.API.Requests
             this.mods = mods ?? Array.Empty<IMod>();
         }
 
-        protected override string Target => $@"beatmaps/{beatmapInfo.OnlineID}/scores{createQueryParameters()}";
+        protected override string Target => $@"beatmaps/{beatmapInfo.OnlineID}/solo-scores{createQueryParameters()}";
 
         private string createQueryParameters()
         {

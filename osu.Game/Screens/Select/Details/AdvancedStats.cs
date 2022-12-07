@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -26,7 +28,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public class AdvancedStats : Container
+    public partial class AdvancedStats : Container
     {
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
@@ -94,7 +96,7 @@ namespace osu.Game.Screens.Select.Details
             modSettingChangeTracker?.Dispose();
 
             modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
-            modSettingChangeTracker.SettingChanged += m =>
+            modSettingChangeTracker.SettingChanged += _ =>
             {
                 debouncedStatisticsUpdate?.Cancel();
                 debouncedStatisticsUpdate = Scheduler.AddDelayed(updateStatistics, 100);
@@ -171,7 +173,7 @@ namespace osu.Game.Screens.Select.Details
             starDifficultyCancellationSource?.Cancel();
         }
 
-        public class StatisticRow : Container, IHasAccentColour
+        public partial class StatisticRow : Container, IHasAccentColour
         {
             private const float value_width = 25;
             private const float name_width = 70;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -8,7 +10,7 @@ using osu.Game.Tournament.Screens.TeamWin;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneTeamWinScreen : TournamentTestScene
+    public partial class TestSceneTeamWinScreen : TournamentTestScene
     {
         [Test]
         public void TestBasic()

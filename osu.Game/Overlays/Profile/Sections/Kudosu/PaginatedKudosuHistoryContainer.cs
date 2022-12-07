@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Bindables;
@@ -12,7 +14,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
-    public class PaginatedKudosuHistoryContainer : PaginatedProfileSubsection<APIKudosuHistory>
+    public partial class PaginatedKudosuHistoryContainer : PaginatedProfileSubsection<APIKudosuHistory>
     {
         public PaginatedKudosuHistoryContainer(Bindable<APIUser> user)
             : base(user, missingText: UsersStrings.ShowExtraKudosuEntryEmpty)

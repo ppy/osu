@@ -4,25 +4,64 @@
 using System;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Database
 {
     public static class RealmExtensions
     {
+        /// <summary>
+        /// Perform a write operation against the provided realm instance.
+        /// </summary>
+        /// <remarks>
+        /// This will automatically start a transaction if not already in one.
+        /// </remarks>
+        /// <param name="realm">The realm to operate on.</param>
+        /// <param name="function">The write operation to run.</param>
         public static void Write(this Realm realm, Action<Realm> function)
         {
-            using var transaction = realm.BeginWrite();
-            function(realm);
-            transaction.Commit();
+            Transaction? transaction = null;
+
+            try
+            {
+                if (!realm.IsInTransaction)
+                    transaction = realm.BeginWrite();
+
+                function(realm);
+
+                transaction?.Commit();
+            }
+            finally
+            {
+                transaction?.Dispose();
+            }
         }
 
+        /// <summary>
+        /// Perform a write operation against the provided realm instance.
+        /// </summary>
+        /// <remarks>
+        /// This will automatically start a transaction if not already in one.
+        /// </remarks>
+        /// <param name="realm">The realm to operate on.</param>
+        /// <param name="function">The write operation to run.</param>
         public static T Write<T>(this Realm realm, Func<Realm, T> function)
         {
-            using var transaction = realm.BeginWrite();
-            var result = function(realm);
-            transaction.Commit();
-            return result;
+            Transaction? transaction = null;
+
+            try
+            {
+                if (!realm.IsInTransaction)
+                    transaction = realm.BeginWrite();
+
+                var result = function(realm);
+
+                transaction?.Commit();
+
+                return result;
+            }
+            finally
+            {
+                transaction?.Dispose();
+            }
         }
 
         /// <summary>

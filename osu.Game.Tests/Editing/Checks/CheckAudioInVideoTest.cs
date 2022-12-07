@@ -18,8 +18,8 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckAudioInVideoTest
     {
-        private CheckAudioInVideo check;
-        private IBeatmap beatmap;
+        private CheckAudioInVideo check = null!;
+        private IBeatmap beatmap = null!;
 
         [SetUp]
         public void Setup()
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Editing.Checks
             Assert.That(issues.Single().Template is CheckAudioInVideo.IssueTemplateMissingFile);
         }
 
-        private BeatmapVerifierContext getContext(Stream resourceStream)
+        private BeatmapVerifierContext getContext(Stream? resourceStream)
         {
             var storyboard = new Storyboard();
             var layer = storyboard.GetLayer("Video");

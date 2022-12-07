@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +26,7 @@ namespace osu.Game.Overlays.Profile
     /// </summary>
     /// <typeparam name="TKey">Type of data to be used for X-axis of the graph.</typeparam>
     /// <typeparam name="TValue">Type of data to be used for Y-axis of the graph.</typeparam>
-    public abstract class UserGraph<TKey, TValue> : Container, IHasCustomTooltip<UserGraphTooltipContent>
+    public abstract partial class UserGraph<TKey, TValue> : Container, IHasCustomTooltip<UserGraphTooltipContent>
     {
         protected const float FADE_DURATION = 150;
 
@@ -134,7 +136,7 @@ namespace osu.Game.Overlays.Profile
 
         protected abstract UserGraphTooltipContent GetTooltipContent(TKey key, TValue value);
 
-        protected class UserLineGraph : LineGraph
+        protected partial class UserLineGraph : LineGraph
         {
             private readonly CircularContainer movingBall;
             private readonly Container bar;
@@ -205,7 +207,7 @@ namespace osu.Game.Overlays.Profile
             }
         }
 
-        private class UserGraphTooltip : VisibilityContainer, ITooltip<UserGraphTooltipContent>
+        private partial class UserGraphTooltip : VisibilityContainer, ITooltip<UserGraphTooltipContent>
         {
             protected readonly OsuSpriteText Label, Counter, BottomText;
             private readonly Box background;

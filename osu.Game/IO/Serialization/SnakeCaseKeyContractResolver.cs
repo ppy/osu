@@ -1,8 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Humanizer;
+#nullable disable
+
 using Newtonsoft.Json.Serialization;
+using osu.Game.Extensions;
 
 namespace osu.Game.IO.Serialization
 {
@@ -10,7 +12,7 @@ namespace osu.Game.IO.Serialization
     {
         protected override string ResolvePropertyName(string propertyName)
         {
-            return propertyName.Underscore();
+            return propertyName.ToSnakeCase();
         }
     }
 }

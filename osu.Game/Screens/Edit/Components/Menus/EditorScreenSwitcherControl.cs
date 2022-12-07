@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -12,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.Menus
 {
-    public class EditorScreenSwitcherControl : OsuTabControl<EditorScreenMode>
+    public partial class EditorScreenSwitcherControl : OsuTabControl<EditorScreenMode>
     {
         public EditorScreenSwitcherControl()
         {
@@ -40,7 +42,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
         protected override TabItem<EditorScreenMode> CreateTabItem(EditorScreenMode value) => new TabItem(value);
 
-        private class TabItem : OsuTabItem
+        private partial class TabItem : OsuTabItem
         {
             private const float transition_length = 250;
 

@@ -5,11 +5,9 @@ using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Resources.Localisation.Web;
 
-#nullable enable
-
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class FeaturedArtistBeatmapBadge : BeatmapBadge
+    public partial class FeaturedArtistBeatmapBadge : BeatmapBadge
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,17 +11,18 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class DifficultySection : SetupSection
+    internal partial class DifficultySection : SetupSection
     {
         private LabelledSliderBar<float> circleSizeSlider;
         private LabelledSliderBar<float> healthDrainSlider;
         private LabelledSliderBar<float> approachRateSlider;
         private LabelledSliderBar<float> overallDifficultySlider;
 
-        public override LocalisableString Title => "Difficulty";
+        public override LocalisableString Title => EditorSetupStrings.DifficultyHeader;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -30,7 +33,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = BeatmapsetsStrings.ShowStatsCs,
                     FixedLabelWidth = LABEL_WIDTH,
-                    Description = "The size of all hit objects",
+                    Description = EditorSetupStrings.CircleSizeDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.CircleSize)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
@@ -43,7 +46,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = BeatmapsetsStrings.ShowStatsDrain,
                     FixedLabelWidth = LABEL_WIDTH,
-                    Description = "The rate of passive health drain throughout playable time",
+                    Description = EditorSetupStrings.DrainRateDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.DrainRate)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
@@ -56,7 +59,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = BeatmapsetsStrings.ShowStatsAr,
                     FixedLabelWidth = LABEL_WIDTH,
-                    Description = "The speed at which objects are presented to the player",
+                    Description = EditorSetupStrings.ApproachRateDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.ApproachRate)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
@@ -69,7 +72,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = BeatmapsetsStrings.ShowStatsAccuracy,
                     FixedLabelWidth = LABEL_WIDTH,
-                    Description = "The harshness of hit windows and difficulty of special objects (ie. spinners)",
+                    Description = EditorSetupStrings.OverallDifficultyDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.OverallDifficulty)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
@@ -94,6 +97,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Difficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
 
             Beatmap.UpdateAllHitObjects();
+            Beatmap.SaveState();
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osuTK;
 using osu.Framework.Graphics;
@@ -18,7 +20,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
-    public class KudosuInfo : Container
+    public partial class KudosuInfo : Container
     {
         private readonly Bindable<APIUser> user = new Bindable<APIUser>();
 
@@ -37,7 +39,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
         protected override bool OnClick(ClickEvent e) => true;
 
-        private class CountTotal : CountSection
+        private partial class CountTotal : CountSection
         {
             public CountTotal()
                 : base(UsersStrings.ShowExtraKudosuTotal)
@@ -48,7 +50,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             }
         }
 
-        private class CountSection : Container
+        private partial class CountSection : Container
         {
             private readonly OsuSpriteText valueText;
             protected readonly LinkFlowContainer DescriptionText;

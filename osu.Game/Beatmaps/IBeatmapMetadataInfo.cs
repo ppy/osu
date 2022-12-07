@@ -4,8 +4,6 @@
 using System;
 using osu.Game.Users;
 
-#nullable enable
-
 namespace osu.Game.Beatmaps
 {
     /// <summary>

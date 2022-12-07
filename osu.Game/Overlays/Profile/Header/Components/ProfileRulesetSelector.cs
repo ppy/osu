@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
@@ -8,7 +10,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class ProfileRulesetSelector : OverlayRulesetSelector
+    public partial class ProfileRulesetSelector : OverlayRulesetSelector
     {
         public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 

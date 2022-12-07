@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
 {
     public class ManiaRulesetConfigManager : RulesetConfigManager<ManiaRulesetSetting>
     {
-        public ManiaRulesetConfigManager(SettingsStore settings, RulesetInfo ruleset, int? variant = null)
+        public ManiaRulesetConfigManager(SettingsStore? settings, RulesetInfo ruleset, int? variant = null)
             : base(settings, ruleset, variant)
         {
         }
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
                 scrollTime => new SettingDescription(
                     rawValue: scrollTime,
                     name: "Scroll Speed",
-                    value: $"{(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime)} ({scrollTime}ms)"
+                    value: $"{scrollTime}ms (speed {(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime)})"
                 )
             )
         };

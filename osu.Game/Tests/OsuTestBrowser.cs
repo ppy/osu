@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -10,7 +12,7 @@ using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Tests
 {
-    public class OsuTestBrowser : OsuGameBase
+    public partial class OsuTestBrowser : OsuGameBase
     {
         protected override void LoadComplete()
         {

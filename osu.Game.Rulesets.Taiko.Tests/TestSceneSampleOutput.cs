@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Testing;
@@ -14,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
     /// Taiko has some interesting rules for legacy mappings.
     /// </summary>
     [HeadlessTest]
-    public class TestSceneSampleOutput : TestSceneTaikoPlayer
+    public partial class TestSceneSampleOutput : TestSceneTaikoPlayer
     {
         public override void SetUpSteps()
         {

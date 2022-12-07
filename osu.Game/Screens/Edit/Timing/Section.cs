@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal abstract class Section<T> : CompositeDrawable
+    internal abstract partial class Section<T> : CompositeDrawable
         where T : ControlPoint
     {
         private OsuCheckbox checkbox;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.AccountCreation
 {
-    public class ScreenEntry : AccountCreationScreen
+    public partial class ScreenEntry : AccountCreationScreen
     {
         private ErrorTextFlowContainer usernameDescription;
         private ErrorTextFlowContainer emailAddressDescription;

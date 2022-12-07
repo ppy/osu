@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogHeader : BreadcrumbControlOverlayHeader
+    public partial class ChangelogHeader : BreadcrumbControlOverlayHeader
     {
         public readonly Bindable<APIChangelogBuild> Build = new Bindable<APIChangelogBuild>();
 
@@ -115,7 +117,7 @@ namespace osu.Game.Overlays.Changelog
             currentStream.Value = Streams.Items.FirstOrDefault(s => s.Name == Build.Value.UpdateStream.Name);
         }
 
-        private class ChangelogHeaderTitle : OverlayTitle
+        private partial class ChangelogHeaderTitle : OverlayTitle
         {
             public ChangelogHeaderTitle()
             {

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -16,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// Highlight on hover, bounce on click.
     /// </summary>
-    public class OsuAnimatedButton : OsuClickableContainer
+    public partial class OsuAnimatedButton : OsuClickableContainer
     {
         /// <summary>
         /// The colour that should be flashed when the <see cref="OsuAnimatedButton"/> is clicked.

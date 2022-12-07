@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -24,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat.Listing
 {
-    public class ChannelListingItem : OsuClickableContainer, IFilterable
+    public partial class ChannelListingItem : OsuClickableContainer, IFilterable
     {
         public event Action<Channel>? OnRequestJoin;
         public event Action<Channel>? OnRequestLeave;

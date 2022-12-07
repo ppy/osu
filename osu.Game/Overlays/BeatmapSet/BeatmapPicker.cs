@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework;
@@ -25,7 +27,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapPicker : Container
+    public partial class BeatmapPicker : Container
     {
         private const float tile_icon_padding = 7;
         private const float tile_spacing = 2;
@@ -154,7 +156,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             base.LoadComplete();
 
-            ruleset.ValueChanged += r => updateDisplay();
+            ruleset.ValueChanged += _ => updateDisplay();
 
             // done here so everything can bind in intialization and get the first trigger
             Beatmap.TriggerChange();
@@ -207,7 +209,7 @@ namespace osu.Game.Overlays.BeatmapSet
             Difficulties.Children.ToList().ForEach(diff => diff.State = diff.Beatmap == Beatmap.Value ? DifficultySelectorState.Selected : DifficultySelectorState.NotSelected);
         }
 
-        public class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
+        public partial class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
         {
             public Action OnLostHover;
 
@@ -218,7 +220,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        public class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>
+        public partial class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>
         {
             private const float transition_duration = 100;
             private const float size = 54;
@@ -272,8 +274,10 @@ namespace osu.Game.Overlays.BeatmapSet
                             Alpha = 0.5f
                         }
                     },
-                    icon = new DifficultyIcon(beatmapInfo, shouldShowTooltip: false)
+                    icon = new DifficultyIcon(beatmapInfo)
                     {
+                        ShowTooltip = false,
+                        Current = { Value = new StarDifficulty(beatmapInfo.StarRating, 0) },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(size - tile_icon_padding * 2),
@@ -321,7 +325,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private class Statistic : FillFlowContainer
+        private partial class Statistic : FillFlowContainer
         {
             private readonly OsuSpriteText text;
 

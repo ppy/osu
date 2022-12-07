@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,7 +11,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class TimingSection : Section<TimingControlPoint>
+    internal partial class TimingSection : Section<TimingControlPoint>
     {
         private LabelledTimeSignature timeSignature;
         private BPMTextBox bpmTextEntry;
@@ -67,7 +69,7 @@ namespace osu.Game.Screens.Edit.Timing
             };
         }
 
-        private class BPMTextBox : LabelledTextBox
+        private partial class BPMTextBox : LabelledTextBox
         {
             private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
 
@@ -75,7 +77,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 Label = "BPM";
 
-                OnCommit += (val, isNew) =>
+                OnCommit += (_, isNew) =>
                 {
                     if (!isNew) return;
 

@@ -1,11 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -17,13 +23,15 @@ using osu.Game.Screens.OnlinePlay.Match;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerLoungeSubScreen : LoungeSubScreen
+    public partial class MultiplayerLoungeSubScreen : LoungeSubScreen
     {
         [Resolved]
         private IAPIProvider api { get; set; }
 
         [Resolved]
         private MultiplayerClient client { get; set; }
+
+        private Dropdown<RoomPermissionsFilter> roomAccessTypeDropdown;
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
@@ -38,10 +46,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
+        protected override IEnumerable<Drawable> CreateFilterControls()
+        {
+            roomAccessTypeDropdown = new SlimEnumDropdown<RoomPermissionsFilter>
+            {
+                RelativeSizeAxes = Axes.None,
+                Width = 160,
+            };
+
+            roomAccessTypeDropdown.Current.BindValueChanged(_ => UpdateFilter());
+
+            return base.CreateFilterControls().Append(roomAccessTypeDropdown);
+        }
+
         protected override FilterCriteria CreateFilterCriteria()
         {
             var criteria = base.CreateFilterCriteria();
             criteria.Category = @"realtime";
+            criteria.Permissions = roomAccessTypeDropdown.Current.Value;
             return criteria;
         }
 
@@ -68,7 +90,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.OpenNewRoom(room);
         }
 
-        private class MultiplayerListingPollingComponent : ListingPollingComponent
+        private partial class MultiplayerListingPollingComponent : ListingPollingComponent
         {
             [Resolved]
             private MultiplayerClient client { get; set; }
@@ -79,7 +101,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             private void load()
             {
                 isConnected.BindTo(client.IsConnected);
-                isConnected.BindValueChanged(c => Scheduler.AddOnce(poll), true);
+                isConnected.BindValueChanged(_ => Scheduler.AddOnce(poll), true);
             }
 
             private void poll()

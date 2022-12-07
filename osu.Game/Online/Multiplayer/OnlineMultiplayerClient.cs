@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,7 +18,7 @@ namespace osu.Game.Online.Multiplayer
     /// <summary>
     /// A <see cref="MultiplayerClient"/> with online connectivity.
     /// </summary>
-    public class OnlineMultiplayerClient : MultiplayerClient
+    public partial class OnlineMultiplayerClient : MultiplayerClient
     {
         private readonly string endpoint;
 
@@ -87,7 +85,13 @@ namespace osu.Game.Online.Multiplayer
             catch (HubException exception)
             {
                 if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
-                    connector?.Reconnect();
+                {
+                    Debug.Assert(connector != null);
+
+                    await connector.Reconnect();
+                    return await JoinRoom(roomId, password);
+                }
+
                 throw;
             }
         }

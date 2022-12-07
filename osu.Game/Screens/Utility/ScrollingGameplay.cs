@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -19,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Utility
 {
-    public class ScrollingGameplay : LatencySampleComponent
+    public partial class ScrollingGameplay : LatencySampleComponent
     {
         private const float judgement_position = 0.8f;
         private const float bar_height = 20;
@@ -101,7 +100,7 @@ namespace osu.Game.Screens.Utility
             hitEvents.Add(h);
         }
 
-        public class SampleNote : LatencySampleComponent
+        public partial class SampleNote : LatencySampleComponent
         {
             public HitEvent? HitEvent;
 

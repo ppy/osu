@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Overlays.Profile.Sections.Historical;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,7 +17,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestScenePlayHistorySubsection : OsuTestScene
+    public partial class TestScenePlayHistorySubsection : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Red);

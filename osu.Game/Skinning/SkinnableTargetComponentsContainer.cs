@@ -13,13 +13,13 @@ namespace osu.Game.Skinning
     /// Optionally also applies a default layout to the components.
     /// </summary>
     [Serializable]
-    public class SkinnableTargetComponentsContainer : Container, ISkinnableDrawable
+    public partial class SkinnableTargetComponentsContainer : Container, ISkinnableDrawable
     {
         public bool IsEditable => false;
 
         public bool UsesFixedAnchor { get; set; }
 
-        private readonly Action<Container> applyDefaults;
+        private readonly Action<Container>? applyDefaults;
 
         /// <summary>
         /// Construct a wrapper with defaults that should be applied once.

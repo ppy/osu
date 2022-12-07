@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -12,7 +14,7 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserProfileOverlay : OsuTestScene
+    public partial class TestSceneUserProfileOverlay : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 
@@ -22,7 +24,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             Username = @"Somebody",
             Id = 1,
-            Country = new Country { FullName = @"Alien" },
+            CountryCode = CountryCode.Unknown,
             CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
@@ -50,8 +52,15 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
                     Description = "Outstanding help by being a voluntary test subject.",
-                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
-                }
+                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg",
+                    Url = "https://osu.ppy.sh/wiki/en/People/Community_Contributors",
+                },
+                new Badge
+                {
+                    AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
+                    Description = "Badge without a url.",
+                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg",
+                },
             },
             Title = "osu!volunteer",
             Colour = "ff0000",
@@ -80,7 +89,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = @"peppy",
                 Id = 2,
                 IsSupporter = true,
-                Country = new Country { FullName = @"Australia", FlagName = @"AU" },
+                CountryCode = CountryCode.AU,
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
             }));
 
@@ -88,7 +97,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Username = @"flyte",
                 Id = 3103765,
-                Country = new Country { FullName = @"Japan", FlagName = @"JP" },
+                CountryCode = CountryCode.JP,
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
             }));
 
@@ -97,7 +106,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = @"BanchoBot",
                 Id = 3,
                 IsBot = true,
-                Country = new Country { FullName = @"Saint Helena", FlagName = @"SH" },
+                CountryCode = CountryCode.SH,
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c4.jpg"
             }));
 
@@ -108,7 +117,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Show without reload", profile.Show);
         }
 
-        private class TestUserProfileOverlay : UserProfileOverlay
+        private partial class TestUserProfileOverlay : UserProfileOverlay
         {
             public new ProfileHeader Header => base.Header;
         }

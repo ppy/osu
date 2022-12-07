@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -8,7 +10,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class ModPerfectTestScene : ModTestScene
+    public abstract partial class ModPerfectTestScene : ModTestScene
     {
         private readonly ModPerfect mod;
 
@@ -31,7 +33,7 @@ namespace osu.Game.Tests.Visual
 
         protected override TestPlayer CreateModPlayer(Ruleset ruleset) => new PerfectModTestPlayer();
 
-        private class PerfectModTestPlayer : TestPlayer
+        private partial class PerfectModTestPlayer : TestPlayer
         {
             public PerfectModTestPlayer()
                 : base(showResults: false)

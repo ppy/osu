@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -22,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogSingleBuild : ChangelogContent
+    public partial class ChangelogSingleBuild : ChangelogContent
     {
         private APIChangelogBuild build;
 
@@ -89,7 +91,7 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        public class ChangelogBuildWithNavigation : ChangelogBuild
+        public partial class ChangelogBuildWithNavigation : ChangelogBuild
         {
             public ChangelogBuildWithNavigation(APIChangelogBuild build)
                 : base(build)
@@ -138,7 +140,7 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        private class NavigationIconButton : IconButton
+        private partial class NavigationIconButton : IconButton
         {
             public Action<APIChangelogBuild> SelectBuild;
 

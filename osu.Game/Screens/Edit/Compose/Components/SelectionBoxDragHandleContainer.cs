@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -13,7 +15,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// Represents a display composite containing and managing the visibility state of the selection box's drag handles.
     /// </summary>
-    public class SelectionBoxDragHandleContainer : CompositeDrawable
+    public partial class SelectionBoxDragHandleContainer : CompositeDrawable
     {
         private Container<SelectionBoxScaleHandle> scaleHandles;
         private Container<SelectionBoxRotationHandle> rotationHandles;

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatTextBar : Container
+    public partial class ChatTextBar : Container
     {
         public readonly BindableBool ShowSearch = new BindableBool();
 

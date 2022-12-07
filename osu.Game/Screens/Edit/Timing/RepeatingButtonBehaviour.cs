@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -14,7 +16,7 @@ namespace osu.Game.Screens.Edit.Timing
     /// <summary>
     /// Represents a component that provides the behaviour of triggering button clicks repeatedly while holding with mouse.
     /// </summary>
-    public class RepeatingButtonBehaviour : Component
+    public partial class RepeatingButtonBehaviour : Component
     {
         private const double initial_delay = 300;
         private const double minimum_delay = 80;
@@ -22,6 +24,9 @@ namespace osu.Game.Screens.Edit.Timing
         private readonly Drawable button;
 
         private Sample sample;
+
+        public Action RepeatBegan;
+        public Action RepeatEnded;
 
         /// <summary>
         /// An additive modifier for the frequency of the sample played on next actuation.
@@ -44,6 +49,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
+            RepeatBegan?.Invoke();
             beginRepeat();
             return true;
         }
@@ -51,6 +57,7 @@ namespace osu.Game.Screens.Edit.Timing
         protected override void OnMouseUp(MouseUpEvent e)
         {
             adjustDelegate?.Cancel();
+            RepeatEnded?.Invoke();
             base.OnMouseUp(e);
         }
 

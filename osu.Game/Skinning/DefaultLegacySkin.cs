@@ -15,7 +15,7 @@ namespace osu.Game.Skinning
         public static SkinInfo CreateInfo() => new SkinInfo
         {
             ID = Skinning.SkinInfo.CLASSIC_SKIN, // this is temporary until database storage is decided upon.
-            Name = "osu!classic",
+            Name = "osu! \"classic\" (2013)",
             Creator = "team osu!",
             Protected = true,
             InstantiationInfo = typeof(DefaultLegacySkin).GetInvariantInstantiationInfo()
@@ -43,6 +43,8 @@ namespace osu.Game.Skinning
                 new Color4(18, 124, 255, 255),
                 new Color4(242, 24, 57, 255)
             };
+
+            Configuration.ConfigDictionary[nameof(SkinConfiguration.LegacySetting.AllowSliderBallTint)] = @"true";
 
             Configuration.LegacyVersion = 2.7m;
         }

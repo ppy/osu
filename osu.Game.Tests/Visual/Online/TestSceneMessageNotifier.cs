@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -21,7 +23,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneMessageNotifier : OsuManualInputManagerTestScene
+    public partial class TestSceneMessageNotifier : OsuManualInputManagerTestScene
     {
         private APIUser friend;
         private Channel publicChannel;
@@ -226,7 +228,7 @@ namespace osu.Game.Tests.Visual.Online
             InputManager.Click(MouseButton.Left);
         }
 
-        private class TestContainer : Container
+        private partial class TestContainer : Container
         {
             [Cached]
             public ChannelManager ChannelManager { get; }

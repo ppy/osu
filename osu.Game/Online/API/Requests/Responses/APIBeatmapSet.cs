@@ -9,8 +9,6 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Models;
 
-#nullable enable
-
 namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIBeatmapSet : IBeatmapSetOnlineInfo, IBeatmapSetInfo
@@ -151,5 +149,8 @@ namespace osu.Game.Online.API.Requests.Responses
         #endregion
 
         public bool Equals(IBeatmapSetInfo? other) => other is APIBeatmapSet b && this.MatchesOnlineID(b);
+
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        public override int GetHashCode() => OnlineID.GetHashCode();
     }
 }

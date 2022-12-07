@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -19,19 +20,19 @@ using LogLevel = osu.Framework.Logging.LogLevel;
 
 namespace osu.Desktop
 {
-    internal class DiscordRichPresence : Component
+    internal partial class DiscordRichPresence : Component
     {
         private const string client_id = "367827983903490050";
 
-        private DiscordRpcClient client;
+        private DiscordRpcClient client = null!;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        private IBindable<APIUser> user;
+        private IBindable<APIUser> user = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
@@ -54,7 +55,7 @@ namespace osu.Desktop
             client.OnReady += onReady;
 
             // safety measure for now, until we performance test / improve backoff for failed connections.
-            client.OnConnectionFailed += (_, __) => client.Deinitialize();
+            client.OnConnectionFailed += (_, _) => client.Deinitialize();
 
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network);
 
@@ -99,6 +100,22 @@ namespace osu.Desktop
             {
                 presence.State = truncate(activity.Value.Status);
                 presence.Details = truncate(getDetails(activity.Value));
+
+                if (getBeatmap(activity.Value) is IBeatmapInfo beatmap && beatmap.OnlineID > 0)
+                {
+                    presence.Buttons = new[]
+                    {
+                        new Button
+                        {
+                            Label = "View beatmap",
+                            Url = $@"{api.WebsiteRootUrl}/beatmapsets/{beatmap.BeatmapSet?.OnlineID}#{ruleset.Value.ShortName}/{beatmap.OnlineID}"
+                        }
+                    };
+                }
+                else
+                {
+                    presence.Buttons = null;
+                }
             }
             else
             {
@@ -111,7 +128,7 @@ namespace osu.Desktop
                 presence.Assets.LargeImageText = string.Empty;
             else
             {
-                if (user.Value.RulesetsStatistics != null && user.Value.RulesetsStatistics.TryGetValue(ruleset.Value.ShortName, out UserStatistics statistics))
+                if (user.Value.RulesetsStatistics != null && user.Value.RulesetsStatistics.TryGetValue(ruleset.Value.ShortName, out UserStatistics? statistics))
                     presence.Assets.LargeImageText = $"{user.Value.Username}" + (statistics.GlobalRank > 0 ? $" (rank #{statistics.GlobalRank:N0})" : string.Empty);
                 else
                     presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (rank #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
@@ -145,15 +162,29 @@ namespace osu.Desktop
             });
         }
 
+        private IBeatmapInfo? getBeatmap(UserActivity activity)
+        {
+            switch (activity)
+            {
+                case UserActivity.InGame game:
+                    return game.BeatmapInfo;
+
+                case UserActivity.Editing edit:
+                    return edit.BeatmapInfo;
+            }
+
+            return null;
+        }
+
         private string getDetails(UserActivity activity)
         {
             switch (activity)
             {
                 case UserActivity.InGame game:
-                    return game.BeatmapInfo.ToString();
+                    return game.BeatmapInfo.ToString() ?? string.Empty;
 
                 case UserActivity.Editing edit:
-                    return edit.BeatmapInfo.ToString();
+                    return edit.BeatmapInfo.ToString() ?? string.Empty;
 
                 case UserActivity.InLobby lobby:
                     return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;

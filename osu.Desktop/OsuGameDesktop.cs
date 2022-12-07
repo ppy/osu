@@ -20,23 +20,28 @@ using osu.Game.Updater;
 using osu.Desktop.Windows;
 using osu.Framework.Threading;
 using osu.Game.IO;
+using osu.Game.IPC;
+using osu.Game.Utils;
+using SDL2;
 
 namespace osu.Desktop
 {
-    internal class OsuGameDesktop : OsuGame
+    internal partial class OsuGameDesktop : OsuGame
     {
-        public OsuGameDesktop(string[] args = null)
+        private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
+
+        public OsuGameDesktop(string[]? args = null)
             : base(args)
         {
         }
 
-        public override StableStorage GetStorageForStableInstall()
+        public override StableStorage? GetStorageForStableInstall()
         {
             try
             {
                 if (Host is DesktopGameHost desktopHost)
                 {
-                    string stablePath = getStableInstallPath();
+                    string? stablePath = getStableInstallPath();
                     if (!string.IsNullOrEmpty(stablePath))
                         return new StableStorage(stablePath, desktopHost);
                 }
@@ -49,11 +54,11 @@ namespace osu.Desktop
             return null;
         }
 
-        private string getStableInstallPath()
+        private string? getStableInstallPath()
         {
             static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs")) || File.Exists(Path.Combine(p, "osu!.cfg"));
 
-            string stableInstallPath;
+            string? stableInstallPath;
 
             if (OperatingSystem.IsWindows())
             {
@@ -81,15 +86,15 @@ namespace osu.Desktop
         }
 
         [SupportedOSPlatform("windows")]
-        private string getStableInstallPathFromRegistry()
+        private string? getStableInstallPathFromRegistry()
         {
-            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
+            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu"))
                 return key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
 
         protected override UpdateManager CreateUpdateManager()
         {
-            string packageManaged = Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER");
+            string? packageManaged = Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER");
 
             if (!string.IsNullOrEmpty(packageManaged))
                 return new NoActionUpdateManager();
@@ -116,24 +121,29 @@ namespace osu.Desktop
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
+
+            osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
         }
 
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);
 
-            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
-
             var desktopWindow = (SDL2DesktopWindow)host.Window;
 
+            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
+            if (iconStream != null)
+                desktopWindow.SetIconFromStream(iconStream);
+
             desktopWindow.CursorState |= CursorState.Hidden;
-            desktopWindow.SetIconFromStream(iconStream);
             desktopWindow.Title = Name;
             desktopWindow.DragDrop += f => fileDrop(new[] { f });
         }
 
+        protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
+
         private readonly List<string> importableFiles = new List<string>();
-        private ScheduledDelegate importSchedule;
+        private ScheduledDelegate? importSchedule;
 
         private void fileDrop(string[] filePaths)
         {
@@ -165,6 +175,30 @@ namespace osu.Desktop
 
                 Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            osuSchemeLinkIPCChannel?.Dispose();
+        }
+
+        private class SDL2BatteryInfo : BatteryInfo
+        {
+            public override double? ChargeLevel
+            {
+                get
+                {
+                    SDL.SDL_GetPowerInfo(out _, out int percentage);
+
+                    if (percentage == -1)
+                        return null;
+
+                    return percentage / 100.0;
+                }
+            }
+
+            public override bool OnBattery => SDL.SDL_GetPowerInfo(out _, out _) == SDL.SDL_PowerState.SDL_POWERSTATE_ON_BATTERY;
         }
     }
 }

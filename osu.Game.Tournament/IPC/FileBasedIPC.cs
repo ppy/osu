@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -20,7 +22,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.IPC
 {
-    public class FileBasedIPC : MatchIPCInfo
+    public partial class FileBasedIPC : MatchIPCInfo
     {
         public Storage IPCStorage { get; private set; }
 
@@ -94,7 +96,7 @@ namespace osu.Game.Tournament.IPC
                                     else
                                     {
                                         beatmapLookupRequest = new GetBeatmapRequest(new APIBeatmap { OnlineID = beatmapId });
-                                        beatmapLookupRequest.Success += b => Beatmap.Value = b;
+                                        beatmapLookupRequest.Success += b => Beatmap.Value = new TournamentBeatmap(b);
                                         API.Queue(beatmapLookupRequest);
                                     }
                                 }

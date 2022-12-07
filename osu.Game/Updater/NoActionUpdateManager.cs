@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -14,7 +16,7 @@ namespace osu.Game.Updater
     /// An update manager that shows notifications if a newer release is detected.
     /// This is a case where updates are handled externally by a package manager or other means, so no action is performed on clicking the notification.
     /// </summary>
-    public class NoActionUpdateManager : UpdateManager
+    public partial class NoActionUpdateManager : UpdateManager
     {
         private string version;
 

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,7 +31,7 @@ using osu.Game.Screens.Menu;
 namespace osu.Game.Overlays
 {
     [Cached]
-    public class FirstRunSetupOverlay : ShearedOverlayContainer
+    public partial class FirstRunSetupOverlay : ShearedOverlayContainer
     {
         [Resolved]
         private IPerformFromScreenRunner performer { get; set; } = null!;
