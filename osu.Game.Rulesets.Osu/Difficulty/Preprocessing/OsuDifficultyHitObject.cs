@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using FFmpeg.AutoGen;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
-        public readonly double StrainTime;
+        public double StrainTime;
 
         /// <summary>
         /// Normalised distance from the "lazy" end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
@@ -148,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
-            if (BaseObject is Spinner || lastObject is Spinner)
+            if (BaseObject is Spinner)
                 return;
 
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
@@ -161,6 +162,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
+
+            if (lastObject is Spinner spinner)
+            {
+                LazyJumpDistance = (BaseObject.StackedPosition * scalingFactor - lastObject.StackedPosition * scalingFactor).Length;
+                StrainTime -= spinner.Duration / clockRate;
+                return;
+            }
 
             LazyJumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
             MinimumJumpTime = StrainTime;

@@ -4,9 +4,11 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -19,9 +21,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             : base(mods)
         {
             this.withSliders = withSliders;
+            hasSpunOut = mods.Any(m => m is OsuModSpunOut);
         }
 
         private readonly bool withSliders;
+        private readonly bool hasSpunOut;
 
         private double currentStrain;
 
@@ -35,7 +39,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
+
+            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders, hasSpunOut) * skillMultiplier;
 
             return currentStrain;
         }
