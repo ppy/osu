@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double acute_angle_multiplier = 2.0;
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.75;
+        private const double spin_radius = 133;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -26,7 +27,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliders)
         {
-            if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
+            if (current.BaseObject is Spinner spinner)
+            {
+                if (spinner.Duration == 0)
+                    return 0;
+
+                return (spinner.SpinsRequired * 2 * Math.PI * spin_radius) / spinner.Duration;
+            }
+
+            if (current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
