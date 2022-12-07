@@ -26,31 +26,44 @@ namespace osu.Game.Beatmaps
 
             bool isFirst = true;
 
-            foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
+            foreach (var hitObject in Beatmap.HitObjects.OfType<IHasComboInformation>())
             {
-                if (isFirst)
+                if (hitObject is IHasMultipleComboInformation mult)
                 {
-                    obj.NewCombo = true;
-
-                    // first hitobject should always be marked as a new combo for sanity.
-                    isFirst = false;
+                    foreach (var comboObject in mult.GetComboObjects())
+                    {
+                        process(comboObject);
+                    }
                 }
+                else
+                    process(hitObject);
 
-                obj.ComboIndex = lastObj?.ComboIndex ?? 0;
-                obj.ComboIndexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
-                obj.IndexInCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
-
-                if (obj.NewCombo)
+                void process(IHasComboInformation obj)
                 {
-                    obj.IndexInCurrentCombo = 0;
-                    obj.ComboIndex++;
-                    obj.ComboIndexWithOffsets += obj.ComboOffset + 1;
+                    if (isFirst)
+                    {
+                        obj.NewCombo = true;
 
-                    if (lastObj != null)
-                        lastObj.LastInCombo = true;
+                        // first hitobject should always be marked as a new combo for sanity.
+                        isFirst = false;
+                    }
+
+                    obj.ComboIndex = lastObj?.ComboIndex ?? 0;
+                    obj.ComboIndexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
+                    obj.IndexInCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
+
+                    if (obj.NewCombo)
+                    {
+                        obj.IndexInCurrentCombo = 0;
+                        obj.ComboIndex++;
+                        obj.ComboIndexWithOffsets += obj.ComboOffset + 1;
+
+                        if (lastObj != null)
+                            lastObj.LastInCombo = true;
+                    }
+
+                    lastObj = obj;
                 }
-
-                lastObj = obj;
             }
         }
 
