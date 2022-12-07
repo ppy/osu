@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Objects.Types
     /// </summary>
     public interface IHasMultipleComboInformation
     {
-        IEnumerable<IHasComboInformation> GetComboObjects();
+        IEnumerable<IHasComboInformation> ComboObjects { get; }
     }
 }
