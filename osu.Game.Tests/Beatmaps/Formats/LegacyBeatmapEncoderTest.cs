@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private (IBeatmap beatmap, TestLegacySkin skin) decodeFromLegacy(System.IO.Stream stream, string name)
+        private (IBeatmap beatmap, TestLegacySkin skin) decodeFromLegacy(Stream stream, string name)
         {
             using (var reader = new LineBufferedReader(stream))
             {
@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             protected internal override ISkin GetSkin() => throw new NotImplementedException();
 
-            public override System.IO.Stream GetStream(string storagePath) => throw new NotImplementedException();
+            public override Stream GetStream(string storagePath) => throw new NotImplementedException();
         }
     }
 }
