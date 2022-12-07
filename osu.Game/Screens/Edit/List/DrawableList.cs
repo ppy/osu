@@ -356,10 +356,10 @@ namespace osu.Game.Screens.Edit.List
 
 #if true
                 if (drawable is DrawableMinimisableList<T> minimisableListChild
-                    && heightAccumulator + minimisableListChild.RepresentedListItem.BoundingBox.Height / 2 > localPos.Y)
+                    && heightAccumulator + minimisableListChild.ListHeadBoundingBox.Height / 2 > localPos.Y)
                 {
 #if VERBOSE_LOGS
-                    Logger.Log($"moving item into list {Properties.GetName.Invoke(minimisableListChild.RepresentedListItem.RepresentedItem)}");
+                    Logger.Log($"moving item into list {minimisableListChild.ListHeadText}");
 #endif
                     itemWasMovedOut = insertElementIntoList(currentlyDraggedItem, 0, srcIndex, minimisableListChild.List);
                     break;
@@ -393,8 +393,8 @@ namespace osu.Game.Screens.Edit.List
             if (!itemWasMovedOut && Parent is DrawableMinimisableList<T> minimisableList && minimisableList.Parent?.Parent is DrawableList<T> list)
             {
 #if VERBOSE_LOGS
-                Logger.Log($"Testing parent moving conditions for {Properties.GetName.Invoke(minimisableList.RepresentedListItem.RepresentedItem)}");
-                if (list.Parent is DrawableMinimisableList<T> parentMinimisableListLogTest) Logger.Log($"and {Properties.GetName.Invoke(parentMinimisableListLogTest.RepresentedListItem.RepresentedItem)}");
+                Logger.Log($"Testing parent moving conditions for {minimisableList.ListHeadText}");
+                if (list.Parent is DrawableMinimisableList<T> parentMinimisableListLogTest) Logger.Log($"and {parentMinimisableListLogTest.ListHeadText}");
 #endif
                 int index = list.Items.IndexOf(minimisableList.Model);
                 Optional<int> parentDstIndex = default;
@@ -405,7 +405,7 @@ namespace osu.Game.Screens.Edit.List
                 // if (dstIndex < 0)
                 //     parentDstIndex = index;
                 // else
-                if (parentListLocalPosition.Y < list.ToLocalSpace(minimisableList.ToScreenSpace(Vector2.Zero)).Y - minimisableList.RepresentedListItem.BoundingBox.Height / 2)
+                if (parentListLocalPosition.Y < list.ToLocalSpace(minimisableList.ToScreenSpace(Vector2.Zero)).Y - minimisableList.ListHeadBoundingBox.Height / 2)
                     parentDstIndex = index;
                 else if (dstIndex > ListItems.Count - 1 && heightAccumulator + list.ListItems.Spacing.Y + list.ItemMap[list.Items[index + 1]].BoundingBox.Height / 2 < localPos.Y)
                     parentDstIndex = index + 1;
@@ -424,8 +424,8 @@ namespace osu.Game.Screens.Edit.List
                 if (parentDstIndex.HasValue)
                 {
 #if VERBOSE_LOGS
-                    Logger.Log($"moving item out of list {Properties.GetName.Invoke(minimisableList.RepresentedListItem.RepresentedItem)}");
-                    if (list.Parent is DrawableMinimisableList<T> parentMinimisableListLogMove) Logger.Log($"moving into list {Properties.GetName.Invoke(parentMinimisableListLogMove.RepresentedListItem.RepresentedItem)}");
+                    Logger.Log($"moving item out of list {minimisableList.ListHeadText}");
+                    if (list.Parent is DrawableMinimisableList<T> parentMinimisableListLogMove) Logger.Log($"moving into list {parentMinimisableListLogMove.ListHeadText}");
 #endif
                     itemWasMovedOut = insertElementIntoList(currentlyDraggedItem, Math.Clamp(parentDstIndex.Value, 0, list.Items.Count), srcIndex, list);
                 }

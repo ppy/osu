@@ -18,6 +18,7 @@ namespace osu.Game.Screens.Edit.List
         where T : Drawable
     {
         private readonly OsuSpriteText text = new OsuSpriteText();
+        public LocalisableString Text => text.Text;
         private readonly Box box;
         public bool IsSelected { get; private set; }
 

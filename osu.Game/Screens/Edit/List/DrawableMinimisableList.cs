@@ -5,7 +5,9 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
@@ -18,11 +20,8 @@ namespace osu.Game.Screens.Edit.List
         public readonly DrawableList<T> List;
 
         private readonly DrawableListItem<T> representedListItem;
-
-        //todo: I did not yet decide if the usage of this in DrawableList is the only one, and if it really needs to access this.
-        //for now I think it needs it, but I will refactor this once I decide.
-        // ReSharper disable once ConvertToAutoPropertyWhenPossible
-        internal DrawableListItem<T> RepresentedListItem => representedListItem;
+        public RectangleF ListHeadBoundingBox => representedListItem.BoundingBox;
+        public LocalisableString ListHeadText => representedListItem.Text;
         private readonly Action updateListPositionAndIcon;
 
         internal DrawableMinimisableList(T item)
