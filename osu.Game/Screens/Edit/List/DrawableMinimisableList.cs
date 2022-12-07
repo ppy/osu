@@ -19,6 +19,12 @@ namespace osu.Game.Screens.Edit.List
 
         private readonly DrawableListItem<T> representedListItem;
 
+        //todo: I did not yet decide if the usage of this in DrawableList is the only one, and if it really needs to access this.
+        //for now I think it needs it, but I will refactor this once I decide.
+        // ReSharper disable once ConvertToAutoPropertyWhenPossible
+        internal DrawableListItem<T> RepresentedListItem => representedListItem;
+        private readonly Action updateListPositionAndIcon;
+
         internal DrawableMinimisableList(T item)
             : this(item, new DrawableListProperties<T>())
         {
@@ -82,13 +88,18 @@ namespace osu.Game.Screens.Edit.List
                 }
             };
 
-            headClickableContainer.Action = () =>
+            updateListPositionAndIcon = () =>
             {
-                Enabled.Toggle();
                 icon.Icon = Enabled.Value ? FontAwesome.Solid.ChevronDown : FontAwesome.Solid.ChevronRight;
 
                 List.X = icon.LayoutSize.X;
                 List.Y = head.LayoutSize.Y;
+            };
+            headClickableContainer.Action = () =>
+            {
+                Enabled.Toggle();
+
+                updateListPositionAndIcon();
             };
 
             List.ItemAdded += t =>
@@ -148,6 +159,7 @@ namespace osu.Game.Screens.Edit.List
         public void ShowList(bool setValue = true)
         {
             List.Show();
+            updateListPositionAndIcon();
             UpdateItem();
             if (setValue) Enabled.Value = true;
         }
@@ -155,6 +167,7 @@ namespace osu.Game.Screens.Edit.List
         public void HideList(bool setValue = true)
         {
             List.Hide();
+            updateListPositionAndIcon();
             UpdateItem();
             if (setValue) Enabled.Value = false;
         }

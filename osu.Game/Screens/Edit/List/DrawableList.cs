@@ -1,16 +1,28 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+//todo: remove this preprocessor statement completely, once the implementation is done.
+//right now I still sometimes want logging statements
+
+#if false
+#define VERBOSE_LOGS
+#endif
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+#if VERBOSE_LOGS
+using osu.Framework.Logging;
+#endif
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.List
@@ -114,6 +126,12 @@ namespace osu.Game.Screens.Edit.List
 
         #region RearrangableListContainer reimplementation
 
+        //this field will allow adding items to Items, which are already present in the itemMap.
+        //all adds will happen syncronously.
+        //this field will also prevent removed items from being disposed explicitly.
+        //HANDLE WITH EXTREME CARE. THIS CAN AND PROBABLY WILL BREAK STUFF IF USED MALICOUSLY.
+        private bool allowAlreadyExistingDictEntry;
+
         private const float exp_base = 1.05f;
 
         /// <summary>
@@ -185,7 +203,7 @@ namespace osu.Game.Screens.Edit.List
                 var drawableItem = itemMap[item];
 
                 ListItems.Remove(drawableItem, false);
-                drawableItem.Dispose();
+                if (!allowAlreadyExistingDictEntry) drawableItem.Dispose();
 
                 itemMap.Remove(item);
             }
@@ -202,6 +220,16 @@ namespace osu.Game.Screens.Edit.List
             {
                 if (itemMap.ContainsKey(item))
                 {
+                    if (allowAlreadyExistingDictEntry)
+                    {
+                        var listItem = ItemMap[item];
+                        listItem.StartArrangement = startArrangement;
+                        listItem.Arrange = arrange;
+                        listItem.EndArrangement = endArrangement;
+                        drawablesToAdd.Add(listItem);
+                        continue;
+                    }
+
                     throw new InvalidOperationException(
                         $"Duplicate items cannot be added to a {nameof(BindableList<DrawableListRepresetedItem<T>>)} that is currently bound with a {nameof(RearrangeableListContainer<DrawableListRepresetedItem<T>>)}.");
                 }
@@ -217,7 +245,7 @@ namespace osu.Game.Screens.Edit.List
                 itemMap[item] = drawable;
             }
 
-            if (!IsLoaded)
+            if (!IsLoaded || allowAlreadyExistingDictEntry)
                 addToHierarchy(drawablesToAdd);
             else
                 LoadComponentsAsync(drawablesToAdd, addToHierarchy);
@@ -229,6 +257,7 @@ namespace osu.Game.Screens.Edit.List
                     // Don't add drawables whose models were removed during the async load, or drawables that are no longer attached to the contained model.
                     if (itemMap.TryGetValue(d.Model, out var modelDrawable) && modelDrawable == d)
                     {
+                        d.ResetEvents();
                         ItemAdded.Invoke(d);
                         ListItems.Add(d);
                     }
@@ -251,15 +280,19 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private void startArrangement(AbstractListItem<T> item, DragStartEvent e)
+        private void startArrangement(AbstractListItem<T> item, DragStartEvent e) => startArrangement(item, e.ScreenSpaceMousePosition);
+
+        private void startArrangement(AbstractListItem<T> item, Vector2 screenSpaceMousePosition)
         {
             currentlyDraggedItem = item;
-            screenSpaceDragPosition = e.ScreenSpaceMousePosition;
+            screenSpaceDragPosition = screenSpaceMousePosition;
         }
 
-        private void arrange(AbstractListItem<T> item, DragEvent e) => screenSpaceDragPosition = e.ScreenSpaceMousePosition;
+        private void arrange(AbstractListItem<T> item, Vector2 screenSpaceMousePosition) => screenSpaceDragPosition = screenSpaceMousePosition;
+        private void arrange(AbstractListItem<T> item, DragEvent e) => arrange(item, e.ScreenSpaceMousePosition);
 
-        private void endArrangement(AbstractListItem<T> item, DragEndEvent e) => currentlyDraggedItem = null;
+        private void endArrangement(AbstractListItem<T> item, DragEndEvent e) => endArrangement(item);
+        private void endArrangement(AbstractListItem<T> item) => currentlyDraggedItem = null;
 
         protected override void Update()
         {
@@ -309,6 +342,7 @@ namespace osu.Game.Screens.Edit.List
             // the item positions as they are being transformed
             float heightAccumulator = 0;
             int dstIndex = 0;
+            bool itemWasMovedOut = false;
 
             for (; dstIndex < Items.Count; dstIndex++)
             {
@@ -319,6 +353,18 @@ namespace osu.Game.Screens.Edit.List
 
                 // Using BoundingBox here takes care of scale, paddings, etc...
                 float height = drawable.BoundingBox.Height;
+
+#if true
+                if (drawable is DrawableMinimisableList<T> minimisableListChild
+                    && heightAccumulator + minimisableListChild.RepresentedListItem.BoundingBox.Height / 2 > localPos.Y)
+                {
+#if VERBOSE_LOGS
+                    Logger.Log($"moving item into list {Properties.GetName.Invoke(minimisableListChild.RepresentedListItem.RepresentedItem)}");
+#endif
+                    itemWasMovedOut = insertElementIntoList(currentlyDraggedItem, 0, srcIndex, minimisableListChild.List);
+                    break;
+                }
+#endif
 
                 // Rearrangement should occur only after the mid-point of items is crossed
                 heightAccumulator += height / 2;
@@ -340,16 +386,93 @@ namespace osu.Game.Screens.Edit.List
                 // Add the remainder of the height of the current item
                 heightAccumulator += height / 2 + ListItems.Spacing.Y;
             }
+#if VERBOSE_LOGS
+            if (dstIndex < 0) Logger.Log("destination index < 0");
+            if (dstIndex > ListItems.Count - 1) Logger.Log("destination index >= ListItems.Count");
+#endif
+            if (!itemWasMovedOut && Parent is DrawableMinimisableList<T> minimisableList && minimisableList.Parent?.Parent is DrawableList<T> list)
+            {
+#if VERBOSE_LOGS
+                Logger.Log($"Testing parent moving conditions for {Properties.GetName.Invoke(minimisableList.RepresentedListItem.RepresentedItem)}");
+                if (list.Parent is DrawableMinimisableList<T> parentMinimisableListLogTest) Logger.Log($"and {Properties.GetName.Invoke(parentMinimisableListLogTest.RepresentedListItem.RepresentedItem)}");
+#endif
+                int index = list.Items.IndexOf(minimisableList.Model);
+                Optional<int> parentDstIndex = default;
+                var parentListLocalPosition = list.ToLocalSpace(screenSpaceDragPosition);
 
-            dstIndex = Math.Clamp(dstIndex, 0, Items.Count - 1);
+                // var lastItem = ItemMap[Items[^1]];
+                //
+                // if (dstIndex < 0)
+                //     parentDstIndex = index;
+                // else
+                if (parentListLocalPosition.Y < list.ToLocalSpace(minimisableList.ToScreenSpace(Vector2.Zero)).Y - minimisableList.RepresentedListItem.BoundingBox.Height / 2)
+                    parentDstIndex = index;
+                else if (dstIndex > ListItems.Count - 1 && heightAccumulator + list.ListItems.Spacing.Y + list.ItemMap[list.Items[index + 1]].BoundingBox.Height / 2 < localPos.Y)
+                    parentDstIndex = index + 1;
 
-            if (srcIndex == dstIndex)
+                // else if (list.ToLocalSpace(ListItems.ToScreenSpace(Vector2.UnitY * (heightAccumulator - ListItems.Spacing.Y))).Y + list.ListItems.Spacing.Y + list.ItemMap[list.Items[index + 1]].BoundingBox.Height / 2 > parentListLocalPosition.Y)
+                //     parentDstIndex = index + 1;
+
+                if (index < 0)
+                {
+                    const string fail_message = "DrawableMinimisableList is Child of DrawableList, but it's Model is not registered in the Items of the DrawableList";
+                    Debug.Fail(fail_message);
+                    //A UnreachableException would be more appropriate, for when we use net7
+                    throw new ArgumentOutOfRangeException(fail_message);
+                }
+
+                if (parentDstIndex.HasValue)
+                {
+#if VERBOSE_LOGS
+                    Logger.Log($"moving item out of list {Properties.GetName.Invoke(minimisableList.RepresentedListItem.RepresentedItem)}");
+                    if (list.Parent is DrawableMinimisableList<T> parentMinimisableListLogMove) Logger.Log($"moving into list {Properties.GetName.Invoke(parentMinimisableListLogMove.RepresentedListItem.RepresentedItem)}");
+#endif
+                    itemWasMovedOut = insertElementIntoList(currentlyDraggedItem, Math.Clamp(parentDstIndex.Value, 0, list.Items.Count), srcIndex, list);
+                }
+            }
+
+            //If Items.Count == 0, then this will throw errors!
+            dstIndex = Math.Clamp(dstIndex, 0, Math.Max(0, Items.Count - 1));
+
+            if (srcIndex == dstIndex && !itemWasMovedOut)
                 return;
 
-            Items.Move(srcIndex, dstIndex);
+            if (!itemWasMovedOut)
+                Items.Move(srcIndex, dstIndex);
 
             // Todo: this could be optimised, but it's a very simple iteration over all the items
             sortItems();
+        }
+
+        /// <summary>
+        /// Moves item (at index srcIndex) into list at (listDstIndex)
+        /// </summary>
+        /// <param name="item">the item to be moved</param>
+        /// <param name="listDstIndex">the index in the target list, the item should be at</param>
+        /// <param name="srcIndex">the index of item in this list</param>
+        /// <param name="list">the target list, to add the item to</param>
+        /// <returns>if the item was actally moved. e.g. we do not want to move a list into itself</returns>
+        private bool insertElementIntoList(AbstractListItem<T> item, int listDstIndex, int srcIndex, DrawableList<T> list)
+        {
+            //don't add a list to itself please.
+            if (item is DrawableMinimisableList<T> itemMinimisableList && itemMinimisableList.List == list) return false;
+            //if we drag a item into a list, expand it
+            if (list.Parent is DrawableMinimisableList<T> listParentMinimisableList && !listParentMinimisableList.Enabled.Value) listParentMinimisableList.ShowList();
+
+            // Logger.Log($"Determined parent index to be {listDstIndex}");
+
+            //remove item from this list
+            allowAlreadyExistingDictEntry = true;
+            Items.RemoveAt(srcIndex); //remove from items and itemMap (synced via CollectionChanged Event)
+            allowAlreadyExistingDictEntry = false;
+            //add item to passed list argument
+            list.allowAlreadyExistingDictEntry = true;
+            list.itemMap[item.Model] = item;
+            list.Items.Insert(listDstIndex, item.Model);
+            list.allowAlreadyExistingDictEntry = false;
+            //set the flags in the target list correctly, so it doesn't get confused on a drag event.
+            list.startArrangement(list.ItemMap[item.Model], screenSpaceDragPosition);
+            return true;
         }
 
         #endregion

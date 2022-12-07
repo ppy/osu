@@ -24,19 +24,10 @@ namespace osu.Game.Screens.Edit.List
         protected AbstractListItem(DrawableListRepresetedItem<T> item, DrawableListProperties<T> properties)
         {
             Model = item;
-            StateChanged = t =>
-            {
-                switch (t)
-                {
-                    case SelectionState.Selected:
-                        Selected.Invoke();
-                        break;
-
-                    case SelectionState.NotSelected:
-                        Deselected.Invoke();
-                        break;
-                }
-            };
+            //this is actually initialised in the next function call.
+            //I just need this so the ide stops complaining.
+            StateChanged = null!;
+            ResetEvents();
             Properties = properties;
         }
 
@@ -54,9 +45,28 @@ namespace osu.Game.Screens.Edit.List
 
         protected void InvokeStateChanged(SelectionState state) => StateChanged.Invoke(state);
 
+        internal void ResetEvents()
+        {
+            Selected = () => { };
+            Deselected = () => { };
+            StateChanged = t =>
+            {
+                switch (t)
+                {
+                    case SelectionState.Selected:
+                        Selected.Invoke();
+                        break;
+
+                    case SelectionState.NotSelected:
+                        Deselected.Invoke();
+                        break;
+                }
+            };
+        }
+
         public event Action<SelectionState> StateChanged;
-        public virtual event Action Selected = () => { };
-        public virtual event Action Deselected = () => { };
+        public event Action Selected = () => { };
+        public event Action Deselected = () => { };
 
         #region RearrangableListItem reimplementation
 
