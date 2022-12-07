@@ -542,14 +542,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 double prevTime = index > 0 ? controlPoints[index.Value - 1].Time : 0;
                                 double nextTime = index < controlPoints.Count - 1 ? controlPoints[index.Value + 1].Time : double.PositiveInfinity;
                                 double clippedTime = MathHelper.Clamp(time - hitObject.StartTime, prevTime + beatmap.GetBeatLengthAtTime(time), nextTime - beatmap.GetBeatLengthAtTime(time));
+                                double oldTime = controlPoints[index.Value].Time;
 
-                                if (controlPoints[index.Value].Time == clippedTime)
-                                    return;
+                                if (clippedTime == oldTime) return;
 
                                 controlPoints[index.Value].Time = clippedTime;
-                                controlPoints[index.Value].Count = (int)Math.Round((clippedTime - prevTime) / beatmap.GetBeatLengthAtTime(clippedTime));
-                                if (index < controlPoints.Count - 1)
-                                    controlPoints[index.Value + 1].Count = (int)Math.Round((nextTime - clippedTime) / beatmap.GetBeatLengthAtTime(nextTime));
+                                controlPoints[index.Value].BeatLength = beatmap.GetBeatLengthAtTime(clippedTime);
                                 beatmap.Update(hitObject);
                                 break;
 
