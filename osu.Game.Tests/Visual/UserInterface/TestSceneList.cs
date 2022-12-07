@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             };
 
-            Scheduler.Add(()=>
+            Scheduler.Add(() =>
             {
                 Child = new Container
                 {
