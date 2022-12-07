@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         protected virtual IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>> CreateDrawableList() => new DrawableList<SelectionBlueprint<ISkinnableDrawable>>();
         protected virtual DrawableList<SelectionBlueprint<ISkinnableDrawable>> DrawableList => (DrawableList<SelectionBlueprint<ISkinnableDrawable>>)BackingDrawableList;
 
-        protected virtual void AddElement(ISkinnableDrawable skinnableDrawable)
+        protected virtual void AddElement(ISkinnableDrawable skinnableDrawable, DrawableList<SelectionBlueprint<ISkinnableDrawable>> list)
         {
             var skinnable = (Drawable)skinnableDrawable;
             skinnable.Name = "Element" + SkinElements.Count;
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private bool testElementSelected(int element) => ((DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)DrawableList.ItemMaps[DrawableList.Items[element]]).IsSelected;
 
-        protected void ListAddItems()
+        protected void ListAddItems(DrawableList<SelectionBlueprint<ISkinnableDrawable>> list)
         {
             int before = 0;
             AddStep("Get Item Count", () => before = DrawableList.Items.Count);
@@ -116,7 +116,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Size = Vector2.One * 50,
                     Position = new Vector2(pos % xwidth, (int)pos / (int)xwidth * (50 + 2)),
-                });
+                }, list);
             }, 10);
             AddAssert("Exactly 10 items were added", () => DrawableList.Items.Count == before + 10);
             checkDepth();
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestListSelection()
         {
-            ListAddItems();
+            ListAddItems(DrawableList);
             //start with regular clicks
             AddAssert("no Item is selected", () => applyToItems(t => !t.IsSelected, DrawableList.ItemMaps.Values));
             AddStep("select first item", () =>
@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestListDrag()
         {
-            ListAddItems();
+            ListAddItems(DrawableList);
             AddStep("Mouse to first element", () =>
             {
                 var first = DrawableList.ItemMaps[DrawableList.Items[0]];

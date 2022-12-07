@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         protected override DrawableList<SelectionBlueprint<ISkinnableDrawable>> DrawableList => ((DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>)BackingDrawableList).List;
 
         [Test]
-        public void TestNestedListsDrag()
+        public void TestListinListDrag()
         {
             AddRepeatStep("Add Lists", () =>
             {
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             DrawableListEntryType.MinimisableList)
                     );
             }, 3);
-            ListAddItems();
+            ListAddItems(DrawableList);
             AddAssert("13 elements in list", () => DrawableList.Items.Count == 13);
             AddStep("Move mouse to first list", () =>
             {
