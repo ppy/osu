@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Specialized;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -52,8 +51,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Container colouredComponents;
         private readonly OsuSpriteText comboIndexText;
-
-        private readonly IBindableList<StreamControlPoint> streamControlPoints = new BindableList<StreamControlPoint>();
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
@@ -109,9 +106,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             switch (item)
             {
-                case IHasStreamPath streamHitObject:
-                    streamControlPoints.BindTo(streamHitObject.StreamPath.ControlPoints);
-                    streamControlPoints.BindCollectionChanged(recreateDragComponents, true);
+                case IHasMultipleDurations hasDurations:
+                    addDragComponents(item);
+                    hasDurations.DurationsUpdated += recreateDragComponents;
 
                     break;
 
@@ -124,7 +121,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        private void recreateDragComponents(object o, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        private void recreateDragComponents()
         {
             colouredComponents.Clear();
             addDragComponents(Item);
@@ -132,9 +129,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void addDragComponents(HitObject item)
         {
-            if (item is not IHasStreamPath streamHitObject) return;
+            if (item is not IHasMultipleDurations hasDurations) return;
 
-            for (int i = 1; i < streamHitObject.StreamPath.ControlPoints.Count; i++)
+            for (int i = 1; i < hasDurations.DurationObjects.Count; i++)
             {
                 colouredComponents.Add(new DragArea(item, i)
                 {
@@ -200,12 +197,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             switch (Item)
             {
-                case IHasStreamPath hasStreamPath and IHasMultipleComboInformation hasCombos when hasStreamPath.Duration > 0:
+                case IHasMultipleComboInformation hasCombos when hasCombos.Duration > 0:
                     // Build a multi-colour gradient to represent each combo colour in the stream path
                     int i = 0;
                     Color4? prevColour = null;
                     double segmentStart = 0;
-                    var streamPath = hasStreamPath.StreamPath.GetStreamPath();
+                    var comboObjects = hasCombos.ComboObjects;
 
                     var colourContainer = new Container
                     {
@@ -214,11 +211,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Padding = new MarginPadding { Horizontal = circle_size / 2f }
                     };
 
-                    foreach (var comboObject in hasCombos.ComboObjects)
+                    foreach (var comboObject in comboObjects)
                     {
-                        if (i == streamPath.Count) break;
+                        if (i == comboObjects.Count) break;
 
-                        double time = streamPath[i++].Item2;
+                        double time = comboObject.StartTime - Item.StartTime;
                         var currentColour = comboObject.GetComboColour(skin);
 
                         if (!prevColour.HasValue)
@@ -236,7 +233,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             continue;
                         }
 
-                        if (currentColour != prevColour.Value || i == streamPath.Count)
+                        if (currentColour != prevColour.Value || i == comboObjects.Count)
                         {
                             // Add colour of this stream segment and start a gradient about 600 ms before the next segment
                             double segmentDuration = time - segmentStart;
@@ -246,16 +243,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 RelativePositionAxes = Axes.X,
-                                Width = (float)((split - segmentStart) / hasStreamPath.Duration),
-                                X = (float)(segmentStart / hasStreamPath.Duration),
+                                Width = (float)((split - segmentStart) / hasCombos.Duration),
+                                X = (float)(segmentStart / hasCombos.Duration),
                                 Colour = prevColour.Value
                             });
                             colourContainer.Add(new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 RelativePositionAxes = Axes.X,
-                                Width = (float)((time - split) / hasStreamPath.Duration),
-                                X = (float)(split / hasStreamPath.Duration),
+                                Width = (float)((time - split) / hasCombos.Duration),
+                                X = (float)(split / hasCombos.Duration),
                                 Colour = ColourInfo.GradientHorizontal(prevColour.Value, currentColour)
                             });
 
@@ -496,8 +493,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 base.Update();
 
                 // Update position to stream control point time
-                if (index.HasValue && hitObject is IHasStreamPath streamHitObject)
-                    X = (float)(streamHitObject.StreamPath.ControlPoints[index.Value].Time / streamHitObject.Duration);
+                if (index.HasValue && hitObject is IHasMultipleDurations hasDurations)
+                    X = (float)(hasDurations.DurationObjects[index.Value].Duration / hasDurations.Duration);
             }
 
             protected override bool OnDragStart(DragStartEvent e)
@@ -552,21 +549,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                                 break;
 
-                            case IHasStreamPath streamHitObject:
+                            case IHasMultipleDurations hasDurations:
                                 if (!index.HasValue) return;
 
-                                var controlPoints = streamHitObject.StreamPath.ControlPoints;
-                                double prevTime = index > 0 ? controlPoints[index.Value - 1].Time : 0;
-                                double nextTime = index < controlPoints.Count - 1 ? controlPoints[index.Value + 1].Time : double.PositiveInfinity;
+                                var controlPoints = hasDurations.DurationObjects;
+                                double prevTime = index > 0 ? controlPoints[index.Value - 1].Duration : 0;
+                                double nextTime = index < controlPoints.Count - 1 ? controlPoints[index.Value + 1].Duration : double.PositiveInfinity;
                                 double beatLength = beatmap.GetBeatLengthAtTime(time);
                                 double minTime = prevTime + beatLength;
                                 double maxTime = nextTime - beatLength;
-                                double clippedTime = MathHelper.Clamp(time - hitObject.StartTime, minTime, maxTime);
+                                double newDuration = MathHelper.Clamp(time - hitObject.StartTime, minTime, maxTime);
 
-                                if (clippedTime == controlPoints[index.Value].Time || Precision.DefinitelyBigger(clippedTime, maxTime) || Precision.DefinitelyBigger(minTime, clippedTime)) return;
+                                if (newDuration == controlPoints[index.Value].Duration || Precision.DefinitelyBigger(newDuration, maxTime) || Precision.DefinitelyBigger(minTime, newDuration)) return;
 
-                                controlPoints[index.Value].Time = clippedTime;
-                                controlPoints[index.Value].BeatLength = beatmap.GetBeatLengthAtTime(clippedTime);
+                                controlPoints[index.Value].Duration = newDuration;
                                 beatmap.Update(hitObject);
                                 break;
 

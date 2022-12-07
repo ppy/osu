@@ -3,11 +3,11 @@
 
 namespace osu.Game.Rulesets.Objects.Types
 {
-    public interface IHasStreamPath
+    /// <summary>
+    /// This object has a start time.
+    /// </summary>
+    public interface IHasStartTime
     {
-        /// <summary>
-        /// The stream path.
-        /// </summary>
-        StreamPath StreamPath { get; }
+        double StartTime { get; set; }
     }
 }

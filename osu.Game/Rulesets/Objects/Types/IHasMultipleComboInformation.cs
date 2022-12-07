@@ -8,8 +8,8 @@ namespace osu.Game.Rulesets.Objects.Types
     /// <summary>
     /// Indicates that this hit object consists of multiple elements which each require separate combo informations.
     /// </summary>
-    public interface IHasMultipleComboInformation
+    public interface IHasMultipleComboInformation : IHasDuration
     {
-        IEnumerable<IHasComboInformation> ComboObjects { get; }
+        IReadOnlyList<IHasStartTimeAndComboInformation> ComboObjects { get; }
     }
 }
