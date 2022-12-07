@@ -16,7 +16,7 @@ using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Input
 {
-    public class InvalidRulesetKeyBindingHandler : Component
+    public partial class InvalidRulesetKeyBindingHandler : Component
     {
         [Resolved]
         private RealmAccess realm { get; set; }
