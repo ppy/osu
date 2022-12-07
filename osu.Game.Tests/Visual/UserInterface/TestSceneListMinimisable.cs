@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             expandList(() => BackingDrawable);
         }
 
-        [Test]
+        [Test, Order(3)]
         public void TestListinListDrag()
         {
             AddRepeatStep("Add Lists", () =>
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        [Test]
+        [Test, Order(4)]
         public void TestDragItemOutOfList()
         {
             const int item_count = 10;

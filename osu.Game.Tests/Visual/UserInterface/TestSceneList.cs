@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.List;
 using osu.Game.Skinning;
@@ -142,7 +143,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        [Test]
+        [Test, Order(2)]
         public void TestListSelection()
         {
             ListAddItems(() => DrawableList);
@@ -180,7 +181,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("first item is not selected", () => !testElementSelected(0));
         }
 
-        [Test]
+        [Test, Order(1)]
         public void TestListDrag()
         {
             ListAddItems(() => DrawableList);
@@ -193,7 +194,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Mouse Move", () =>
             {
                 var last = DrawableList.ItemMaps[DrawableList.Items[^1]];
-                InputManager.MoveMouseTo(last, Vector2.UnitY * last.LayoutSize.Y * 2 / 3);
+                InputManager.MoveMouseTo(last.ToScreenSpace(Vector2.UnitY * (last.BoundingBox.Height / 2 + 1)));
             });
             AddStep("Mouse Up", () => InputManager.ReleaseButton(MouseButton.Left));
             AddAssert("Check Elements have been swapped", () =>
@@ -202,7 +203,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     var selectionBlueprint = DrawableList.ItemMaps[DrawableList.Items[i]].Model.RepresentedItem;
 
-                    if (((Drawable)selectionBlueprint.Item).Name != $"Element{(i + 1) % DrawableList.Items.Count}") return false;
+                    if (((Drawable)selectionBlueprint.Item).Name != $"Element{(i + 1) % DrawableList.Items.Count}")
+                    {
+                        Logger.Log($"Element{i} doesn't have the correct name");
+                        return false;
+                    }
                 }
 
                 return true;
