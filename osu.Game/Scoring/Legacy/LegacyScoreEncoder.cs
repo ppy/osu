@@ -25,12 +25,12 @@ namespace osu.Game.Scoring.Legacy
         /// Database version in stable-compatible YYYYMMDD format.
         /// Should be incremented if any changes are made to the format/usage.
         /// </summary>
-        public const int LATEST_VERSION = FIRST_LAZER_VERSION;
+        public const int LATEST_VERSION = 30000001;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
         /// </summary>
-        public const int FIRST_LAZER_VERSION = 30000001;
+        public const int FIRST_LAZER_VERSION = 30000000;
 
         private readonly Score score;
         private readonly IBeatmap? beatmap;
