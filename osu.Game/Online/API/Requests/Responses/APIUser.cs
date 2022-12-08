@@ -164,6 +164,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"guest_beatmapset_count")]
         public int GuestBeatmapsetCount;
 
+        [JsonProperty(@"nominated_beatmapset_count")]
+        public int NominatedBeatmapsetCount;
+
         [JsonProperty(@"scores_best_count")]
         public int ScoresBestCount;
 
