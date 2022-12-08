@@ -45,6 +45,13 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
             AddAssert("context menu open", () => this.ChildrenOfType<OsuContextMenu>().SingleOrDefault()?.State == MenuState.Open);
+
+            AddStep("click object", () =>
+            {
+                blueprint = this.ChildrenOfType<TimelineHitObjectBlueprint>().Single();
+                InputManager.MoveMouseTo(blueprint);
+                InputManager.Click(MouseButton.Left);
+            });
         }
 
         [Test]
