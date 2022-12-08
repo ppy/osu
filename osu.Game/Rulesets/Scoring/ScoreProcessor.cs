@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Scoring
     public partial class ScoreProcessor : JudgementProcessor
     {
         private const double max_score = 1000000;
+        private const double min_score = 0;
+
 
         /// <summary>
         /// Invoked when this <see cref="ScoreProcessor"/> was reset from a replay frame.
@@ -420,6 +422,11 @@ namespace osu.Game.Rulesets.Scoring
 
             // Populate total score after everything else.
             score.TotalScore = ComputeScore(ScoringMode.Standardised, score);
+            
+            if (score.TotalScore < min_score)
+            {
+                score.TotalScore = 0;
+            }
         }
 
         /// <summary>
