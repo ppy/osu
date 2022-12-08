@@ -422,11 +422,7 @@ namespace osu.Game.Rulesets.Scoring
 
             // Populate total score after everything else.
             score.TotalScore = ComputeScore(ScoringMode.Standardised, score);
-            
-            if (score.TotalScore < min_score)
-            {
-                score.TotalScore = 0;
-            }
+            score.TotalScore = max(score.TotalScore, min_score);
         }
 
         /// <summary>
