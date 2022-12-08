@@ -52,6 +52,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 result.Value = (currentRotation - record.Rotation) / (Time.Current - record.Time) * 1000 * 60 / 360;
             }
 
+            if (result.Value < 0)
+            {
+                result.Value = 0;
+            }
+            
             records.Enqueue(new RotationRecord { Rotation = currentRotation, Time = Time.Current });
         }
 
