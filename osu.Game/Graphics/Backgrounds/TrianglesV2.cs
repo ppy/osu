@@ -5,6 +5,7 @@ using osu.Framework.Utils;
 using osuTK;
 using System;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
@@ -54,6 +55,7 @@ namespace osu.Game.Graphics.Backgrounds
         private Random? stableRandom;
 
         private IShader shader = null!;
+        private Texture texture = null!;
 
         /// <summary>
         /// Construct a new triangle visualisation.
@@ -69,6 +71,7 @@ namespace osu.Game.Graphics.Backgrounds
         private void load(ShaderManager shaders, IRenderer renderer)
         {
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "TriangleBorder");
+            texture = renderer.WhitePixel;
         }
 
         protected override void LoadComplete()
@@ -177,6 +180,7 @@ namespace osu.Game.Graphics.Backgrounds
             protected new TrianglesV2 Source => (TrianglesV2)base.Source;
 
             private IShader shader = null!;
+            private Texture texture = null!;
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
 
@@ -198,6 +202,7 @@ namespace osu.Game.Graphics.Backgrounds
                 base.ApplyState();
 
                 shader = Source.shader;
+                texture = Source.texture;
                 size = Source.DrawSize;
                 thickness = Source.Thickness;
 
@@ -259,7 +264,7 @@ namespace osu.Game.Graphics.Backgrounds
                         (bottomLeftClipped.Y - topLeftClipped.Y) / relativeHeight
                     );
 
-                    renderer.DrawQuad(drawQuad, colourInfo, vertexAction: vertexBatch.AddAction, textureCoords: textureCoords);
+                    renderer.DrawQuad(texture, drawQuad, colourInfo, new RectangleF(0, 0, 1, 1), vertexBatch.AddAction, textureCoords: textureCoords);
                 }
 
                 shader.Unbind();
