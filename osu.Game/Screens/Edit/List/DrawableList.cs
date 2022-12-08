@@ -40,13 +40,26 @@ namespace osu.Game.Screens.Edit.List
         public IReadOnlyDictionary<DrawableListRepresetedItem<T>, AbstractListItem<T>> ItemMaps => ItemMap;
         public event Action<AbstractListItem<T>> ItemAdded = _ => { };
 
+        /// <summary>
+        /// This event is called if an item is dragged out of the current list.
+        /// This event will be called just before the item is relocated to the new list.
+        /// </summary>
+        /// Parameters are the item, that is dragged, and the list that the item will be dragged into.
+        public event Action<AbstractListItem<T>, DrawableList<T>> ItemDraggedOut = (_, _) => { };
+
+        /// <summary>
+        /// This event is called if an item is dragged into of the current list.
+        /// This event will be called just before the item is relocated into the new list.
+        /// This also means that the ItemAdded event will trigger AFTER this event.
+        /// </summary>
+        /// Parameters are the item, that is dragged, and the list that the item was dragged out of.
+        public event Action<AbstractListItem<T>, DrawableList<T>> ItemDraggedIn = (_, _) => { };
+
         public DrawableList(DrawableListProperties<T> properties)
         {
             this.properties = properties;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            // old: t odo: compute this somehow add runtime
-            // Height = ScrollContainer.AvailableContent + 1;
             InternalChild = ListItems = new FillFlowContainer<AbstractListItem<T>>
             {
                 RelativeSizeAxes = Axes.X,
@@ -443,6 +456,8 @@ namespace osu.Game.Screens.Edit.List
             //if we drag a item into a list, expand it
             if (list.Parent is DrawableMinimisableList<T> listParentMinimisableList && !listParentMinimisableList.Enabled.Value) listParentMinimisableList.ShowList();
 
+            ItemDraggedOut.Invoke(item, list);
+            list.ItemDraggedIn.Invoke(item, this);
             // Logger.Log($"Determined parent index to be {listDstIndex}");
 
             //remove item from this list
