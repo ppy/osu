@@ -149,11 +149,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 && lists[0].List.ItemMaps.TryGetValue(movedItem, out var test)
                 && test == movedDrawableItem
             );
-            AddStep("Move item below the second List", () =>
-            {
-                float y = lists[1].ListHeadBoundingBox.Height / 2 + 1;
-                InputManager.MoveMouseTo(lists[1].Parent.ToScreenSpace(lists[1].BoundingBox).BottomLeft);
-            });
+            AddStep("Move item below the second List", () => InputManager.MoveMouseTo(lists[1].Parent.ToScreenSpace(lists[1].BoundingBox).BottomLeft));
             AddAssert("Item was actually moved to 3rd spot", () => BackingDrawable.List.Items[2] == movedItem);
         }
     }
