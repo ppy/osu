@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,6 +22,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Skinning.Components
 {
@@ -34,8 +38,27 @@ namespace osu.Game.Skinning.Components
         [SettingSource("Template", "Supports {Label} and {Value}, but also including arbitrary attributes like {StarRating} (see attribute list for supported values).")]
         public Bindable<string> Template { get; set; } = new Bindable<string>("{Label}: {Value}");
 
+        [SettingSource("Adjust Difficulty", "Should Mods that change Beatmap Statistics be applied to the shown Stats?")]
+        public BindableBool DifficultyAdjust { get; set; } = new BindableBool(true);
+
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        private ModSettingChangeTracker modSettingChangeTracker = null!;
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> workingBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
+
+        private CancellationTokenSource? starDifficultyCancellationSource;
+        private StarDifficulty? starRating;
+
+        private BeatmapDifficulty difficulty = null!;
 
         private readonly Dictionary<BeatmapAttribute, LocalisableString> valueDictionary = new Dictionary<BeatmapAttribute, LocalisableString>();
 
@@ -53,6 +76,8 @@ namespace osu.Game.Skinning.Components
             [BeatmapAttribute.Length] = ArtistStrings.TracklistLength.ToTitle(),
             [BeatmapAttribute.RankedStatus] = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault,
             [BeatmapAttribute.BPM] = BeatmapsetsStrings.ShowStatsBpm,
+            [BeatmapAttribute.BPMMinimum] = ArtistStrings.TracksIndexFormBpmGte,
+            [BeatmapAttribute.BPMMaximum] = ArtistStrings.TracksIndexFormBpmLte,
         }.ToImmutableDictionary();
 
         private readonly OsuSpriteText text;
@@ -78,27 +103,106 @@ namespace osu.Game.Skinning.Components
 
             Attribute.BindValueChanged(_ => updateLabel());
             Template.BindValueChanged(_ => updateLabel());
-            beatmap.BindValueChanged(b =>
+            ruleset.BindValueChanged(_ =>
             {
-                updateBeatmapContent(b.NewValue);
-                updateLabel();
+                updateAllInfo();
+                //custom rulesets might not provide all of the same mods, and in that case we do need to update all info
+            });
+            mods.BindValueChanged(_ =>
+            {
+                //for the very first time this is called it actually can be null.
+                //My annotations just do not account for that.
+                //ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+                modSettingChangeTracker?.Dispose();
+                Action modsSettingsChangedAction = () =>
+                {
+                    //if we only dispaly base stats, mods are ignored anyways.
+                    //so then we can skip checking for a StarRating Update
+                    if (DifficultyAdjust.Value) updateStarRating();
+                    updateBpm();
+                    updateBeatmapContent();
+                    updateLabel();
+                };
+
+                modSettingChangeTracker = new ModSettingChangeTracker(mods.Value);
+                modSettingChangeTracker.SettingChanged += _ => modsSettingsChangedAction();
+                modsSettingsChangedAction();
+            });
+            DifficultyAdjust.BindValueChanged(_ =>
+            {
+                updateAllInfo();
+            });
+            workingBeatmap.BindValueChanged(_ =>
+            {
+                updateAllInfo();
             }, true);
         }
 
-        private void updateBeatmapContent(WorkingBeatmap workingBeatmap)
+        private void updateAllInfo()
         {
-            valueDictionary[BeatmapAttribute.Title] = workingBeatmap.BeatmapInfo.Metadata.Title;
-            valueDictionary[BeatmapAttribute.Artist] = workingBeatmap.BeatmapInfo.Metadata.Artist;
-            valueDictionary[BeatmapAttribute.DifficultyName] = workingBeatmap.BeatmapInfo.DifficultyName;
-            valueDictionary[BeatmapAttribute.Creator] = workingBeatmap.BeatmapInfo.Metadata.Author.Username;
-            valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(workingBeatmap.BeatmapInfo.Length).ToFormattedDuration();
-            valueDictionary[BeatmapAttribute.RankedStatus] = workingBeatmap.BeatmapInfo.Status.GetLocalisableDescription();
-            valueDictionary[BeatmapAttribute.BPM] = workingBeatmap.BeatmapInfo.BPM.ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.CircleSize] = ((double)workingBeatmap.BeatmapInfo.Difficulty.CircleSize).ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.HPDrain] = ((double)workingBeatmap.BeatmapInfo.Difficulty.DrainRate).ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.Accuracy] = ((double)workingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty).ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.ApproachRate] = ((double)workingBeatmap.BeatmapInfo.Difficulty.ApproachRate).ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.StarRating] = workingBeatmap.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
+            updateStarRating();
+            updateBpm();
+            updateBeatmapContent();
+            updateLabel();
+        }
+
+        private void updateDifficulty()
+        {
+            difficulty = new BeatmapDifficulty(workingBeatmap.Value.BeatmapInfo.Difficulty);
+
+            if (!DifficultyAdjust.Value) return;
+
+            foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(difficulty);
+        }
+
+        private void updateStarRating()
+        {
+            starDifficultyCancellationSource?.Cancel();
+            starDifficultyCancellationSource = new CancellationTokenSource();
+
+            var starDifficultyTask = DifficultyAdjust.Value
+                ? difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token)
+                : difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token);
+            starDifficultyTask.ContinueWith(_ => Schedule(() =>
+            {
+                starRating = starDifficultyTask.GetResultSafely();
+                valueDictionary[BeatmapAttribute.StarRating] = (starRating?.Stars ?? -1).ToLocalisableString(@"F2");
+                updateLabel();
+            }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
+        }
+
+        private void updateBpm()
+        {
+            var beatmap = workingBeatmap.Value.Beatmap;
+            // this doesn't consider mods which apply variable rates, yet.
+            double rate = 1;
+
+            if (DifficultyAdjust.Value)
+            {
+                foreach (var mod in mods.Value.OfType<ModRateAdjust>())
+                    rate = mod.ApplyToRate(0, rate);
+            }
+
+            valueDictionary[BeatmapAttribute.BPMMaximum] = Math.Round(beatmap.ControlPointInfo.BPMMaximum * rate).ToLocalisableString(@"F0");
+            valueDictionary[BeatmapAttribute.BPMMinimum] = Math.Round(beatmap.ControlPointInfo.BPMMinimum * rate).ToLocalisableString(@"F0");
+            valueDictionary[BeatmapAttribute.BPM] = Math.Round(60000 / beatmap.GetMostCommonBeatLength() * rate).ToLocalisableString(@"F0");
+        }
+
+        private void updateBeatmapContent()
+        {
+            updateDifficulty();
+            var beatmapInfo = workingBeatmap.Value.BeatmapInfo;
+            valueDictionary[BeatmapAttribute.Title] = beatmapInfo.Metadata.Title;
+            valueDictionary[BeatmapAttribute.Artist] = beatmapInfo.Metadata.Artist;
+            valueDictionary[BeatmapAttribute.DifficultyName] = beatmapInfo.DifficultyName;
+            valueDictionary[BeatmapAttribute.Creator] = beatmapInfo.Metadata.Author.Username;
+            valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(beatmapInfo.Length).ToFormattedDuration();
+            valueDictionary[BeatmapAttribute.RankedStatus] = beatmapInfo.Status.GetLocalisableDescription();
+            valueDictionary[BeatmapAttribute.CircleSize] = ((double)difficulty.CircleSize).ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.HPDrain] = ((double)difficulty.DrainRate).ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.Accuracy] = ((double)difficulty.OverallDifficulty).ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.ApproachRate] = ((double)difficulty.ApproachRate).ToLocalisableString(@"F2");
         }
 
         private void updateLabel()
@@ -122,6 +226,12 @@ namespace osu.Game.Skinning.Components
 
             text.Text = LocalisableString.Format(numberedTemplate, args);
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            starDifficultyCancellationSource?.Cancel();
+        }
     }
 
     public enum BeatmapAttribute
@@ -138,5 +248,7 @@ namespace osu.Game.Skinning.Components
         Length,
         RankedStatus,
         BPM,
+        BPMMinimum,
+        BPMMaximum,
     }
 }
