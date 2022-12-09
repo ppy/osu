@@ -119,7 +119,7 @@ namespace osu.Game.Skinning.Components
                     //if we only dispaly base stats, mods are ignored anyways.
                     //so then we can skip checking for a StarRating Update
                     if (DifficultyAdjust.Value) updateStarRating();
-                    updateBpm();
+                    updateBpmAndLength();
                     updateBeatmapContent();
                     updateLabel();
                 };
@@ -141,7 +141,7 @@ namespace osu.Game.Skinning.Components
         private void updateAllInfo()
         {
             updateStarRating();
-            updateBpm();
+            updateBpmAndLength();
             updateBeatmapContent();
             updateLabel();
         }
@@ -172,7 +172,7 @@ namespace osu.Game.Skinning.Components
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
 
-        private void updateBpm()
+        private void updateBpmAndLength()
         {
             var beatmap = workingBeatmap.Value.Beatmap;
             // this doesn't consider mods which apply variable rates, yet.
@@ -187,6 +187,7 @@ namespace osu.Game.Skinning.Components
             valueDictionary[BeatmapAttribute.BPMMaximum] = Math.Round(beatmap.ControlPointInfo.BPMMaximum * rate).ToLocalisableString(@"F0");
             valueDictionary[BeatmapAttribute.BPMMinimum] = Math.Round(beatmap.ControlPointInfo.BPMMinimum * rate).ToLocalisableString(@"F0");
             valueDictionary[BeatmapAttribute.BPM] = Math.Round(60000 / beatmap.GetMostCommonBeatLength() * rate).ToLocalisableString(@"F0");
+            valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(workingBeatmap.Value.BeatmapInfo.Length / rate).ToFormattedDuration();
         }
 
         private void updateBeatmapContent()
@@ -197,7 +198,6 @@ namespace osu.Game.Skinning.Components
             valueDictionary[BeatmapAttribute.Artist] = beatmapInfo.Metadata.Artist;
             valueDictionary[BeatmapAttribute.DifficultyName] = beatmapInfo.DifficultyName;
             valueDictionary[BeatmapAttribute.Creator] = beatmapInfo.Metadata.Author.Username;
-            valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(beatmapInfo.Length).ToFormattedDuration();
             valueDictionary[BeatmapAttribute.RankedStatus] = beatmapInfo.Status.GetLocalisableDescription();
             valueDictionary[BeatmapAttribute.CircleSize] = ((double)difficulty.CircleSize).ToLocalisableString(@"F2");
             valueDictionary[BeatmapAttribute.HPDrain] = ((double)difficulty.DrainRate).ToLocalisableString(@"F2");
