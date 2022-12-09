@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Utils;
 using Realms;
 using SharpCompress.Archives.Zip;
 
@@ -64,7 +66,11 @@ namespace osu.Game.Database
         {
             if (item is TModel model)
             {
-                filename = $"{model.GetDisplayString().GetValidFilename()}{FileExtension}";
+                string itemFilename = item.GetDisplayString().GetValidFilename();
+
+                IEnumerable<string> existingExports = ExportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
+
+                string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
 
                 using (var stream = ExportStorage.CreateFileSafely(filename))
                 {
