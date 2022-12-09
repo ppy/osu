@@ -159,7 +159,7 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
-        public void BeginPlaying(GameplayState state, Score score)
+        public void BeginPlaying(GameplayState state, Score score, long? token)
         {
             // This schedule is only here to match the one below in `EndPlaying`.
             Schedule(() =>
@@ -175,6 +175,7 @@ namespace osu.Game.Online.Spectator
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
                 currentState.State = SpectatedUserState.Playing;
                 currentState.MaximumScoringValues = state.ScoreProcessor.MaximumScoringValues;
+                currentState.ScoreToken = token;
 
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
