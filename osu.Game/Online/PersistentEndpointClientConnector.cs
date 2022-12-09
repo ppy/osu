@@ -145,7 +145,9 @@ namespace osu.Game.Online
 
         private async Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)
         {
-            isConnected.Value = false;
+            bool hasBeenCancelled = cancellationToken.IsCancellationRequested;
+
+            await disconnect(true);
 
             if (ex != null)
                 await handleErrorAndDelay(ex, cancellationToken).ConfigureAwait(false);
@@ -153,7 +155,7 @@ namespace osu.Game.Online
                 Logger.Log($"{ClientName} disconnected", LoggingTarget.Network);
 
             // make sure a disconnect wasn't triggered (and this is still the active connection).
-            if (!cancellationToken.IsCancellationRequested)
+            if (!hasBeenCancelled)
                 await Task.Run(connect, default).ConfigureAwait(false);
         }
 
@@ -174,7 +176,9 @@ namespace osu.Game.Online
             }
             finally
             {
+                isConnected.Value = false;
                 CurrentConnection = null;
+
                 if (takeLock)
                     connectionLock.Release();
             }

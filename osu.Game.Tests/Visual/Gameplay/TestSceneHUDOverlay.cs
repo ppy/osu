@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -24,7 +25,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneHUDOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneHUDOverlay : OsuManualInputManagerTestScene
     {
         private OsuConfigManager localConfig = null!;
 
@@ -187,17 +188,21 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestInputDoesntWorkWhenHUDHidden()
         {
-            SongProgressBar getSongProgress() => hudOverlay.ChildrenOfType<SongProgressBar>().Single();
+            SongProgressBar? getSongProgress() => hudOverlay.ChildrenOfType<SongProgressBar>().SingleOrDefault();
 
             bool seeked = false;
 
             createNew();
+
+            AddUntilStep("wait for song progress", () => getSongProgress() != null);
 
             AddStep("bind seek", () =>
             {
                 seeked = false;
 
                 var progress = getSongProgress();
+
+                Debug.Assert(progress != null);
 
                 progress.ShowHandle = true;
                 progress.OnSeek += _ => seeked = true;

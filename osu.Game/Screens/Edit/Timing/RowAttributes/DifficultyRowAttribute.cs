@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
-    public class DifficultyRowAttribute : RowAttribute
+    public partial class DifficultyRowAttribute : RowAttribute
     {
         private readonly BindableNumber<double> speedMultiplier;
 

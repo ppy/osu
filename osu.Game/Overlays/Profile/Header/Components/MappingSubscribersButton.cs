@@ -12,7 +12,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class MappingSubscribersButton : ProfileHeaderStatisticsButton
+    public partial class MappingSubscribersButton : ProfileHeaderStatisticsButton
     {
         public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 

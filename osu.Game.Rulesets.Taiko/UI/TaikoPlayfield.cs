@@ -28,7 +28,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoPlayfield : ScrollingPlayfield
+    public partial class TaikoPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
@@ -112,6 +112,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                             FillMode = FillMode.Fit,
                             Children = new[]
                             {
+                                new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.KiaiGlow), _ => Empty())
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
                                 hitExplosionContainer = new Container<HitExplosion>
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -342,7 +346,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }
 
-        private class ProxyContainer : LifetimeManagementContainer
+        private partial class ProxyContainer : LifetimeManagementContainer
         {
             public void Add(Drawable proxy) => AddInternal(proxy);
 

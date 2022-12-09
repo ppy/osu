@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class ChangelogOverlay : OnlineOverlay<ChangelogHeader>
+    public partial class ChangelogOverlay : OnlineOverlay<ChangelogHeader>
     {
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 

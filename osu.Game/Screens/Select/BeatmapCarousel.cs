@@ -32,7 +32,7 @@ using Realms;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapCarousel : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class BeatmapCarousel : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.
@@ -770,7 +770,7 @@ namespace osu.Game.Screens.Select
             {
                 updateItem(item);
 
-                if (!item.Item.Filtered.Value)
+                if (item.Item.Visible)
                 {
                     bool isSelected = item.Item.State.Value == CarouselItemState.Selected;
 
@@ -1075,7 +1075,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
+        protected partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
         {
             private bool rightMouseScrollBlocked;
 

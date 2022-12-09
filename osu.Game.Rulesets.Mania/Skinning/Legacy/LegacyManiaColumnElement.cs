@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
     /// <summary>
     /// A <see cref="CompositeDrawable"/> which is placed somewhere within a <see cref="Column"/>.
     /// </summary>
-    public class LegacyManiaColumnElement : CompositeDrawable
+    public partial class LegacyManiaColumnElement : CompositeDrawable
     {
         [Resolved]
         protected Column Column { get; private set; } = null!;

@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuMenu : Menu
+    public partial class OsuMenu : Menu
     {
         private Sample sampleOpen;
         private Sample sampleClose;

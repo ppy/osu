@@ -32,7 +32,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePlayerLoader : ScreenTestScene
+    public partial class TestScenePlayerLoader : ScreenTestScene
     {
         private TestPlayerLoader loader;
         private TestPlayer player;
@@ -451,7 +451,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault();
 
-        private class TestPlayerLoader : PlayerLoader
+        private partial class TestPlayerLoader : PlayerLoader
         {
             public new VisualSettings VisualSettings => base.VisualSettings;
 
@@ -482,7 +482,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
         }
 
-        protected class SlowLoadPlayer : TestPlayer
+        protected partial class SlowLoadPlayer : TestPlayer
         {
             public readonly ManualResetEventSlim AllowLoad = new ManualResetEventSlim(false);
 

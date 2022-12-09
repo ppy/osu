@@ -10,7 +10,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online
 {
-    public class BeatmapDownloadTracker : DownloadTracker<IBeatmapSetInfo>
+    public partial class BeatmapDownloadTracker : DownloadTracker<IBeatmapSetInfo>
     {
         [Resolved(CanBeNull = true)]
         protected BeatmapModelDownloader? Downloader { get; private set; }

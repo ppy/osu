@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings.Sections.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class UserInterfaceSection : SettingsSection
+    public partial class UserInterfaceSection : SettingsSection
     {
         public override LocalisableString Header => UserInterfaceStrings.UserInterfaceSectionHeader;
 

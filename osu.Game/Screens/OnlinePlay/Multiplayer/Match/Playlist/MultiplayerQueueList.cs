@@ -19,7 +19,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     /// <summary>
     /// A gameplay-ordered list of <see cref="DrawableRoomPlaylistItem"/>s.
     /// </summary>
-    public class MultiplayerQueueList : DrawableRoomPlaylist
+    public partial class MultiplayerQueueList : DrawableRoomPlaylist
     {
         public MultiplayerQueueList()
         {
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         protected override DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new QueuePlaylistItem(item);
 
-        private class QueueFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
+        private partial class QueueFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
             [Resolved(typeof(Room), nameof(Room.Playlist))]
             private BindableList<PlaylistItem> roomPlaylist { get; set; }
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.OfType<RearrangeableListItem<PlaylistItem>>().OrderBy(item => item.Model.PlaylistOrder);
         }
 
-        private class QueuePlaylistItem : DrawableRoomPlaylistItem
+        private partial class QueuePlaylistItem : DrawableRoomPlaylistItem
         {
             [Resolved]
             private IAPIProvider api { get; set; }

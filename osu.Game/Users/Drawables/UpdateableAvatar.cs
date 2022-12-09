@@ -13,7 +13,7 @@ namespace osu.Game.Users.Drawables
     /// <summary>
     /// An avatar which can update to a new user when needed.
     /// </summary>
-    public class UpdateableAvatar : ModelBackedDrawable<APIUser>
+    public partial class UpdateableAvatar : ModelBackedDrawable<APIUser>
     {
         public APIUser User
         {

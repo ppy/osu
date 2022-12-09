@@ -38,7 +38,7 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
+    public partial class LeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         public const float HEIGHT = 60;
 
@@ -317,7 +317,7 @@ namespace osu.Game.Online.Leaderboards
             base.OnHoverLost(e);
         }
 
-        private class ScoreComponentLabel : Container, IHasTooltip
+        private partial class ScoreComponentLabel : Container, IHasTooltip
         {
             private const float icon_size = 20;
             private readonly FillFlowContainer content;
@@ -379,7 +379,7 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private class RankLabel : Container, IHasTooltip
+        private partial class RankLabel : Container, IHasTooltip
         {
             public RankLabel(int? rank)
             {
@@ -398,7 +398,7 @@ namespace osu.Game.Online.Leaderboards
             public LocalisableString TooltipText { get; }
         }
 
-        private class DateLabel : DrawableDate
+        private partial class DateLabel : DrawableDate
         {
             public DateLabel(DateTimeOffset date)
                 : base(date)

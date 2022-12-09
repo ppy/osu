@@ -32,7 +32,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneDeleteLocalScore : OsuManualInputManagerTestScene
+    public partial class TestSceneDeleteLocalScore : OsuManualInputManagerTestScene
     {
         private readonly ContextMenuContainer contextMenuContainer;
         private readonly BeatmapLeaderboard leaderboard;

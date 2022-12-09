@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.Timing
     /// <summary>
     /// Represents a component that provides the behaviour of triggering button clicks repeatedly while holding with mouse.
     /// </summary>
-    public class RepeatingButtonBehaviour : Component
+    public partial class RepeatingButtonBehaviour : Component
     {
         private const double initial_delay = 300;
         private const double minimum_delay = 80;

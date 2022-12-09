@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class SpinnerRotationTracker : CircularContainer
+    public partial class SpinnerRotationTracker : CircularContainer
     {
         public override bool IsPresent => true; // handle input when hidden
 

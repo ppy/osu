@@ -15,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneComposeSelectBox : OsuManualInputManagerTestScene
+    public partial class TestSceneComposeSelectBox : OsuManualInputManagerTestScene
     {
         private Container selectionArea;
         private SelectionBox selectionBox;

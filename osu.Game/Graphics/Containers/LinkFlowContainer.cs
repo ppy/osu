@@ -18,7 +18,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class LinkFlowContainer : OsuTextFlowContainer
+    public partial class LinkFlowContainer : OsuTextFlowContainer
     {
         public LinkFlowContainer(Action<SpriteText> defaultCreationParameters = null)
             : base(defaultCreationParameters)

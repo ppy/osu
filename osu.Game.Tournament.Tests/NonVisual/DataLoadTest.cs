@@ -17,7 +17,7 @@ using osu.Game.Tests;
 
 namespace osu.Game.Tournament.Tests.NonVisual
 {
-    public class DataLoadTest : TournamentHostTest
+    public partial class DataLoadTest : TournamentHostTest
     {
         [Test]
         public void TestRulesetGetsValidOnlineID()
@@ -78,7 +78,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
             }
         }
 
-        public class TestTournament : TournamentGameBase
+        public partial class TestTournament : TournamentGameBase
         {
             private readonly bool resetRuleset;
             private readonly Action runOnLoadComplete;

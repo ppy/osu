@@ -27,7 +27,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorTestGameplay : EditorTestScene
+    public partial class TestSceneEditorTestGameplay : EditorTestScene
     {
         protected override bool IsolateSavingFromDatabase => false;
 
@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestSharedClockState()
+        public void TestClockTimeTransferIsOneDirectional()
         {
             AddStep("seek to 00:01:00", () => EditorClock.Seek(60_000));
             AddStep("click test gameplay button", () =>
@@ -195,15 +195,15 @@ namespace osu.Game.Tests.Visual.Editing
             GameplayClockContainer gameplayClockContainer = null;
             AddStep("fetch gameplay clock", () => gameplayClockContainer = editorPlayer.ChildrenOfType<GameplayClockContainer>().First());
             AddUntilStep("gameplay clock running", () => gameplayClockContainer.IsRunning);
+            // when the gameplay test is entered, the clock is expected to continue from where it was in the main editor...
             AddAssert("gameplay time past 00:01:00", () => gameplayClockContainer.CurrentTime >= 60_000);
 
-            double timeAtPlayerExit = 0;
             AddWaitStep("wait some", 5);
-            AddStep("store time before exit", () => timeAtPlayerExit = gameplayClockContainer.CurrentTime);
 
             AddStep("exit player", () => editorPlayer.Exit());
             AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
-            AddAssert("time is past player exit", () => EditorClock.CurrentTime >= timeAtPlayerExit);
+            // but when exiting from gameplay test back to editor, the expectation is that the editor time should revert to what it was at the point of initiating the gameplay test.
+            AddAssert("time reverted to 00:01:00", () => EditorClock.CurrentTime, () => Is.EqualTo(60_000));
         }
 
         public override void TearDownSteps()

@@ -24,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class DrawableMatchTeam : DrawableTournamentTeam, IHasContextMenu
+    public partial class DrawableMatchTeam : DrawableTournamentTeam, IHasContextMenu
     {
         private readonly TournamentMatch match;
         private readonly bool losers;

@@ -4,6 +4,7 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -19,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A button with added default sound effects.
     /// </summary>
-    public class OsuButton : Button
+    public partial class OsuButton : Button
     {
         public LocalisableString Text
         {
@@ -36,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Sets a custom background colour to this button, replacing the provided default.
         /// </summary>
-        public Color4 BackgroundColour
+        public virtual Color4 BackgroundColour
         {
             get => backgroundColour ?? defaultBackgroundColour;
             set
@@ -69,6 +70,8 @@ namespace osu.Game.Graphics.UserInterface
         protected Box Background;
         protected SpriteText SpriteText;
 
+        private readonly Box flashLayer;
+
         public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Button)
         {
             Height = 40;
@@ -87,6 +90,7 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
+                        Depth = float.MaxValue,
                     },
                     Hover = new Box
                     {
@@ -99,6 +103,14 @@ namespace osu.Game.Graphics.UserInterface
                         Depth = float.MinValue
                     },
                     SpriteText = CreateText(),
+                    flashLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Blending = BlendingParameters.Additive,
+                        Depth = float.MinValue,
+                        Colour = Color4.White.Opacity(0.5f),
+                        Alpha = 0,
+                    },
                 }
             });
 
@@ -125,10 +137,12 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(ClickEvent e)
         {
             if (Enabled.Value)
-                Background.FlashColour(Color4.White, 800, Easing.OutQuint);
+                flashLayer.FadeOutFromOne(800, Easing.OutQuint);
 
             return base.OnClick(e);
         }
+
+        protected virtual float HoverLayerFinalAlpha => 0.1f;
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -136,7 +150,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Hover.FadeTo(0.2f, 40, Easing.OutQuint)
                      .Then()
-                     .FadeTo(0.1f, 800, Easing.OutQuint);
+                     .FadeTo(HoverLayerFinalAlpha, 800, Easing.OutQuint);
             }
 
             return base.OnHover(e);

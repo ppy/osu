@@ -10,13 +10,12 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public abstract class CreateRoomButton : PurpleTriangleButton, IKeyBindingHandler<PlatformAction>
+    public abstract partial class CreateRoomButton : PurpleRoundedButton, IKeyBindingHandler<PlatformAction>
     {
         [BackgroundDependencyLoader]
         private void load()
         {
             SpriteText.Font = SpriteText.Font.With(size: 14);
-            Triangles.TriangleScale = 1.5f;
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)

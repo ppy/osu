@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class DrawableOsuEditorRuleset : DrawableOsuRuleset
+    public partial class DrawableOsuEditorRuleset : DrawableOsuRuleset
     {
         public DrawableOsuEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { Size = Vector2.One };
 
-        private class OsuEditorPlayfield : OsuPlayfield
+        private partial class OsuEditorPlayfield : OsuPlayfield
         {
             protected override GameplayCursorContainer CreateCursor() => null;
 

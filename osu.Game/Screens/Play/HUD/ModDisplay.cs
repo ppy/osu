@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// Displays a single-line horizontal auto-sized flow of mods. For cases where wrapping is required, use <see cref="ModFlowDisplay"/> instead.
     /// </summary>
-    public class ModDisplay : CompositeDrawable, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class ModDisplay : CompositeDrawable, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         private const int fade_duration = 1000;
 

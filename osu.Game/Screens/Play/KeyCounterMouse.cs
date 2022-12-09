@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterMouse : KeyCounter
+    public partial class KeyCounterMouse : KeyCounter
     {
         public MouseButton Button { get; }
 

@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultSongProgress : SongProgress
+    public partial class DefaultSongProgress : SongProgress
     {
         private const float bottom_bar_height = 5;
         private const float graph_height = SquareGraph.Column.WIDTH * 6;
