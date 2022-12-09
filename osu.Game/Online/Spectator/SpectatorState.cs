@@ -33,14 +33,17 @@ namespace osu.Game.Online.Spectator
         [Key(4)]
         public ScoringValues MaximumScoringValues { get; set; }
 
+        [Key(5)]
+        public long? ScoreToken { get; set; }
+
         public bool Equals(SpectatorState other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return BeatmapID == other.BeatmapID && Mods.SequenceEqual(other.Mods) && RulesetID == other.RulesetID && State == other.State;
+            return BeatmapID == other.BeatmapID && Mods.SequenceEqual(other.Mods) && RulesetID == other.RulesetID && State == other.State && ScoreToken == other.ScoreToken;
         }
 
-        public override string ToString() => $"Beatmap:{BeatmapID} Mods:{string.Join(',', Mods)} Ruleset:{RulesetID} State:{State}";
+        public override string ToString() => $"Beatmap:{BeatmapID} Mods:{string.Join(',', Mods)} Ruleset:{RulesetID} State:{State} Token:{ScoreToken}";
     }
 }

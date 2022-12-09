@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Play
                     realmBeatmap.LastPlayed = DateTimeOffset.Now;
             });
 
-            spectatorClient.BeginPlaying(GameplayState, Score);
+            spectatorClient.BeginPlaying(GameplayState, Score, token);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
