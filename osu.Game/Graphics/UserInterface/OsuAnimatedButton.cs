@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// Highlight on hover, bounce on click.
     /// </summary>
-    public class OsuAnimatedButton : OsuClickableContainer
+    public partial class OsuAnimatedButton : OsuClickableContainer
     {
         /// <summary>
         /// The colour that should be flashed when the <see cref="OsuAnimatedButton"/> is clicked.

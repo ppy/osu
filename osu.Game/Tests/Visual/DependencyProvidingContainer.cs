@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Visual
     /// <remarks>
     /// The <see cref="CachedDependencies"/> must be set while this <see cref="DependencyProvidingContainer"/> is not loaded.
     /// </remarks>
-    public class DependencyProvidingContainer : Container
+    public partial class DependencyProvidingContainer : Container
     {
         /// <summary>
         /// The dependencies provided to the children.

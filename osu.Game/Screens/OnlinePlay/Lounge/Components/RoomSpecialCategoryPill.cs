@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class RoomSpecialCategoryPill : OnlinePlayComposite
+    public partial class RoomSpecialCategoryPill : OnlinePlayComposite
     {
         private SpriteText text;
         private PillContainer pill;

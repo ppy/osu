@@ -21,7 +21,7 @@ using Realms;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
+    public partial class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
     {
         public Action<ScoreInfo>? ScoreSelected;
 
@@ -204,10 +204,11 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
                 else if (filterMods)
                 {
-                    // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
-                    // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
-                    var selectedMods = mods.Value.Select(m => m.Acronym);
-                    scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
+                    // otherwise find all the scores that have all of the currently selected mods (similar to how web applies mod filters)
+                    // we're creating and using a string HashSet representation of selected mods so that it can be translated into the DB query itself
+                    var selectedMods = mods.Value.Select(m => m.Acronym).ToHashSet();
+
+                    scores = scores.Where(s => selectedMods.SetEquals(s.Mods.Select(m => m.Acronym)));
                 }
 
                 scores = scoreManager.OrderByTotalScore(scores.Detach());

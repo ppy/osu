@@ -16,7 +16,7 @@ using osu.Game.Overlays.Wiki;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneWikiHeader : OsuTestScene
+    public partial class TestSceneWikiHeader : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Orange);
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Online
             };
         }
 
-        private class TestHeader : WikiHeader
+        private partial class TestHeader : WikiHeader
         {
             public IReadOnlyList<LocalisableString?> TabControlItems => TabControl.Items;
         }

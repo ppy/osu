@@ -15,7 +15,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Wiki.Markdown
 {
-    public class WikiNoticeContainer : FillFlowContainer
+    public partial class WikiNoticeContainer : FillFlowContainer
     {
         private readonly bool isOutdated;
         private readonly bool needsCleanup;
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
             }
         }
 
-        private class NoticeBox : Container
+        private partial class NoticeBox : Container
         {
             [Resolved]
             private IMarkdownTextFlowComponent parentFlowComponent { get; set; }

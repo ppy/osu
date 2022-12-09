@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
-    public class TableRowBackground : CompositeDrawable
+    public partial class TableRowBackground : CompositeDrawable
     {
         private const int fade_duration = 100;
 

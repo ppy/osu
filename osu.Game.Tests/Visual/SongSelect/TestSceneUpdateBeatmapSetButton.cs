@@ -22,7 +22,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestSceneUpdateBeatmapSetButton : OsuManualInputManagerTestScene
+    public partial class TestSceneUpdateBeatmapSetButton : OsuManualInputManagerTestScene
     {
         private BeatmapCarousel carousel = null!;
 

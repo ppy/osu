@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings.Sections.Online;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class OnlineSection : SettingsSection
+    public partial class OnlineSection : SettingsSection
     {
         public override LocalisableString Header => OnlineSettingsStrings.OnlineSectionHeader;
 

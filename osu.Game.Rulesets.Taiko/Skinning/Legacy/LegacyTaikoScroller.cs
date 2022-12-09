@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class LegacyTaikoScroller : CompositeDrawable
+    public partial class LegacyTaikoScroller : CompositeDrawable
     {
         public Bindable<JudgementResult> LastResult = new Bindable<JudgementResult>();
 
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             }
         }
 
-        private class ScrollerSprite : CompositeDrawable
+        private partial class ScrollerSprite : CompositeDrawable
         {
             private Sprite passingSprite = null!;
             private Sprite failingSprite = null!;

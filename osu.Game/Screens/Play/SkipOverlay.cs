@@ -25,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class SkipOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// The total number of successful skips performed by this overlay.
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        public class FadeContainer : Container, IStateful<Visibility>
+        public partial class FadeContainer : Container, IStateful<Visibility>
         {
             public event Action<Visibility> StateChanged;
 
@@ -287,14 +287,14 @@ namespace osu.Game.Screens.Play
             public override void Show() => State = Visibility.Visible;
         }
 
-        private class ButtonContainer : VisibilityContainer
+        private partial class ButtonContainer : VisibilityContainer
         {
             protected override void PopIn() => this.FadeIn(fade_time);
 
             protected override void PopOut() => this.FadeOut(fade_time);
         }
 
-        private class Button : OsuClickableContainer
+        private partial class Button : OsuClickableContainer
         {
             private Color4 colourNormal;
             private Color4 colourHover;

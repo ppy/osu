@@ -31,7 +31,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePoolingRuleset : OsuTestScene
+    public partial class TestScenePoolingRuleset : OsuTestScene
     {
         private const double time_between_objects = 1000;
 
@@ -194,7 +194,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override string ShortName { get; } = string.Empty;
         }
 
-        private class TestDrawablePoolingRuleset : DrawableRuleset<TestHitObject>
+        private partial class TestDrawablePoolingRuleset : DrawableRuleset<TestHitObject>
         {
             public int PoolSize;
 
@@ -210,7 +210,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override Playfield CreatePlayfield() => new TestPlayfield(PoolSize);
         }
 
-        private class TestPlayfield : Playfield
+        private partial class TestPlayfield : Playfield
         {
             private readonly int poolSize;
 
@@ -283,7 +283,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public double Duration { get; set; }
         }
 
-        private class DrawableTestHitObject : DrawableHitObject<TestHitObject>
+        private partial class DrawableTestHitObject : DrawableHitObject<TestHitObject>
         {
             public DrawableTestHitObject()
                 : base(null)
@@ -335,7 +335,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
         }
 
-        private class DrawableTestKilledHitObject : DrawableHitObject<TestKilledHitObject>
+        private partial class DrawableTestKilledHitObject : DrawableHitObject<TestKilledHitObject>
         {
             public DrawableTestKilledHitObject()
                 : base(null)

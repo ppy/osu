@@ -14,7 +14,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneObjectMerging : TestSceneOsuEditor
+    public partial class TestSceneObjectMerging : TestSceneOsuEditor
     {
         private OsuSelectionHandler selectionHandler => Editor.ChildrenOfType<OsuSelectionHandler>().First();
 

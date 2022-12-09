@@ -6,7 +6,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyHoldNoteHeadPiece : LegacyNotePiece
+    public partial class LegacyHoldNoteHeadPiece : LegacyNotePiece
     {
         protected override Drawable? GetAnimation(ISkinSource skin)
         {

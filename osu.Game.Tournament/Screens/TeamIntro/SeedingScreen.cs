@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
-    public class SeedingScreen : TournamentMatchScreen
+    public partial class SeedingScreen : TournamentMatchScreen
     {
         private Container mainContainer;
 
@@ -116,7 +116,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             };
         });
 
-        private class RightInfo : CompositeDrawable
+        private partial class RightInfo : CompositeDrawable
         {
             public RightInfo(TournamentTeam team)
             {
@@ -148,7 +148,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 }
             }
 
-            private class BeatmapScoreRow : CompositeDrawable
+            private partial class BeatmapScoreRow : CompositeDrawable
             {
                 public BeatmapScoreRow(SeedingBeatmap beatmap)
                 {
@@ -190,7 +190,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 }
             }
 
-            private class ModRow : CompositeDrawable
+            private partial class ModRow : CompositeDrawable
             {
                 private readonly string mods;
                 private readonly int seeding;
@@ -254,7 +254,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             }
         }
 
-        private class LeftInfo : CompositeDrawable
+        private partial class LeftInfo : CompositeDrawable
         {
             public LeftInfo(TournamentTeam team)
             {
@@ -286,7 +286,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     fill.Add(new RowDisplay(p.Username, p.Rank?.ToString("\\##,0") ?? "-"));
             }
 
-            internal class RowDisplay : CompositeDrawable
+            internal partial class RowDisplay : CompositeDrawable
             {
                 public RowDisplay(string left, string right)
                 {
@@ -313,7 +313,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 }
             }
 
-            private class TeamDisplay : DrawableTournamentTeam
+            private partial class TeamDisplay : DrawableTournamentTeam
             {
                 public TeamDisplay(TournamentTeam team)
                     : base(team)

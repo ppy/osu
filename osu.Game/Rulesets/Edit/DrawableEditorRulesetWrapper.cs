@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A wrapper for a <see cref="DrawableRuleset{TObject}"/>. Handles adding visual representations of <see cref="HitObject"/>s to the underlying <see cref="DrawableRuleset{TObject}"/>.
     /// </summary>
-    internal class DrawableEditorRulesetWrapper<TObject> : CompositeDrawable
+    internal partial class DrawableEditorRulesetWrapper<TObject> : CompositeDrawable
         where TObject : HitObject
     {
         public Playfield Playfield => drawableRuleset.Playfield;

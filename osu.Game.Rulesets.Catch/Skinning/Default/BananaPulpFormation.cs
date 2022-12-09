@@ -5,7 +5,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class BananaPulpFormation : PulpFormation
+    public partial class BananaPulpFormation : PulpFormation
     {
         public BananaPulpFormation()
         {

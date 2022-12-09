@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsTextBox : SettingsItem<string>
+    public partial class SettingsTextBox : SettingsItem<string>
     {
         protected override Drawable CreateControl() => new OutlinedTextBox
         {

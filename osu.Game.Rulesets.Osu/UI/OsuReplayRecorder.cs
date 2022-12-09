@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuReplayRecorder : ReplayRecorder<OsuAction>
+    public partial class OsuReplayRecorder : ReplayRecorder<OsuAction>
     {
         public OsuReplayRecorder(Score score)
             : base(score)

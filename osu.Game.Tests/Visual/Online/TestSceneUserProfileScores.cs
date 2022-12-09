@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneUserProfileScores : OsuTestScene
+    public partial class TestSceneUserProfileScores : OsuTestScene
     {
         public TestSceneUserProfileScores()
         {
@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private class ColourProvidedContainer : Container
+        private partial class ColourProvidedContainer : Container
         {
             [Cached]
             private readonly OverlayColourProvider colourProvider;

@@ -107,7 +107,7 @@ namespace osu.Game.Configuration
         }
     }
 
-    public static class SettingSourceExtensions
+    public static partial class SettingSourceExtensions
     {
         public static IEnumerable<Drawable> CreateSettingsControls(this object obj)
         {
@@ -267,12 +267,12 @@ namespace osu.Game.Configuration
                   .OrderBy(attr => attr.Item1)
                   .ToArray();
 
-        private class ModSettingsEnumDropdown<T> : SettingsEnumDropdown<T>
+        private partial class ModSettingsEnumDropdown<T> : SettingsEnumDropdown<T>
             where T : struct, Enum
         {
             protected override OsuDropdown<T> CreateDropdown() => new ModDropdownControl();
 
-            private class ModDropdownControl : DropdownControl
+            private partial class ModDropdownControl : DropdownControl
             {
                 // Set menu's max height low enough to workaround nested scroll issues (see https://github.com/ppy/osu-framework/issues/4536).
                 protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 100);

@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.AccountCreation
 {
-    public class ScreenWelcome : AccountCreationScreen
+    public partial class ScreenWelcome : AccountCreationScreen
     {
         [BackgroundDependencyLoader]
         private void load()

@@ -17,7 +17,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedProfileSubsection<SoloScoreInfo>
+    public partial class PaginatedScoreContainer : PaginatedProfileSubsection<SoloScoreInfo>
     {
         private readonly ScoreType type;
 

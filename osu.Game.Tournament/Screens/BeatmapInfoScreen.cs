@@ -13,7 +13,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens
 {
-    public abstract class BeatmapInfoScreen : TournamentMatchScreen
+    public abstract partial class BeatmapInfoScreen : TournamentMatchScreen
     {
         protected readonly SongBar SongBar;
 

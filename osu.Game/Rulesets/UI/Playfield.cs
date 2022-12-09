@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.UI
 {
     [Cached(typeof(IPooledHitObjectProvider))]
     [Cached(typeof(IPooledSampleProvider))]
-    public abstract class Playfield : CompositeDrawable, IPooledHitObjectProvider, IPooledSampleProvider
+    public abstract partial class Playfield : CompositeDrawable, IPooledHitObjectProvider, IPooledSampleProvider
     {
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
@@ -93,7 +93,8 @@ namespace osu.Game.Rulesets.UI
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
         [Resolved(CanBeNull = true)]
-        private IReadOnlyList<Mod> mods { get; set; }
+        [CanBeNull]
+        protected IReadOnlyList<Mod> Mods { get; private set; }
 
         private readonly HitObjectEntryManager entryManager = new HitObjectEntryManager();
 
@@ -243,9 +244,9 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
-            if (!IsNested && mods != null)
+            if (!IsNested && Mods != null)
             {
-                foreach (var mod in mods)
+                foreach (var mod in Mods)
                 {
                     if (mod is IUpdatableByPlayfield updatable)
                         updatable.Update(this);
@@ -374,9 +375,9 @@ namespace osu.Game.Rulesets.UI
 
                     // If this is the first time this DHO is being used, then apply the DHO mods.
                     // This is done before Apply() so that the state is updated once when the hitobject is applied.
-                    if (mods != null)
+                    if (Mods != null)
                     {
-                        foreach (var m in mods.OfType<IApplicableToDrawableHitObject>())
+                        foreach (var m in Mods.OfType<IApplicableToDrawableHitObject>())
                             m.ApplyToDrawableHitObject(dho);
                     }
                 }
@@ -427,7 +428,7 @@ namespace osu.Game.Rulesets.UI
             return pool;
         }
 
-        private class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>
+        private partial class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>
         {
             private readonly ISampleInfo sampleInfo;
 

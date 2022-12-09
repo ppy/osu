@@ -7,7 +7,7 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenCustom : BackgroundScreen
+    public partial class BackgroundScreenCustom : BackgroundScreen
     {
         private readonly string textureName;
 

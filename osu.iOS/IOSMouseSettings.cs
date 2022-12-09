@@ -10,7 +10,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.iOS
 {
-    public class IOSMouseSettings : SettingsSubsection
+    public partial class IOSMouseSettings : SettingsSubsection
     {
         protected override LocalisableString Header => MouseSettingsStrings.Mouse;
 

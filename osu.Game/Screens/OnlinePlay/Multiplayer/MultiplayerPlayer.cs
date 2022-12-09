@@ -22,7 +22,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerPlayer : RoomSubmittingPlayer
+    public partial class MultiplayerPlayer : RoomSubmittingPlayer
     {
         protected override bool PauseOnFocusLost => false;
 

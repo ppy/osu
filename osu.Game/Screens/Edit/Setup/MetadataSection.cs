@@ -14,7 +14,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class MetadataSection : SetupSection
+    public partial class MetadataSection : SetupSection
     {
         protected LabelledTextBox ArtistTextBox;
         protected LabelledTextBox RomanisedArtistTextBox;

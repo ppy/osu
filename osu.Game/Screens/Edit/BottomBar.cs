@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
-    internal class BottomBar : CompositeDrawable
+    internal partial class BottomBar : CompositeDrawable
     {
         public TestGameplayButton TestGameplayButton { get; private set; }
 

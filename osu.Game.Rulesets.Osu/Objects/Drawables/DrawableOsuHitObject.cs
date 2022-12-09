@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public abstract class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
+    public abstract partial class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
         public readonly IBindable<Vector2> PositionBindable = new Bindable<Vector2>();
         public readonly IBindable<int> StackHeightBindable = new Bindable<int>();

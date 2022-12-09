@@ -22,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderVelocityAdjust : OsuGameTestScene
+    public partial class TestSceneSliderVelocityAdjust : OsuGameTestScene
     {
         private Screens.Edit.Editor editor => Game.ScreenStack.CurrentScreen as Screens.Edit.Editor;
 

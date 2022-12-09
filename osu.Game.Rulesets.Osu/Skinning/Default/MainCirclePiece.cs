@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class MainCirclePiece : CompositeDrawable
+    public partial class MainCirclePiece : CompositeDrawable
     {
         private readonly CirclePiece circle;
         private readonly RingPiece ring;

@@ -20,7 +20,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
-    public class KudosuInfo : Container
+    public partial class KudosuInfo : Container
     {
         private readonly Bindable<APIUser> user = new Bindable<APIUser>();
 
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
         protected override bool OnClick(ClickEvent e) => true;
 
-        private class CountTotal : CountSection
+        private partial class CountTotal : CountSection
         {
             public CountTotal()
                 : base(UsersStrings.ShowExtraKudosuTotal)
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             }
         }
 
-        private class CountSection : Container
+        private partial class CountSection : Container
         {
             private readonly OsuSpriteText valueText;
             protected readonly LinkFlowContainer DescriptionText;

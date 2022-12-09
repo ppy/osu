@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    public class SetupScreen : TournamentScreen
+    public partial class SetupScreen : TournamentScreen
     {
         private FillFlowContainer fillFlow;
 

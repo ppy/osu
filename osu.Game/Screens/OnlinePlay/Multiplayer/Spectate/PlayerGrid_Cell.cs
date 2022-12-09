@@ -17,7 +17,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// A cell of the grid. Contains the content and tracks to the linked facade.
         /// </summary>
-        private class Cell : CompositeDrawable
+        private partial class Cell : CompositeDrawable
         {
             /// <summary>
             /// The index of the original facade of this cell.

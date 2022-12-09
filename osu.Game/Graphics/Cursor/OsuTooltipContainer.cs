@@ -16,7 +16,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class OsuTooltipContainer : TooltipContainer
+    public partial class OsuTooltipContainer : TooltipContainer
     {
         protected override ITooltip CreateTooltip() => new OsuTooltip();
 
@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.Cursor
 
         protected override double AppearDelay => (1 - CurrentTooltip.Alpha) * base.AppearDelay; // reduce appear delay if the tooltip is already partly visible.
 
-        public class OsuTooltip : Tooltip
+        public partial class OsuTooltip : Tooltip
         {
             private readonly Box background;
             private readonly OsuSpriteText text;

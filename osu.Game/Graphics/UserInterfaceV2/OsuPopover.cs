@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class OsuPopover : Popover, IKeyBindingHandler<GlobalAction>
+    public partial class OsuPopover : Popover, IKeyBindingHandler<GlobalAction>
     {
         private const float fade_duration = 250;
         private const double scale_duration = 500;

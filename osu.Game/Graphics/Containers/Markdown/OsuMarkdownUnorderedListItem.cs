@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownUnorderedListItem : OsuMarkdownListItem
+    public partial class OsuMarkdownUnorderedListItem : OsuMarkdownListItem
     {
         private const float left_padding = 20;
 

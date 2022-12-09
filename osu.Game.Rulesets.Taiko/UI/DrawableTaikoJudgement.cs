@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// Text that is shown as judgement when a hit object is hit or missed.
     /// </summary>
-    public class DrawableTaikoJudgement : DrawableJudgement
+    public partial class DrawableTaikoJudgement : DrawableJudgement
     {
         public DrawableTaikoJudgement()
         {

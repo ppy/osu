@@ -19,7 +19,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableHit : DrawableTaikoStrongableHitObject<Hit, Hit.StrongNestedHit>
+    public partial class DrawableHit : DrawableTaikoStrongableHitObject<Hit, Hit.StrongNestedHit>
     {
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
@@ -220,7 +220,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override DrawableStrongNestedHit CreateStrongNestedHit(Hit.StrongNestedHit hitObject) => new StrongNestedHit(hitObject);
 
-        public class StrongNestedHit : DrawableStrongNestedHit
+        public partial class StrongNestedHit : DrawableStrongNestedHit
         {
             public new DrawableHit ParentHitObject => (DrawableHit)base.ParentHitObject;
 

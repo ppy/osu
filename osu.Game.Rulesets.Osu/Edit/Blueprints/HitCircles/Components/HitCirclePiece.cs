@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
-    public class HitCirclePiece : BlueprintPiece<HitCircle>
+    public partial class HitCirclePiece : BlueprintPiece<HitCircle>
     {
         public HitCirclePiece()
         {

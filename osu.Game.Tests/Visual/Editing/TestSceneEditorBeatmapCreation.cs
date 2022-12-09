@@ -31,7 +31,7 @@ using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorBeatmapCreation : EditorTestScene
+    public partial class TestSceneEditorBeatmapCreation : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

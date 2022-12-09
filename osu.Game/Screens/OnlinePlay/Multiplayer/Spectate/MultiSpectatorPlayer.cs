@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// <summary>
     /// A single spectated player within a <see cref="MultiSpectatorScreen"/>.
     /// </summary>
-    public class MultiSpectatorPlayer : SpectatorPlayer
+    public partial class MultiSpectatorPlayer : SpectatorPlayer
     {
         /// <summary>
         /// All adjustments applied to the clock of this <see cref="MultiSpectatorPlayer"/> which come from mods.

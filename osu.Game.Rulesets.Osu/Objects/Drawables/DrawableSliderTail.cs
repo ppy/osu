@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking
+    public partial class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 

@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class OsuCursorContainer : GameplayCursorContainer, IKeyBindingHandler<OsuAction>
+    public partial class OsuCursorContainer : GameplayCursorContainer, IKeyBindingHandler<OsuAction>
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             ActiveCursor.ScaleTo(CursorScale.Value * 0.8f, 450, Easing.OutQuint);
         }
 
-        private class DefaultCursorTrail : CursorTrail
+        private partial class DefaultCursorTrail : CursorTrail
         {
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)

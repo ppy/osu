@@ -16,7 +16,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 {
-    public class TaikoSpanPlacementBlueprint : PlacementBlueprint
+    public partial class TaikoSpanPlacementBlueprint : PlacementBlueprint
     {
         private readonly HitPiece headPiece;
         private readonly HitPiece tailPiece;

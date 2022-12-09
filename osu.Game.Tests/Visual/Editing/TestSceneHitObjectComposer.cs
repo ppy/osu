@@ -29,7 +29,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneHitObjectComposer : EditorClockTestScene
+    public partial class TestSceneHitObjectComposer : EditorClockTestScene
     {
         private OsuHitObjectComposer hitObjectComposer;
         private EditorBeatmapContainer editorBeatmapContainer;
@@ -168,7 +168,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
         }
 
-        public class EditorBeatmapContainer : Container
+        public partial class EditorBeatmapContainer : Container
         {
             private readonly IWorkingBeatmap working;
 

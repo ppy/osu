@@ -7,7 +7,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Menu
 {
-    public class ConfirmExitDialog : PopupDialog
+    public partial class ConfirmExitDialog : PopupDialog
     {
         /// <summary>
         /// Construct a new exit confirmation dialog.

@@ -13,7 +13,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSpinnerPlacementBlueprint : PlacementBlueprintTestScene
+    public partial class TestSceneSpinnerPlacementBlueprint : PlacementBlueprintTestScene
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableSpinner((Spinner)hitObject);
 

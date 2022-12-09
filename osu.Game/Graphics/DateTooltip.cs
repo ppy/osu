@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Graphics
 {
-    public class DateTooltip : VisibilityContainer, ITooltip<DateTimeOffset>
+    public partial class DateTooltip : VisibilityContainer, ITooltip<DateTimeOffset>
     {
         private readonly OsuSpriteText dateText, timeText;
         private readonly Box background;

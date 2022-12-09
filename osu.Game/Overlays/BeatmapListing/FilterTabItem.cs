@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class FilterTabItem<T> : TabItem<T>
+    public partial class FilterTabItem<T> : TabItem<T>
     {
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }

@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// A component which can trigger the most appropriate hit sound for a given point in time, based on the state of a <see cref="HitObjectContainer"/>
     /// </summary>
-    public class GameplaySampleTriggerSource : CompositeDrawable
+    public partial class GameplaySampleTriggerSource : CompositeDrawable
     {
         /// <summary>
         /// The number of concurrent samples allowed to be played concurrently so that it feels better when spam-pressing a key.

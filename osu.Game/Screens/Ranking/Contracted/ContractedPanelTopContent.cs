@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Ranking.Contracted
 {
-    public class ContractedPanelTopContent : CompositeDrawable
+    public partial class ContractedPanelTopContent : CompositeDrawable
     {
         public readonly Bindable<int?> ScorePosition = new Bindable<int?>();
 

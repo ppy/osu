@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class ControlPointSettings : EditorRoundedScreenSettings
+    public partial class ControlPointSettings : EditorRoundedScreenSettings
     {
         protected override IReadOnlyList<Drawable> CreateSections() => new Drawable[]
         {

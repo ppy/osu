@@ -16,7 +16,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class OsuFileSelector : FileSelector
+    public partial class OsuFileSelector : FileSelector
     {
         public OsuFileSelector(string initialPath = null, string[] validFileExtensions = null)
             : base(initialPath, validFileExtensions)
@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override void NotifySelectionError() => this.FlashColour(Colour4.Red, 300);
 
-        protected class OsuDirectoryListingFile : DirectoryListingFile
+        protected partial class OsuDirectoryListingFile : DirectoryListingFile
         {
             public OsuDirectoryListingFile(FileInfo file)
                 : base(file)

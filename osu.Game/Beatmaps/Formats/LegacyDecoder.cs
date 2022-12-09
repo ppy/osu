@@ -147,7 +147,11 @@ namespace osu.Game.Beatmaps.Formats
             );
         }
 
-        protected string CleanFilename(string path) => path.Trim('"').ToStandardisedPath();
+        protected string CleanFilename(string path) => path
+                                                       // User error which is supported by stable (https://github.com/ppy/osu/issues/21204)
+                                                       .Replace(@"\\", @"\")
+                                                       .Trim('"')
+                                                       .ToStandardisedPath();
 
         public enum Section
         {

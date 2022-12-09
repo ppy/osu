@@ -12,7 +12,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class RulesetBindingsSection : SettingsSection
+    public partial class RulesetBindingsSection : SettingsSection
     {
         public override Drawable CreateIcon() => ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon
         {

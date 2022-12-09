@@ -11,14 +11,14 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsNumberBox : SettingsItem<int?>
+    public partial class SettingsNumberBox : SettingsItem<int?>
     {
         protected override Drawable CreateControl() => new NumberControl
         {
             RelativeSizeAxes = Axes.X,
         };
 
-        private sealed class NumberControl : CompositeDrawable, IHasCurrentValue<int?>
+        private sealed partial class NumberControl : CompositeDrawable, IHasCurrentValue<int?>
         {
             private readonly BindableWithCurrent<int?> current = new BindableWithCurrent<int?>();
 
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        private class OutlinedNumberBox : OutlinedTextBox
+        private partial class OutlinedNumberBox : OutlinedTextBox
         {
             protected override bool AllowIme => false;
 

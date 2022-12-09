@@ -13,7 +13,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online.Metadata
 {
-    public class OnlineMetadataClient : MetadataClient
+    public partial class OnlineMetadataClient : MetadataClient
     {
         private readonly string endpoint;
 

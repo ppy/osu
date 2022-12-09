@@ -21,7 +21,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneModPresetPanel : OsuTestScene
+    public partial class TestSceneModPresetPanel : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);

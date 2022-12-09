@@ -21,7 +21,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Online.Spectator
 {
-    public abstract class SpectatorClient : Component, ISpectatorClient
+    public abstract partial class SpectatorClient : Component, ISpectatorClient
     {
         /// <summary>
         /// The maximum milliseconds between frame bundle sends.

@@ -30,7 +30,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Objects.Drawables
 {
     [Cached(typeof(DrawableHitObject))]
-    public abstract class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>
+    public abstract partial class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>
     {
         /// <summary>
         /// Invoked after this <see cref="DrawableHitObject"/>'s applied <see cref="HitObject"/> has had its defaults applied.
@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             comboColourBrightness.BindValueChanged(_ => UpdateComboColour());
 
             // Apply transforms
-            updateState(State.Value, true);
+            updateStateFromResult();
         }
 
         /// <summary>
@@ -266,17 +266,22 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // If not loaded, the state update happens in LoadComplete().
             if (IsLoaded)
             {
-                if (Result.IsHit)
-                    updateState(ArmedState.Hit, true);
-                else if (Result.HasResult)
-                    updateState(ArmedState.Miss, true);
-                else
-                    updateState(ArmedState.Idle, true);
+                updateStateFromResult();
 
                 // Combo colour may have been applied via a bindable flow while no object entry was attached.
                 // Update here to ensure we're in a good state.
                 UpdateComboColour();
             }
+        }
+
+        private void updateStateFromResult()
+        {
+            if (Result.IsHit)
+                updateState(ArmedState.Hit, true);
+            else if (Result.HasResult)
+                updateState(ArmedState.Miss, true);
+            else
+                updateState(ArmedState.Idle, true);
         }
 
         protected sealed override void OnFree(HitObjectLifetimeEntry entry)
@@ -745,7 +750,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
     }
 
-    public abstract class DrawableHitObject<TObject> : DrawableHitObject
+    public abstract partial class DrawableHitObject<TObject> : DrawableHitObject
         where TObject : HitObject
     {
         public new TObject HitObject => (TObject)base.HitObject;

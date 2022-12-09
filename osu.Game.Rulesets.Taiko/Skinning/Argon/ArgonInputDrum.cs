@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class ArgonInputDrum : AspectContainer
+    public partial class ArgonInputDrum : AspectContainer
     {
         private const float rim_size = 0.3f;
 
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         /// <summary>
         /// A half-drum. Contains one centre and one rim hit.
         /// </summary>
-        private class TaikoHalfDrum : CompositeDrawable, IKeyBindingHandler<TaikoAction>
+        private partial class TaikoHalfDrum : CompositeDrawable, IKeyBindingHandler<TaikoAction>
         {
             /// <summary>
             /// The key to be used for the rim of the half-drum.

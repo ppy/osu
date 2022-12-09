@@ -10,7 +10,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownImage : MarkdownImage, IHasTooltip
+    public partial class OsuMarkdownImage : MarkdownImage, IHasTooltip
     {
         public LocalisableString TooltipText { get; }
 

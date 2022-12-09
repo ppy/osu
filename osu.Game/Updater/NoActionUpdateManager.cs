@@ -16,7 +16,7 @@ namespace osu.Game.Updater
     /// An update manager that shows notifications if a newer release is detected.
     /// This is a case where updates are handled externally by a package manager or other means, so no action is performed on clicking the notification.
     /// </summary>
-    public class NoActionUpdateManager : UpdateManager
+    public partial class NoActionUpdateManager : UpdateManager
     {
         private string version;
 

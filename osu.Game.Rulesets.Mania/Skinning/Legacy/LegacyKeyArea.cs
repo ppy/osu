@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyKeyArea : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
+    public partial class LegacyKeyArea : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 

@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
-    public class SampleRowAttribute : RowAttribute
+    public partial class SampleRowAttribute : RowAttribute
     {
         private AttributeText sampleText;
         private OsuSpriteText volumeText;

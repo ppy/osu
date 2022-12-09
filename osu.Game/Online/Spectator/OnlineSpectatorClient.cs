@@ -12,7 +12,7 @@ using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Online.Spectator
 {
-    public class OnlineSpectatorClient : SpectatorClient
+    public partial class OnlineSpectatorClient : SpectatorClient
     {
         private readonly string endpoint;
 

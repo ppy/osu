@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public class CatchPlacementBlueprint<THitObject> : PlacementBlueprint
+    public partial class CatchPlacementBlueprint<THitObject> : PlacementBlueprint
         where THitObject : CatchHitObject, new()
     {
         protected new THitObject HitObject => (THitObject)base.HitObject;

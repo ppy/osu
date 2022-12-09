@@ -296,6 +296,13 @@ namespace osu.Game.Scoring
                         break;
                     }
 
+                    case HitResult.LargeBonus:
+                    case HitResult.SmallBonus:
+                        if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)
+                            yield return new HitResultDisplayStatistic(r.result, value, null, r.displayName);
+
+                        break;
+
                     case HitResult.SmallTickMiss:
                     case HitResult.LargeTickMiss:
                         break;

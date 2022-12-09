@@ -23,7 +23,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
+    public partial class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
         public const float HEIGHT = MAX_HEIGHT;
 
