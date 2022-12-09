@@ -58,24 +58,21 @@ namespace osu.Game.Database
         /// <summary>
         /// Export the model to default folder.
         /// </summary>
-        /// <param name="item">The model should export.</param>
+        /// <param name="model">The model should export.</param>
         /// <returns></returns>
-        public async Task ExportAsync(RealmObject item)
+        public async Task ExportAsync(TModel model)
         {
-            if (item is TModel model)
+            notifications?.Post(notification);
+
+            string itemFilename = model.GetDisplayString().GetValidFilename();
+            IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
+            string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
+
+            notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
+
+            using (var stream = exportStorage.CreateFileSafely(filename))
             {
-                notifications?.Post(notification);
-
-                string itemFilename = item.GetDisplayString().GetValidFilename();
-                IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
-                string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
-
-                notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
-
-                using (var stream = exportStorage.CreateFileSafely(filename))
-                {
-                    await ExportToStreamAsync(model, stream);
-                }
+                await ExportToStreamAsync(model, stream);
             }
         }
 
