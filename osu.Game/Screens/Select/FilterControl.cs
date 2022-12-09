@@ -185,7 +185,8 @@ namespace osu.Game.Screens.Select
                                         DefaultStringLowerBound = "0",
                                         DefaultStringUpperBound = "∞",
                                         DefaultTooltipUpperBound = UserInterfaceStrings.NoLimit,
-                                        TooltipSuffix = "stars"
+                                        TooltipSuffix = "stars",
+                                        NubFormat = "N1"
                                     },
                                     collectionDropdown = new CollectionDropdown
                                     {

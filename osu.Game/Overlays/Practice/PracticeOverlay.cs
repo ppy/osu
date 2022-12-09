@@ -105,7 +105,8 @@ namespace osu.Game.Overlays.Practice
                             DefaultStringUpperBound = "End",
                             DefaultTooltipLowerBound = "Start of beatmap",
                             DefaultTooltipUpperBound = "End of beatmap",
-                            TooltipSuffix = "%"
+                            TooltipSuffix = "%",
+                            NubFormat = "P1"
                         },
                         RestartButton = new ShearedButton(150)
                         {

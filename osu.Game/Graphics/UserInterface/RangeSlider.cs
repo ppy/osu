@@ -87,6 +87,11 @@ namespace osu.Game.Graphics.UserInterface
             set => upperBound.TooltipSuffix = lowerBound.TooltipSuffix = value;
         }
 
+        public string NubFormat
+        {
+            set => lowerBound.NubFormat = upperBound.NubFormat = value;
+        }
+
         private float minRange = 0.1f;
 
         private readonly OsuSpriteText label;
@@ -163,6 +168,7 @@ namespace osu.Game.Graphics.UserInterface
             public string? DefaultString;
             public LocalisableString? DefaultTooltip;
             public string? TooltipSuffix;
+            public string? NubFormat;
             public float NubWidth { get; set; } = Nub.HEIGHT;
 
             public override LocalisableString TooltipText =>
@@ -193,7 +199,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 Current.BindValueChanged(current =>
                 {
-                    currentDisplay.Text = (current.NewValue != Current.Default ? current.NewValue.ToString("N1") : DefaultString) ?? current.NewValue.ToString("N1");
+                    currentDisplay.Text = (current.NewValue != Current.Default ? current.NewValue.ToString(NubFormat) : DefaultString) ?? current.NewValue.ToString(NubFormat);
                 }, true);
             }
 
