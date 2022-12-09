@@ -90,17 +90,14 @@ namespace osu.Game.Rulesets.Scoring
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
-        /// <summary>
-        /// Scoring values for a perfect play.
-        /// </summary>
-        public ScoringValues MaximumScoringValues
+        public Dictionary<HitResult, int> MaximumStatistics
         {
             get
             {
                 if (!beatmapApplied)
                     throw new InvalidOperationException($"Cannot access maximum scoring values before calling {nameof(ApplyBeatmap)}.");
 
-                return maximumScoringValues;
+                return maximumResultCounts.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
         }
 
