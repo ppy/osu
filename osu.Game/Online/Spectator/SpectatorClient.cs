@@ -174,7 +174,7 @@ namespace osu.Game.Online.Spectator
                 currentState.RulesetID = score.ScoreInfo.RulesetID;
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
                 currentState.State = SpectatedUserState.Playing;
-                currentState.MaximumScoringValues = state.ScoreProcessor.MaximumScoringValues;
+                currentState.MaximumStatistics = state.ScoreProcessor.MaximumStatistics;
 
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
