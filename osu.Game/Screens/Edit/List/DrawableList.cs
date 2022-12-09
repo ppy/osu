@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Edit.List
             {
                 T representedItem = Items[i].RepresentedItem;
 
-                Properties.SetItemDepth.Invoke(representedItem, Items.Count - i);
+                Properties.SetItemDepth.Invoke(representedItem, i);
             }
         }
 

@@ -28,6 +28,7 @@ using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.List;
 using osu.Game.Skinning.Components;
 using osuTK;
@@ -228,7 +229,7 @@ namespace osu.Game.Skinning.Editor
             LayerSidebarList.Properties.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
             LayerSidebarList.Properties.SetItemDepth = (blueprint, depth) =>
             {
-                if (blueprint.Parent is Container<Drawable> container)
+                if (blueprint.Parent is Container<SelectionBlueprint<ISkinnableDrawable>> container)
                 {
                     container.ChangeChildDepth(blueprint, depth);
                     container.Invalidate();
@@ -238,6 +239,31 @@ namespace osu.Game.Skinning.Editor
                 {
                     containerM.ChangeChildDepth((Drawable)blueprint.Item, depth);
                     containerM.Invalidate();
+                }
+            };
+            //fix https://github.com/ppy/osu/pull/21119#issuecomment-1344529992
+            //todo: find an actual solution to this
+            //todo: this fix makes the settings "fade in" every on-drag event. It looks a bit wierd.
+            LayerSidebarList.Properties.PostOnDragAction = (e) =>
+            {
+                if (content.Children.Count > 0 && content.Children[0] is BlueprintContainer<ISkinnableDrawable> container)
+                {
+                    //we need the toList here actually, so we create a copy and don't enumerate over the existing elements.
+                    var newOrderedChilden = container.SelectionBlueprints.Children.OrderBy(d => d.Depth).Reverse().ToList();
+                    var selectedChildren = newOrderedChilden.Where(t => t.State == SelectionState.Selected).ToList();
+
+                    container.SelectionBlueprints.Clear(false);
+                    container.SelectionBlueprints.AddRange(newOrderedChilden);
+
+                    //deselect already selected elements
+                    selectedChildren.ForEach(t => t.State = SelectionState.NotSelected);
+                    //select and then unselect everything once, because that apparently that updates how items are selected?
+                    newOrderedChilden.ForEach(t => t.State = SelectionState.Selected);
+                    newOrderedChilden.ForEach(t => t.State = SelectionState.NotSelected);
+                    //and this is just to restore the state before we do this dirty hack.
+                    selectedChildren.ForEach(t => t.State = SelectionState.Selected);
+                    //an invalidation doesn't help to apply?/update? the click handler.
+                    // container.Invalidate();
                 }
             };
             LayerSidebarList.Properties.OnDragAction();
