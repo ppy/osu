@@ -29,10 +29,7 @@ namespace osu.Game.Overlays.Practice
 
         protected bool BlockFail = true;
 
-        public PracticePlayer(PracticePlayerLoader loader)
-        {
-            this.loader = loader;
-        }
+        public PracticePlayer(PracticePlayerLoader loader) => this.loader = loader;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
@@ -101,11 +98,6 @@ namespace osu.Game.Overlays.Practice
 
             OnGameplayStarted += () =>
             {
-                //Todo:Find a way to make this delay not run when paused
-                DrawableRuleset.Delay(customEndTime - customStartTime).Then().Schedule(() =>
-                {
-                    /* Restart()*/
-                });
                 GameplayClockContainer.Delay(grace_period).Then().Schedule(() => BlockFail = false);
             };
         }
@@ -120,7 +112,12 @@ namespace osu.Game.Overlays.Practice
         {
             LoadComponent(PracticeOverlay = new PracticeOverlay(loader)
             {
-                Restart = () => Restart(),
+                Restart = () =>
+                {
+                    //Stops the pauseoverlay showing for a moment as we restart
+                    PauseOverlay.Expire();
+                    Restart();
+                },
                 OnShow = () =>
                 {
                     GameplayClockContainer.Hide();
@@ -139,6 +136,19 @@ namespace osu.Game.Overlays.Practice
                     PauseOverlay.Show();
                 }
             });
+        }
+
+        //Probably not ideal, but avoids issues that calculating custom end based on gameplaystart has with pausing
+        private bool isRestarting = true;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!(GameplayClockContainer.CurrentTime > customEndTime) || !isRestarting) return;
+
+            isRestarting = false;
+            Restart();
         }
 
         private void addButtons(OsuColour colour)

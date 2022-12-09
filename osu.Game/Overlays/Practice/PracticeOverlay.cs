@@ -7,8 +7,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Mods;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Practice.PracticeOverlayComponents;
@@ -119,6 +121,21 @@ namespace osu.Game.Overlays.Practice
                     }
                 }
             };
+        }
+
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (!e.Repeat)
+            {
+                switch (e.Action)
+                {
+                    case GlobalAction.Select:
+                        RestartButton.TriggerClick();
+                        return true;
+                }
+            }
+
+            return base.OnPressed(e);
         }
 
         protected override void PopOut()
