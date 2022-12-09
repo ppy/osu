@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
@@ -21,7 +20,7 @@ namespace osu.Game.Database
     /// <summary>
     /// A class which handles exporting legacy user data of a single type from osu-stable.
     /// </summary>
-    public abstract class LegacyModelExporter<TModel> : Component
+    public abstract class LegacyModelExporter<TModel>
         where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
     {
         /// <summary>
@@ -30,22 +29,23 @@ namespace osu.Game.Database
         protected abstract string FileExtension { get; }
 
         protected Storage UserFileStorage;
-        protected Storage ExportStorage;
+        private readonly Storage exportStorage;
 
         protected RealmAccess RealmAccess;
 
         private readonly ProgressNotification notification;
 
-        private string filename = "";
-
         private bool canCancel = true;
+
+        private readonly INotificationOverlay? notifications;
 
         protected LegacyModelExporter(Storage storage, RealmAccess realm, INotificationOverlay? notifications = null)
         {
-            ExportStorage = storage.GetStorageForDirectory(@"exports");
+            exportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
             RealmAccess = realm;
 
+            this.notifications = notifications;
             notification = new ProgressNotification
             {
                 State = ProgressNotificationState.Active,
@@ -53,8 +53,6 @@ namespace osu.Game.Database
                 CompletionText = "Export completed"
             };
             notification.CancelRequested += () => canCancel;
-
-            notifications?.Post(notification);
         }
 
         /// <summary>
@@ -66,13 +64,15 @@ namespace osu.Game.Database
         {
             if (item is TModel model)
             {
+                notifications?.Post(notification);
+
                 string itemFilename = item.GetDisplayString().GetValidFilename();
-
-                IEnumerable<string> existingExports = ExportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
-
+                IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
                 string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
 
-                using (var stream = ExportStorage.CreateFileSafely(filename))
+                notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
+
+                using (var stream = exportStorage.CreateFileSafely(filename))
                 {
                     await ExportToStreamAsync(model, stream);
                 }
@@ -138,7 +138,6 @@ namespace osu.Game.Database
             }
 
             notification.CompletionText = "Export Complete, Click to open the folder";
-            notification.CompletionClickAction += () => ExportStorage.PresentFileExternally(filename);
             notification.State = ProgressNotificationState.Completed;
         }
     }
