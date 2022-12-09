@@ -124,11 +124,18 @@ namespace osu.Game.Overlays.Practice
                 OnShow = () =>
                 {
                     GameplayClockContainer.Hide();
-                    PauseOverlay.Hide();
                 },
                 OnHide = () =>
                 {
                     GameplayClockContainer.Show();
+
+                    // We don't want the pause overlay triggering on exit if the player is not alive
+                    if (GameplayState.HasFailed)
+                    {
+                        FailOverlay.Show();
+                        return;
+                    }
+
                     PauseOverlay.Show();
                 }
             });
