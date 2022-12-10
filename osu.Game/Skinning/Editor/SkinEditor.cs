@@ -244,7 +244,7 @@ namespace osu.Game.Skinning.Editor
             //fix https://github.com/ppy/osu/pull/21119#issuecomment-1344529992
             //todo: find an actual solution to this
             //todo: this fix makes the settings "fade in" every on-drag event. It looks a bit wierd.
-            LayerSidebarList.Properties.PostOnDragAction = (e) =>
+            LayerSidebarList.Properties.PostOnDragAction = _ =>
             {
                 if (content.Children.Count > 0 && content.Children[0] is BlueprintContainer<ISkinnableDrawable> container)
                 {
