@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     if (DrawableList.Items[i - 1].RepresentedItem.Item is Drawable drawable1
                         && DrawableList.Items[i].RepresentedItem.Item is Drawable drawable2
-                        && drawable1.Depth < drawable2.Depth) return false;
+                        && drawable1.Depth > drawable2.Depth) return false;
                 }
 
                 return true;
