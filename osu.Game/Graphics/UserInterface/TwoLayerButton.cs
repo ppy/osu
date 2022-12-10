@@ -30,8 +30,7 @@ namespace osu.Game.Graphics.UserInterface
         public Box TextLayer;
 
         private const int transform_time = 600;
-        private const int pulse_length = 250;
-
+        
         private const float shear_width = 5f;
 
         private static readonly Vector2 shear = new Vector2(shear_width / Footer.HEIGHT, 0);
