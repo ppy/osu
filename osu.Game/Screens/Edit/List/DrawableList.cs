@@ -164,6 +164,10 @@ namespace osu.Game.Screens.Edit.List
         /// </summary>
         protected virtual void OnItemsChanged()
         {
+            if (Items.Count <= 0) return;
+
+            Properties.OnDragAction();
+            Properties.PostOnDragAction(ItemMap[Items[0]]);
         }
 
         private void collectionChanged(object sender, NotifyCollectionChangedEventArgs e)
