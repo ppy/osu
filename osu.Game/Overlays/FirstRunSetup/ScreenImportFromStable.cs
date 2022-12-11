@@ -16,12 +16,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Screens.Edit.Setup;
 using osuTK;
 
@@ -41,7 +43,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private StableLocatorLabelledTextBox stableLocatorTextBox = null!;
 
-        private OsuTextFlowContainer copyInformation = null!;
+        private LinkFlowContainer copyInformation = null!;
 
         private IEnumerable<ImportCheckbox> contentCheckboxes => Content.Children.OfType<ImportCheckbox>();
 
@@ -50,7 +52,7 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             Content.Children = new Drawable[]
             {
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
+                new LinkFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunOverlayImportFromStableScreenStrings.Description,
@@ -66,7 +68,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new ImportCheckbox(CommonStrings.Scores, StableContent.Scores),
                 new ImportCheckbox(CommonStrings.Skins, StableContent.Skins),
                 new ImportCheckbox(CommonStrings.Collections, StableContent.Collections),
-                copyInformation = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
+                copyInformation = new LinkFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     RelativeSizeAxes = Axes.X,
@@ -92,6 +94,9 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             stableLocatorTextBox.Current.BindValueChanged(_ => updateStablePath(), true);
         }
+
+        [Resolved(canBeNull: true)]
+        private OsuGame? game { get; set; }
 
         private void updateStablePath()
         {
@@ -124,11 +129,15 @@ namespace osu.Game.Overlays.FirstRunSetup
                 copyInformation.Text = "Data migration will use \"hard links\". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation.";
             }
             else if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
-                copyInformation.Text = "Hard links are not supported on this operating system, so a copy of all files will be made during import.";
+                copyInformation.Text = "Lightweight linking of files are not supported on your operating system yet, so a copy of all files will be made during import.";
             else
             {
                 copyInformation.Text =
-                    "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install and the file system is NTFS.";
+                    "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system is NTFS). ";
+                copyInformation.AddLink(GeneralSettingsStrings.ChangeFolderLocation, () =>
+                {
+                    game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()));
+                });
             }
         }
 
