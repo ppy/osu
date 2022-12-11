@@ -9,8 +9,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD.JudgementCounter
 {
@@ -22,14 +22,14 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         public List<JudgementCounterInfo> Results = new List<JudgementCounterInfo>();
 
         [BackgroundDependencyLoader]
-        private void load(DrawableRuleset ruleset)
+        private void load(IBindable<WorkingBeatmap> working)
         {
-            foreach (var result in ruleset.Ruleset.GetHitResults())
+            foreach (var result in working.Value.BeatmapInfo.Ruleset.CreateInstance().GetHitResults())
             {
                 Results.Add(new JudgementCounterInfo
                 {
                     ResultInfo = (result.result, result.displayName),
-                    ResultCount = new BindableInt(),
+                    ResultCount = new BindableInt()
                 });
             }
         }
