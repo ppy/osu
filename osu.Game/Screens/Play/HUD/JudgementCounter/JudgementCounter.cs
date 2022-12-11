@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             Result = result;
         }
 
-        private OsuSpriteText resultName = null!;
+        public OsuSpriteText ResultName = null!;
         private FillFlowContainer flowContainer = null!;
         private JudgementRollingCounter counter = null!;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                     {
                         Current = Result.ResultCount
                     },
-                    resultName = new OsuSpriteText
+                    ResultName = new OsuSpriteText
                     {
                         Font = OsuFont.Numeric.With(size: 8),
                         Text = Result.ResultInfo.Displayname
@@ -72,11 +72,11 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             {
                 if (value.NewValue)
                 {
-                    resultName.Show();
+                    ResultName.Show();
                     return;
                 }
 
-                resultName.Hide();
+                ResultName.Hide();
             }, true);
 
             Direction.BindValueChanged(direction =>
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
                 changeAnchor(Anchor.BottomLeft);
 
-                void changeAnchor(Anchor anchor) => counter.Anchor = resultName.Anchor = counter.Origin = resultName.Origin = anchor;
+                void changeAnchor(Anchor anchor) => counter.Anchor = ResultName.Anchor = counter.Origin = ResultName.Origin = anchor;
             }, true);
 
             base.LoadComplete();
