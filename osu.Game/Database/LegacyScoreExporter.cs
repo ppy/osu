@@ -5,21 +5,21 @@ using System.IO;
 using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
-using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 
 namespace osu.Game.Database
 {
     public class LegacyScoreExporter : LegacyModelExporter<ScoreInfo>
     {
-        public LegacyScoreExporter(Storage storage, RealmAccess realm, INotificationOverlay? notifications = null)
-            : base(storage, realm, notifications)
+        public LegacyScoreExporter(Storage storage, RealmAccess realm)
+            : base(storage, realm)
         {
         }
 
         protected override string FileExtension => ".osr";
 
-        protected override void ExportToStream(ScoreInfo model, Stream stream)
+        protected override void ExportToStream(ScoreInfo model, Stream stream, ProgressNotification notification)
         {
             var file = model.Files.SingleOrDefault();
             if (file == null)

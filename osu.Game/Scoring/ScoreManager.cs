@@ -27,6 +27,7 @@ namespace osu.Game.Scoring
     {
         private readonly OsuConfigManager configManager;
         private readonly ScoreImporter scoreImporter;
+        private readonly LegacyScoreExporter scoreExporter;
 
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, IAPIProvider api,
                             OsuConfigManager configManager = null)
@@ -35,6 +36,11 @@ namespace osu.Game.Scoring
             this.configManager = configManager;
 
             scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm, api)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
+
+            scoreExporter = new LegacyScoreExporter(storage, realm)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
@@ -176,6 +182,8 @@ namespace osu.Game.Scoring
         public IEnumerable<string> HandledExtensions => scoreImporter.HandledExtensions;
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreImporter.Import(notification, tasks);
+
+        public void Export(ScoreInfo score) => Task.Run(() => scoreExporter.ExportAsync(score));
 
         public Task<Live<ScoreInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
 

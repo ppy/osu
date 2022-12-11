@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -18,7 +17,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -34,7 +32,6 @@ using osuTK.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Utils;
-using osu.Framework.Platform;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -73,17 +70,10 @@ namespace osu.Game.Online.Leaderboards
         [Resolved(canBeNull: true)]
         private SongSelect songSelect { get; set; }
 
-        [Resolved]
-        private Storage storage { get; set; }
-
-        [Resolved]
-        private RealmAccess realm { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private INotificationOverlay notifications { get; set; }
-
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
         public virtual ScoreInfo TooltipContent => Score;
+
+        private ScoreManager scoreManager = null!;
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true)
         {
@@ -102,6 +92,8 @@ namespace osu.Game.Online.Leaderboards
             var user = Score.User;
 
             statisticsLabels = GetStatistics(Score).Select(s => new ScoreComponentLabel(s)).ToList();
+
+            this.scoreManager = scoreManager;
 
             ClickableAvatar innerAvatar;
 
@@ -434,7 +426,7 @@ namespace osu.Game.Online.Leaderboards
 
                 if (Score.Files.Count > 0)
                 {
-                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => Task.Run(() => new LegacyScoreExporter(storage, realm, notifications).ExportAsync(Score))));
+                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(Score)));
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
                 }
 

@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
 using Realms;
@@ -33,26 +32,16 @@ namespace osu.Game.Database
 
         protected RealmAccess RealmAccess;
 
-        private readonly ProgressNotification notification;
-
         private bool canCancel = true;
 
-        private readonly INotificationOverlay? notifications;
+        private string filename = string.Empty;
+        public Action<Notification>? PostNotification { get; set; }
 
-        protected LegacyModelExporter(Storage storage, RealmAccess realm, INotificationOverlay? notifications = null)
+        protected LegacyModelExporter(Storage storage, RealmAccess realm)
         {
             exportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
             RealmAccess = realm;
-
-            this.notifications = notifications;
-            notification = new ProgressNotification
-            {
-                State = ProgressNotificationState.Active,
-                Text = "Exporting...",
-                CompletionText = "Export completed"
-            };
-            notification.CancelRequested += () => canCancel;
         }
 
         /// <summary>
@@ -62,13 +51,9 @@ namespace osu.Game.Database
         /// <returns></returns>
         public async Task ExportAsync(TModel model)
         {
-            notifications?.Post(notification);
-
             string itemFilename = model.GetDisplayString().GetValidFilename();
             IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
-            string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
-
-            notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
+            filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
 
             using (var stream = exportStorage.CreateFileSafely(filename))
             {
@@ -77,22 +62,50 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Export te model corresponding to model to given stream.
+        /// Export model to stream.
         /// </summary>
         /// <param name="model">The medel which have <see cref="IHasGuidPrimaryKey"/>.</param>
         /// <param name="stream">The stream to export.</param>
         /// <returns></returns>
         public async Task ExportToStreamAsync(TModel model, Stream stream)
         {
+            ProgressNotification notification = new ProgressNotification
+            {
+                State = ProgressNotificationState.Active,
+                Text = "Exporting...",
+                CompletionText = "Export completed"
+            };
+            notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
+            notification.CancelRequested += () => canCancel;
+            PostNotification?.Invoke(notification);
+            canCancel = true;
+
             Guid id = model.ID;
             await Task.Run(() =>
             {
                 RealmAccess.Run(r =>
                 {
                     TModel refetchModel = r.Find<TModel>(id);
-                    ExportToStream(refetchModel, stream);
+                    ExportToStream(refetchModel, stream, notification);
                 });
-            }).ContinueWith(onComplete);
+            }).ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    notification.State = ProgressNotificationState.Cancelled;
+                    Logger.Error(t.Exception, "An error occurred while exporting");
+
+                    return;
+                }
+
+                if (notification.CancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                notification.CompletionText = "Export Complete, Click to open the folder";
+                notification.State = ProgressNotificationState.Completed;
+            });
         }
 
         /// <summary>
@@ -101,14 +114,16 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The item to export.</param>
         /// <param name="outputStream">The output stream to export to.</param>
-        protected virtual void ExportToStream(TModel model, Stream outputStream) => exportZipArchive(model, outputStream);
+        /// <param name="notification">The notification will displayed to the user</param>
+        protected virtual void ExportToStream(TModel model, Stream outputStream, ProgressNotification notification) => exportZipArchive(model, outputStream, notification);
 
         /// <summary>
         /// Exports an item to Stream as a legacy (.zip based) package.
         /// </summary>
         /// <param name="model">The item to export.</param>
         /// <param name="outputStream">The output stream to export to.</param>
-        private void exportZipArchive(TModel model, Stream outputStream)
+        /// <param name="notification">The notification will displayed to the user</param>
+        private void exportZipArchive(TModel model, Stream outputStream, ProgressNotification notification)
         {
             using (var archive = ZipArchive.Create())
             {
@@ -128,25 +143,6 @@ namespace osu.Game.Database
                 canCancel = false;
                 archive.SaveTo(outputStream);
             }
-        }
-
-        private void onComplete(Task t)
-        {
-            if (t.IsFaulted)
-            {
-                notification.State = ProgressNotificationState.Cancelled;
-                Logger.Error(t.Exception, "An error occurred while exporting");
-
-                return;
-            }
-
-            if (notification.CancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-
-            notification.CompletionText = "Export Complete, Click to open the folder";
-            notification.State = ProgressNotificationState.Completed;
         }
     }
 }

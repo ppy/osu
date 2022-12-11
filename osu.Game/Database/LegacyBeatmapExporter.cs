@@ -3,14 +3,13 @@
 
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays;
 
 namespace osu.Game.Database
 {
     public class LegacyBeatmapExporter : LegacyModelExporter<BeatmapSetInfo>
     {
-        public LegacyBeatmapExporter(Storage storage, RealmAccess realm, INotificationOverlay? notifications = null)
-            : base(storage, realm, notifications)
+        public LegacyBeatmapExporter(Storage storage, RealmAccess realm)
+            : base(storage, realm)
         {
         }
 
