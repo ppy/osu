@@ -44,7 +44,7 @@ namespace osu.Game.Skinning.Components
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
-        private ModSettingChangeTracker modSettingChangeTracker = null!;
+        private ModSettingChangeTracker? modSettingChangeTracker;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -110,9 +110,6 @@ namespace osu.Game.Skinning.Components
             });
             mods.BindValueChanged(_ =>
             {
-                //for the very first time this is called it actually can be null.
-                //My annotations just do not account for that.
-                //ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
                 modSettingChangeTracker?.Dispose();
                 Action modsSettingsChangedAction = () =>
                 {
@@ -231,6 +228,7 @@ namespace osu.Game.Skinning.Components
         {
             base.Dispose(isDisposing);
             starDifficultyCancellationSource?.Cancel();
+            modSettingChangeTracker?.Dispose();
         }
     }
 
