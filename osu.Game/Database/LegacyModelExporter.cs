@@ -92,7 +92,7 @@ namespace osu.Game.Database
                     TModel refetchModel = r.Find<TModel>(id);
                     ExportToStream(refetchModel, stream);
                 });
-            }).ContinueWith(OnComplete);
+            }).ContinueWith(onComplete);
         }
 
         protected virtual void ExportToStream(TModel model, Stream outputStream) => createZipArchive(model, outputStream);
@@ -119,7 +119,7 @@ namespace osu.Game.Database
             }
         }
 
-        protected void OnComplete(Task t)
+        private void onComplete(Task t)
         {
             if (t.IsFaulted)
             {
