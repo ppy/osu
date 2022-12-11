@@ -24,6 +24,7 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osu.Game.Skinning;
 using osuTK;
+using JudgementTally = osu.Game.Screens.Play.HUD.JudgementCounter.JudgementTally;
 
 namespace osu.Game.Screens.Play
 {
@@ -57,6 +58,9 @@ namespace osu.Game.Screens.Play
 
         [Cached]
         private readonly ClicksPerSecondCalculator clicksPerSecondCalculator;
+
+        [Cached]
+        private readonly JudgementTally tally;
 
         public Bindable<bool> ShowHealthBar = new Bindable<bool>(true);
 
@@ -146,6 +150,7 @@ namespace osu.Game.Screens.Play
                     Spacing = new Vector2(5)
                 },
                 clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
+                tally = new JudgementTally()
             };
 
             hideTargets = new List<Drawable> { mainComponents, KeyCounter, topRightElements };
