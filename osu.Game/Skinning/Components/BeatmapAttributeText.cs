@@ -156,7 +156,7 @@ namespace osu.Game.Skinning.Components
         private void updateStarRating()
         {
             //set implicit default, whilst calculating beatmap difficulty.
-            valueDictionary[BeatmapAttribute.StarRating] = workingBeatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2");0
+            valueDictionary[BeatmapAttribute.StarRating] = workingBeatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
 
             starDifficultyCancellationSource?.Cancel();
             starDifficultyCancellationSource = new CancellationTokenSource();
