@@ -33,14 +33,10 @@ namespace osu.Game.Screens.Select
 
         private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
 
-        [Resolved(CanBeNull = true)]
-        private BeatmapSetOverlay? beatmapOverlay { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
-            BeatmapOptions.AddButton(@"View", @"details", FontAwesome.Solid.Bars, colours.Blue, () => beatmapOverlay?.FetchAndShowBeatmap(Beatmap.Value.BeatmapInfo.OnlineID));
+            BeatmapOptions.InsertButton(1, @"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
         }
 
         protected void PresentScore(ScoreInfo score) =>

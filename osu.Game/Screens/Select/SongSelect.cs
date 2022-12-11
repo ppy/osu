@@ -127,6 +127,9 @@ namespace osu.Game.Screens.Select
         [Resolved(CanBeNull = true)]
         internal IOverlayManager OverlayManager { get; private set; }
 
+        [Resolved(CanBeNull = true)]
+        private BeatmapSetOverlay beatmapOverlay { get; set; }
+
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)
         {
@@ -290,6 +293,7 @@ namespace osu.Game.Screens.Select
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
                 BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
+                BeatmapOptions.InsertButton(2, @"View", @"details", FontAwesome.Solid.Bars, colours.Blue, () => beatmapOverlay?.FetchAndShowBeatmap(Beatmap.Value.BeatmapInfo.OnlineID));
             }
 
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
