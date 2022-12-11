@@ -205,7 +205,9 @@ namespace osu.Game.Overlays
 
             protected override UserTrackingScrollContainer CreateScrollContainer() => new OverlayScrollContainer();
 
-            protected override FlowContainer<ProfileSection> CreateScrollContentContainer() => new FillFlowContainer<ProfileSection>
+            // Reverse child ID is required so expanding beatmap panels can appear above sections below them.
+            // This can also be done by setting Depth when adding new sections above if using ReverseChildID turns out to have any issues.
+            protected override FlowContainer<ProfileSection> CreateScrollContentContainer() => new ReverseChildIDFillFlowContainer<ProfileSection>
             {
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
