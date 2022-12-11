@@ -95,6 +95,12 @@ namespace osu.Game.Database
             }).ContinueWith(onComplete);
         }
 
+        /// <summary>
+        /// Exports an item to Stream.
+        /// Override if custom export method is required.
+        /// </summary>
+        /// <param name="model">The item to export.</param>
+        /// <param name="outputStream">The output stream to export to.</param>
         protected virtual void ExportToStream(TModel model, Stream outputStream) => exportZipArchive(model, outputStream);
 
         /// <summary>
