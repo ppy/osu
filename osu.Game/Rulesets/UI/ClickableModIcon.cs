@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// Display the specified mod at a fixed size.
     /// </summary>
-    public class ClickableModIcon : ModIcon
+    public partial class ClickableModIcon : ModIcon
     {
         private readonly Action action;
 

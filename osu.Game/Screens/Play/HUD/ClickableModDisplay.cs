@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// Displays a single-line horizontal auto-sized flow of mods. For cases where wrapping is required, use <see cref="ModFlowDisplay"/> instead.
     /// </summary>
-    public class ClickableModDisplay : ModDisplay
+    public partial class ClickableModDisplay : ModDisplay
     {
         private readonly Bindable<bool> replayLoaded = new Bindable<bool>();
 
