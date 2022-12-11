@@ -102,9 +102,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestHideJudgementNames()
+        public void TestToggleJudgementNames()
         {
             AddStep("Hide judgement names", () => counter.ShowName.Value = false);
+            AddAssert("Assert hidden", () => counter.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 0);
+            AddStep("Hide judgement names", () => counter.ShowName.Value = true);
+            AddAssert("Assert shown", () => counter.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 1);
         }
 
         [Test]
