@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
-        public double StrainTime;
+        public readonly double StrainTime;
 
         /// <summary>
         /// Normalised distance from the "lazy" end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
@@ -81,6 +81,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double? Angle { get; private set; }
 
         /// <summary>
+        /// The duration of the spinner associated with this <see cref="OsuDifficultyHitObject"/> for <see cref="Spinner"/> objects, accounted for clockrate.
+        /// </summary>
+        public double? SpinnerDuration { get; private set; }
+
+        /// <summary>
         /// Retrieves the full hit window for a Great <see cref="HitResult"/>.
         /// </summary>
         public double HitWindowGreat { get; private set; }
@@ -105,6 +110,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 HitWindowGreat = 2 * BaseObject.HitWindows.WindowFor(HitResult.Great) / clockRate;
             }
+
+            if (BaseObject is Spinner spinner)
+                SpinnerDuration = spinner.Duration / clockRate;
 
             setDistances(clockRate);
         }
@@ -162,13 +170,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
-
-            if (lastObject is Spinner spinner)
-            {
-                LazyJumpDistance = (BaseObject.StackedPosition * scalingFactor - lastObject.StackedPosition * scalingFactor).Length;
-                StrainTime -= spinner.Duration / clockRate;
-                return;
-            }
 
             LazyJumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
             MinimumJumpTime = StrainTime;

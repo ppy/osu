@@ -49,6 +49,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
             }
+            // ... unless the last object is the spinner, in which case we take the velocity of the jump from the previous spinner.
+            else if (osuLastObj.SpinnerDuration.HasValue)
+                currVelocity = osuCurrObj.LazyJumpDistance / Math.Max(osuCurrObj.StrainTime - osuLastObj.SpinnerDuration.Value, 25);
 
             // As above, do the same for the previous hitobject.
             double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
