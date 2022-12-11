@@ -412,7 +412,7 @@ namespace osu.Game.Screens.Select
                 if (beatmap == null || bpmLabelContainer == null)
                     return;
 
-                var (bpmMax, mostCommonBPM, bpmMin, _) = beatmap.GetBPMAndLength(mods.Value.OfType<IApplicableToRate>());
+                var (bpmMin, mostCommonBPM, bpmMax, _) = beatmap.GetBPMAndLength(mods.Value.OfType<IApplicableToRate>());
 
                 string labelText = bpmMin == bpmMax
                     ? $"{bpmMin}"

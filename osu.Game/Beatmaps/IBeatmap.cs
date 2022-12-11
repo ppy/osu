@@ -132,9 +132,9 @@ namespace osu.Game.Beatmaps
             foreach (var mod in mods)
                 rate = mod.ApplyToRate(time, rate);
 
-            int bpmMin = (int)Math.Round(beatmap.ControlPointInfo.BPMMinimum * rate);
+            int bpmMin = (int)Math.Round(Math.Round(beatmap.ControlPointInfo.BPMMinimum) * rate);
             int bpmAverage = (int)Math.Round(60000 / beatmap.GetMostCommonBeatLength() * rate);
-            int bpmMax = (int)Math.Round(beatmap.ControlPointInfo.BPMMaximum * rate);
+            int bpmMax = (int)Math.Round(Math.Round(beatmap.ControlPointInfo.BPMMaximum) * rate);
             double length = beatmap.BeatmapInfo.Length / rate;
 
             return (bpmMin, bpmAverage, bpmMax, length);
