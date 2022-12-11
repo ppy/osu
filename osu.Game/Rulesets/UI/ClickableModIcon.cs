@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     public partial class ClickableModIcon : ModIcon
     {
-        private readonly Action action;
+        private readonly Action? action;
 
         private readonly Bindable<bool> replayLoaded = new Bindable<bool>();
 
@@ -30,22 +30,29 @@ namespace osu.Game.Rulesets.UI
         {
             this.replayLoaded.BindTo(replayLoaded);
 
-            action = () =>
+            if (mod is ICanBeToggledDuringReplay dmod)
             {
-                if (!replayLoaded.Value) return;
-
-                if (mod is ICanBeToggledDuringReplay dmod)
+                dmod.IsDisabled.BindValueChanged(s =>
                 {
-                    dmod.IsDisabled.Toggle();
+                    Colour = s.NewValue ? OsuColour.Gray(0.7f) : Colour = Color4.White;
+                });
 
-                    Colour = dmod.IsDisabled.Value ? OsuColour.Gray(0.7f) : Colour = Color4.White;
-                }
-            };
+                action = () =>
+                {
+                    if (!replayLoaded.Value) return;
+
+                    dmod.IsDisabled.Toggle();
+                };
+            }
+            else
+            {
+                action = null;
+            }
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            action.Invoke();
+            action?.Invoke();
             return true;
         }
     }
