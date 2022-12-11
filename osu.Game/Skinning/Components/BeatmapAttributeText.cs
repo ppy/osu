@@ -155,6 +155,9 @@ namespace osu.Game.Skinning.Components
 
         private void updateStarRating()
         {
+            //set implicit default, whilst calculating beatmap difficulty.
+            valueDictionary[BeatmapAttribute.StarRating] = workingBeatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2");0
+
             starDifficultyCancellationSource?.Cancel();
             starDifficultyCancellationSource = new CancellationTokenSource();
 
@@ -164,7 +167,9 @@ namespace osu.Game.Skinning.Components
             starDifficultyTask.ContinueWith(_ => Schedule(() =>
             {
                 starRating = starDifficultyTask.GetResultSafely();
-                valueDictionary[BeatmapAttribute.StarRating] = (starRating?.Stars ?? -1).ToLocalisableString(@"F2");
+
+                double? stars = starRating?.Stars;
+                if (stars is not null) valueDictionary[BeatmapAttribute.StarRating] = stars.ToLocalisableString(@"F2");
                 updateLabel();
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
