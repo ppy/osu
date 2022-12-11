@@ -4,6 +4,7 @@
     <SupportedOSPlatformVersion>13.4</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
     <MtouchUseLlvm>false</MtouchUseLlvm> <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
+    <UseMauiEssentials>true</UseMauiEssentials>
   </PropertyGroup>
   <Import Project="..\osu.iOS.props" />
   <ItemGroup>
@@ -12,8 +13,5 @@
     <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
   </ItemGroup>
 </Project>

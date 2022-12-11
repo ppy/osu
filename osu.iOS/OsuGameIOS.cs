@@ -5,6 +5,7 @@
 
 using System;
 using Foundation;
+using Microsoft.Maui.Devices;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Handlers;
 using osu.Framework.iOS.Input;
@@ -12,7 +13,6 @@ using osu.Game;
 using osu.Game.Overlays.Settings;
 using osu.Game.Updater;
 using osu.Game.Utils;
-using Xamarin.Essentials;
 
 namespace osu.iOS
 {
