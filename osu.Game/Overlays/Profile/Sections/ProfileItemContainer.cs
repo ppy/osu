@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class ProfileItemContainer : Container
+    public partial class ProfileItemContainer : Container
     {
         private const int hover_duration = 200;
 

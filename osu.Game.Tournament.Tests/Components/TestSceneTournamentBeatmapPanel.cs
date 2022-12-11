@@ -14,7 +14,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneTournamentBeatmapPanel : TournamentTestScene
+    public partial class TestSceneTournamentBeatmapPanel : TournamentTestScene
     {
         /// <remarks>
         /// Warning: the below API instance is actually the online API, rather than the dummy API provided by the test.

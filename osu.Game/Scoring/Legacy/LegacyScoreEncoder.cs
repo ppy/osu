@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
+using osu.Game.IO.Serialization;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
@@ -24,7 +25,7 @@ namespace osu.Game.Scoring.Legacy
         /// Database version in stable-compatible YYYYMMDD format.
         /// Should be incremented if any changes are made to the format/usage.
         /// </summary>
-        public const int LATEST_VERSION = FIRST_LAZER_VERSION;
+        public const int LATEST_VERSION = 30000001;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
@@ -77,6 +78,7 @@ namespace osu.Game.Scoring.Legacy
                 sw.WriteByteArray(createReplayData());
                 sw.Write((long)0);
                 writeModSpecificData(score.ScoreInfo, sw);
+                sw.WriteByteArray(createScoreInfoData());
             }
         }
 
@@ -84,9 +86,13 @@ namespace osu.Game.Scoring.Legacy
         {
         }
 
-        private byte[] createReplayData()
+        private byte[] createReplayData() => compress(replayStringContent);
+
+        private byte[] createScoreInfoData() => compress(LegacyReplaySoloScoreInfo.FromScore(score.ScoreInfo).Serialize());
+
+        private byte[] compress(string data)
         {
-            byte[] content = new ASCIIEncoding().GetBytes(replayStringContent);
+            byte[] content = new ASCIIEncoding().GetBytes(data);
 
             using (var outStream = new MemoryStream())
             {

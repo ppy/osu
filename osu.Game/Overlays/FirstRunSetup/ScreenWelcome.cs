@@ -18,15 +18,16 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Settings;
 using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(FirstRunSetupOverlayStrings), nameof(FirstRunSetupOverlayStrings.WelcomeTitle))]
-    public class ScreenWelcome : FirstRunSetupScreen
+    public partial class ScreenWelcome : FirstRunSetupScreen
     {
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(FrameworkConfigManager frameworkConfig)
         {
             Content.Children = new Drawable[]
             {
@@ -52,6 +53,11 @@ namespace osu.Game.Overlays.FirstRunSetup
                         },
                     }
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = GeneralSettingsStrings.PreferOriginalMetadataLanguage,
+                    Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode)
+                },
                 new LanguageSelectionFlow
                 {
                     RelativeSizeAxes = Axes.X,
@@ -60,7 +66,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             };
         }
 
-        private class LanguageSelectionFlow : FillFlowContainer
+        private partial class LanguageSelectionFlow : FillFlowContainer
         {
             private Bindable<string> frameworkLocale = null!;
             private IBindable<LocalisationParameters> localisationParameters = null!;
@@ -101,7 +107,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     c.Selected = c.Language == language;
             }
 
-            private class LanguageButton : OsuClickableContainer
+            private partial class LanguageButton : OsuClickableContainer
             {
                 public readonly Language Language;
 

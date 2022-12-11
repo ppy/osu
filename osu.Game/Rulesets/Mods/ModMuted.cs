@@ -37,6 +37,9 @@ namespace osu.Game.Rulesets.Mods
 
         public BindableBool IsDisabled { get; } = new BindableBool();
 
+        [SettingSource("Start muted", "Increase volume as combo builds.")]
+        public BindableBool InverseMuting { get; } = new BindableBool();
+
         [SettingSource("Enable metronome", "Add a metronome beat to help you keep track of the rhythm.")]
         public BindableBool EnableMetronome { get; } = new BindableBool(true);
 
@@ -46,9 +49,6 @@ namespace osu.Game.Rulesets.Mods
             MinValue = 0,
             MaxValue = 500,
         };
-
-        [SettingSource("Start muted", "Increase volume as combo builds.")]
-        public BindableBool InverseMuting { get; } = new BindableBool();
 
         [SettingSource("Mute hit sounds", "Hit sounds are also muted alongside the track.")]
         public BindableBool AffectsHitSounds { get; } = new BindableBool(true);
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Mods
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 
-    public class MuteComboSlider : OsuSliderBar<int>
+    public partial class MuteComboSlider : OsuSliderBar<int>
     {
         public override LocalisableString TooltipText => Current.Value == 0 ? "always muted" : base.TooltipText;
     }

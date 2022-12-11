@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<linker>
+    <assembly fullname="mscorlib">
+        <!-- see https://github.com/ppy/osu/issues/21516 -->
+        <type fullname="System.Globalization.*Calendar"/>
+    </assembly>
+</linker>

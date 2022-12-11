@@ -21,7 +21,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableSwell : DrawableTaikoHitObject<Swell>
+    public partial class DrawableSwell : DrawableTaikoHitObject<Swell>
     {
         private const float target_ring_thick_border = 1.4f;
         private const float target_ring_thin_border = 1f;

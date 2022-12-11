@@ -12,6 +12,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -25,7 +26,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// <summary>
     /// The component that displays the player's accuracy on the results screen.
     /// </summary>
-    public class AccuracyCircle : CompositeDrawable
+    public partial class AccuracyCircle : CompositeDrawable
     {
         /// <summary>
         /// Duration for the transforms causing this component to appear.
@@ -79,8 +80,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
         private readonly ScoreInfo score;
 
-        private SmoothCircularProgress accuracyCircle;
-        private SmoothCircularProgress innerMask;
+        private CircularProgress accuracyCircle;
+        private CircularProgress innerMask;
         private Container<RankBadge> badges;
         private RankText rankText;
 
@@ -109,7 +110,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         {
             InternalChildren = new Drawable[]
             {
-                new SmoothCircularProgress
+                new CircularProgress
                 {
                     Name = "Background circle",
                     Anchor = Anchor.Centre,
@@ -120,7 +121,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     InnerRadius = accuracy_circle_radius + 0.01f, // Extends a little bit into the circle
                     Current = { Value = 1 },
                 },
-                accuracyCircle = new SmoothCircularProgress
+                accuracyCircle = new CircularProgress
                 {
                     Name = "Accuracy circle",
                     Anchor = Anchor.Centre,
@@ -139,42 +140,42 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Padding = new MarginPadding(2),
                     Children = new Drawable[]
                     {
-                        new SmoothCircularProgress
+                        new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.X),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = 1 }
                         },
-                        new SmoothCircularProgress
+                        new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.S),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = 1 - virtual_ss_percentage }
                         },
-                        new SmoothCircularProgress
+                        new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.A),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = 0.95f }
                         },
-                        new SmoothCircularProgress
+                        new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.B),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = 0.9f }
                         },
-                        new SmoothCircularProgress
+                        new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.C),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = 0.8f }
                         },
-                        new SmoothCircularProgress
+                        new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.D),
@@ -195,14 +196,14 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             Blending = new BlendingParameters
                             {
                                 Source = BlendingType.DstColor,
-                                Destination = BlendingType.OneMinusSrcAlpha,
+                                Destination = BlendingType.OneMinusSrcColor,
                                 SourceAlpha = BlendingType.One,
                                 DestinationAlpha = BlendingType.SrcAlpha
                             },
-                            Child = innerMask = new SmoothCircularProgress
+                            Child = innerMask = new CircularProgress
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                InnerRadius = RANK_CIRCLE_RADIUS - 0.01f,
+                                InnerRadius = RANK_CIRCLE_RADIUS - 0.02f,
                             }
                         }
                     }

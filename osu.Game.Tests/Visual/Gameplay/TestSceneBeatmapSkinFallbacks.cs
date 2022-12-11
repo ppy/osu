@@ -26,7 +26,7 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneBeatmapSkinFallbacks : OsuPlayerTestScene
+    public partial class TestSceneBeatmapSkinFallbacks : OsuPlayerTestScene
     {
         private ISkin currentBeatmapSkin;
 

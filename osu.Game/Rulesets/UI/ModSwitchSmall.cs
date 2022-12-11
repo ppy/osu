@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.UI
 {
-    public class ModSwitchSmall : CompositeDrawable
+    public partial class ModSwitchSmall : CompositeDrawable
     {
         public BindableBool Active { get; } = new BindableBool();
 

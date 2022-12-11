@@ -27,7 +27,7 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinEditorSceneLibrary : CompositeDrawable
+    public partial class SkinEditorSceneLibrary : CompositeDrawable
     {
         public const float HEIGHT = BUTTON_HEIGHT + padding * 2;
 
@@ -120,7 +120,7 @@ namespace osu.Game.Skinning.Editor
             };
         }
 
-        public class SceneButton : OsuButton
+        public partial class SceneButton : OsuButton
         {
             public SceneButton()
             {

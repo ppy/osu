@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.Containers
     ///
     /// This container will also trigger beat events when the beat matching clock is paused at <see cref="TimingControlPoint.DEFAULT"/>'s BPM.
     /// </remarks>
-    public class BeatSyncedContainer : Container
+    public partial class BeatSyncedContainer : Container
     {
         private int lastBeat;
 

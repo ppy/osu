@@ -9,7 +9,7 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TournamentTestBrowser : TournamentGameBase
+    public partial class TournamentTestBrowser : TournamentGameBase
     {
         protected override void LoadComplete()
         {

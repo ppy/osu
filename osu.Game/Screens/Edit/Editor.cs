@@ -40,7 +40,6 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -58,8 +57,7 @@ namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
     [Cached]
-    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider,
-                          IGameplaySettings
+    public partial class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -98,9 +96,6 @@ namespace osu.Game.Screens.Edit
 
         [Resolved(canBeNull: true)]
         private INotificationOverlay notifications { get; set; }
-
-        [Resolved]
-        private IGameplaySettings globalGameplaySettings { get; set; }
 
         public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
@@ -503,6 +498,15 @@ namespace osu.Game.Screens.Edit
                     seek(e, 1);
                     return true;
 
+                // Of those, these two keys are reversed from stable because it feels more natural (and matches mouse wheel scroll directionality).
+                case Key.Up:
+                    seekControlPoint(-1);
+                    return true;
+
+                case Key.Down:
+                    seekControlPoint(1);
+                    return true;
+
                 // Track traversal keys.
                 // Matching osu-stable implementations.
                 case Key.Z:
@@ -533,12 +537,14 @@ namespace osu.Game.Screens.Edit
                     // Seek to last object time, or track end if already there.
                     // Note that in osu-stable subsequent presses when at track end won't return to last object.
                     // This has intentionally been changed to make it more useful.
-                    double? lastObjectTime = editorBeatmap.HitObjects.LastOrDefault()?.GetEndTime();
-
-                    if (lastObjectTime == null || clock.CurrentTime == lastObjectTime)
+                    if (!editorBeatmap.HitObjects.Any())
+                    {
                         clock.Seek(clock.TrackLength);
-                    else
-                        clock.Seek(lastObjectTime.Value);
+                        return true;
+                    }
+
+                    double lastObjectTime = editorBeatmap.GetLastObjectTime();
+                    clock.Seek(clock.CurrentTime == lastObjectTime ? clock.TrackLength : lastObjectTime);
                     return true;
             }
 
@@ -896,6 +902,16 @@ namespace osu.Game.Screens.Edit
             }
         }
 
+        private void seekControlPoint(int direction)
+        {
+            var found = direction < 1
+                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime)
+                : editorBeatmap.ControlPointInfo.AllControlPoints.FirstOrDefault(p => p.Time > clock.CurrentTime);
+
+            if (found != null)
+                clock.Seek(found.Time);
+        }
+
         private void seek(UIEvent e, int direction)
         {
             double amount = e.ShiftPressed ? 4 : 1;
@@ -1038,18 +1054,12 @@ namespace osu.Game.Screens.Edit
         IClock IBeatSyncProvider.Clock => clock;
         ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
 
-        private class BeatmapEditorToast : Toast
+        private partial class BeatmapEditorToast : Toast
         {
             public BeatmapEditorToast(LocalisableString value, string beatmapDisplayName)
                 : base(InputSettingsStrings.EditorSection, value, beatmapDisplayName)
             {
             }
         }
-
-        // Combo colour normalisation should not be applied in the editor.
-        IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => new Bindable<float>();
-
-        // Arguable.
-        IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => globalGameplaySettings.PositionalHitsoundsLevel;
     }
 }

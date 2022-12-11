@@ -26,7 +26,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class APIAccess : Component, IAPIProvider
+    public partial class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
 
@@ -419,7 +419,7 @@ namespace osu.Game.Online.API
             failureCount++;
             log.Add($@"API failure count is now {failureCount}");
 
-            if (failureCount >= 3 && State.Value == APIState.Online)
+            if (failureCount >= 3)
             {
                 state.Value = APIState.Failing;
                 flushQueue();

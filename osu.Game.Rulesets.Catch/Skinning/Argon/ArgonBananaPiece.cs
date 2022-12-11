@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Argon
 {
-    internal class ArgonBananaPiece : ArgonFruitPiece
+    internal partial class ArgonBananaPiece : ArgonFruitPiece
     {
         private Container stabilisedPieceContainer = null!;
 

@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// The part of the timeline that displays bookmarks.
     /// </summary>
-    public class BookmarkPart : TimelinePart
+    public partial class BookmarkPart : TimelinePart
     {
         protected override void LoadBeatmap(EditorBeatmap beatmap)
         {
@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 Add(new BookmarkVisualisation(bookmark));
         }
 
-        private class BookmarkVisualisation : PointVisualisation
+        private partial class BookmarkVisualisation : PointVisualisation
         {
             public BookmarkVisualisation(double startTime)
                 : base(startTime)

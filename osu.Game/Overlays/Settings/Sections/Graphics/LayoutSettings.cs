@@ -25,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
-    public class LayoutSettings : SettingsSubsection
+    public partial class LayoutSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GraphicsSettingsStrings.LayoutHeader;
 
@@ -177,13 +177,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 updateScreenModeWarning();
             }, true);
 
-            windowModes.BindCollectionChanged((_, _) =>
-            {
-                if (windowModes.Count > 1)
-                    windowModeDropdown.Show();
-                else
-                    windowModeDropdown.Hide();
-            }, true);
+            windowModes.BindCollectionChanged((_, _) => updateDisplaySettingsVisibility());
 
             currentDisplay.BindValueChanged(display => Schedule(() =>
             {
@@ -219,7 +213,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
 
                 scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
-                scalingSettings.ForEach(s => s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything);
+                scalingSettings.ForEach(s =>
+                {
+                    s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything;
+                    s.CanBeShown.Value = scalingMode.Value != ScalingMode.Off;
+                });
             }
         }
 
@@ -234,20 +232,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private void updateDisplaySettingsVisibility()
         {
-            if (resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen)
-                resolutionDropdown.Show();
-            else
-                resolutionDropdown.Hide();
-
-            if (displayDropdown.Items.Count() > 1)
-                displayDropdown.Show();
-            else
-                displayDropdown.Hide();
-
-            if (host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero)
-                safeAreaConsiderationsCheckbox.Show();
-            else
-                safeAreaConsiderationsCheckbox.Hide();
+            windowModeDropdown.CanBeShown.Value = windowModes.Count > 1;
+            resolutionDropdown.CanBeShown.Value = resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen;
+            displayDropdown.CanBeShown.Value = displayDropdown.Items.Count() > 1;
+            safeAreaConsiderationsCheckbox.CanBeShown.Value = host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero;
         }
 
         private void updateScreenModeWarning()
@@ -324,7 +312,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             base.Dispose(isDisposing);
         }
 
-        private class ScalingPreview : ScalingContainer
+        private partial class ScalingPreview : ScalingContainer
         {
             public ScalingPreview()
             {
@@ -337,16 +325,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
         }
 
-        private class UIScaleSlider : OsuSliderBar<float>
+        private partial class UIScaleSlider : OsuSliderBar<float>
         {
             public override LocalisableString TooltipText => base.TooltipText + "x";
         }
 
-        private class DisplaySettingsDropdown : SettingsDropdown<Display>
+        private partial class DisplaySettingsDropdown : SettingsDropdown<Display>
         {
             protected override OsuDropdown<Display> CreateDropdown() => new DisplaySettingsDropdownControl();
 
-            private class DisplaySettingsDropdownControl : DropdownControl
+            private partial class DisplaySettingsDropdownControl : DropdownControl
             {
                 protected override LocalisableString GenerateItemText(Display item)
                 {
@@ -355,11 +343,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
         }
 
-        private class ResolutionSettingsDropdown : SettingsDropdown<Size>
+        private partial class ResolutionSettingsDropdown : SettingsDropdown<Size>
         {
             protected override OsuDropdown<Size> CreateDropdown() => new ResolutionDropdownControl();
 
-            private class ResolutionDropdownControl : DropdownControl
+            private partial class ResolutionDropdownControl : DropdownControl
             {
                 protected override LocalisableString GenerateItemText(Size item)
                 {

@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class RetryButton : OsuAnimatedButton
+    public partial class RetryButton : OsuAnimatedButton
     {
         private readonly Box background;
 
