@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         public bool UsesFixedAnchor { get; set; }
 
         [SettingSource("Counter direction")]
-        public Bindable<FillDirection> Direction { get; set; } = new Bindable<FillDirection>();
+        public Bindable<Flow> FlowDirection { get; set; } = new Bindable<Flow>();
 
         [SettingSource("Show judgement names")]
         public BindableBool ShowName { get; set; } = new BindableBool(true);
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         {
             InternalChild = JudgementContainer = new FillFlowContainer
             {
-                Direction = Direction.Value,
+                Direction = getFlow(FlowDirection.Value),
                 Spacing = new Vector2(10),
                 AutoSizeAxes = Axes.Both
             };
@@ -61,9 +61,17 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         {
             base.LoadComplete();
 
-            Direction.BindValueChanged(direction => JudgementContainer.Direction = direction.NewValue);
-            Mode.BindValueChanged(_ => updateCounter(), true);
+            FlowDirection.BindValueChanged(direction =>
+            {
+                JudgementContainer.Direction = getFlow(direction.NewValue);
 
+                //Can't pass directly due to Enum conversion
+                foreach (var counter in JudgementContainer.Children.OfType<JudgementCounter>())
+                {
+                    counter.Direction.Value = getFlow(direction.NewValue);
+                }
+            });
+            Mode.BindValueChanged(_ => updateCounter(), true);
             ShowMax.BindValueChanged(value =>
             {
                 var firstChild = JudgementContainer.Children.FirstOrDefault();
@@ -113,6 +121,28 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             }
         }
 
+        private FillDirection getFlow(Flow flow)
+        {
+            switch (flow)
+            {
+                case Flow.Horizonal:
+                    return FillDirection.Horizontal;
+
+                case Flow.Vertical:
+                    return FillDirection.Vertical;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(flow), flow, @"Unsupported direction");
+            }
+        }
+
+        //Used to hide default full option in FillDirection
+        public enum Flow
+        {
+            Horizonal,
+            Vertical
+        }
+
         public enum DisplayMode
         {
             Simple,
@@ -125,7 +155,6 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             JudgementCounter counter = new JudgementCounter(info)
             {
                 ShowName = { BindTarget = ShowName },
-                Direction = { BindTarget = Direction }
             };
             return counter;
         }
