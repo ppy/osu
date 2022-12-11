@@ -14,7 +14,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Mods
 {
-    public class TestSceneModDisable : ModTestScene
+    public partial class TestSceneModDisable : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
