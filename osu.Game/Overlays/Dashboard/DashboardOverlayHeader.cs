@@ -10,11 +10,11 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Dashboard
 {
-    public class DashboardOverlayHeader : TabControlOverlayHeader<DashboardOverlayTabs>
+    public partial class DashboardOverlayHeader : TabControlOverlayHeader<DashboardOverlayTabs>
     {
         protected override OverlayTitle CreateTitle() => new DashboardTitle();
 
-        private class DashboardTitle : OverlayTitle
+        private partial class DashboardTitle : OverlayTitle
         {
             public DashboardTitle()
             {

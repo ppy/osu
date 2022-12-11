@@ -34,7 +34,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class MainMenu : OsuScreen, IHandlePresentBeatmap, IKeyBindingHandler<GlobalAction>
+    public partial class MainMenu : OsuScreen, IHandlePresentBeatmap, IKeyBindingHandler<GlobalAction>
     {
         public const float FADE_IN_DURATION = 300;
 

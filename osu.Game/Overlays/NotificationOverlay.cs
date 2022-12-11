@@ -20,7 +20,7 @@ using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Overlays
 {
-    public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, INotificationOverlay
+    public partial class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, INotificationOverlay
     {
         public string IconTexture => "Icons/Hexacons/notification";
         public LocalisableString Title => NotificationsStrings.HeaderTitle;

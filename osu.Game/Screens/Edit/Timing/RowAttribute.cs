@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class RowAttribute : CompositeDrawable
+    public partial class RowAttribute : CompositeDrawable
     {
         protected readonly ControlPoint Point;
 

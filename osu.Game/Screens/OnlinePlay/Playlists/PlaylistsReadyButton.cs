@@ -15,7 +15,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsReadyButton : ReadyButton
+    public partial class PlaylistsReadyButton : ReadyButton
     {
         [Resolved(typeof(Room), nameof(Room.EndDate))]
         private Bindable<DateTimeOffset?> endDate { get; set; }
@@ -38,8 +38,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private void load(OsuColour colours)
         {
             BackgroundColour = colours.Green;
-            Triangles.ColourDark = colours.Green;
-            Triangles.ColourLight = colours.GreenLight;
         }
 
         private bool hasRemainingAttempts = true;

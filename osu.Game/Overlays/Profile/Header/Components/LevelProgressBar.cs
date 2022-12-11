@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class LevelProgressBar : CompositeDrawable, IHasTooltip
+    public partial class LevelProgressBar : CompositeDrawable, IHasTooltip
     {
         public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 

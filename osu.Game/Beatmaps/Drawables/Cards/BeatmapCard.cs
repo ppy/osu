@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public abstract class BeatmapCard : OsuClickableContainer, IEquatable<BeatmapCard>
+    public abstract partial class BeatmapCard : OsuClickableContainer
     {
         public const float TRANSITION_DURATION = 400;
         public const float CORNER_RADIUS = 10;
@@ -96,16 +96,5 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     throw new ArgumentOutOfRangeException(nameof(size), size, @"Unsupported card size");
             }
         }
-
-        public bool Equals(BeatmapCard? other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-
-            return BeatmapSet.Equals(other.BeatmapSet);
-        }
-
-        public override bool Equals(object obj) => obj is BeatmapCard other && Equals(other);
-        public override int GetHashCode() => BeatmapSet.GetHashCode();
     }
 }

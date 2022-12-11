@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class MenuCursorContainer : CursorContainer
+    public partial class MenuCursorContainer : CursorContainer
     {
         private readonly IBindable<bool> screenshotCursorVisibility = new Bindable<bool>(true);
         public override bool IsPresent => screenshotCursorVisibility.Value && base.IsPresent;
@@ -94,7 +94,8 @@ namespace osu.Game.Graphics.Cursor
         private OsuGame? game { get; set; }
 
         private readonly IBindable<bool> lastInputWasMouse = new BindableBool();
-        private readonly IBindable<bool> isIdle = new BindableBool();
+        private readonly IBindable<bool> gameActive = new BindableBool(true);
+        private readonly IBindable<bool> gameIdle = new BindableBool();
 
         protected override void LoadComplete()
         {
@@ -105,8 +106,11 @@ namespace osu.Game.Graphics.Cursor
 
             if (game != null)
             {
-                isIdle.BindTo(game.IsIdle);
-                isIdle.BindValueChanged(_ => updateState());
+                gameIdle.BindTo(game.IsIdle);
+                gameIdle.BindValueChanged(_ => updateState());
+
+                gameActive.BindTo(game.IsActive);
+                gameActive.BindValueChanged(_ => updateState());
             }
         }
 
@@ -114,7 +118,7 @@ namespace osu.Game.Graphics.Cursor
 
         private void updateState()
         {
-            bool combinedVisibility = State.Value == Visibility.Visible && (lastInputWasMouse.Value || !hideCursorOnNonMouseInput) && !isIdle.Value;
+            bool combinedVisibility = getCursorVisibility();
 
             if (visible == combinedVisibility)
                 return;
@@ -125,6 +129,27 @@ namespace osu.Game.Graphics.Cursor
                 PopIn();
             else
                 PopOut();
+        }
+
+        private bool getCursorVisibility()
+        {
+            // do not display when explicitly set to hidden state.
+            if (State.Value == Visibility.Hidden)
+                return false;
+
+            // only hide cursor when game is focused, otherwise it should always be displayed.
+            if (gameActive.Value)
+            {
+                // do not display when last input is not mouse.
+                if (hideCursorOnNonMouseInput && !lastInputWasMouse.Value)
+                    return false;
+
+                // do not display when game is idle.
+                if (gameIdle.Value)
+                    return false;
+            }
+
+            return true;
         }
 
         protected override void Update()
@@ -272,7 +297,7 @@ namespace osu.Game.Graphics.Cursor
             channel.Play();
         }
 
-        public class Cursor : Container
+        public partial class Cursor : Container
         {
             private Container cursorContainer = null!;
             private Bindable<float> cursorScale = null!;
@@ -330,7 +355,7 @@ namespace osu.Game.Graphics.Cursor
             }
         }
 
-        private class MouseInputDetector : Component
+        private partial class MouseInputDetector : Component
         {
             /// <summary>
             /// Whether the last input applied to the game is sourced from mouse.

@@ -8,7 +8,7 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class CreatePlaylistsRoomButton : CreateRoomButton
+    public partial class CreatePlaylistsRoomButton : CreateRoomButton
     {
         [BackgroundDependencyLoader]
         private void load()

@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override string Acronym => "HO";
 
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier => 0.9;
 
         public override LocalisableString Description => @"将所有面条替换成单键";
 

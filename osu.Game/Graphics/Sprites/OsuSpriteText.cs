@@ -8,7 +8,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public class OsuSpriteText : SpriteText
+    public partial class OsuSpriteText : SpriteText
     {
         public bool NoFontAutoUpdate;
 

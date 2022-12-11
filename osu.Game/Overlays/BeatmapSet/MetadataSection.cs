@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class MetadataSection : Container
+    public partial class MetadataSection : Container
     {
         private readonly FillFlowContainer textContainer;
         private readonly MetadataType type;

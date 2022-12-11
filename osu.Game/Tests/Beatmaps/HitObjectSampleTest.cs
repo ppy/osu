@@ -33,7 +33,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Beatmaps
 {
     [HeadlessTest]
-    public abstract class HitObjectSampleTest : PlayerTestScene, IStorageResourceProvider
+    public abstract partial class HitObjectSampleTest : PlayerTestScene, IStorageResourceProvider
     {
         protected abstract IResourceStore<byte[]> RulesetResources { get; }
         protected LegacySkin Skin { get; private set; }
@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Beatmaps
                 return fallback.Get(type, info);
             }
 
-            public void Inject<T>(T instance) where T : class
+            public void Inject<T>(T instance) where T : class, IDependencyInjectionCandidate
             {
                 // Never used directly
             }

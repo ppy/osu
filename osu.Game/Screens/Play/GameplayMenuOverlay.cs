@@ -27,7 +27,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
+    public abstract partial class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly Bindable<bool> optui = new Bindable<bool>();
         protected const int TRANSITION_DURATION = 200;
@@ -262,7 +262,7 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        private class Button : DialogButton
+        private partial class Button : DialogButton
         {
             // required to ensure keyboard navigation always starts from an extremity (unless the cursor is moved)
             protected override bool OnHover(HoverEvent e) => true;

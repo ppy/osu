@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogSingleBuild : ChangelogContent
+    public partial class ChangelogSingleBuild : ChangelogContent
     {
         private APIChangelogBuild build;
 
@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        public class ChangelogBuildWithNavigation : ChangelogBuild
+        public partial class ChangelogBuildWithNavigation : ChangelogBuild
         {
             public ChangelogBuildWithNavigation(APIChangelogBuild build)
                 : base(build)
@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        private class NavigationIconButton : IconButton
+        private partial class NavigationIconButton : IconButton
         {
             public Action<APIChangelogBuild> SelectBuild;
 

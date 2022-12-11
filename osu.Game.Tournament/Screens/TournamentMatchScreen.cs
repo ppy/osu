@@ -8,7 +8,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens
 {
-    public abstract class TournamentMatchScreen : TournamentScreen
+    public abstract partial class TournamentMatchScreen : TournamentScreen
     {
         protected readonly Bindable<TournamentMatch> CurrentMatch = new Bindable<TournamentMatch>();
         private WarningBox noMatchWarning;

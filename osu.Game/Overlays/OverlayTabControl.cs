@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayTabControl<T> : OsuTabControl<T>
+    public abstract partial class OverlayTabControl<T> : OsuTabControl<T>
     {
         private readonly Box bar;
 
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays
 
         protected override TabItem<T> CreateTabItem(T value) => new OverlayTabItem(value);
 
-        protected class OverlayTabItem : TabItem<T>, IHasAccentColour
+        protected partial class OverlayTabItem : TabItem<T>, IHasAccentColour
         {
             protected readonly ExpandingBar Bar;
             protected readonly OsuSpriteText Text;

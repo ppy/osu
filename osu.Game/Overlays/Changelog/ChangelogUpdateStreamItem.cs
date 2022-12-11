@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogUpdateStreamItem : OverlayStreamItem<APIUpdateStream>
+    public partial class ChangelogUpdateStreamItem : OverlayStreamItem<APIUpdateStream>
     {
         public ChangelogUpdateStreamItem(APIUpdateStream stream)
             : base(stream)

@@ -14,7 +14,7 @@ using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Screens.Menu
 {
-    public class IntroCircles : IntroScreen
+    public partial class IntroCircles : IntroScreen
     {
         protected override string BeatmapHash => "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 

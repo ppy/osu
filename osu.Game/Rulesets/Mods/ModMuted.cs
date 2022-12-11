@@ -35,6 +35,9 @@ namespace osu.Game.Rulesets.Mods
 
         private readonly BindableNumber<int> currentCombo = new BindableInt();
 
+        [SettingSource("以静音开始", "随连击增加音量")]
+        public BindableBool InverseMuting { get; } = new BindableBool();
+
         [SettingSource("启用节拍器", "添加节拍器来帮助你跟住歌曲的节奏。")]
         public BindableBool EnableMetronome { get; } = new BindableBool(true);
 
@@ -44,9 +47,6 @@ namespace osu.Game.Rulesets.Mods
             MinValue = 0,
             MaxValue = 500,
         };
-
-        [SettingSource("以静音开始", "随连击增加音量")]
-        public BindableBool InverseMuting { get; } = new BindableBool();
 
         [SettingSource("静音音效", "音效也会跟着音频静音。")]
         public BindableBool AffectsHitSounds { get; } = new BindableBool(true);
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Mods
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 
-    public class MuteComboSlider : OsuSliderBar<int>
+    public partial class MuteComboSlider : OsuSliderBar<int>
     {
         public override LocalisableString TooltipText => Current.Value == 0 ? "总是静音" : base.TooltipText;
     }

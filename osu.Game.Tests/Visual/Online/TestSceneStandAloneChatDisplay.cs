@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneStandAloneChatDisplay : OsuManualInputManagerTestScene
+    public partial class TestSceneStandAloneChatDisplay : OsuManualInputManagerTestScene
     {
         private readonly APIUser admin = new APIUser
         {
@@ -56,7 +56,9 @@ namespace osu.Game.Tests.Visual.Online
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Add(channelManager = new ChannelManager(parent.Get<IAPIProvider>()));
+            var api = parent.Get<IAPIProvider>();
+
+            Add(channelManager = new ChannelManager(api));
 
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -71,6 +73,11 @@ namespace osu.Game.Tests.Visual.Online
             messageIdSequence = 0;
             channelManager.CurrentChannel.Value = testChannel = new Channel();
 
+            reinitialiseDrawableDisplay();
+        });
+
+        private void reinitialiseDrawableDisplay()
+        {
             Children = new[]
             {
                 chatDisplay = new TestStandAloneChatDisplay
@@ -90,13 +97,14 @@ namespace osu.Game.Tests.Visual.Online
                     Channel = { Value = testChannel },
                 }
             };
-        });
+        }
 
         [Test]
         public void TestSystemMessageOrdering()
         {
             var standardMessage = new Message(messageIdSequence++)
             {
+                Timestamp = DateTimeOffset.Now,
                 Sender = admin,
                 Content = "I am a wang!"
             };
@@ -104,14 +112,45 @@ namespace osu.Game.Tests.Visual.Online
             var infoMessage1 = new InfoMessage($"the system is calling {messageIdSequence++}");
             var infoMessage2 = new InfoMessage($"the system is calling {messageIdSequence++}");
 
+            var standardMessage2 = new Message(messageIdSequence++)
+            {
+                Timestamp = DateTimeOffset.Now,
+                Sender = admin,
+                Content = "I am a wang!"
+            };
+
             AddStep("message from admin", () => testChannel.AddNewMessages(standardMessage));
             AddStep("message from system", () => testChannel.AddNewMessages(infoMessage1));
             AddStep("message from system", () => testChannel.AddNewMessages(infoMessage2));
+            AddStep("message from admin", () => testChannel.AddNewMessages(standardMessage2));
 
-            AddAssert("message order is correct", () => testChannel.Messages.Count == 3
-                                                        && testChannel.Messages[0] == standardMessage
-                                                        && testChannel.Messages[1] == infoMessage1
-                                                        && testChannel.Messages[2] == infoMessage2);
+            AddAssert("count is correct", () => testChannel.Messages.Count, () => Is.EqualTo(4));
+
+            AddAssert("message order is correct", () => testChannel.Messages, () => Is.EqualTo(new[]
+            {
+                standardMessage,
+                infoMessage1,
+                infoMessage2,
+                standardMessage2
+            }));
+
+            AddAssert("displayed order is correct", () => chatDisplay.DrawableChannel.ChildrenOfType<ChatLine>().Select(c => c.Message), () => Is.EqualTo(new[]
+            {
+                standardMessage,
+                infoMessage1,
+                infoMessage2,
+                standardMessage2
+            }));
+
+            AddStep("reinit drawable channel", reinitialiseDrawableDisplay);
+
+            AddAssert("displayed order is still correct", () => chatDisplay.DrawableChannel.ChildrenOfType<ChatLine>().Select(c => c.Message), () => Is.EqualTo(new[]
+            {
+                standardMessage,
+                infoMessage1,
+                infoMessage2,
+                standardMessage2
+            }));
         }
 
         [Test]
@@ -399,7 +438,7 @@ namespace osu.Game.Tests.Visual.Online
         private void checkNotScrolledToBottom() =>
             AddUntilStep("not scrolled to bottom", () => !chatDisplay.ScrolledToBottom);
 
-        private class TestStandAloneChatDisplay : StandAloneChatDisplay
+        private partial class TestStandAloneChatDisplay : StandAloneChatDisplay
         {
             public TestStandAloneChatDisplay(bool textBox = false)
                 : base(textBox)

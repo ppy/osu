@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
-    public abstract class SmokeSegment : Drawable, ITexturedShaderDrawable
+    public abstract partial class SmokeSegment : Drawable, ITexturedShaderDrawable
     {
         // fade anim values
         private const double initial_fade_out_duration = 4000;
@@ -49,15 +49,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private const float max_rotation = 0.25f;
 
         public IShader? TextureShader { get; private set; }
-        public IShader? RoundedTextureShader { get; private set; }
 
         protected Texture? Texture { get; set; }
 
-        private float radius => Texture?.DisplayWidth * 0.165f ?? 3;
+        private float height => Texture?.DisplayHeight * 0.165f ?? 3;
+
+        private float width => Texture?.DisplayWidth * 0.165f ?? 3;
 
         protected readonly List<SmokePoint> SmokePoints = new List<SmokePoint>();
 
-        private float pointInterval => radius * 7f / 8;
+        private float pointInterval => width * 7f / 8;
 
         private double smokeStartTime { get; set; } = double.MinValue;
 
@@ -69,7 +70,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
-            RoundedTextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
         }
 
@@ -181,7 +181,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             private readonly List<SmokePoint> points = new List<SmokePoint>();
             private IVertexBatch<TexturedVertex2D>? quadBatch;
-            private float radius;
+            private float width;
+            private float height;
             private Vector2 drawSize;
             private Texture? texture;
             private int rotationSeed;
@@ -204,7 +205,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
             {
                 base.ApplyState();
 
-                radius = Source.radius;
+                width = Source.width;
+                height = Source.height;
                 drawSize = Source.DrawSize;
                 texture = Source.Texture;
 
@@ -247,18 +249,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 texture ??= renderer.WhitePixel;
                 RectangleF textureRect = texture.GetTextureRect();
 
-                var shader = GetAppropriateShader(renderer);
-
                 renderer.SetBlend(BlendingParameters.Additive);
                 renderer.PushLocalMatrix(DrawInfo.Matrix);
 
-                shader.Bind();
+                TextureShader.Bind();
                 texture.Bind();
 
                 for (int i = 0; i < points.Count; i++)
                     drawPointQuad(points[i], textureRect, i + firstVisiblePointIndex);
 
-                shader.Unbind();
+                TextureShader.Unbind();
                 renderer.PopLocalMatrix();
             }
 
@@ -338,11 +338,13 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 var dir = PointDirection(point, index);
                 var ortho = dir.PerpendicularLeft;
+                dir *= scale * width;
+                ortho *= scale * height;
 
-                var localTopLeft = point.Position + (radius * scale * (-ortho - dir));
-                var localTopRight = point.Position + (radius * scale * (-ortho + dir));
-                var localBotLeft = point.Position + (radius * scale * (ortho - dir));
-                var localBotRight = point.Position + (radius * scale * (ortho + dir));
+                var localTopLeft = point.Position - ortho - dir;
+                var localTopRight = point.Position - ortho + dir;
+                var localBotLeft = point.Position + ortho - dir;
+                var localBotRight = point.Position + ortho + dir;
 
                 quadBatch.Add(new TexturedVertex2D
                 {

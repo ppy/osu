@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,7 +8,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
+    public partial class TaikoPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
         private const float default_aspect = 16f / 9f;

@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Automation;
         public override LocalisableString Description => @"转盘会自动完成";
         public override double ScoreMultiplier => 0.9;
-        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAutopilot), typeof(OsuModTarget) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAutopilot), typeof(OsuModTargetPractice) };
 
         public void ApplyToDrawableHitObject(DrawableHitObject hitObject)
         {

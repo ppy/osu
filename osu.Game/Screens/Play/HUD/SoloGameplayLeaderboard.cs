@@ -7,17 +7,22 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Select;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SoloGameplayLeaderboard : GameplayLeaderboard
+    public partial class SoloGameplayLeaderboard : GameplayLeaderboard
     {
         private const int duration = 100;
 
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
+
+        private readonly Bindable<PlayBeatmapDetailArea.TabType> scoreSource = new Bindable<PlayBeatmapDetailArea.TabType>();
+
         private readonly IUser trackingUser;
 
         public readonly IBindableList<ScoreInfo> Scores = new BindableList<ScoreInfo>();
@@ -46,11 +51,13 @@ namespace osu.Game.Screens.Play.HUD
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
+            config.BindWith(OsuSetting.BeatmapDetailTab, scoreSource);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             Scores.BindCollectionChanged((_, _) => Scheduler.AddOnce(showScores), true);
 
             // Alpha will be updated via `updateVisibility` below.
@@ -91,6 +98,18 @@ namespace osu.Game.Screens.Play.HUD
 
             // Local score should always show lower than any existing scores in cases of ties.
             local.DisplayOrder.Value = long.MaxValue;
+        }
+
+        protected override bool CheckValidScorePosition(int i)
+        {
+            // change displayed position to '-' when there are 50 already submitted scores and tracked score is last
+            if (scoreSource.Value != PlayBeatmapDetailArea.TabType.Local)
+            {
+                if (i == Flow.Count && Flow.Count > GetScoresRequest.MAX_SCORES_PER_REQUEST)
+                    return false;
+            }
+
+            return base.CheckValidScorePosition(i);
         }
 
         private void updateVisibility() =>

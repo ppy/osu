@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapSetOnlineStatusPill : ThemeComparisonTestScene
+    public partial class TestSceneBeatmapSetOnlineStatusPill : ThemeComparisonTestScene
     {
         protected override Drawable CreateContent() => new FillFlowContainer
         {

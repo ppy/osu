@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class TopScoreUserSection : CompositeDrawable
+    public partial class TopScoreUserSection : CompositeDrawable
     {
         private readonly SpriteText rankText;
         private readonly UpdateableRank rank;

@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModBeatCore) };
     }
 
-    public abstract class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
+    public abstract partial class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
         where TObject : HitObject
     {
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
@@ -57,16 +57,7 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 
-    public class NightcoreBeatContainer : BeatSyncedContainer
-    {
-        private PausableSkinnableSound? hatSample;
-        private PausableSkinnableSound? clapSample;
-        private PausableSkinnableSound? kickSample;
-        private PausableSkinnableSound? finishSample;
-
-        private int? firstBeat;
-
-        public NightcoreBeatContainer()
+        public partial class NightcoreBeatContainer : BeatSyncedContainer
         {
             Divisor = 2;
         }

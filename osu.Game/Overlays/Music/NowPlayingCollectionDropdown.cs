@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Music
     /// <summary>
     /// A <see cref="CollectionDropdown"/> for use in the <see cref="NowPlayingOverlay"/>.
     /// </summary>
-    public class NowPlayingCollectionDropdown : CollectionDropdown
+    public partial class NowPlayingCollectionDropdown : CollectionDropdown
     {
         protected override bool ShowManageCollectionsItem => false;
 
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Music
 
         protected override CollectionDropdownMenu CreateCollectionMenu() => new CollectionsMenu();
 
-        private class CollectionsMenu : CollectionDropdownMenu
+        private partial class CollectionsMenu : CollectionDropdownMenu
         {
             public CollectionsMenu()
             {
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Music
             }
         }
 
-        private class CollectionsHeader : CollectionDropdownHeader
+        private partial class CollectionsHeader : CollectionDropdownHeader
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)

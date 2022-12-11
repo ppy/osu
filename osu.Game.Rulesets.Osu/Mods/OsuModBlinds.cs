@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
+    public partial class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
     {
         public override string Name => "致盲";
         public override LocalisableString Description => "蒙上你的眼睛";
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <summary>
         /// Element for the Blinds mod drawing 2 black boxes covering the whole screen which resize inside a restricted area with some leniency.
         /// </summary>
-        public class DrawableOsuBlinds : Container
+        public partial class DrawableOsuBlinds : Container
         {
             /// <summary>
             /// Black background boxes behind blind panel textures.
@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// </summary>
             public void AnimateClosedness(float value) => this.TransformTo(nameof(easing), value, 200, Easing.OutQuint);
 
-            public class ModBlindsPanel : Sprite
+            public partial class ModBlindsPanel : Sprite
             {
                 [BackgroundDependencyLoader]
                 private void load(TextureStore textures)

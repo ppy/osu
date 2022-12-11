@@ -11,7 +11,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardVideo : CompositeDrawable
+    public partial class DrawableStoryboardVideo : CompositeDrawable
     {
         public readonly StoryboardVideo Video;
 

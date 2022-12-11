@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
+    public partial class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
     {
         public override LocalisableString Description => @"用鼠标来控制小人";
 
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             }
         }
 
-        private class MouseInputHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
+        private partial class MouseInputHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
         {
             private readonly CatcherArea catcherArea;
 

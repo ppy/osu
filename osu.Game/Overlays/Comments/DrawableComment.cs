@@ -31,7 +31,8 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class DrawableComment : CompositeDrawable
+    [Cached]
+    public partial class DrawableComment : CompositeDrawable
     {
         private const int avatar_size = 40;
 
@@ -330,13 +331,13 @@ namespace osu.Game.Overlays.Comments
             if (WasDeleted)
                 makeDeleted();
 
-            actionsContainer.AddLink("Copy link", copyUrl);
-            actionsContainer.AddArbitraryDrawable(new Container { Width = 10 });
+            actionsContainer.AddLink(CommonStrings.ButtonsPermalink, copyUrl);
+            actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
-            {
-                actionsContainer.AddLink("Delete", deleteComment);
-            }
+                actionsContainer.AddLink(CommonStrings.ButtonsDelete, deleteComment);
+            else
+                actionsContainer.AddArbitraryDrawable(new CommentReportButton(Comment));
 
             if (Comment.IsTopLevel)
             {
@@ -496,7 +497,7 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
-        private class PinnedCommentNotice : FillFlowContainer
+        private partial class PinnedCommentNotice : FillFlowContainer
         {
             public PinnedCommentNotice()
             {
@@ -523,7 +524,7 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        private class ParentUsername : FillFlowContainer, IHasTooltip
+        private partial class ParentUsername : FillFlowContainer, IHasTooltip
         {
             public LocalisableString TooltipText => getParentMessage();
 
@@ -552,12 +553,12 @@ namespace osu.Game.Overlays.Comments
                 };
             }
 
-            private string getParentMessage()
+            private LocalisableString getParentMessage()
             {
                 if (parentComment == null)
                     return string.Empty;
 
-                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? "已删除" : string.Empty;
+                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? CommentsStrings.Deleted : string.Empty;
             }
         }
     }

@@ -11,11 +11,11 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownSeparator : MarkdownSeparator
+    public partial class OsuMarkdownSeparator : MarkdownSeparator
     {
         protected override Drawable CreateSeparator() => new Separator();
 
-        private class Separator : Box
+        private partial class Separator : Box
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)

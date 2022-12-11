@@ -26,7 +26,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Skins
 {
     [HeadlessTest]
-    public class TestSceneSkinResources : OsuTestScene
+    public partial class TestSceneSkinResources : OsuTestScene
     {
         [Resolved]
         private SkinManager skins { get; set; } = null!;

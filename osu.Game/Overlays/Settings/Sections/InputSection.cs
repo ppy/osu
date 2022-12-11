@@ -3,8 +3,6 @@
 
 #nullable disable
 
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -17,13 +15,11 @@ using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class InputSection : SettingsSection
+    public partial class InputSection : SettingsSection
     {
         private readonly KeyBindingPanel keyConfig;
 
         public override LocalisableString Header => InputSettingsStrings.InputSectionHeader;
-
-        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "keybindings" });
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
@@ -53,7 +49,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        public class HandlerSection : SettingsSubsection
+        public partial class HandlerSection : SettingsSubsection
         {
             private readonly InputHandler handler;
 

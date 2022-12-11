@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class DesignSection : SetupSection
+    internal partial class DesignSection : SetupSection
     {
         protected LabelledSwitchButton EnableCountdown;
 

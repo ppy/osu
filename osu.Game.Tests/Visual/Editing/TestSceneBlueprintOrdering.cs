@@ -24,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneBlueprintOrdering : EditorTestScene
+    public partial class TestSceneBlueprintOrdering : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

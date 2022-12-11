@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class DigitalClockDisplay : ClockDisplay
+    public partial class DigitalClockDisplay : ClockDisplay
     {
         private OsuSpriteText realTime;
         private OsuSpriteText gameTime;

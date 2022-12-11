@@ -31,7 +31,7 @@ namespace osu.Game.Online.Leaderboards
     /// </summary>
     /// <typeparam name="TScope">The scope of the leaderboard (ie. global or local).</typeparam>
     /// <typeparam name="TScoreInfo">The score model class.</typeparam>
-    public abstract class Leaderboard<TScope, TScoreInfo> : CompositeDrawable
+    public abstract partial class Leaderboard<TScope, TScoreInfo> : CompositeDrawable
     {
         /// <summary>
         /// The currently displayed scores.

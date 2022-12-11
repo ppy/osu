@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
-    public class EditorRadioButtonCollection : CompositeDrawable
+    public partial class EditorRadioButtonCollection : CompositeDrawable
     {
         private IReadOnlyList<RadioButton> items;
 
