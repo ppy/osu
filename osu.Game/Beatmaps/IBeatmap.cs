@@ -3,10 +3,12 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
@@ -114,5 +116,28 @@ namespace osu.Game.Beatmaps
         /// It's not super efficient so calls should be kept to a minimum.
         /// </remarks>
         public static double GetLastObjectTime(this IBeatmap beatmap) => beatmap.HitObjects.Max(h => h.GetEndTime());
+
+        /// <summary>
+        /// Gets the BPM of a beatmap scaled by active mods of Type T
+        /// </summary>
+        /// <param name="beatmap">Beatmap, to get base BPM and length from</param>
+        /// <param name="mods">Mods to be applied to </param>
+        /// <param name="time">The beatmap time at which the mods should be applied</param>
+        /// <returns>Adjusted (Minimum BPM, Average BPM, Maximum BPM, Length)</returns>
+        public static (int, int, int, double) GetBPMAndLength(this IBeatmap beatmap, IEnumerable<IApplicableToRate> mods, double time = 0)
+        {
+            // this doesn't consider mods which apply variable rates, yet.
+            double rate = 1;
+
+            foreach (var mod in mods)
+                rate = mod.ApplyToRate(time, rate);
+
+            int bpmMin = (int)Math.Round(beatmap.ControlPointInfo.BPMMinimum * rate);
+            int bpmAverage = (int)Math.Round(60000 / beatmap.GetMostCommonBeatLength() * rate);
+            int bpmMax = (int)Math.Round(beatmap.ControlPointInfo.BPMMaximum * rate);
+            double length = beatmap.BeatmapInfo.Length / rate;
+
+            return (bpmMin, bpmAverage, bpmMax, length);
+        }
     }
 }

@@ -171,20 +171,12 @@ namespace osu.Game.Skinning.Components
 
         private void updateBpmAndLength()
         {
-            var beatmap = workingBeatmap.Value.Beatmap;
-            // this doesn't consider mods which apply variable rates, yet.
-            double rate = 1;
+            var (bpmMax, mostCommonBPM, bpmMin, length) = workingBeatmap.Value.Beatmap.GetBPMAndLength(mods.Value.OfType<ModRateAdjust>());
 
-            if (DifficultyAdjust.Value)
-            {
-                foreach (var mod in mods.Value.OfType<ModRateAdjust>())
-                    rate = mod.ApplyToRate(0, rate);
-            }
-
-            valueDictionary[BeatmapAttribute.BPMMaximum] = Math.Round(beatmap.ControlPointInfo.BPMMaximum * rate).ToLocalisableString(@"F0");
-            valueDictionary[BeatmapAttribute.BPMMinimum] = Math.Round(beatmap.ControlPointInfo.BPMMinimum * rate).ToLocalisableString(@"F0");
-            valueDictionary[BeatmapAttribute.BPM] = Math.Round(60000 / beatmap.GetMostCommonBeatLength() * rate).ToLocalisableString(@"F0");
-            valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(workingBeatmap.Value.BeatmapInfo.Length / rate).ToFormattedDuration();
+            valueDictionary[BeatmapAttribute.BPMMaximum] = bpmMax.ToLocalisableString(@"F0");
+            valueDictionary[BeatmapAttribute.BPMMinimum] = mostCommonBPM.ToLocalisableString(@"F0");
+            valueDictionary[BeatmapAttribute.BPM] = bpmMin.ToLocalisableString(@"F0");
+            valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(length).ToFormattedDuration();
         }
 
         private void updateBeatmapContent()

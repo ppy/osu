@@ -412,14 +412,7 @@ namespace osu.Game.Screens.Select
                 if (beatmap == null || bpmLabelContainer == null)
                     return;
 
-                // this doesn't consider mods which apply variable rates, yet.
-                double rate = 1;
-                foreach (var mod in mods.Value.OfType<IApplicableToRate>())
-                    rate = mod.ApplyToRate(0, rate);
-
-                int bpmMax = (int)Math.Round(Math.Round(beatmap.ControlPointInfo.BPMMaximum) * rate);
-                int bpmMin = (int)Math.Round(Math.Round(beatmap.ControlPointInfo.BPMMinimum) * rate);
-                int mostCommonBPM = (int)Math.Round(Math.Round(60000 / beatmap.GetMostCommonBeatLength()) * rate);
+                var (bpmMax, mostCommonBPM, bpmMin, _) = beatmap.GetBPMAndLength(mods.Value.OfType<IApplicableToRate>());
 
                 string labelText = bpmMin == bpmMax
                     ? $"{bpmMin}"
