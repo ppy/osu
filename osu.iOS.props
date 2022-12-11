@@ -3,6 +3,8 @@
     <CodesignKey>iPhone Developer</CodesignKey>
     <NullabilityInfoContextSupport>true</NullabilityInfoContextSupport>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <!-- Workaround for an upstream issue which Realm suffers from (https://github.com/dotnet/runtime/issues/69410). -->
+    <UseInterpreter>true</UseInterpreter>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Platform)' == 'iPhone'">
     <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
