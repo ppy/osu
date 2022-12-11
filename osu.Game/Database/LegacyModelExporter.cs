@@ -95,9 +95,14 @@ namespace osu.Game.Database
             }).ContinueWith(onComplete);
         }
 
-        protected virtual void ExportToStream(TModel model, Stream outputStream) => createZipArchive(model, outputStream);
+        protected virtual void ExportToStream(TModel model, Stream outputStream) => exportZipArchive(model, outputStream);
 
-        private void createZipArchive(TModel model, Stream outputStream)
+        /// <summary>
+        /// Exports an item to Stream as a legacy (.zip based) package.
+        /// </summary>
+        /// <param name="model">The item to export.</param>
+        /// <param name="outputStream">The output stream to export to.</param>
+        private void exportZipArchive(TModel model, Stream outputStream)
         {
             using (var archive = ZipArchive.Create())
             {
