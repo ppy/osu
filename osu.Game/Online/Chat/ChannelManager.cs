@@ -529,6 +529,10 @@ namespace osu.Game.Online.Chat
                         {
                             Logger.Log($"Joined public channel {channel}");
                             joinChannel(channel, fetchInitialMessages);
+
+                            // Required after joining public channels to mark the user as online in them.
+                            // Todo: Temporary workaround for https://github.com/ppy/osu-web/issues/9602
+                            SendAck();
                         };
                         req.Failure += e =>
                         {
