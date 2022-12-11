@@ -241,6 +241,7 @@ namespace osu.Game.Skinning.Editor
                     containerM.Invalidate();
                 }
             };
+            LayerSidebarList.Properties.GetDepth = blueprint => ((Drawable)blueprint.Item).Depth;
             //fix https://github.com/ppy/osu/pull/21119#issuecomment-1344529992
             //todo: find an actual solution to this
             //todo: this fix makes the settings "fade in" every on-drag event. It looks a bit wierd.

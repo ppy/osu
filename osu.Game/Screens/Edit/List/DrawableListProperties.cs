@@ -72,6 +72,8 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
+        public Func<T, float> GetDepth { get; set; } = d => d.Depth;
+
         internal DrawableListProperties(IDrawableListItem<T> topLevelItem)
         {
             ApplyAll = topLevelItem.ApplyAction;

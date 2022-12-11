@@ -222,10 +222,37 @@ namespace osu.Game.Screens.Edit.List
 
         private void addItems(IList items)
         {
+            Action<int, T> setItemPosition = (oldIndex, item) =>
+            {
+                //Lazers default positions for new items was at the top of the list.
+                //We keep that default for now, IF items have no/invalid depth information
+                if (oldIndex > 0 && oldIndex < Items.Count)
+                {
+                    int intDepth = (int)Properties.GetDepth(item);
+                    int depthIndex = 0;
+
+                    //look for the appropriate place, for items of the given depth.
+                    //We cannot rely on the default OnDragAction, because it can be changed.
+                    for (; depthIndex < Items.Count; depthIndex++)
+                    {
+                        if (Properties.GetDepth(Items[depthIndex].RepresentedItem) >= intDepth) break;
+                    }
+
+                    //now that we found the appropriate place, we move the item there.
+                    //this will leave us with a sorted list (when looking at depths), given that the starting list is sorted.
+                    //When adding new elements, we might end up with multiple elements of the same depth.
+                    //In that case new items should always get ordered before old items of the same depth.
+                    //the depths still need to be fixed by the next OnDepthAction call, that happens in OnItemsChanged.
+                    Items.Move(oldIndex, !Properties.GetDepth(item).Equals(intDepth) ? 0 : depthIndex);
+                }
+            };
             var drawablesToAdd = new List<AbstractListItem<T>>();
 
             foreach (var item in items.Cast<DrawableListRepresetedItem<T>>())
             {
+                int oldIndex = Items.IndexOf(item);
+                setItemPosition(oldIndex, item.RepresentedItem);
+
                 if (itemMap.ContainsKey(item))
                 {
                     if (allowAlreadyExistingDictEntry)
@@ -278,6 +305,7 @@ namespace osu.Game.Screens.Edit.List
 
         private void sortItems()
         {
+            //sync ListItems Positions to Items
             for (int i = 0; i < Items.Count; i++)
             {
                 var drawable = itemMap[Items[i]];
