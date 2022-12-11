@@ -42,6 +42,8 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
 
+        private readonly LegacyBeatmapExporter beatmapExporter;
+
         public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
 
         public BeatmapManager(Storage storage, RealmAccess realm, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
@@ -66,6 +68,11 @@ namespace osu.Game.Beatmaps
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
+
+            beatmapExporter = new LegacyBeatmapExporter(storage, realm)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
         }
 
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
@@ -445,6 +452,8 @@ namespace osu.Game.Beatmaps
 
         public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
             beatmapImporter.ImportAsUpdate(notification, importTask, original);
+
+        public void Export(BeatmapSetInfo beatmap) => Task.Run(() => beatmapExporter.ExportAsync(beatmap));
 
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {

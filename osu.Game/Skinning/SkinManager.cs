@@ -58,6 +58,8 @@ namespace osu.Game.Skinning
 
         private readonly SkinImporter skinImporter;
 
+        private readonly LegacySkinExporter skinExporter;
+
         private readonly IResourceStore<byte[]> userFiles;
 
         private Skin argonSkin { get; }
@@ -108,6 +110,11 @@ namespace osu.Game.Skinning
                     throw new InvalidOperationException($"Setting {nameof(CurrentSkin)}'s value directly is not supported. Use {nameof(CurrentSkinInfo)} instead.");
 
                 SourceChanged?.Invoke();
+            };
+
+            skinExporter = new LegacySkinExporter(storage, realm)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
             };
         }
 
@@ -279,6 +286,8 @@ namespace osu.Game.Skinning
         public Task<Live<SkinInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original) => skinImporter.ImportAsUpdate(notification, task, original);
 
         public Task<Live<SkinInfo>> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => skinImporter.Import(task, batchImport, cancellationToken);
+
+        public void ExporCurrenttSkin() => CurrentSkinInfo.Value.PerformRead(s => skinExporter.ExportAsync(s));
 
         #endregion
 
