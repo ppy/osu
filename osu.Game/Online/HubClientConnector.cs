@@ -59,11 +59,15 @@ namespace osu.Game.Online
             var builder = new HubConnectionBuilder()
                 .WithUrl(endpoint, options =>
                 {
-                    // Use HttpClient.DefaultProxy once on net6 everywhere.
-                    // The credential setter can also be removed at this point.
-                    options.Proxy = WebRequest.DefaultWebProxy;
-                    if (options.Proxy != null)
-                        options.Proxy.Credentials = CredentialCache.DefaultCredentials;
+                    // Configuring proxies is not supported on iOS, see https://github.com/xamarin/xamarin-macios/issues/14632.
+                    if (RuntimeInfo.OS != RuntimeInfo.Platform.iOS)
+                    {
+                        // Use HttpClient.DefaultProxy once on net6 everywhere.
+                        // The credential setter can also be removed at this point.
+                        options.Proxy = WebRequest.DefaultWebProxy;
+                        if (options.Proxy != null)
+                            options.Proxy.Credentials = CredentialCache.DefaultCredentials;
+                    }
 
                     options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
                     options.Headers.Add("OsuVersionHash", versionHash);
