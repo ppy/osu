@@ -24,7 +24,7 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osu.Game.Skinning;
 using osuTK;
-using JudgementTally = osu.Game.Screens.Play.HUD.JudgementCounter.JudgementTally;
+using osu.Game.Screens.Play.HUD.JudgementCounter;
 
 namespace osu.Game.Screens.Play
 {
