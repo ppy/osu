@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,6 +11,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -66,6 +65,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override Container<Drawable> Content { get; }
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
+
         protected Box Hover;
         protected Box Background;
         protected SpriteText SpriteText;
@@ -115,7 +116,7 @@ namespace osu.Game.Graphics.UserInterface
             });
 
             if (hoverSounds.HasValue)
-                AddInternal(new HoverClickSounds(hoverSounds.Value) { Enabled = { BindTarget = Enabled } });
+                Add(new HoverClickSounds(hoverSounds.Value) { Enabled = { BindTarget = Enabled } });
         }
 
         [BackgroundDependencyLoader]
