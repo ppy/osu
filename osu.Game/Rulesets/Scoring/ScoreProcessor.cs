@@ -493,31 +493,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <remarks>
         /// This method is useful in a variety of situations, with a few drawbacks that need to be considered:
         /// <list type="bullet">
-        ///     <item>The maximum <see cref="ScoringValues.BonusScore"/> will always be 0.</item>
-        ///     <item>The current and maximum <see cref="ScoringValues.CountBasicHitObjects"/> will always be the same value.</item>
-        /// </list>
-        /// Consumers are expected to more accurately fill in the above values through external means.
-        /// <para>
-        /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.CountBasicHitObjects"/> for use in
-        /// <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoringValues,osu.Game.Scoring.ScoringValues)"/>.
-        /// </para>
-        /// </remarks>
-        /// <param name="header">The replay frame header to extract scoring values from.</param>
-        /// <param name="current">The "current" scoring values, representing the hit statistics as they appear.</param>
-        /// <param name="maximum">The "maximum" scoring values, representing the hit statistics as if the maximum hit result was attained each time.</param>
-        [Pure]
-        internal void ExtractScoringValues(FrameHeader header, out ScoringValues current, out ScoringValues maximum)
-        {
-            extractScoringValues(header.Statistics, out current, out maximum);
-            current.MaxCombo = header.MaxCombo;
-        }
-
-        /// <summary>
-        /// Applies a best-effort extraction of hit statistics into <see cref="ScoringValues"/>.
-        /// </summary>
-        /// <remarks>
-        /// This method is useful in a variety of situations, with a few drawbacks that need to be considered:
-        /// <list type="bullet">
         ///     <item>The current <see cref="ScoringValues.MaxCombo"/> will always be 0.</item>
         ///     <item>The maximum <see cref="ScoringValues.BonusScore"/> will always be 0.</item>
         ///     <item>The current and maximum <see cref="ScoringValues.CountBasicHitObjects"/> will always be the same value.</item>
