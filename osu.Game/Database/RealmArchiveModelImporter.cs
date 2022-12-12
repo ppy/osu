@@ -13,6 +13,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
@@ -115,7 +116,7 @@ namespace osu.Game.Database
 
                 try
                 {
-                    var model = await Import(task, isBatchImport, notification.CancellationToken).ConfigureAwait(false);
+                    var model = await Import(task, new ImportParameters { Batch = isBatchImport }, notification.CancellationToken).ConfigureAwait(false);
 
                     lock (imported)
                     {
@@ -176,16 +177,16 @@ namespace osu.Game.Database
         /// Note that this bypasses the UI flow and should only be used for special cases or testing.
         /// </summary>
         /// <param name="task">The <see cref="ImportTask"/> containing data about the <typeparamref name="TModel"/> to import.</param>
-        /// <param name="batchImport">Whether this import is part of a larger batch.</param>
+        /// <param name="parameters">Parameters to further configure the import process.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        public async Task<Live<TModel>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default)
+        public async Task<Live<TModel>?> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             Live<TModel>? import;
             using (ArchiveReader reader = task.GetReader())
-                import = await importFromArchive(reader, batchImport, cancellationToken).ConfigureAwait(false);
+                import = await importFromArchive(reader, parameters, cancellationToken).ConfigureAwait(false);
 
             // We may or may not want to delete the file depending on where it is stored.
             //  e.g. reconstructing/repairing database with items from default storage.
@@ -211,9 +212,9 @@ namespace osu.Game.Database
         /// This method also handled queueing the import task on a relevant import thread pool.
         /// </remarks>
         /// <param name="archive">The archive to be imported.</param>
-        /// <param name="batchImport">Whether this import is part of a larger batch.</param>
+        /// <param name="parameters">Parameters to further configure the import process.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        private async Task<Live<TModel>?> importFromArchive(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
+        private async Task<Live<TModel>?> importFromArchive(ArchiveReader archive, ImportParameters parameters = default, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -236,10 +237,10 @@ namespace osu.Game.Database
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(() => ImportModel(model, archive, batchImport, cancellationToken),
+            var scheduledImport = Task.Factory.StartNew(() => ImportModel(model, archive, parameters, cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler,
-                batchImport ? import_scheduler_batch : import_scheduler);
+                parameters.Batch ? import_scheduler_batch : import_scheduler);
 
             return await scheduledImport.ConfigureAwait(false);
         }
@@ -249,15 +250,15 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
-        /// <param name="batchImport">If <c>true</c>, imports will be skipped before they begin, given an existing model matches on hash and filenames. Should generally only be used for large batch imports, as it may defy user expectations when updating an existing model.</param>
+        /// <param name="parameters">Parameters to further configure the import process.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
+        public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             TModel? existing;
 
-            if (batchImport && archive != null)
+            if (parameters.Batch && archive != null)
             {
                 // this is a fast bail condition to improve large import performance.
                 item.Hash = computeHashFast(archive);
@@ -358,7 +359,7 @@ namespace osu.Game.Database
                     // import to store
                     realm.Add(item);
 
-                    PostImport(item, realm, batchImport);
+                    PostImport(item, realm, parameters);
 
                     transaction.Commit();
                 }
@@ -493,8 +494,8 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The model prepared for import.</param>
         /// <param name="realm">The current realm context.</param>
-        /// <param name="batchImport">Whether the import was part of a batch.</param>
-        protected virtual void PostImport(TModel model, Realm realm, bool batchImport)
+        /// <param name="parameters">Parameters to further configure the import process.</param>
+        protected virtual void PostImport(TModel model, Realm realm, ImportParameters parameters)
         {
         }
 

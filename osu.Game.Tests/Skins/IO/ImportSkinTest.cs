@@ -12,6 +12,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
@@ -360,7 +361,7 @@ namespace osu.Game.Tests.Skins.IO
         private async Task<Live<SkinInfo>> loadSkinIntoOsu(OsuGameBase osu, ImportTask import, bool batchImport = false)
         {
             var skinManager = osu.Dependencies.Get<SkinManager>();
-            return await skinManager.Import(import, batchImport);
+            return await skinManager.Import(import, new ImportParameters { Batch = batchImport });
         }
     }
 }
