@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 };
 
-                spectatorClient.BeginPlaying(TestGameplayState.Create(new OsuRuleset()), recordingScore, 0);
+                spectatorClient.BeginPlaying(0, TestGameplayState.Create(new OsuRuleset()), recordingScore);
                 spectatorClient.OnNewFrames += onNewFrames;
             });
         }
