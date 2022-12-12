@@ -9,11 +9,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
     public partial class SettingsButton : RoundedButton, IHasTooltip, IConditionalFilterable
     {
+        // We don't want to receive input at the padded area
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
+
         public SettingsButton()
         {
             RelativeSizeAxes = Axes.X;
