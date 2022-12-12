@@ -236,41 +236,35 @@ namespace osu.Game.Graphics.Backgrounds
                 shader.GetUniform<float>("thickness").UpdateValue(ref thickness);
                 shader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
 
-                float relativeHeight = triangleSize.Y / size.Y;
-                float relativeWidth = triangleSize.X / size.X;
+                Vector2 relativeTriangleSize = Vector2.Divide(triangleSize, size);
 
                 foreach (TriangleParticle particle in parts)
                 {
-                    Vector2 topLeft = particle.Position - new Vector2(relativeWidth * 0.5f, 0f);
+                    Vector2 topLeft = particle.Position - new Vector2(relativeTriangleSize.X * 0.5f, 0f);
 
-                    Vector2 topLeftClipped = clipToDrawable(topLeft);
-                    Vector2 topRightClipped = clipToDrawable(topLeft + new Vector2(relativeWidth, 0f));
-                    Vector2 bottomLeftClipped = clipToDrawable(topLeft + new Vector2(0f, relativeHeight));
-                    Vector2 bottomRightClipped = clipToDrawable(topLeft + new Vector2(relativeWidth, relativeHeight));
+                    Quad clampedQuad = clampToDrawable(topLeft, relativeTriangleSize);
 
                     var drawQuad = new Quad(
-                        Vector2Extensions.Transform(topLeftClipped * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(topRightClipped * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(bottomLeftClipped * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(bottomRightClipped * size, DrawInfo.Matrix)
+                        Vector2Extensions.Transform(clampedQuad.TopLeft * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(clampedQuad.TopRight * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(clampedQuad.BottomLeft * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(clampedQuad.BottomRight * size, DrawInfo.Matrix)
                     );
 
-                    ColourInfo colourInfo = triangleColourInfo(DrawColourInfo.Colour, new Quad(topLeftClipped, topRightClipped, bottomLeftClipped, bottomRightClipped));
+                    ColourInfo colourInfo = triangleColourInfo(DrawColourInfo.Colour, clampedQuad);
 
                     var textureCoords = new RectangleF(
-                        (topLeftClipped.X - topLeft.X) / relativeWidth,
-                        (topLeftClipped.Y - topLeft.Y) / relativeHeight,
-                        (topRightClipped.X - topLeftClipped.X) / relativeWidth,
-                        (bottomLeftClipped.Y - topLeftClipped.Y) / relativeHeight
-                    );
+                        clampedQuad.TopLeft.X - topLeft.X,
+                        clampedQuad.TopLeft.Y - topLeft.Y,
+                        clampedQuad.Width,
+                        clampedQuad.Height
+                    ) / relativeTriangleSize;
 
                     renderer.DrawQuad(texture, drawQuad, colourInfo, new RectangleF(0, 0, 1, 1), vertexBatch.AddAction, textureCoords: textureCoords);
                 }
 
                 shader.Unbind();
             }
-
-            private static Vector2 clipToDrawable(Vector2 input) => new Vector2(Math.Clamp(input.X, 0f, 1f), Math.Clamp(input.Y, 0f, 1f));
 
             private static ColourInfo triangleColourInfo(ColourInfo source, Quad quad)
             {
@@ -281,6 +275,19 @@ namespace osu.Game.Graphics.Backgrounds
                     BottomLeft = source.Interpolate(quad.BottomLeft),
                     BottomRight = source.Interpolate(quad.BottomRight)
                 };
+            }
+
+            private static Quad clampToDrawable(Vector2 topLeft, Vector2 size)
+            {
+                float leftClamped = Math.Clamp(topLeft.X, 0f, 1f);
+                float topClamped = Math.Clamp(topLeft.Y, 0f, 1f);
+
+                return new Quad(
+                    leftClamped,
+                    topClamped,
+                    Math.Clamp(topLeft.X + size.X, 0f, 1f) - leftClamped,
+                    Math.Clamp(topLeft.Y + size.Y, 0f, 1f) - topClamped
+                );
             }
 
             protected override void Dispose(bool isDisposing)
