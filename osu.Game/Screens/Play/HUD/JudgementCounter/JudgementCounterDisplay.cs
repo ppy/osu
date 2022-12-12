@@ -33,32 +33,28 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         [Resolved]
         private JudgementTally tally { get; set; } = null!;
 
-        protected FillFlowContainer JudgementContainer = null!;
+        protected FillFlowContainer JudgementContainer;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public JudgementCounterDisplay()
         {
+            AutoSizeAxes = Axes.Both;
             InternalChild = JudgementContainer = new FillFlowContainer
             {
                 Direction = getFlow(FlowDirection.Value),
                 Spacing = new Vector2(10),
                 AutoSizeAxes = Axes.Both
             };
-
-            foreach (var result in tally.Results)
-            {
-                JudgementContainer.Add(createCounter(result));
-            }
-        }
-
-        protected override void Update()
-        {
-            Size = JudgementContainer.Size;
-            base.Update();
         }
 
         protected override void LoadComplete()
         {
+            //Adding this in "load" will cause it to not load in properly after the first beatmap attempt. Or after existing and reentering.
+            //this does not happen in tests, or in the skin editor component preview button.
+            foreach (var result in tally.Results)
+            {
+                JudgementContainer.Add(createCounter(result));
+            }
+
             base.LoadComplete();
 
             FlowDirection.BindValueChanged(direction =>
@@ -125,7 +121,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         {
             switch (flow)
             {
-                case Flow.Horizonal:
+                case Flow.Horizontal:
                     return FillDirection.Horizontal;
 
                 case Flow.Vertical:
@@ -139,7 +135,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         //Used to hide default full option in FillDirection
         public enum Flow
         {
-            Horizonal,
+            Horizontal,
             Vertical
         }
 
