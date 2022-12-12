@@ -10,6 +10,10 @@ using osu.Game.Overlays;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Allocation;
+using osu.Game.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osuTK.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -21,6 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         private readonly SettingsButton settingsButton;
+        private readonly OsuClickableContainer clickableContainer;
         private readonly RoundedButton roundedButton;
         private readonly ShearedButton shearedButton;
 
@@ -34,6 +39,28 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
+                    clickableContainer = new OsuClickableContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 40,
+                        Enabled = { Value = true },
+                        Masking = true,
+                        CornerRadius = 20,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.Red
+                            },
+                            new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Text = "Rounded clickable container"
+                            }
+                        }
+                    },
                     settingsButton = new SettingsButton
                     {
                         Enabled = { Value = true },
@@ -87,6 +114,16 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Move cursor to corner", () => InputManager.MoveMouseTo(shearedButton.ScreenSpaceDrawQuad.TopLeft + Vector2.One));
             AddAssert("Cursor within a button", () => shearedButton.ScreenSpaceDrawQuad.Contains(InputManager.CurrentState.Mouse.Position));
             AddAssert("Button is not hovered", () => !shearedButton.IsHovered);
+        }
+
+        [Test]
+        public void TestRoundedClickableContainerInput()
+        {
+            AddStep("Move cursor to button", () => InputManager.MoveMouseTo(clickableContainer));
+            AddAssert("Button is hovered", () => clickableContainer.IsHovered);
+            AddStep("Move cursor to corner", () => InputManager.MoveMouseTo(clickableContainer.ScreenSpaceDrawQuad.TopLeft + Vector2.One));
+            AddAssert("Cursor within a button", () => clickableContainer.ScreenSpaceDrawQuad.Contains(InputManager.CurrentState.Mouse.Position));
+            AddAssert("Button is not hovered", () => !clickableContainer.IsHovered);
         }
     }
 }

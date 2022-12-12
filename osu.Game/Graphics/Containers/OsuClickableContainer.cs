@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.Containers
 
         private readonly Container content = new Container { RelativeSizeAxes = Axes.Both };
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) && Content.ReceivePositionalInputAt(screenSpacePos);
 
         protected override Container<Drawable> Content => content;
 
