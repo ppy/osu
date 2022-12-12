@@ -76,6 +76,7 @@ namespace osu.Game.Online.Spectator
 
         private IBeatmap? currentBeatmap;
         private Score? currentScore;
+        private long? currentScoreToken;
 
         private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
 
@@ -108,7 +109,7 @@ namespace osu.Game.Online.Spectator
                     // re-send state in case it wasn't received
                     if (IsPlaying)
                         // TODO: this is likely sent out of order after a reconnect scenario. needs further consideration.
-                        BeginPlayingInternal(currentState);
+                        BeginPlayingInternal(currentScoreToken, currentState);
                 }
                 else
                 {
@@ -159,7 +160,7 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
-        public void BeginPlaying(GameplayState state, Score score, long? token)
+        public void BeginPlaying(long? scoreToken, GameplayState state, Score score)
         {
             // This schedule is only here to match the one below in `EndPlaying`.
             Schedule(() =>
@@ -175,12 +176,12 @@ namespace osu.Game.Online.Spectator
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
                 currentState.State = SpectatedUserState.Playing;
                 currentState.MaximumScoringValues = state.ScoreProcessor.MaximumScoringValues;
-                currentState.ScoreToken = token;
 
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
+                currentScoreToken = scoreToken;
 
-                BeginPlayingInternal(currentState);
+                BeginPlayingInternal(currentScoreToken, currentState);
             });
         }
 
@@ -265,7 +266,7 @@ namespace osu.Game.Online.Spectator
             });
         }
 
-        protected abstract Task BeginPlayingInternal(SpectatorState state);
+        protected abstract Task BeginPlayingInternal(long? scoreToken, SpectatorState state);
 
         protected abstract Task SendFramesInternal(FrameDataBundle bundle);
 
