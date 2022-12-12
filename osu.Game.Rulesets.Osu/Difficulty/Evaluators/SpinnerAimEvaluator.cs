@@ -11,6 +11,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public class SpinnerAimEvaluator
     {
+        /// <summary>
+        /// Evaluates the difficulty of spinning the current object, based on:
+        /// <list type="bullet">
+        /// <item><description>the spinning velocity required to achieve a Great hitresult,</description></item>
+        /// <item><description>and the duration of the spinner.</description></item>
+        /// </list>
+        /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hasSpunOut)
         {
             if (current.BaseObject is not Spinner spinner || hasSpunOut || spinner.Duration <= 0)
@@ -21,12 +28,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrent.SpinnerDuration.IsNull())
                 return 0;
 
-            double r = 0.05 / (0.00008 + Math.Max(0, (5000 - spinner.Duration) / (1000 * 2000)));
-            double numerator = -spinner.Duration + Math.Sqrt(spinner.Duration * spinner.Duration - 40 * r * spinner.SpinsRequired);
-            double denominator = -20 * r;
+            // Desmos: https://www.desmos.com/calculator/ps8s5hghnl
+
+            // The game permits a max spinning velocity of 0.05 units per ms, and it
+            // takes some time before the maximum spinning velocity on a spinner is
+            // achieved. This value is the time at which the maximum spinning velocity
+            // is achieved by the player.
+            double timeOfMaxSpinningVelocity = 0.05 / (0.00008 + Math.Max(0, (5000 - spinner.Duration) / (1000 * 2000)));
+
+            // This is a quadratic equation that returns the minimum rad/ms required by
+            // the player to achieve a Great (300) hit result on a spinner.
+            double numerator = -spinner.Duration + Math.Sqrt(spinner.Duration * spinner.Duration - 40 * timeOfMaxSpinningVelocity * spinner.SpinsRequired);
+            double denominator = -20 * timeOfMaxSpinningVelocity;
 
             // This value is scaled by the spinner's overall duration to account
-            // for the fact that longer spinners are generally more lenient.
+            // for the fact that longer spinners generally play more lenient.
             return (400000 * numerator / denominator) / osuCurrent.SpinnerDuration.Value;
         }
     }
