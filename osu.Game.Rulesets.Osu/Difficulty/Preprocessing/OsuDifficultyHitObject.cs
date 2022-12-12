@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using FFmpeg.AutoGen;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
