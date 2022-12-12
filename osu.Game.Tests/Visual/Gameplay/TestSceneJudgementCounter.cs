@@ -34,13 +34,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var ruleset = CreateRuleset();
 
+            var r = ruleset.CreateBeatmapConverter(Beatmap.Value.Beatmap);
+
+            var n = r.Convert().BeatmapInfo.Ruleset.CreateInstance();
             Debug.Assert(ruleset != null);
 
-            scoreProcessor = new ScoreProcessor(ruleset);
+            scoreProcessor = new ScoreProcessor(n);
             Child = new DependencyProvidingContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                CachedDependencies = new (Type, object)[] { (typeof(ScoreProcessor), scoreProcessor), (typeof(Ruleset), ruleset) },
+                CachedDependencies = new (Type, object)[] { (typeof(ScoreProcessor), scoreProcessor), (typeof(Ruleset), n) },
                 Children = new Drawable[]
                 {
                     judgementTally = new JudgementTally(),

@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD.JudgementCounter
@@ -21,7 +22,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> working)
         {
-            foreach (var result in working.Value.BeatmapInfo.Ruleset.CreateInstance().GetHitResults())
+            foreach (var result in getRuleset(working).GetHitResults())
             {
                 Results.Add(new JudgementCounterInfo
                 {
@@ -29,6 +30,14 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                     ResultCount = new BindableInt()
                 });
             }
+        }
+
+        private Ruleset getRuleset(IBindable<WorkingBeatmap> working)
+        {
+            var ruleset = working.Value.BeatmapInfo.Ruleset.CreateInstance();
+            var converter = ruleset.RulesetInfo.CreateInstance().CreateBeatmapConverter(working.Value.Beatmap);
+
+            return converter.CanConvert() ? converter.Convert().BeatmapInfo.Ruleset.CreateInstance() : ruleset;
         }
 
         protected override void LoadComplete()
