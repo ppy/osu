@@ -38,14 +38,14 @@ namespace osu.Game.Screens.Edit.List
 
         public T? RepresentedItem => null;
         public IReadOnlyDictionary<DrawableListRepresetedItem<T>, AbstractListItem<T>> ItemMaps => ItemMap;
-        public event Action<AbstractListItem<T>> ItemAdded = _ => { };
+        public event Action<AbstractListItem<T>> ItemAdded = static _ => { };
 
         /// <summary>
         /// This event is called if an item is dragged out of the current list.
         /// This event will be called just before the item is relocated to the new list.
         /// </summary>
         /// Parameters are the item, that is dragged, and the list that the item will be dragged into.
-        public event Action<AbstractListItem<T>, DrawableList<T>> ItemDraggedOut = (_, _) => { };
+        public event Action<AbstractListItem<T>, DrawableList<T>> ItemDraggedOut = static (_, _) => { };
 
         /// <summary>
         /// This event is called if an item is dragged into of the current list.
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.List
         /// This also means that the ItemAdded event will trigger AFTER this event.
         /// </summary>
         /// Parameters are the item, that is dragged, and the list that the item was dragged out of.
-        public event Action<AbstractListItem<T>, DrawableList<T>> ItemDraggedIn = (_, _) => { };
+        public event Action<AbstractListItem<T>, DrawableList<T>> ItemDraggedIn = static (_, _) => { };
 
         public DrawableList(DrawableListProperties<T> properties)
         {
@@ -112,8 +112,8 @@ namespace osu.Game.Screens.Edit.List
             // Scheduler.Add(() => Scheduler.Add(() => Height = ScrollContainer.AvailableContent + 1));
         }
 
-        public virtual void Select() => ApplyAction(t => t.Select());
-        public virtual void Deselect() => ApplyAction(t => t.Deselect());
+        public virtual void Select() => ApplyAction(static t => t.Select());
+        public virtual void Deselect() => ApplyAction(static t => t.Deselect());
 
         public void ApplyAction(Action<IDrawableListItem<T>> action)
         {

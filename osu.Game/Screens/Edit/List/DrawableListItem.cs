@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Edit.List
             }
             else
             {
-                Properties.ApplyAll(element => element.Deselect());
+                Properties.ApplyAll(static element => element.Deselect());
                 Select();
             }
 
@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Edit.List
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            Properties.ApplyAll(element => element.Deselect());
+            Properties.ApplyAll(static element => element.Deselect());
             Select();
             return base.OnDragStart(e);
         }

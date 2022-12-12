@@ -60,9 +60,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Add Lists", () =>
             {
                 int items = 0;
-                List<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>> list = new List<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>>(item_count);
                 AddElement(Enumerable.Range(0, item_count)
-                                     .Select(_ => new TextElement()),
+                                     .Select(static _ => new TextElement()),
                     BackingDrawable.List.Items,
                     () => "List" + (item_count - ++items),
                     DrawableListEntryType.MinimisableList,
@@ -99,7 +98,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 int items = 0;
                 List<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>> list = new List<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>>(item_count);
                 AddElement(Enumerable.Range(0, item_count)
-                                     .Select(_ => new TextElement()),
+                                     .Select(static _ => new TextElement()),
                     list,
                     () => "List" + (item_count - ++items),
                     DrawableListEntryType.MinimisableList,

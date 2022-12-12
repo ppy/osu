@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit.List
     public interface IDrawableListItem<T> : IDrawableListRepresetedItem<T>, IDrawable
         where T : Drawable
     {
-        public static readonly Action<T, int> DEFAULT_SET_ITEM_DEPTH = (t, d) =>
+        public static readonly Action<T, int> DEFAULT_SET_ITEM_DEPTH = static (t, d) =>
         {
             if (t is Drawable drawable)
             {

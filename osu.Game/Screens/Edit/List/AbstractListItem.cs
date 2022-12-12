@@ -47,8 +47,8 @@ namespace osu.Game.Screens.Edit.List
 
         internal void ResetEvents()
         {
-            Selected = () => { };
-            Deselected = () => { };
+            Selected = static () => { };
+            Deselected = static () => { };
             StateChanged = t =>
             {
                 switch (t)
@@ -65,8 +65,8 @@ namespace osu.Game.Screens.Edit.List
         }
 
         public event Action<SelectionState> StateChanged;
-        public event Action Selected = () => { };
-        public event Action Deselected = () => { };
+        public event Action Selected = static () => { };
+        public event Action Deselected = static () => { };
 
         #region RearrangableListItem reimplementation
 
@@ -75,17 +75,17 @@ namespace osu.Game.Screens.Edit.List
         /// <summary>
         /// Invoked on drag start, if an arrangement should be started.
         /// </summary>
-        internal Action<AbstractListItem<T>, DragStartEvent> StartArrangement = (_, _) => { };
+        internal Action<AbstractListItem<T>, DragStartEvent> StartArrangement = static (_, _) => { };
 
         /// <summary>
         /// Invoked on drag, if this item is being arranged.
         /// </summary>
-        internal Action<AbstractListItem<T>, DragEvent> Arrange = (_, _) => { };
+        internal Action<AbstractListItem<T>, DragEvent> Arrange = static (_, _) => { };
 
         /// <summary>
         /// Invoked on drag end, if this item is being arranged.
         /// </summary>
-        internal Action<AbstractListItem<T>, DragEndEvent> EndArrangement = (_, _) => { };
+        internal Action<AbstractListItem<T>, DragEndEvent> EndArrangement = static (_, _) => { };
 
         /// <summary>
         /// Whether the item is able to be dragged at the given screen-space position.

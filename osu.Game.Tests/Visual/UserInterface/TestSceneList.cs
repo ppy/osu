@@ -33,8 +33,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             drawable.Width = 100;
             drawable.RelativeSizeAxes = Axes.None;
             drawable.Anchor = Anchor.CentreRight;
-            ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)drawable).Properties.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
-            ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)drawable).Properties.SetItemDepth = (blueprint, depth) =>
+            ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)drawable).Properties.GetName = static t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
+            ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)drawable).Properties.SetItemDepth = static (blueprint, depth) =>
             {
                 if (blueprint.Parent is Container<Drawable> container)
                 {
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 int items = 0;
                 AddElement(Enumerable.Range(0, item_number)
-                                     .Select(_ => new TextElement()),
+                                     .Select(static _ => new TextElement()),
                     listSupplier().Items,
                     () => "Element" + (item_number - ++items)
                 );
@@ -173,7 +173,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             ListAddItems(() => DrawableList);
             //start with regular clicks
-            AddAssert("no Item is selected", () => applyToItems(t => !t.IsSelected, DrawableList.ItemMaps.Values));
+            AddAssert("no Item is selected", () => applyToItems(static t => !t.IsSelected, DrawableList.ItemMaps.Values));
             AddStep("select first item", () =>
             {
                 InputManager.MoveMouseTo(DrawableList.ItemMaps[DrawableList.Items[0]]);

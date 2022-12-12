@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private Action onDragAction = () => { };
+        private Action onDragAction = static () => { };
 
         public Action OnDragAction
         {
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private Action<AbstractListItem<T>> postOnDragAction = i => i.Parent?.Invalidate();
+        private Action<AbstractListItem<T>> postOnDragAction = static i => i.Parent?.Invalidate();
 
         public Action<AbstractListItem<T>> PostOnDragAction
         {
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        public Func<T, float> GetDepth { get; set; } = d => d.Depth;
+        public Func<T, float> GetDepth { get; set; } = static d => d.Depth;
 
         internal DrawableListProperties(IDrawableListItem<T> topLevelItem)
         {
