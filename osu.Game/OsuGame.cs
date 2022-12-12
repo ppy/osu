@@ -16,6 +16,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
@@ -405,6 +406,16 @@ namespace osu.Game
         {
             if (url.StartsWith('/'))
                 url = $"{API.APIEndpointUrl}{url}";
+
+            if (!url.CheckIsValidUrl())
+            {
+                Notifications.Post(new SimpleErrorNotification
+                {
+                    Text = $"The URL {url} has an unsupported or dangerous protocol and will not be opened.",
+                });
+
+                return;
+            }
 
             externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
         });
