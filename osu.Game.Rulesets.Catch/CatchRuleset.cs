@@ -10,8 +10,11 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Catch.Beatmaps;
+using osu.Game.Rulesets.Catch.Configuration;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Catch.Edit;
 using osu.Game.Rulesets.Catch.Mods;
@@ -20,6 +23,7 @@ using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Catch.Skinning.Argon;
 using osu.Game.Rulesets.Catch.Skinning.Legacy;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
@@ -206,5 +210,9 @@ namespace osu.Game.Rulesets.Catch
         public override HitObjectComposer CreateHitObjectComposer() => new CatchHitObjectComposer(this);
 
         public override IBeatmapVerifier CreateBeatmapVerifier() => new CatchBeatmapVerifier();
+
+        public override IRulesetConfigManager? CreateConfig(SettingsStore? settings) => new CatchRulesetConfigManager(settings, RulesetInfo);
+
+        public override RulesetSettingsSubsection? CreateSettings() => new CatchSettingsSubsection(this);
     }
 }

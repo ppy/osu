@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Catch.UI.Cursor;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 
@@ -57,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (Mods != null && Mods.Any(m => m is ModRelax))
                 return new CatchRelaxCursorContainer();
 
-            return base.CreateCursor();
+            return new CatchCursorContainer();
         }
 
         [BackgroundDependencyLoader]
