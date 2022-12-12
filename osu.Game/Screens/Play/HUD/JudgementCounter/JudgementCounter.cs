@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD.JudgementCounter
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         private JudgementRollingCounter counter = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, DrawableRuleset ruleset)
         {
             AutoSizeAxes = Axes.Both;
             InternalChild = flowContainer = new FillFlowContainer
@@ -44,7 +45,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                     ResultName = new OsuSpriteText
                     {
                         Font = OsuFont.Numeric.With(size: 8),
-                        Text = Result.ResultInfo.Displayname
+                        Text = ruleset.Ruleset.GetDisplayNameForHitResult(Result.ResultInfo.Type)
                     }
                 }
             };
