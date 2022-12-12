@@ -45,7 +45,8 @@ namespace osu.Game.Database
         /// <param name="data">The file data stream.</param>
         /// <param name="realm">The realm instance to add to. Should already be in a transaction.</param>
         /// <param name="addToRealm">Whether the <see cref="RealmFile"/> should immediately be added to the underlying realm. If <c>false</c> is provided here, the instance must be manually added.</param>
-        public RealmFile Add(Stream data, Realm realm, bool addToRealm = true)
+        /// <param name="preferHardLinks">Whether this import should use hard links rather than file copy operations if available.</param>
+        public RealmFile Add(Stream data, Realm realm, bool addToRealm = true, bool preferHardLinks = false)
         {
             string hash = data.ComputeSHA2Hash();
 
@@ -54,7 +55,7 @@ namespace osu.Game.Database
             var file = existing ?? new RealmFile { Hash = hash };
 
             if (!checkFileExistsAndMatchesHash(file))
-                copyToStore(file, data);
+                copyToStore(file, data, preferHardLinks);
 
             if (addToRealm && !file.IsManaged)
                 realm.Add(file);
@@ -62,9 +63,9 @@ namespace osu.Game.Database
             return file;
         }
 
-        private void copyToStore(RealmFile file, Stream data)
+        private void copyToStore(RealmFile file, Stream data, bool preferHardLinks)
         {
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows && data is FileStream fs)
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows && data is FileStream fs && preferHardLinks)
             {
                 // attempt to do a fast hard link rather than copy.
                 if (CreateHardLink(Storage.GetFullPath(file.GetStoragePath()), fs.Name, IntPtr.Zero))
@@ -79,6 +80,58 @@ namespace osu.Game.Database
             data.Seek(0, SeekOrigin.Begin);
         }
 
+        private bool checkFileExistsAndMatchesHash(RealmFile file)
+        {
+            string path = file.GetStoragePath();
+
+            // we may be re-adding a file to fix missing store entries.
+            if (!Storage.Exists(path))
+                return false;
+
+            // even if the file already exists, check the existing checksum for safety.
+            using (var stream = Storage.GetStream(path))
+                return stream.ComputeSHA2Hash() == file.Hash;
+        }
+
+        public void Cleanup()
+        {
+            Logger.Log(@"Beginning realm file store cleanup");
+
+            int totalFiles = 0;
+            int removedFiles = 0;
+
+            // can potentially be run asynchronously, although we will need to consider operation order for disk deletion vs realm removal.
+            realm.Write(r =>
+            {
+                // TODO: consider using a realm native query to avoid iterating all files (https://github.com/realm/realm-dotnet/issues/2659#issuecomment-927823707)
+                var files = r.All<RealmFile>().ToList();
+
+                foreach (var file in files)
+                {
+                    totalFiles++;
+
+                    if (file.BacklinksCount > 0)
+                        continue;
+
+                    try
+                    {
+                        removedFiles++;
+                        Storage.Delete(file.GetStoragePath());
+                        r.Remove(file);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not delete databased file {file.Hash}");
+                    }
+                }
+            });
+
+            Logger.Log($@"Finished realm file store cleanup ({removedFiles} of {totalFiles} deleted)");
+        }
+
+        #region Windows hard link support
+
+        // For future use (to detect if a file is a hard link with other references existing on disk).
         public static int GetFileLinkCount(string filePath)
         {
             int result = 0;
@@ -132,53 +185,6 @@ namespace osu.Game.Database
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool CloseHandle(SafeHandle hObject);
 
-        private bool checkFileExistsAndMatchesHash(RealmFile file)
-        {
-            string path = file.GetStoragePath();
-
-            // we may be re-adding a file to fix missing store entries.
-            if (!Storage.Exists(path))
-                return false;
-
-            // even if the file already exists, check the existing checksum for safety.
-            using (var stream = Storage.GetStream(path))
-                return stream.ComputeSHA2Hash() == file.Hash;
-        }
-
-        public void Cleanup()
-        {
-            Logger.Log(@"Beginning realm file store cleanup");
-
-            int totalFiles = 0;
-            int removedFiles = 0;
-
-            // can potentially be run asynchronously, although we will need to consider operation order for disk deletion vs realm removal.
-            realm.Write(r =>
-            {
-                // TODO: consider using a realm native query to avoid iterating all files (https://github.com/realm/realm-dotnet/issues/2659#issuecomment-927823707)
-                var files = r.All<RealmFile>().ToList();
-
-                foreach (var file in files)
-                {
-                    totalFiles++;
-
-                    if (file.BacklinksCount > 0)
-                        continue;
-
-                    try
-                    {
-                        removedFiles++;
-                        Storage.Delete(file.GetStoragePath());
-                        r.Remove(file);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $@"Could not delete databased file {file.Hash}");
-                    }
-                }
-            });
-
-            Logger.Log($@"Finished realm file store cleanup ({removedFiles} of {totalFiles} deleted)");
-        }
+        #endregion
     }
 }
