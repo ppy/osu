@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.List;
 using osu.Game.Skinning;
@@ -68,24 +70,48 @@ namespace osu.Game.Tests.Visual.UserInterface
         protected virtual void CreateDrawableList() => BackingDrawableList = new DrawableList<SelectionBlueprint<ISkinnableDrawable>>();
         protected virtual DrawableList<SelectionBlueprint<ISkinnableDrawable>> DrawableList => BackingDrawableList;
 
-        protected virtual void AddElement(ISkinnableDrawable skinnableDrawable, DrawableList<SelectionBlueprint<ISkinnableDrawable>> list)
+        protected void AddElement(IEnumerable<ISkinnableDrawable> skinnableDrawable, IList<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>> list)
         {
-            var skinnable = (Drawable)skinnableDrawable;
-            skinnable.Name = "Element" + SkinElements.Count;
+            string getName() => "Element" + list.Count;
+            AddElement(skinnableDrawable, list, getName);
+        }
+
+        protected void AddElement(IEnumerable<ISkinnableDrawable> skinnableDrawable, IList<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>> list, Func<string> producer)
+            => AddElement(skinnableDrawable, list, producer, DrawableListEntryType.Item, true);
+
+        protected virtual void AddElement(IEnumerable<ISkinnableDrawable> skinnableDrawable, IList<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>> list, Func<string> producer, DrawableListEntryType type, bool addToSkinElements)
+        {
+            var represetedItems = skinnableDrawable.Select(e =>
+            {
+                ((Drawable)e).Name = producer();
+                return new SkinBlueprint(e);
+            }).Select(e => new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(e, type));
 
             //this makes sure I actually can only select a single element
 
-            var skinBlueprint = new SkinBlueprint(skinnableDrawable);
-            list.Items.Add(new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(skinBlueprint, DrawableListEntryType.Item));
+            list.AddRange(represetedItems);
 
-            SkinElements.Add(new Container
+            if (!addToSkinElements) return;
+
+            Drawable getElement(Drawable drawable)
+            {
+                float pos = SkinElements.Children.Count / 2 * (50 + 2);
+                //make sure we can fit exactly the number of elements we want in a grid pattern
+                float xwidth = (int)(SkinElements.ChildSize.X - 100) / 52 * 52;
+                drawable.Position = new Vector2(pos % xwidth, (int)pos / (int)xwidth * (50 + 2));
+                return drawable;
+            }
+
+            var containers = represetedItems.Select(e => new Container
             {
                 Children = new[]
                 {
-                    skinBlueprint,
-                    skinnable
+                    getElement(e.RepresentedItem),
+                    getElement((Drawable)e.RepresentedItem.Item),
                 }
             });
+
+            SkinElements.AddRange(containers);
         }
 
         private bool applyToItems(Predicate<DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>> predicate,
@@ -110,21 +136,20 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         protected void ListAddItems(Func<DrawableList<SelectionBlueprint<ISkinnableDrawable>>> listSupplier)
         {
+            const int item_number = 10;
+
             int before = 0;
             AddStep("Get Item Count", () => before = listSupplier().Items.Count);
-            AddRepeatStep("add item", () =>
+            AddStep($"add {item_number} items", () =>
             {
-                var list = listSupplier();
-                float pos = list.Items.Count * (50 + 2);
-                //make sure we can fit exactly the number of elements we want in a grid pattern
-                float xwidth = (int)(SkinElements.ChildSize.X - 100) / 52 * 52;
-                AddElement(new BigBlackBox
-                {
-                    Size = Vector2.One * 50,
-                    Position = new Vector2(pos % xwidth, (int)pos / (int)xwidth * (50 + 2)),
-                }, list);
-            }, 10);
-            AddAssert("Exactly 10 items were added", () => listSupplier().Items.Count == before + 10);
+                int items = 0;
+                AddElement(Enumerable.Range(0, item_number)
+                                     .Select(_ => new TextElement()),
+                    listSupplier().Items,
+                    () => "Element" + (item_number - ++items)
+                );
+            });
+            AddAssert($"Exactly {item_number} items were added", () => listSupplier().Items.Count == before + item_number);
             checkDepth();
         }
 
@@ -203,9 +228,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     var selectionBlueprint = DrawableList.ItemMaps[DrawableList.Items[i]].Model.RepresentedItem;
 
-                    if (((Drawable)selectionBlueprint.Item).Name != $"Element{(i + 1) % DrawableList.Items.Count}")
+                    int expectedNum = (i + 1) % DrawableList.Items.Count;
+                    string name = ((Drawable)selectionBlueprint.Item).Name;
+
+                    if (name != $"Element{expectedNum}")
                     {
-                        Logger.Log($"Element{i} doesn't have the correct name");
+                        Logger.Log($"Element {i} doesn't have the correct name, Expected 'Element{expectedNum}' but got '{name}'");
                         return false;
                     }
                 }

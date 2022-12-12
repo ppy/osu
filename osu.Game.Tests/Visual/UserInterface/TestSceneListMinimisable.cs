@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
@@ -54,21 +55,19 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test, Order(3)]
         public void TestListinListDrag()
         {
-            AddRepeatStep("Add Lists", () =>
-            {
-                DrawableList
-                    .Items
-                    .Add(
-                        new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(
-                            new SkinBlueprint(
-                                new BigBlackBox
-                                {
-                                    Name = "List" + DrawableList.Items.Count
-                                }),
-                            DrawableListEntryType.MinimisableList)
-                    );
-            }, 3);
+            const int item_count = 3;
             ListAddItems(() => DrawableList);
+            AddStep("Add Lists", () =>
+            {
+                int items = 0;
+                List<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>> list = new List<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>>(item_count);
+                AddElement(Enumerable.Range(0, item_count)
+                                     .Select(_ => new TextElement()),
+                    BackingDrawable.List.Items,
+                    () => "List" + (item_count - ++items),
+                    DrawableListEntryType.MinimisableList,
+                    false);
+            });
             AddAssert("13 elements in list", () => DrawableList.Items.Count == 13);
             AddStep("Move mouse to first list", () =>
             {
@@ -93,16 +92,25 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestDragItemOutOfList()
         {
             const int item_count = 10;
+
             List<DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>> lists = new List<DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>>(item_count);
-            AddRepeatStep("add lists", () =>
+            AddStep("add lists", () =>
             {
-                var item = new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(new SkinBlueprint(new TextElement
-                {
-                    Name = $"List{lists.Count}"
-                }), DrawableListEntryType.MinimisableList);
-                BackingDrawable.List.Items.Add(item);
-                lists.Add((DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>)BackingDrawable.List.ItemMaps[item]);
-            }, item_count);
+                int items = 0;
+                List<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>> list = new List<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>>(item_count);
+                AddElement(Enumerable.Range(0, item_count)
+                                     .Select(_ => new TextElement()),
+                    list,
+                    () => "List" + (item_count - ++items),
+                    DrawableListEntryType.MinimisableList,
+                    false);
+                BackingDrawable.List.Items.AddRange(list);
+
+                AbstractListItem<SelectionBlueprint<ISkinnableDrawable>> getItem(DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>> item) => BackingDrawable.List.ItemMaps[item];
+                lists.AddRange(list.Select(getItem).Cast<DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>>().Reverse());
+            });
+            AddAssert("lists were all added", () => lists.Count == item_count);
+            // ReSharper disable once HeuristicUnreachableCode
             expandList(() => lists[0]);
             ListAddItems(() => lists[0].List);
             ListAddItems(() => lists[1].List);

@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private Action<AbstractListItem<T>> postOnDragAction = i => { i.Parent.Invalidate(); };
+        private Action<AbstractListItem<T>> postOnDragAction = i => i.Parent?.Invalidate();
 
         public Action<AbstractListItem<T>> PostOnDragAction
         {
