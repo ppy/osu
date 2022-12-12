@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
-using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
