@@ -78,7 +78,8 @@ namespace osu.Game.Screens.Edit.List
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                         }
-                    }
+                    },
+                    Margin = new MarginPadding { Bottom = 2.5f }
                 },
                 List = new DrawableList<T>(Properties)
                 {
