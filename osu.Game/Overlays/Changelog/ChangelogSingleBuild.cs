@@ -104,27 +104,29 @@ namespace osu.Game.Overlays.Changelog
             {
                 var fill = base.CreateHeader();
 
-                foreach (var existing in fill.Children.OfType<OsuHoverContainer>())
+                var nestedFill = fill.Children.OfType<FillFlowContainer>().First();
+
+                var buildDisplay = nestedFill.Children.OfType<OsuHoverContainer>().First();
+
+                buildDisplay.Scale = new Vector2(1.25f);
+                buildDisplay.Action = null;
+
+                fill.Add(date = new OsuSpriteText
                 {
-                    existing.Scale = new Vector2(1.25f);
-                    existing.Action = null;
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Text = Build.CreatedAt.Date.ToString("dd MMMM yyyy"),
+                    Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 14),
+                    Margin = new MarginPadding { Top = 5 },
+                    Scale = new Vector2(1.25f),
+                });
 
-                    existing.Add(date = new OsuSpriteText
-                    {
-                        Text = Build.CreatedAt.Date.ToString("dd MMMM yyyy"),
-                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 14),
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.TopCentre,
-                        Margin = new MarginPadding { Top = 5 },
-                    });
-                }
-
-                fill.Insert(-1, new NavigationIconButton(Build.Versions?.Previous)
+                nestedFill.Insert(-1, new NavigationIconButton(Build.Versions?.Previous)
                 {
                     Icon = FontAwesome.Solid.ChevronLeft,
                     SelectBuild = b => SelectBuild(b)
                 });
-                fill.Insert(1, new NavigationIconButton(Build.Versions?.Next)
+                nestedFill.Insert(1, new NavigationIconButton(Build.Versions?.Next)
                 {
                     Icon = FontAwesome.Solid.ChevronRight,
                     SelectBuild = b => SelectBuild(b)
