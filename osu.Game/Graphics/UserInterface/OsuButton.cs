@@ -61,7 +61,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override Container<Drawable> Content { get; }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) && Content.ReceivePositionalInputAt(screenSpacePos);
 
         protected Box Hover;
         protected Box Background;
