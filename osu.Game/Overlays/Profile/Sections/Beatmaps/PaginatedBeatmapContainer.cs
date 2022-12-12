@@ -58,6 +58,9 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                 case BeatmapSetType.Guest:
                     return user.GuestBeatmapsetCount;
 
+                case BeatmapSetType.Nominated:
+                    return user.NominatedBeatmapsetCount;
+
                 default:
                     return 0;
             }
