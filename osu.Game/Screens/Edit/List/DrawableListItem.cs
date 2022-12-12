@@ -21,6 +21,17 @@ namespace osu.Game.Screens.Edit.List
         private readonly Box box;
         public bool IsSelected { get; private set; }
 
+        private DrawableList<T>? parentList
+        {
+            get
+            {
+                //The immediate parent is a FillFlowContainer. It's parent is the actual list we are intrested in.
+                if (Parent?.Parent is DrawableList<T> list) return list;
+
+                return null;
+            }
+        }
+
         internal DrawableListItem(DrawableListRepresetedItem<T> represetedItem, DrawableListProperties<T> properties, LocalisableString name)
             : base(represetedItem, properties)
         {
@@ -148,14 +159,14 @@ namespace osu.Game.Screens.Edit.List
         protected override void OnDrag(DragEvent e)
         {
             base.OnDrag(e);
-            Properties.OnDragAction();
+            parentList?.OnDragAction();
             Properties.PostOnDragAction(this);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
             base.OnDragEnd(e);
-            Properties.OnDragAction();
+            parentList?.OnDragAction();
             Properties.PostOnDragAction(this);
         }
 

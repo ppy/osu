@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Edit.List
 
         public virtual Drawable GetDrawableListItem() => this;
 
-        internal void Default_onDragAction()
+        internal void OnDragAction()
         {
             for (int i = 0; i < Items.Count; i++)
             {
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Edit.List
         {
             if (Items.Count <= 0) return;
 
-            Properties.OnDragAction();
+            OnDragAction();
             Properties.PostOnDragAction(ItemMap[Items[0]]);
         }
 

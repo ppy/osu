@@ -267,7 +267,6 @@ namespace osu.Game.Skinning.Editor
                     // container.Invalidate();
                 }
             };
-            LayerSidebarList.Properties.OnDragAction();
         }
 
         protected override void LoadComplete()
