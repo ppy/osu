@@ -18,6 +18,9 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
     {
         public bool UsesFixedAnchor { get; set; }
 
+        [SettingSource("Display mode")]
+        public Bindable<DisplayMode> Mode { get; set; } = new Bindable<DisplayMode>();
+
         [SettingSource("Counter direction")]
         public Bindable<Flow> FlowDirection { get; set; } = new Bindable<Flow>();
 
@@ -26,9 +29,6 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
         [SettingSource("Show max judgement")]
         public BindableBool ShowMax { get; set; } = new BindableBool(true);
-
-        [SettingSource("Display mode")]
-        public Bindable<DisplayMode> Mode { get; set; } = new Bindable<DisplayMode>();
 
         [Resolved]
         private JudgementTally tally { get; set; } = null!;
