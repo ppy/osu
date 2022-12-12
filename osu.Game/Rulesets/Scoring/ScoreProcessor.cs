@@ -95,9 +95,9 @@ namespace osu.Game.Rulesets.Scoring
             get
             {
                 if (!beatmapApplied)
-                    throw new InvalidOperationException($"Cannot access maximum scoring values before calling {nameof(ApplyBeatmap)}.");
+                    throw new InvalidOperationException($"Cannot access maximum statistics before calling {nameof(ApplyBeatmap)}.");
 
-                return maximumResultCounts.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                return new Dictionary<HitResult, int>(maximumResultCounts);
             }
         }
 
