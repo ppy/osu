@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -104,9 +103,9 @@ namespace osu.Game.Overlays.Changelog
             {
                 var fill = base.CreateHeader();
 
-                var nestedFill = fill.Children.OfType<FillFlowContainer>().First();
+                var nestedFill = (FillFlowContainer)fill.Child;
 
-                var buildDisplay = nestedFill.Children.OfType<OsuHoverContainer>().First();
+                var buildDisplay = (OsuHoverContainer)nestedFill.Child;
 
                 buildDisplay.Scale = new Vector2(1.25f);
                 buildDisplay.Action = null;
