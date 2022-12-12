@@ -8,8 +8,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD.JudgementCounter
 {
@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         private JudgementRollingCounter counter = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, DrawableRuleset ruleset)
+        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset)
         {
             AutoSizeAxes = Axes.Both;
             InternalChild = flowContainer = new FillFlowContainer
@@ -45,16 +45,16 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                     ResultName = new OsuSpriteText
                     {
                         Font = OsuFont.Numeric.With(size: 8),
-                        Text = ruleset.Ruleset.GetDisplayNameForHitResult(Result.ResultInfo.Type)
+                        Text = ruleset.Value.CreateInstance().GetDisplayNameForHitResult(Result.Type)
                     }
                 }
             };
 
-            var result = Result.ResultInfo.Type;
+            var result = Result.Type;
 
             if (result.IsBasic())
             {
-                Colour = colours.ForHitResult(Result.ResultInfo.Type);
+                Colour = colours.ForHitResult(Result.Type);
                 return;
             }
 

@@ -34,16 +34,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var ruleset = CreateRuleset();
 
-            var r = ruleset.CreateBeatmapConverter(Beatmap.Value.Beatmap);
-
-            var n = r.Convert().BeatmapInfo.Ruleset.CreateInstance();
             Debug.Assert(ruleset != null);
 
-            scoreProcessor = new ScoreProcessor(n);
+            scoreProcessor = new ScoreProcessor(ruleset);
             Child = new DependencyProvidingContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                CachedDependencies = new (Type, object)[] { (typeof(ScoreProcessor), scoreProcessor), (typeof(Ruleset), n) },
+                CachedDependencies = new (Type, object)[] { (typeof(ScoreProcessor), scoreProcessor), (typeof(Ruleset), ruleset) },
                 Children = new Drawable[]
                 {
                     judgementTally = new JudgementTally(),
@@ -130,7 +127,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private int hiddenCount()
         {
-            var num = counter.JudgementContainer.Children.OfType<JudgementCounter>().First(child => child.Result.ResultInfo.Type == HitResult.LargeTickHit);
+            var num = counter.JudgementContainer.Children.OfType<JudgementCounter>().First(child => child.Result.Type == HitResult.LargeTickHit);
             return num.Result.ResultCount.Value;
         }
 

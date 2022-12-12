@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
         protected override void LoadComplete()
         {
-            //Adding this in "load" will cause it to not load in properly after the first beatmap attempt. Or after existing and reentering.
+            //Adding this in "load" will cause the component to not load in properly after the first beatmap attempt. Or after existing and reentering.
             //this does not happen in tests, or in the skin editor component preview button.
             foreach (var result in tally.Results)
             {
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                 {
                     counter.Direction.Value = getFlow(direction.NewValue);
                 }
-            });
+            }, true);
             Mode.BindValueChanged(_ => updateCounter(), true);
             ShowMax.BindValueChanged(value =>
             {
@@ -89,19 +89,19 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             switch (Mode.Value)
             {
                 case DisplayMode.Simple:
-                    foreach (var counter in counters.Where(counter => counter.Result.ResultInfo.Type.IsBasic()))
+                    foreach (var counter in counters.Where(counter => counter.Result.Type.IsBasic()))
                         counter.Show();
 
-                    foreach (var counter in counters.Where(counter => !counter.Result.ResultInfo.Type.IsBasic()))
+                    foreach (var counter in counters.Where(counter => !counter.Result.Type.IsBasic()))
                         counter.Hide();
 
                     break;
 
                 case DisplayMode.Normal:
-                    foreach (var counter in counters.Where(counter => !counter.Result.ResultInfo.Type.IsBonus()))
+                    foreach (var counter in counters.Where(counter => !counter.Result.Type.IsBonus()))
                         counter.Show();
 
-                    foreach (var counter in counters.Where(counter => counter.Result.ResultInfo.Type.IsBonus()))
+                    foreach (var counter in counters.Where(counter => counter.Result.Type.IsBonus()))
                         counter.Hide();
 
                     break;

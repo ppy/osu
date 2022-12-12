@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 
@@ -20,24 +19,16 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         public List<JudgementCounterInfo> Results = new List<JudgementCounterInfo>();
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> working)
+        private void load(IBindable<RulesetInfo> ruleset)
         {
-            foreach (var result in getRuleset(working).GetHitResults())
+            foreach (var result in ruleset.Value.CreateInstance().GetHitResults())
             {
                 Results.Add(new JudgementCounterInfo
                 {
-                    ResultInfo = (result.result, result.displayName),
+                    Type = result.result,
                     ResultCount = new BindableInt()
                 });
             }
-        }
-
-        private Ruleset getRuleset(IBindable<WorkingBeatmap> working)
-        {
-            var ruleset = working.Value.BeatmapInfo.Ruleset.CreateInstance();
-            var converter = ruleset.RulesetInfo.CreateInstance().CreateBeatmapConverter(working.Value.Beatmap);
-
-            return converter.CanConvert() ? converter.Convert().BeatmapInfo.Ruleset.CreateInstance() : ruleset;
         }
 
         protected override void LoadComplete()
@@ -45,14 +36,14 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             base.LoadComplete();
             scoreProcessor.NewJudgement += judgement =>
             {
-                foreach (JudgementCounterInfo result in Results.Where(result => result.ResultInfo.Type == judgement.Type))
+                foreach (JudgementCounterInfo result in Results.Where(result => result.Type == judgement.Type))
                 {
                     result.ResultCount.Value++;
                 }
             };
             scoreProcessor.JudgementReverted += judgement =>
             {
-                foreach (JudgementCounterInfo result in Results.Where(result => result.ResultInfo.Type == judgement.Type))
+                foreach (JudgementCounterInfo result in Results.Where(result => result.Type == judgement.Type))
                 {
                     result.ResultCount.Value--;
                 }
