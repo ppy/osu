@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osuTK;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -17,6 +16,8 @@ namespace osu.Game.Graphics.Containers
         private readonly HoverSampleSet sampleSet;
 
         private readonly Container content = new Container { RelativeSizeAxes = Axes.Both };
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
 
         protected override Container<Drawable> Content => content;
 
@@ -38,11 +39,8 @@ namespace osu.Game.Graphics.Containers
                 content.AutoSizeAxes = AutoSizeAxes;
             }
 
-            InternalChildren = new Drawable[]
-            {
-                content,
-                CreateHoverSounds(sampleSet)
-            };
+            AddInternal(content);
+            Add(CreateHoverSounds(sampleSet));
         }
     }
 }
