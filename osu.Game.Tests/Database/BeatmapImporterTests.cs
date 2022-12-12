@@ -1052,7 +1052,7 @@ namespace osu.Game.Tests.Database
         {
             string? temp = path ?? TestResources.GetTestBeatmapForImport(virtualTrack);
 
-            var importedSet = await importer.Import(new ImportTask(temp), batchImport);
+            var importedSet = await importer.Import(new ImportTask(temp), new ImportParameters { Batch = batchImport });
 
             Assert.NotNull(importedSet);
             Debug.Assert(importedSet != null);

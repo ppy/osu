@@ -179,8 +179,8 @@ namespace osu.Game.Scoring
 
         public Task<Live<ScoreInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
 
-        public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            scoreImporter.ImportModel(item, archive, batchImport, cancellationToken);
+        public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
+            scoreImporter.ImportModel(item, archive, parameters, cancellationToken);
 
         /// <summary>
         /// Populates the <see cref="ScoreInfo.MaximumStatistics"/> for a given <see cref="ScoreInfo"/>.

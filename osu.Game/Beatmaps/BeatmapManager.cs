@@ -460,11 +460,11 @@ namespace osu.Game.Beatmaps
 
         public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => beatmapImporter.Import(notification, tasks);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            beatmapImporter.Import(task, batchImport, cancellationToken);
+        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
+            beatmapImporter.Import(task, parameters, cancellationToken);
 
         public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) =>
-            beatmapImporter.ImportModel(item, archive, false, cancellationToken);
+            beatmapImporter.ImportModel(item, archive, default, cancellationToken);
 
         public IEnumerable<string> HandledExtensions => beatmapImporter.HandledExtensions;
 
@@ -525,5 +525,25 @@ namespace osu.Game.Beatmaps
         #endregion
 
         public override string HumanisedModelName => "beatmap";
+    }
+
+    public struct ImportParameters
+    {
+        /// <summary>
+        /// Whether this import is part of a larger batch.
+        /// </summary>
+        /// <remarks>
+        /// May skip intensive pre-import checks in favour of faster processing.
+        ///
+        /// More specifically, imports will be skipped before they begin, given an existing model matches on hash and filenames. Should generally only be used for large batch imports, as it may defy user expectations when updating an existing model.
+        ///
+        /// Will also change scheduling behaviour to run at a lower priority.
+        /// </remarks>
+        public bool Batch { get; set; }
+
+        /// <summary>
+        /// Whether this import should use hard links rather than file copy operations if available.
+        /// </summary>
+        public bool PreferHardLinks { get; set; }
     }
 }

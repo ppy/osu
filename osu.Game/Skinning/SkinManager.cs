@@ -22,6 +22,7 @@ using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Overlays.Notifications;
@@ -274,11 +275,14 @@ namespace osu.Game.Skinning
 
         public IEnumerable<string> HandledExtensions => skinImporter.HandledExtensions;
 
-        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => skinImporter.Import(notification, tasks);
+        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) =>
+            skinImporter.Import(notification, tasks);
 
-        public Task<Live<SkinInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original) => skinImporter.ImportAsUpdate(notification, task, original);
+        public Task<Live<SkinInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original) =>
+            skinImporter.ImportAsUpdate(notification, task, original);
 
-        public Task<Live<SkinInfo>> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => skinImporter.Import(task, batchImport, cancellationToken);
+        public Task<Live<SkinInfo>> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
+            skinImporter.Import(task, parameters, cancellationToken);
 
         #endregion
 
