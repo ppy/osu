@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
-            if (BaseObject is Spinner)
+            if (BaseObject is Spinner || (lastObject is Spinner spinner && spinner.DifficultySpinsRequired <= 0))
                 return;
 
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.

@@ -38,12 +38,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // This is a quadratic equation that returns the minimum rad/ms required by
             // the player to achieve a Great (300) hit result on a spinner.
-            double numerator = -spinner.Duration + Math.Sqrt(spinner.Duration * spinner.Duration - 40 * timeOfMaxSpinningVelocity * spinner.SpinsRequired);
+            double numerator = -spinner.Duration + Math.Sqrt(spinner.Duration * spinner.Duration - 40 * timeOfMaxSpinningVelocity * spinner.DifficultySpinsRequired);
             double denominator = -20 * timeOfMaxSpinningVelocity;
 
             // This value is scaled by the spinner's overall duration to account
             // for the fact that longer spinners generally play more lenient.
-            return (400000 * numerator / denominator) / osuCurrent.SpinnerDuration.Value;
+            return (175000 * numerator / denominator) / osuCurrent.SpinnerDuration.Value;
         }
     }
 }
