@@ -225,9 +225,9 @@ namespace osu.Game.Skinning.Editor
 
         private void initLayerEditor()
         {
-            LayerSidebarList.List.Items.RemoveAll(_ => true);
-            LayerSidebarList.Properties.GetName = t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
-            LayerSidebarList.Properties.SetItemDepth = (blueprint, depth) =>
+            LayerSidebarList.List.Items.RemoveAll(static _ => true);
+            LayerSidebarList.Properties.GetName = static t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
+            LayerSidebarList.Properties.SetItemDepth = static (blueprint, depth) =>
             {
                 if (blueprint.Parent is Container<SelectionBlueprint<ISkinnableDrawable>> container)
                 {
@@ -241,7 +241,7 @@ namespace osu.Game.Skinning.Editor
                     containerM.Invalidate();
                 }
             };
-            LayerSidebarList.Properties.GetDepth = blueprint => ((Drawable)blueprint.Item).Depth;
+            LayerSidebarList.Properties.GetDepth = static blueprint => ((Drawable)blueprint.Item).Depth;
             //fix https://github.com/ppy/osu/pull/21119#issuecomment-1344529992
             //todo: find an actual solution to this
             //todo: this fix makes the settings "fade in" every on-drag event. It looks a bit wierd.
@@ -250,19 +250,19 @@ namespace osu.Game.Skinning.Editor
                 if (content.Children.Count > 0 && content.Children[0] is BlueprintContainer<ISkinnableDrawable> container)
                 {
                     //we need the toList here actually, so we create a copy and don't enumerate over the existing elements.
-                    var newOrderedChilden = container.SelectionBlueprints.Children.OrderBy(d => d.Depth).Reverse().ToList();
-                    var selectedChildren = newOrderedChilden.Where(t => t.State == SelectionState.Selected).ToList();
+                    var newOrderedChilden = container.SelectionBlueprints.Children.OrderBy(static d => d.Depth).Reverse().ToList();
+                    var selectedChildren = newOrderedChilden.Where(static t => t.State == SelectionState.Selected).ToList();
 
                     container.SelectionBlueprints.Clear(false);
                     container.SelectionBlueprints.AddRange(newOrderedChilden);
 
                     //deselect already selected elements
-                    selectedChildren.ForEach(t => t.State = SelectionState.NotSelected);
+                    selectedChildren.ForEach(static t => t.State = SelectionState.NotSelected);
                     //select and then unselect everything once, because that apparently that updates how items are selected?
-                    newOrderedChilden.ForEach(t => t.State = SelectionState.Selected);
-                    newOrderedChilden.ForEach(t => t.State = SelectionState.NotSelected);
+                    newOrderedChilden.ForEach(static t => t.State = SelectionState.Selected);
+                    newOrderedChilden.ForEach(static t => t.State = SelectionState.NotSelected);
                     //and this is just to restore the state before we do this dirty hack.
-                    selectedChildren.ForEach(t => t.State = SelectionState.Selected);
+                    selectedChildren.ForEach(static t => t.State = SelectionState.Selected);
                     //an invalidation doesn't help to apply?/update? the click handler.
                     // container.Invalidate();
                 }
@@ -336,7 +336,7 @@ namespace osu.Game.Skinning.Editor
                 LayerSidebarList.List.Items.AddRange(
                     blueprintContainer.SelectionBlueprints
                                       .Children
-                                      .Select(item =>
+                                      .Select(static item =>
                                           new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(item, DrawableListEntryType.Item)
                                       ));
 
@@ -351,7 +351,7 @@ namespace osu.Game.Skinning.Editor
         {
             headerText.Clear();
 
-            headerText.AddParagraph("Skin editor", cp => cp.Font = OsuFont.Default.With(size: 16));
+            headerText.AddParagraph("Skin editor", static cp => cp.Font = OsuFont.Default.With(size: 16));
             headerText.NewParagraph();
             headerText.AddText("Currently editing ", cp =>
             {
@@ -490,7 +490,7 @@ namespace osu.Game.Skinning.Editor
                 // Even though we are 100% on an update thread, we need to wait for realm callbacks to fire (to correctly invalidate caches in RealmBackedResourceStore).
                 // See https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-2483573 for further discussion.
                 // This is the best we can do for now.
-                realm.Run(r => r.Refresh());
+                realm.Run(static r => r.Refresh());
 
                 // place component
                 var sprite = new SkinnableSprite
