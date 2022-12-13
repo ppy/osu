@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
         }
 
-        public void OnUserInput(DrawableTaikoHitObject<Swell> swell, int numHits, SkinnableDrawable mainPiece)
+        public void AnimateSwellProgress(DrawableTaikoHitObject<Swell> swell, int numHits, SkinnableDrawable mainPiece)
         {
             float completion = (float)numHits / swell.HitObject.RequiredHits;
 
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                 .FadeTo(completion / 8, 2000, Easing.OutQuint);
         }
 
-        public void OnHitObjectEnd(ArmedState state, SkinnableDrawable mainPiece)
+        public void AnimateSwellCompletion(ArmedState state, SkinnableDrawable mainPiece)
         {
             const double transition_duration = 300;
 
@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             mainPiece.FadeOut(transition_duration, Easing.OutQuad);
         }
 
-        public void ApplyPassiveTransforms(DrawableTaikoHitObject<Swell> swell, SkinnableDrawable mainPiece)
+        public void AnimateSwellStart(DrawableTaikoHitObject<Swell> swell, SkinnableDrawable mainPiece)
         {
             if (swell.IsHit == false)
                 expandingRing.FadeTo(0);

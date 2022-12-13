@@ -9,14 +9,10 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public interface ISkinnableSwell
     {
-        void OnUserInput(DrawableTaikoHitObject<Swell> swell, int numHits, SkinnableDrawable mainPiece);
+        void AnimateSwellProgress(DrawableTaikoHitObject<Swell> swell, int numHits, SkinnableDrawable mainPiece);
 
-        void OnHitObjectEnd(ArmedState state, SkinnableDrawable mainPiece);
+        void AnimateSwellCompletion(ArmedState state, SkinnableDrawable mainPiece);
 
-        /// <summary>
-        /// Applies passive transforms on HitObject start. Gets called every time DrawableTaikoHitobject
-        /// changes state. This happens on creation, and when the object is completed (as in hit or missed).
-        /// </summary>
-        void ApplyPassiveTransforms(DrawableTaikoHitObject<Swell> swell, SkinnableDrawable mainPiece);
+        void AnimateSwellStart(DrawableTaikoHitObject<Swell> swell, SkinnableDrawable mainPiece);
     }
 }

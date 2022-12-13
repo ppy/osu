@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             FillMode = FillMode.Fit;
 
-            Content.Add(spinnerBody = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Swell), _ => new DefaultSwell())
+            Content.Add(spinnerBody = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.SwellBody), _ => new DefaultSwell())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 int numHits = ticks.Count(r => r.IsHit);
 
-                (spinnerBody.Drawable as ISkinnableSwell)?.OnUserInput(this, numHits, MainPiece);
+                (spinnerBody.Drawable as ISkinnableSwell)?.AnimateSwellProgress(this, numHits, MainPiece);
 
                 if (numHits == HitObject.RequiredHits)
                     ApplyResult(r => r.Type = r.Judgement.MaxResult);
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.UpdateStartTimeStateTransforms();
 
-            (spinnerBody.Drawable as ISkinnableSwell)?.ApplyPassiveTransforms(this, MainPiece);
+            (spinnerBody.Drawable as ISkinnableSwell)?.AnimateSwellStart(this, MainPiece);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -153,16 +153,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
+                    // Only for rewind support. Reallows user inputs if swell is rewound from being hit/missed to being idle.
                     HandleUserInput = true;
                     break;
 
                 case ArmedState.Miss:
                 case ArmedState.Hit:
+                    const int clear_animation_duration = 1200;
+
                     // Postpone drawable hitobject expiration until it has animated/faded out. Inputs on the object are disallowed during this delay.
-                    LifetimeEnd = Time.Current + 1200;
+                    LifetimeEnd = Time.Current + clear_animation_duration;
                     HandleUserInput = false;
 
-                    (spinnerBody.Drawable as ISkinnableSwell)?.OnHitObjectEnd(state, MainPiece);
+                    (spinnerBody.Drawable as ISkinnableSwell)?.AnimateSwellCompletion(state, MainPiece);
                     break;
             }
         }
