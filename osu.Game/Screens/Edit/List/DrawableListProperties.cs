@@ -22,18 +22,6 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private Action<AbstractListItem<T>> postOnDragAction = static i => i.Parent?.Invalidate();
-
-        public Action<AbstractListItem<T>> PostOnDragAction
-        {
-            get => postOnDragAction;
-            set
-            {
-                postOnDragAction = value;
-                topLevelItem.UpdateItem();
-            }
-        }
-
         public Action<Action<IDrawableListItem<T>>> ApplyAll { get; internal set; }
 
         private Func<T, LocalisableString> getName = IDrawableListItem<T>.GetDefaultText;

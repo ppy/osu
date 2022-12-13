@@ -160,14 +160,12 @@ namespace osu.Game.Screens.Edit.List
         {
             base.OnDrag(e);
             parentList?.OnDragAction();
-            Properties.PostOnDragAction(this);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
             base.OnDragEnd(e);
             parentList?.OnDragAction();
-            Properties.PostOnDragAction(this);
         }
 
         public override SelectionState State

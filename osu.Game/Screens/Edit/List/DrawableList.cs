@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Edit.List
             {
                 T representedItem = Items[i].RepresentedItem;
 
-                Properties.SetItemDepth.Invoke(representedItem, i);
+                Properties.SetItemDepth.Invoke(representedItem, Items.Count - i);
             }
         }
 
@@ -167,7 +167,6 @@ namespace osu.Game.Screens.Edit.List
             if (Items.Count <= 0) return;
 
             OnDragAction();
-            Properties.PostOnDragAction(ItemMap[Items[0]]);
         }
 
         private void collectionChanged(object sender, NotifyCollectionChangedEventArgs e)
