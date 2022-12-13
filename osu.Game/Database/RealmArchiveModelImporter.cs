@@ -82,16 +82,16 @@ namespace osu.Game.Database
 
         public Task Import(params string[] paths) => Import(paths.Select(p => new ImportTask(p)).ToArray());
 
-        public Task Import(params ImportTask[] tasks)
+        public Task Import(ImportTask[] tasks, ImportParameters parameters = default)
         {
             var notification = new ProgressNotification { State = ProgressNotificationState.Active };
 
             PostNotification?.Invoke(notification);
 
-            return Import(notification, tasks);
+            return Import(notification, tasks, parameters);
         }
 
-        public async Task<IEnumerable<Live<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public async Task<IEnumerable<Live<TModel>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default)
         {
             if (tasks.Length == 0)
             {
@@ -107,7 +107,7 @@ namespace osu.Game.Database
 
             var imported = new List<Live<TModel>>();
 
-            bool isBatchImport = tasks.Length >= minimum_items_considered_batch_import;
+            parameters.Batch |= tasks.Length >= minimum_items_considered_batch_import;
 
             await Task.WhenAll(tasks.Select(async task =>
             {
@@ -116,7 +116,7 @@ namespace osu.Game.Database
 
                 try
                 {
-                    var model = await Import(task, new ImportParameters { Batch = isBatchImport }, notification.CancellationToken).ConfigureAwait(false);
+                    var model = await Import(task, parameters, notification.CancellationToken).ConfigureAwait(false);
 
                     lock (imported)
                     {

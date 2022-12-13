@@ -18,6 +18,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -411,7 +412,7 @@ namespace osu.Game.Skinning.Editor
             return Task.CompletedTask;
         }
 
-        public Task Import(params ImportTask[] tasks) => throw new NotImplementedException();
+        Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
         public IEnumerable<string> HandledExtensions => new[] { ".jpg", ".jpeg", ".png" };
 
