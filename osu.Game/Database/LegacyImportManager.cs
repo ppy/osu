@@ -72,7 +72,7 @@ namespace osu.Game.Database
             string testExistingPath = stableStorage.GetFullPath(stableStorage.GetFiles(string.Empty).First());
             string testDestinationPath = desktopGameHost.Storage.GetFullPath(test_filename);
 
-            return RealmFileStore.CreateHardLink(testDestinationPath, testExistingPath, IntPtr.Zero);
+            return HardLinkHelper.CreateHardLink(testDestinationPath, testExistingPath, IntPtr.Zero);
         }
 
         public virtual async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
