@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
@@ -57,22 +56,15 @@ namespace osu.Game.Database
 
         public bool CheckHardLinkAvailability()
         {
-            if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
-                return false;
-
             var stableStorage = GetCurrentStableStorage();
 
             if (stableStorage == null || gameHost is not DesktopGameHost desktopGameHost)
                 return false;
 
-            const string test_filename = "_hard_link_test";
+            string testExistingPath = stableStorage.GetFullPath(string.Empty);
+            string testDestinationPath = desktopGameHost.Storage.GetFullPath(string.Empty);
 
-            desktopGameHost.Storage.Delete(test_filename);
-
-            string testExistingPath = stableStorage.GetFullPath(stableStorage.GetFiles(string.Empty).First());
-            string testDestinationPath = desktopGameHost.Storage.GetFullPath(test_filename);
-
-            return HardLinkHelper.CreateHardLink(testDestinationPath, testExistingPath, IntPtr.Zero);
+            return HardLinkHelper.CheckAvailability(testDestinationPath, testExistingPath);
         }
 
         public virtual async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
