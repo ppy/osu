@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Input;
+using osu.Framework.Input.Handlers.Touch;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
@@ -35,11 +37,15 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(GameHost gameHost)
         {
-            // With relax mod, input maps directly to x position and left/right buttons are not used.
-            if (!Mods.Any(m => m is ModRelax))
-                KeyBindingInputManager.Add(new CatchTouchInputMapper());
+            var touchHandler = gameHost.AvailableInputHandlers.OfType<TouchHandler>().SingleOrDefault();
+            if (touchHandler?.Enabled.Value == true)
+            {
+                // With relax mod, input maps directly to x position and left/right buttons are not used.
+                if (!Mods.Any(m => m is ModRelax))
+                    KeyBindingInputManager.Add(new CatchTouchInputMapper());
+            }
         }
 
         protected double GetTimeRange(float approachRate) => IBeatmapDifficultyInfo.DifficultyRange(approachRate, 1800, 1200, 450);
