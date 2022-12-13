@@ -6,11 +6,55 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Win32.SafeHandles;
+using osu.Framework;
 
 namespace osu.Game.IO
 {
     internal static class HardLinkHelper
     {
+        public static bool CheckAvailability(string testDestinationPath, string testSourcePath)
+        {
+            // We can support other operating systems quite easily in the future.
+            // Let's handle the most common one for now, though.
+            if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+                return false;
+
+            const string test_filename = "_hard_link_test";
+
+            testDestinationPath = Path.Combine(testDestinationPath, test_filename);
+            testSourcePath = Path.Combine(testSourcePath, test_filename);
+
+            cleanupFiles();
+
+            try
+            {
+                File.WriteAllText(testSourcePath, string.Empty);
+
+                // Test availability by creating an arbitrary hard link between the source and destination paths.
+                return CreateHardLink(testDestinationPath, testSourcePath, IntPtr.Zero);
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                cleanupFiles();
+            }
+
+            void cleanupFiles()
+            {
+                try
+                {
+                    File.Delete(testDestinationPath);
+                    File.Delete(testSourcePath);
+                }
+                catch
+                {
+                }
+            }
+        }
+
         // For future use (to detect if a file is a hard link with other references existing on disk).
         public static int GetFileLinkCount(string filePath)
         {
@@ -27,26 +71,7 @@ namespace osu.Game.IO
         }
 
         [DllImport("Kernel32.dll", CharSet = CharSet.Unicode)]
-        public static extern bool CreateHardLink(
-            string lpFileName,
-            string lpExistingFileName,
-            IntPtr lpSecurityAttributes
-        );
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct ByHandleFileInformation
-        {
-            public readonly uint FileAttributes;
-            public readonly FILETIME CreationTime;
-            public readonly FILETIME LastAccessTime;
-            public readonly FILETIME LastWriteTime;
-            public readonly uint VolumeSerialNumber;
-            public readonly uint FileSizeHigh;
-            public readonly uint FileSizeLow;
-            public readonly uint NumberOfLinks;
-            public readonly uint FileIndexHigh;
-            public readonly uint FileIndexLow;
-        }
+        public static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         private static extern SafeFileHandle CreateFile(
@@ -64,5 +89,20 @@ namespace osu.Game.IO
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool CloseHandle(SafeHandle hObject);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct ByHandleFileInformation
+        {
+            public readonly uint FileAttributes;
+            public readonly FILETIME CreationTime;
+            public readonly FILETIME LastAccessTime;
+            public readonly FILETIME LastWriteTime;
+            public readonly uint VolumeSerialNumber;
+            public readonly uint FileSizeHigh;
+            public readonly uint FileSizeLow;
+            public readonly uint NumberOfLinks;
+            public readonly uint FileIndexHigh;
+            public readonly uint FileIndexLow;
+        }
     }
 }
