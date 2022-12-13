@@ -8,7 +8,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps;
 using osu.Game.IO;
 
 namespace osu.Game.Database

@@ -5,7 +5,6 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.Database
 {
