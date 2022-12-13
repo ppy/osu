@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Edit.List
 
         public virtual Drawable GetDrawableListItem() => this;
 
-        internal void OnDragAction()
+        internal void SetAllDepths()
         {
             for (int i = 0; i < Items.Count; i++)
             {
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Edit.List
         {
             if (Items.Count <= 0) return;
 
-            OnDragAction();
+            SetAllDepths();
         }
 
         private void collectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -470,6 +470,7 @@ namespace osu.Game.Screens.Edit.List
 
             // Todo: this could be optimised, but it's a very simple iteration over all the items
             sortItems();
+            SetAllDepths();
         }
 
         /// <summary>
@@ -502,6 +503,7 @@ namespace osu.Game.Screens.Edit.List
             list.allowAlreadyExistingDictEntry = false;
             //set the flags in the target list correctly, so it doesn't get confused on a drag event.
             list.startArrangement(list.ItemMap[item.Model], screenSpaceDragPosition);
+            list.SetAllDepths();
             return true;
         }
 

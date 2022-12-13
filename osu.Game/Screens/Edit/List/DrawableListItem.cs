@@ -159,13 +159,13 @@ namespace osu.Game.Screens.Edit.List
         protected override void OnDrag(DragEvent e)
         {
             base.OnDrag(e);
-            parentList?.OnDragAction();
+            parentList?.SetAllDepths();
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
             base.OnDragEnd(e);
-            parentList?.OnDragAction();
+            parentList?.SetAllDepths();
         }
 
         public override SelectionState State
