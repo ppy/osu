@@ -564,7 +564,7 @@ namespace osu.Game.Tests.Database
 
                 var imported = await importer.Import(
                     progressNotification,
-                    new ImportTask(zipStream, string.Empty)
+                    new[] { new ImportTask(zipStream, string.Empty) }
                 );
 
                 realm.Run(r => r.Refresh());

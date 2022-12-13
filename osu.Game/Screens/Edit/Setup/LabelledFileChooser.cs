@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
@@ -91,7 +92,7 @@ namespace osu.Game.Screens.Edit.Setup
             return Task.CompletedTask;
         }
 
-        Task ICanAcceptFiles.Import(params ImportTask[] tasks) => throw new NotImplementedException();
+        Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
         protected override void Dispose(bool isDisposing)
         {

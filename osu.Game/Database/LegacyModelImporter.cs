@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.IO;
 
 namespace osu.Game.Database
@@ -57,7 +58,12 @@ namespace osu.Game.Database
                 return Task.CompletedTask;
             }
 
-            return Task.Run(async () => await Importer.Import(GetStableImportPaths(storage).ToArray()).ConfigureAwait(false));
+            return Task.Run(async () =>
+            {
+                var tasks = GetStableImportPaths(storage).Select(p => new ImportTask(p)).ToArray();
+
+                await Importer.Import(tasks, new ImportParameters { Batch = true, PreferHardLinks = true }).ConfigureAwait(false);
+            });
         }
 
         /// <summary>

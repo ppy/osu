@@ -17,6 +17,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -269,7 +270,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 return Task.CompletedTask;
             }
 
-            Task ICanAcceptFiles.Import(params ImportTask[] tasks) => throw new NotImplementedException();
+            Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
             protected override void Dispose(bool isDisposing)
             {

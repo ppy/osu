@@ -271,12 +271,12 @@ namespace osu.Game.Skinning
 
         public Task Import(params string[] paths) => skinImporter.Import(paths);
 
-        public Task Import(params ImportTask[] tasks) => skinImporter.Import(tasks);
+        public Task Import(ImportTask[] imports, ImportParameters parameters = default) => skinImporter.Import(imports, parameters);
 
         public IEnumerable<string> HandledExtensions => skinImporter.HandledExtensions;
 
-        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) =>
-            skinImporter.Import(notification, tasks);
+        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) =>
+            skinImporter.Import(notification, tasks, parameters);
 
         public Task<Live<SkinInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original) =>
             skinImporter.ImportAsUpdate(notification, task, original);

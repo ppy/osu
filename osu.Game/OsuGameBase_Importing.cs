@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 
 namespace osu.Game
@@ -44,13 +45,13 @@ namespace osu.Game
             }
         }
 
-        public virtual async Task Import(params ImportTask[] tasks)
+        public virtual async Task Import(ImportTask[] tasks, ImportParameters parameters = default)
         {
             var tasksPerExtension = tasks.GroupBy(t => Path.GetExtension(t.Path).ToLowerInvariant());
             await Task.WhenAll(tasksPerExtension.Select(taskGroup =>
             {
                 var importer = fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(taskGroup.Key));
-                return importer?.Import(taskGroup.ToArray()) ?? Task.CompletedTask;
+                return importer?.Import(taskGroup.ToArray(), parameters) ?? Task.CompletedTask;
             })).ConfigureAwait(false);
         }
 
