@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.Spectator
             }
         }
 
-        protected override Task BeginPlayingInternal(SpectatorState state)
+        protected override Task BeginPlayingInternal(long? scoreToken, SpectatorState state)
         {
             // Track the local user's playing beatmap ID.
             Debug.Assert(state.BeatmapID != null);
