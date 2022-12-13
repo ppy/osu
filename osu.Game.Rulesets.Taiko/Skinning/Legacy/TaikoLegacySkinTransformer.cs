@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     case TaikoSkinComponents.DrumRollTick:
                         return this.GetAnimation("sliderscorepoint", false, false);
 
-                    case TaikoSkinComponents.Swell:
+                    case TaikoSkinComponents.SwellBody:
                         if (GetTexture("spinner-circle") != null)
                             return new LegacySwell();
 

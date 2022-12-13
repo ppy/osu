@@ -91,13 +91,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             clearSample = skin.GetSample(new SampleInfo("spinner-osu"));
         }
 
-        public void OnUserInput(DrawableTaikoHitObject<Swell> swell, int numHits, SkinnableDrawable mainPiece)
+        public void AnimateSwellProgress(DrawableTaikoHitObject<Swell> swell, int numHits, SkinnableDrawable mainPiece)
         {
             remainingHitsCountdown.Text = $"{swell.HitObject.RequiredHits - numHits}";
             spinnerCircle.RotateTo(180f * numHits, 1000, Easing.OutQuint);
         }
 
-        public void OnHitObjectEnd(ArmedState state, SkinnableDrawable mainPiece)
+        public void AnimateSwellCompletion(ArmedState state, SkinnableDrawable mainPiece)
         {
             const double clear_transition_duration = 300;
 
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             }
         }
 
-        public void ApplyPassiveTransforms(DrawableTaikoHitObject<Swell> swell, SkinnableDrawable mainPiece)
+        public void AnimateSwellStart(DrawableTaikoHitObject<Swell> swell, SkinnableDrawable mainPiece)
         {
             if (swell.IsHit == false)
             {
