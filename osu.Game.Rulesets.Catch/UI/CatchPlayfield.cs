@@ -52,13 +52,7 @@ namespace osu.Game.Rulesets.Catch.UI
             this.difficulty = difficulty;
         }
 
-        protected override GameplayCursorContainer CreateCursor()
-        {
-            if (Mods != null && Mods.Any(m => m is ModRelax))
-                return new CatchRelaxCursorContainer();
-
-            return base.CreateCursor();
-        }
+        protected override GameplayCursorContainer CreateCursor() => new CatchCursorContainer();
 
         [BackgroundDependencyLoader]
         private void load()
