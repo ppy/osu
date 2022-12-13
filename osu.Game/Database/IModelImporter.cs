@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using osu.Game.Beatmaps;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Database
