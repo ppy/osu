@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A button with added default sound effects.
     /// </summary>
-    public partial class OsuButton : Button
+    public abstract partial class OsuButton : Button
     {
         public LocalisableString Text
         {
@@ -73,7 +73,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly Box flashLayer;
 
-        public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Button)
+        protected OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Button)
         {
             Height = 40;
 
