@@ -34,19 +34,17 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             scoreProcessor.NewJudgement += judgement =>
             {
                 foreach (JudgementCounterInfo result in Results.Where(result => result.Type == judgement.Type))
-                {
                     result.ResultCount.Value++;
-                }
             };
+
             scoreProcessor.JudgementReverted += judgement =>
             {
                 foreach (JudgementCounterInfo result in Results.Where(result => result.Type == judgement.Type))
-                {
                     result.ResultCount.Value--;
-                }
             };
         }
     }

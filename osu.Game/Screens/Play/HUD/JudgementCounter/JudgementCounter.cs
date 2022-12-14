@@ -112,8 +112,6 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         {
             protected override OsuSpriteText CreateSpriteText()
                 => base.CreateSpriteText().With(s => s.Font = s.Font.With(fixedWidth: true, size: 16));
-
-            protected override double RollingDuration => 750;
         }
     }
 }
