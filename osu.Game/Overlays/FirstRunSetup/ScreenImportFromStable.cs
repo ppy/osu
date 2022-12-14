@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 copyInformation.Text = "Data migration will use \"hard links\". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation.";
             }
             else if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
-                copyInformation.Text = "Lightweight linking of files are not supported on your operating system yet, so a copy of all files will be made during import.";
+                copyInformation.Text = "Lightweight linking of files is not supported on your operating system yet, so a copy of all files will be made during import.";
             else
             {
                 copyInformation.Text =
