@@ -11,7 +11,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
