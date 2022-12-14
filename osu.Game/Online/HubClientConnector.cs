@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -73,7 +74,7 @@ namespace osu.Game.Online
                     options.Headers.Add("OsuVersionHash", versionHash);
                 });
 
-            if (RuntimeInfo.SupportsJIT && preferMessagePack)
+            if (RuntimeFeature.IsDynamicCodeCompiled && preferMessagePack)
             {
                 builder.AddMessagePackProtocol(options =>
                 {
