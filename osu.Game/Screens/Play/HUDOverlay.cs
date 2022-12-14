@@ -107,6 +107,8 @@ namespace osu.Game.Screens.Play
             Children = new Drawable[]
             {
                 CreateFailingLayer(),
+                //Needs to be initialized before skinnable drawables.
+                tally = new JudgementTally(),
                 mainComponents = new MainComponentsContainer
                 {
                     AlwaysPresent = true,
@@ -150,7 +152,6 @@ namespace osu.Game.Screens.Play
                     Spacing = new Vector2(5)
                 },
                 clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
-                tally = new JudgementTally()
             };
 
             hideTargets = new List<Drawable> { mainComponents, KeyCounter, topRightElements };

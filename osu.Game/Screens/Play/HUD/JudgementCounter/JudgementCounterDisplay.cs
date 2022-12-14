@@ -33,9 +33,10 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         [Resolved]
         private JudgementTally tally { get; set; } = null!;
 
-        protected FillFlowContainer JudgementContainer;
+        protected FillFlowContainer JudgementContainer = null!;
 
-        public JudgementCounterDisplay()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             AutoSizeAxes = Axes.Both;
             InternalChild = JudgementContainer = new FillFlowContainer
@@ -44,17 +45,15 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                 Spacing = new Vector2(10),
                 AutoSizeAxes = Axes.Both
             };
-        }
 
-        protected override void LoadComplete()
-        {
-            //Adding this in "load" will cause the component to not load in properly after the first beatmap attempt. Or after existing and reentering.
-            //this does not happen in tests, or in the skin editor component preview button.
             foreach (var result in tally.Results)
             {
                 JudgementContainer.Add(createCounter(result));
             }
+        }
 
+        protected override void LoadComplete()
+        {
             base.LoadComplete();
 
             FlowDirection.BindValueChanged(direction =>
