@@ -70,7 +70,7 @@ namespace osu.Game.IO
             return result;
         }
 
-        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode)]
+        [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
