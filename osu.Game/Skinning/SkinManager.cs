@@ -287,7 +287,7 @@ namespace osu.Game.Skinning
 
         public Task<Live<SkinInfo>> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => skinImporter.Import(task, batchImport, cancellationToken);
 
-        public void ExporCurrenttSkin() => CurrentSkinInfo.Value.PerformRead(s => skinExporter.ExportAsync(s));
+        public Task ExportSkin(SkinInfo skin) => skinExporter.ExportAsync(skin);
 
         #endregion
 

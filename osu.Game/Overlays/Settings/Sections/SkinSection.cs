@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 try
                 {
-                    skins.ExporCurrenttSkin();
+                    skins.CurrentSkinInfo.Value.PerformRead(s => skins.ExportSkin(s));
                 }
                 catch (Exception e)
                 {
