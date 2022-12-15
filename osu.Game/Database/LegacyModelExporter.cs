@@ -140,40 +140,39 @@ namespace osu.Game.Database
         /// <param name="notification">The notification will displayed to the user</param>
         private void exportZipArchive(TModel model, Stream outputStream, ProgressNotification notification)
         {
-            using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)))
+            using var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate));
+
+            float i = 0;
+            bool fileMissing = false;
+
+            foreach (var file in model.Files)
             {
-                float i = 0;
-                bool fileMissing = false;
+                notification.CancellationToken.ThrowIfCancellationRequested();
 
-                foreach (var file in model.Files)
+                using (var stream = UserFileStorage.GetStream(file.File.GetStoragePath()))
                 {
-                    notification.CancellationToken.ThrowIfCancellationRequested();
-
-                    using (var stream = UserFileStorage.GetStream(file.File.GetStoragePath()))
+                    // Sometimes we cannot find the file(probably deleted by the user), so we handle this and post a error.
+                    if (stream == null)
                     {
-                        // Sometimes we cannot find the file(probably deleted by the user), so we handle this and post a error.
-                        if (stream == null)
+                        // Only pop up once to prevent spam.
+                        if (!fileMissing)
                         {
-                            // Only pop up once to prevent spam.
-                            if (!fileMissing)
+                            PostNotification?.Invoke(new SimpleErrorNotification
                             {
-                                PostNotification?.Invoke(new SimpleErrorNotification
-                                {
-                                    Text = "Some of your files are missing, they will not be included in the archive"
-                                });
-                                fileMissing = true;
-                            }
-                        }
-                        else
-                        {
-                            writer.Write(file.Filename, stream);
+                                Text = "Some of your files are missing, they will not be included in the archive"
+                            });
+                            fileMissing = true;
                         }
                     }
-
-                    i++;
-                    notification.Progress = i / model.Files.Count();
-                    notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
+                    else
+                    {
+                        writer.Write(file.Filename, stream);
+                    }
                 }
+
+                i++;
+                notification.Progress = i / model.Files.Count();
+                notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
             }
         }
     }
