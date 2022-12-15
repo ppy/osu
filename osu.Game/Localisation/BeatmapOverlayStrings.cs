@@ -12,22 +12,21 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "User content disclaimer"
         /// </summary>
-        public static LocalisableString UserContentDisclaimer => new TranslatableString(getKey(@"user_content_disclaimer"), @"User content disclaimer");
+        public static LocalisableString UserContentDisclaimerHeader => new TranslatableString(getKey(@"user_content_disclaimer"), @"User content disclaimer");
 
         /// <summary>
         /// "By turning off the &quot;Featured Artist&quot; filter, all user-uploaded content will be displayed.
         ///
-        /// This includes content which may not be correctly licensed for use and as such may not be safe for streaming, sharing, or consumption."
+        /// This includes content that may not be correctly licensed for osu! usage. Browse at your own risk."
         /// </summary>
-        public static LocalisableString ByTurningOffTheFeatured => new TranslatableString(getKey(@"by_turning_off_the_featured"),
-            @"By turning off the ""Featured Artist"" filter, all user-uploaded content will be displayed.
+        public static LocalisableString UserContentDisclaimerDescription => new TranslatableString(getKey(@"by_turning_off_the_featured"), @"By turning off the ""Featured Artist"" filter, all user-uploaded content will be displayed.
 
-This includes content which may not be correctly licensed for use and as such may not be safe for streaming, sharing, or consumption.");
+This includes content that may not be correctly licensed for osu! usage. Browse at your own risk.");
 
         /// <summary>
         /// "I understand"
         /// </summary>
-        public static LocalisableString Understood => new TranslatableString(getKey(@"understood"), @"I understand");
+        public static LocalisableString UserContentConfirmButtonText => new TranslatableString(getKey(@"understood"), @"I understand");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

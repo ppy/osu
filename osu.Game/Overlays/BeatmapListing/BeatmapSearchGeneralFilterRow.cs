@@ -87,8 +87,8 @@ namespace osu.Game.Overlays.BeatmapListing
     {
         public FeaturedArtistConfirmDialog(Action confirm)
         {
-            HeaderText = BeatmapOverlayStrings.UserContentDisclaimer;
-            BodyText = BeatmapOverlayStrings.ByTurningOffTheFeatured;
+            HeaderText = BeatmapOverlayStrings.UserContentDisclaimerHeader;
+            BodyText = BeatmapOverlayStrings.UserContentDisclaimerDescription;
 
             Icon = FontAwesome.Solid.ExclamationTriangle;
 
@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 new PopupDialogDangerousButton
                 {
-                    Text = BeatmapOverlayStrings.Understood,
+                    Text = BeatmapOverlayStrings.UserContentConfirmButtonText,
                     Action = confirm
                 },
                 new PopupDialogCancelButton
