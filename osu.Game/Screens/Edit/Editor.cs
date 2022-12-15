@@ -322,6 +322,13 @@ namespace osu.Game.Screens.Edit
                                                 State = { BindTarget = editorHitMarkers },
                                             }
                                         }
+                                    },
+                                    new MenuItem("Timing")
+                                    {
+                                        Items = new MenuItem[]
+                                        {
+                                            new EditorMenuItem("Set Current Position as Preview Point", MenuItemType.Standard, SetCurrectTimeAsPreview)
+                                        }
                                     }
                                 }
                             },
@@ -800,6 +807,11 @@ namespace osu.Game.Screens.Edit
         protected void Undo() => changeHandler?.RestoreState(-1);
 
         protected void Redo() => changeHandler?.RestoreState(1);
+
+        protected void SetCurrectTimeAsPreview()
+        {
+            editorBeatmap.PreviewTime.Value = (int)clock.CurrentTime;
+        }
 
         private void resetTrack(bool seekToStart = false)
         {
