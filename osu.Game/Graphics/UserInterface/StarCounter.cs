@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float star_spacing = 4;
 
-        private const int maxStarCount = 10;
+        private const int max_star_count = 10;
         private float current;
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace osu.Game.Graphics.UserInterface
         /// Shows a float count as stars. Used as star difficulty display.
         /// </summary>
         /// <param name="starCount">Maximum amount of stars to display.</param>
-        public StarCounter(int starCount = maxStarCount)
+        public StarCounter(int starCount = max_star_count)
         {
             StarCount = Math.Max(starCount, 0);
 
