@@ -9,14 +9,13 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuInputManager : RulesetInputManager<OsuAction>
+    public partial class OsuInputManager : RulesetInputManager<OsuAction>
     {
         private readonly OsuTouchInputMapper touchInputMapper;
 
@@ -43,27 +42,16 @@ namespace osu.Game.Rulesets.Osu
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
             Add(touchInputMapper);
         }
 
-        protected override bool Handle(UIEvent e)
-        {
-            if ((e is MouseMoveEvent || e is TouchMoveEvent) && !AllowUserCursorMovement) return false;
+        protected override bool Handle(UIEvent e) =>
+            (e is not (MouseMoveEvent or TouchMoveEvent) || AllowUserCursorMovement) && base.Handle(e);
 
-            return base.Handle(e);
-        }
-
-        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
-        {
-            var source = e.Touch.Source;
-
-            if (touchInputMapper.IsTapTouch(source))
-                return true;
-
-            return base.HandleMouseTouchStateChange(e);
-        }
+        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e) =>
+            touchInputMapper.IsTapTouch(e.Touch.Source) || base.HandleMouseTouchStateChange(e);
 
         /// <summary>
         /// Blocks <see cref="OsuAction.LeftButton"/> from being propagated by the <see cref="OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH"/>, so all the tapping must be done by other fingers.

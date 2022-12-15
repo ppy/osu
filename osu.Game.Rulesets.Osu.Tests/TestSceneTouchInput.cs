@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneTouchInput : TestSceneOsuPlayer
+    public partial class TestSceneTouchInput : TestSceneOsuPlayer
     {
         private OsuActionKeyCounter leftKeyCounter = null!;
 

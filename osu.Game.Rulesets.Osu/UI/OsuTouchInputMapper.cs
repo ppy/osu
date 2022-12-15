@@ -11,7 +11,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuTouchInputMapper : Drawable
+    public partial class OsuTouchInputMapper : Drawable
     {
         public const TouchSource DEFAULT_CURSOR_TOUCH = TouchSource.Touch1;
 
