@@ -140,27 +140,19 @@ namespace osu.Game.Database
         /// <param name="notification">The notification will displayed to the user</param>
         private void exportZipArchive(TModel model, Stream outputStream, ProgressNotification notification)
         {
-            try
+            using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)))
             {
-                using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)))
+                float i = 0;
+
+                foreach (var file in model.Files)
                 {
-                    float i = 0;
+                    notification.CancellationToken.ThrowIfCancellationRequested();
 
-                    foreach (var file in model.Files)
-                    {
-                        notification.CancellationToken.ThrowIfCancellationRequested();
-
-                        writer.Write(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
-                        i++;
-                        notification.Progress = i / model.Files.Count();
-                        notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
-                    }
+                    writer.Write(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
+                    i++;
+                    notification.Progress = i / model.Files.Count();
+                    notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
                 }
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.Log("Export operat canceled");
-                throw;
             }
         }
     }
