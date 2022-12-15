@@ -58,7 +58,6 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="starCount">Maximum amount of stars to display.</param>
         public StarCounter(int starCount = max_star_count)
         {
-            StarCount = Math.Max(starCount, 0);
             StarCount = Math.Clamp(StarCount, 0, 10);
 
             AutoSizeAxes = Axes.Both;
