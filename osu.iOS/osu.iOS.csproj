@@ -3,7 +3,6 @@
     <TargetFramework>net6.0-ios</TargetFramework>
     <SupportedOSPlatformVersion>13.4</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
-    <MtouchUseLlvm>false</MtouchUseLlvm> <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
     <UseMauiEssentials>true</UseMauiEssentials>
   </PropertyGroup>
   <Import Project="..\osu.iOS.props" />
