@@ -55,7 +55,6 @@ namespace osu.Game.Rulesets.Osu
 
         /// <summary>
         /// Blocks <see cref="OsuAction.LeftButton"/> from being propagated by the <see cref="OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH"/>, so all the tapping must be done by other fingers.
-        /// this can only happen in certain conditions so it may return false.
         /// </summary>
         /// <returns>Whether we disabled <see cref="OsuAction.LeftButton"/> from being propagated by the <see cref="OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH"/></returns>
         public bool BlockTouchCursorAction()
@@ -68,11 +67,13 @@ namespace osu.Game.Rulesets.Osu
             Vector2? cursorTouchPosition = CurrentState.Touch.GetTouchPosition(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH);
 
             // We shouldn't disable the cursor action input if the cursor isn't even active in the first place.
-            if (cursorTouchPosition == null)
-                return false;
+            if (cursorTouchPosition == null) return false;
+
+            var cursorTouch = new Touch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH, cursorTouchPosition.Value);
+            var disableCursorTouch = new TouchStateChangeEvent(CurrentState, null, cursorTouch, false, cursorTouchPosition);
 
             // Disables the actions for the cursor touch, all tapping must be done by the other fingers now.
-            base.HandleMouseTouchStateChange(new TouchStateChangeEvent(CurrentState, null, new Touch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH, cursorTouchPosition.Value), false, cursorTouchPosition));
+            base.HandleTouchStateChange(disableCursorTouch);
 
             return true;
         }
