@@ -453,7 +453,7 @@ namespace osu.Game.Beatmaps
         public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
             beatmapImporter.ImportAsUpdate(notification, importTask, original);
 
-        public void Export(BeatmapSetInfo beatmap) => Task.Run(() => beatmapExporter.ExportAsync(beatmap));
+        public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap);
 
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {

@@ -183,7 +183,7 @@ namespace osu.Game.Scoring
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreImporter.Import(notification, tasks);
 
-        public void Export(ScoreInfo score) => Task.Run(() => scoreExporter.ExportAsync(score));
+        public Task Export(ScoreInfo score) => scoreExporter.ExportAsync(score);
 
         public Task<Live<ScoreInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
 
