@@ -86,6 +86,8 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private EditorClock editorClock { get; set; }
 
+        public BindableInt PreviewTime;
+
         private readonly IBeatmapProcessor beatmapProcessor;
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
@@ -107,6 +109,9 @@ namespace osu.Game.Screens.Edit
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
+
+            PreviewTime = new BindableInt(playableBeatmap.Metadata.PreviewTime);
+            PreviewTime.BindValueChanged(s => this.beatmapInfo.Metadata.PreviewTime = s.NewValue);
         }
 
         /// <summary>
