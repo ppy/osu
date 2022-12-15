@@ -143,12 +143,33 @@ namespace osu.Game.Database
             using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)))
             {
                 float i = 0;
+                bool fileMissing = false;
 
                 foreach (var file in model.Files)
                 {
                     notification.CancellationToken.ThrowIfCancellationRequested();
 
-                    writer.Write(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
+                    using (var stream = UserFileStorage.GetStream(file.File.GetStoragePath()))
+                    {
+                        // Sometimes we cannot find the file(probably deleted by the user), so we handle this and post a error.
+                        if (stream == null)
+                        {
+                            // Only pop up once to prevent spam.
+                            if (!fileMissing)
+                            {
+                                PostNotification?.Invoke(new SimpleErrorNotification
+                                {
+                                    Text = "Some of your files are missing, they will not be included in the archive"
+                                });
+                                fileMissing = true;
+                            }
+                        }
+                        else
+                        {
+                            writer.Write(file.Filename, stream);
+                        }
+                    }
+
                     i++;
                     notification.Progress = i / model.Files.Count();
                     notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
