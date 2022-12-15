@@ -15,12 +15,12 @@ namespace osu.Game.Localisation
         public static LocalisableString UserContentDisclaimer => new TranslatableString(getKey(@"user_content_disclaimer"), @"User content disclaimer");
 
         /// <summary>
-        /// "By turning off the &quot;featured artist&quot; filter, all user uploaded content will be displayed.
+        /// "By turning off the &quot;Featured Artist&quot; filter, all user-uploaded content will be displayed.
         ///
         /// This includes content which may not be correctly licensed for use and as such may not be safe for streaming, sharing, or consumption."
         /// </summary>
         public static LocalisableString ByTurningOffTheFeatured => new TranslatableString(getKey(@"by_turning_off_the_featured"),
-            @"By turning off the ""featured artist"" filter, all user uploaded content will be displayed.
+            @"By turning off the ""Featured Artist"" filter, all user-uploaded content will be displayed.
 
 This includes content which may not be correctly licensed for use and as such may not be safe for streaming, sharing, or consumption.");
 
