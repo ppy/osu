@@ -32,8 +32,6 @@ namespace osu.Game.Database
 
         protected RealmAccess RealmAccess;
 
-        protected bool CanCancel = true;
-
         private string filename = string.Empty;
         public Action<Notification>? PostNotification { get; set; }
 
@@ -54,10 +52,16 @@ namespace osu.Game.Database
             string itemFilename = model.GetDisplayString().GetValidFilename();
             IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
             filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
+            bool success;
 
             using (var stream = exportStorage.CreateFileSafely(filename))
             {
-                await ExportToStreamAsync(model, stream);
+                success = await ExportToStreamAsync(model, stream);
+            }
+
+            if (!success)
+            {
+                exportStorage.Delete(filename);
             }
         }
 
@@ -66,8 +70,8 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The medel which have <see cref="IHasGuidPrimaryKey"/>.</param>
         /// <param name="stream">The stream to export.</param>
-        /// <returns></returns>
-        public async Task ExportToStreamAsync(TModel model, Stream stream)
+        /// <returns>Whether the export was successful</returns>
+        public async Task<bool> ExportToStreamAsync(TModel model, Stream stream)
         {
             ProgressNotification notification = new ProgressNotification
             {
@@ -76,35 +80,33 @@ namespace osu.Game.Database
                 CompletionText = "Export completed"
             };
             notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
-            notification.CancelRequested += () => CanCancel;
             PostNotification?.Invoke(notification);
-            CanCancel = true;
 
             Guid id = model.ID;
-            await Task.Run(() =>
+            return await Task.Run(() =>
             {
                 RealmAccess.Run(r =>
                 {
                     TModel refetchModel = r.Find<TModel>(id);
                     ExportToStream(refetchModel, stream, notification);
                 });
-            }).ContinueWith(t =>
+            }, notification.CancellationToken).ContinueWith(t =>
             {
+                if (t.IsCanceled)
+                {
+                    return false;
+                }
+
                 if (t.IsFaulted)
                 {
                     notification.State = ProgressNotificationState.Cancelled;
                     Logger.Error(t.Exception, "An error occurred while exporting");
-
-                    return;
-                }
-
-                if (notification.CancellationToken.IsCancellationRequested)
-                {
-                    return;
+                    return false;
                 }
 
                 notification.CompletionText = "Export Complete, Click to open the folder";
                 notification.State = ProgressNotificationState.Completed;
+                return true;
             });
         }
 
@@ -121,6 +123,8 @@ namespace osu.Game.Database
     public abstract class LegacyArchiveExporter<TModel> : LegacyModelExporter<TModel>
         where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
     {
+        private bool canCancel = true;
+
         protected LegacyArchiveExporter(Storage storage, RealmAccess realm)
             : base(storage, realm)
         {
@@ -136,23 +140,33 @@ namespace osu.Game.Database
         /// <param name="notification">The notification will displayed to the user</param>
         private void exportZipArchive(TModel model, Stream outputStream, ProgressNotification notification)
         {
-            using (var archive = ZipArchive.Create())
+            try
             {
-                float i = 0;
+                notification.CancelRequested += () => canCancel;
 
-                foreach (var file in model.Files)
+                using (var archive = ZipArchive.Create())
                 {
-                    if (notification.CancellationToken.IsCancellationRequested) return;
+                    float i = 0;
 
-                    archive.AddEntry(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
-                    i++;
-                    notification.Progress = i / model.Files.Count();
-                    notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
+                    foreach (var file in model.Files)
+                    {
+                        notification.CancellationToken.ThrowIfCancellationRequested();
+
+                        archive.AddEntry(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
+                        i++;
+                        notification.Progress = i / model.Files.Count();
+                        notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
+                    }
+
+                    notification.Text = "Saving Zip Archive...";
+                    canCancel = false;
+                    archive.SaveTo(outputStream);
                 }
-
-                notification.Text = "Saving Zip Archive...";
-                CanCancel = false;
-                archive.SaveTo(outputStream);
+            }
+            catch (OperationCanceledException)
+            {
+                Logger.Log("Export operat canceled");
+                throw;
             }
         }
     }
