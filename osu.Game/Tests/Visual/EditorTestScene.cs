@@ -102,6 +102,8 @@ namespace osu.Game.Tests.Visual
 
             public new void Redo() => base.Redo();
 
+            public new void SetCurrectTimeAsPreview() => base.SetCurrectTimeAsPreview();
+
             public new bool Save() => base.Save();
 
             public new void Cut() => base.Cut();
