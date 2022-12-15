@@ -73,7 +73,8 @@ namespace osu.Game.Online.Leaderboards
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
         public virtual ScoreInfo TooltipContent => Score;
 
-        private ScoreManager scoreManager = null!;
+        [Resolved]
+        private ScoreManager scoreManager { get; set; } = null!;
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true)
         {
@@ -87,13 +88,11 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager)
+        private void load(IAPIProvider api, OsuColour colour)
         {
             var user = Score.User;
 
             statisticsLabels = GetStatistics(Score).Select(s => new ScoreComponentLabel(s)).ToList();
-
-            this.scoreManager = scoreManager;
 
             ClickableAvatar innerAvatar;
 
