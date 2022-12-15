@@ -49,6 +49,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void setStars(float stars)
         {
             starCounter.Current = stars;
+            starCounter.Current = starCounter.Current > 10 ? starCounter.Current = 10 : starCounter.Current = starCounter.Current;
             starsLabel.Text = starCounter.Current.ToString("0.00");
         }
     }

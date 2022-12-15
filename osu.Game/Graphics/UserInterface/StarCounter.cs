@@ -59,6 +59,7 @@ namespace osu.Game.Graphics.UserInterface
         public StarCounter(int starCount = max_star_count)
         {
             StarCount = Math.Max(starCount, 0);
+            StarCount = StarCount > 10 ? StarCount = 10 : StarCount = StarCount;
 
             AutoSizeAxes = Axes.Both;
 
