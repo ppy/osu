@@ -6,7 +6,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Database
 {
-    public class LegacyBeatmapExporter : LegacyModelExporter<BeatmapSetInfo>
+    public class LegacyBeatmapExporter : LegacyArchiveExporter<BeatmapSetInfo>
     {
         public LegacyBeatmapExporter(Storage storage, RealmAccess realm)
             : base(storage, realm)

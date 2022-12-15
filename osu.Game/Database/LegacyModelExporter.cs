@@ -32,7 +32,7 @@ namespace osu.Game.Database
 
         protected RealmAccess RealmAccess;
 
-        private bool canCancel = true;
+        protected bool CanCancel = true;
 
         private string filename = string.Empty;
         public Action<Notification>? PostNotification { get; set; }
@@ -76,9 +76,9 @@ namespace osu.Game.Database
                 CompletionText = "Export completed"
             };
             notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
-            notification.CancelRequested += () => canCancel;
+            notification.CancelRequested += () => CanCancel;
             PostNotification?.Invoke(notification);
-            canCancel = true;
+            CanCancel = true;
 
             Guid id = model.ID;
             await Task.Run(() =>
@@ -115,7 +115,18 @@ namespace osu.Game.Database
         /// <param name="model">The item to export.</param>
         /// <param name="outputStream">The output stream to export to.</param>
         /// <param name="notification">The notification will displayed to the user</param>
-        protected virtual void ExportToStream(TModel model, Stream outputStream, ProgressNotification notification) => exportZipArchive(model, outputStream, notification);
+        protected abstract void ExportToStream(TModel model, Stream outputStream, ProgressNotification notification);
+    }
+
+    public abstract class LegacyArchiveExporter<TModel> : LegacyModelExporter<TModel>
+        where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
+    {
+        protected LegacyArchiveExporter(Storage storage, RealmAccess realm)
+            : base(storage, realm)
+        {
+        }
+
+        protected override void ExportToStream(TModel model, Stream outputStream, ProgressNotification notification) => exportZipArchive(model, outputStream, notification);
 
         /// <summary>
         /// Exports an item to Stream as a legacy (.zip based) package.
@@ -140,7 +151,7 @@ namespace osu.Game.Database
                 }
 
                 notification.Text = "Saving Zip Archive...";
-                canCancel = false;
+                CanCancel = false;
                 archive.SaveTo(outputStream);
             }
         }
