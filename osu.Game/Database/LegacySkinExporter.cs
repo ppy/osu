@@ -6,7 +6,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {
-    public class LegacySkinExporter : LegacyModelExporter<SkinInfo>
+    public class LegacySkinExporter : LegacyArchiveExporter<SkinInfo>
     {
         public LegacySkinExporter(Storage storage, RealmAccess realm)
             : base(storage, realm)
