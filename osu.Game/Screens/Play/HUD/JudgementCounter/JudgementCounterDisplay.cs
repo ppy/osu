@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                     counter.Direction.Value = getFlow(direction.NewValue);
                 }
             }, true);
-            Mode.BindValueChanged(_ => updateCounter(), true);
+            Mode.BindValueChanged(_ => updateMode(), true);
             ShowMax.BindValueChanged(value =>
             {
                 var firstChild = JudgementContainer.Children.FirstOrDefault();
@@ -81,38 +81,35 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             }, true);
         }
 
-        private void updateCounter()
+        private void updateMode()
         {
-            var counters = JudgementContainer.Children.OfType<JudgementCounter>().ToList();
-
-            switch (Mode.Value)
+            foreach (var counter in JudgementContainer.Children.OfType<JudgementCounter>().Where(counter => !counter.Result.Type.IsBasic()))
             {
-                case DisplayMode.Simple:
-                    foreach (var counter in counters.Where(counter => counter.Result.Type.IsBasic()))
-                        counter.Show();
-
-                    foreach (var counter in counters.Where(counter => !counter.Result.Type.IsBasic()))
+                switch (Mode.Value)
+                {
+                    case DisplayMode.Simple:
                         counter.Hide();
 
-                    break;
+                        break;
 
-                case DisplayMode.Normal:
-                    foreach (var counter in counters.Where(counter => !counter.Result.Type.IsBonus()))
+                    case DisplayMode.Normal:
+                        if (counter.Result.Type.IsBonus())
+                        {
+                            counter.Hide();
+                            break;
+                        }
+
+                        counter.Show();
+                        break;
+
+                    case DisplayMode.All:
                         counter.Show();
 
-                    foreach (var counter in counters.Where(counter => counter.Result.Type.IsBonus()))
-                        counter.Hide();
+                        break;
 
-                    break;
-
-                case DisplayMode.All:
-                    foreach (JudgementCounter counter in counters.Where(counter => !counter.IsPresent))
-                        counter.Show();
-
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
         }
 
@@ -149,7 +146,8 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         {
             JudgementCounter counter = new JudgementCounter(info)
             {
-                ShowName = { BindTarget = ShowName },
+                State = { Value = Visibility.Visible },
+                ShowName = { BindTarget = ShowName }
             };
             return counter;
         }

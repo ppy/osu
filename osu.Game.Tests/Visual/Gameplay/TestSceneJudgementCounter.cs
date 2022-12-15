@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private ScoreProcessor scoreProcessor = null!;
         private JudgementTally judgementTally = null!;
-        private TestJudgementCounterDisplay counter = null!;
+        private TestJudgementCounterDisplay counterDisplay = null!;
 
         private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
 
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         RelativeSizeAxes = Axes.Both,
                         CachedDependencies = new (Type, object)[] { (typeof(JudgementTally), judgementTally) },
-                        Child = counter = new TestJudgementCounterDisplay
+                        Child = counterDisplay = new TestJudgementCounterDisplay
                         {
                             Margin = new MarginPadding { Top = 100 },
                             Anchor = Anchor.TopCentre,
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("Add judgement", () => applyOneJudgement(HitResult.Miss), 2);
             AddRepeatStep("Add judgement", () => applyOneJudgement(HitResult.Meh), 2);
             AddRepeatStep("Add judgement", () => applyOneJudgement(HitResult.LargeTickHit), 2);
-            AddStep("Show all judgements", () => counter.Mode.Value = JudgementCounterDisplay.DisplayMode.All);
+            AddStep("Show all judgements", () => counterDisplay.Mode.Value = JudgementCounterDisplay.DisplayMode.All);
             AddAssert("Check value added whilst hidden", () => hiddenCount() == 2);
         }
 
@@ -91,43 +91,49 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddRepeatStep("Add judgement", () => applyOneJudgement(HitResult.LargeTickHit), 2);
             AddAssert("Check value added whilst hidden", () => hiddenCount() == 2);
-            AddStep("Show all judgements", () => counter.Mode.Value = JudgementCounterDisplay.DisplayMode.All);
+            AddStep("Show all judgements", () => counterDisplay.Mode.Value = JudgementCounterDisplay.DisplayMode.All);
         }
 
         [Test]
         public void TestChangeFlowDirection()
         {
-            AddStep("Set direction vertical", () => counter.FlowDirection.Value = JudgementCounterDisplay.Flow.Vertical);
-            AddStep("Set direction horizontal", () => counter.FlowDirection.Value = JudgementCounterDisplay.Flow.Horizontal);
+            AddStep("Set direction vertical", () => counterDisplay.FlowDirection.Value = JudgementCounterDisplay.Flow.Vertical);
+            AddStep("Set direction horizontal", () => counterDisplay.FlowDirection.Value = JudgementCounterDisplay.Flow.Horizontal);
         }
 
         [Test]
         public void TestToggleJudgementNames()
         {
-            AddStep("Hide judgement names", () => counter.ShowName.Value = false);
-            AddAssert("Assert hidden", () => counter.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 0);
-            AddStep("Hide judgement names", () => counter.ShowName.Value = true);
-            AddAssert("Assert shown", () => counter.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 1);
+            AddStep("Hide judgement names", () => counterDisplay.ShowName.Value = false);
+            AddAssert("Assert hidden", () => counterDisplay.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 0);
+            AddStep("Hide judgement names", () => counterDisplay.ShowName.Value = true);
+            AddAssert("Assert shown", () => counterDisplay.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 1);
         }
 
         [Test]
         public void TestHideMaxValue()
         {
-            AddStep("Hide max judgement", () => counter.ShowMax.Value = false);
-            AddStep("Show max judgement", () => counter.ShowMax.Value = true);
+            AddStep("Hide max judgement", () => counterDisplay.ShowMax.Value = false);
+            AddWaitStep("wait some", 2);
+            AddAssert("Check max hidden", () => counterDisplay.JudgementContainer.ChildrenOfType<JudgementCounter>().First().Alpha == 0);
+            AddStep("Show max judgement", () => counterDisplay.ShowMax.Value = true);
         }
 
         [Test]
         public void TestCycleDisplayModes()
         {
-            AddStep("Show all judgements", () => counter.Mode.Value = JudgementCounterDisplay.DisplayMode.All);
-            AddStep("Show normal judgements", () => counter.Mode.Value = JudgementCounterDisplay.DisplayMode.Normal);
-            AddStep("Show basic judgements", () => counter.Mode.Value = JudgementCounterDisplay.DisplayMode.Simple);
+            AddStep("Show basic judgements", () => counterDisplay.Mode.Value = JudgementCounterDisplay.DisplayMode.Simple);
+            AddWaitStep("wait some", 2);
+            AddAssert("Check only basic", () => counterDisplay.JudgementContainer.ChildrenOfType<JudgementCounter>().Last().Alpha == 0);
+            AddStep("Show normal judgements", () => counterDisplay.Mode.Value = JudgementCounterDisplay.DisplayMode.Normal);
+            AddStep("Show all judgements", () => counterDisplay.Mode.Value = JudgementCounterDisplay.DisplayMode.All);
+            AddWaitStep("wait some", 2);
+            AddAssert("Check all visible", () => counterDisplay.JudgementContainer.ChildrenOfType<JudgementCounter>().Last().Alpha == 1);
         }
 
         private int hiddenCount()
         {
-            var num = counter.JudgementContainer.Children.OfType<JudgementCounter>().First(child => child.Result.Type == HitResult.LargeTickHit);
+            var num = counterDisplay.JudgementContainer.Children.OfType<JudgementCounter>().First(child => child.Result.Type == HitResult.LargeTickHit);
             return num.Result.ResultCount.Value;
         }
 

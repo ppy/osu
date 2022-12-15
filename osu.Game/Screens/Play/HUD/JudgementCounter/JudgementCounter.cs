@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
         protected override void PopIn()
         {
-            this.FadeInFromZero(500, Easing.OutQuint);
+            this.FadeIn(500, Easing.OutQuint);
         }
 
         protected override void PopOut()
