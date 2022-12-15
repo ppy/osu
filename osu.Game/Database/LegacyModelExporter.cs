@@ -12,7 +12,9 @@ using osu.Game.Extensions;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
 using Realms;
-using SharpCompress.Archives.Zip;
+using SharpCompress.Common;
+using SharpCompress.Writers;
+using SharpCompress.Writers.Zip;
 
 namespace osu.Game.Database
 {
@@ -123,8 +125,6 @@ namespace osu.Game.Database
     public abstract class LegacyArchiveExporter<TModel> : LegacyModelExporter<TModel>
         where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
     {
-        private bool canCancel = true;
-
         protected LegacyArchiveExporter(Storage storage, RealmAccess realm)
             : base(storage, realm)
         {
@@ -142,9 +142,7 @@ namespace osu.Game.Database
         {
             try
             {
-                notification.CancelRequested += () => canCancel;
-
-                using (var archive = ZipArchive.Create())
+                using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)))
                 {
                     float i = 0;
 
@@ -152,15 +150,11 @@ namespace osu.Game.Database
                     {
                         notification.CancellationToken.ThrowIfCancellationRequested();
 
-                        archive.AddEntry(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
+                        writer.Write(file.Filename, UserFileStorage.GetStream(file.File.GetStoragePath()));
                         i++;
                         notification.Progress = i / model.Files.Count();
                         notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
                     }
-
-                    notification.Text = "Saving Zip Archive...";
-                    canCancel = false;
-                    archive.SaveTo(outputStream);
                 }
             }
             catch (OperationCanceledException)
