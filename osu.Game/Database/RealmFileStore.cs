@@ -66,7 +66,7 @@ namespace osu.Game.Database
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows && data is FileStream fs && preferHardLinks)
             {
                 // attempt to do a fast hard link rather than copy.
-                if (HardLinkHelper.CreateHardLink(Storage.GetFullPath(file.GetStoragePath()), fs.Name, IntPtr.Zero))
+                if (HardLinkHelper.CreateHardLink(Storage.GetFullPath(file.GetStoragePath(), true), fs.Name, IntPtr.Zero))
                     return;
             }
 
