@@ -54,6 +54,19 @@ namespace osu.Game.Database
 
         public void UpdateStorage(string stablePath) => cachedStorage = new StableStorage(stablePath, gameHost as DesktopGameHost);
 
+        public bool CheckHardLinkAvailability()
+        {
+            var stableStorage = GetCurrentStableStorage();
+
+            if (stableStorage == null || gameHost is not DesktopGameHost desktopGameHost)
+                return false;
+
+            string testExistingPath = stableStorage.GetFullPath(string.Empty);
+            string testDestinationPath = desktopGameHost.Storage.GetFullPath(string.Empty);
+
+            return HardLinkHelper.CheckAvailability(testDestinationPath, testExistingPath);
+        }
+
         public virtual async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
         {
             var stableStorage = GetCurrentStableStorage();

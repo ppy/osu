@@ -73,7 +73,7 @@ namespace osu.Game.Database
                     if (originalModel != null)
                         importSuccessful = (await importer.ImportAsUpdate(notification, new ImportTask(filename), originalModel).ConfigureAwait(false)) != null;
                     else
-                        importSuccessful = (await importer.Import(notification, new ImportTask(filename)).ConfigureAwait(false)).Any();
+                        importSuccessful = (await importer.Import(notification, new[] { new ImportTask(filename) }).ConfigureAwait(false)).Any();
 
                     // for now a failed import will be marked as a failed download for simplicity.
                     if (!importSuccessful)
