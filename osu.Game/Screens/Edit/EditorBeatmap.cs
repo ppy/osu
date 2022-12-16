@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private EditorClock editorClock { get; set; }
 
-        public BindableInt PreviewTime;
+        public BindableInt PreviewTime { get; }
 
         private readonly IBeatmapProcessor beatmapProcessor;
 
