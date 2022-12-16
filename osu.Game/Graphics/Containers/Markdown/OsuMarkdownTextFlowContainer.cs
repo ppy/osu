@@ -40,6 +40,8 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override void AddFootnoteLink(FootnoteLink footnoteLink) => AddDrawable(new OsuMarkdownFootnoteLink(footnoteLink));
 
+        protected override void AddFootnoteBacklink(FootnoteLink footnoteBacklink) => AddDrawable(new OsuMarkdownFootnoteBacklink(footnoteBacklink));
+
         protected override SpriteText CreateEmphasisedSpriteText(bool bold, bool italic)
             => CreateSpriteText().With(t => t.Font = t.Font.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, italics: italic));
 
