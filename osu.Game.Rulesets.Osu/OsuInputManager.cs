@@ -35,11 +35,21 @@ namespace osu.Game.Rulesets.Osu
             set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowGameplayInputs = value;
         }
 
+        private bool allowUserCursorMovement = true;
+
         /// <summary>
         /// Whether the user's cursor movement events should be accepted.
         /// Can be used to block only movement while still accepting button input.
         /// </summary>
-        public bool AllowUserCursorMovement { get; set; } = true;
+        public bool AllowUserCursorMovement
+        {
+            get => allowUserCursorMovement;
+            set
+            {
+                allowUserCursorMovement = value;
+                touchInputMapper.HandleAllowUserCursorMovement(allowUserCursorMovement);
+            }
+        }
 
         protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
@@ -63,8 +73,23 @@ namespace osu.Game.Rulesets.Osu
             return base.Handle(e);
         }
 
-        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e) =>
-            touchInputMapper.IsTapTouch(e.Touch.Source) || base.HandleMouseTouchStateChange(e);
+        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
+        {
+            var source = e.Touch.Source;
+
+            if (touchInputMapper.IsTapTouch(source))
+                return true;
+
+            if (AllowUserCursorMovement)
+                return base.HandleMouseTouchStateChange(e);
+
+            // Still allow for forwarding of the "touch" part, but replace the positional data with that of the mouse.
+            // Primarily relied upon by the "autopilot" osu! mod.
+            var touch = new Touch(source, CurrentState.Mouse.Position);
+            e = new TouchStateChangeEvent(e.State, e.Input, touch, e.IsActive, null);
+
+            return base.HandleMouseTouchStateChange(e);
+        }
 
         public void EnableStreamMode(TouchSource cursorSource)
         {
