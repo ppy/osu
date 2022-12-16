@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("seek to 1000", () => EditorClock.Seek(1000));
             AddAssert("time is 1000", () => EditorClock.CurrentTime == 1000);
-            AddStep("set current time as preview point", () => Editor.SetCurrectTimeAsPreview());
+            AddStep("set current time as preview point", () => Editor.SetCurrentTimeAsPreview());
             AddAssert("preview time is 1000", () => EditorBeatmap.PreviewTime.Value == 1000);
         }
 
