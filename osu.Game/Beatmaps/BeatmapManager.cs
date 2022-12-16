@@ -456,15 +456,15 @@ namespace osu.Game.Beatmaps
 
         public Task Import(params string[] paths) => beatmapImporter.Import(paths);
 
-        public Task Import(params ImportTask[] tasks) => beatmapImporter.Import(tasks);
+        public Task Import(ImportTask[] tasks, ImportParameters parameters = default) => beatmapImporter.Import(tasks, parameters);
 
-        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => beatmapImporter.Import(notification, tasks);
+        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) => beatmapImporter.Import(notification, tasks, parameters);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            beatmapImporter.Import(task, batchImport, cancellationToken);
+        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
+            beatmapImporter.Import(task, parameters, cancellationToken);
 
         public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) =>
-            beatmapImporter.ImportModel(item, archive, false, cancellationToken);
+            beatmapImporter.ImportModel(item, archive, default, cancellationToken);
 
         public IEnumerable<string> HandledExtensions => beatmapImporter.HandledExtensions;
 
