@@ -66,12 +66,8 @@ namespace osu.Game.Rulesets.Osu
             Add(touchInputMapper);
         }
 
-        protected override bool Handle(UIEvent e)
-        {
-            if (e is MouseMoveEvent or TouchMoveEvent && !AllowUserCursorMovement) return false;
-
-            return base.Handle(e);
-        }
+        protected override bool Handle(UIEvent e) =>
+            (e is not (MouseMoveEvent or TouchMoveEvent) || AllowUserCursorMovement) && base.Handle(e);
 
         protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
         {
