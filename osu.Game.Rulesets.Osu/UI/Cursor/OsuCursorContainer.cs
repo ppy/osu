@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Bindable<bool> showTrail = new Bindable<bool>(true);
 
-        private readonly Drawable cursorTrail;
+        public readonly Drawable CursorTrail;
 
         public IBindable<float> CursorScale => cursorScale;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    cursorTrail = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
+                    CursorTrail = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
                     new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
                 }
             };
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             base.LoadComplete();
 
-            showTrail.BindValueChanged(v => cursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
+            showTrail.BindValueChanged(v => CursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
 
             userCursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
             userCursorScale.ValueChanged += _ => calculateScale();
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 var newScale = new Vector2(e.NewValue);
 
                 ActiveCursor.Scale = newScale;
-                cursorTrail.Scale = newScale;
+                CursorTrail.Scale = newScale;
             }, true);
 
             calculateScale();
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             var newScale = new Vector2(scale);
 
             ActiveCursor.ScaleTo(newScale, 400, Easing.OutQuint);
-            cursorTrail.Scale = newScale;
+            CursorTrail.Scale = newScale;
         }
 
         private int downCount;
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                Texture = textures.Get(@"Cursor/cursortrail");
+                Texture = textures.Get(@"Cursor/CursorTrail");
                 Scale = new Vector2(1 / Texture.ScaleAdjust);
             }
         }
