@@ -7,6 +7,7 @@ using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -114,7 +115,7 @@ namespace osu.Game.Overlays.Changelog
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = Build.CreatedAt.Date.ToString("dd MMMM yyyy"),
+                    Text = Build.CreatedAt.Date.ToLocalisableString("dd MMMM yyyy"),
                     Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 14),
                     Margin = new MarginPadding { Top = 5 },
                     Scale = new Vector2(1.25f),
