@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using Markdig.Extensions.Footnotes;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -27,14 +29,13 @@ namespace osu.Game.Graphics.Containers.Markdown.Footnotes
         public OsuMarkdownFootnoteBacklink(FootnoteLink backlink)
         {
             this.backlink = backlink;
-            AutoSizeAxes = Axes.X;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider colourProvider, OsuMarkdownContainer markdownContainer, OverlayScrollContainer? scrollContainer)
         {
             float fontSize = parentTextComponent.CreateSpriteText().Font.Size;
-            Height = fontSize;
+            Size = new Vector2(fontSize);
 
             IdleColour = colourProvider.Light2;
             HoverColour = colourProvider.Light1;
@@ -47,6 +48,15 @@ namespace osu.Game.Graphics.Containers.Markdown.Footnotes
                 Size = new Vector2(fontSize / 2),
                 Icon = FontAwesome.Solid.ArrowUp,
             });
+
+            if (scrollContainer != null)
+            {
+                Action = () =>
+                {
+                    var footnoteLink = markdownContainer.ChildrenOfType<OsuMarkdownFootnoteLink>().Single(footnoteLink => footnoteLink.FootnoteLink.Index == backlink.Index);
+                    scrollContainer.ScrollIntoView(footnoteLink);
+                };
+            }
         }
     }
 }
