@@ -16,13 +16,16 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers.Markdown;
+using osu.Game.Graphics.Containers.Markdown.Footnotes;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki.Markdown;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public partial class TestSceneWikiMarkdownContainer : OsuTestScene
+    public partial class TestSceneWikiMarkdownContainer : OsuManualInputManagerTestScene
     {
+        private OverlayScrollContainer scrollContainer;
         private TestMarkdownContainer markdownContainer;
 
         [Cached]
@@ -31,8 +34,6 @@ namespace osu.Game.Tests.Visual.Online
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            OverlayScrollContainer scrollContainer;
-
             Children = new Drawable[]
             {
                 new Box
@@ -230,6 +231,31 @@ Phasellus eu nunc nec ligula semper fringilla. Aliquam magna neque, placerat sed
 
 [^test]: This is a **footnote**.
 [^test2]: This is another footnote [with a link](https://google.com/)!");
+            AddStep("shrink scroll height", () => scrollContainer.Height = 0.5f);
+
+            AddStep("press second footnote link", () =>
+            {
+                InputManager.MoveMouseTo(markdownContainer.ChildrenOfType<OsuMarkdownFootnoteLink>().ElementAt(1));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("second footnote scrolled into view", () =>
+            {
+                var footnote = markdownContainer.ChildrenOfType<OsuMarkdownFootnote>().ElementAt(1);
+                return scrollContainer.ScreenSpaceDrawQuad.Contains(footnote.ScreenSpaceDrawQuad.TopLeft)
+                       && scrollContainer.ScreenSpaceDrawQuad.Contains(footnote.ScreenSpaceDrawQuad.BottomRight);
+            });
+
+            AddStep("press first footnote backlink", () =>
+            {
+                InputManager.MoveMouseTo(markdownContainer.ChildrenOfType<OsuMarkdownFootnoteBacklink>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("first footnote link scrolled into view", () =>
+            {
+                var footnote = markdownContainer.ChildrenOfType<OsuMarkdownFootnoteLink>().First();
+                return scrollContainer.ScreenSpaceDrawQuad.Contains(footnote.ScreenSpaceDrawQuad.TopLeft)
+                       && scrollContainer.ScreenSpaceDrawQuad.Contains(footnote.ScreenSpaceDrawQuad.BottomRight);
+            });
         }
 
         private partial class TestMarkdownContainer : WikiMarkdownContainer
