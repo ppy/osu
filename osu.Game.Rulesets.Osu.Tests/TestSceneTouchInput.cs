@@ -57,13 +57,15 @@ namespace osu.Game.Rulesets.Osu.Tests
             }));
         }
 
-        private string getTouchString(TouchSource source) => (source - TouchSource.Touch1 + 1).ToOrdinalWords();
-
         private void expectTapTouchesAmount(int expect) => AddAssert($"Has {expect} tap touches active", () => touchInputMapper.ActiveTapTouchesCount == expect);
 
         private void assertAllowingTouchInput() => AddAssert("Allowing other touch input", () => touchInputMapper.AcceptingTouchInputs);
 
+        private string getTouchString(TouchSource source) => (source - TouchSource.Touch1 + 1).ToOrdinalWords();
+
         private void addTouchWithFingerStep(TouchSource source) => AddStep($"Touch with {getTouchString(source)} finger", () => touch(source));
+
+        private void addReleaseFingerStep(TouchSource source) => AddStep($"Released the {getTouchString(source)} finger", () => release(source));
 
         private void addFirstFingerTouchStep() => addTouchWithFingerStep(TouchSource.Touch1);
 
@@ -79,12 +81,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             addTouchWithFingerStep(TouchSource.Touch3);
         }
 
-        private string getExpectKeyCounterText(string name, int expect) => $"The {name} key was pressed {expect} times";
-
-        private bool getExpectKeyCounterCondition(KeyCounter counter, int expect) => counter.CountPresses == expect;
-
         private void expectKeyCountersCountingBe(int left, int right)
         {
+            bool getExpectKeyCounterCondition(KeyCounter counter, int expect) => counter.CountPresses == expect;
+            string getExpectKeyCounterText(string name, int expect) => $"The {name} key was pressed {expect} times";
+
             AddAssert(getExpectKeyCounterText("left", left), () => getExpectKeyCounterCondition(leftKeyCounter, left));
             AddAssert(getExpectKeyCounterText("right", right), () => getExpectKeyCounterCondition(rightKeyCounter, right));
         }
@@ -110,6 +111,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Disable cursor movement", () => osuInputManager.AllowUserCursorMovement = false);
             steppedTouchWithThreeFingers();
+            expectBothKeysPressed();
             expectKeyCountersCountingBe(1, 1);
         }
 
@@ -150,6 +152,19 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertAcceptedOnlyThreeSequentialInputs();
             AddAssert("Touch input is blocked", () => !touchInputMapper.AcceptingTouchInputs);
             AddAssert("Is on stream mode", () => touchInputMapper.IsStreamMode);
+        }
+
+        [Test]
+        public void TestStreamMode()
+        {
+            steppedTouchWithThreeFingers();
+            AddAssert("Is on stream mode", () => touchInputMapper.IsStreamMode);
+
+            addReleaseFingerStep(TouchSource.Touch3);
+            addReleaseFingerStep(TouchSource.Touch2);
+            addReleaseFingerStep(TouchSource.Touch1);
+
+            AddAssert("Is not on stream mode", () => !touchInputMapper.IsStreamMode);
         }
 
         [Test]
