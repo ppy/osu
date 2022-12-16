@@ -14,6 +14,10 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             base.LoadBeatmap(beatmap);
             Add(new PreviewTimeVisualisation(beatmap.PreviewTime));
+            beatmap.PreviewTime.BindValueChanged(s =>
+            {
+                Alpha = s.NewValue == -1 ? 0 : 1;
+            }, true);
         }
 
         private partial class PreviewTimeVisualisation : PointVisualisation
