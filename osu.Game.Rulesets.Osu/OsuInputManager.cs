@@ -5,13 +5,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -21,9 +21,16 @@ namespace osu.Game.Rulesets.Osu
 
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
-        public bool AllowUserPresses
+        /// <summary>
+        /// Whether gameplay input buttons should be allowed.
+        /// Defaults to <c>true</c>, generally used for mods like Relax which turn off main inputs.
+        /// </summary>
+        /// <remarks>
+        /// Of note, auxiliary inputs like the "smoke" key are left usable.
+        /// </remarks>
+        public bool AllowGameplayInputs
         {
-            set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowUserPresses = value;
+            set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowGameplayInputs = value;
         }
 
         /// <summary>
@@ -47,51 +54,59 @@ namespace osu.Game.Rulesets.Osu
             Add(touchInputMapper);
         }
 
-        protected override bool Handle(UIEvent e) =>
-            (e is not (MouseMoveEvent or TouchMoveEvent) || AllowUserCursorMovement) && base.Handle(e);
-
-        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e) =>
-            touchInputMapper.IsTapTouch(e.Touch.Source) || base.HandleMouseTouchStateChange(e);
-
-        /// <summary>
-        /// Blocks <see cref="OsuAction.LeftButton"/> from being propagated by the <see cref="OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH"/>, so all the tapping must be done by other fingers.
-        /// </summary>
-        /// <returns>Whether we disabled <see cref="OsuAction.LeftButton"/> from being propagated by the <see cref="OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH"/></returns>
-        public bool BlockTouchCursorAction()
+        protected override bool Handle(UIEvent e)
         {
-            // We don't want to block the default cursor touch action input when the default cursor touch isn't a proper cursor touch.
-            // this because it will completely block the first input with mods which don't accept cursor input such as autopilot.
-            if (!touchInputMapper.IsCursorTouch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH))
-                return false;
+            if (e is MouseMoveEvent or TouchMoveEvent && !AllowUserCursorMovement) return false;
 
-            Vector2? cursorTouchPosition = CurrentState.Touch.GetTouchPosition(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH);
-
-            // We shouldn't disable the cursor action input if the cursor isn't even active in the first place.
-            if (cursorTouchPosition == null) return false;
-
-            var cursorTouch = new Touch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH, cursorTouchPosition.Value);
-            var disableCursorTouch = new TouchStateChangeEvent(CurrentState, null, cursorTouch, false, cursorTouchPosition);
-
-            // Disables the actions for the cursor touch, all tapping must be done by the other fingers now.
-            base.HandleTouchStateChange(disableCursorTouch);
-
-            return true;
+            return base.Handle(e);
         }
 
-        private class OsuKeyBindingContainer : RulesetKeyBindingContainer
+        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
         {
-            public bool AllowUserPresses = true;
+            if (touchInputMapper.IsTapTouch(e.Touch.Source))
+                return true;
+
+            if (!touchInputMapper.IsStreamMode)
+                return base.HandleMouseTouchStateChange(e);
+
+            // Enables stream mode by disabling mouse input from the touch cursor.
+            e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
+
+            return base.HandleMouseTouchStateChange(e);
+        }
+
+        private partial class OsuKeyBindingContainer : RulesetKeyBindingContainer
+        {
+            private bool allowGameplayInputs = true;
+
+            /// <summary>
+            /// Whether gameplay input buttons should be allowed.
+            /// Defaults to <c>true</c>, generally used for mods like Relax which turn off main inputs.
+            /// </summary>
+            /// <remarks>
+            /// Of note, auxiliary inputs like the "smoke" key are left usable.
+            /// </remarks>
+            public bool AllowGameplayInputs
+            {
+                get => allowGameplayInputs;
+                set
+                {
+                    allowGameplayInputs = value;
+                    ReloadMappings();
+                }
+            }
 
             public OsuKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
             {
             }
 
-            protected override bool Handle(UIEvent e)
+            protected override void ReloadMappings(IQueryable<RealmKeyBinding> realmKeyBindings)
             {
-                if (!AllowUserPresses) return false;
+                base.ReloadMappings(realmKeyBindings);
 
-                return base.Handle(e);
+                if (!AllowGameplayInputs)
+                    KeyBindings = KeyBindings.Where(b => b.GetAction<OsuAction>() == OsuAction.Smoke).ToList();
             }
         }
     }
@@ -102,6 +117,9 @@ namespace osu.Game.Rulesets.Osu
         LeftButton,
 
         [Description("Right button")]
-        RightButton
+        RightButton,
+
+        [Description("Smoke")]
+        Smoke,
     }
 }
