@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Chat
         public Color4 AccentColour { get; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            Child.ReceivePositionalInputAt(screenSpacePos);
+            colouredDrawable.ReceivePositionalInputAt(screenSpacePos);
 
         public float FontSize
         {
@@ -87,13 +87,13 @@ namespace osu.Game.Overlays.Chat
             {
                 AccentColour = default_colours[user.Id % default_colours.Length];
 
-                Child = colouredDrawable = drawableText;
+                Add(colouredDrawable = drawableText);
             }
             else
             {
                 AccentColour = Color4Extensions.FromHex(user.Colour);
 
-                Child = new Container
+                Add(new Container
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Chat
                             }
                         }
                     }
-                };
+                });
             }
         }
 

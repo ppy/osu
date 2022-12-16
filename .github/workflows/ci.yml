@@ -132,8 +132,8 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
-      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
-      # cannot accept .sln(f) files as arguments.
-      # Build just the main game for now.
+      - name: Install .NET Workloads
+        run: dotnet workload install maui-ios
+
       - name: Build
-        run: msbuild osu.iOS/osu.iOS.csproj /restore /p:Configuration=Debug
+        run: dotnet build -c Debug osu.iOS
