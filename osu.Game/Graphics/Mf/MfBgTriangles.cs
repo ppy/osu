@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
-using osuTK.Platform.Windows;
 
 namespace osu.Game.Graphics.Mf
 {
@@ -18,10 +17,9 @@ namespace osu.Game.Graphics.Mf
     {
         private readonly Bindable<bool> optui = new Bindable<bool>();
         private readonly BackgroundTriangles backgroundTriangle;
-        public bool EnableBeatSync { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config, OsuColour colour)
+        private void load(MConfigManager config)
         {
             config.BindWith(MSetting.OptUI, optui);
         }
