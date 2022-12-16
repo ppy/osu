@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual
 
             public new void Redo() => base.Redo();
 
-            public new void SetCurrectTimeAsPreview() => base.SetCurrectTimeAsPreview();
+            public new void SetCurrentTimeAsPreview() => base.SetCurrentTimeAsPreview();
 
             public new bool Save() => base.Save();
 

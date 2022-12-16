@@ -327,7 +327,7 @@ namespace osu.Game.Screens.Edit
                                     {
                                         Items = new MenuItem[]
                                         {
-                                            new EditorMenuItem("Set Current Position as Preview Point", MenuItemType.Standard, SetCurrectTimeAsPreview)
+                                            new EditorMenuItem("Set Current Position as Preview Point", MenuItemType.Standard, SetCurrentTimeAsPreview)
                                         }
                                     }
                                 }
@@ -808,7 +808,7 @@ namespace osu.Game.Screens.Edit
 
         protected void Redo() => changeHandler?.RestoreState(1);
 
-        protected void SetCurrectTimeAsPreview()
+        protected void SetCurrentTimeAsPreview()
         {
             editorBeatmap.PreviewTime.Value = (int)clock.CurrentTime;
         }
