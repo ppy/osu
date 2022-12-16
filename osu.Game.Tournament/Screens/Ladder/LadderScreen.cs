@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
@@ -81,11 +82,15 @@ namespace osu.Game.Tournament.Screens.Ladder
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         foreach (var p in args.NewItems.Cast<TournamentMatch>())
                             addMatch(p);
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
+                        Debug.Assert(args.OldItems != null);
+
                         foreach (var p in args.OldItems.Cast<TournamentMatch>())
                         {
                             foreach (var d in MatchesContainer.Where(d => d.Match == p))
