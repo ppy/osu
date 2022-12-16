@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -125,9 +124,11 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 keyBindingContainer.TriggerReleased(triggeredActions[source]);
                 triggeredActions.Remove(source);
-
-                if (triggeredActions.Any())
-                    IsStreamMode = false;
+            }
+            else if (IsCursorTouch(source))
+            {
+                cursorTouchSource = null;
+                IsStreamMode = false;
             }
 
             base.OnTouchUp(e);
