@@ -25,7 +25,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2022.1204.0" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2022.1216.1" />
   </ItemGroup>
   <!-- OpenTabletDriver contains P/Invokes to the "Quartz" framework for native macOS code.
        This leads iOS linker into attempting to include that framework, despite not existing on such platform.
