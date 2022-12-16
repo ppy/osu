@@ -22,7 +22,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [System.ComponentModel.Description("Advanced beatmap statistics display")]
-    public class TestSceneAdvancedStats : OsuTestScene
+    public partial class TestSceneAdvancedStats : OsuTestScene
     {
         private TestAdvancedStats advancedStats;
 
@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select unchanged Difficulty Adjust mod", () =>
             {
                 var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance().AsNonNull();
-                var difficultyAdjustMod = ruleset.CreateMod<ModDifficultyAdjust>();
+                var difficultyAdjustMod = ruleset.CreateMod<ModDifficultyAdjust>().AsNonNull();
                 difficultyAdjustMod.ReadFromDifficulty(advancedStats.BeatmapInfo.Difficulty);
                 SelectedMods.Value = new[] { difficultyAdjustMod };
             });
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select changed Difficulty Adjust mod", () =>
             {
                 var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance().AsNonNull();
-                var difficultyAdjustMod = ruleset.CreateMod<OsuModDifficultyAdjust>();
+                var difficultyAdjustMod = ruleset.CreateMod<OsuModDifficultyAdjust>().AsNonNull();
                 var originalDifficulty = advancedStats.BeatmapInfo.Difficulty;
 
                 difficultyAdjustMod.ReadFromDifficulty(originalDifficulty);
@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private bool barIsBlue(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == colours.BlueDark;
         private bool barIsRed(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == colours.Red;
 
-        private class TestAdvancedStats : AdvancedStats
+        private partial class TestAdvancedStats : AdvancedStats
         {
             public new StatisticRow FirstValue => base.FirstValue;
             public new StatisticRow HpDrain => base.HpDrain;

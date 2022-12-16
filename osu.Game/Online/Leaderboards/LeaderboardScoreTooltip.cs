@@ -15,15 +15,18 @@ using osu.Framework.Localisation;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScoreTooltip : VisibilityContainer, ITooltip<ScoreInfo>
+    public partial class LeaderboardScoreTooltip : VisibilityContainer, ITooltip<ScoreInfo>
     {
         private OsuSpriteText timestampLabel = null!;
         private FillFlowContainer<HitResultCell> topScoreStatistics = null!;
         private FillFlowContainer<HitResultCell> bottomScoreStatistics = null!;
         private FillFlowContainer<ModCell> modStatistics = null!;
+        private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
 
         public LeaderboardScoreTooltip()
         {
@@ -36,8 +39,9 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager configManager)
         {
+            configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -92,6 +96,13 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            prefer24HourTime.BindValueChanged(_ => updateTimestampLabel(), true);
+        }
+
         private ScoreInfo? displayedScore;
 
         public void SetContent(ScoreInfo score)
@@ -101,7 +112,7 @@ namespace osu.Game.Online.Leaderboards
 
             displayedScore = score;
 
-            timestampLabel.Text = $"Played on {score.Date.ToLocalTime():d MMMM yyyy HH:mm}";
+            updateTimestampLabel();
 
             modStatistics.Clear();
             topScoreStatistics.Clear();
@@ -121,12 +132,22 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
+        private void updateTimestampLabel()
+        {
+            if (displayedScore != null)
+            {
+                timestampLabel.Text = prefer24HourTime.Value
+                    ? $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy HH:mm}"
+                    : $"Played on {displayedScore.Date.ToLocalTime():d MMMM yyyy h:mm tt}";
+            }
+        }
+
         protected override void PopIn() => this.FadeIn(20, Easing.OutQuint);
         protected override void PopOut() => this.FadeOut(80, Easing.OutQuint);
 
         public void Move(Vector2 pos) => Position = pos;
 
-        private class HitResultCell : CompositeDrawable
+        private partial class HitResultCell : CompositeDrawable
         {
             private readonly LocalisableString displayName;
             private readonly HitResult result;
@@ -168,7 +189,7 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private class ModCell : CompositeDrawable
+        private partial class ModCell : CompositeDrawable
         {
             private readonly Mod mod;
 

@@ -21,7 +21,7 @@ using osu.Game.Overlays.Wiki.Markdown;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneWikiMarkdownContainer : OsuTestScene
+    public partial class TestSceneWikiMarkdownContainer : OsuTestScene
     {
         private TestMarkdownContainer markdownContainer;
 
@@ -189,7 +189,17 @@ Line after image";
             });
         }
 
-        private class TestMarkdownContainer : WikiMarkdownContainer
+        [Test]
+        public void TestFlag()
+        {
+            AddStep("Add flag", () =>
+            {
+                markdownContainer.CurrentPath = @"https://dev.ppy.sh";
+                markdownContainer.Text = "::{flag=\"AU\"}:: ::{flag=\"ZZ\"}::";
+            });
+        }
+
+        private partial class TestMarkdownContainer : WikiMarkdownContainer
         {
             public LinkInline Link;
 
@@ -198,7 +208,7 @@ Line after image";
                 UrlAdded = link => Link = link,
             };
 
-            private class TestMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
+            private partial class TestMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
             {
                 public Action<LinkInline> UrlAdded;
 

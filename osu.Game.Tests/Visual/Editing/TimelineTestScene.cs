@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -22,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public abstract class TimelineTestScene : EditorClockTestScene
+    public abstract partial class TimelineTestScene : EditorClockTestScene
     {
         protected TimelineArea TimelineArea { get; private set; }
 
@@ -45,7 +46,10 @@ namespace osu.Game.Tests.Visual.Editing
             Dependencies.Cache(EditorBeatmap);
             Dependencies.CacheAs<IBeatSnapProvider>(EditorBeatmap);
 
-            Composer = playable.BeatmapInfo.Ruleset.CreateInstance().CreateHitObjectComposer().With(d => d.Alpha = 0);
+            Composer = playable.BeatmapInfo.Ruleset.CreateInstance().CreateHitObjectComposer();
+            Debug.Assert(Composer != null);
+
+            Composer.Alpha = 0;
 
             Add(new OsuContextMenuContainer
             {
@@ -83,7 +87,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         public abstract Drawable CreateTestComponent();
 
-        private class AudioVisualiser : CompositeDrawable
+        private partial class AudioVisualiser : CompositeDrawable
         {
             private readonly Drawable marker;
 
@@ -122,7 +126,7 @@ namespace osu.Game.Tests.Visual.Editing
             }
         }
 
-        private class StartStopButton : OsuButton
+        private partial class StartStopButton : OsuButton
         {
             [Resolved]
             private EditorClock editorClock { get; set; }

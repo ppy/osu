@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +27,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.Skinning.Argon;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Rulesets.Osu.UI;
@@ -44,7 +43,7 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuRuleset : Ruleset, ILegacyRuleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
 
@@ -60,6 +59,7 @@ namespace osu.Game.Rulesets.Osu
         {
             new KeyBinding(InputKey.Z, OsuAction.LeftButton),
             new KeyBinding(InputKey.X, OsuAction.RightButton),
+            new KeyBinding(InputKey.C, OsuAction.Smoke),
             new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu
                 yield return new OsuModSpunOut();
 
             if (mods.HasFlagFast(LegacyMods.Target))
-                yield return new OsuModTarget();
+                yield return new OsuModTargetPractice();
 
             if (mods.HasFlagFast(LegacyMods.TouchDevice))
                 yield return new OsuModTouchDevice();
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu
                         value |= LegacyMods.SpunOut;
                         break;
 
-                    case OsuModTarget:
+                    case OsuModTargetPractice:
                         value |= LegacyMods.Target;
                         break;
 
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu
                 case ModType.Conversion:
                     return new Mod[]
                     {
-                        new OsuModTarget(),
+                        new OsuModTargetPractice(),
                         new OsuModDifficultyAdjust(),
                         new OsuModClassic(),
                         new OsuModRandom(),
@@ -201,7 +201,8 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModMuted(),
                         new OsuModNoScope(),
                         new MultiMod(new OsuModMagnetised(), new OsuModRepel()),
-                        new ModAdaptiveSpeed()
+                        new ModAdaptiveSpeed(),
+                        new OsuModFreezeFrame()
                     };
 
                 case ModType.System:
@@ -233,13 +234,25 @@ namespace osu.Game.Rulesets.Osu
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new OsuLegacySkinTransformer(skin);
+        public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)
+        {
+            switch (skin)
+            {
+                case LegacySkin:
+                    return new OsuLegacySkinTransformer(skin);
+
+                case ArgonSkin:
+                    return new OsuArgonSkinTransformer(skin);
+            }
+
+            return null;
+        }
 
         public int LegacyID => 0;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
-        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
+        public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
         protected override IEnumerable<HitResult> GetValidHitResults()
         {

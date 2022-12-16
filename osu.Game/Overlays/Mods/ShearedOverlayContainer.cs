@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Mods
     /// A sheared overlay which provides a header and footer and basic animations.
     /// Exposes <see cref="TopLevelContent"/>, <see cref="MainAreaContent"/> and <see cref="Footer"/> as valid targets for content.
     /// </summary>
-    public abstract class ShearedOverlayContainer : OsuFocusedOverlayContainer
+    public abstract partial class ShearedOverlayContainer : OsuFocusedOverlayContainer
     {
         protected const float PADDING = 14;
 

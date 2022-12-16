@@ -17,7 +17,7 @@ using osu.Game.Overlays;
 namespace osu.Game.Tests.Visual.Settings
 {
     [TestFixture]
-    public class TestSceneSettingsItem : OsuTestScene
+    public partial class TestSceneSettingsItem : OsuTestScene
     {
         [Test]
         public void TestRestoreDefaultValueButtonVisibility()
@@ -29,11 +29,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 Child = textBox = new SettingsTextBox
                 {
-                    Current = new Bindable<string>
-                    {
-                        Default = "test",
-                        Value = "test"
-                    }
+                    Current = new Bindable<string>("test")
                 };
             });
             AddUntilStep("wait for loaded", () => textBox.IsLoaded);
@@ -59,11 +55,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 Child = textBox = new SettingsTextBox
                 {
-                    Current = new Bindable<string>
-                    {
-                        Default = "test",
-                        Value = "test"
-                    }
+                    Current = new Bindable<string>("test")
                 };
             });
             AddUntilStep("wait for loaded", () => textBox.IsLoaded);

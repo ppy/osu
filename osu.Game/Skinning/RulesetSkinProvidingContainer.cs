@@ -23,7 +23,7 @@ namespace osu.Game.Skinning
     /// A type of <see cref="SkinProvidingContainer"/> specialized for <see cref="DrawableRuleset"/> and other gameplay-related components.
     /// Providing access to parent skin sources and the beatmap skin each surrounded with the ruleset legacy skin transformer.
     /// </summary>
-    public class RulesetSkinProvidingContainer : SkinProvidingContainer
+    public partial class RulesetSkinProvidingContainer : SkinProvidingContainer
     {
         protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
@@ -41,7 +41,7 @@ namespace osu.Game.Skinning
             Ruleset = ruleset;
             Beatmap = beatmap;
 
-            InternalChild = new BeatmapSkinProvidingContainer(beatmapSkin is LegacySkin ? GetLegacyRulesetTransformedSkin(beatmapSkin) : beatmapSkin)
+            InternalChild = new BeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin))
             {
                 Child = Content = new Container
                 {
@@ -67,21 +67,22 @@ namespace osu.Game.Skinning
 
             Debug.Assert(ParentSource != null);
 
-            foreach (var skin in ParentSource.AllSources)
+            foreach (var source in ParentSource.AllSources)
             {
-                switch (skin)
+                switch (source)
                 {
-                    case LegacySkin legacySkin:
-                        sources.Add(GetLegacyRulesetTransformedSkin(legacySkin));
+                    case Skin skin:
+                        sources.Add(GetRulesetTransformedSkin(skin));
                         break;
 
                     default:
-                        sources.Add(skin);
+                        sources.Add(source);
                         break;
                 }
             }
 
-            int lastDefaultSkinIndex = sources.IndexOf(sources.OfType<DefaultSkin>().LastOrDefault());
+            // TODO: check
+            int lastDefaultSkinIndex = sources.IndexOf(sources.OfType<TrianglesSkin>().LastOrDefault());
 
             // Ruleset resources should be given the ability to override game-wide defaults
             // This is achieved by placing them before the last instance of DefaultSkin.
@@ -94,16 +95,16 @@ namespace osu.Game.Skinning
             SetSources(sources);
         }
 
-        protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
+        protected ISkin GetRulesetTransformedSkin(ISkin skin)
         {
-            if (legacySkin == null)
+            if (skin == null)
                 return null;
 
-            var rulesetTransformed = Ruleset.CreateLegacySkinProvider(legacySkin, Beatmap);
+            var rulesetTransformed = Ruleset.CreateSkinTransformer(skin, Beatmap);
             if (rulesetTransformed != null)
                 return rulesetTransformed;
 
-            return legacySkin;
+            return skin;
         }
 
         protected override void Dispose(bool isDisposing)

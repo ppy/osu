@@ -1,19 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class SpinnerSpmCalculator : Component
+    public partial class SpinnerSpmCalculator : Component
     {
         private readonly Queue<RotationRecord> records = new Queue<RotationRecord>();
         private const double spm_count_duration = 595; // not using hundreds to avoid frame rounding issues
@@ -26,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         private readonly Bindable<double> result = new BindableDouble();
 
         [Resolved]
-        private DrawableHitObject drawableSpinner { get; set; }
+        private DrawableHitObject drawableSpinner { get; set; } = null!;
 
         protected override void LoadComplete()
         {
@@ -66,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Dispose(isDisposing);
 
-            if (drawableSpinner != null)
+            if (drawableSpinner.IsNotNull())
                 drawableSpinner.HitObjectApplied -= resetState;
         }
 

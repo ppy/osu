@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A container for <see cref="SelectionBlueprint{HitObject}"/> ordered by their <see cref="HitObject"/> start times.
     /// </summary>
-    public sealed class HitObjectOrderedSelectionContainer : Container<SelectionBlueprint<HitObject>>
+    public sealed partial class HitObjectOrderedSelectionContainer : Container<SelectionBlueprint<HitObject>>
     {
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; }
@@ -24,10 +24,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            editorBeatmap.HitObjectUpdated += hitObjectUpdated;
+            editorBeatmap.BeatmapReprocessed += SortInternal;
         }
-
-        private void hitObjectUpdated(HitObject _) => SortInternal();
 
         public override void Add(SelectionBlueprint<HitObject> drawable)
         {
@@ -72,7 +70,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.Dispose(isDisposing);
 
             if (editorBeatmap != null)
-                editorBeatmap.HitObjectUpdated -= hitObjectUpdated;
+                editorBeatmap.BeatmapReprocessed -= SortInternal;
         }
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -16,17 +17,27 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneHitEventTimingDistributionGraph : OsuTestScene
+    public partial class TestSceneHitEventTimingDistributionGraph : OsuTestScene
     {
         private HitEventTimingDistributionGraph graph = null!;
+        private readonly BindableFloat width = new BindableFloat(600);
+        private readonly BindableFloat height = new BindableFloat(130);
 
         private static readonly HitObject placeholder_object = new HitCircle();
+
+        public TestSceneHitEventTimingDistributionGraph()
+        {
+            width.BindValueChanged(e => graph.Width = e.NewValue);
+            height.BindValueChanged(e => graph.Height = e.NewValue);
+        }
 
         [Test]
         public void TestManyDistributedEvents()
         {
             createTest(CreateDistributedHitEvents());
             AddStep("add adjustment", () => graph.UpdateOffset(10));
+            AddSliderStep("width", 0.0f, 1000.0f, width.Value, width.Set);
+            AddSliderStep("height", 0.0f, 1000.0f, height.Value, height.Set);
         }
 
         [Test]
@@ -137,7 +148,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(600, 130)
+                    Size = new Vector2(width.Value, height.Value)
                 }
             };
         });

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -13,54 +12,35 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuTouchInputMapper : Drawable
     {
-        public const TouchSource DEFAULT_CURSOR_TOUCH = TouchSource.Touch1;
+        /// <summary>
+        /// The max amount of touches that we handle.
+        /// </summary>
+        private const int max_handled_tap_touches = 2;
 
         /// <summary>
-        /// The max amount of tap touches that should be allowed.
+        /// The max amount of touches that we handle. Decremented by one.
         /// </summary>
-        private const int allowed_tap_touches_limit = 2;
+        private const int max_handled_tap_touches_decremented = max_handled_tap_touches - 1;
 
         /// <summary>
-        /// The max amount of tap touches that should be allowed decremented. can be used on cases like <see cref="BlockCursorActionOnNextTap"/>.
+        /// This is our parent <see cref="osuInputManager"/>.
         /// </summary>
-        private const int allowed_tap_touches_limit_decremented = allowed_tap_touches_limit - 1;
-
         private readonly OsuInputManager osuInputManager;
 
+        /// <summary>
+        /// This is our <see cref="keyBindingContainer"/>. We trigger <see cref="OsuAction"/>s  with it.
+        /// </summary>
         private KeyBindingContainer<OsuAction> keyBindingContainer => osuInputManager.KeyBindingContainer;
 
         /// <summary>
-        /// Maps all <see cref="TouchSource"/>s into a respective <see cref="OsuAction"/>.
+        /// This is a dictionary tracking all the active <see cref="TouchSource"/>s and the <see cref="OsuAction"/> that it triggered.
         /// </summary>
-        private readonly Dictionary<TouchSource, OsuAction> tapActionsMap = Enum.GetValues(typeof(TouchSource))
-                                                                                .Cast<TouchSource>()
-                                                                                .ToDictionary(source => source, source => (source - TouchSource.Touch1) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
+        private readonly Dictionary<TouchSource, OsuAction> triggeredActions = new Dictionary<TouchSource, OsuAction>();
 
         /// <summary>
-        /// Tracks all currently active tap <see cref="TouchSource"/>s.
+        /// Tracks how many touch sources are currently active.
         /// </summary>
-        private readonly HashSet<TouchSource> activeTapTouches = new HashSet<TouchSource>();
-
-        /// <summary>
-        /// Tracks how many tap touches are currently active.
-        /// </summary>
-        public int ActiveTapTouchesCount => activeTapTouches.Count;
-
-        /// <summary>
-        /// Checks whether we should block the <see cref="OsuAction.LeftButton"/> triggered by the <see cref="DEFAULT_CURSOR_TOUCH"/> from being propagated.
-        /// </summary>
-        /// <param name="limit">How many tap touches for the cursor actions to be blocked</param>
-        /// <returns>Whether the <see cref="OsuAction.LeftButton"/> should be blocked from being propagated.</returns>
-        private bool checkBlockCursorAction(int limit) => ActiveTapTouchesCount >= limit;
-
-        public bool BlockCursorAction => checkBlockCursorAction(allowed_tap_touches_limit);
-
-        public bool BlockCursorActionOnNextTap => checkBlockCursorAction(allowed_tap_touches_limit_decremented);
-
-        /// <summary>
-        /// Whether we just blocked the cursor actions from being propagated.
-        /// </summary>
-        public bool JustBlockedCursorActions;
+        public int ActiveTapTouchesCount => triggeredActions.Count;
 
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
@@ -68,22 +48,21 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         /// <summary>
+        /// This is the touch assigned to the cursor.
+        /// </summary>
+        private TouchSource? cursorTouchSource;
+
+        /// <summary>
         /// Checks whether a given <see cref="TouchSource"/> is a tap touch.
-        /// <remarks>
-        /// A tap touch is any touch that is done whilst a cursor touch is active or when the cursor movement is blocked.
-        /// </remarks>
         /// </summary>
         /// <param name="source">The <see cref="TouchSource"/> to check.</param>
         /// <returns>Whether the given source is a tap touch.</returns>
-        public bool IsTapTouch(TouchSource source) => source != DEFAULT_CURSOR_TOUCH || !osuInputManager.AllowUserCursorMovement;
+        public bool IsTapTouch(TouchSource source) =>
+            (cursorTouchSource.HasValue && source != cursorTouchSource.Value) || !osuInputManager.AllowUserCursorMovement;
 
         /// <summary>
         /// Checks whether a given <see cref="TouchSource"/> is a cursor touch.
         /// </summary>
-        /// <remarks>
-        /// The <see cref="DEFAULT_CURSOR_TOUCH"/> will always be the cursor touch.
-        /// Unless the cursor movement is blocked, in this case there aren't cursor touches.
-        /// </remarks>
         /// <param name="source">The <see cref="TouchSource"/> to check.</param>
         /// <returns>Whether the given source is the cursor touch.</returns>
         public bool IsCursorTouch(TouchSource source) => !IsTapTouch(source);
@@ -91,26 +70,36 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// Whether we can still handle another touch input.
         /// </summary>
-        public bool AcceptingTouchInputs => ActiveTapTouchesCount <= allowed_tap_touches_limit_decremented;
+        public bool AcceptingTouchInputs => ActiveTapTouchesCount <= max_handled_tap_touches_decremented;
+
+        /// <summary>
+        /// Whether stream mode is enabled.
+        /// When stream mode is enabled the cursor's handled action is disabled.
+        /// This means all the tapping must be done by other fingers.
+        /// </summary>
+        public bool IsStreamMode;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
+            if (!AcceptingTouchInputs) return base.OnTouchDown(e);
+
             var source = e.Touch.Source;
 
-            if (!AcceptingTouchInputs || IsCursorTouch(source)) return base.OnTouchDown(e);
+            if (IsCursorTouch(source))
+            {
+                cursorTouchSource = source;
 
-            if (BlockCursorActionOnNextTap)
-            {
-                if (!JustBlockedCursorActions)
-                    JustBlockedCursorActions = osuInputManager.BlockTouchCursorAction();
-            }
-            else
-            {
-                JustBlockedCursorActions = false;
+                return base.OnTouchDown(e);
             }
 
-            activeTapTouches.Add(source);
-            keyBindingContainer.TriggerPressed(tapActionsMap[source]);
+            var action = ActiveTapTouchesCount % 2 == 0 ? OsuAction.RightButton : OsuAction.LeftButton;
+
+            triggeredActions.Add(source, action);
+
+            if (!IsStreamMode)
+                IsStreamMode = ActiveTapTouchesCount == max_handled_tap_touches && IsCursorTouch(cursorTouchSource!.Value);
+
+            keyBindingContainer.TriggerPressed(action);
 
             return base.OnTouchDown(e);
         }
@@ -119,11 +108,13 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             var source = e.Touch.Source;
 
-            // We must only disable active tap touches. this guarantees that their assigned actions were properly triggered and can be disabled.
-            if (activeTapTouches.Contains(source))
+            if (triggeredActions.ContainsKey(source))
             {
-                activeTapTouches.Remove(source);
-                keyBindingContainer.TriggerReleased(tapActionsMap[source]);
+                keyBindingContainer.TriggerReleased(triggeredActions[source]);
+                triggeredActions.Remove(source);
+
+                if (triggeredActions.Any())
+                    IsStreamMode = false;
             }
 
             base.OnTouchUp(e);

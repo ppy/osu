@@ -1,18 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     /// <summary>
     /// A single spectated player within a <see cref="MultiSpectatorScreen"/>.
     /// </summary>
-    public class MultiSpectatorPlayer : SpectatorPlayer
+    public partial class MultiSpectatorPlayer : SpectatorPlayer
     {
         /// <summary>
         /// All adjustments applied to the clock of this <see cref="MultiSpectatorPlayer"/> which come from mods.
@@ -34,8 +36,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(CancellationToken cancellationToken)
         {
+            // HUD overlay may not be loaded if load has been cancelled early.
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
             HUDOverlay.PlayerSettingsOverlay.Expire();
             HUDOverlay.HoldToQuit.Expire();
         }
@@ -65,5 +71,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             clockAdjustmentsFromMods.BindAdjustments(gameplayClockContainer.AdjustmentsFromMods);
             return gameplayClockContainer;
         }
+
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new MultiSpectatorResultsScreen(score);
     }
 }

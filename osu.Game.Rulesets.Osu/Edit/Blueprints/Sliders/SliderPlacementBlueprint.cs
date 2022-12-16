@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
-    public class SliderPlacementBlueprint : PlacementBlueprint
+    public partial class SliderPlacementBlueprint : PlacementBlueprint
     {
         public new Slider HitObject => (Slider)base.HitObject;
 
@@ -198,7 +198,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
 
                 // Update the cursor position.
-                cursor.Position = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+                var result = snapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position);
+                cursor.Position = ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
             }
             else if (cursor != null)
             {

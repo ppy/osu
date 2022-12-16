@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// A container that handles tracking of an <see cref="OsuLogo"/> through different layout scenarios.
     /// </summary>
-    public class LogoTrackingContainer : Container
+    public partial class LogoTrackingContainer : Container
     {
         public Facade LogoFacade => facade;
 
@@ -131,7 +131,7 @@ namespace osu.Game.Graphics.Containers
             base.Dispose(isDisposing);
         }
 
-        private class InternalFacade : Facade
+        private partial class InternalFacade : Facade
         {
             public new void SetSize(Vector2 size)
             {
@@ -142,7 +142,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// A dummy object used to denote another object's location.
         /// </summary>
-        public abstract class Facade : Drawable
+        public abstract partial class Facade : Drawable
         {
             public override Vector2 Size
             {

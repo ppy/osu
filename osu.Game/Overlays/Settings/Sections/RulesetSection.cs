@@ -12,7 +12,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class RulesetSection : SettingsSection
+    public partial class RulesetSection : SettingsSection
     {
         public override LocalisableString Header => RulesetSettingsStrings.Rulesets;
 
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 try
                 {
-                    SettingsSubsection section = ruleset.CreateSettings();
+                    SettingsSubsection? section = ruleset.CreateSettings();
 
                     if (section != null)
                         Add(section);

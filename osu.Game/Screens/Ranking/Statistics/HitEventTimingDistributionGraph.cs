@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +18,7 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// <summary>
     /// A graph which displays the distribution of hit timing in a series of <see cref="HitEvent"/>s.
     /// </summary>
-    public class HitEventTimingDistributionGraph : CompositeDrawable
+    public partial class HitEventTimingDistributionGraph : CompositeDrawable
     {
         /// <summary>
         /// The number of bins on each side of the timing distribution.
@@ -47,6 +45,12 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         private readonly IReadOnlyList<HitEvent> hitEvents;
 
+        private readonly IDictionary<HitResult, int>[] bins;
+        private double binSize;
+        private double hitOffset;
+
+        private Bar[]? barDrawables;
+
         /// <summary>
         /// Creates a new <see cref="HitEventTimingDistributionGraph"/>.
         /// </summary>
@@ -54,21 +58,14 @@ namespace osu.Game.Screens.Ranking.Statistics
         public HitEventTimingDistributionGraph(IReadOnlyList<HitEvent> hitEvents)
         {
             this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit()).ToList();
+            bins = Enumerable.Range(0, total_timing_distribution_bins).Select(_ => new Dictionary<HitResult, int>()).ToArray<IDictionary<HitResult, int>>();
         }
-
-        private IDictionary<HitResult, int>[] bins;
-        private double binSize;
-        private double hitOffset;
-
-        private Bar[] barDrawables;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (hitEvents == null || hitEvents.Count == 0)
+            if (hitEvents.Count == 0)
                 return;
-
-            bins = Enumerable.Range(0, total_timing_distribution_bins).Select(_ => new Dictionary<HitResult, int>()).ToArray<IDictionary<HitResult, int>>();
 
             binSize = Math.Ceiling(hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins);
 
@@ -207,27 +204,32 @@ namespace osu.Game.Screens.Ranking.Statistics
             }
         }
 
-        private class Bar : CompositeDrawable
+        private partial class Bar : CompositeDrawable
         {
-            private float totalValue => values.Sum(v => v.Value);
-            private float basalHeight => BoundingBox.Width / BoundingBox.Height;
-            private float availableHeight => 1 - basalHeight;
-
             private readonly IReadOnlyList<KeyValuePair<HitResult, int>> values;
             private readonly float maxValue;
             private readonly bool isCentre;
+            private readonly float totalValue;
 
-            private Circle[] boxOriginals;
-            private Circle boxAdjustment;
+            private float basalHeight;
+            private float offsetAdjustment;
+
+            private Circle[] boxOriginals = null!;
+
+            private Circle? boxAdjustment;
 
             [Resolved]
-            private OsuColour colours { get; set; }
+            private OsuColour colours { get; set; } = null!;
+
+            private const double duration = 300;
 
             public Bar(IDictionary<HitResult, int> values, float maxValue, bool isCentre)
             {
                 this.values = values.OrderBy(v => v.Key.GetIndexForOrderedDisplay()).ToList();
                 this.maxValue = maxValue;
                 this.isCentre = isCentre;
+                totalValue = values.Sum(v => v.Value);
+                offsetAdjustment = totalValue;
 
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
@@ -254,38 +256,32 @@ namespace osu.Game.Screens.Ranking.Statistics
                 else
                 {
                     // A bin with no value draws a grey dot instead.
-                    InternalChildren = boxOriginals = new[]
+                    Circle dot = new Circle
                     {
-                        new Circle
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Colour = isCentre ? Color4.White : Color4.Gray,
-                            Height = 0,
-                        },
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Colour = isCentre ? Color4.White : Color4.Gray,
+                        Height = 0,
                     };
+                    InternalChildren = boxOriginals = new[] { dot };
                 }
-            }
-
-            private const double duration = 300;
-
-            private float offsetForValue(float value)
-            {
-                return availableHeight * value / maxValue;
-            }
-
-            private float heightForValue(float value)
-            {
-                return basalHeight + offsetForValue(value);
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
+                if (!values.Any())
+                    return;
+
+                updateBasalHeight();
+
                 foreach (var boxOriginal in boxOriginals)
+                {
+                    boxOriginal.Y = 0;
                     boxOriginal.Height = basalHeight;
+                }
 
                 float offsetValue = 0;
 
@@ -295,6 +291,12 @@ namespace osu.Game.Screens.Ranking.Statistics
                     boxOriginals[i].ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
                     offsetValue -= values[i].Value;
                 }
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                updateBasalHeight();
             }
 
             public void UpdateOffset(float adjustment)
@@ -318,7 +320,53 @@ namespace osu.Game.Screens.Ranking.Statistics
                     });
                 }
 
-                boxAdjustment.ResizeHeightTo(heightForValue(adjustment), duration, Easing.OutQuint);
+                offsetAdjustment = adjustment;
+                drawAdjustmentBar();
+            }
+
+            private void updateBasalHeight()
+            {
+                float newBasalHeight = DrawHeight > DrawWidth ? DrawWidth / DrawHeight : 1;
+
+                if (newBasalHeight == basalHeight)
+                    return;
+
+                basalHeight = newBasalHeight;
+                foreach (var dot in boxOriginals)
+                    dot.Height = basalHeight;
+
+                draw();
+            }
+
+            private float offsetForValue(float value) => (1 - basalHeight) * value / maxValue;
+
+            private float heightForValue(float value) => MathF.Max(basalHeight + offsetForValue(value), 0);
+
+            private void draw()
+            {
+                resizeBars();
+
+                if (boxAdjustment != null)
+                    drawAdjustmentBar();
+            }
+
+            private void resizeBars()
+            {
+                float offsetValue = 0;
+
+                for (int i = 0; i < values.Count; i++)
+                {
+                    boxOriginals[i].Y = offsetForValue(offsetValue) * DrawHeight;
+                    boxOriginals[i].Height = heightForValue(values[i].Value);
+                    offsetValue -= values[i].Value;
+                }
+            }
+
+            private void drawAdjustmentBar()
+            {
+                bool hasAdjustment = offsetAdjustment != totalValue;
+
+                boxAdjustment.ResizeHeightTo(heightForValue(offsetAdjustment), duration, Easing.OutQuint);
                 boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
             }
         }

@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -20,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneZoomableScrollContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneZoomableScrollContainer : OsuManualInputManagerTestScene
     {
         private ZoomableScrollContainer scrollContainer;
         private Drawable innerBox;
@@ -54,7 +55,7 @@ namespace osu.Game.Tests.Visual.Editing
                             }
                         }
                     },
-                    new MenuCursor()
+                    new MenuCursorContainer()
                 };
 
                 scrollContainer.Add(innerBox = new Box
@@ -64,6 +65,18 @@ namespace osu.Game.Tests.Visual.Editing
                 });
             });
             AddUntilStep("Scroll container is loaded", () => scrollContainer.LoadState >= LoadState.Loaded);
+        }
+
+        [Test]
+        public void TestInitialZoomOutOfRange()
+        {
+            AddStep("Invalid ZoomableScrollContainer throws ArgumentException", () =>
+            {
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    _ = new ZoomableScrollContainer(1, 60, 0);
+                });
+            });
         }
 
         [Test]

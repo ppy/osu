@@ -21,6 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
+    [TestFixture]
     public partial class TestSceneTouchInput : TestSceneOsuPlayer
     {
         private OsuActionKeyCounter leftKeyCounter = null!;
@@ -42,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Release touches", () =>
             {
-                foreach (TouchSource source in Enum.GetValues(typeof(TouchSource)))
+                foreach (TouchSource source in osuInputManager.CurrentState.Touch.ActiveSources)
                     release(source);
             });
             AddStep("Create key counter", () => osuInputManager.Add(new Container
@@ -96,10 +97,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             expectPressedCurrently(OsuAction.RightButton);
         }
 
+        private void testFirstTouchSource() => AddStep("Add first touch source", () => touch(TouchSource.Touch1));
+
         [Test]
         public void TestTouchSources()
         {
-            AddAssert("Cursor touch is properly set", () => touchInputMapper.IsCursorTouch(OsuTouchInputMapper.DEFAULT_CURSOR_TOUCH));
+            AddAssert("Cursor touch is properly set", () => touchInputMapper.IsCursorTouch(TouchSource.Touch1));
+            testFirstTouchSource();
             AddAssert("All other touches are tap touches", () => Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().Skip(1).All(source => touchInputMapper.IsTapTouch(source)));
         }
 
@@ -107,6 +111,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestTouchSourcesWithDisabledCursorMovement()
         {
             AddStep("Disable cursor movement", () => osuInputManager.AllowUserCursorMovement = false);
+            testFirstTouchSource();
             AddAssert("All touches are tap touches", () => Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().All(source => touchInputMapper.IsTapTouch(source)));
         }
 
@@ -130,7 +135,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertAllowingTouchInput();
             expectBothKeysPressed();
             expectKeyCountersCountingBe(1, 1);
-            AddAssert("Cursor action will be blocked on next tap", () => touchInputMapper.BlockCursorActionOnNextTap);
         }
 
         private void assertAcceptedOnlyThreeSequentialInputs()
@@ -146,8 +150,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             steppedTouchWithThreeFingers();
 
             assertAcceptedOnlyThreeSequentialInputs();
-            AddAssert("Cursor action is blocked", () => touchInputMapper.BlockCursorAction && touchInputMapper.JustBlockedCursorActions);
             AddAssert("Touch input is blocked", () => !touchInputMapper.AcceptingTouchInputs);
+            AddAssert("Is on stream mode", () => touchInputMapper.IsStreamMode);
         }
 
         [Test]
@@ -161,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap { HitObjects = new List<HitObject> { new HitCircle { StartTime = 99999 } } };
 
-        public class OsuActionKeyCounter : KeyCounter, IKeyBindingHandler<OsuAction>
+        public partial class OsuActionKeyCounter : KeyCounter, IKeyBindingHandler<OsuAction>
         {
             public OsuAction Action { get; }
 

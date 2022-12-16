@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -12,7 +13,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online.Metadata
 {
-    public class OnlineMetadataClient : MetadataClient
+    public partial class OnlineMetadataClient : MetadataClient
     {
         private readonly string endpoint;
 
@@ -79,6 +80,10 @@ namespace osu.Game.Online.Metadata
 
                             await ProcessChanges(catchUpChanges.BeatmapSetIDs);
                         }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Error while processing catch-up of metadata ({e.Message})");
                     }
                     finally
                     {

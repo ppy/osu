@@ -5,20 +5,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
-    public class ReplayPlayer : Player, IKeyBindingHandler<GlobalAction>
+    public partial class ReplayPlayer : Player, IKeyBindingHandler<GlobalAction>
     {
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
@@ -55,6 +55,15 @@ namespace osu.Game.Screens.Play
         // Don't re-import replay scores as they're already present in the database.
         protected override Task ImportScore(Score score) => Task.CompletedTask;
 
+        public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
+
+        protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
+            new SoloGameplayLeaderboard(Score.ScoreInfo.User)
+            {
+                AlwaysVisible = { Value = true },
+                Scores = { BindTarget = LeaderboardScores }
+            };
+
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -83,7 +92,7 @@ namespace osu.Game.Screens.Play
 
             void keyboardSeek(int direction)
             {
-                double target = Math.Clamp(GameplayClockContainer.CurrentTime + direction * keyboard_seek_amount, 0, GameplayState.Beatmap.HitObjects.Last().GetEndTime());
+                double target = Math.Clamp(GameplayClockContainer.CurrentTime + direction * keyboard_seek_amount, 0, GameplayState.Beatmap.GetLastObjectTime());
 
                 Seek(target);
             }

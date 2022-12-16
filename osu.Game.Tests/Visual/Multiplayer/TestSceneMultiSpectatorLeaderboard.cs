@@ -16,7 +16,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiSpectatorLeaderboard : MultiplayerTestScene
+    public partial class TestSceneMultiSpectatorLeaderboard : MultiplayerTestScene
     {
         private Dictionary<int, ManualClock> clocks;
         private MultiSpectatorLeaderboard leaderboard;
@@ -120,6 +120,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             => AddStep($"set user {userId} time {time}", () => clocks[userId].CurrentTime = time);
 
         private void assertCombo(int userId, int expectedCombo)
-            => AddUntilStep($"player {userId} has {expectedCombo} combo", () => this.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId).Combo.Value == expectedCombo);
+            => AddUntilStep($"player {userId} has {expectedCombo} combo", () => this.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.OnlineID == userId).Combo.Value == expectedCombo);
     }
 }

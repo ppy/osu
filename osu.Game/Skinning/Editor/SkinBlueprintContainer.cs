@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinBlueprintContainer : BlueprintContainer<ISkinnableDrawable>
+    public partial class SkinBlueprintContainer : BlueprintContainer<ISkinnableDrawable>
     {
         private readonly Drawable target;
 
@@ -115,6 +115,11 @@ namespace osu.Game.Skinning.Editor
             }
 
             return false;
+        }
+
+        protected override void SelectAll()
+        {
+            SelectedItems.AddRange(targetComponents.SelectMany(list => list).Except(SelectedItems).ToArray());
         }
 
         /// <summary>

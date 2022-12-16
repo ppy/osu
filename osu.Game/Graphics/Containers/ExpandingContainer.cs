@@ -14,7 +14,7 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// Represents a <see cref="Container"/> with the ability to expand/contract on hover.
     /// </summary>
-    public class ExpandingContainer : Container, IExpandingContainer
+    public partial class ExpandingContainer : Container, IExpandingContainer
     {
         private readonly float contractedWidth;
         private readonly float expandedWidth;

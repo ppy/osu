@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     /// <summary>
     /// A visualisation of a single <see cref="PathControlPoint"/> in a <see cref="Slider"/>.
     /// </summary>
-    public class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
+    public partial class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
     {
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
 
@@ -53,6 +54,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private IBindable<Vector2> sliderPosition;
         private IBindable<float> sliderScale;
 
+        [UsedImplicitly]
+        private readonly IBindable<int> sliderVersion;
+
         public PathControlPointPiece(Slider slider, PathControlPoint controlPoint)
         {
             this.slider = slider;
@@ -61,11 +65,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             // we don't want to run the path type update on construction as it may inadvertently change the slider.
             cachePoints(slider);
 
-            slider.Path.Version.BindValueChanged(_ =>
+            sliderVersion = slider.Path.Version.GetBoundCopy();
+
+            // schedule ensure that updates are only applied after all operations from a single frame are applied.
+            // this avoids inadvertently changing the slider path type for batch operations.
+            sliderVersion.BindValueChanged(_ => Scheduler.AddOnce(() =>
             {
                 cachePoints(slider);
                 updatePathType();
-            });
+            }));
 
             controlPoint.Changed += updateMarkerDisplay;
 

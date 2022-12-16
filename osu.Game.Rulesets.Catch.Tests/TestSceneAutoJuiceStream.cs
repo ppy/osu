@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneAutoJuiceStream : TestSceneCatchPlayer
+    public partial class TestSceneAutoJuiceStream : TestSceneCatchPlayer
     {
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {

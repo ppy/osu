@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.UI
     /// Displays an interactive ruleset gameplay instance.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
-    public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachHUDPieces
+    public abstract partial class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachHUDPieces
         where TObject : HitObject
     {
         public override event Action<JudgementResult> NewResult;
@@ -384,7 +384,7 @@ namespace osu.Game.Rulesets.UI
         // only show the cursor when within the playfield, by default.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Playfield.ReceivePositionalInputAt(screenSpacePos);
 
-        CursorContainer IProvideCursor.MenuCursor => Playfield.Cursor;
+        CursorContainer IProvideCursor.Cursor => Playfield.Cursor;
 
         public override GameplayCursorContainer Cursor => Playfield.Cursor;
 
@@ -414,7 +414,7 @@ namespace osu.Game.Rulesets.UI
     /// </remarks>
     /// </summary>
     [Cached(typeof(DrawableRuleset))]
-    public abstract class DrawableRuleset : CompositeDrawable
+    public abstract partial class DrawableRuleset : CompositeDrawable
     {
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
@@ -499,6 +499,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor being displayed by the <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
+        [CanBeNull]
         public abstract GameplayCursorContainer Cursor { get; }
 
         /// <summary>

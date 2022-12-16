@@ -17,7 +17,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 {
-    public class PaginatedBeatmapContainer : PaginatedProfileSubsection<APIBeatmapSet>
+    public partial class PaginatedBeatmapContainer : PaginatedProfileSubsection<APIBeatmapSet>
     {
         private const float panel_padding = 10f;
         private readonly BeatmapSetType type;
@@ -57,6 +57,9 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
                 case BeatmapSetType.Guest:
                     return user.GuestBeatmapsetCount;
+
+                case BeatmapSetType.Nominated:
+                    return user.NominatedBeatmapsetCount;
 
                 default:
                     return 0;

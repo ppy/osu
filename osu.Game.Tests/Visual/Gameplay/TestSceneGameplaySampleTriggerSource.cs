@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneGameplaySampleTriggerSource : PlayerTestScene
+    public partial class TestSceneGameplaySampleTriggerSource : PlayerTestScene
     {
         private TestGameplaySampleTriggerSource sampleTriggerSource;
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("hit first hitobject", () =>
             {
                 InputManager.Click(MouseButton.Left);
-                return nextObjectEntry.Result.HasResult;
+                return nextObjectEntry.Result?.HasResult == true;
             });
 
             AddAssert("check correct object after hit", () => sampleTriggerSource.GetMostValidObject() == beatmap.HitObjects[1]);
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("trigger sample", () => sampleTriggerSource.Play(), 10);
         }
 
-        public class TestGameplaySampleTriggerSource : GameplaySampleTriggerSource
+        public partial class TestGameplaySampleTriggerSource : GameplaySampleTriggerSource
         {
             public TestGameplaySampleTriggerSource(HitObjectContainer hitObjectContainer)
                 : base(hitObjectContainer)

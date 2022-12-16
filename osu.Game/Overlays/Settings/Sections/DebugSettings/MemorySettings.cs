@@ -16,7 +16,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
-    public class MemorySettings : SettingsSubsection
+    public partial class MemorySettings : SettingsSubsection
     {
         protected override LocalisableString Header => DebugSettingsStrings.MemoryHeader;
 
@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 },
                 new SettingsButton
                 {
-                    Text = DebugSettingsStrings.CompactRealm,
+                    Text = "Compact realm",
                     Action = () =>
                     {
                         // Blocking operations implicitly causes a Compact().
