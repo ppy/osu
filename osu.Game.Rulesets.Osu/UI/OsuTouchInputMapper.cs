@@ -96,8 +96,16 @@ namespace osu.Game.Rulesets.Osu.UI
 
             triggeredActions.Add(source, action);
 
-            if (!IsStreamMode)
-                IsStreamMode = ActiveTapTouchesCount == max_handled_tap_touches && IsCursorTouch(cursorTouchSource!.Value);
+            if (!IsStreamMode && ActiveTapTouchesCount == max_handled_tap_touches)
+            {
+                var cursorTouch = cursorTouchSource!.Value;
+
+                if (IsCursorTouch(cursorTouch))
+                {
+                    IsStreamMode = true;
+                    osuInputManager.EnableStreamMode(cursorTouch);
+                }
+            }
 
             keyBindingContainer.TriggerPressed(action);
 

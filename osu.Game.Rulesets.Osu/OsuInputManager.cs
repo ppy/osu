@@ -6,8 +6,10 @@ using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using System.Linq;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Osu.UI;
@@ -61,18 +63,20 @@ namespace osu.Game.Rulesets.Osu
             return base.Handle(e);
         }
 
-        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
-        {
-            if (touchInputMapper.IsTapTouch(e.Touch.Source))
-                return true;
+        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e) =>
+            touchInputMapper.IsTapTouch(e.Touch.Source) || base.HandleMouseTouchStateChange(e);
 
-            if (!touchInputMapper.IsStreamMode)
-                return base.HandleMouseTouchStateChange(e);
+        public void EnableStreamMode(TouchSource cursorSource)
+        {
+            var touchPosition = CurrentState.Mouse.Position;
+
+            var cursorTouch = new Touch(cursorSource, touchPosition);
+            var cursorInput = new TouchInput(cursorTouch, false);
 
             // Enables stream mode by disabling mouse input from the touch cursor.
-            e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
+            var streamModeEvent = new TouchStateChangeEvent(CurrentState, cursorInput, cursorTouch, false, touchPosition);
 
-            return base.HandleMouseTouchStateChange(e);
+            base.HandleMouseTouchStateChange(streamModeEvent);
         }
 
         private partial class OsuKeyBindingContainer : RulesetKeyBindingContainer
