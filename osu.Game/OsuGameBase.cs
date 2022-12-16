@@ -270,6 +270,7 @@ namespace osu.Game
             largeStore.AddTextureSource(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
 
+            dependencies.CacheAs(LocalConfig);
             dependencies.CacheAs<IGameplaySettings>(LocalConfig);
 
             dependencies.Cache(MConfig);
@@ -321,9 +322,9 @@ namespace osu.Game
             dependencies.Cache(userCache = new UserLookupCache());
             AddInternal(userCache);
 
-            var helper = new CustomFontHelper();
-            dependencies.Cache(helper);
-            AddInternal(helper);
+            //var helper = new CustomFontHelper();
+            //dependencies.Cache(helper);
+            //AddInternal(helper);
 
             dependencies.Cache(beatmapCache = new BeatmapLookupCache());
             AddInternal(beatmapCache);

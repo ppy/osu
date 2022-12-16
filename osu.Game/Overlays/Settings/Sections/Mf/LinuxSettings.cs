@@ -8,7 +8,7 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
-    public class LinuxSettings : SettingsSubsection
+    public partial class LinuxSettings : SettingsSubsection
     {
         protected override LocalisableString Header => "Linux集成";
 

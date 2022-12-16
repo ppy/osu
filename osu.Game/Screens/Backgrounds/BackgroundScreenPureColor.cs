@@ -8,7 +8,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenPureColor : BackgroundScreen
+    public partial class BackgroundScreenPureColor : BackgroundScreen
     {
         public readonly Color4 BackgroundColor;
         private readonly Box box;

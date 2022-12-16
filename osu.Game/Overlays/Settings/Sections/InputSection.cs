@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Settings.Sections
         }
     }
 
-    internal class FrameworkActionManagerSetings : SettingsSubsection
+    internal partial class FrameworkActionManagerSetings : SettingsSubsection
     {
         protected override LocalisableString Header => "框架";
 

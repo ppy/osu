@@ -7,7 +7,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
-    public class SettingsSeparatorPiece : SettingsPieceBasePanel
+    public partial class SettingsSeparatorPiece : SettingsPieceBasePanel
     {
         [BackgroundDependencyLoader]
         private void load()

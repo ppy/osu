@@ -8,7 +8,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
-    public class MfMainSection : SettingsSection
+    public partial class MfMainSection : SettingsSection
     {
         public override Drawable CreateIcon() => new SpriteIcon
         {

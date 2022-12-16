@@ -6,7 +6,7 @@ using osu.Game.Screens.LLin.SideBar.PluginsPage;
 
 namespace osu.Game.Screens.LLin.SideBar
 {
-    internal class SidebarPluginsPage : OsuScrollContainer, ISidebarContent
+    internal partial class SidebarPluginsPage : OsuScrollContainer, ISidebarContent
     {
         public string Title => "插件";
         public IconUsage Icon => FontAwesome.Solid.Boxes;

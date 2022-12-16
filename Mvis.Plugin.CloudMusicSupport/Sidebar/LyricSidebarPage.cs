@@ -13,7 +13,7 @@ using osu.Game.Screens.LLin.Plugins.Types;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 {
-    public class LyricSidebarSectionContainer : PluginSidebarPage
+    public partial class LyricSidebarSectionContainer : PluginSidebarPage
     {
         private LoadingSpinner loading;
 

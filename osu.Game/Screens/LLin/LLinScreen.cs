@@ -31,6 +31,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.LLin.Misc;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar;
@@ -48,7 +49,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.LLin
 {
     [Cached(typeof(IImplementLLin))]
-    public class LLinScreen : ScreenWithBeatmapBackground, IImplementLLin, IKeyBindingHandler<GlobalAction>
+    public partial class LLinScreen : ScreenWithBeatmapBackground, IImplementLLin, IKeyBindingHandler<GlobalAction>
     {
         public Action<bool> OnTrackRunningToggle { get; set; }
         public Action Exiting { get; set; }
@@ -603,7 +604,7 @@ namespace osu.Game.Screens.LLin
 
         private LoadingSpinner loadingSpinner;
 
-        private readonly NightcoreBeatContainer nightcoreBeatContainer = new NightcoreBeatContainer();
+        private readonly ModNightcore<HitObject>.NightcoreBeatContainer nightcoreBeatContainer = new ModNightcore<HitObject>.NightcoreBeatContainer();
 
         #region 设置
 

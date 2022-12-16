@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings
 {
-    public class PlayerSettings : OsuScrollContainer, ISidebarContent
+    public partial class PlayerSettings : OsuScrollContainer, ISidebarContent
     {
         private readonly FillFlowContainer<Section> fillFlow = new FillFlowContainer<Section>
         {

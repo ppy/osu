@@ -4,7 +4,7 @@ using osu.Framework.Localisation;
 
 namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
-    public class TooltipContainer : Container, IHasTooltip
+    public partial class TooltipContainer : Container, IHasTooltip
     {
         public LocalisableString TooltipText { get; set; }
     }

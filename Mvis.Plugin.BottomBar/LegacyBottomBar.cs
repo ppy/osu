@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace Mvis.Plugin.BottomBar
 {
-    internal class LegacyBottomBar : LLinPlugin, IFunctionBarProvider
+    internal partial class LegacyBottomBar : LLinPlugin, IFunctionBarProvider
     {
         protected override Drawable CreateContent() => new PlaceHolder();
 

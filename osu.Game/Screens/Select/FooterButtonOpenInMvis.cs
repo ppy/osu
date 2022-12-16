@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButtonOpenInMvis : FooterButton
+    public partial class FooterButtonOpenInMvis : FooterButton
     {
         private BindableBool OptUIEnabled = new BindableBool();
 

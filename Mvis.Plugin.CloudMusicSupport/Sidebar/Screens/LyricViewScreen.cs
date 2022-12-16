@@ -16,7 +16,7 @@ using osuTK;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 {
-    public class LyricViewScreen : LyricScreen<LyricPiece>
+    public partial class LyricViewScreen : LyricScreen<LyricPiece>
     {
         [Resolved]
         private IImplementLLin llin { get; set; }

@@ -4,7 +4,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
-    public class DangerousZone : SettingsSection
+    public partial class DangerousZone : SettingsSection
     {
         public override LocalisableString Header => "危险地带";
 

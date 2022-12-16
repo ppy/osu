@@ -26,7 +26,7 @@ using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
 namespace osu.Game.Screens.LLin.Plugins
 {
-    public class LLinPluginManager : CompositeDrawable
+    public partial class LLinPluginManager : CompositeDrawable
     {
         #region 插件管理
 

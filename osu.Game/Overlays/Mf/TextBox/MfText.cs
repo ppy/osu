@@ -4,7 +4,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mf.TextBox
 {
-    public class MfLinkFlowContainer : LinkFlowContainer
+    public partial class MfLinkFlowContainer : LinkFlowContainer
     {
         public MfLinkFlowContainer()
         {

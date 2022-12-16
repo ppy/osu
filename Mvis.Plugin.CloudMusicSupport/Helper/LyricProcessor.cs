@@ -16,7 +16,7 @@ using osu.Game.Online.API;
 
 namespace Mvis.Plugin.CloudMusicSupport.Helper
 {
-    public class LyricProcessor : Component
+    public partial class LyricProcessor : Component
     {
         #region 歌词获取
 

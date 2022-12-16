@@ -10,7 +10,7 @@ using osu.Game.Overlays.Settings.Sections.Mf;
 
 namespace osu.Game.Overlays
 {
-    public class MfSettingsPanel : SettingsSubPanel
+    public partial class MfSettingsPanel : SettingsSubPanel
     {
         protected override Drawable CreateHeader() => new SettingsHeader("Mf-osu自定义选项", "在这里调整Mf-osu的额外设置!");
 

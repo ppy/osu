@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Textures;
 namespace osu.Game.Overlays.OnlinePicture
 {
     [LongRunningLoad]
-    public class UpdateableOnlinePicture : Sprite
+    public partial class UpdateableOnlinePicture : Sprite
     {
         private string TargetURI;
 

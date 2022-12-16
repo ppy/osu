@@ -22,7 +22,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Framework.Bindables;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -39,7 +38,6 @@ namespace osu.Game.Graphics.Backgrounds
         private float extraY;
         public bool IgnoreSettings;
         public bool EnableBeatSync;
-        private float alphaOrig = 1;
         private const float triangle_size = 100;
         private const float base_velocity = 50;
 

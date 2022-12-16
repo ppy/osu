@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
-    public class Toolbox : CompositeDrawable
+    public partial class Toolbox : CompositeDrawable
     {
         private readonly FillFlowContainer buttonFillFlow;
         private readonly OsuSpriteText idText;

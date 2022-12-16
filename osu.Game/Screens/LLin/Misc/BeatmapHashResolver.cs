@@ -6,7 +6,7 @@ using osu.Game.Beatmaps;
 namespace osu.Game.Screens.LLin.Misc
 {
     [Cached]
-    public class BeatmapHashResolver : Component
+    public partial class BeatmapHashResolver : Component
     {
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }

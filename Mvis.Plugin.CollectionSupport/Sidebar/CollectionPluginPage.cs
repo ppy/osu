@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
-    public class CollectionPluginPage : PluginSidebarPage
+    public partial class CollectionPluginPage : PluginSidebarPage
     {
         //[Resolved]
         //private CollectionManager collectionManager { get; set; }

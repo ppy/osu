@@ -10,7 +10,7 @@ using osu.Game.Overlays.Mf.Sections;
 
 namespace osu.Game.Overlays
 {
-    public class MfMenuOverlay : FullscreenOverlay<MfMenuHeader>
+    public partial class MfMenuOverlay : FullscreenOverlay<MfMenuHeader>
     {
         private readonly MfMenuSectionsContainer sectionContainer;
         private readonly MfMenuHeaderTabControl tabControl;

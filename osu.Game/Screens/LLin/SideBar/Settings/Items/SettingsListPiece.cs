@@ -9,7 +9,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
-    public class SettingsListPiece<T> : SettingsPieceBasePanel, ISettingsItem<T>
+    public partial class SettingsListPiece<T> : SettingsPieceBasePanel, ISettingsItem<T>
     {
         public Bindable<T> Bindable { get; set; }
 
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             base.OnMiddleClick();
         }
 
-        private class CurrentValueText : CompositeDrawable
+        private partial class CurrentValueText : CompositeDrawable
         {
             public LocalisableString Text
             {

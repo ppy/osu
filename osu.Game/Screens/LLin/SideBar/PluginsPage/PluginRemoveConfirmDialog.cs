@@ -3,7 +3,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.LLin.SideBar.PluginsPage
 {
-    public class PluginRemoveConfirmDialog : PopupDialog
+    public partial class PluginRemoveConfirmDialog : PopupDialog
     {
         public PluginRemoveConfirmDialog(string headerText, Action<bool> onConfirm)
         {

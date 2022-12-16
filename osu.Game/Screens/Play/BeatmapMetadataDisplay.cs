@@ -318,7 +318,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class SelectedRulesetIcon : Container
+        private partial class SelectedRulesetIcon : Container
         {
             private Container rulesetTextContainer;
             private ConstrainedIconContainer icon;

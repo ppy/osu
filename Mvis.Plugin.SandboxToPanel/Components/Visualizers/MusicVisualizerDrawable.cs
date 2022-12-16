@@ -33,7 +33,7 @@ namespace Mvis.Plugin.Sandbox.Components.Visualizers
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, GameHost host, TextureStore textures)
         {
-            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
             Texture = GetTexture(host.Renderer, textures);
         }
 

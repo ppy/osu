@@ -105,7 +105,7 @@ namespace osu.Game.Localisation
         public static LocalisableString ComboColourNormalisation => new TranslatableString(getKey(@"combo_colour_normalisation"), @"Combo colour normalisation");
 
         /// <summary>
-        /// "Hit lighting"
+        /// "击打闪光"
         /// </summary>
         public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"击打闪光");
 
@@ -144,6 +144,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Png => new TranslatableString(getKey(@"png_lossless"), @"PNG (lossless)");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

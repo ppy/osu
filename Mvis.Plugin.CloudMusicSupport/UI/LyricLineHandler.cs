@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace Mvis.Plugin.CloudMusicSupport.UI
 {
-    public class LyricLineHandler : CompositeDrawable
+    public partial class LyricLineHandler : CompositeDrawable
     {
         private OsuSpriteText currentLine;
         private OsuSpriteText currentLineTranslated;

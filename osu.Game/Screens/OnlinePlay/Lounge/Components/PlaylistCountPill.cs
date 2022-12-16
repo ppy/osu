@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;

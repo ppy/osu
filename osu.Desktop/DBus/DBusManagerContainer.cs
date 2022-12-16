@@ -25,7 +25,7 @@ using osu.Game.Users;
 
 namespace osu.Desktop.DBus
 {
-    public class DBusManagerContainer : Component, IDBusManagerContainer<IMDBusObject>
+    public partial class DBusManagerContainer : Component, IDBusManagerContainer<IMDBusObject>
     {
         public DBusManager<IMDBusObject> DBusManager;
 

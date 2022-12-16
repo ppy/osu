@@ -7,7 +7,7 @@ using osuTK;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
-    public class SettingsSlider<T> : OsuSliderBar<T>
+    public partial class SettingsSlider<T> : OsuSliderBar<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         private Circle circle;

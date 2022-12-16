@@ -27,7 +27,7 @@ using Realms;
 
 namespace Mvis.Plugin.CollectionSupport
 {
-    public class CollectionHelper : BindableControlledPlugin, IProvideAudioControlPlugin
+    public partial class CollectionHelper : BindableControlledPlugin, IProvideAudioControlPlugin
     {
         [Resolved]
         private RealmAccess realm { get; set; } = null!;

@@ -7,7 +7,7 @@ using osu.Game.Screens.LLin.Plugins.Config;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
-    public class MfMvisPluginSection : SettingsSection
+    public partial class MfMvisPluginSection : SettingsSection
     {
         public override Drawable CreateIcon() => new SpriteIcon
         {

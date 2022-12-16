@@ -34,21 +34,12 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModTargetPractice : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>,
                                         IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride, IHasSeed, IHidesApproachCircles
     {
-<<<<<<< HEAD:osu.Game.Rulesets.Osu/Mods/OsuModTarget.cs
-        public override string Name => "打靶";
-        public override string Acronym => "TP";
-        public override ModType Type => ModType.Conversion;
-        public override IconUsage? Icon => OsuIcon.ModTarget;
-        public override LocalisableString Description => @"练习跟上歌曲的节奏!";
-        public override double ScoreMultiplier => 1;
-=======
         public override string Name => "打靶";
         public override string Acronym => "TP";
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => OsuIcon.ModTarget;
         public override LocalisableString Description => @"练习跟上歌曲的节奏.";
         public override double ScoreMultiplier => 0.1;
->>>>>>> upstream/master:osu.Game.Rulesets.Osu/Mods/OsuModTargetPractice.cs
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
         {

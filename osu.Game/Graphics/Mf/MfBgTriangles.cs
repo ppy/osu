@@ -11,7 +11,7 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Graphics.Mf
 {
-    public class MBgTriangles : VisibilityContainer
+    public partial class MBgTriangles : VisibilityContainer
     {
         private readonly Bindable<bool> optui = new Bindable<bool>();
         private readonly BackgroundTriangles backgroundTriangle;
@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.Mf
             };
         }
 
-        private class BackgroundTriangles : Container
+        private partial class BackgroundTriangles : Container
         {
             private readonly Triangles triangles;
             public readonly float TriangleScale;

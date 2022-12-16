@@ -7,7 +7,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
-    public class SettingsTextBoxPiece : SettingsPieceBasePanel, ISettingsItem<string>
+    public partial class SettingsTextBoxPiece : SettingsPieceBasePanel, ISettingsItem<string>
     {
         public Bindable<string> Bindable { get; set; }
 
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             return textBox;
         }
 
-        private class PieceTextBox : OsuTextBox
+        private partial class PieceTextBox : OsuTextBox
         {
         }
     }

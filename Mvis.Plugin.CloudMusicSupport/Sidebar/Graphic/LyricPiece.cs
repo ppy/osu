@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
-    public class LyricPiece : DrawableLyric, IHasTooltip, IHasContextMenu
+    public partial class LyricPiece : DrawableLyric, IHasTooltip, IHasContextMenu
     {
         public LocalisableString TooltipText { get; private set; }
 

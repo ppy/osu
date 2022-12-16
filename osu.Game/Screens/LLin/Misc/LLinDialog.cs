@@ -7,7 +7,7 @@ using osu.Game.Screens.LLin.Plugins;
 
 namespace osu.Game.Screens.LLin.Misc
 {
-    internal class LLinDialog : PopupDialog
+    internal partial class LLinDialog : PopupDialog
     {
         private readonly ColourInfo defaultColorInfo = new ColourInfo();
 

@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
-    public class ExperimentalSettings : SettingsSubsection
+    public partial class ExperimentalSettings : SettingsSubsection
     {
         protected override LocalisableString Header => "实验性功能";
 
@@ -70,17 +70,17 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             customWindowIconPath.BindValueChanged(v => game?.SetWindowIcon(v.NewValue));
         }
 
-        private class PreferredFontSettingsDropDown : SettingsDropdown<Font>
+        private partial class PreferredFontSettingsDropDown : SettingsDropdown<Font>
         {
             protected override OsuDropdown<Font> CreateDropdown() => new FontDropdownControl();
 
-            private class FontDropdownControl : DropdownControl
+            private partial class FontDropdownControl : DropdownControl
             {
                 protected override LocalisableString GenerateItemText(Font font) => $"{font.Name}({font.FamilyName})";
             }
         }
 
-        private class ExperimentalSettingsSetupContainer : FillFlowContainer
+        private partial class ExperimentalSettingsSetupContainer : FillFlowContainer
         {
             [Resolved]
             private MConfigManager mConfg { get; set; }

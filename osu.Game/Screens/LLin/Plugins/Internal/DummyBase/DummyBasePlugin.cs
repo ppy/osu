@@ -8,7 +8,7 @@ using osu.Game.Screens.LLin.SideBar.Tabs;
 
 namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
 {
-    internal class DummyBasePlugin : LLinPlugin
+    internal partial class DummyBasePlugin : LLinPlugin
     {
         internal DummyBasePlugin(MConfigManager config, LLinPluginManager plmgr)
         {

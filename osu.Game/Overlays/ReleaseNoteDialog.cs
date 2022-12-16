@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class ReleaseNoteDialog : OsuFocusedOverlayContainer
+    public partial class ReleaseNoteDialog : OsuFocusedOverlayContainer
     {
         private MarkdownContainer mdContainer;
 

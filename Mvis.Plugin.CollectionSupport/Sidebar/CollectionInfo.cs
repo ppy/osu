@@ -15,7 +15,7 @@ using osuTK;
 
 namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
-    public class CollectionInfo : CompositeDrawable
+    public partial class CollectionInfo : CompositeDrawable
     {
         private OsuSpriteText collectionName;
         private OsuSpriteText collectionBeatmapCount;

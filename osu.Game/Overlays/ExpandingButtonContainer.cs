@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public abstract class ExpandingButtonContainer : Container, IStateful<ExpandedState>
+    public abstract partial class ExpandingButtonContainer : Container, IStateful<ExpandedState>
     {
         private readonly float contractedWidth;
         private readonly float expandedWidth;
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays
             return base.OnMouseMove(e);
         }
 
-        private class SidebarScrollContainer : OsuScrollContainer
+        private partial class SidebarScrollContainer : OsuScrollContainer
         {
             public SidebarScrollContainer()
             {

@@ -6,7 +6,7 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    public class PureColorBackground : Background
+    public partial class PureColorBackground : Background
     {
         private Bindable<string> colorHex;
 

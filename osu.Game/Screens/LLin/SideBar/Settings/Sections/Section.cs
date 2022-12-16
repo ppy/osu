@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Sections
 {
-    public abstract class Section : CompositeDrawable, ISidebarContent
+    public abstract partial class Section : CompositeDrawable, ISidebarContent
     {
         public string Title
         {

@@ -4,7 +4,7 @@ using osu.Framework.Graphics.Pooling;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
-    public abstract class DrawableLyric : PoolableDrawable, IComparable<DrawableLyric>
+    public abstract partial class DrawableLyric : PoolableDrawable, IComparable<DrawableLyric>
     {
         public Lyric Value
         {

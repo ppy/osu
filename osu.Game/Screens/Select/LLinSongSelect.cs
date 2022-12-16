@@ -4,7 +4,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Select
 {
-    public class LLinSongSelect : SongSelect
+    public partial class LLinSongSelect : SongSelect
     {
         public override bool HideOverlaysOnEnter => true;
 

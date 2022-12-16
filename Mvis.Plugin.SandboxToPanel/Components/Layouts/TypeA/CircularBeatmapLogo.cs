@@ -3,14 +3,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
-using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osuTK;
 using osuTK.Graphics;
 
 namespace Mvis.Plugin.Sandbox.Components.Layouts.TypeA
 {
-    public class CircularBeatmapLogo : CurrentBeatmapProvider
+    public partial class CircularBeatmapLogo : CurrentBeatmapProvider
     {
         private const int base_size = 350;
 
@@ -67,7 +67,7 @@ namespace Mvis.Plugin.Sandbox.Components.Layouts.TypeA
             progress.Current.Value = (track == null || track.Length == 0) ? 0 : (track.CurrentTime / track.Length);
         }
 
-        private class Progress : SmoothCircularProgress
+        private partial class Progress : CircularProgress
         {
             private static readonly float sigma = 5;
 

@@ -7,7 +7,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
-    public class DBusSettings : SettingsSubsection
+    public partial class DBusSettings : SettingsSubsection
     {
         private SettingsSlider<double, TimeSlider> dbusWaitOnlineSlider;
         protected override LocalisableString Header => "DBus";

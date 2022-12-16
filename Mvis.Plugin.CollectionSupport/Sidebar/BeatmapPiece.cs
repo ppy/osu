@@ -17,7 +17,7 @@ using osu.Game.Screens.LLin.Misc;
 
 namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
-    public class BeatmapPiece : CompositeDrawable
+    public partial class BeatmapPiece : CompositeDrawable
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }

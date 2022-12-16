@@ -16,7 +16,7 @@ using osuTK;
 
 namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
-    public class BeatmapList : CompositeDrawable
+    public partial class BeatmapList : CompositeDrawable
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }

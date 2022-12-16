@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.SideBar
 {
-    public class SongSelectPage : CompositeDrawable, ISidebarContent
+    public partial class SongSelectPage : CompositeDrawable, ISidebarContent
     {
         public string Title => "歌曲选择";
         public IconUsage Icon => FontAwesome.Solid.MousePointer;

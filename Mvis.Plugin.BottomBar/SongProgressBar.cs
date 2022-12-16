@@ -8,7 +8,7 @@ using osu.Game.Screens.LLin.Misc;
 
 namespace Mvis.Plugin.BottomBar
 {
-    public class SongProgressBar : ProgressBar
+    public partial class SongProgressBar : ProgressBar
     {
         private Indicator indicator;
         private Indicator songProgressIndicator;

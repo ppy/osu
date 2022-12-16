@@ -11,7 +11,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.LLin.Misc
 {
-    public class BeatmapCover : CompositeDrawable
+    public partial class BeatmapCover : CompositeDrawable
     {
         private readonly WorkingBeatmap b;
 
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.LLin.Misc
             }
         }
 
-        public class Cover : Sprite
+        public partial class Cover : Sprite
         {
             private readonly WorkingBeatmap b;
 

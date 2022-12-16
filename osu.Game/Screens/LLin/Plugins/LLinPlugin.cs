@@ -13,7 +13,7 @@ using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
 namespace osu.Game.Screens.LLin.Plugins
 {
-    public abstract class LLinPlugin : Container
+    public abstract partial class LLinPlugin : Container
     {
         /// <summary>
         /// 加载插件要提供的内容

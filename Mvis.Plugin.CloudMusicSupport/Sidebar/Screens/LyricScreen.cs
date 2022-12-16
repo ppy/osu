@@ -11,7 +11,7 @@ using osu.Game.Graphics.Cursor;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 {
-    public abstract class LyricScreen<T> : SidebarScreen
+    public abstract partial class LyricScreen<T> : SidebarScreen
         where T : DrawableLyric, new()
     {
         protected abstract T CreatePiece(Lyric lyric);

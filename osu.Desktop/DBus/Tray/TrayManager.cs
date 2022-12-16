@@ -9,7 +9,7 @@ using Tmds.DBus;
 
 namespace osu.Desktop.DBus.Tray
 {
-    public class TrayManager : Component, IHandleTrayManagement
+    public partial class TrayManager : Component, IHandleTrayManagement
     {
         private DBusManager<IMDBusObject> dBusManager;
 

@@ -8,7 +8,7 @@ using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class MfSection : SettingsSection
+    public partial class MfSection : SettingsSection
     {
         public override LocalisableString Header => "Mf-osu";
 

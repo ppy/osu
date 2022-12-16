@@ -5,7 +5,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mf.Sections
 {
-    public class MfMenuSectionsContainer : SectionsContainer<MfMenuSection>
+    public partial class MfMenuSectionsContainer : SectionsContainer<MfMenuSection>
     {
         public MfMenuSectionsContainer()
         {

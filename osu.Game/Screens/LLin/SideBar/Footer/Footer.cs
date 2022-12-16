@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.LLin.SideBar.Footer
 {
-    public class Footer : CompositeDrawable
+    public partial class Footer : CompositeDrawable
     {
         [CanBeNull]
         private Box bgBox;

@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             Add(new EditorKeyBindingsSubsection(manager));
         }
 
-        private class MvisBindingsSection : KeyBindingsSubsection
+        private partial class MvisBindingsSection : KeyBindingsSubsection
         {
             protected override LocalisableString Header => "Mvis播放器";
 

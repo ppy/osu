@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
-    public class EditableLyricPiece : DrawableLyric, IHasTooltip
+    public partial class EditableLyricPiece : DrawableLyric, IHasTooltip
     {
         public LocalisableString TooltipText { get; set; }
 

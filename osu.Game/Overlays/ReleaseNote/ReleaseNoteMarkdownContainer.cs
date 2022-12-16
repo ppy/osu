@@ -5,7 +5,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.ReleaseNote
 {
-    public class ReleaseNoteMarkdownContainer : OsuMarkdownContainer
+    public partial class ReleaseNoteMarkdownContainer : OsuMarkdownContainer
     {
         public override SpriteText CreateSpriteText() => new OsuSpriteText
         {

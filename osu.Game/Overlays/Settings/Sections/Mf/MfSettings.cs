@@ -13,7 +13,7 @@ using osu.Game.Configuration.AccelUtils;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
-    public class MfSettings : SettingsSubsection
+    public partial class MfSettings : SettingsSubsection
     {
         private SettingsCheckbox systemCursor;
         private SettingsTextBoxWithIndicator accelTextBox;

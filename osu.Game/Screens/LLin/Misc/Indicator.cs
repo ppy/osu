@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.Misc
 {
-    public class Indicator : CompositeDrawable
+    public partial class Indicator : CompositeDrawable
     {
         private readonly OsuSpriteText text = new OsuSpriteText
         {

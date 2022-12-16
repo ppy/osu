@@ -6,7 +6,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class MfSettingsEnteranceButton : SettingsSubsection
+    public partial class MfSettingsEnteranceButton : SettingsSubsection
     {
         protected override LocalisableString Header => "Mf-osu选项";
 

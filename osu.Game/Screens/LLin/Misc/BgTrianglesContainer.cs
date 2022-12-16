@@ -8,7 +8,7 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.LLin.Misc
 {
-    public class BgTrianglesContainer : VisibilityContainer
+    public partial class BgTrianglesContainer : VisibilityContainer
     {
         private const float triangles_alpha = 0.65f;
         private readonly Bindable<bool> enableBgTriangles = new Bindable<bool>();

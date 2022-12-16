@@ -17,7 +17,7 @@ using osuTK;
 namespace Mvis.Plugin.Sandbox
 {
     [Cached]
-    public class SandboxPanel : BindableControlledPlugin
+    public partial class SandboxPanel : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
         public override int Version => 10;
@@ -79,7 +79,7 @@ namespace Mvis.Plugin.Sandbox
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new SandboxConfigManager(storage);
 
-        private SettingsEntry[] entries;
+        private SettingsEntry[]? entries;
 
         public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {

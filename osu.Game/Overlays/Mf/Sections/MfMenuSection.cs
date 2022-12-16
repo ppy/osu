@@ -8,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mf.Sections
 {
-    public abstract class MfMenuSection : Container
+    public abstract partial class MfMenuSection : Container
     {
         public abstract string Title { get; }
         public abstract string SectionId { get; }

@@ -14,7 +14,7 @@ namespace osu.Game.Screens.LLin
     ///<summary>
     ///更改自<see cref="OverlayColourProvider"/>
     ///</summary>
-    public class CustomColourProvider : Component
+    public partial class CustomColourProvider : Component
     {
         public Color4 ActiveColor => Highlight2;
         public Color4 InActiveColor => Dark4;

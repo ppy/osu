@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Mf
 {
-    public class FontInfoTooltip : VisibilityContainer, ITooltip
+    public partial class FontInfoTooltip : VisibilityContainer, ITooltip
     {
         private static readonly FontUsage default_font = new FontUsage("Noto-CJK-Basic");
 
@@ -108,7 +108,7 @@ namespace osu.Game.Graphics.Mf
             };
         }
 
-        private class BasicInfoLine : InfoLine<string>
+        private partial class BasicInfoLine : InfoLine<string>
         {
             protected override Anchor NameAnchor => Anchor.TopLeft;
             protected override Anchor NameOrigin => Anchor.TopLeft;
@@ -132,7 +132,7 @@ namespace osu.Game.Graphics.Mf
             protected override Drawable CreateValueIndicator() => valueText;
         }
 
-        private class BoolInfoLine : InfoLine<bool>
+        private partial class BoolInfoLine : InfoLine<bool>
         {
             public BoolInfoLine(string keyName)
                 : base(keyName)
@@ -157,7 +157,7 @@ namespace osu.Game.Graphics.Mf
             protected override Drawable CreateValueIndicator() => icon;
         }
 
-        private abstract class InfoLine<T> : FillFlowContainer
+        private abstract partial class InfoLine<T> : FillFlowContainer
         {
             public abstract T Value { set; }
 

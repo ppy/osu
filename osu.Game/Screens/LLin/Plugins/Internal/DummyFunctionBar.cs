@@ -5,7 +5,7 @@ using osu.Game.Screens.LLin.Plugins.Types;
 
 namespace osu.Game.Screens.LLin.Plugins.Internal
 {
-    public class DummyFunctionBar : LLinPlugin, IFunctionBarProvider
+    public partial class DummyFunctionBar : LLinPlugin, IFunctionBarProvider
     {
         public DummyFunctionBar()
         {

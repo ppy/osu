@@ -7,7 +7,7 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
-    public class LinuxSection : SettingsSection
+    public partial class LinuxSection : SettingsSection
     {
         public override Drawable CreateIcon() => new SpriteIcon
         {

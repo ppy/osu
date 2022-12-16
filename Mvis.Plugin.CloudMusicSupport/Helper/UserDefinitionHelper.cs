@@ -16,7 +16,7 @@ using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace Mvis.Plugin.CloudMusicSupport.Helper
 {
-    public class UserDefinitionHelper : Component
+    public partial class UserDefinitionHelper : Component
     {
         private APIMappingRoot mappingRoot;
 
