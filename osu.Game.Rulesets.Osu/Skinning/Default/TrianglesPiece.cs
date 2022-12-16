@@ -13,7 +13,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         public TrianglesPiece(int? seed = null)
             : base(seed)
         {
-            IgnoreSettings = true;
             TriangleScale = 1.2f;
             HideAlphaDiscrepancies = false;
         }
