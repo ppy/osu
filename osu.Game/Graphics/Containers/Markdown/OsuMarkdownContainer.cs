@@ -11,6 +11,7 @@ using Markdig.Extensions.Footnotes;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
@@ -19,6 +20,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
+    [Cached]
     public partial class OsuMarkdownContainer : MarkdownContainer
     {
         /// <summary>

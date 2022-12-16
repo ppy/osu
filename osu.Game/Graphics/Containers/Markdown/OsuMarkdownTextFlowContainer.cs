@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using Markdig.Extensions.CustomContainers;
+using Markdig.Extensions.Footnotes;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Containers.Markdown.Footnotes;
 using osu.Game.Overlays;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
@@ -35,6 +37,8 @@ namespace osu.Game.Graphics.Containers.Markdown
         {
             Text = codeInline.Content
         });
+
+        protected override void AddFootnoteLink(FootnoteLink footnoteLink) => AddDrawable(new OsuMarkdownFootnoteLink(footnoteLink));
 
         protected override SpriteText CreateEmphasisedSpriteText(bool bold, bool italic)
             => CreateSpriteText().With(t => t.Font = t.Font.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, italics: italic));
