@@ -16,6 +16,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 {
     public partial class JudgementCounterDisplay : CompositeDrawable, ISkinnableDrawable
     {
+        public const int TRANSFORM_DURATION = 500;
         public bool UsesFixedAnchor { get; set; }
 
         [SettingSource("Display mode")]
@@ -47,9 +48,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             };
 
             foreach (var result in tally.Results)
-            {
                 JudgementContainer.Add(createCounter(result));
-            }
         }
 
         protected override void LoadComplete()
@@ -62,22 +61,13 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
                 //Can't pass directly due to Enum conversion
                 foreach (var counter in JudgementContainer.Children.OfType<JudgementCounter>())
-                {
                     counter.Direction.Value = getFlow(direction.NewValue);
-                }
             }, true);
             Mode.BindValueChanged(_ => updateMode(), true);
             ShowMax.BindValueChanged(value =>
             {
                 var firstChild = JudgementContainer.Children.FirstOrDefault();
-
-                if (value.NewValue)
-                {
-                    firstChild?.Show();
-                    return;
-                }
-
-                firstChild?.Hide();
+                firstChild.FadeTo(value.NewValue ? 1 : 0, TRANSFORM_DURATION, Easing.OutQuint);
             }, true);
         }
 
@@ -89,22 +79,14 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                 {
                     case DisplayMode.Simple:
                         counter.Hide();
-
                         break;
 
                     case DisplayMode.Normal:
-                        if (counter.Result.Type.IsBonus())
-                        {
-                            counter.Hide();
-                            break;
-                        }
-
-                        counter.Show();
+                        counter.FadeTo(counter.Result.Type.IsBonus() ? 0 : 1);
                         break;
 
                     case DisplayMode.All:
                         counter.Show();
-
                         break;
 
                     default:

@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD.JudgementCounter
@@ -35,17 +36,14 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         {
             base.LoadComplete();
 
-            scoreProcessor.NewJudgement += judgement =>
-            {
-                foreach (JudgementCounterInfo result in Results.Where(result => result.Type == judgement.Type))
-                    result.ResultCount.Value++;
-            };
+            scoreProcessor.NewJudgement += judgement => updateCount(judgement, false);
+            scoreProcessor.JudgementReverted += judgement => updateCount(judgement, true);
+        }
 
-            scoreProcessor.JudgementReverted += judgement =>
-            {
-                foreach (JudgementCounterInfo result in Results.Where(result => result.Type == judgement.Type))
-                    result.ResultCount.Value--;
-            };
+        private void updateCount(JudgementResult judgement, bool revert)
+        {
+            foreach (JudgementCounterInfo result in Results.Where(result => result.Type == judgement.Type))
+                result.ResultCount.Value = revert ? result.ResultCount.Value - 1 : result.ResultCount.Value + 1;
         }
     }
 }
