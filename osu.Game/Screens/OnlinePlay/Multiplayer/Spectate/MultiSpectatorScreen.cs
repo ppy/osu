@@ -34,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// Whether all spectating players have finished loading.
         /// </summary>
-        public bool AllPlayersLoaded => instances.All(p => p?.PlayerLoaded == true);
+        public bool AllPlayersLoaded => instances.All(p => p.PlayerLoaded);
 
         protected override UserActivity InitialActivity => new UserActivity.SpectatingMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 

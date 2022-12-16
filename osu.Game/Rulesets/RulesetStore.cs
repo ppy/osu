@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets
 
         private void loadRulesetFromFile(string file)
         {
-            string? filename = Path.GetFileNameWithoutExtension(file);
+            string filename = Path.GetFileNameWithoutExtension(file);
 
             if (LoadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == filename))
                 return;
@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets
             }
             catch (Exception e)
             {
-                LogFailedLoad(assembly.GetName().Name.Split('.').Last(), e);
+                LogFailedLoad(assembly.GetName().Name!.Split('.').Last(), e);
             }
         }
 

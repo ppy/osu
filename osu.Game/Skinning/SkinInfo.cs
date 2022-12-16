@@ -56,7 +56,7 @@ namespace osu.Game.Skinning
                 return new TrianglesSkin(this, resources);
             }
 
-            return (Skin)Activator.CreateInstance(type, this, resources);
+            return (Skin)Activator.CreateInstance(type, this, resources)!;
         }
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;

@@ -178,7 +178,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    await cacheDownloadRequest.PerformAsync();
+                    await cacheDownloadRequest.PerformAsync().ConfigureAwait(false);
                 }
                 catch
                 {

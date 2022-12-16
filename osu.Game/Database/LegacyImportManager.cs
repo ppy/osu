@@ -66,16 +66,16 @@ namespace osu.Game.Database
             switch (content)
             {
                 case StableContent.Beatmaps:
-                    return await new LegacyBeatmapImporter(beatmaps).GetAvailableCount(stableStorage);
+                    return await new LegacyBeatmapImporter(beatmaps).GetAvailableCount(stableStorage).ConfigureAwait(false);
 
                 case StableContent.Skins:
-                    return await new LegacySkinImporter(skins).GetAvailableCount(stableStorage);
+                    return await new LegacySkinImporter(skins).GetAvailableCount(stableStorage).ConfigureAwait(false);
 
                 case StableContent.Collections:
-                    return await new LegacyCollectionImporter(realmAccess).GetAvailableCount(stableStorage);
+                    return await new LegacyCollectionImporter(realmAccess).GetAvailableCount(stableStorage).ConfigureAwait(false);
 
                 case StableContent.Scores:
-                    return await new LegacyScoreImporter(scores).GetAvailableCount(stableStorage);
+                    return await new LegacyScoreImporter(scores).GetAvailableCount(stableStorage).ConfigureAwait(false);
 
                 default:
                     throw new ArgumentException($"Only one {nameof(StableContent)} flag should be specified.");
