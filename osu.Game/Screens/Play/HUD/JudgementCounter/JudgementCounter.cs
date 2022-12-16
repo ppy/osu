@@ -20,10 +20,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
         public readonly JudgementCounterInfo Result;
 
-        public JudgementCounter(JudgementCounterInfo result)
-        {
-            Result = result;
-        }
+        public JudgementCounter(JudgementCounterInfo result) => Result = result;
 
         public OsuSpriteText ResultName = null!;
         private FillFlowContainer flowContainer = null!;
@@ -52,45 +49,18 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
             var result = Result.Type;
 
-            if (result.IsBasic())
-            {
-                Colour = colours.ForHitResult(Result.Type);
-                return;
-            }
-
-            if (!result.IsBonus())
-            {
-                Colour = colours.PurpleLight;
-                return;
-            }
-
-            Colour = colours.PurpleLighter;
+            Colour = result.IsBasic() ? colours.ForHitResult(Result.Type) : !result.IsBonus() ? colours.PurpleLight : colours.PurpleLighter;
         }
 
         protected override void LoadComplete()
         {
             ShowName.BindValueChanged(value =>
-            {
-                if (value.NewValue)
-                {
-                    ResultName.Show();
-                    return;
-                }
-
-                ResultName.Hide();
-            }, true);
+                ResultName.FadeTo(value.NewValue ? 1 : 0, JudgementCounterDisplay.TRANSFORM_DURATION, Easing.OutQuint), true);
 
             Direction.BindValueChanged(direction =>
             {
                 flowContainer.Direction = direction.NewValue;
-
-                if (direction.NewValue == FillDirection.Vertical)
-                {
-                    changeAnchor(Anchor.TopLeft);
-                    return;
-                }
-
-                changeAnchor(Anchor.BottomLeft);
+                changeAnchor(direction.NewValue == FillDirection.Vertical ? Anchor.TopLeft : Anchor.BottomLeft);
 
                 void changeAnchor(Anchor anchor) => counter.Anchor = ResultName.Anchor = counter.Origin = ResultName.Origin = anchor;
             }, true);
@@ -98,15 +68,8 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             base.LoadComplete();
         }
 
-        protected override void PopIn()
-        {
-            this.FadeIn(500, Easing.OutQuint);
-        }
-
-        protected override void PopOut()
-        {
-            this.FadeOut(100);
-        }
+        protected override void PopIn() => this.FadeIn(JudgementCounterDisplay.TRANSFORM_DURATION, Easing.OutQuint);
+        protected override void PopOut() => this.FadeOut(100);
 
         private sealed partial class JudgementRollingCounter : RollingCounter<int>
         {

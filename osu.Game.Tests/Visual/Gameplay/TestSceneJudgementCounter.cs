@@ -81,9 +81,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("Add judgement", () => applyOneJudgement(HitResult.Great), 2);
             AddRepeatStep("Add judgement", () => applyOneJudgement(HitResult.Miss), 2);
             AddRepeatStep("Add judgement", () => applyOneJudgement(HitResult.Meh), 2);
-            AddRepeatStep("Add judgement", () => applyOneJudgement(HitResult.LargeTickHit), 2);
-            AddStep("Show all judgements", () => counterDisplay.Mode.Value = JudgementCounterDisplay.DisplayMode.All);
-            AddAssert("Check value added whilst hidden", () => hiddenCount() == 2);
         }
 
         [Test]
@@ -105,8 +102,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestToggleJudgementNames()
         {
             AddStep("Hide judgement names", () => counterDisplay.ShowName.Value = false);
+            AddWaitStep("wait some", 2);
             AddAssert("Assert hidden", () => counterDisplay.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 0);
             AddStep("Hide judgement names", () => counterDisplay.ShowName.Value = true);
+            AddWaitStep("wait some", 2);
             AddAssert("Assert shown", () => counterDisplay.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 1);
         }
 
