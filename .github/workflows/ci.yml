@@ -121,12 +121,20 @@ jobs:
 
   build-only-ios:
     name: Build only (iOS)
-    # Pin to macOS 12 until GitHub finishes migrating all repositories to use it when specifying `macos-latest`.
+    # change to macos-latest once GitHub finishes migrating all repositories to macOS 12.
     runs-on: macos-12
     timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      # see https://github.com/actions/runner-images/issues/6771#issuecomment-1354713617
+      # remove once all workflow VMs use Xcode 14.1
+      - name: Set Xcode Version
+        shell: bash
+        run: |
+          sudo xcode-select -s "/Applications/Xcode_14.1.app"
+          echo "MD_APPLE_SDK_ROOT=/Applications/Xcode_14.1.app" >> $GITHUB_ENV
 
       - name: Install .NET 6.0.x
         uses: actions/setup-dotnet@v1
