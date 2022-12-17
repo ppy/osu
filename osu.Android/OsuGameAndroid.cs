@@ -5,6 +5,7 @@
 
 using System;
 using Android.App;
+using Microsoft.Maui.Devices;
 using osu.Framework.Allocation;
 using osu.Framework.Android.Input;
 using osu.Framework.Input.Handlers;
@@ -13,7 +14,6 @@ using osu.Game;
 using osu.Game.Overlays.Settings;
 using osu.Game.Updater;
 using osu.Game.Utils;
-using Xamarin.Essentials;
 
 namespace osu.Android
 {

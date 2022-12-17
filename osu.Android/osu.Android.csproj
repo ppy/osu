@@ -5,13 +5,10 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>osu.Android</RootNamespace>
     <AssemblyName>osu.Android</AssemblyName>
-
+    <UseMauiEssentials>true</UseMauiEssentials>
     <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
     <EnableLLVM>false</EnableLLVM>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.3" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
