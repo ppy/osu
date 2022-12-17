@@ -121,7 +121,8 @@ jobs:
 
   build-only-ios:
     name: Build only (iOS)
-    runs-on: macos-latest
+    # Pin to macOS 12 until GitHub finishes migrating all repositories to use it when specifying `macos-latest`.
+    runs-on: macos-12
     timeout-minutes: 60
     steps:
       - name: Checkout
