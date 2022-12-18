@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -19,9 +18,9 @@ using static osu.Game.Rulesets.Mania.ManiaSettingsSubsection;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModSlowDown : Mod, IApplicableToDrawableRuleset<ManiaHitObject>, IApplicableToScoreProcessor, IApplicableToPlayer
+    public class ManiaModScrollUp : Mod, IApplicableToDrawableRuleset<ManiaHitObject>, IApplicableToScoreProcessor, IApplicableToPlayer
     {
-        public override string Name => "Scoll up";
+        public override string Name => "Scroll up";
         public override string Acronym => "SU";
         public override LocalisableString Description => @"";
         public override double ScoreMultiplier => 1;
@@ -55,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             Precision = 5,
         };
 
-        public ManiaModSlowDown()
+        public ManiaModScrollUp()
         {
             MinScoreSpeed.BindValueChanged(s =>
             {
@@ -89,7 +88,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     return;
                 }
 
-                double speed = MinScoreSpeed.Value - (MinScoreSpeed.Value - MaxScoreSpeed.Value) * Math.Log(s.NewValue + 1, MaxComboCount.Value + 1);
+                double speed = MinScoreSpeed.Value - (MinScoreSpeed.Value - MaxScoreSpeed.Value) * ((double)s.NewValue / MaxComboCount.Value);
 
                 scoreProcessor.TransformBindableTo(scrollTime, speed, 500, Easing.OutQuint);
             });
