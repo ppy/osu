@@ -130,6 +130,7 @@ namespace osu.Game.Screens.Play
             score.ScoreInfo.Date = DateTimeOffset.Now;
 
             await submitScore(score).ConfigureAwait(false);
+            spectatorClient.EndPlaying(GameplayState);
         }
 
         [Resolved]
