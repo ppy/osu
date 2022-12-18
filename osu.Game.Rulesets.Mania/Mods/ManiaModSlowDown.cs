@@ -55,6 +55,19 @@ namespace osu.Game.Rulesets.Mania.Mods
             Precision = 5,
         };
 
+        public ManiaModSlowDown()
+        {
+            MinScoreSpeed.BindValueChanged(s =>
+            {
+                MaxScoreSpeed.MaxValue = s.NewValue;
+            });
+
+            MaxScoreSpeed.BindValueChanged(s =>
+            {
+                MinScoreSpeed.MinValue = s.NewValue;
+            });
+        }
+
         public void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
             this.drawableRuleset = (DrawableManiaRuleset)drawableRuleset;
