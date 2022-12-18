@@ -11,6 +11,11 @@ namespace osu.Game.Rulesets.Osu.UI
     public partial class OsuTouchInputMapper : Drawable
     {
         /// <summary>
+        /// Tracks how many touch sources are currently active.
+        /// </summary>
+        public int ActiveTapTouchesCount => triggeredActions.Count;
+
+        /// <summary>
         /// The max amount of touches that we handle.
         /// </summary>
         private int maxHandledTapTouches => osuInputManager.AllowUserCursorMovement ? 2 : 1;
@@ -26,19 +31,26 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly Dictionary<TouchSource, OsuAction> triggeredActions = new Dictionary<TouchSource, OsuAction>();
 
         /// <summary>
-        /// Tracks how many touch sources are currently active.
+        /// This is the touch assigned to the cursor.
         /// </summary>
-        public int ActiveTapTouchesCount => triggeredActions.Count;
+        private TouchSource? cursorTouchSource;
+
+        /// <summary>
+        /// Whether we can still handle another touch input.
+        /// </summary>
+        public bool AcceptingTouchInputs => ActiveTapTouchesCount < maxHandledTapTouches;
+
+        /// <summary>
+        /// Whether stream mode is enabled.
+        /// When stream mode is enabled the cursor's handled action is disabled.
+        /// This means all the tapping must be done by other fingers.
+        /// </summary>
+        public bool IsStreamMode { get; private set; }
 
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
             osuInputManager = inputManager;
         }
-
-        /// <summary>
-        /// This is the touch assigned to the cursor.
-        /// </summary>
-        private TouchSource? cursorTouchSource;
 
         /// <summary>
         /// Checks whether a given <see cref="TouchSource"/> is a tap touch.
@@ -53,18 +65,6 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <param name="source">The <see cref="TouchSource"/> to check.</param>
         /// <returns>Whether the given source is the cursor touch.</returns>
         public bool IsCursorTouch(TouchSource source) => !IsTapTouch(source);
-
-        /// <summary>
-        /// Whether we can still handle another touch input.
-        /// </summary>
-        public bool AcceptingTouchInputs => ActiveTapTouchesCount < maxHandledTapTouches;
-
-        /// <summary>
-        /// Whether stream mode is enabled.
-        /// When stream mode is enabled the cursor's handled action is disabled.
-        /// This means all the tapping must be done by other fingers.
-        /// </summary>
-        public bool IsStreamMode;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
