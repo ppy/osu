@@ -19,7 +19,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 {
-    public class JudgementTest : RateAdjustedBeatmapTestScene
+    public partial class JudgementTest : RateAdjustedBeatmapTestScene
     {
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
         protected List<JudgementResult> JudgementResults { get; private set; } = null!;
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             return beatmap;
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

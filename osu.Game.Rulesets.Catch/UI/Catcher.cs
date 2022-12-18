@@ -26,7 +26,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Catch.UI
 {
     [Cached]
-    public class Catcher : SkinReloadableDrawable
+    public partial class Catcher : SkinReloadableDrawable
     {
         /// <summary>
         /// The size of the catcher at 1x scale.

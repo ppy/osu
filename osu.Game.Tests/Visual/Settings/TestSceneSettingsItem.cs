@@ -17,7 +17,7 @@ using osu.Game.Overlays;
 namespace osu.Game.Tests.Visual.Settings
 {
     [TestFixture]
-    public class TestSceneSettingsItem : OsuTestScene
+    public partial class TestSceneSettingsItem : OsuTestScene
     {
         [Test]
         public void TestRestoreDefaultValueButtonVisibility()

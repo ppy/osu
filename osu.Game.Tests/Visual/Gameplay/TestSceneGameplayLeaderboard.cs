@@ -18,7 +18,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneGameplayLeaderboard : OsuTestScene
+    public partial class TestSceneGameplayLeaderboard : OsuTestScene
     {
         private TestGameplayLeaderboard leaderboard;
 
@@ -169,7 +169,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             leaderboardScore.TotalScore.BindTo(score);
         }
 
-        private class TestGameplayLeaderboard : GameplayLeaderboard
+        private partial class TestGameplayLeaderboard : GameplayLeaderboard
         {
             public float Spacing => Flow.Spacing.Y;
 

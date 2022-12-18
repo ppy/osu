@@ -23,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapDetails : Container
+    public partial class BeatmapDetails : Container
     {
         private const float spacing = 10;
         private const float transition_duration = 250;
@@ -273,7 +273,7 @@ namespace osu.Game.Screens.Select
             loading.Hide();
         }
 
-        private class DetailBox : Container
+        private partial class DetailBox : Container
         {
             private readonly Container content;
             protected override Container<Drawable> Content => content;

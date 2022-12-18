@@ -2,22 +2,31 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
+    public partial class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
     {
         private Drawable backgroundLayer = null!;
+        private Drawable? foregroundLayer;
+
+        private Bindable<int> currentCombo { get; } = new BindableInt();
+
+        private int animationFrame;
+        private double beatLength;
 
         // required for editor blueprints (not sure why these circle pieces are zero size).
         public override Quad ScreenSpaceDrawQuad => backgroundLayer.ScreenSpaceDrawQuad;
@@ -26,6 +35,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         {
             RelativeSizeAxes = Axes.Both;
         }
+
+        [Resolved(canBeNull: true)]
+        private GameplayState? gameplayState { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private IBeatSyncProvider? beatSyncProvider { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, DrawableHitObject drawableHitObject)
@@ -45,7 +60,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             // backgroundLayer is guaranteed to exist due to the pre-check in TaikoLegacySkinTransformer.
             AddInternal(backgroundLayer = new LegacyKiaiFlashingDrawable(() => getDrawableFor("circle")));
 
-            var foregroundLayer = getDrawableFor("circleoverlay");
+            foregroundLayer = getDrawableFor("circleoverlay");
             if (foregroundLayer != null)
                 AddInternal(foregroundLayer);
 
@@ -58,6 +73,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 c.Anchor = Anchor.Centre;
                 c.Origin = Anchor.Centre;
             }
+
+            if (gameplayState != null)
+                currentCombo.BindTo(gameplayState.ScoreProcessor.Combo);
         }
 
         protected override void LoadComplete()
@@ -74,6 +92,37 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             // This ensures they are scaled relative to each other but also match the expected DrawableHit size.
             foreach (var c in InternalChildren)
                 c.Scale = new Vector2(DrawHeight / 128);
+
+            if (foregroundLayer is IFramedAnimation animatableForegroundLayer)
+                animateForegroundLayer(animatableForegroundLayer);
+        }
+
+        private void animateForegroundLayer(IFramedAnimation animatableForegroundLayer)
+        {
+            int multiplier;
+
+            if (currentCombo.Value >= 150)
+            {
+                multiplier = 2;
+            }
+            else if (currentCombo.Value >= 50)
+            {
+                multiplier = 1;
+            }
+            else
+            {
+                animatableForegroundLayer.GotoFrame(0);
+                return;
+            }
+
+            if (beatSyncProvider?.ControlPoints != null)
+            {
+                beatLength = beatSyncProvider.ControlPoints.TimingPointAt(Time.Current).BeatLength;
+
+                animationFrame = Time.Current % ((beatLength * 2) / multiplier) >= beatLength / multiplier ? 0 : 1;
+
+                animatableForegroundLayer.GotoFrame(animationFrame);
+            }
         }
 
         private Color4 accentColour;

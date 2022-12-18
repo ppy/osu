@@ -150,7 +150,7 @@ namespace osu.Game.Online
             await disconnect(true);
 
             if (ex != null)
-                await handleErrorAndDelay(ex, cancellationToken).ConfigureAwait(false);
+                await handleErrorAndDelay(ex, CancellationToken.None).ConfigureAwait(false);
             else
                 Logger.Log($"{ClientName} disconnected", LoggingTarget.Network);
 

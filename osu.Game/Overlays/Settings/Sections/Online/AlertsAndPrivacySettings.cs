@@ -11,7 +11,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
-    public class AlertsAndPrivacySettings : SettingsSubsection
+    public partial class AlertsAndPrivacySettings : SettingsSubsection
     {
         protected override LocalisableString Header => OnlineSettingsStrings.AlertsAndPrivacyHeader;
 

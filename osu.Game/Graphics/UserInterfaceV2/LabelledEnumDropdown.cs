@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class LabelledEnumDropdown<TEnum> : LabelledDropdown<TEnum>
+    public partial class LabelledEnumDropdown<TEnum> : LabelledDropdown<TEnum>
         where TEnum : struct, Enum
     {
         protected override OsuDropdown<TEnum> CreateDropdown() => new OsuEnumDropdown<TEnum>();

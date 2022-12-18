@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play
     /// Manage the animation to be applied when a player fails.
     /// Single use and automatically disposed after use.
     /// </summary>
-    public class FailAnimation : Container
+    public partial class FailAnimation : Container
     {
         public Action? OnComplete;
 

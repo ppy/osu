@@ -14,7 +14,7 @@ using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
 {
-    public class PlayBeatmapDetailArea : BeatmapDetailArea
+    public partial class PlayBeatmapDetailArea : BeatmapDetailArea
     {
         public readonly BeatmapLeaderboard Leaderboard;
 

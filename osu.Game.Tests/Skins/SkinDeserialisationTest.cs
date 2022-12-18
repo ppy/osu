@@ -40,7 +40,9 @@ namespace osu.Game.Tests.Skins
             // Covers clicks/s counter
             "Archives/modified-default-20220818.osk",
             // Covers longest combo counter
-            "Archives/modified-default-20221012.osk"
+            "Archives/modified-default-20221012.osk",
+            // Covers TextElement and BeatmapInfoDrawable
+            "Archives/modified-default-20221102.osk"
         };
 
         /// <summary>

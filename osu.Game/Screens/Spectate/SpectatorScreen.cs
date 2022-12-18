@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Spectate
     /// <summary>
     /// A <see cref="OsuScreen"/> which spectates one or more users.
     /// </summary>
-    public abstract class SpectatorScreen : OsuScreen
+    public abstract partial class SpectatorScreen : OsuScreen
     {
         protected IReadOnlyList<int> Users => users;
 

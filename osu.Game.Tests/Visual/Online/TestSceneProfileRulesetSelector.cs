@@ -16,7 +16,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneProfileRulesetSelector : OsuTestScene
+    public partial class TestSceneProfileRulesetSelector : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);

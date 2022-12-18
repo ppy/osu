@@ -15,7 +15,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
+    public abstract partial class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
         public readonly Bindable<float> OriginalXBindable = new Bindable<float>();
         public readonly Bindable<float> XOffsetBindable = new Bindable<float>();

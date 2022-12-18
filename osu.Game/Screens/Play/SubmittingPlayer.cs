@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// A player instance which supports submitting scores to an online store.
     /// </summary>
-    public abstract class SubmittingPlayer : Player
+    public abstract partial class SubmittingPlayer : Player
     {
         /// <summary>
         /// The token to be used for the current submission. This is fetched via a request created by <see cref="CreateTokenRequest"/>.
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Play
                     realmBeatmap.LastPlayed = DateTimeOffset.Now;
             });
 
-            spectatorClient.BeginPlaying(GameplayState, Score);
+            spectatorClient.BeginPlaying(token, GameplayState, Score);
         }
 
         public override bool OnExiting(ScreenExitEvent e)

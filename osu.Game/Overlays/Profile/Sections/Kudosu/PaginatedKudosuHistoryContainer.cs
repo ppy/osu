@@ -14,7 +14,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
-    public class PaginatedKudosuHistoryContainer : PaginatedProfileSubsection<APIKudosuHistory>
+    public partial class PaginatedKudosuHistoryContainer : PaginatedProfileSubsection<APIKudosuHistory>
     {
         public PaginatedKudosuHistoryContainer(Bindable<APIUser> user)
             : base(user, missingText: UsersStrings.ShowExtraKudosuEntryEmpty)

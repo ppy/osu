@@ -19,7 +19,7 @@ using osu.Game.Updater;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class UpdateSettings : SettingsSubsection
+    public partial class UpdateSettings : SettingsSubsection
     {
         [Resolved(CanBeNull = true)]
         private UpdateManager updateManager { get; set; }

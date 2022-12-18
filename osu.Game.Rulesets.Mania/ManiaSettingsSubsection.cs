@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania
 {
-    public class ManiaSettingsSubsection : RulesetSettingsSubsection
+    public partial class ManiaSettingsSubsection : RulesetSettingsSubsection
     {
         protected override LocalisableString Header => "osu!mania";
 
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Mania
             };
         }
 
-        public class ManiaScrollSlider : OsuSliderBar<double>
+        public partial class ManiaScrollSlider : OsuSliderBar<double>
         {
             public override LocalisableString TooltipText => $"{Current.Value}ms (speed {(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / Current.Value)})";
 

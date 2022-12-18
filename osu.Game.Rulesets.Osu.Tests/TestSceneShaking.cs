@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneShaking : TestSceneHitCircle
+    public partial class TestSceneShaking : TestSceneHitCircle
     {
         private readonly List<ScheduledDelegate> scheduledTasks = new List<ScheduledDelegate>();
 

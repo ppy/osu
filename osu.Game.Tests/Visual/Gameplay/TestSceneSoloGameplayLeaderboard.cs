@@ -19,7 +19,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSoloGameplayLeaderboard : OsuTestScene
+    public partial class TestSceneSoloGameplayLeaderboard : OsuTestScene
     {
         [Cached]
         private readonly ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());

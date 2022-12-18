@@ -12,7 +12,7 @@ using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Online.Spectator
 {
-    public class OnlineSpectatorClient : SpectatorClient
+    public partial class OnlineSpectatorClient : SpectatorClient
     {
         private readonly string endpoint;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Online.Spectator
             }
         }
 
-        protected override async Task BeginPlayingInternal(SpectatorState state)
+        protected override async Task BeginPlayingInternal(long? scoreToken, SpectatorState state)
         {
             if (!IsConnected.Value)
                 return;
@@ -56,7 +56,7 @@ namespace osu.Game.Online.Spectator
 
             try
             {
-                await connection.InvokeAsync(nameof(ISpectatorServer.BeginPlaySession), state);
+                await connection.InvokeAsync(nameof(ISpectatorServer.BeginPlaySession), scoreToken, state);
             }
             catch (Exception exception)
             {
@@ -65,7 +65,7 @@ namespace osu.Game.Online.Spectator
                     Debug.Assert(connector != null);
 
                     await connector.Reconnect();
-                    await BeginPlayingInternal(state);
+                    await BeginPlayingInternal(scoreToken, state);
                 }
 
                 // Exceptions can occur if, for instance, the locally played beatmap doesn't have a server-side counterpart.
