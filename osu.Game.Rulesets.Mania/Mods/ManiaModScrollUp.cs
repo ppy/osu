@@ -57,14 +57,16 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public ManiaModScrollUp()
         {
-            MinScoreSpeed.BindValueChanged(s =>
+            MinScoreSpeed.BindValueChanged(val =>
             {
-                MaxScoreSpeed.MaxValue = s.NewValue;
+                if (val.NewValue <= MaxScoreSpeed.Value)
+                    MaxScoreSpeed.Value = val.NewValue + MaxScoreSpeed.Precision;
             });
 
-            MaxScoreSpeed.BindValueChanged(s =>
+            MaxScoreSpeed.BindValueChanged(val =>
             {
-                MinScoreSpeed.MinValue = s.NewValue;
+                if (val.NewValue >= MinScoreSpeed.Value)
+                    MinScoreSpeed.Value = val.NewValue + MinScoreSpeed.Precision;
             });
         }
 
