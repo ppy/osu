@@ -2,10 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -15,22 +13,12 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// The max amount of touches that we handle.
         /// </summary>
-        private readonly BindableInt maxHandledTapTouches = new BindableInt(2);
-
-        /// <summary>
-        /// The max amount of touches that we handle. Decremented by one.
-        /// </summary>
-        private int maxHandledTapTouchesDecremented;
+        private int maxHandledTapTouches => osuInputManager.AllowUserCursorMovement ? 2 : 1;
 
         /// <summary>
         /// This is our parent <see cref="osuInputManager"/>.
         /// </summary>
         private readonly OsuInputManager osuInputManager;
-
-        /// <summary>
-        /// This is our <see cref="keyBindingContainer"/>. We trigger <see cref="OsuAction"/>s  with it.
-        /// </summary>
-        private KeyBindingContainer<OsuAction> keyBindingContainer => osuInputManager.KeyBindingContainer;
 
         /// <summary>
         /// This is a dictionary tracking all the active <see cref="TouchSource"/>s and the <see cref="OsuAction"/> that it triggered.
@@ -45,16 +33,6 @@ namespace osu.Game.Rulesets.Osu.UI
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
             osuInputManager = inputManager;
-            maxHandledTapTouches.BindValueChanged(e => maxHandledTapTouchesDecremented = e.NewValue - 1, true);
-        }
-
-        /// <summary>
-        /// Handles how we behave when we don't accept cursor movement (e.g. autopilot).
-        /// </summary>
-        public void HandleAllowUserCursorMovement(bool allowUserCursorMovement)
-        {
-            if (!allowUserCursorMovement)
-                maxHandledTapTouches.Value -= 1;
         }
 
         /// <summary>
@@ -79,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// Whether we can still handle another touch input.
         /// </summary>
-        public bool AcceptingTouchInputs => ActiveTapTouchesCount <= maxHandledTapTouchesDecremented;
+        public bool AcceptingTouchInputs => ActiveTapTouchesCount < maxHandledTapTouches;
 
         /// <summary>
         /// Whether stream mode is enabled.
@@ -105,13 +83,13 @@ namespace osu.Game.Rulesets.Osu.UI
 
             triggeredActions.Add(source, action);
 
-            if (osuInputManager.AllowUserCursorMovement && !IsStreamMode && ActiveTapTouchesCount == maxHandledTapTouches.Value)
+            if (osuInputManager.AllowUserCursorMovement && !IsStreamMode && ActiveTapTouchesCount == maxHandledTapTouches)
             {
                 IsStreamMode = true;
                 osuInputManager.EnableStreamMode(cursorTouchSource!.Value);
             }
 
-            keyBindingContainer.TriggerPressed(action);
+            osuInputManager.KeyBindingContainer.TriggerPressed(action);
 
             return base.OnTouchDown(e);
         }
@@ -122,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             if (triggeredActions.ContainsKey(source))
             {
-                keyBindingContainer.TriggerReleased(triggeredActions[source]);
+                osuInputManager.KeyBindingContainer.TriggerReleased(triggeredActions[source]);
                 triggeredActions.Remove(source);
             }
             else if (IsCursorTouch(source))
