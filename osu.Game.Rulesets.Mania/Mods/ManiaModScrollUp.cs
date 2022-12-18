@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Acronym => "SU";
         public override LocalisableString Description => @"Key will become faster..., until you miss";
         public override double ScoreMultiplier => 1;
-        public override IconUsage? Icon => FontAwesome.Solid.AngleDoubleUp;
+        public override IconUsage? Icon => null;
         public override ModType Type => ModType.Conversion;
 
         private DrawableManiaRuleset drawableRuleset = null!;
