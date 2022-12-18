@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Name => "Scroll up";
         public override string Acronym => "SU";
-        public override LocalisableString Description => @"";
+        public override LocalisableString Description => @"Key will become faster..., until you miss";
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => FontAwesome.Solid.AngleDoubleUp;
         public override ModType Type => ModType.Conversion;
