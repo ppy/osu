@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -88,7 +89,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     return;
                 }
 
-                double speed = MinScoreSpeed.Value - (MinScoreSpeed.Value - MaxScoreSpeed.Value) * ((double)s.NewValue / MaxComboCount.Value);
+                double speed = MinScoreSpeed.Value - (MinScoreSpeed.Value - MaxScoreSpeed.Value) * Math.Log(s.NewValue + 1, MaxComboCount.Value + 1);
 
                 scoreProcessor.TransformBindableTo(scrollTime, speed, 500, Easing.OutQuint);
             });
