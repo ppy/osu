@@ -6,9 +6,9 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public partial class CatchRelaxCursorContainer : GameplayCursorContainer
+    public partial class CatchCursorContainer : GameplayCursorContainer
     {
-        // Just hide the cursor in relax.
+        // Just hide the cursor.
         // The main goal here is to show that we have a cursor so the game never shows the global one.
         protected override Drawable CreateCursor() => Empty();
     }
