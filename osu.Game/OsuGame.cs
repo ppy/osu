@@ -356,6 +356,14 @@ namespace osu.Game
                     SearchBeatmapSet(argString);
                     break;
 
+                case LinkAction.FilterBeatmapSetGenre:
+                    FilterBeatmapSetGenre(argString);
+                    break;
+
+                case LinkAction.FilterBeatmapSetLanguage:
+                    FilterBeatmapSetLanguage(argString);
+                    break;
+
                 case LinkAction.OpenEditorTimestamp:
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
@@ -459,6 +467,10 @@ namespace osu.Game
         /// </summary>
         /// <param name="query">The query to search for.</param>
         public void SearchBeatmapSet(string query) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithSearch(query));
+
+        public void FilterBeatmapSetGenre(string genre) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithGenreFilter(genre));
+
+        public void FilterBeatmapSetLanguage(string language) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithLanguageFilter(language));
 
         /// <summary>
         /// Show a wiki's page as an overlay

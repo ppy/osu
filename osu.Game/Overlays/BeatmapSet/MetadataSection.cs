@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using Humanizer;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -12,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays.BeatmapListing;
 using osuTK;
 using osuTK.Graphics;
 
@@ -114,6 +116,14 @@ namespace osu.Game.Overlays.BeatmapSet
                         else
                             loaded.AddLink(text, LinkAction.SearchBeatmapSet, text);
 
+                        break;
+
+                    case MetadataType.Genre:
+                        loaded.AddLink(text.DehumanizeTo<SearchGenre>().GetLocalisableDescription(), LinkAction.FilterBeatmapSetGenre, text);
+                        break;
+
+                    case MetadataType.Language:
+                        loaded.AddLink(text.DehumanizeTo<SearchLanguage>().GetLocalisableDescription(), LinkAction.FilterBeatmapSetLanguage, text);
                         break;
 
                     default:
