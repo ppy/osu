@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -14,12 +15,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Screens.Edit.Setup;
 using osuTK;
 
@@ -39,6 +43,8 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private StableLocatorLabelledTextBox stableLocatorTextBox = null!;
 
+        private LinkFlowContainer copyInformation = null!;
+
         private IEnumerable<ImportCheckbox> contentCheckboxes => Content.Children.OfType<ImportCheckbox>();
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -46,7 +52,7 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             Content.Children = new Drawable[]
             {
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
+                new LinkFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunOverlayImportFromStableScreenStrings.Description,
@@ -62,6 +68,12 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new ImportCheckbox(CommonStrings.Scores, StableContent.Scores),
                 new ImportCheckbox(CommonStrings.Skins, StableContent.Skins),
                 new ImportCheckbox(CommonStrings.Collections, StableContent.Collections),
+                copyInformation = new LinkFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
+                {
+                    Colour = OverlayColourProvider.Content1,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y
+                },
                 importButton = new ProgressRoundedButton
                 {
                     Size = button_size,
@@ -82,6 +94,9 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             stableLocatorTextBox.Current.BindValueChanged(_ => updateStablePath(), true);
         }
+
+        [Resolved(canBeNull: true)]
+        private OsuGame? game { get; set; }
 
         private void updateStablePath()
         {
@@ -105,6 +120,25 @@ namespace osu.Game.Overlays.FirstRunSetup
             toggleInteraction(true);
             stableLocatorTextBox.Current.Value = storage.GetFullPath(string.Empty);
             importButton.Enabled.Value = true;
+
+            bool available = legacyImportManager.CheckHardLinkAvailability();
+            Logger.Log($"Hard link support is {available}");
+
+            if (available)
+            {
+                copyInformation.Text = "Data migration will use \"hard links\". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation.";
+            }
+            else if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+                copyInformation.Text = "Lightweight linking of files is not supported on your operating system yet, so a copy of all files will be made during import.";
+            else
+            {
+                copyInformation.Text =
+                    "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system is NTFS). ";
+                copyInformation.AddLink(GeneralSettingsStrings.ChangeFolderLocation, () =>
+                {
+                    game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()));
+                });
+            }
         }
 
         private void runImport()
@@ -235,7 +269,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 return Task.CompletedTask;
             }
 
-            Task ICanAcceptFiles.Import(params ImportTask[] tasks) => throw new NotImplementedException();
+            Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
             protected override void Dispose(bool isDisposing)
             {

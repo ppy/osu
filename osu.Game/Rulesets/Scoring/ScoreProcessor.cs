@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
-using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -90,17 +89,14 @@ namespace osu.Game.Rulesets.Scoring
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
-        /// <summary>
-        /// Scoring values for a perfect play.
-        /// </summary>
-        public ScoringValues MaximumScoringValues
+        public Dictionary<HitResult, int> MaximumStatistics
         {
             get
             {
                 if (!beatmapApplied)
-                    throw new InvalidOperationException($"Cannot access maximum scoring values before calling {nameof(ApplyBeatmap)}.");
+                    throw new InvalidOperationException($"Cannot access maximum statistics before calling {nameof(ApplyBeatmap)}.");
 
-                return maximumScoringValues;
+                return new Dictionary<HitResult, int>(maximumResultCounts);
             }
         }
 
@@ -268,7 +264,7 @@ namespace osu.Game.Rulesets.Scoring
         private void updateScore()
         {
             Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
-            TotalScore.Value = ComputeScore(Mode.Value, currentScoringValues, maximumScoringValues);
+            TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues);
         }
 
         /// <summary>
@@ -285,7 +281,7 @@ namespace osu.Game.Rulesets.Scoring
             // We only extract scoring values from the score's statistics. This is because accuracy is always relative to the point of pass or fail rather than relative to the whole beatmap.
             extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
 
-            return maximum.BaseScore > 0 ? current.BaseScore / maximum.BaseScore : 1;
+            return maximum.BaseScore > 0 ? (double)current.BaseScore / maximum.BaseScore : 1;
         }
 
         /// <summary>
@@ -303,9 +299,9 @@ namespace osu.Game.Rulesets.Scoring
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
-            ExtractScoringValues(scoreInfo, out var current, out var maximum);
+            extractScoringValues(scoreInfo, out var current, out var maximum);
 
-            return ComputeScore(mode, current, maximum);
+            return computeScore(mode, current, maximum);
         }
 
         /// <summary>
@@ -316,7 +312,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="maximum">The maximum scoring values.</param>
         /// <returns>The total score computed from the given scoring values.</returns>
         [Pure]
-        public long ComputeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum)
+        private long computeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum)
         {
             double accuracyRatio = maximum.BaseScore > 0 ? (double)current.BaseScore / maximum.BaseScore : 1;
             double comboRatio = maximum.MaxCombo > 0 ? (double)current.MaxCombo / maximum.MaxCombo : 1;
@@ -474,45 +470,20 @@ namespace osu.Game.Rulesets.Scoring
         /// Consumers are expected to more accurately fill in the above values through external means.
         /// <para>
         /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.CountBasicHitObjects"/> for use in
-        /// <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoringValues,osu.Game.Scoring.ScoringValues)"/>.
+        /// <see cref="computeScore(osu.Game.Rulesets.Scoring.ScoringMode,ScoringValues,ScoringValues)"/>.
         /// </para>
         /// </remarks>
         /// <param name="scoreInfo">The score to extract scoring values from.</param>
         /// <param name="current">The "current" scoring values, representing the hit statistics as they appear.</param>
         /// <param name="maximum">The "maximum" scoring values, representing the hit statistics as if the maximum hit result was attained each time.</param>
         [Pure]
-        internal void ExtractScoringValues(ScoreInfo scoreInfo, out ScoringValues current, out ScoringValues maximum)
+        private void extractScoringValues(ScoreInfo scoreInfo, out ScoringValues current, out ScoringValues maximum)
         {
             extractScoringValues(scoreInfo.Statistics, out current, out maximum);
             current.MaxCombo = scoreInfo.MaxCombo;
 
             if (scoreInfo.MaximumStatistics.Count > 0)
                 extractScoringValues(scoreInfo.MaximumStatistics, out _, out maximum);
-        }
-
-        /// <summary>
-        /// Applies a best-effort extraction of hit statistics into <see cref="ScoringValues"/>.
-        /// </summary>
-        /// <remarks>
-        /// This method is useful in a variety of situations, with a few drawbacks that need to be considered:
-        /// <list type="bullet">
-        ///     <item>The maximum <see cref="ScoringValues.BonusScore"/> will always be 0.</item>
-        ///     <item>The current and maximum <see cref="ScoringValues.CountBasicHitObjects"/> will always be the same value.</item>
-        /// </list>
-        /// Consumers are expected to more accurately fill in the above values through external means.
-        /// <para>
-        /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.CountBasicHitObjects"/> for use in
-        /// <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoringValues,osu.Game.Scoring.ScoringValues)"/>.
-        /// </para>
-        /// </remarks>
-        /// <param name="header">The replay frame header to extract scoring values from.</param>
-        /// <param name="current">The "current" scoring values, representing the hit statistics as they appear.</param>
-        /// <param name="maximum">The "maximum" scoring values, representing the hit statistics as if the maximum hit result was attained each time.</param>
-        [Pure]
-        internal void ExtractScoringValues(FrameHeader header, out ScoringValues current, out ScoringValues maximum)
-        {
-            extractScoringValues(header.Statistics, out current, out maximum);
-            current.MaxCombo = header.MaxCombo;
         }
 
         /// <summary>
@@ -588,6 +559,32 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.Dispose(isDisposing);
             hitEvents.Clear();
+        }
+
+        /// <summary>
+        /// Stores the required scoring data that fulfils the minimum requirements for a <see cref="ScoreProcessor"/> to calculate score.
+        /// </summary>
+        private struct ScoringValues
+        {
+            /// <summary>
+            /// The sum of all "basic" <see cref="HitObject"/> scoring values. See: <see cref="HitResultExtensions.IsBasic"/> and <see cref="Judgement.ToNumericResult"/>.
+            /// </summary>
+            public long BaseScore;
+
+            /// <summary>
+            /// The sum of all "bonus" <see cref="HitObject"/> scoring values. See: <see cref="HitResultExtensions.IsBonus"/> and <see cref="Judgement.ToNumericResult"/>.
+            /// </summary>
+            public long BonusScore;
+
+            /// <summary>
+            /// The highest achieved combo.
+            /// </summary>
+            public int MaxCombo;
+
+            /// <summary>
+            /// The count of "basic" <see cref="HitObject"/>s. See: <see cref="HitResultExtensions.IsBasic"/>.
+            /// </summary>
+            public int CountBasicHitObjects;
         }
     }
 

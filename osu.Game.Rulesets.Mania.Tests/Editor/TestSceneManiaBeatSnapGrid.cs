@@ -90,6 +90,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         public override bool CursorInPlacementArea => false;
 
         public TestHitObjectComposer(Playfield playfield)
+            : base(new ManiaRuleset())
         {
             Playfield = playfield;
         }

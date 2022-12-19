@@ -7,6 +7,7 @@ using osu.Framework.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -70,5 +71,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             clockAdjustmentsFromMods.BindAdjustments(gameplayClockContainer.AdjustmentsFromMods);
             return gameplayClockContainer;
         }
+
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new MultiSpectatorResultsScreen(score);
     }
 }
