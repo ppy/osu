@@ -75,10 +75,7 @@ namespace osu.Game.Rulesets
                                                   return false;
 
                                               return args.Name.Contains(name, StringComparison.Ordinal);
-                                          })
-                                          // Pick the greatest assembly version.
-                                          .OrderByDescending(a => a.GetName().Version)
-                                          .FirstOrDefault();
+                                          }).MaxBy(a => a.GetName().Version);
 
             if (domainAssembly != null)
                 return domainAssembly;

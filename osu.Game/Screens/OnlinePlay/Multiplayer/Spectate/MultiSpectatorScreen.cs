@@ -171,9 +171,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             if (!isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
             {
-                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock))
-                                              .OrderBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime))
-                                              .FirstOrDefault();
+                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock)).MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
 
                 // Only bind adjustments if there's actually a valid source, else just use the previous ones to ensure no sudden changes to audio.
                 if (currentAudioSource != null)
