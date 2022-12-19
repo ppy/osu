@@ -6,14 +6,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Screens.Select.FooterV2
 {
-    public partial class FooterV2 : Container
+    public partial class FooterV2 : InputBlockingContainer
     {
         //Should be 60, setting to 50 for now for the sake of matching the current BackButton height.
         private const int height = 50;
@@ -62,7 +61,7 @@ namespace osu.Game.Screens.Select.FooterV2
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 40),
+                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 10),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
@@ -81,11 +80,5 @@ namespace osu.Game.Screens.Select.FooterV2
                 }
             };
         }
-
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-        protected override bool OnClick(ClickEvent e) => true;
-
-        protected override bool OnHover(HoverEvent e) => true;
     }
 }
