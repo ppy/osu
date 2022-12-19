@@ -18,6 +18,7 @@ using osu.Framework.Utils;
 using osu.Game.Graphics.Containers.Markdown;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki.Markdown;
+using osu.Game.Users.Drawables;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -197,6 +198,7 @@ Line after image";
                 markdownContainer.CurrentPath = @"https://dev.ppy.sh";
                 markdownContainer.Text = "::{flag=\"AU\"}:: ::{flag=\"ZZ\"}::";
             });
+            AddAssert("Two flags visible", () => markdownContainer.ChildrenOfType<DrawableFlag>().Count(), () => Is.EqualTo(2));
         }
 
         [Test]
