@@ -73,7 +73,8 @@ namespace osu.Game.Screens.Select.FooterV2
                         Text = rewindSpriteText.Text,
                         AlwaysPresent = true, // make sure the button is sized large enough to always show this
                         Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre
+                        Origin = Anchor.BottomCentre,
+                        Font = OsuFont.TorusAlternate.With(size: 19),
                     });
 
                     fallingRewind.FadeOutFromOne(fade_time, Easing.In);

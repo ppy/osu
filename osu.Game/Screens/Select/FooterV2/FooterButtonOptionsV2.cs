@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select.FooterV2
 {
@@ -15,6 +16,7 @@ namespace osu.Game.Screens.Select.FooterV2
             Text = "Options";
             Icon = FontAwesome.Solid.Cog;
             AccentColour = colour.Purple1;
+            Hotkey = GlobalAction.ToggleBeatmapOptions;
         }
     }
 }

@@ -60,14 +60,14 @@ namespace osu.Game.Screens.Select.FooterV2
             set => text.Text = value;
         }
 
-        private SpriteText text = null!;
-        private SpriteIcon icon = null!;
-        protected Container TextContainer = null!;
-        private Box bar = null!;
-        private Box backgroundBox = null!;
+        private readonly SpriteText text;
+        private readonly SpriteIcon icon;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected Container TextContainer;
+        private readonly Box bar;
+        private readonly Box backgroundBox;
+
+        public FooterButtonV2()
         {
             EdgeEffect = new EdgeEffectParameters
             {
@@ -146,46 +146,33 @@ namespace osu.Game.Screens.Select.FooterV2
 
         public GlobalAction? Hotkey;
 
-        private bool isHovered;
-
         protected override bool OnHover(HoverEvent e)
         {
-            isHovered = true;
             updateDisplay();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            isHovered = false;
             updateDisplay();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (!Enabled.Value)
-                return true;
-
-            return base.OnMouseDown(e);
+            return !Enabled.Value || base.OnMouseDown(e);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!Enabled.Value)
-                return true;
-
-            return base.OnClick(e);
+            return !Enabled.Value || base.OnClick(e);
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action == Hotkey && !e.Repeat)
-            {
-                TriggerClick();
-                return true;
-            }
+            if (e.Action != Hotkey || e.Repeat) return false;
 
-            return false;
+            TriggerClick();
+            return true;
         }
 
         public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
@@ -198,19 +185,19 @@ namespace osu.Game.Screens.Select.FooterV2
                 return;
             }
 
-            switch (OverlayState.Value)
+            if (OverlayState.Value == Visibility.Visible)
             {
-                case Visibility.Visible:
-                    backgroundBox.FadeColour(buttonAccentColour.Darken(0.5f), transition_length, Easing.OutQuint);
-                    return;
-
-                case Visibility.Hidden:
-                    backgroundBox.FadeColour(buttonAccentColour, transition_length, Easing.OutQuint);
-                    break;
+                backgroundBox.FadeColour(buttonAccentColour.Darken(0.5f), transition_length, Easing.OutQuint);
+                return;
             }
 
-            //Hover logic.
-            backgroundBox.FadeColour(isHovered && Enabled.Value ? colourProvider.Background3.Lighten(.3f) : colourProvider.Background3, transition_length, Easing.OutQuint);
+            if (IsHovered)
+            {
+                backgroundBox.FadeColour(colourProvider.Background3.Lighten(0.3f), transition_length, Easing.OutQuint);
+                return;
+            }
+
+            backgroundBox.FadeColour(colourProvider.Background3, transition_length, Easing.OutQuint);
         }
     }
 }
