@@ -184,7 +184,7 @@ namespace osu.Game.Online.Spectator
                 Header = header;
             }
 
-            public int CompareTo(TimedFrame other) => Time.CompareTo(other.Time);
+            public int CompareTo(TimedFrame? other) => Time.CompareTo(other?.Time);
         }
     }
 }

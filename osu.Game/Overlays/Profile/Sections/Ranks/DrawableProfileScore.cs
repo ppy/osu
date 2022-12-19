@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -268,8 +267,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             protected override Drawable[] CreateText(IBeatmapInfo beatmapInfo)
             {
                 var metadata = beatmapInfo.Metadata;
-
-                Debug.Assert(metadata != null);
 
                 return new Drawable[]
                 {

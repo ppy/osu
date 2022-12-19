@@ -534,7 +534,7 @@ namespace osu.Game.Rulesets.Scoring
                             break;
 
                         default:
-                            maxResult = maxBasicResult ??= ruleset.GetHitResults().OrderByDescending(kvp => Judgement.ToNumericResult(kvp.result)).First().result;
+                            maxResult = maxBasicResult ??= ruleset.GetHitResults().MaxBy(kvp => Judgement.ToNumericResult(kvp.result)).result;
                             break;
                     }
 
