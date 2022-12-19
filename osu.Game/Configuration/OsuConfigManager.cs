@@ -102,6 +102,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MouseDisableWheel, false);
             SetDefault(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
 
+            SetDefault(OsuSetting.UseSeparateSensitivity, false);
+
             // Graphics
             SetDefault(OsuSetting.ShowFpsDisplay, false);
 
@@ -375,5 +377,6 @@ namespace osu.Game.Configuration
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
+        UseSeparateSensitivity,
     }
 }
