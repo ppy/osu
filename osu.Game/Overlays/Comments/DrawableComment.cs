@@ -20,6 +20,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
@@ -336,7 +337,7 @@ namespace osu.Game.Overlays.Comments
             actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
-                actionsContainer.AddLink(CommonStrings.ButtonsDelete, deleteComment);
+                actionsContainer.AddLink(CommonStrings.ButtonsDelete.ToLower(), deleteComment);
             else
                 actionsContainer.AddArbitraryDrawable(new CommentReportButton(Comment));
 
