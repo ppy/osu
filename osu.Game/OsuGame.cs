@@ -16,6 +16,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
@@ -332,7 +333,7 @@ namespace osu.Game
         /// <param name="link">The link to load.</param>
         public void HandleLink(LinkDetails link) => Schedule(() =>
         {
-            string argString = link.Argument.ToString();
+            string argString = link.Argument.ToString() ?? string.Empty;
 
             switch (link.Action)
             {
@@ -405,6 +406,16 @@ namespace osu.Game
         {
             if (url.StartsWith('/'))
                 url = $"{API.APIEndpointUrl}{url}";
+
+            if (!url.CheckIsValidUrl())
+            {
+                Notifications.Post(new SimpleErrorNotification
+                {
+                    Text = $"The URL {url} has an unsupported or dangerous protocol and will not be opened.",
+                });
+
+                return;
+            }
 
             externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
         });
@@ -1031,6 +1042,8 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database) return;
 
+                Debug.Assert(entry.Target != null);
+
                 const int short_term_display_limit = 3;
 
                 if (recentLogCount < short_term_display_limit)
@@ -1043,7 +1056,7 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
-                    string logFile = $@"{entry.Target.ToString().ToLowerInvariant()}.log";
+                    string logFile = $@"{entry.Target.Value.ToString().ToLowerInvariant()}.log";
 
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {

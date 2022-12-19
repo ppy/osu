@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private class ReplayFrameComparer : IComparer<ReplayFrame>
         {
-            public int Compare(ReplayFrame f1, ReplayFrame f2)
+            public int Compare(ReplayFrame? f1, ReplayFrame? f2)
             {
                 if (f1 == null) throw new ArgumentNullException(nameof(f1));
                 if (f2 == null) throw new ArgumentNullException(nameof(f2));
