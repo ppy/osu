@@ -286,6 +286,7 @@ namespace osu.Game.Overlays
 
             Debug.Assert(stack != null);
 
+            CurrentScreen?.HidePopover();
             stack.CurrentScreen.Exit();
             currentStepIndex--;
 
@@ -301,6 +302,7 @@ namespace osu.Game.Overlays
 
             if (currentStepIndex < steps.Count)
             {
+                CurrentScreen?.HidePopover();
                 var nextScreen = (Screen)Activator.CreateInstance(steps[currentStepIndex.Value])!;
 
                 loadingShowDelegate = Scheduler.AddDelayed(() => loading.Show(), 200);
