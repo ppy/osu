@@ -23,12 +23,13 @@ namespace osu.Game.Screens.Select.FooterV2
 {
     public partial class FooterButtonV2 : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        private const int button_height = 120;
+        private const int button_height = 90;
         private const int button_width = 140;
         private const int corner_radius = 10;
         private const int transition_length = 500;
 
-        public const float SHEAR_WIDTH = 16;
+        //Accounts for corner radius margin on bottom, would be 12
+        public const float SHEAR_WIDTH = 13.5f;
 
         public Bindable<Visibility> OverlayState = new Bindable<Visibility>();
 
@@ -63,7 +64,7 @@ namespace osu.Game.Screens.Select.FooterV2
         private SpriteIcon icon = null!;
         protected Container TextContainer = null!;
         private Box bar = null!;
-        private Box backGroundBox = null!;
+        private Box backgroundBox = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -81,7 +82,7 @@ namespace osu.Game.Screens.Select.FooterV2
             CornerRadius = corner_radius;
             InternalChildren = new Drawable[]
             {
-                backGroundBox = new Box
+                backgroundBox = new Box
                 {
                     Colour = colourProvider.Background3,
                     RelativeSizeAxes = Axes.Both
@@ -90,6 +91,8 @@ namespace osu.Game.Screens.Select.FooterV2
                 //For elements that should not be sheared.
                 new Container
                 {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                     Shear = -SHEAR,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -98,18 +101,18 @@ namespace osu.Game.Screens.Select.FooterV2
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Position = new Vector2(-SHEAR_WIDTH * (52f / button_height), 42),
+                            Y = 42,
                             AutoSizeAxes = Axes.Both,
                             Child = text = new OsuSpriteText
                             {
-                                Font = OsuFont.TorusAlternate.With(size: 16),
+                                //figma design says the size is 16, but due to the issues with font sizes 19 matches better
+                                Font = OsuFont.TorusAlternate.With(size: 19),
                                 AlwaysPresent = true
                             }
                         },
                         icon = new SpriteIcon
                         {
-                            //We want to offset this by the same amount as the text for aesthetic purposes
-                            Position = new Vector2(-SHEAR_WIDTH * (52f / button_height), 12),
+                            Y = 12,
                             Size = new Vector2(20),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre
@@ -117,7 +120,7 @@ namespace osu.Game.Screens.Select.FooterV2
                         new Container
                         {
                             //Offset the bar to centre it with consideration for the shearing
-                            Position = new Vector2(-SHEAR_WIDTH * (80f / button_height), -40),
+                            Position = new Vector2(-0.15f * 35, -10),
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(120, 6),
@@ -136,6 +139,7 @@ namespace osu.Game.Screens.Select.FooterV2
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             Enabled.BindValueChanged(_ => updateDisplay(), true);
             OverlayState.BindValueChanged(_ => updateDisplay());
         }
@@ -190,23 +194,23 @@ namespace osu.Game.Screens.Select.FooterV2
         {
             if (!Enabled.Value)
             {
-                backGroundBox.FadeColour(colourProvider.Background3.Darken(0.3f), transition_length, Easing.OutQuint);
+                backgroundBox.FadeColour(colourProvider.Background3.Darken(0.3f), transition_length, Easing.OutQuint);
                 return;
             }
 
             switch (OverlayState.Value)
             {
                 case Visibility.Visible:
-                    backGroundBox.FadeColour(buttonAccentColour.Darken(0.5f), transition_length, Easing.OutQuint);
+                    backgroundBox.FadeColour(buttonAccentColour.Darken(0.5f), transition_length, Easing.OutQuint);
                     return;
 
                 case Visibility.Hidden:
-                    backGroundBox.FadeColour(buttonAccentColour, transition_length, Easing.OutQuint);
+                    backgroundBox.FadeColour(buttonAccentColour, transition_length, Easing.OutQuint);
                     break;
             }
 
             //Hover logic.
-            backGroundBox.FadeColour(isHovered && Enabled.Value ? colourProvider.Background3.Lighten(.3f) : colourProvider.Background3, transition_length, Easing.OutQuint);
+            backgroundBox.FadeColour(isHovered && Enabled.Value ? colourProvider.Background3.Lighten(.3f) : colourProvider.Background3, transition_length, Easing.OutQuint);
         }
     }
 }

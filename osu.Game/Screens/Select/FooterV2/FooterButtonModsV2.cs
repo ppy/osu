@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Select.FooterV2
         private void load(OsuColour colour)
         {
             Text = "Mods";
-            Icon = FontAwesome.Solid.ArrowsAlt;
+            Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colour.Lime1;
         }
     }
