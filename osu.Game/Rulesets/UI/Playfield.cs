@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Cursor = CreateCursor();
+            Cursor = CreateCursor(Mods.ToArray());
 
             if (Cursor != null)
             {
@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.UI
         /// Provide a cursor which is to be used for gameplay.
         /// </summary>
         /// <returns>The cursor, or null to show the menu cursor.</returns>
-        protected virtual GameplayCursorContainer CreateCursor() => null;
+        protected virtual GameplayCursorContainer CreateCursor(Mod[] mods) => null;
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.

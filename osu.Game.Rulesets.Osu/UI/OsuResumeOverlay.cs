@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             if (localCursorContainer == null)
             {
-                Add(localCursorContainer = new OsuCursorContainer());
+                Add(localCursorContainer = new OsuCursorContainer(new Rulesets.Mods.Mod[0]));
 
                 localCursorScale = new BindableFloat();
                 localCursorScale.BindTo(localCursorContainer.CursorScale);

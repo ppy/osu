@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -11,5 +12,10 @@ namespace osu.Game.Rulesets.Catch.UI
         // Just hide the cursor.
         // The main goal here is to show that we have a cursor so the game never shows the global one.
         protected override Drawable CreateCursor() => Empty();
+
+        public CatchCursorContainer(Mod[] mods) : base(mods)
+        {
+
+        }
     }
 }

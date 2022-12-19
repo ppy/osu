@@ -17,7 +17,10 @@ using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osu.Game.Rulesets.Mods;
+using System.Linq;
 using osuTK;
+using osu.Framework.Logging;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
@@ -31,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Bindable<bool> showTrail = new Bindable<bool>(true);
 
-        public readonly Drawable CursorTrail;
+        private readonly Drawable cursorTrail;
 
         public IBindable<float> CursorScale => cursorScale;
 
@@ -40,14 +43,14 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private Bindable<float> userCursorScale;
         private Bindable<bool> autoCursorScale;
 
-        public OsuCursorContainer()
+        public OsuCursorContainer(Mod[] mods) : base(mods)
         {
             InternalChild = fadeContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    CursorTrail = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
+                    cursorTrail = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
                     new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
                 }
             };
@@ -69,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             base.LoadComplete();
 
-            showTrail.BindValueChanged(v => CursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
+            showTrail.BindValueChanged(v => cursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
 
             userCursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
             userCursorScale.ValueChanged += _ => calculateScale();
@@ -82,11 +85,19 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 var newScale = new Vector2(e.NewValue);
 
                 ActiveCursor.Scale = newScale;
-                CursorTrail.Scale = newScale;
+                cursorTrail.Scale = newScale;
             }, true);
 
             calculateScale();
         }
+
+		protected override void Update() {
+			foreach (IHidesCursorTrail modifier in Mods.OfType<IHidesCursorTrail>())
+            {
+                cursorTrail.Alpha = 0;
+            } // FIXME: Don't do this every frame. It's only like this right now because for some reason it won't work if I only do it once. 
+			base.Update();
+		}
 
         /// <summary>
         /// Get the scale applicable to the ActiveCursor based on a beatmap's circle size.
@@ -109,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             var newScale = new Vector2(scale);
 
             ActiveCursor.ScaleTo(newScale, 400, Easing.OutQuint);
-            CursorTrail.Scale = newScale;
+            cursorTrail.Scale = newScale;
         }
 
         private int downCount;
@@ -170,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                Texture = textures.Get(@"Cursor/CursorTrail");
+                Texture = textures.Get(@"Cursor/cursortrail");
                 Scale = new Vector2(1 / Texture.ScaleAdjust);
             }
         }

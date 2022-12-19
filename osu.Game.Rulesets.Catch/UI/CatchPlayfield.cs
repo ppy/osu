@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -50,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.UI
             this.difficulty = difficulty;
         }
 
-        protected override GameplayCursorContainer CreateCursor() => new CatchCursorContainer();
+        protected override GameplayCursorContainer CreateCursor(Mod[] mods) => new CatchCursorContainer(mods);
 
         [BackgroundDependencyLoader]
         private void load()

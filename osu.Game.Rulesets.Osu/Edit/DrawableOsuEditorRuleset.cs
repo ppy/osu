@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private partial class OsuEditorPlayfield : OsuPlayfield
         {
-            protected override GameplayCursorContainer CreateCursor() => null;
+            protected override GameplayCursorContainer CreateCursor(Mod[] mods) => null;
 
             public OsuEditorPlayfield()
             {

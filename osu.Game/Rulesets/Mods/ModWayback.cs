@@ -15,15 +15,7 @@ namespace osu.Game.Rulesets.Mods
         {
             get
             {
-                double multiplier = 1;
-                float followSpeed = FollowSpeed.Value;
-                double pos = 0;
-                while (pos < 90)
-                {
-                    multiplier += 0.01;
-                    pos += (100 - pos) / 100 * followSpeed;
-                }
-                return multiplier;
+				return 1;
             }
         }
         public override Type[] IncompatibleMods => new Type[] { typeof(ModNoScope) };

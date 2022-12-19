@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osuTK;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Mods;
+using System.Linq;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -19,10 +21,13 @@ namespace osu.Game.Rulesets.UI
         /// This holds the true visibility value.
         /// </summary>
         public Visibility LastFrameState;
-        public bool Delayed;
-        public Vector2 TruePosition = Vector2.Zero;
         public Vector2 TargetPosition = Vector2.Zero;
-		public float FollowSpeed;
+        public Mod[] Mods;
+
+        public GameplayCursorContainer(Mod[] mods)
+        {
+            Mods = mods;
+        }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
@@ -32,18 +37,12 @@ namespace osu.Game.Rulesets.UI
 
         protected override void Update()
         {
-            // FIXME: This is jank-tastic because I don't know how to modify osu!framework. But it works.
             base.Update();
-            if (Delayed)
+            Position = TargetPosition;
+            foreach (IModifiesCursorMovement modifier in Mods.OfType<IModifiesCursorMovement>())
             {
-                TruePosition = Vector2.Lerp(TruePosition, TargetPosition, (float)Time.Elapsed / 1000 * FollowSpeed);
+                Position = modifier.UpdatePosition(TargetPosition, (float)Time.Elapsed / 1000f);
             }
-            else
-            {
-                TruePosition = TargetPosition;
-            }
-            ActiveCursor.Position = TruePosition;
-            LastFrameState = State.Value;
         }
     }
 }
