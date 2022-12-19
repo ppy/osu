@@ -126,7 +126,8 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             if (available)
             {
-                copyInformation.Text = "Data migration will use \"hard links\". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation.";
+                copyInformation.Text =
+                    "Data migration will use \"hard links\". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation.";
             }
             else if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
                 copyInformation.Text = "Lightweight linking of files is not supported on your operating system yet, so a copy of all files will be made during import.";
@@ -171,6 +172,18 @@ namespace osu.Game.Overlays.FirstRunSetup
             stableLocatorTextBox.Current.Disabled = !allow;
             foreach (var c in contentCheckboxes)
                 c.Current.Disabled = !allow;
+        }
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            stableLocatorTextBox.HidePopover();
+            base.OnSuspending(e);
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            stableLocatorTextBox.HidePopover();
+            return base.OnExiting(e);
         }
 
         private partial class ImportCheckbox : SettingsCheckbox
