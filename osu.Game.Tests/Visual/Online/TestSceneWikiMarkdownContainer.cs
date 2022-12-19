@@ -199,6 +199,16 @@ Line after image";
             });
         }
 
+        [Test]
+        public void TestHeadingWithIdAttribute()
+        {
+            AddStep("Add heading with ID", () =>
+            {
+                markdownContainer.Text = "# This is a heading with an ID {#this-is-the-id}";
+            });
+            AddAssert("ID not visible", () => markdownContainer.ChildrenOfType<SpriteText>().All(spriteText => spriteText.Text != "{#this-is-the-id}"));
+        }
+
         private partial class TestMarkdownContainer : WikiMarkdownContainer
         {
             public LinkInline Link;
