@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Select.FooterV2
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
+        /// <param name="button">The button to be added.</param>
+        /// <param name="overlay">The <see cref="OverlayContainer"/> to be toggled by this button.</param>
         public void AddButton(FooterButtonV2 button, OverlayContainer? overlay = null)
         {
             if (overlay != null)
