@@ -63,7 +63,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		CodeAnalysis\osu.ruleset = CodeAnalysis\osu.ruleset
 		osu.sln.DotSettings = osu.sln.DotSettings
 		osu.TestProject.props = osu.TestProject.props
-		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Benchmarks", "osu.Game.Benchmarks\osu.Game.Benchmarks.csproj", "{93632F2D-2BB4-46C1-A7B8-F8CF2FB27118}"
