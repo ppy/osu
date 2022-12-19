@@ -6,6 +6,7 @@ using Markdig.Extensions.AutoLinks;
 using Markdig.Extensions.CustomContainers;
 using Markdig.Extensions.EmphasisExtras;
 using Markdig.Extensions.Footnotes;
+using osu.Game.Graphics.Containers.Markdown.Extensions;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
@@ -33,6 +34,12 @@ namespace osu.Game.Graphics.Containers.Markdown
         public bool CustomContainers { get; init; }
 
         /// <summary>
+        /// Allows the <see cref="OsuMarkdownContainer"/> to parse custom attributes in block elements (used e.g. for custom anchor names in the wiki).
+        /// </summary>
+        /// <seealso cref="BlockAttributeExtension"/>
+        public bool BlockAttributes { get; init; }
+
+        /// <summary>
         /// Returns a prepared <see cref="MarkdownPipeline"/> according to the options specified by the current <see cref="OsuMarkdownContainerOptions"/> instance.
         /// </summary>
         /// <remarks>
@@ -53,7 +60,10 @@ namespace osu.Game.Graphics.Containers.Markdown
                 pipeline = pipeline.UseAutoLinks();
 
             if (CustomContainers)
-                pipeline.UseCustomContainers();
+                pipeline = pipeline.UseCustomContainers();
+
+            if (BlockAttributes)
+                pipeline = pipeline.UseBlockAttributes();
 
             return pipeline.Build();
         }
