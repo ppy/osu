@@ -333,7 +333,7 @@ namespace osu.Game
         /// <param name="link">The link to load.</param>
         public void HandleLink(LinkDetails link) => Schedule(() =>
         {
-            string argString = link.Argument.ToString();
+            string argString = link.Argument.ToString() ?? string.Empty;
 
             switch (link.Action)
             {
@@ -1042,6 +1042,8 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database) return;
 
+                Debug.Assert(entry.Target != null);
+
                 const int short_term_display_limit = 3;
 
                 if (recentLogCount < short_term_display_limit)
@@ -1054,7 +1056,7 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
-                    string logFile = $@"{entry.Target.ToString().ToLowerInvariant()}.log";
+                    string logFile = $@"{entry.Target.Value.ToString().ToLowerInvariant()}.log";
 
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
