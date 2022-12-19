@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneUpdateableBeatmapSetCover : OsuTestScene
+    public partial class TestSceneUpdateableBeatmapSetCover : OsuTestScene
     {
         [Test]
         public void TestLocal([Values] BeatmapSetCoverType coverType)
@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             Covers = new BeatmapSetOnlineCovers { Cover = coverUrl }
         };
 
-        private class TestUpdateableOnlineBeatmapSetCover : UpdateableOnlineBeatmapSetCover
+        private partial class TestUpdateableOnlineBeatmapSetCover : UpdateableOnlineBeatmapSetCover
         {
             private readonly int loadDelay;
 
@@ -163,7 +163,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class TestOnlineBeatmapSetCover : OnlineBeatmapSetCover
+        private partial class TestOnlineBeatmapSetCover : OnlineBeatmapSetCover
         {
             private readonly int loadDelay;
 

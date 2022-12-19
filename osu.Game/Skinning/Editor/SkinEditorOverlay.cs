@@ -23,7 +23,7 @@ namespace osu.Game.Skinning.Editor
     /// A container which handles loading a skin editor on user request for a specified target.
     /// This also handles the scaling / positioning adjustment of the target.
     /// </summary>
-    public class SkinEditorOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
+    public partial class SkinEditorOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly ScalingContainer scalingContainer;
 

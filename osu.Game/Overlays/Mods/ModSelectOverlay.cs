@@ -28,7 +28,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler
+    public abstract partial class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler
     {
         public const int BUTTON_WIDTH = 200;
 
@@ -612,7 +612,7 @@ namespace osu.Game.Overlays.Mods
         /// Manages horizontal scrolling of mod columns, along with the "active" states of each column based on visibility.
         /// </summary>
         [Cached]
-        internal class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
+        internal partial class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
         {
             public ColumnScrollContainer()
                 : base(Direction.Horizontal)
@@ -653,7 +653,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Manages layout of mod columns.
         /// </summary>
-        internal class ColumnFlowContainer : FillFlowContainer<ColumnDimContainer>
+        internal partial class ColumnFlowContainer : FillFlowContainer<ColumnDimContainer>
         {
             public IEnumerable<ModSelectColumn> Columns => Children.Select(dimWrapper => dimWrapper.Column);
 
@@ -669,7 +669,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Encapsulates a column and provides dim and input blocking based on an externally managed "active" state.
         /// </summary>
-        internal class ColumnDimContainer : Container
+        internal partial class ColumnDimContainer : Container
         {
             public ModSelectColumn Column { get; }
 
@@ -759,7 +759,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// A container which blocks and handles input, managing the "return from customisation" state change.
         /// </summary>
-        private class ClickToReturnContainer : Container
+        private partial class ClickToReturnContainer : Container
         {
             public BindableBool HandleMouse { get; } = new BindableBool();
 

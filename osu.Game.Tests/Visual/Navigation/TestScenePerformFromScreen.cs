@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -21,7 +22,7 @@ using static osu.Game.Tests.Visual.Navigation.TestSceneScreenNavigation;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestScenePerformFromScreen : OsuGameTestScene
+    public partial class TestScenePerformFromScreen : OsuGameTestScene
     {
         private bool actionPerformed;
 
@@ -83,6 +84,19 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true));
             AddUntilStep("returned to song select", () => Game.ScreenStack.CurrentScreen is MainMenu);
             AddAssert("did perform", () => actionPerformed);
+        }
+
+        [Test]
+        public void TestPerformEnsuresScreenIsLoaded()
+        {
+            TestLoadBlockingScreen screen = null;
+
+            AddStep("push blocking screen", () => Game.ScreenStack.Push(screen = new TestLoadBlockingScreen()));
+            AddStep("perform", () => Game.PerformFromScreen(_ => actionPerformed = true, new[] { typeof(TestLoadBlockingScreen) }));
+            AddAssert("action not performed", () => !actionPerformed);
+
+            AddStep("allow load", () => screen.LoadEvent.Set());
+            AddUntilStep("action performed", () => actionPerformed);
         }
 
         [Test]
@@ -223,7 +237,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("beatmap updated", () => Game.Beatmap.Value.BeatmapSetInfo.OnlineID == 241526);
         }
 
-        public class DialogBlockingScreen : OsuScreen
+        public partial class DialogBlockingScreen : OsuScreen
         {
             [Resolved]
             private IDialogOverlay dialogOverlay { get; set; }
@@ -246,7 +260,7 @@ namespace osu.Game.Tests.Visual.Navigation
             }
         }
 
-        public class TestScreenWithNestedStack : OsuScreen, IHasSubScreenStack
+        public partial class TestScreenWithNestedStack : OsuScreen, IHasSubScreenStack
         {
             public DialogBlockingScreen Blocker { get; private set; }
 
@@ -268,6 +282,17 @@ namespace osu.Game.Tests.Visual.Navigation
                 }
 
                 return base.OnExiting(e);
+            }
+        }
+
+        public partial class TestLoadBlockingScreen : OsuScreen
+        {
+            public readonly ManualResetEventSlim LoadEvent = new ManualResetEventSlim();
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadEvent.Wait(10000);
             }
         }
     }

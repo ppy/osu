@@ -17,7 +17,7 @@ using osu.Game.Utils;
 
 namespace osu.Android
 {
-    public class OsuGameAndroid : OsuGame
+    public partial class OsuGameAndroid : OsuGame
     {
         [Cached]
         private readonly OsuGameActivity gameActivity;

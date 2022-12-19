@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
-    public class ClicksPerSecondCounter : RollingCounter<int>, ISkinnableDrawable
+    public partial class ClicksPerSecondCounter : RollingCounter<int>, ISkinnableDrawable
     {
         [Resolved]
         private ClicksPerSecondCalculator calculator { get; set; } = null!;
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 
         protected override IHasText CreateText() => new TextComponent();
 
-        private class TextComponent : CompositeDrawable, IHasText
+        private partial class TextComponent : CompositeDrawable, IHasText
         {
             public LocalisableString Text
             {

@@ -23,7 +23,7 @@ using Direction = osu.Game.Rulesets.Catch.UI.Direction;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneCatchSkinConfiguration : OsuTestScene
+    public partial class TestSceneCatchSkinConfiguration : OsuTestScene
     {
         private Catcher catcher;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             public bool FlipCatcherPlate { get; set; }
 
             public TestSkin()
-                : base(null)
+                : base(null!)
             {
             }
 

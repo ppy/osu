@@ -12,8 +12,11 @@
     <PackageReference Include="ppy.osu.Framework.Android" Version="2022.1101.0" />
   </ItemGroup>
   <ItemGroup Label="Transitive Dependencies">
-    <!-- SQLite fails to load without this package. -->
-    <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.2" />
+    <!-- Realm needs to be directly referenced in all Xamarin projects, as it will not pull in its transitive dependencies otherwise. -->
+    <PackageReference Include="Realm" Version="10.18.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <LinkDescription Include="$(MSBuildThisFileDirectory)\osu.Android\Linker.xml"/>
   </ItemGroup>
   <PropertyGroup>
     <!-- Fody does not handle Android build well, and warns when unchanged.

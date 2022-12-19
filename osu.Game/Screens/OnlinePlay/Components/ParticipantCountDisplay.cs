@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class ParticipantCountDisplay : OnlinePlayComposite
+    public partial class ParticipantCountDisplay : OnlinePlayComposite
     {
         private const float text_size = 30;
         private const float transition_duration = 100;

@@ -83,6 +83,8 @@ namespace osu.Game
 
         public const int SAMPLE_CONCURRENCY = 6;
 
+        public const double SFX_STEREO_STRENGTH = 0.75;
+
         /// <summary>
         /// Length of debounce (in milliseconds) for commonly occuring sample playbacks that could stack.
         /// </summary>
@@ -262,6 +264,7 @@ namespace osu.Game
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(LocalConfig);
+            dependencies.CacheAs<IGameplaySettings>(LocalConfig);
 
             InitialiseFonts();
 
@@ -616,10 +619,15 @@ namespace osu.Game
                 return;
             }
 
+            var previouslySelectedMods = SelectedMods.Value.ToArray();
+
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
 
             AvailableMods.Value = dict;
+
+            if (!SelectedMods.Disabled)
+                SelectedMods.Value = previouslySelectedMods.Select(m => instance.CreateModFromAcronym(m.Acronym)).Where(m => m != null).ToArray();
 
             void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
         }

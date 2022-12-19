@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneSafeAreaHandling : OsuGameTestScene
+    public partial class TestSceneSafeAreaHandling : OsuGameTestScene
     {
         private SafeAreaDefiningContainer safeAreaContainer;
 

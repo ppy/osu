@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuCheckbox : Checkbox
+    public partial class OsuCheckbox : Checkbox
     {
         /// <summary>
         /// Whether to play sounds when the state changes as a result of user interaction.

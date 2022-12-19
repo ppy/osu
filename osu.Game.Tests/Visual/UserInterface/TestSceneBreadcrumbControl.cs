@@ -14,7 +14,7 @@ using osu.Game.Graphics.UserInterface;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneBreadcrumbControl : OsuTestScene
+    public partial class TestSceneBreadcrumbControl : OsuTestScene
     {
         private readonly TestBreadcrumbControl breadcrumbs;
 
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             Circles,
         }
 
-        private class TestBreadcrumbControl : BreadcrumbControl<BreadcrumbTab>
+        private partial class TestBreadcrumbControl : BreadcrumbControl<BreadcrumbTab>
         {
             public BreadcrumbTabItem GetDrawable(BreadcrumbTab tab) => (BreadcrumbTabItem)TabContainer.First(t => t.Value == tab);
         }

@@ -25,7 +25,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
+    public partial class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         /// <summary>
@@ -45,6 +45,8 @@ namespace osu.Game.Graphics.UserInterface
         public virtual LocalisableString TooltipText { get; private set; }
 
         public bool PlaySamplesOnAdjust { get; set; } = true;
+
+        private readonly HoverClickSounds hoverClickSounds;
 
         /// <summary>
         /// Whether to format the tooltip as a percentage or the actual value.
@@ -127,10 +129,8 @@ namespace osu.Game.Graphics.UserInterface
                         Current = { Value = true }
                     },
                 },
-                new HoverClickSounds()
+                hoverClickSounds = new HoverClickSounds()
             };
-
-            Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
         }
 
         [BackgroundDependencyLoader(true)]
@@ -152,6 +152,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
             CurrentNumber.BindValueChanged(current => TooltipText = getTooltipText(current.NewValue), true);
+
+            Current.BindDisabledChanged(disabled =>
+            {
+                Alpha = disabled ? 0.3f : 1;
+                hoverClickSounds.Enabled.Value = !disabled;
+            }, true);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -177,7 +183,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateGlow()
         {
-            Nub.Glowing = IsHovered || IsDragged;
+            Nub.Glowing = !Current.Disabled && (IsHovered || IsDragged);
         }
 
         protected override void OnUserChange(T value)

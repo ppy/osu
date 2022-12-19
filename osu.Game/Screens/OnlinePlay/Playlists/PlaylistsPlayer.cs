@@ -21,7 +21,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsPlayer : RoomSubmittingPlayer
+    public partial class PlaylistsPlayer : RoomSubmittingPlayer
     {
         public Action Exited;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
-            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.ComputeScore(ScoringMode.Standardised, Score.ScoreInfo));
+            Score.ScoreInfo.TotalScore = ScoreProcessor.ComputeScore(ScoringMode.Standardised, Score.ScoreInfo);
         }
 
         protected override void Dispose(bool isDisposing)

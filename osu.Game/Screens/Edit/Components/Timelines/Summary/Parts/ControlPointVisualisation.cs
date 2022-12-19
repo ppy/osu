@@ -11,7 +11,7 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
-    public class ControlPointVisualisation : PointVisualisation, IControlPointVisualisation
+    public partial class ControlPointVisualisation : PointVisualisation, IControlPointVisualisation
     {
         protected readonly ControlPoint Point;
 

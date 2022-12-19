@@ -24,7 +24,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    public class TestSceneColumn : ManiaInputTestScene
+    public partial class TestSceneColumn : ManiaInputTestScene
     {
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();

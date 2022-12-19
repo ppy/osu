@@ -15,7 +15,7 @@ using osu.Game.Tournament.IO;
 
 namespace osu.Game.Tournament.Components
 {
-    public class TourneyVideo : CompositeDrawable
+    public partial class TourneyVideo : CompositeDrawable
     {
         private readonly string filename;
         private readonly bool drawFallbackGradient;

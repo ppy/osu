@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneBackButton : OsuTestScene
+    public partial class TestSceneBackButton : OsuTestScene
     {
         public TestSceneBackButton()
         {

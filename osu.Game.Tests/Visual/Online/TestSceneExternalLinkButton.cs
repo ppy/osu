@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneExternalLinkButton : OsuTestScene
+    public partial class TestSceneExternalLinkButton : OsuTestScene
     {
         public TestSceneExternalLinkButton()
         {

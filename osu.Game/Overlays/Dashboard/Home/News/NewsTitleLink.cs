@@ -13,7 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
 {
-    public class NewsTitleLink : OsuHoverContainer
+    public partial class NewsTitleLink : OsuHoverContainer
     {
         private readonly APINewsPost post;
 

@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapCardDownloadButton : OsuTestScene
+    public partial class TestSceneBeatmapCardDownloadButton : OsuTestScene
     {
         private DownloadButton downloadButton;
 
@@ -59,8 +59,9 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Size = new Vector2(25f, 50f),
+                    Scale = new Vector2(2f),
                     State = { Value = DownloadState.NotDownloaded },
-                    Scale = new Vector2(2)
                 };
             });
         }

@@ -13,7 +13,7 @@ using osu.Game.Skinning.Editor;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinEditorComponentsList : SkinnableTestScene
+    public partial class TestSceneSkinEditorComponentsList : SkinnableTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);

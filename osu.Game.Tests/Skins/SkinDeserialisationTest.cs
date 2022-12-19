@@ -40,7 +40,9 @@ namespace osu.Game.Tests.Skins
             // Covers clicks/s counter
             "Archives/modified-default-20220818.osk",
             // Covers longest combo counter
-            "Archives/modified-default-20221012.osk"
+            "Archives/modified-default-20221012.osk",
+            // Covers TextElement and BeatmapInfoDrawable
+            "Archives/modified-default-20221102.osk"
         };
 
         /// <summary>
@@ -80,7 +82,7 @@ namespace osu.Game.Tests.Skins
                 var skin = new TestSkin(new SkinInfo(), null, storage);
 
                 Assert.That(skin.DrawableComponentInfo, Has.Count.EqualTo(2));
-                Assert.That(skin.DrawableComponentInfo[SkinnableTarget.MainHUDComponents], Has.Length.EqualTo(9));
+                Assert.That(skin.DrawableComponentInfo[GlobalSkinComponentLookup.LookupType.MainHUDComponents], Has.Length.EqualTo(9));
             }
         }
 
@@ -93,10 +95,10 @@ namespace osu.Game.Tests.Skins
                 var skin = new TestSkin(new SkinInfo(), null, storage);
 
                 Assert.That(skin.DrawableComponentInfo, Has.Count.EqualTo(2));
-                Assert.That(skin.DrawableComponentInfo[SkinnableTarget.MainHUDComponents], Has.Length.EqualTo(6));
-                Assert.That(skin.DrawableComponentInfo[SkinnableTarget.SongSelect], Has.Length.EqualTo(1));
+                Assert.That(skin.DrawableComponentInfo[GlobalSkinComponentLookup.LookupType.MainHUDComponents], Has.Length.EqualTo(6));
+                Assert.That(skin.DrawableComponentInfo[GlobalSkinComponentLookup.LookupType.SongSelect], Has.Length.EqualTo(1));
 
-                var skinnableInfo = skin.DrawableComponentInfo[SkinnableTarget.SongSelect].First();
+                var skinnableInfo = skin.DrawableComponentInfo[GlobalSkinComponentLookup.LookupType.SongSelect].First();
 
                 Assert.That(skinnableInfo.Type, Is.EqualTo(typeof(SkinnableSprite)));
                 Assert.That(skinnableInfo.Settings.First().Key, Is.EqualTo("sprite_name"));
@@ -107,10 +109,10 @@ namespace osu.Game.Tests.Skins
             using (var storage = new ZipArchiveReader(stream))
             {
                 var skin = new TestSkin(new SkinInfo(), null, storage);
-                Assert.That(skin.DrawableComponentInfo[SkinnableTarget.MainHUDComponents], Has.Length.EqualTo(8));
-                Assert.That(skin.DrawableComponentInfo[SkinnableTarget.MainHUDComponents].Select(i => i.Type), Contains.Item(typeof(UnstableRateCounter)));
-                Assert.That(skin.DrawableComponentInfo[SkinnableTarget.MainHUDComponents].Select(i => i.Type), Contains.Item(typeof(ColourHitErrorMeter)));
-                Assert.That(skin.DrawableComponentInfo[SkinnableTarget.MainHUDComponents].Select(i => i.Type), Contains.Item(typeof(LegacySongProgress)));
+                Assert.That(skin.DrawableComponentInfo[GlobalSkinComponentLookup.LookupType.MainHUDComponents], Has.Length.EqualTo(8));
+                Assert.That(skin.DrawableComponentInfo[GlobalSkinComponentLookup.LookupType.MainHUDComponents].Select(i => i.Type), Contains.Item(typeof(UnstableRateCounter)));
+                Assert.That(skin.DrawableComponentInfo[GlobalSkinComponentLookup.LookupType.MainHUDComponents].Select(i => i.Type), Contains.Item(typeof(ColourHitErrorMeter)));
+                Assert.That(skin.DrawableComponentInfo[GlobalSkinComponentLookup.LookupType.MainHUDComponents].Select(i => i.Type), Contains.Item(typeof(LegacySongProgress)));
             }
         }
 

@@ -18,6 +18,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -27,7 +28,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
+    public partial class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
     {
         private const float circle_size = 38;
 
@@ -53,6 +54,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public TimelineHitObjectBlueprint(HitObject item)
             : base(item)
@@ -165,7 +169,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     break;
 
                 default:
-                    return;
+                    colour = colourProvider.Highlight1;
+                    break;
             }
 
             if (IsSelected)
@@ -262,7 +267,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
 
-        private class Tick : Circle
+        private partial class Tick : Circle
         {
             public Tick()
             {
@@ -273,7 +278,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        public class DragArea : Circle
+        public partial class DragArea : Circle
         {
             private readonly HitObject? hitObject;
 
@@ -419,9 +424,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 break;
 
                             case IHasDuration endTimeHitObject:
-                                double snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
+                                double snappedTime = Math.Max(hitObject.StartTime + beatSnapProvider.GetBeatLengthAtTime(hitObject.StartTime), beatSnapProvider.SnapTime(time));
 
-                                if (endTimeHitObject.EndTime == snappedTime || Precision.AlmostEquals(snappedTime, hitObject.StartTime, beatmap.GetBeatLengthAtTime(snappedTime)))
+                                if (endTimeHitObject.EndTime == snappedTime)
                                     return;
 
                                 endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
@@ -436,12 +441,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 base.OnDragEnd(e);
 
-                OnDragHandled?.Invoke(null);
+                dragOperation?.Cancel();
+                dragOperation = null;
+
                 changeHandler?.EndChange();
+                OnDragHandled?.Invoke(null);
             }
         }
 
-        public class Border : ExtendableCircle
+        public partial class Border : ExtendableCircle
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -457,7 +465,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// <summary>
         /// A circle with externalised end caps so it can take up the full width of a relative width area.
         /// </summary>
-        public class ExtendableCircle : CompositeDrawable
+        public partial class ExtendableCircle : CompositeDrawable
         {
             protected readonly Circle Content;
 

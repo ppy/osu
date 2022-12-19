@@ -6,16 +6,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game.Database;
-using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Notifications;
 using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Online.Chat
@@ -23,7 +24,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Manages everything channel related
     /// </summary>
-    public class ChannelManager : PollingComponent, IChannelPostTarget
+    public partial class ChannelManager : CompositeComponent, IChannelPostTarget
     {
         /// <summary>
         /// The channels the player joins on startup
@@ -64,44 +65,50 @@ namespace osu.Game.Online.Chat
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
         private readonly IAPIProvider api;
+        private readonly NotificationsClientConnector connector;
 
         [Resolved]
         private UserLookupCache users { get; set; }
 
-        public readonly BindableBool HighPollRate = new BindableBool();
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private bool channelsInitialised;
+        private ScheduledDelegate scheduledAck;
 
-        private readonly IBindable<bool> isIdle = new BindableBool();
+        private long? lastSilenceMessageId;
+        private uint? lastSilenceId;
 
         public ChannelManager(IAPIProvider api)
         {
             this.api = api;
+
+            connector = api.GetNotificationsConnector();
+
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(IdleTracker idleTracker)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            HighPollRate.BindValueChanged(updatePollRate);
-            isIdle.BindValueChanged(updatePollRate, true);
+            connector.ChannelJoined += ch => Schedule(() => joinChannel(ch));
 
-            if (idleTracker != null)
-                isIdle.BindTo(idleTracker.IsIdle);
-        }
+            connector.ChannelParted += ch => Schedule(() => LeaveChannel(getChannel(ch)));
 
-        private void updatePollRate(ValueChangedEvent<bool> valueChangedEvent)
-        {
-            // Polling will eventually be replaced with websocket, but let's avoid doing these background operations as much as possible for now.
-            // The only loss will be delayed PM/message highlight notifications.
-            int millisecondsBetweenPolls = HighPollRate.Value ? 1000 : 60000;
+            connector.NewMessages += msgs => Schedule(() => addMessages(msgs));
 
-            if (isIdle.Value)
-                millisecondsBetweenPolls *= 10;
-
-            if (TimeBetweenPolls.Value != millisecondsBetweenPolls)
+            connector.PresenceReceived += () => Schedule(() =>
             {
-                TimeBetweenPolls.Value = millisecondsBetweenPolls;
-                Logger.Log($"Chat is now polling every {TimeBetweenPolls.Value} ms");
-            }
+                if (!channelsInitialised)
+                {
+                    channelsInitialised = true;
+                    // we want this to run after the first presence so we can see if the user is in any channels already.
+                    initializeChannels();
+                }
+            });
+
+            connector.Start();
+
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(_ => SendAck(), true);
         }
 
         /// <summary>
@@ -181,7 +188,8 @@ namespace osu.Game.Online.Chat
                     Timestamp = DateTimeOffset.Now,
                     ChannelId = target.Id,
                     IsAction = isAction,
-                    Content = text
+                    Content = text,
+                    Uuid = Guid.NewGuid().ToString()
                 };
 
                 target.AddLocalEcho(message);
@@ -191,13 +199,7 @@ namespace osu.Game.Online.Chat
                 {
                     var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(target.Users.First(), message);
 
-                    createNewPrivateMessageRequest.Success += createRes =>
-                    {
-                        target.Id = createRes.ChannelID;
-                        target.ReplaceMessage(message, createRes.Message);
-                        dequeueAndRun();
-                    };
-
+                    createNewPrivateMessageRequest.Success += _ => dequeueAndRun();
                     createNewPrivateMessageRequest.Failure += exception =>
                     {
                         handlePostException(exception);
@@ -211,12 +213,7 @@ namespace osu.Game.Online.Chat
 
                 var req = new PostMessageRequest(message);
 
-                req.Success += m =>
-                {
-                    target.ReplaceMessage(message, m);
-                    dequeueAndRun();
-                };
-
+                req.Success += m => dequeueAndRun();
                 req.Failure += exception =>
                 {
                     handlePostException(exception);
@@ -328,12 +325,14 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        private void handleChannelMessages(IEnumerable<Message> messages)
+        private void addMessages(List<Message> messages)
         {
             var channels = JoinedChannels.ToList();
 
             foreach (var group in messages.GroupBy(m => m.ChannelId))
                 channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
+
+            lastSilenceMessageId ??= messages.LastOrDefault()?.Id;
         }
 
         private void initializeChannels()
@@ -376,11 +375,49 @@ namespace osu.Game.Online.Chat
             var fetchInitialMsgReq = new GetMessagesRequest(channel);
             fetchInitialMsgReq.Success += messages =>
             {
-                handleChannelMessages(messages);
+                addMessages(messages);
                 channel.MessagesLoaded = true; // this will mark the channel as having received messages even if there were none.
             };
 
             api.Queue(fetchInitialMsgReq);
+        }
+
+        /// <summary>
+        /// Sends an acknowledgement request to the API.
+        /// This marks the user as online to receive messages from public channels, while also returning a list of silenced users.
+        /// It needs to be called at least once every 10 minutes to remain visibly marked as online.
+        /// </summary>
+        public void SendAck()
+        {
+            if (apiState.Value != APIState.Online)
+                return;
+
+            var req = new ChatAckRequest
+            {
+                SinceMessageId = lastSilenceMessageId,
+                SinceSilenceId = lastSilenceId
+            };
+
+            req.Failure += _ => scheduleNextRequest();
+            req.Success += ack =>
+            {
+                foreach (var silence in ack.Silences)
+                {
+                    foreach (var channel in JoinedChannels)
+                        channel.RemoveMessagesFromUser(silence.UserId);
+                    lastSilenceId = Math.Max(lastSilenceId ?? 0, silence.Id);
+                }
+
+                scheduleNextRequest();
+            };
+
+            api.Queue(req);
+
+            void scheduleNextRequest()
+            {
+                scheduledAck?.Cancel();
+                scheduledAck = Scheduler.AddDelayed(SendAck, 60000);
+            }
         }
 
         /// <summary>
@@ -395,7 +432,13 @@ namespace osu.Game.Online.Chat
         {
             Channel found = null;
 
-            bool lookupCondition(Channel ch) => lookup.Id > 0 ? ch.Id == lookup.Id : lookup.Name == ch.Name;
+            bool lookupCondition(Channel ch)
+            {
+                if (ch.Id > 0 && lookup.Id > 0)
+                    return ch.Id == lookup.Id;
+
+                return ch.Name == lookup.Name;
+            }
 
             var available = AvailableChannels.FirstOrDefault(lookupCondition);
             if (available != null)
@@ -414,6 +457,12 @@ namespace osu.Game.Online.Chat
                 var foundSelf = found.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
                 if (foundSelf != null)
                     found.Users.Remove(foundSelf);
+            }
+            else
+            {
+                found.Id = lookup.Id;
+                found.Name = lookup.Name;
+                found.LastMessageId = Math.Max(found.LastMessageId ?? 0, lookup.LastMessageId ?? 0);
             }
 
             if (joined == null && addToJoined) joinedChannels.Add(found);
@@ -464,7 +513,7 @@ namespace osu.Game.Online.Chat
                             {
                                 channel.Id = resChannel.ChannelID.Value;
 
-                                handleChannelMessages(resChannel.RecentMessages);
+                                addMessages(resChannel.RecentMessages);
                                 channel.MessagesLoaded = true; // this will mark the channel as having received messages even if there were none.
                             }
                         };
@@ -480,6 +529,10 @@ namespace osu.Game.Online.Chat
                         {
                             Logger.Log($"Joined public channel {channel}");
                             joinChannel(channel, fetchInitialMessages);
+
+                            // Required after joining public channels to mark the user as online in them.
+                            // Todo: Temporary workaround for https://github.com/ppy/osu-web/issues/9602
+                            SendAck();
                         };
                         req.Failure += e =>
                         {
@@ -574,57 +627,6 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        private long lastMessageId;
-
-        private bool channelsInitialised;
-
-        protected override Task Poll()
-        {
-            if (!api.IsLoggedIn)
-                return base.Poll();
-
-            var fetchReq = new GetUpdatesRequest(lastMessageId);
-
-            var tcs = new TaskCompletionSource<bool>();
-
-            fetchReq.Success += updates =>
-            {
-                if (updates?.Presence != null)
-                {
-                    foreach (var channel in updates.Presence)
-                    {
-                        // we received this from the server so should mark the channel already joined.
-                        channel.Joined.Value = true;
-                        joinChannel(channel);
-                    }
-
-                    //todo: handle left channels
-
-                    handleChannelMessages(updates.Messages);
-
-                    foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
-                        JoinedChannels.FirstOrDefault(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
-
-                    lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
-                }
-
-                if (!channelsInitialised)
-                {
-                    channelsInitialised = true;
-                    // we want this to run after the first presence so we can see if the user is in any channels already.
-                    initializeChannels();
-                }
-
-                tcs.SetResult(true);
-            };
-
-            fetchReq.Failure += _ => tcs.SetResult(false);
-
-            api.Queue(fetchReq);
-
-            return tcs.Task;
-        }
-
         /// <summary>
         /// Marks the <paramref name="channel"/> as read
         /// </summary>
@@ -645,6 +647,12 @@ namespace osu.Game.Online.Chat
             req.Failure += e => Logger.Log($"Failed to mark channel {channel} up to '{message}' as read ({e.Message})", LoggingTarget.Network);
 
             api.Queue(req);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            connector?.Dispose();
         }
     }
 

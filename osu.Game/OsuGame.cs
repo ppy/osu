@@ -71,7 +71,7 @@ namespace osu.Game
     /// for initial components that are generally retrieved via DI.
     /// </summary>
     [Cached(typeof(OsuGame))]
-    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
+    public partial class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
     {
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
@@ -520,11 +520,29 @@ namespace osu.Game
                 }
                 else
                 {
-                    Logger.Log($"Completing {nameof(PresentBeatmap)} with beatmap {beatmap} ruleset {selection.Ruleset}");
-                    Ruleset.Value = selection.Ruleset;
-                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+                    // Don't change the local ruleset if the user is on another ruleset and is showing converted beatmaps at song select.
+                    // Eventually we probably want to check whether conversion is actually possible for the current ruleset.
+                    bool requiresRulesetSwitch = !selection.Ruleset.Equals(Ruleset.Value)
+                                                 && (selection.Ruleset.OnlineID > 0 || !LocalConfig.Get<bool>(OsuSetting.ShowConvertedBeatmaps));
+
+                    if (requiresRulesetSwitch)
+                    {
+                        Ruleset.Value = selection.Ruleset;
+                        Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+
+                        Logger.Log($"Completing {nameof(PresentBeatmap)} with beatmap {beatmap} ruleset {selection.Ruleset}");
+                    }
+                    else
+                    {
+                        Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+
+                        Logger.Log($"Completing {nameof(PresentBeatmap)} with beatmap {beatmap} (maintaining ruleset)");
+                    }
                 }
-            }, validScreens: new[] { typeof(SongSelect), typeof(IHandlePresentBeatmap) });
+            }, validScreens: new[]
+            {
+                typeof(SongSelect), typeof(IHandlePresentBeatmap)
+            });
         }
 
         /// <summary>
@@ -598,14 +616,14 @@ namespace osu.Game
             }, validScreens: validScreens);
         }
 
-        public override Task Import(params ImportTask[] imports)
+        public override Task Import(ImportTask[] imports, ImportParameters parameters = default)
         {
             // encapsulate task as we don't want to begin the import process until in a ready state.
 
             // ReSharper disable once AsyncVoidLambda
             // TODO: This is bad because `new Task` doesn't have a Func<Task?> override.
             // Only used for android imports and a bit of a mess. Probably needs rethinking overall.
-            var importTask = new Task(async () => await base.Import(imports).ConfigureAwait(false));
+            var importTask = new Task(async () => await base.Import(imports, parameters).ConfigureAwait(false));
 
             waitForReady(() => this, _ => importTask.Start());
 
@@ -910,19 +928,6 @@ namespace osu.Game
 
             loadComponentSingleFile(new BackgroundBeatmapProcessor(), Add);
 
-            chatOverlay.State.BindValueChanged(_ => updateChatPollRate());
-            // Multiplayer modes need to increase poll rate temporarily.
-            API.Activity.BindValueChanged(_ => updateChatPollRate(), true);
-
-            void updateChatPollRate()
-            {
-                channelManager.HighPollRate.Value =
-                    chatOverlay.State.Value == Visibility.Visible
-                    || API.Activity.Value is UserActivity.InLobby
-                    || API.Activity.Value is UserActivity.InMultiplayerGame
-                    || API.Activity.Value is UserActivity.SpectatingMultiplayerGame;
-            }
-
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
@@ -1001,6 +1006,9 @@ namespace osu.Game
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
         {
             otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+
+            Settings.Hide();
+            Notifications.Hide();
 
             // Partially visible so leave it at the current depth.
             if (overlay.IsPresent)

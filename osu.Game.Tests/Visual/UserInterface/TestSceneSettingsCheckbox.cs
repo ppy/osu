@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneSettingsCheckbox : OsuTestScene
+    public partial class TestSceneSettingsCheckbox : OsuTestScene
     {
         [TestCase]
         public void TestCheckbox()
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        private class OverlayColourContainer : Container
+        private partial class OverlayColourContainer : Container
         {
             [Cached]
             private OverlayColourProvider colourProvider;
