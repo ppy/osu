@@ -479,7 +479,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // copied from SliderBar so we can do custom spacing logic.
                 float xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
 
-                CurrentNumber.Value = beatDivisor.ValidDivisors.Value.Presets.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
+                CurrentNumber.Value = beatDivisor.ValidDivisors.Value.Presets.MinBy(d => Math.Abs(getMappedPosition(d) - xPosition));
                 OnUserChange(Current.Value);
             }
 
