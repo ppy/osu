@@ -158,7 +158,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             foreach (var round in LadderInfo.Rounds)
             {
-                var topMatch = MatchesContainer.Where(p => !p.Match.Losers.Value && p.Match.Round.Value == round).OrderBy(p => p.Y).FirstOrDefault();
+                var topMatch = MatchesContainer.Where(p => !p.Match.Losers.Value && p.Match.Round.Value == round).MinBy(p => p.Y);
 
                 if (topMatch == null) continue;
 
@@ -172,7 +172,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             foreach (var round in LadderInfo.Rounds)
             {
-                var topMatch = MatchesContainer.Where(p => p.Match.Losers.Value && p.Match.Round.Value == round).OrderBy(p => p.Y).FirstOrDefault();
+                var topMatch = MatchesContainer.Where(p => p.Match.Losers.Value && p.Match.Round.Value == round).MinBy(p => p.Y);
 
                 if (topMatch == null) continue;
 

@@ -70,14 +70,14 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         [JsonIgnore]
         public double BPMMaximum =>
-            60000 / (TimingPoints.OrderBy(c => c.BeatLength).FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength;
+            60000 / (TimingPoints.MinBy(c => c.BeatLength) ?? TimingControlPoint.DEFAULT).BeatLength;
 
         /// <summary>
         /// Finds the minimum BPM represented by any timing control point.
         /// </summary>
         [JsonIgnore]
         public double BPMMinimum =>
-            60000 / (TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength;
+            60000 / (TimingPoints.MaxBy(c => c.BeatLength) ?? TimingControlPoint.DEFAULT).BeatLength;
 
         /// <summary>
         /// Remove all <see cref="ControlPointGroup"/>s and return to a pristine state.
