@@ -33,7 +33,7 @@ namespace osu.iOS
         {
             switch (handler)
             {
-                case IOSMouseHandler _:
+                case IOSMouseHandler:
                     return new IOSMouseSettings();
 
                 default:
