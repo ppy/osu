@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -144,6 +145,12 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public void Search(string query)
             => Schedule(() => searchControl.Query.Value = query);
+
+        public void FilterGenre(string genre)
+            => Schedule(() => searchControl.Genre.Value = genre.DehumanizeTo<SearchGenre>());
+
+        public void FilterLanguage(string language)
+            => Schedule(() => searchControl.Language.Value = language.DehumanizeTo<SearchLanguage>());
 
         protected override void LoadComplete()
         {
