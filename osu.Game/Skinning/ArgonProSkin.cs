@@ -24,7 +24,7 @@ namespace osu.Game.Skinning
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
-                string remappedLookup = lookup.Replace("Gameplay/", "Gameplay/Pro/");
+                string remappedLookup = lookup.Replace(@"Gameplay/", @"Gameplay/ArgonPro/");
 
                 var sample = Samples?.Get(remappedLookup) ?? Resources.AudioManager?.Samples.Get(remappedLookup);
                 if (sample != null)
