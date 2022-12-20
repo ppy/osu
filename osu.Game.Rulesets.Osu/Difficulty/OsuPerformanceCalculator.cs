@@ -114,10 +114,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= sliderNerfFactor;
             }
 
-            aimValue *= accuracy;
-            // It is important to consider accuracy difficulty when scaling with accuracy.
+            // Scale the aim value with accuracy and OD.
             double odScaling = Math.Pow(attributes.OverallDifficulty, 2) / 2500;
-            aimValue *= 0.98 + (attributes.OverallDifficulty >= 0 ? odScaling : -odScaling);
+            aimValue *=
+                (0.98 + (attributes.OverallDifficulty >= 0 ? odScaling : -odScaling)) *
+                Math.Pow(accuracy, (14 - Math.Max(attributes.OverallDifficulty, 2.5)) / 2);
 
             return aimValue;
         }
@@ -150,7 +151,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Scale the tap value with accuracy and OD.
             double odScaling = Math.Pow(attributes.OverallDifficulty, 2) / 750;
-            tapValue *= (0.95 + (attributes.OverallDifficulty >= 0 ? odScaling : -odScaling)) * Math.Pow((accuracy + relevantAccuracy) / 2.0, (14 - Math.Max(attributes.OverallDifficulty, 2.5)) / 2);
+            tapValue *=
+                (0.95 + (attributes.OverallDifficulty >= 0 ? odScaling : -odScaling)) *
+                Math.Pow((accuracy + relevantAccuracy) / 2.0, (14 - Math.Max(attributes.OverallDifficulty, 2.5)) / 2);
 
             // Scale the tap value with # of 50s to punish doubletapping.
             tapValue *= Math.Pow(0.99, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);

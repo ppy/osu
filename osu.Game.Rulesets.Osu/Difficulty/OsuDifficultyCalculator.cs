@@ -47,12 +47,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
-            if (mods.Any(m => m is OsuModTouchDevice))
-            {
-                aimRating = Math.Pow(aimRating, 0.8);
-                flashlightRating = Math.Pow(flashlightRating, 0.8);
-            }
-
             if (mods.Any(h => h is OsuModRelax))
             {
                 aimRating *= 0.9;
@@ -62,13 +56,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 visualRating = 0.0;
             }
 
-            double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
+            double baseAimPerformance = Math.Pow(5 * Math.Max(1, Math.Pow(aimRating, 0.8) / 0.0675) - 4, 3) / 100000;
             double baseTapPerformance = Math.Pow(5 * Math.Max(1, tapRating / 0.0675) - 4, 3) / 100000;
             double baseFlashlightPerformance = 0.0;
-            double baseVisualPerformance = Math.Pow(visualRating, 2.0) * 22.5;
+            double baseVisualPerformance = Math.Pow(visualRating, 1.6) * 22.5;
 
             if (mods.Any(h => h is OsuModFlashlight))
-                baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 25.0;
+                baseFlashlightPerformance = Math.Pow(flashlightRating, 1.6) * 25.0;
 
             double basePerformance =
                 Math.Pow(
@@ -78,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(baseVisualPerformance, 1.1), 1.0 / 1.1
                 );
 
-            double starRating = basePerformance > 0.00001 ? Math.Cbrt(1.12) * 0.025 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
+            double starRating = basePerformance > 0.00001 ? 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double drainRate = beatmap.Difficulty.DrainRate;
