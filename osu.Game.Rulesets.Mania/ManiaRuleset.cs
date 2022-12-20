@@ -268,7 +268,6 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModInvert(),
                         new ManiaModConstantSpeed(),
                         new ManiaModHoldOff(),
-                        new ManiaModScrollUp(),
                     };
 
                 case ModType.Automation:
@@ -282,7 +281,8 @@ namespace osu.Game.Rulesets.Mania
                     {
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new ManiaModMuted(),
-                        new ModAdaptiveSpeed()
+                        new ModAdaptiveSpeed(),
+                        new ManiaModScrollUp(),
                     };
 
                 default:

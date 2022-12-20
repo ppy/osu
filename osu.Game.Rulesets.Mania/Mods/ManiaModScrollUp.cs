@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override LocalisableString Description => @"Key will become faster..., until you miss";
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => null;
-        public override ModType Type => ModType.Conversion;
+        public override ModType Type => ModType.Fun;
 
         private DrawableManiaRuleset drawableRuleset = null!;
 
