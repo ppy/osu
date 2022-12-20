@@ -10,7 +10,11 @@ git clone https://github.com/MATRIX-feather/osu-framework.git
 
 cd osu-framework
 
-git checkout custom
+# !!! 重要 !!!
+# 这里通过git checkout来确保Framework在正确的分支上
+# mfosu默认克隆下来是stable分支，因此Framework也使用对应的stable
+# 如果你打算用daily分支，请记得把Framework也切换到daily上
+git checkout stable
 cd ../osu
 
 dotnet run --project osu.Desktop -c Release
