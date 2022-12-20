@@ -173,6 +173,16 @@ namespace osu.Game.Overlays.FirstRunSetup
                 c.Current.Disabled = !allow;
         }
 
+        public override void OnSuspending(ScreenTransitionEvent e) {
+            this.stableLocatorTextBox.HidePopover();
+            base.OnSuspending(e);
+        }
+
+        public override bool OnExiting(ScreenExitEvent e) {
+            this.stableLocatorTextBox.HidePopover();
+            return base.OnExiting(e);
+        }
+
         private partial class ImportCheckbox : SettingsCheckbox
         {
             public readonly StableContent StableContent;

@@ -286,7 +286,6 @@ namespace osu.Game.Overlays
 
             Debug.Assert(stack != null);
 
-            CurrentScreen?.HidePopover();
             stack.CurrentScreen.Exit();
             currentStepIndex--;
 
@@ -311,7 +310,6 @@ namespace osu.Game.Overlays
                     loading.Hide();
                 };
 
-                CurrentScreen?.HidePopover();
                 stack.Push(nextScreen);
             }
             else
