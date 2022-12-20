@@ -35,7 +35,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Realm" Version="10.18.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2022.1219.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2022.1207.0" />
     <PackageReference Include="Sentry" Version="3.23.1" />
     <PackageReference Include="SharpCompress" Version="0.32.2" />
@@ -45,6 +44,7 @@
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\osu-framework\osu.Framework\osu.Framework.csproj" />
     <ProjectReference Include="..\M.Resources\M.Resources.csproj" />
     <ProjectReference Include="..\M.DBus\M.DBus.csproj" />
   </ItemGroup>
