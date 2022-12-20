@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.None,
-                    Size = new Vector2(screen_width, screen_width / 16f * 9 / 2),
+                    Size = new Vector2(screen_width, screen_width / 16f * 9),
                     Children = new Drawable[]
                     {
                         new GridContainer
@@ -68,7 +68,6 @@ namespace osu.Game.Overlays.FirstRunSetup
                             {
                                 new Drawable[]
                                 {
-                                    new SampleScreenContainer(new PinnedMainMenu()),
                                     new SampleScreenContainer(new NestedSongSelect()),
                                 },
                                 // TODO: add more screens here in the future (gameplay / results)
@@ -107,17 +106,6 @@ namespace osu.Game.Overlays.FirstRunSetup
             protected override bool ControlGlobalMusic => false;
 
             public override bool? AllowTrackAdjustments => false;
-        }
-
-        private partial class PinnedMainMenu : MainMenu
-        {
-            public override void OnEntering(ScreenTransitionEvent e)
-            {
-                base.OnEntering(e);
-
-                Buttons.ReturnToTopOnIdle = false;
-                Buttons.State = ButtonSystemState.TopLevel;
-            }
         }
 
         private partial class UIScaleSlider : OsuSliderBar<float>
