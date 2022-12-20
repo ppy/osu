@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// </summary>
         protected abstract CoverExpandDirection ExpandDirection { get; }
 
-        public virtual float Coverage { get => 0.5f; }
+        protected virtual float Coverage => 0.5f;
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {

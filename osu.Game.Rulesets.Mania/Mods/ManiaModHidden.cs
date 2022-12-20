@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override LocalisableString Description => @"Keys fade out before you hit them!";
         public override double ScoreMultiplier => 1;
 
-        [SettingSource("Coverage", "How much of the playfield notes should be hidden for.")]
+        [SettingSource("Coverage", "The proportion of playfield height that notes will be hidden for.")]
         public BindableNumber<float> CoverageAmount { get; } = new BindableFloat(0.5f)
         {
             Precision = 0.01f,
@@ -23,7 +23,8 @@ namespace osu.Game.Rulesets.Mania.Mods
             MaxValue = 0.8f,
             Default = 0.5f,
         };
-        public override float Coverage => CoverageAmount.Value;
+
+        protected override float Coverage => CoverageAmount.Value;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ManiaModFadeIn)).ToArray();
 
