@@ -30,6 +30,8 @@ using osu.Game.Overlays.Chat.Listing;
 using osu.Game.Overlays.Chat.ChannelList;
 using osuTK;
 using osuTK.Input;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -528,6 +530,42 @@ namespace osu.Game.Tests.Visual.Online
             {
                 testChannel1.RemoveMessagesFromUser(testUser.Id);
             });
+        }
+
+        [Test]
+        public void TestChatReport()
+        {
+            AddStep("Show overlay with channel", () =>
+            {
+                chatOverlay.Show();
+                channelManager.CurrentChannel.Value = channelManager.JoinChannel(testChannel1);
+            });
+
+            AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
+            waitForChannel1Visible();
+
+            AddStep("Right click username", () =>
+            {
+                var username = this.ChildrenOfType<DrawableUsername>().First();
+                InputManager.MoveMouseTo(username);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddStep("Click report", () =>
+            {
+                var btn = this.ChildrenOfType<OsuSpriteText>().First(x => x.Text == "Report");
+                InputManager.MoveMouseTo(btn);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("Try to report", () =>
+            {
+                var btn = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                InputManager.MoveMouseTo(btn);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("Report message sended", () => channelManager.CurrentChannel.Value.Messages.Any(x => x.Content.Contains("!report")));
         }
 
         private void joinTestChannel(int i)

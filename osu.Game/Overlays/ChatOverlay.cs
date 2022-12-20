@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -122,7 +123,7 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.Y,
                                     Width = side_bar_width,
                                 },
-                                new Container
+                                new PopoverContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Anchor = Anchor.TopRight,

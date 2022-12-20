@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,7 +26,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
 {
-    public partial class DrawableUsername : OsuClickableContainer, IHasContextMenu
+    public partial class DrawableUsername : OsuClickableContainer, IHasContextMenu, IHasPopover
     {
         public Color4 AccentColour { get; }
 
@@ -152,10 +153,18 @@ namespace osu.Game.Overlays.Chat
                 };
 
                 if (!user.Equals(api.LocalUser.Value))
+                {
                     items.Add(new OsuMenuItem("Start Chat", MenuItemType.Standard, openUserChannel));
+                    items.Add(new OsuMenuItem("Report", MenuItemType.Destructive, this.ShowPopover));
+                }
 
                 return items.ToArray();
             }
+        }
+
+        private void report(ChatReportReason reason, string comments)
+        {
+            chatManager?.PostMessage($"!report {user.Username} ({reason.GetDescription()}): {comments}");
         }
 
         private void openUserChannel()
@@ -220,6 +229,11 @@ namespace osu.Game.Overlays.Chat
             Color4Extensions.FromHex("4335a5"),
             Color4Extensions.FromHex("812a96"),
             Color4Extensions.FromHex("992861"),
+        };
+
+        public Popover GetPopover() => new ReportChatPopover(user)
+        {
+            Action = report
         };
     }
 }
