@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         [SettingSource("Min Speed", "The speed when combo is 0", SettingControlType = typeof(SettingsSlider<double, ManiaScrollSlider>))]
         public BindableDouble MinScoreSpeed { get; } = new BindableDouble(DrawableManiaRuleset.MAX_TIME_RANGE)
         {
-            MinValue = DrawableManiaRuleset.MIN_TIME_RANGE,
+            MinValue = DrawableManiaRuleset.MIN_TIME_RANGE + 5,
             MaxValue = DrawableManiaRuleset.MAX_TIME_RANGE,
             Precision = 5,
         };
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public BindableDouble MaxScoreSpeed { get; } = new BindableDouble(DrawableManiaRuleset.MIN_TIME_RANGE)
         {
             MinValue = DrawableManiaRuleset.MIN_TIME_RANGE,
-            MaxValue = DrawableManiaRuleset.MAX_TIME_RANGE,
+            MaxValue = DrawableManiaRuleset.MAX_TIME_RANGE - 5,
             Precision = 5,
         };
 
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             MinScoreSpeed.BindValueChanged(val =>
             {
                 if (val.NewValue <= MaxScoreSpeed.Value)
-                    MaxScoreSpeed.Value = val.NewValue + MaxScoreSpeed.Precision;
+                    MaxScoreSpeed.Value = val.NewValue - MaxScoreSpeed.Precision;
             });
 
             MaxScoreSpeed.BindValueChanged(val =>
@@ -86,11 +86,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             scoreProcessor.Combo.BindValueChanged(s =>
             {
-                if (s.NewValue > MaxComboCount.Value)
-                {
-                    return;
-                }
-
                 double speed = MinScoreSpeed.Value - (MinScoreSpeed.Value - MaxScoreSpeed.Value) * Math.Log(s.NewValue + 1, MaxComboCount.Value + 1);
 
                 scoreProcessor.TransformBindableTo(scrollTime, speed, 500, Easing.OutQuint);
