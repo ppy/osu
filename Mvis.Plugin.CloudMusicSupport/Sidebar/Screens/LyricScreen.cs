@@ -171,7 +171,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         protected virtual void RefreshLrcInfo(List<Lyric> lyrics)
         {
-            LyricScroll.Clear();
+            LyricScroll.Clear(false);
             AvaliablePieces.Clear();
             //lyricPool.Clear();
 
