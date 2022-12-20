@@ -16,6 +16,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
@@ -332,7 +333,7 @@ namespace osu.Game
         /// <param name="link">The link to load.</param>
         public void HandleLink(LinkDetails link) => Schedule(() =>
         {
-            string argString = link.Argument.ToString();
+            string argString = link.Argument.ToString() ?? string.Empty;
 
             switch (link.Action)
             {
@@ -405,6 +406,16 @@ namespace osu.Game
         {
             if (url.StartsWith('/'))
                 url = $"{API.APIEndpointUrl}{url}";
+
+            if (!url.CheckIsValidUrl())
+            {
+                Notifications.Post(new SimpleErrorNotification
+                {
+                    Text = $"The URL {url} has an unsupported or dangerous protocol and will not be opened.",
+                });
+
+                return;
+            }
 
             externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
         });
@@ -616,14 +627,14 @@ namespace osu.Game
             }, validScreens: validScreens);
         }
 
-        public override Task Import(params ImportTask[] imports)
+        public override Task Import(ImportTask[] imports, ImportParameters parameters = default)
         {
             // encapsulate task as we don't want to begin the import process until in a ready state.
 
             // ReSharper disable once AsyncVoidLambda
             // TODO: This is bad because `new Task` doesn't have a Func<Task?> override.
             // Only used for android imports and a bit of a mess. Probably needs rethinking overall.
-            var importTask = new Task(async () => await base.Import(imports).ConfigureAwait(false));
+            var importTask = new Task(async () => await base.Import(imports, parameters).ConfigureAwait(false));
 
             waitForReady(() => this, _ => importTask.Start());
 
@@ -1031,6 +1042,8 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database) return;
 
+                Debug.Assert(entry.Target != null);
+
                 const int short_term_display_limit = 3;
 
                 if (recentLogCount < short_term_display_limit)
@@ -1043,7 +1056,7 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
-                    string logFile = $@"{entry.Target.ToString().ToLowerInvariant()}.log";
+                    string logFile = $@"{entry.Target.Value.ToString().ToLowerInvariant()}.log";
 
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {

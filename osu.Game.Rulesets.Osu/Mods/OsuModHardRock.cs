@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             osuObject.Scale -= 0.125f;
 
-            OsuHitObjectGenerationUtils.ReflectVertically(osuObject);
+            OsuHitObjectGenerationUtils.ReflectVerticallyAlongPlayfield(osuObject);
         }
     }
 }

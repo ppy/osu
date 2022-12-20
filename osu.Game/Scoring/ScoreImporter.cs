@@ -101,8 +101,7 @@ namespace osu.Game.Scoring
             // Populate the maximum statistics.
             HitResult maxBasicResult = rulesetInstance.GetHitResults()
                                                       .Select(h => h.result)
-                                                      .Where(h => h.IsBasic())
-                                                      .OrderByDescending(Judgement.ToNumericResult).First();
+                                                      .Where(h => h.IsBasic()).MaxBy(Judgement.ToNumericResult);
 
             foreach ((HitResult result, int count) in score.Statistics)
             {
@@ -145,9 +144,9 @@ namespace osu.Game.Scoring
 #pragma warning restore CS0618
         }
 
-        protected override void PostImport(ScoreInfo model, Realm realm, bool batchImport)
+        protected override void PostImport(ScoreInfo model, Realm realm, ImportParameters parameters)
         {
-            base.PostImport(model, realm, batchImport);
+            base.PostImport(model, realm, parameters);
 
             var userRequest = new GetUserRequest(model.RealmUser.Username);
 
