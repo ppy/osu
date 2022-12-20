@@ -19,10 +19,10 @@ using static osu.Game.Rulesets.Mania.ManiaSettingsSubsection;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModScrollUp : Mod, IApplicableToDrawableRuleset<ManiaHitObject>, IApplicableToScoreProcessor, IApplicableToPlayer
+    public class ManiaModAccelerate : Mod, IApplicableToDrawableRuleset<ManiaHitObject>, IApplicableToScoreProcessor, IApplicableToPlayer
     {
-        public override string Name => "Scroll up";
-        public override string Acronym => "SU";
+        public override string Name => "Accelerate";
+        public override string Acronym => "AC";
         public override LocalisableString Description => @"Key will become faster..., until you miss";
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => null;
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             Precision = 5,
         };
 
-        public ManiaModScrollUp()
+        public ManiaModAccelerate()
         {
             MinScoreSpeed.BindValueChanged(val =>
             {

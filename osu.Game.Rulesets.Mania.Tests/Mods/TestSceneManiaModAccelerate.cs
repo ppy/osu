@@ -7,14 +7,14 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
 {
-    public partial class TestSceneManiaModScrollUp : ModTestScene
+    public partial class TestSceneManiaModAccelerate : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 
         [Test]
-        public void TestConstantScroll() => CreateModTest(new ModTestData
+        public void TestModAccelerate() => CreateModTest(new ModTestData
         {
-            Mod = new ManiaModScrollUp(),
+            Mod = new ManiaModAccelerate(),
             PassCondition = () => Player.ScoreProcessor.JudgedHits >= 2
         });
     }
