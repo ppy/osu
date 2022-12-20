@@ -19,6 +19,7 @@ using osu.Game.Graphics.Containers.Markdown;
 using osu.Game.Graphics.Containers.Markdown.Footnotes;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki.Markdown;
+using osu.Game.Users.Drawables;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
@@ -210,6 +211,17 @@ Line after image";
                 markdownContainer.CurrentPath = @"https://dev.ppy.sh";
                 markdownContainer.Text = "::{flag=\"AU\"}:: ::{flag=\"ZZ\"}::";
             });
+            AddAssert("Two flags visible", () => markdownContainer.ChildrenOfType<DrawableFlag>().Count(), () => Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TestHeadingWithIdAttribute()
+        {
+            AddStep("Add heading with ID", () =>
+            {
+                markdownContainer.Text = "# This is a heading with an ID {#this-is-the-id}";
+            });
+            AddAssert("ID not visible", () => markdownContainer.ChildrenOfType<SpriteText>().All(spriteText => spriteText.Text != "{#this-is-the-id}"));
         }
 
         [Test]
