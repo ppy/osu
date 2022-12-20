@@ -3,9 +3,9 @@
 
 using System;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mania.Objects;
@@ -19,7 +19,7 @@ using static osu.Game.Rulesets.Mania.ManiaSettingsSubsection;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModAccelerate : Mod, IApplicableToDrawableRuleset<ManiaHitObject>, IApplicableToScoreProcessor, IApplicableToPlayer
+    public class ManiaModAccelerate : Mod, IApplicableToDrawableRuleset<ManiaHitObject>, IApplicableToScoreProcessor, IApplicableToPlayer, IUpdatableByPlayfield
     {
         public override string Name => "Accelerate";
         public override string Acronym => "AC";
@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Mania.Mods
         private DrawableManiaRuleset drawableRuleset = null!;
 
         private readonly BindableDouble scrollTime = new BindableDouble();
+
+        private readonly BindableDouble targetScrollTime = new BindableDouble();
 
         [SettingSource("Max Speed combo", "The combo count at which point the spead reaches max.")]
         public BindableInt MaxComboCount { get; } = new BindableInt(480)
@@ -80,18 +82,29 @@ namespace osu.Game.Rulesets.Mania.Mods
             drawableRuleset.ScoreSpeed.Disabled = false;
             scrollTime.BindTo(drawableRuleset.ScoreSpeed);
             scrollTime.Value = MinScoreSpeed.Value;
+            targetScrollTime.Value = MinScoreSpeed.Value;
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             scoreProcessor.Combo.BindValueChanged(s =>
             {
-                double speed = MinScoreSpeed.Value - (MinScoreSpeed.Value - MaxScoreSpeed.Value) * Math.Log(s.NewValue + 1, MaxComboCount.Value + 1);
-
-                scoreProcessor.TransformBindableTo(scrollTime, speed, 500, Easing.OutQuint);
+                if (s.NewValue >= MaxComboCount.Value)
+                {
+                    targetScrollTime.Value = MaxScoreSpeed.Value;
+                }
+                else
+                {
+                    targetScrollTime.Value = MinScoreSpeed.Value - (MinScoreSpeed.Value - MaxScoreSpeed.Value) * Math.Log(s.NewValue + 1, MaxComboCount.Value + 1);
+                }
             });
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+
+        public void Update(Playfield playfield)
+        {
+            scrollTime.Value = Interpolation.DampContinuously(scrollTime.Value, targetScrollTime.Value, 250, playfield.Clock.ElapsedFrameTime);
+        }
     }
 }
