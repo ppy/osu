@@ -101,8 +101,7 @@ namespace osu.Game.Scoring
             // Populate the maximum statistics.
             HitResult maxBasicResult = rulesetInstance.GetHitResults()
                                                       .Select(h => h.result)
-                                                      .Where(h => h.IsBasic())
-                                                      .OrderByDescending(Judgement.ToNumericResult).First();
+                                                      .Where(h => h.IsBasic()).MaxBy(Judgement.ToNumericResult);
 
             foreach ((HitResult result, int count) in score.Statistics)
             {

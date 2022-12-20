@@ -352,11 +352,13 @@ namespace osu.Game.Overlays
 
         protected virtual DrawableChannel CreateDrawableChannel(Channel newChannel) => new DrawableChannel(newChannel);
 
-        private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        private void joinedChannelsChanged(object? sender, NotifyCollectionChangedEventArgs args)
         {
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Debug.Assert(args.NewItems != null);
+
                     IEnumerable<Channel> newChannels = args.NewItems.OfType<Channel>().Where(isChatChannel);
 
                     foreach (var channel in newChannels)
@@ -365,6 +367,8 @@ namespace osu.Game.Overlays
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    Debug.Assert(args.OldItems != null);
+
                     IEnumerable<Channel> leftChannels = args.OldItems.OfType<Channel>().Where(isChatChannel);
 
                     foreach (var channel in leftChannels)
@@ -384,7 +388,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        private void availableChannelsChanged(object? sender, NotifyCollectionChangedEventArgs args)
             => channelListing.UpdateAvailableChannels(channelManager.AvailableChannels);
 
         private void handleChatMessage(string message)

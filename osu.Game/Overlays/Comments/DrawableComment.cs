@@ -19,6 +19,7 @@ using System;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
@@ -360,6 +361,8 @@ namespace osu.Game.Overlays.Comments
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         onRepliesAdded(args.NewItems.Cast<DrawableComment>());
                         break;
 

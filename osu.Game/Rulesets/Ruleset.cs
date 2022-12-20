@@ -89,6 +89,8 @@ namespace osu.Game.Rulesets
                                                        // Confine all mods of each mod type into a single IEnumerable<Mod>
                                                        .SelectMany(GetModsFor)
                                                        // Filter out all null mods
+                                                       // This is to handle old rulesets which were doing mods bad. Can be removed at some point we are sure nulls will not appear here.
+                                                       // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                                                        .Where(mod => mod != null)
                                                        // Resolve MultiMods as their .Mods property
                                                        .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
