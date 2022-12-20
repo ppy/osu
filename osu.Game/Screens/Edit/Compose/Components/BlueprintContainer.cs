@@ -58,6 +58,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         foreach (object o in args.NewItems)
                         {
                             if (blueprintMap.TryGetValue((T)o, out var blueprint))
@@ -67,6 +69,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
+                        Debug.Assert(args.OldItems != null);
+
                         foreach (object o in args.OldItems)
                         {
                             if (blueprintMap.TryGetValue((T)o, out var blueprint))

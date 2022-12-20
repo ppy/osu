@@ -105,7 +105,7 @@ namespace osu.Game.Skinning
                     return SkinUtils.As<TValue>(GetComboColour(Configuration, comboColour.ColourIndex, comboColour.Combo));
 
                 case SkinCustomColourLookup customColour:
-                    return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
+                    return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString() ?? string.Empty));
 
                 case LegacyManiaSkinConfigurationLookup maniaLookup:
                     if (!AllowManiaSkin)
@@ -277,7 +277,7 @@ namespace osu.Game.Skinning
             => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
         private IBindable<string>? getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
-            => source.ImageLookups.TryGetValue(lookup, out string image) ? new Bindable<string>(image) : null;
+            => source.ImageLookups.TryGetValue(lookup, out string? image) ? new Bindable<string>(image) : null;
 
         private IBindable<TValue>? legacySettingLookup<TValue>(SkinConfiguration.LegacySetting legacySetting)
             where TValue : notnull
@@ -298,7 +298,7 @@ namespace osu.Game.Skinning
         {
             try
             {
-                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out string val))
+                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString() ?? string.Empty, out string? val))
                 {
                     // special case for handling skins which use 1 or 0 to signify a boolean state.
                     // ..or in some cases 2 (https://github.com/ppy/osu/issues/18579).

@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Edit.Compose
             if (composer == null)
                 return string.Empty;
 
-            double displayTime = EditorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime).FirstOrDefault()?.StartTime ?? clock.CurrentTime;
+            double displayTime = EditorBeatmap.SelectedHitObjects.MinBy(h => h.StartTime)?.StartTime ?? clock.CurrentTime;
             string selectionAsString = composer.ConvertSelectionToString();
 
             return !string.IsNullOrEmpty(selectionAsString)

@@ -136,9 +136,8 @@ namespace osu.Game.Online.Leaderboards
         {
             if (displayedScore != null)
             {
-                timestampLabel.Text = prefer24HourTime.Value
-                    ? $"于 {displayedScore.Date.ToLocalTime():yyyy MMMM d HH:mm} 游玩"
-                    : $"于 {displayedScore.Date.ToLocalTime():yyyy MMMM d h:mm tt} 游玩";
+                timestampLabel.Text = LocalisableString.Format("于 {0} 游玩",
+                    displayedScore.Date.ToLocalTime().ToLocalisableString(prefer24HourTime.Value ? @"d MMMM yyyy HH:mm" : @"d MMMM yyyy h:mm tt"));
             }
         }
 

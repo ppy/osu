@@ -349,8 +349,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             public void SelectBeatmap() => editPlaylistButton.TriggerClick();
 
-            private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) =>
-                playlistLength.Text = $"长度: {Playlist.GetTotalDuration()}";
+            private void onPlaylistChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
+                playlistLength.Text = $"时长: {Playlist.GetTotalDuration()}";
 
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0;
 

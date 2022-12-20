@@ -16,7 +16,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public void AttachGroup(ControlPointGroup pointGroup) => Time = pointGroup.Time;
 
-        public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
+        public int CompareTo(ControlPoint? other) => Time.CompareTo(other?.Time);
 
         public virtual Color4 GetRepresentingColour(OsuColour colours) => colours.Yellow;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public ControlPoint DeepClone()
         {
-            var copy = (ControlPoint)Activator.CreateInstance(GetType());
+            var copy = (ControlPoint)Activator.CreateInstance(GetType())!;
 
             copy.CopyFrom(this);
 
