@@ -4,17 +4,23 @@
 #nullable disable
 
 using Markdig;
+using Markdig.Extensions.Footnotes;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Containers.Markdown.Footnotes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Containers.Markdown.Footnotes;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
+    [Cached]
     public partial class OsuMarkdownContainer : MarkdownContainer
     {
         public OsuMarkdownContainer()
@@ -76,6 +82,10 @@ namespace osu.Game.Graphics.Containers.Markdown
 
             return new OsuMarkdownUnorderedListItem(level);
         }
+
+        protected override MarkdownFootnoteGroup CreateFootnoteGroup(FootnoteGroup footnoteGroup) => base.CreateFootnoteGroup(footnoteGroup).With(g => g.Spacing = new Vector2(5));
+
+        protected override MarkdownFootnote CreateFootnote(Footnote footnote) => new OsuMarkdownFootnote(footnote);
 
         protected sealed override MarkdownPipeline CreateBuilder()
             => Options.BuildPipeline();
