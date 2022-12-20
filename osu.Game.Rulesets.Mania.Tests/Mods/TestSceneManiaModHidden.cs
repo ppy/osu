@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         [TestCase(0.5f)]
         [TestCase(0.2f)]
         [TestCase(0.8f)]
-        public void TestCoverage(float Coverage) => CreateModTest(new ModTestData { Mod = new ManiaModHidden { CoverageAmount = { Value = Coverage } }, PassCondition = () => true });
+        public void TestCoverage(float coverage) => CreateModTest(new ModTestData { Mod = new ManiaModHidden { CoverageAmount = { Value = coverage } }, PassCondition = () => true });
     }
 }
