@@ -26,7 +26,6 @@ using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
@@ -1458,18 +1457,18 @@ namespace osu.Game
             switch (newCondition)
             {
                 case GamemodeActivateCondition.Always:
-                    linuxGameHost.GamemodeStart();
+                    GamemodeSupport.RequestStart();
                     break;
 
                 case GamemodeActivateCondition.InGame:
                     if (ScreenStack.CurrentScreen is Player)
-                        linuxGameHost.GamemodeStart();
+                        GamemodeSupport.RequestStart();
                     else
-                        linuxGameHost.GamemodeEnd();
+                        GamemodeSupport.RequestEnd();
                     break;
 
                 case GamemodeActivateCondition.Never:
-                    linuxGameHost.GamemodeEnd();
+                    GamemodeSupport.RequestEnd();
                     break;
             }
         }

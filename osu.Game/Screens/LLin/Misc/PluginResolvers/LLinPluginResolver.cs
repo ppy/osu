@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Types;
 
@@ -73,20 +72,18 @@ namespace osu.Game.Screens.LLin.Misc.PluginResolvers
             functionBarDictionary[ToPath(defaultFunctionbar)] = defaultFunctionbar;
         }
 
-        [CanBeNull]
-        internal Type GetAudioControlPluginByPath(string path)
+        internal Type? GetAudioControlPluginByPath(string path)
         {
-            TypeWrapper result;
+            TypeWrapper? result;
             if (audioPluginDictionary.TryGetValue(path, out result))
                 return result.Type;
 
             return null;
         }
 
-        [CanBeNull]
-        internal Type GetFunctionBarProviderByPath(string path)
+        internal Type? GetFunctionBarProviderByPath(string path)
         {
-            TypeWrapper result;
+            TypeWrapper? result;
             if (functionBarDictionary.TryGetValue(path, out result))
                 return result.Type;
 

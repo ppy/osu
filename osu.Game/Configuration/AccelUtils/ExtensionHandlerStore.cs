@@ -53,7 +53,7 @@ namespace osu.Game.Configuration.AccelUtils
                 //From RulesetStore
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    string name = assembly.GetName().Name;
+                    string name = assembly.GetName().Name ?? "";
 
                     if (!name.StartsWith("M.AccelPlugin", StringComparison.Ordinal))
                         continue;
@@ -106,7 +106,11 @@ namespace osu.Game.Configuration.AccelUtils
                     {
                         loadedAssemblies[assembly] = type;
                         //Logger.Log($"{type}是插件Provider");
-                        addMvisPlugin(type, assembly.FullName);
+
+                        if (assembly.FullName != null)
+                            addMvisPlugin(type, assembly.FullName);
+                        else
+                            Logger.Log($"{assembly}没有FullName，将不会加载");
                     }
 
                     //Logger.Log($"{type}不是任何一个SubClass");
@@ -132,7 +136,7 @@ namespace osu.Game.Configuration.AccelUtils
 
             try
             {
-                var handlerInstance = (IExtensionHandler)Activator.CreateInstance(type);
+                var handlerInstance = (IExtensionHandler)Activator.CreateInstance(type)!;
                 AccelExtensionsUtil.AddHandler(handlerInstance);
             }
             catch (Exception e)

@@ -4,6 +4,7 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -86,8 +87,8 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "忽略框架KeyBind",
-                    Current = fcm.GetBindable<bool>(FrameworkSetting.ActionContainerIgnoreKeyBind)
+                    LabelText = "忽略框架KeyBind（TBD）",
+                    Current = new Bindable<bool>() // fcm.GetBindable<bool>(FrameworkSetting.ActionContainerIgnoreKeyBind)
                 }
             };
         }

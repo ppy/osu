@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <Authors> </Authors>
         <Copyright> </Copyright>
         <PackageProjectUrl>https://github.com/MATRIX-feather/osu</PackageProjectUrl>
@@ -16,6 +16,6 @@
     <EmbeddedResource Include="Documents\**\*" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\osu-framework\osu.Framework\osu.Framework.csproj" />
+    <PackageReference Include="ppy.osu.Framework" Version="2022.1219.0" />
   </ItemGroup>
 </Project>

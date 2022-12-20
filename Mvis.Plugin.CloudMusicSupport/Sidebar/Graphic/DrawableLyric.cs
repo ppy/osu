@@ -31,6 +31,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
         protected abstract void UpdateValue(Lyric lyric);
 
-        public int CompareTo(DrawableLyric other) => CurrentY.CompareTo(other.CurrentY);
+        public int CompareTo(DrawableLyric? other) => CurrentY.CompareTo(other?.CurrentY ?? 0);
     }
 }

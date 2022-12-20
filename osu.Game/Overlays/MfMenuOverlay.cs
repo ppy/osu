@@ -56,14 +56,18 @@ namespace osu.Game.Overlays
 
         protected override void LoadComplete()
         {
-            foreach (var o in SectionsOrder)
+            foreach (string o in SectionsOrder)
             {
                 var sec = Sections.FirstOrDefault(s => s.SectionId == o);
-                Schedule(() =>
+
+                if (sec != null)
                 {
-                    tabControl.AddItem(sec);
-                    sectionContainer.Add(sec);
-                });
+                    Schedule(() =>
+                    {
+                        tabControl.AddItem(sec);
+                        sectionContainer.Add(sec);
+                    });
+                }
             }
 
             tabControl.Current.BindValueChanged(OnSelectedTabTypeChanged);

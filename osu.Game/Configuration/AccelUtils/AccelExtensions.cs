@@ -91,20 +91,21 @@ namespace osu.Game.Configuration.AccelUtils
 
                     //查询值
                     object value;
-                    data.TryGetValue(propertyInfo.name, out value);
+                    data.TryGetValue(propertyInfo.name, out value!);
 
                     //如果有扩展名，则将值交由其对应的处理器处理
                     if (!string.IsNullOrEmpty(propertyInfo.extensionName))
                     {
                         //查询支持的处理器
-                        IExtensionHandler handler;
-                        bool vaildExtension = ExtensionHandlers.TryGetValue(propertyInfo.extensionName, out handler);
+                        IExtensionHandler? handler;
+                        ExtensionHandlers.TryGetValue(propertyInfo.extensionName, out handler);
 
                         //如果没查到，则转换到大写再试一次
-                        if (!vaildExtension) vaildExtension = ExtensionHandlers.TryGetValue(propertyInfo.extensionName.ToUpperInvariant(), out handler);
+                        if (handler == null)
+                            ExtensionHandlers.TryGetValue(propertyInfo.extensionName.ToUpperInvariant(), out handler);
 
                         //如果还是没有
-                        if (!vaildExtension && !noSuggestion)
+                        if (!noSuggestion)
                         {
                             string suggestion = "输入建议: ";
                             bool haveSuggestion = false;
@@ -121,7 +122,7 @@ namespace osu.Game.Configuration.AccelUtils
                             errors.Add(haveSuggestion ? suggestion : $"未找到与 {propertyInfo.extensionName} 对应的处理器, 它将保持原始状态");
                         }
 
-                        if (vaildExtension)
+                        if (handler != null)
                         {
                             try
                             {

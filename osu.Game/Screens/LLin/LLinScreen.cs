@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using JetBrains.Annotations;
 using M.DBus.Tray;
 using M.Resources.Localisation.LLin;
 using osu.Framework;
@@ -127,7 +126,7 @@ namespace osu.Game.Screens.LLin
                 changeAudioControlProvider(null);
         }
 
-        private void changeAudioControlProvider(IProvideAudioControlPlugin pacp)
+        private void changeAudioControlProvider(IProvideAudioControlPlugin? pacp)
         {
             //如果没找到(为null)，则解锁Beatmap.Disabled
             Beatmap.Disabled = (pacp != null) && (pacp != pluginManager.DefaultAudioController);
@@ -522,10 +521,10 @@ namespace osu.Game.Screens.LLin
         {
             checkIfPluginIllegal(sender);
 
-            ProgressNotification target;
+            ProgressNotification? target;
             if (!notificationDictionary.TryGetValue(targetID, out target)) return false;
 
-            if (target.State == ProgressNotificationState.Completed || target.State == ProgressNotificationState.Cancelled)
+            if (target.State is ProgressNotificationState.Completed or ProgressNotificationState.Cancelled)
                 return false;
 
             target.Progress = Math.Min(1, progress);
@@ -537,7 +536,7 @@ namespace osu.Game.Screens.LLin
         {
             checkIfPluginIllegal(sender);
 
-            ProgressNotification target;
+            ProgressNotification? target;
             if (!notificationDictionary.TryGetValue(targetID, out target)) return false;
 
             if (target.State == ProgressNotificationState.Cancelled)
@@ -1154,7 +1153,7 @@ namespace osu.Game.Screens.LLin
             set => userFunctionBar = value;
         }
 
-        private void changeFunctionBarProvider([CanBeNull] IFunctionBarProvider target)
+        private void changeFunctionBarProvider(IFunctionBarProvider? target)
         {
             //找到旧的Functionbar
             var targetDrawable = overlayLayer.FirstOrDefault(d => d == currentFunctionBar);

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <Authors> </Authors>
         <Copyright> </Copyright>
         <PackageProjectUrl>https://github.com/matrix-feather/osu</PackageProjectUrl>
@@ -9,7 +9,7 @@
         <Company> </Company>
     </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Tmds.DBus" Version="0.9.1" />
-    <ProjectReference Include="..\..\osu-framework\osu.Framework\osu.Framework.csproj" />
+    <PackageReference Include="Tmds.DBus" Version="0.11.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2022.1219.0" />
   </ItemGroup>
 </Project>

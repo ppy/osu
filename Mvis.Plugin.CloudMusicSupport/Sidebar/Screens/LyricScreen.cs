@@ -119,7 +119,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                 foreach (var p in LyricScroll.Children)
                 {
                     //如果已经在显示了，则从toDisplay里去掉
-                    if (toDisplay.Remove(toDisplay.Find(d => d.Value.Equals(p.Value)))) continue;
+                    var toRemove = toDisplay.Find(d => d.Value.Equals(p.Value));
+                    if (toRemove != null && toDisplay.Remove(toRemove)) continue;
 
                     //如果面板不在显示区，则直接Expire
                     if (p.Y + p.DrawHeight < visibleTop - distanceLoadUnload
@@ -172,7 +173,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         {
             LyricScroll.Clear();
             AvaliablePieces.Clear();
-            lyricPool.Clear();
+            //lyricPool.Clear();
 
             LyricScroll.ScrollToStart();
 

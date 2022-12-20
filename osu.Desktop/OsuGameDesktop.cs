@@ -202,6 +202,26 @@ namespace osu.Desktop
             desktopWindow.CursorState |= CursorState.Hidden;
             desktopWindow.Title = Name;
             desktopWindow.DragDrop += f => fileDrop(new[] { f });
+
+            //mfosu: Find SDLWindowHandle
+            if (windowHandle == null)
+            {
+                var fields = desktopWindow.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+
+                foreach (var fieldInfo in fields)
+                {
+                    if (!fieldInfo.Name.Contains("SDLWindowHandle")) continue;
+
+                    object? val = fieldInfo.GetValue(desktopWindow);
+
+                    windowHandle = (val is IntPtr ptr) ? ptr : IntPtr.Zero;
+
+                    break;
+                }
+
+                if (windowHandle == null || windowHandle == IntPtr.Zero)
+                    Logger.Log("未能找到WindowHandle，某些功能将被限制", level: LogLevel.Important);
+            }
         }
 
         protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
@@ -244,7 +264,18 @@ namespace osu.Desktop
         public void TransformWindowOpacity(float final, double duration = 0, Easing easing = Easing.None) =>
             this.TransformBindableTo(windowOpacity, final, duration, easing);
 
-        public void SetWindowOpacity(float value) => ((SDL2DesktopWindow)Window).Opacity = value;
+        private IntPtr? windowHandle;
+
+        /// <summary>
+        /// Sets window opacity
+        /// mfosu interface
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetWindowOpacity(float value)
+        {
+            if (windowHandle != null && windowHandle != IntPtr.Zero)
+                SDL.SDL_SetWindowOpacity((IntPtr)windowHandle, value);
+        }
 
         protected override void Dispose(bool isDisposing)
         {

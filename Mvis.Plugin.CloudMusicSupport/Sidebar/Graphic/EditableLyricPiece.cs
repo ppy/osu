@@ -12,6 +12,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Screens.LLin;
 using osuTK;
 using osuTK.Graphics;
@@ -94,7 +95,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                             Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
-                                new OsuButton
+                                new RoundedButton
                                 {
                                     Text = CloudMusicStrings.Delete,
                                     Size = new Vector2(90, 40),
@@ -105,7 +106,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                                     },
                                     BackgroundColour = osuColour.PinkDark
                                 },
-                                new OsuButton
+                                new RoundedButton
                                 {
                                     Text = CloudMusicStrings.TrackTimeToLyric,
                                     Size = new Vector2(120, 40),
@@ -117,7 +118,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                                     },
                                     BackgroundColour = osuColour.Gray8
                                 },
-                                new OsuButton
+                                new RoundedButton
                                 {
                                     Text = CloudMusicStrings.LyricTimeToTrack,
                                     Size = new Vector2(120, 40),

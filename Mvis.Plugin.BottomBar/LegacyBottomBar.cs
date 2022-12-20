@@ -215,7 +215,7 @@ namespace Mvis.Plugin.BottomBar
 
         public void Remove(IFunctionProvider provider)
         {
-            BottomBarButton target;
+            BottomBarButton? target;
 
             switch (provider.Type)
             {
