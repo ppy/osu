@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             MaxValue = 10,
             Precision = 0.01
         };
-        
+
         private BindableDouble localSensitivityY = new BindableDouble(1)
         {
             MinValue = 0.1,
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.LoadComplete();
 
-            relativeMode.BindValueChanged(relative => 
+            relativeMode.BindValueChanged(relative =>
             {
                 localSensitivityX.Disabled = !relative.NewValue;
                 localSensitivityY.Disabled = !relative.NewValue || !separateMode.Value;
@@ -198,7 +198,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             separateSensitivity.Current.BindValueChanged(separate =>
             {
-                if(separate.NewValue)
+                if (separate.NewValue)
                     handlerSensitivity.Value = new Vector2d(localSensitivityX.Value, localSensitivityY.Value);
                 else
                     handlerSensitivity.Value = new Vector2d(localSensitivityX.Value, localSensitivityX.Value);
@@ -207,7 +207,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 verticalSensitivitySettings.ClearTransforms();
                 verticalSensitivitySettings.AutoSizeDuration = transition_duration;
                 verticalSensitivitySettings.AutoSizeEasing = Easing.OutQuint;
-                
+
                 updateScalingModeVisibility();
                 horizontalSensitivity.LabelText = separate.NewValue ? MouseSettingsStrings.CursorHorizontalSensitivity : MouseSettingsStrings.CursorSensitivity;
             }, true);

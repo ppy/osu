@@ -29,7 +29,7 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString HighPrecisionMouseTooltip => new TranslatableString(getKey(@"high_precision_mouse_tooltip"), @"Attempts to bypass any operation system mouse acceleration. On windows, this is equivalent to what used to be known as ""Raw Input"".");
 
-         /// <summary>
+        /// <summary>
         /// "Separate sensitivity"
         /// </summary>
         public static LocalisableString SeparateSensitivity => new TranslatableString(getKey(@"separate_sensitivity"), @"Separate sensitivity");
