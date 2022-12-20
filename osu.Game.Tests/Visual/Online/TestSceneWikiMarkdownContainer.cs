@@ -16,13 +16,16 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers.Markdown;
+using osu.Game.Graphics.Containers.Markdown.Footnotes;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki.Markdown;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public partial class TestSceneWikiMarkdownContainer : OsuTestScene
+    public partial class TestSceneWikiMarkdownContainer : OsuManualInputManagerTestScene
     {
+        private OverlayScrollContainer scrollContainer;
         private TestMarkdownContainer markdownContainer;
 
         [Cached]
@@ -38,15 +41,25 @@ namespace osu.Game.Tests.Visual.Online
                     Colour = overlayColour.Background5,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new BasicScrollContainer
+                scrollContainer = new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding(20),
-                    Child = markdownContainer = new TestMarkdownContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                    }
+                }
+            };
+
+            scrollContainer.Child = new DependencyProvidingContainer
+            {
+                CachedDependencies = new (Type, object)[]
+                {
+                    (typeof(OverlayScrollContainer), scrollContainer)
+                },
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Child = markdownContainer = new TestMarkdownContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                 }
             };
         });
@@ -196,6 +209,52 @@ Line after image";
             {
                 markdownContainer.CurrentPath = @"https://dev.ppy.sh";
                 markdownContainer.Text = "::{flag=\"AU\"}:: ::{flag=\"ZZ\"}::";
+            });
+        }
+
+        [Test]
+        public void TestFootnotes()
+        {
+            AddStep("set content", () => markdownContainer.Text = @"This text has a footnote[^test].
+
+Here's some more text[^test2] with another footnote!
+
+# Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam efficitur laoreet posuere. Ut accumsan tortor in ipsum tincidunt ultrices. Suspendisse a malesuada tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce a sagittis nibh. In et velit sit amet mauris aliquet consectetur quis vehicula lorem. Etiam sit amet tellus ac velit ornare maximus. Donec quis metus eget libero ullamcorper imperdiet id vitae arcu. Vivamus iaculis rhoncus purus malesuada mollis. Vestibulum dictum at nisi sed tincidunt. Suspendisse finibus, ipsum ut dapibus commodo, leo eros porttitor sapien, non scelerisque nisi ligula sed ex. Pellentesque magna orci, hendrerit eu iaculis sit amet, ullamcorper in urna. Vivamus dictum mauris orci, nec facilisis dolor fringilla eu. Sed at porttitor nisi, at venenatis urna. Ut at orci vitae libero semper ullamcorper eu ut risus. Mauris hendrerit varius enim, ut varius nisi feugiat mattis.
+
+## In at eros urna. Sed ipsum lorem, tempor sit amet purus in, vehicula pellentesque leo. Fusce volutpat pellentesque velit sit amet porttitor. Nulla eget erat ex. Praesent eu lacinia est, quis vehicula lacus. Donec consequat ultrices neque, at finibus quam efficitur vel. Vestibulum molestie nisl sit amet metus semper, at vestibulum massa rhoncus. Quisque imperdiet suscipit augue, et dignissim odio eleifend ut.
+
+Aliquam sed vestibulum mauris, ut lobortis elit. Sed quis lacinia erat. Nam ultricies, risus non pellentesque sollicitudin, mauris dolor tincidunt neque, ac porta ipsum dui quis libero. Integer eget velit neque. Vestibulum venenatis mauris vitae rutrum vestibulum. Maecenas suscipit eu purus eu tempus. Nam dui nisl, bibendum condimentum mollis et, gravida vel dui. Sed et eros rutrum, facilisis sapien eu, mattis ligula. Fusce finibus pulvinar dolor quis consequat.
+
+Donec ipsum felis, feugiat vel fermentum at, commodo eu sapien. Suspendisse nec enim vitae felis laoreet laoreet. Phasellus purus quam, fermentum a pharetra vel, tempor et urna. Integer vitae quam diam. Aliquam tincidunt tortor a iaculis convallis. Suspendisse potenti. Cras quis risus quam. Nullam tincidunt in lorem posuere sagittis.
+
+Phasellus eu nunc nec ligula semper fringilla. Aliquam magna neque, placerat sed urna tristique, laoreet pharetra nulla. Vivamus maximus turpis purus, eu viverra dolor sodales porttitor. Praesent bibendum sapien purus, sed ultricies dolor iaculis sed. Fusce congue hendrerit malesuada. Nulla nulla est, auctor ac fringilla sed, ornare a lorem. Donec quis velit imperdiet, imperdiet sem non, pellentesque sapien. Maecenas in orci id ipsum placerat facilisis non sed nisi. Duis dictum lorem sodales odio dictum eleifend. Vestibulum bibendum euismod quam, eget pharetra orci facilisis sed. Vivamus at diam non ipsum consequat tristique. Pellentesque gravida dignissim pellentesque. Donec ullamcorper lacinia orci, id consequat purus faucibus quis. Phasellus metus nunc, iaculis a interdum vel, congue sed erat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam eros libero, hendrerit luctus nulla vitae, luctus maximus nunc.
+
+[^test]: This is a **footnote**.
+[^test2]: This is another footnote [with a link](https://google.com/)!");
+            AddStep("shrink scroll height", () => scrollContainer.Height = 0.5f);
+
+            AddStep("press second footnote link", () =>
+            {
+                InputManager.MoveMouseTo(markdownContainer.ChildrenOfType<OsuMarkdownFootnoteLink>().ElementAt(1));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("second footnote scrolled into view", () =>
+            {
+                var footnote = markdownContainer.ChildrenOfType<OsuMarkdownFootnote>().ElementAt(1);
+                return scrollContainer.ScreenSpaceDrawQuad.Contains(footnote.ScreenSpaceDrawQuad.TopLeft)
+                       && scrollContainer.ScreenSpaceDrawQuad.Contains(footnote.ScreenSpaceDrawQuad.BottomRight);
+            });
+
+            AddStep("press first footnote backlink", () =>
+            {
+                InputManager.MoveMouseTo(markdownContainer.ChildrenOfType<OsuMarkdownFootnoteBacklink>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("first footnote link scrolled into view", () =>
+            {
+                var footnote = markdownContainer.ChildrenOfType<OsuMarkdownFootnoteLink>().First();
+                return scrollContainer.ScreenSpaceDrawQuad.Contains(footnote.ScreenSpaceDrawQuad.TopLeft)
+                       && scrollContainer.ScreenSpaceDrawQuad.Contains(footnote.ScreenSpaceDrawQuad.BottomRight);
             });
         }
 
