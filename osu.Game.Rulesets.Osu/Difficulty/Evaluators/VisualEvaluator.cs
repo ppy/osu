@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double strain;
 
             if (isHiddenMod)
-                strain = Math.Min(25, Math.Pow(noteDensity, 2.25));
+                strain = Math.Min(25, Math.Pow(noteDensity, 2.5));
             else
                 strain = Math.Min(20, Math.Pow(noteDensity, 2));
 
