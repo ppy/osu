@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'MATRIX-feather/osu-framework'
-          ref: 'custom'
+          ref: 'daily'
           path: 'osu-framework'
 
       - name: 安装sdk (${{ matrix.dotnet-version }})
@@ -33,7 +33,7 @@ jobs:
 
       - name: 解决依赖
         working-directory: ./mfosu
-        run: dotnet restore
+        run: dotnet restore osu.Desktop
 
       - name: 构建
         working-directory: ./mfosu
