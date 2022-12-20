@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
-    public class SettingsPieceBasePanel : CompositeDrawable
+    public partial class SettingsPieceBasePanel : CompositeDrawable
     {
         private readonly OsuSpriteText text = new OsuSpriteText
         {

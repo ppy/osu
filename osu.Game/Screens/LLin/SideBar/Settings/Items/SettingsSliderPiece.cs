@@ -6,7 +6,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
-    public class SettingsSliderPiece<T> : SettingsPieceBasePanel, ISettingsItem<T>
+    public partial class SettingsSliderPiece<T> : SettingsPieceBasePanel, ISettingsItem<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         public Bindable<T> Bindable { get; set; }

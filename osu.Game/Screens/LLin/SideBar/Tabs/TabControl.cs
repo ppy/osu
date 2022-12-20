@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Screens.LLin.SideBar.Tabs
 {
-    internal class TabControl : CompositeDrawable
+    internal partial class TabControl : CompositeDrawable
     {
         public FillFlowContainer<TabControlItem> Tabs;
 

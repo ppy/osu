@@ -2,7 +2,7 @@ using Mvis.Plugin.CloudMusicSupport.Misc;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
-    public class DummyDrawableLyric : DrawableLyric
+    public partial class DummyDrawableLyric : DrawableLyric
     {
         public override int FinalHeight()
         {

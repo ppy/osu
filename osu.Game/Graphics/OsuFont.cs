@@ -4,7 +4,6 @@
 #nullable disable
 
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Utils;
 
 namespace osu.Game.Graphics
 {
@@ -75,7 +74,7 @@ namespace osu.Game.Graphics
             return null;
         }
 
-        public static string GetCustomTypeface() => CustomFontHelper.CurrentTypeface.Value;
+        //public static string GetCustomTypeface() => CustomFontHelper.CurrentTypeface.Value;
 
         /// <summary>
         /// Retrieves the string representation of a <see cref="FontWeight"/>.

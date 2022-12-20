@@ -13,6 +13,6 @@ namespace osu.Game.Online.Rooms
         public abstract Drawable GetIcon(OsuColour colours, float size);
 
         public override int GetHashCode() => GetType().GetHashCode();
-        public override bool Equals(object obj) => GetType() == obj?.GetType();
+        public override bool Equals(object? obj) => GetType() == obj?.GetType();
     }
 }

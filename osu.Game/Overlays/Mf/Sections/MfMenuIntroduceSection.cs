@@ -7,7 +7,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mf.Sections
 {
-    public class MfMenuIntroduceSection : MfMenuSection
+    public partial class MfMenuIntroduceSection : MfMenuSection
     {
         public override string Title => "关于";
         public override string SectionId => "Introduce";

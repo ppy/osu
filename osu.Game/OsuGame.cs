@@ -26,6 +26,7 @@ using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Sprites;
@@ -76,7 +77,7 @@ namespace osu.Game
     /// for initial components that are generally retrieved via DI.
     /// </summary>
     [Cached(typeof(OsuGame))]
-    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
+    public partial class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
     {
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
@@ -194,6 +195,8 @@ namespace osu.Game
         private IntroScreen introScreen;
 
         private Bindable<string> configRuleset;
+
+        private Bindable<bool> applySafeAreaConsiderations;
 
         private Bindable<float> uiScale;
 
@@ -337,10 +340,7 @@ namespace osu.Game
             configRuleset = LocalConfig.GetBindable<string>(OsuSetting.Ruleset);
             uiScale = LocalConfig.GetBindable<float>(OsuSetting.UIScale);
 
-            var preferredRuleset = int.TryParse(configRuleset.Value, out int rulesetId)
-                // int parsing can be removed 20220522
-                ? RulesetStore.GetRuleset(rulesetId)
-                : RulesetStore.GetRuleset(configRuleset.Value);
+            var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
 
             try
             {
@@ -371,6 +371,9 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
+
+            applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
+            applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -389,7 +392,7 @@ namespace osu.Game
         /// <param name="link">The link to load.</param>
         public void HandleLink(LinkDetails link) => Schedule(() =>
         {
-            string argString = link.Argument.ToString();
+            string argString = link.Argument.ToString() ?? string.Empty;
 
             switch (link.Action)
             {
@@ -466,6 +469,16 @@ namespace osu.Game
         {
             if (url.StartsWith('/'))
                 url = $"{API.APIEndpointUrl}{url}";
+
+            if (!url.CheckIsValidUrl())
+            {
+                Notifications.Post(new SimpleErrorNotification
+                {
+                    Text = $"The URL {url} has an unsupported or dangerous protocol and will not be opened.",
+                });
+
+                return;
+            }
 
             externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
         });
@@ -581,11 +594,29 @@ namespace osu.Game
                 }
                 else
                 {
-                    Logger.Log($"Completing {nameof(PresentBeatmap)} with beatmap {beatmap} ruleset {selection.Ruleset}");
-                    Ruleset.Value = selection.Ruleset;
-                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+                    // Don't change the local ruleset if the user is on another ruleset and is showing converted beatmaps at song select.
+                    // Eventually we probably want to check whether conversion is actually possible for the current ruleset.
+                    bool requiresRulesetSwitch = !selection.Ruleset.Equals(Ruleset.Value)
+                                                 && (selection.Ruleset.OnlineID > 0 || !LocalConfig.Get<bool>(OsuSetting.ShowConvertedBeatmaps));
+
+                    if (requiresRulesetSwitch)
+                    {
+                        Ruleset.Value = selection.Ruleset;
+                        Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+
+                        Logger.Log($"Completing {nameof(PresentBeatmap)} with beatmap {beatmap} ruleset {selection.Ruleset}");
+                    }
+                    else
+                    {
+                        Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+
+                        Logger.Log($"Completing {nameof(PresentBeatmap)} with beatmap {beatmap} (maintaining ruleset)");
+                    }
                 }
-            }, validScreens: new[] { typeof(SongSelect), typeof(IHandlePresentBeatmap) });
+            }, validScreens: new[]
+            {
+                typeof(SongSelect), typeof(IHandlePresentBeatmap)
+            });
         }
 
         /// <summary>
@@ -659,14 +690,14 @@ namespace osu.Game
             }, validScreens: validScreens);
         }
 
-        public override Task Import(params ImportTask[] imports)
+        public override Task Import(ImportTask[] imports, ImportParameters parameters = default)
         {
             // encapsulate task as we don't want to begin the import process until in a ready state.
 
             // ReSharper disable once AsyncVoidLambda
             // TODO: This is bad because `new Task` doesn't have a Func<Task?> override.
             // Only used for android imports and a bit of a mess. Probably needs rethinking overall.
-            var importTask = new Task(async () => await base.Import(imports).ConfigureAwait(false));
+            var importTask = new Task(async () => await base.Import(imports, parameters).ConfigureAwait(false));
 
             waitForReady(() => this, _ => importTask.Start());
 
@@ -978,19 +1009,6 @@ namespace osu.Game
 
             loadComponentSingleFile(new BackgroundBeatmapProcessor(), Add);
 
-            chatOverlay.State.BindValueChanged(_ => updateChatPollRate());
-            // Multiplayer modes need to increase poll rate temporarily.
-            API.Activity.BindValueChanged(_ => updateChatPollRate(), true);
-
-            void updateChatPollRate()
-            {
-                channelManager.HighPollRate.Value =
-                    chatOverlay.State.Value == Visibility.Visible
-                    || API.Activity.Value is UserActivity.InLobby
-                    || API.Activity.Value is UserActivity.InMultiplayerGame
-                    || API.Activity.Value is UserActivity.SpectatingMultiplayerGame;
-            }
-
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
@@ -1070,6 +1088,9 @@ namespace osu.Game
         {
             otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
 
+            Settings.Hide();
+            Notifications.Hide();
+
             // Partially visible so leave it at the current depth.
             if (overlay.IsPresent)
                 return;
@@ -1091,6 +1112,8 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database) return;
 
+                Debug.Assert(entry.Target != null);
+
                 const int short_term_display_limit = 3;
 
                 if (recentLogCount < short_term_display_limit)
@@ -1103,7 +1126,7 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
-                    string logFile = $@"{entry.Target.ToString().ToLowerInvariant()}.log";
+                    string logFile = $@"{entry.Target.Value.ToString().ToLowerInvariant()}.log";
 
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
@@ -1434,18 +1457,18 @@ namespace osu.Game
             switch (newCondition)
             {
                 case GamemodeActivateCondition.Always:
-                    linuxGameHost.GamemodeStart();
+                    GamemodeSupport.RequestStart();
                     break;
 
                 case GamemodeActivateCondition.InGame:
                     if (ScreenStack.CurrentScreen is Player)
-                        linuxGameHost.GamemodeStart();
+                        GamemodeSupport.RequestStart();
                     else
-                        linuxGameHost.GamemodeEnd();
+                        GamemodeSupport.RequestEnd();
                     break;
 
                 case GamemodeActivateCondition.Never:
-                    linuxGameHost.GamemodeEnd();
+                    GamemodeSupport.RequestEnd();
                     break;
             }
         }

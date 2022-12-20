@@ -15,7 +15,7 @@ using osu.Game.Configuration.AccelUtils;
 namespace osu.Game.Beatmaps.Drawables
 {
     [LongRunningLoad]
-    public class OnlineBeatmapSetCover : Sprite
+    public partial class OnlineBeatmapSetCover : Sprite
     {
         private readonly IBeatmapSetOnlineInfo set;
         private readonly BeatmapSetCoverType type;

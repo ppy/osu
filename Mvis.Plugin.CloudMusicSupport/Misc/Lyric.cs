@@ -20,7 +20,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc
             };
         }
 
-        public bool Equals(Lyric other)
+        public bool Equals(Lyric? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -28,14 +28,14 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc
             return Time == other.Time && Content == other.Content && TranslatedString == other.TranslatedString;
         }
 
-        public int CompareTo(Lyric other)
+        public int CompareTo(Lyric? other)
         {
             if (other == null) return 1;
 
             return other.Time.CompareTo(Time);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

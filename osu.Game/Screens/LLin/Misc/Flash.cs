@@ -7,7 +7,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.LLin.Misc
 {
-    public class Flash : BeatSyncedContainer
+    public partial class Flash : BeatSyncedContainer
     {
         private readonly Box flashBox = new Box
         {

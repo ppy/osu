@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new NightcoreBeatContainer());
+            drawableRuleset.Overlays.Add(new ModNightcore<TObject>.NightcoreBeatContainer());
         }
     }
 }

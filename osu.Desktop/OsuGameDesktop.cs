@@ -22,25 +22,17 @@ using osu.Desktop.Windows;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Handlers;
-using osu.Framework.Input.Handlers.Joystick;
-using osu.Framework.Input.Handlers.Mouse;
-using osu.Framework.Input.Handlers.Tablet;
-using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.Screens.Menu;
 using osu.Game.IPC;
-using osu.Game.Overlays.Settings;
-using osu.Game.Overlays.Settings.Sections;
-using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Utils;
 using SDL2;
 
 namespace osu.Desktop
 {
-    internal class OsuGameDesktop : OsuGame
+    internal partial class OsuGameDesktop : OsuGame
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
 
@@ -210,26 +202,25 @@ namespace osu.Desktop
             desktopWindow.CursorState |= CursorState.Hidden;
             desktopWindow.Title = Name;
             desktopWindow.DragDrop += f => fileDrop(new[] { f });
-        }
 
-        public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
-        {
-            switch (handler)
+            //mfosu: Find SDLWindowHandle
+            if (windowHandle == null)
             {
-                case ITabletHandler th:
-                    return new TabletSettings(th);
+                var fields = desktopWindow.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-                case MouseHandler mh:
-                    return new MouseSettings(mh);
+                foreach (var fieldInfo in fields)
+                {
+                    if (!fieldInfo.Name.Contains("SDLWindowHandle")) continue;
 
-                case JoystickHandler jh:
-                    return new JoystickSettings(jh);
+                    object? val = fieldInfo.GetValue(desktopWindow);
 
-                case TouchHandler th:
-                    return new InputSection.HandlerSection(th);
+                    windowHandle = (val is IntPtr ptr) ? ptr : IntPtr.Zero;
 
-                default:
-                    return base.CreateSettingsSubsectionFor(handler);
+                    break;
+                }
+
+                if (windowHandle == null || windowHandle == IntPtr.Zero)
+                    Logger.Log("未能找到WindowHandle，某些功能将被限制", level: LogLevel.Important);
             }
         }
 
@@ -273,7 +264,18 @@ namespace osu.Desktop
         public void TransformWindowOpacity(float final, double duration = 0, Easing easing = Easing.None) =>
             this.TransformBindableTo(windowOpacity, final, duration, easing);
 
-        public void SetWindowOpacity(float value) => ((SDL2DesktopWindow)Window).Opacity = value;
+        private IntPtr? windowHandle;
+
+        /// <summary>
+        /// Sets window opacity
+        /// mfosu interface
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetWindowOpacity(float value)
+        {
+            if (windowHandle != null && windowHandle != IntPtr.Zero)
+                SDL.SDL_SetWindowOpacity((IntPtr)windowHandle, value);
+        }
 
         protected override void Dispose(bool isDisposing)
         {

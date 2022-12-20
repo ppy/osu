@@ -13,10 +13,11 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays
 {
-    public class OnlinePictureOverlay : OsuFocusedOverlayContainer
+    public partial class OnlinePictureOverlay : OsuFocusedOverlayContainer
     {
         [Resolved]
         private OsuGame game { get; set; }
@@ -29,7 +30,7 @@ namespace osu.Game.Overlays
         private Container topbarContainer;
         private Container bottomContainer;
         private LoadingSpinner loadingSpinner;
-        private TriangleButton openInBrowserButton;
+        private RoundedButton openInBrowserButton;
         private OsuSpriteText infoText;
         private bool canOpenInBrowser;
 
@@ -96,7 +97,7 @@ namespace osu.Game.Overlays
                             Spacing = new Vector2(20),
                             Children = new Drawable[]
                             {
-                                openInBrowserButton = new TriangleButton
+                                openInBrowserButton = new RoundedButton
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.2f,
@@ -106,7 +107,7 @@ namespace osu.Game.Overlays
                                     Origin = Anchor.Centre,
                                     Action = () => openLink(target),
                                 },
-                                new TriangleButton
+                                new RoundedButton
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.2f,

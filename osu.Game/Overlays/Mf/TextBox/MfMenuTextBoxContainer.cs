@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mf.TextBox
 {
-    public class MfMenuTextBoxContainer : Container
+    public partial class MfMenuTextBoxContainer : Container
     {
         public string Title;
 

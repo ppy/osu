@@ -9,7 +9,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
 {
-    public class ColourPreviewer : Container
+    public partial class ColourPreviewer : Container
     {
         private readonly CustomColourProvider provider = new CustomColourProvider();
         private Box bg6;

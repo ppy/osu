@@ -6,7 +6,7 @@ using osuTK.Graphics;
 
 namespace Mvis.Plugin.BottomBar.Buttons
 {
-    public class BottomBarSwitchButton : BottomBarButton
+    public partial class BottomBarSwitchButton : BottomBarButton
     {
         public BindableBool Value = new BindableBool();
 

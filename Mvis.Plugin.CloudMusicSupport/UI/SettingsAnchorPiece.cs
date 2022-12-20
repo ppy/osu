@@ -5,7 +5,7 @@ using osu.Game.Screens.LLin.SideBar.Settings.Items;
 
 namespace Mvis.Plugin.CloudMusicSupport.UI
 {
-    public class SettingsAnchorPiece : SettingsListPiece<Anchor>
+    public partial class SettingsAnchorPiece : SettingsListPiece<Anchor>
     {
         public SettingsAnchorPiece()
         {

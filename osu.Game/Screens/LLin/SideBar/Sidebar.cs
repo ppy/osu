@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.SideBar
 {
-    internal class Sidebar : VisibilityContainer
+    internal partial class Sidebar : VisibilityContainer
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }

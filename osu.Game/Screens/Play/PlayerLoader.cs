@@ -31,7 +31,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class PlayerLoader : ScreenWithBeatmapBackground
+    public partial class PlayerLoader : ScreenWithBeatmapBackground
     {
         private float realExtraDelay = 750;
 
@@ -576,7 +576,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class MutedNotification : SimpleNotification
+        private partial class MutedNotification : SimpleNotification
         {
             public override bool IsImportant => true;
 
@@ -631,7 +631,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class BatteryWarningNotification : SimpleNotification
+        private partial class BatteryWarningNotification : SimpleNotification
         {
             public override bool IsImportant => true;
 

@@ -16,7 +16,7 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public class TaikoSelectionHandler : EditorSelectionHandler
+    public partial class TaikoSelectionHandler : EditorSelectionHandler
     {
         private readonly Bindable<TernaryState> selectionRimState = new Bindable<TernaryState>();
         private readonly Bindable<TernaryState> selectionStrongState = new Bindable<TernaryState>();

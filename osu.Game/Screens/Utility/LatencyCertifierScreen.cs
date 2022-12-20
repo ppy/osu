@@ -30,7 +30,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Utility
 {
     [Cached]
-    public class LatencyCertifierScreen : OsuScreen
+    public partial class LatencyCertifierScreen : OsuScreen
     {
         private FrameSync previousFrameSyncMode;
         private double previousActiveHz;
@@ -260,10 +260,7 @@ namespace osu.Game.Screens.Utility
 
             var displayMode = host.Window?.CurrentDisplayMode.Value;
 
-            string exclusive = "unknown";
-
-            if (host.Renderer is IWindowsRenderer windowsRenderer)
-                exclusive = windowsRenderer.FullscreenCapability.ToString();
+            string exclusive = (host.Renderer as IWindowsRenderer)?.FullscreenCapability.ToString() ?? "unknown";
 
             statusText.Clear();
 

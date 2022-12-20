@@ -12,7 +12,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Screens.Menu
 {
-    public class MenuLogoVisualisation : LogoVisualisation
+    internal partial class MenuLogoVisualisation : LogoVisualisation
     {
         private IBindable<APIUser> user;
         private Bindable<Skin> skin;

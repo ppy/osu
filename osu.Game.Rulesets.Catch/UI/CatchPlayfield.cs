@@ -10,12 +10,13 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchPlayfield : ScrollingPlayfield
+    public partial class CatchPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// The width of the playfield.
@@ -48,6 +49,8 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             this.difficulty = difficulty;
         }
+
+        protected override GameplayCursorContainer CreateCursor() => new CatchCursorContainer();
 
         [BackgroundDependencyLoader]
         private void load()

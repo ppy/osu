@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarMfButton : ToolbarOverlayToggleButton
+    public partial class ToolbarMfButton : ToolbarOverlayToggleButton
     {
         public ToolbarMfButton()
         {

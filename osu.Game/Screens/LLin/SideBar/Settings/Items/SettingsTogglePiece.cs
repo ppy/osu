@@ -7,7 +7,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
-    public class SettingsTogglePiece : SettingsPieceBasePanel, ISettingsItem<bool>
+    public partial class SettingsTogglePiece : SettingsPieceBasePanel, ISettingsItem<bool>
     {
         public Bindable<bool> Bindable { get; set; }
 

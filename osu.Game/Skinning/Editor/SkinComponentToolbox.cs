@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinComponentToolbox : EditorSidebarSection
+    public partial class SkinComponentToolbox : EditorSidebarSection
     {
         public Action<Type>? RequestPlacement;
 
@@ -59,9 +58,7 @@ namespace osu.Game.Skinning.Editor
         {
             try
             {
-                var instance = (Drawable)Activator.CreateInstance(type);
-
-                Debug.Assert(instance != null);
+                Drawable instance = (Drawable)Activator.CreateInstance(type)!;
 
                 if (!((ISkinnableDrawable)instance).IsEditable) return;
 
@@ -81,7 +78,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        public class ToolboxComponentButton : OsuButton
+        public partial class ToolboxComponentButton : OsuButton
         {
             public Action<Type>? RequestPlacement;
 
@@ -171,7 +168,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        public class DependencyBorrowingContainer : Container
+        public partial class DependencyBorrowingContainer : Container
         {
             protected override bool ShouldBeConsideredForInput(Drawable child) => false;
 

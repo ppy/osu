@@ -27,7 +27,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class Disclaimer : StartupScreen
+    public partial class Disclaimer : StartupScreen
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenPureColor(backgroundColor);
 
@@ -314,27 +314,22 @@ namespace osu.Game.Screens.Menu
         {
             string[] tips =
             {
-                "您可以在游戏中的任何位置按Ctrl+T来切换顶栏!",
-                "您可以在游戏中的任何位置按Ctrl+O来访问设置!",
-                "所有设置都是动态的，并实时生效。试试在游戏时时更改皮肤!",
-                "每一次更新都会携带全新的功能。确保您的游戏为最新版本!",
-                "如果您发现UI太大或太小，那么试试更改设置中的界面缩放!",
-                "试着调整“屏幕缩放”模式，即使在全屏模式下也可以更改游戏或UI区域！",
-                "osu!direct对所有用户可用。您可以使用Ctrl+D在任何地方访问它！",
-                "看到回放界面下面的时间条没？拖动他试试！",
-                "多线程模式允许您即使在低帧数的情况下也能拥有准确的判定！",
-                "在mod选择面板中向下滚动可以找到一堆有趣的新mod！",
-                "大部分web内容(玩家资料,在线排名等)在游戏内已有原生支持！点点看顶栏上的图标！",
-                "右键一个谱面可以选择查看在线信息，隐藏该谱面甚至删除单个难度！",
-                "所有删除操作在退出游戏前都是临时的！您可以在“维护”设置中选择恢复被意外删除的内容！",
-                "看看多人游戏中的“时移”玩法，他具备房间排行榜和游玩列表的功能！",
-                "您可以在游戏中按Ctrl+F11来切换高级fps显示功能！",
-                "使用Ctrl+F2来查看详细性能记录！",
-                "看看\"游玩列表\"系统, 他允许用户创建自己的自定义排行榜和永久排行榜!",
-                "使用linux游玩以获得更好的体验 ——翎",
-                "原来，你也玩osu",
-                "选择ppy，选择成功！",
-                "owo"
+                "You can press Ctrl-T anywhere in the game to toggle the toolbar!",
+                "You can press Ctrl-O anywhere in the game to access options!",
+                "All settings are dynamic and take effect in real-time. Try pausing and changing the skin while playing!",
+                "New features are coming online every update. Make sure to stay up-to-date!",
+                "If you find the UI too large or small, try adjusting UI scale in settings!",
+                "Try adjusting the \"Screen Scaling\" mode to change your gameplay or UI area, even in fullscreen!",
+                "What used to be \"osu!direct\" is available to all users just like on the website. You can access it anywhere using Ctrl-B!",
+                "Seeking in replays is available by dragging on the difficulty bar at the bottom of the screen!",
+                "Multithreading support means that even with low \"FPS\" your input and judgements will be accurate!",
+                "Try scrolling down in the mod select panel to find a bunch of new fun mods!",
+                "Most of the web content (profiles, rankings, etc.) are available natively in-game from the icons on the toolbar!",
+                "Get more details, hide or delete a beatmap by right-clicking on its panel at song select!",
+                "All delete operations are temporary until exiting. Restore accidentally deleted content from the maintenance settings!",
+                "Check out the \"playlists\" system, which lets users create their own custom and permanent leaderboards!",
+                "Toggle advanced frame / thread statistics with Ctrl-F11!",
+                "Take a look under the hood at performance counters and enable verbose performance logging with Ctrl-F2!",
             };
 
             return tips[RNG.Next(0, tips.Length)];

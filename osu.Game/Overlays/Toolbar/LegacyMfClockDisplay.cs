@@ -10,7 +10,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class LegacyMfClockDisplay : ClockDisplay
+    public partial class LegacyMfClockDisplay : ClockDisplay
     {
         private readonly OsuSpriteText spriteText;
         private readonly FillFlowContainer tooltipContainer;

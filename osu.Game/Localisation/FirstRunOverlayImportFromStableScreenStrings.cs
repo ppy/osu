@@ -15,10 +15,10 @@ namespace osu.Game.Localisation
         public static LocalisableString Header => new TranslatableString(getKey(@"llin_header"), @"导入");
 
         /// <summary>
-        /// "如果你之前装有stable，你可以选择在这里导入所有内容。 这将会复制一遍所有内容，并不影响现有的stable文件。"
+        /// "If you have an installation of a previous osu! version, you can choose to migrate your existing content. Note that this will not affect your existing installation's files in any way."
         /// </summary>
-        public static LocalisableString Description => new TranslatableString(getKey(@"llin_description"),
-            @"如果你之前装有stable，你可以选择在这里导入所有内容。 这将会复制一遍所有内容，并不影响现有的stable文件。");
+        public static LocalisableString Description => new TranslatableString(getKey(@"description"),
+            @"If you have an installation of a previous osu! version, you can choose to migrate your existing content. Note that this will not affect your existing installation's files in any way.");
 
         /// <summary>
         /// "stable安装地址"

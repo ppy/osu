@@ -7,7 +7,7 @@ using osu.Game.Screens.LLin.SideBar.Settings.Items;
 
 namespace osu.Game.Screens.LLin.Plugins
 {
-    internal class OsuMusicControllerWrapper : LLinPlugin, IProvideAudioControlPlugin
+    internal partial class OsuMusicControllerWrapper : LLinPlugin, IProvideAudioControlPlugin
     {
         [Resolved]
         private MusicController controller { get; set; }

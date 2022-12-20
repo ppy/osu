@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// A container which provides a "blueprint" display of items.
     /// Includes selection and manipulation support via a <see cref="Components.SelectionHandler{T}"/>.
     /// </summary>
-    public abstract class BlueprintContainer<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
+    public abstract partial class BlueprintContainer<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
         where T : class
     {
         protected DragBox DragBox { get; private set; }
@@ -58,6 +58,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         foreach (object o in args.NewItems)
                         {
                             if (blueprintMap.TryGetValue((T)o, out var blueprint))
@@ -67,6 +69,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
+                        Debug.Assert(args.OldItems != null);
+
                         foreach (object o in args.OldItems)
                         {
                             if (blueprintMap.TryGetValue((T)o, out var blueprint))

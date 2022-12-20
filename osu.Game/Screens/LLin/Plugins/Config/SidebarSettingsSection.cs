@@ -8,7 +8,7 @@ using osu.Game.Screens.LLin.SideBar.Settings.Sections;
 namespace osu.Game.Screens.LLin.Plugins.Config
 {
     [Obsolete("请使用GetSettingEntries")]
-    public abstract class PluginSidebarSettingsSection : Section
+    public abstract partial class PluginSidebarSettingsSection : Section
     {
         private readonly LLinPlugin plugin;
         protected IPluginConfigManager ConfigManager;
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.LLin.Plugins.Config
     }
 
     [Cached]
-    public class NewPluginSettingsSection : Section
+    public partial class NewPluginSettingsSection : Section
     {
         private readonly LLinPlugin plugin;
 

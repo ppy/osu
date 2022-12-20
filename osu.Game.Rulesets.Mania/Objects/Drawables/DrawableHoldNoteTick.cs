@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// <summary>
     /// Visualises a <see cref="HoldNoteTick"/> hit object.
     /// </summary>
-    public class DrawableHoldNoteTick : DrawableManiaHitObject<HoldNoteTick>
+    public partial class DrawableHoldNoteTick : DrawableManiaHitObject<HoldNoteTick>
     {
         /// <summary>
         /// References the time at which the user started holding the hold note.

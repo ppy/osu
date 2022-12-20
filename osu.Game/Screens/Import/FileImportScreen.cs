@@ -15,14 +15,13 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
 using FileInfo = System.IO.FileInfo;
 
 namespace osu.Game.Screens.Import
 {
-    public class FileImportScreen : OsuScreen
+    public partial class FileImportScreen : OsuScreen
     {
         public override bool HideOverlaysOnEnter => true;
 
@@ -30,7 +29,7 @@ namespace osu.Game.Screens.Import
         private Container contentContainer;
         private TextFlowContainer currentFileText;
 
-        private TriangleButton importButton;
+        private RoundedButton importButton;
 
         private const float duration = 300;
         private const float button_height = 50;
@@ -102,7 +101,7 @@ namespace osu.Game.Screens.Import
                                     }
                                 },
                             },
-                            importButton = new TriangleButton
+                            importButton = new RoundedButton
                             {
                                 Text = "导入该文件",
                                 Anchor = Anchor.BottomCentre,

@@ -4,7 +4,7 @@ using osu.Framework.Graphics.Pooling;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
-    public abstract class DrawableLyric : PoolableDrawable, IComparable<DrawableLyric>
+    public abstract partial class DrawableLyric : PoolableDrawable, IComparable<DrawableLyric>
     {
         public Lyric Value
         {
@@ -31,6 +31,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
         protected abstract void UpdateValue(Lyric lyric);
 
-        public int CompareTo(DrawableLyric other) => CurrentY.CompareTo(other.CurrentY);
+        public int CompareTo(DrawableLyric? other) => CurrentY.CompareTo(other?.CurrentY ?? 0);
     }
 }

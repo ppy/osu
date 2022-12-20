@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
 {
-    public class FunctionBar : LLinPlugin, IFunctionBarProvider
+    public partial class FunctionBar : LLinPlugin, IFunctionBarProvider
     {
         public float GetSafeAreaPadding() => Height;
 

@@ -23,7 +23,7 @@ namespace osu.Game.Scoring
             throw new System.NotImplementedException();
         }
 
-        public override ArchiveDownloadRequest<IScoreInfo> GetExistingDownload(IScoreInfo model)
+        public override ArchiveDownloadRequest<IScoreInfo>? GetExistingDownload(IScoreInfo model)
             => CurrentDownloads.Find(r => r.Model.MatchesOnlineID(model));
     }
 }

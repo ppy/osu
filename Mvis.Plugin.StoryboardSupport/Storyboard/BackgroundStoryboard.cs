@@ -8,7 +8,7 @@ using osu.Game.Storyboards.Drawables;
 namespace Mvis.Plugin.StoryboardSupport.Storyboard
 {
     [LongRunningLoad]
-    public class BackgroundStoryboard : BeatmapSkinProvidingContainer
+    public partial class BackgroundStoryboard : BeatmapSkinProvidingContainer
     {
         public InterpolatingFramedClock RunningClock;
         private DrawableStoryboard drawableStoryboard;

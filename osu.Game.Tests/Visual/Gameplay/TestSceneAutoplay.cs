@@ -19,7 +19,7 @@ using osu.Game.Users.Drawables;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [Description("Player instantiated with an autoplay mod.")]
-    public class TestSceneAutoplay : TestSceneAllRulesetPlayers
+    public partial class TestSceneAutoplay : TestSceneAllRulesetPlayers
     {
         protected new TestReplayPlayer Player => (TestReplayPlayer)base.Player;
 

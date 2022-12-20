@@ -100,6 +100,11 @@ namespace osu.Game.Localisation
         public static LocalisableString StoryboardVideo => new TranslatableString(getKey(@"storyboard_video"), @"故事板 / 视频");
 
         /// <summary>
+        /// "Combo colour normalisation"
+        /// </summary>
+        public static LocalisableString ComboColourNormalisation => new TranslatableString(getKey(@"combo_colour_normalisation"), @"Combo colour normalisation");
+
+        /// <summary>
         /// "击打闪光"
         /// </summary>
         public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"击打闪光");
@@ -139,6 +144,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Png => new TranslatableString(getKey(@"png_lossless"), @"PNG (lossless)");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

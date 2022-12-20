@@ -24,7 +24,7 @@ using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
 namespace Mvis.Plugin.CloudMusicSupport
 {
-    public class LyricPlugin : BindableControlledPlugin
+    public partial class LyricPlugin : BindableControlledPlugin
     {
         /// <summary>
         /// 请参阅 <see cref="LLinPlugin.TargetLayer"/>

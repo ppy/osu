@@ -16,7 +16,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuSettingsSubsection : RulesetSettingsSubsection
+    public partial class OsuSettingsSubsection : RulesetSettingsSubsection
     {
         protected override LocalisableString Header => "osu!";
 
@@ -265,17 +265,17 @@ namespace osu.Game.Rulesets.Osu.UI
             };
         }
 
-        private class MultiplierSlider : OsuSliderBar<float>
+        private partial class MultiplierSlider : OsuSliderBar<float>
         {
             public override LocalisableString TooltipText => Current.Value.ToString("N3") + "x";
         }
 
-        private class AngleSlider : OsuSliderBar<float>
+        private partial class AngleSlider : OsuSliderBar<float>
         {
             public override LocalisableString TooltipText => (Current.Value * 180).ToString("N2") + "deg";
         }
 
-        private class FramerateSlider : OsuSliderBar<float>
+        private partial class FramerateSlider : OsuSliderBar<float>
         {
             public override LocalisableString TooltipText => Current.Value.ToString("N0") + "fps";
         }

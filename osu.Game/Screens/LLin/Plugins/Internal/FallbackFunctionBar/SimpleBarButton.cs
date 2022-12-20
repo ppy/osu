@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
 {
-    public class SimpleBarButton : CompositeDrawable, IHasTooltip
+    public partial class SimpleBarButton : CompositeDrawable, IHasTooltip
     {
         private readonly SpriteIcon spriteIcon = new SpriteIcon
         {

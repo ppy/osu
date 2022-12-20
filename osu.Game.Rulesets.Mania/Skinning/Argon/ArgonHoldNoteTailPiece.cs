@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    internal class ArgonHoldNoteTailPiece : CompositeDrawable
+    internal partial class ArgonHoldNoteTailPiece : CompositeDrawable
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 },
                 new Container
                 {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.82f,
                     Masking = true,
@@ -54,6 +56,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = ArgonNotePiece.CORNER_RADIUS * 2,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
                 },
             };
         }

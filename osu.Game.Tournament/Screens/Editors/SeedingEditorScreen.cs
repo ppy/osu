@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public class SeedingEditorScreen : TournamentEditorScreen<SeedingEditorScreen.SeedingResultRow, SeedingResult>
+    public partial class SeedingEditorScreen : TournamentEditorScreen<SeedingEditorScreen.SeedingResultRow, SeedingResult>
     {
         private readonly TournamentTeam team;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Tournament.Screens.Editors
             this.team = team;
         }
 
-        public class SeedingResultRow : CompositeDrawable, IModelBacked<SeedingResult>
+        public partial class SeedingResultRow : CompositeDrawable, IModelBacked<SeedingResult>
         {
             public SeedingResult Model { get; }
 
@@ -106,7 +106,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 AutoSizeAxes = Axes.Y;
             }
 
-            public class SeedingBeatmapEditor : CompositeDrawable
+            public partial class SeedingBeatmapEditor : CompositeDrawable
             {
                 private readonly SeedingResult round;
                 private readonly FillFlowContainer flow;
@@ -134,7 +134,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     flow.Add(new SeedingBeatmapRow(round, user));
                 }
 
-                public class SeedingBeatmapRow : CompositeDrawable
+                public partial class SeedingBeatmapRow : CompositeDrawable
                 {
                     private readonly SeedingResult result;
                     public SeedingBeatmap Model { get; }
@@ -239,17 +239,17 @@ namespace osu.Game.Tournament.Screens.Editors
 
                             var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = Model.ID });
 
-                            req.Success += res =>
+                            req.Success += res => Schedule(() =>
                             {
                                 Model.Beatmap = new TournamentBeatmap(res);
                                 updatePanel();
-                            };
+                            });
 
-                            req.Failure += _ =>
+                            req.Failure += _ => Schedule(() =>
                             {
                                 Model.Beatmap = null;
                                 updatePanel();
-                            };
+                            });
 
                             API.Queue(req);
                         }, true);

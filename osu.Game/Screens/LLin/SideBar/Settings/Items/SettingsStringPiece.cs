@@ -13,7 +13,7 @@ using osu.Game.Screens.LLin.Plugins.Config;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
-    public class SettingsStringPiece : SettingsPieceBasePanel, ISettingsItem<string>
+    public partial class SettingsStringPiece : SettingsPieceBasePanel, ISettingsItem<string>
     {
         private OsuTextBox textBox;
         public LocalisableString TooltipText { get; set; }
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             base.OnMiddleClick();
         }
 
-        private class SettingsTextBox : OutlinedTextBox
+        private partial class SettingsTextBox : OutlinedTextBox
         {
             [BackgroundDependencyLoader]
             private void load(CustomColourProvider ccp)

@@ -8,7 +8,7 @@ using osu.Game.Screens.LLin.SideBar.Tabs;
 
 namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
 {
-    internal class DummyBasePlugin : LLinPlugin
+    internal partial class DummyBasePlugin : LLinPlugin
     {
         internal DummyBasePlugin(MConfigManager config, LLinPluginManager plmgr)
         {
@@ -89,6 +89,12 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
                     Name = "自动启用垂直同步",
                     Bindable = config.GetBindable<bool>(MSetting.MvisAutoVSync),
                     Description = "启用后，将在进入播放器时自动启用垂直同步，并在退出时恢复帧数限制"
+                },
+                new BooleanSettingsEntry
+                {
+                    Name = "使用新版三角粒子",
+                    Bindable = config.GetBindable<bool>(MSetting.MvisUseTriangleV2),
+                    Description = "可能不适合所有背景，仍需调教"
                 },
                 new NumberSettingsEntry<float>
                 {

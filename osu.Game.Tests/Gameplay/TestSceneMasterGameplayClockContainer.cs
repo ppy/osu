@@ -17,7 +17,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneMasterGameplayClockContainer : OsuTestScene
+    public partial class TestSceneMasterGameplayClockContainer : OsuTestScene
     {
         private OsuConfigManager localConfig;
 

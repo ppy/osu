@@ -61,7 +61,7 @@ namespace osu.Game.Screens.LLin.Plugins
                 //From RulesetStore
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    string name = assembly.GetName().Name;
+                    string? name = assembly.GetName().Name ?? "unknown";
 
                     if (!name.StartsWith("Mvis.Plugin", StringComparison.Ordinal)
                         && !name.StartsWith("LLin.Plugin", StringComparison.Ordinal))
@@ -138,13 +138,19 @@ namespace osu.Game.Screens.LLin.Plugins
         /// </summary>
         /// <param name="pluginType">要添加的插件</param>
         /// <param name="fullName">与pluginType对应的Assembly的fullName</param>
-        private void addMvisPlugin(Type pluginType, string fullName)
+        private void addMvisPlugin(Type pluginType, string? fullName)
         {
             //Logger.Log($"载入 {fullName}");
 
+            if (fullName == null)
+            {
+                Logger.Log($"插件{pluginType}的FullName为null，将不会加载");
+                return;
+            }
+
             try
             {
-                var providerInstance = (LLinPluginProvider)Activator.CreateInstance(pluginType);
+                var providerInstance = (LLinPluginProvider)Activator.CreateInstance(pluginType)!;
                 LoadedPluginProviders.Add(providerInstance);
                 //Logger.Log($"[OK] 载入 {fullName}");
             }

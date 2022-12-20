@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
-    public class ScrollingHitObjectContainer : HitObjectContainer
+    public partial class ScrollingHitObjectContainer : HitObjectContainer
     {
         private readonly IBindable<double> timeRange = new BindableDouble();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();

@@ -24,7 +24,7 @@ using static osu.Game.Tests.Visual.Navigation.TestSceneScreenNavigation;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestSceneSkinEditorNavigation : OsuGameTestScene
+    public partial class TestSceneSkinEditorNavigation : OsuGameTestScene
     {
         private TestPlaySongSelect songSelect;
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();

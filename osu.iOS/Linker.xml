@@ -24,4 +24,8 @@
     <assembly fullname="osu.Game.Rulesets.Osu">
         <type fullname="*" />
     </assembly>
+    <assembly fullname="mscorlib">
+        <!-- see https://github.com/ppy/osu/issues/21516 -->
+        <type fullname="System.Globalization.*Calendar"/>
+    </assembly>
 </linker>

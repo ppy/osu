@@ -8,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.Mf
 {
-    public class HashOverridenWarning : CompositeDrawable
+    public partial class HashOverridenWarning : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         private void load(OsuGameBase gameBase, TextureStore textures)

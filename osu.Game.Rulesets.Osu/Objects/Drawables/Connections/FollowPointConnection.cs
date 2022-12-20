@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// Visualises the <see cref="FollowPoint"/>s between two <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPointConnection : PoolableDrawableWithLifetime<FollowPointLifetimeEntry>
+    public partial class FollowPointConnection : PoolableDrawableWithLifetime<FollowPointLifetimeEntry>
     {
         // Todo: These shouldn't be constants
         public const int SPACING = 32;

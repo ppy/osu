@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     /// <summary>
     /// A visualisation of a single <see cref="PathControlPoint"/> in a <see cref="Slider"/>.
     /// </summary>
-    public class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
+    public partial class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
     {
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
 

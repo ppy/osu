@@ -4,7 +4,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.OnlinePicture
 {
-    public class OnlinePictureContentContainer : Container
+    public partial class OnlinePictureContentContainer : Container
     {
         public Func<float> GetTopBarHeight;
         public Func<float> GetBottomContainerHeight;

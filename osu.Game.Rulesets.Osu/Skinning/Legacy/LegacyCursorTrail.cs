@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyCursorTrail : CursorTrail
+    public partial class LegacyCursorTrail : CursorTrail
     {
         private readonly ISkin skin;
         private readonly BindableBool forceLong = new BindableBool();
@@ -24,7 +22,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private bool disjointTrail;
         private double lastTrailTime;
-        private IBindable<float> cursorSize;
+
+        private IBindable<float> cursorSize = null!;
 
         private Vector2? currentPosition;
 
@@ -39,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(OsuRulesetConfigManager rulesetConfig)
         {
+            cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize).GetBoundCopy();
+
             Texture = skin.GetTexture("cursortrail");
             rulesetConfig.BindWith(OsuRulesetSetting.CursorTrailForceLong, forceLong);
             forceLong.BindValueChanged(_ => updateDisjoint(), true);
@@ -67,6 +68,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             else
             {
                 Blending = BlendingParameters.Additive;
+            }
+
+            if (Texture != null)
+            {
+                // stable "magic ratio". see OsuPlayfieldAdjustmentContainer for full explanation.
+                Texture.ScaleAdjust *= 1.6f;
             }
         }
 

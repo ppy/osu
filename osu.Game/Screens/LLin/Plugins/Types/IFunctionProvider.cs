@@ -48,7 +48,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types
         /// </summary>
         public Action<bool> OnActive { get; set; }
 
-        public string ToString() => $"{Title} - {Description}";
+        public string? ToString() => $"{Title} - {Description}";
     }
 
     public interface IToggleableFunctionProvider : IFunctionProvider

@@ -7,7 +7,7 @@ using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
 namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
 {
-    internal class DummyAudioPlugin : LLinPlugin
+    internal partial class DummyAudioPlugin : LLinPlugin
     {
         internal DummyAudioPlugin(MConfigManager config, LLinPluginManager plmgr)
         {

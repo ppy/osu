@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyMainCirclePiece : CompositeDrawable
+    public partial class LegacyMainCirclePiece : CompositeDrawable
     {
         public override bool RemoveCompletedTransforms => false;
 
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             InternalChildren = new[]
             {
-                CircleSprite = new KiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
+                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = OverlaySprite = new KiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
+                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             if (hasNumber)
             {
-                OverlayLayer.Add(hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
+                OverlayLayer.Add(hitCircleText = new SkinnableSpriteText(new OsuSkinComponentLookup(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,

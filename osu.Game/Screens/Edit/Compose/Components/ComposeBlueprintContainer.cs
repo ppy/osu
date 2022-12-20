@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
 using osuTK.Input;
@@ -29,7 +30,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A blueprint container generally displayed as an overlay to a ruleset's playfield.
     /// </summary>
-    public class ComposeBlueprintContainer : EditorBlueprintContainer
+    public partial class ComposeBlueprintContainer : EditorBlueprintContainer
     {
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 
@@ -57,7 +58,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             TernaryStates = CreateTernaryButtons().ToArray();
 
-            AddInternal(placementBlueprintContainer);
+            AddInternal(new DrawableRulesetDependenciesProvidingContainer(Composer.Ruleset)
+            {
+                Child = placementBlueprintContainer
+            });
         }
 
         protected override void LoadComplete()

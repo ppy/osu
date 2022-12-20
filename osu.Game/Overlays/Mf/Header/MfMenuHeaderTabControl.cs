@@ -7,7 +7,7 @@ using osu.Game.Overlays.Mf.Sections;
 
 namespace osu.Game.Overlays.Mf.Header
 {
-    public class MfMenuHeaderTabControl : OverlayTabControl<MfMenuSection>
+    public partial class MfMenuHeaderTabControl : OverlayTabControl<MfMenuSection>
     {
         public const float HEIGHT = 47;
         private const float bar_height = 2;
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Mf.Header
             Direction = FillDirection.Horizontal,
         };
 
-        private class ProfileSectionTabItem : OverlayTabItem
+        private partial class ProfileSectionTabItem : OverlayTabItem
         {
             public ProfileSectionTabItem(MfMenuSection value)
                 : base(value)

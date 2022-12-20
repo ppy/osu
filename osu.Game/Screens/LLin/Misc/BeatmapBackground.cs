@@ -7,7 +7,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.LLin.Misc
 {
-    public class BeatmapBackground : BufferedContainer
+    public partial class BeatmapBackground : BufferedContainer
     {
         private readonly Sprite sprite;
         private readonly WorkingBeatmap beatmap;

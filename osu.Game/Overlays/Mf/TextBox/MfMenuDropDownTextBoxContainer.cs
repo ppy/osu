@@ -5,7 +5,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Mf.TextBox
 {
-    public class MfMenuDropDownTextBoxContainer : MfMenuTextBoxContainer
+    public partial class MfMenuDropDownTextBoxContainer : MfMenuTextBoxContainer
     {
         private readonly BindableBool isExpanded = new BindableBool();
         protected override bool Clickable => true;

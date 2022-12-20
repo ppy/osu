@@ -131,11 +131,17 @@ namespace osu.Game.Screens
         /// </summary>
         /// <param name="fontType">要添加的字体</param>
         /// <param name="fullName">与fontType对应的Assembly的fullName</param>
-        private void addFont(Type fontType, string fullName)
+        private void addFont(Type fontType, string? fullName)
         {
+            if (fullName == null)
+            {
+                Logger.Log("字体" + fontType + "的FullName为null，将不会加载");
+                return;
+            }
+
             try
             {
-                var currentFontInfo = (Font)Activator.CreateInstance(fontType);
+                var currentFontInfo = (Font)Activator.CreateInstance(fontType)!;
 
                 if (ActiveFonts.Any(f => f.FamilyName == currentFontInfo.FamilyName))
                 {

@@ -24,7 +24,7 @@ using osuTK.Graphics;
 
 namespace Mvis.Plugin.Yasp
 {
-    public class YaspPlugin : BindableControlledPlugin
+    public partial class YaspPlugin : BindableControlledPlugin
     {
         private Drawable currentContent;
 

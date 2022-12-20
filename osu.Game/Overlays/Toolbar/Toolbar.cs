@@ -22,7 +22,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class Toolbar : OverlayContainer, IKeyBindingHandler<GlobalAction>
+    public partial class Toolbar : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float HEIGHT = 40;
         public const float TOOLTIP_HEIGHT = 30;
@@ -147,6 +147,8 @@ namespace osu.Game.Overlays.Toolbar
                                 Name = "Right buttons",
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
                                 Children = new Drawable[]
                                 {
                                     new Box
@@ -214,7 +216,7 @@ namespace osu.Game.Overlays.Toolbar
             rulesetSelector.Current.BindTo(ruleset);
         }
 
-        public class ToolbarBackground : Container
+        public partial class ToolbarBackground : Container
         {
             private readonly Box gradientBackground;
 

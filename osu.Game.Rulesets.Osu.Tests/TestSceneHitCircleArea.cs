@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneHitCircleArea : OsuManualInputManagerTestScene
+    public partial class TestSceneHitCircleArea : OsuManualInputManagerTestScene
     {
         private HitCircle hitCircle;
         private DrawableHitCircle drawableHitCircle;
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             hitCircle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            Child = new SkinProvidingContainer(new TrianglesSkin(null))
+            Child = new SkinProvidingContainer(new TrianglesSkin(null!))
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = drawableHitCircle = new DrawableHitCircle(hitCircle)

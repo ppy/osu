@@ -8,7 +8,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
 {
-    public class ToggleableBarButton : SimpleBarButton
+    public partial class ToggleableBarButton : SimpleBarButton
     {
         private Box indicator;
 

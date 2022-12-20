@@ -16,9 +16,9 @@ using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace Mvis.Plugin.CloudMusicSupport.Helper
 {
-    public class UserDefinitionHelper : Component
+    public partial class UserDefinitionHelper : Component
     {
-        private APIMappingRoot mappingRoot;
+        private APIMappingRoot? mappingRoot;
 
         #region 依赖
 
@@ -136,11 +136,11 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             var result = mappingRoot.Data.FirstOrDefault(m =>
                 (m.ArtistMatchMode == MatchingMode.Contains
                     ? m.MatchingArtist.Any(s => metadata.Artist.Contains(s) || (metadata.ArtistUnicode?.Contains(s) ?? false))
-                    : m.MatchingArtist.Any(s => metadata.Artist.Equals(s) || (metadata.ArtistUnicode?.Equals(s) ?? false)))
+                    : m.MatchingArtist.Any(s => metadata.Artist == s || metadata.ArtistUnicode == s))
                 &&
                 (m.TitleMatchMode == MatchingMode.Contains
                     ? m.MatchingTitle.Any(s => metadata.Title.Contains(s) || (metadata.TitleUnicode?.Contains(s) ?? false))
-                    : m.MatchingTitle.Any(s => metadata.Title.Equals(s) || (metadata.TitleUnicode?.Equals(s) ?? false)))
+                    : m.MatchingTitle.Any(s => metadata.Title == s || metadata.TitleUnicode == s))
             );
 
             if (result != null) neteaseID = result.TargetNeteaseID;
@@ -150,6 +150,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
         internal void Debug()
         {
+            if (mappingRoot == null) return;
+
             foreach (var mapping in mappingRoot.Data)
             {
                 string titleString = "";

@@ -14,7 +14,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class DifficultySection : SetupSection
+    internal partial class DifficultySection : SetupSection
     {
         private LabelledSliderBar<float> circleSizeSlider;
         private LabelledSliderBar<float> healthDrainSlider;

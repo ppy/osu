@@ -13,7 +13,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsParticipantsList : OnlinePlayTestScene
+    public partial class TestScenePlaylistsParticipantsList : OnlinePlayTestScene
     {
         public override void SetUpSteps()
         {

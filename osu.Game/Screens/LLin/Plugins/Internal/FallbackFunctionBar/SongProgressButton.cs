@@ -5,7 +5,7 @@ using osu.Game.Screens.LLin.Plugins.Types;
 
 namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
 {
-    public class SongProgressButton : ToggleableBarButton
+    public partial class SongProgressButton : ToggleableBarButton
     {
         public SongProgressButton(IToggleableFunctionProvider provider)
             : base(provider)

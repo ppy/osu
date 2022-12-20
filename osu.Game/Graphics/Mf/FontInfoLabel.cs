@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.Mf
 {
-    public class FontInfoLabel : CompositeDrawable, IHasCustomTooltip
+    public partial class FontInfoLabel : CompositeDrawable, IHasCustomTooltip
     {
         private readonly Font font;
         private readonly Box bg;

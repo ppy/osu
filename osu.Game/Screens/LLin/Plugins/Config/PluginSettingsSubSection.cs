@@ -7,7 +7,7 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Screens.LLin.Plugins.Config
 {
     [Obsolete("请使用GetSettingEntries")]
-    public abstract class PluginSettingsSubSection : SettingsSubsection
+    public abstract partial class PluginSettingsSubSection : SettingsSubsection
     {
         private readonly LLinPlugin plugin;
         protected IPluginConfigManager ConfigManager;
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.LLin.Plugins.Config
         }
     }
 
-    public class PluginSettingsSubsection : SettingsSubsection
+    public partial class PluginSettingsSubsection : SettingsSubsection
     {
         private readonly LLinPlugin plugin;
 

@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
-    public class SettingsTextBoxWithIndicator : SettingsTextBox
+    public partial class SettingsTextBoxWithIndicator : SettingsTextBox
     {
         public enum ParseState
         {
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             currentIndicator.UpdateInfo(state, result, errors);
         }
 
-        private class Indicator : CompositeDrawable
+        private partial class Indicator : CompositeDrawable
         {
             private readonly SpriteIcon iconDisplay = new SpriteIcon
             {

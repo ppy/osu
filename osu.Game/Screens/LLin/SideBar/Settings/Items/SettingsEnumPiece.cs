@@ -4,7 +4,7 @@ using osu.Framework.Extensions;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
-    public class SettingsEnumPiece<T> : SettingsListPiece<T>
+    public partial class SettingsEnumPiece<T> : SettingsListPiece<T>
         where T : struct, Enum
     {
         public SettingsEnumPiece()

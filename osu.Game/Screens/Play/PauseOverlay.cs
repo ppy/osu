@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class PauseOverlay : GameplayMenuOverlay
+    public partial class PauseOverlay : GameplayMenuOverlay
     {
         public Action OnResume;
 

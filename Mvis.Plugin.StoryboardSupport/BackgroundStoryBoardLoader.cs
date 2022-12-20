@@ -21,7 +21,7 @@ namespace Mvis.Plugin.StoryboardSupport
     ///<summary>
     /// 负责故事版的异步加载功能
     ///</summary>
-    public class BackgroundStoryBoardLoader : BindableControlledPlugin
+    public partial class BackgroundStoryBoardLoader : BindableControlledPlugin
     {
         public const float STORYBOARD_FADEIN_DURATION = 750;
         public const float STORYBOARD_FADEOUT_DURATION = STORYBOARD_FADEIN_DURATION / 2;
@@ -125,7 +125,7 @@ namespace Mvis.Plugin.StoryboardSupport
 
         public override IPluginConfigManager CreateConfigManager(Storage storage) => new SbLoaderConfigManager(storage);
 
-        private SettingsEntry[] entries;
+        private SettingsEntry[]? entries;
 
         public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {

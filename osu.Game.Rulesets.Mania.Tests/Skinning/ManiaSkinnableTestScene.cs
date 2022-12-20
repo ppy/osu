@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
     /// <summary>
     /// A test scene for skinnable mania components.
     /// </summary>
-    public abstract class ManiaSkinnableTestScene : SkinnableTestScene
+    public abstract partial class ManiaSkinnableTestScene : SkinnableTestScene
     {
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly TestScrollingInfo scrollingInfo = new TestScrollingInfo();

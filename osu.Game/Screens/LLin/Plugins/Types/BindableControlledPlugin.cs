@@ -3,7 +3,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.LLin.Plugins.Types
 {
-    public abstract class BindableControlledPlugin : LLinPlugin
+    public abstract partial class BindableControlledPlugin : LLinPlugin
     {
         [Resolved]
         private LLinPluginManager manager { get; set; }

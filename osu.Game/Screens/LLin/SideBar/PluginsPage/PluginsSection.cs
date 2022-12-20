@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.SideBar.PluginsPage
 {
-    internal class PluginsSection : Section
+    internal partial class PluginsSection : Section
     {
         private LLinPluginManager manager;
         private FillFlowContainer placeholder;

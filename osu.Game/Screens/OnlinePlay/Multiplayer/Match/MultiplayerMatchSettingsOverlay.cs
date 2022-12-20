@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -25,7 +26,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
+    public partial class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
     {
         private MatchSettings settings = null!;
 
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             SettingsApplied = Hide
         };
 
-        protected class MatchSettings : OnlinePlayComposite
+        protected partial class MatchSettings : OnlinePlayComposite
         {
             private const float disabled_alpha = 0.2f;
 
@@ -64,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public OsuEnumDropdown<QueueMode> QueueModeDropdown = null!;
             public OsuTextBox PasswordTextBox = null!;
             public OsuCheckbox AutoSkipCheckbox = null!;
-            public TriangleButton ApplyButton = null!;
+            public RoundedButton ApplyButton = null!;
 
             public OsuSpriteText ErrorText = null!;
 
@@ -274,7 +275,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = DrawableRoomPlaylistItem.HEIGHT
                                                         },
-                                                        new PurpleTriangleButton
+                                                        new RoundedButton
                                                         {
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = 40,
@@ -460,7 +461,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             });
         }
 
-        public class CreateOrUpdateButton : TriangleButton
+        public partial class CreateOrUpdateButton : RoundedButton
         {
             [Resolved(typeof(Room), nameof(Room.RoomID))]
             private Bindable<long?> roomId { get; set; } = null!;
@@ -474,9 +475,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                BackgroundColour = colours.Yellow;
-                Triangles.ColourLight = colours.YellowLight;
-                Triangles.ColourDark = colours.YellowDark;
+                BackgroundColour = colours.YellowDark;
             }
         }
 

@@ -4,7 +4,7 @@ using System;
 
 namespace osu.Game.Screens.Select
 {
-    public class MvisBeatmapDetailArea : BeatmapDetailArea
+    public partial class MvisBeatmapDetailArea : BeatmapDetailArea
     {
         public Action SelectCurrentAction;
 

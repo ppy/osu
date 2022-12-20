@@ -67,6 +67,7 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.MvisTabControlPosition, TabControlPosition.Right);
             SetDefault(MSetting.MvisAutoVSync, true);
             SetDefault(MSetting.MvisPlayerSettingsMaxWidth, 0.6f, 0.2f, 1f);
+            SetDefault(MSetting.MvisUseTriangleV2, false);
 
             //实验性功能
             SetDefault(MSetting.CustomWindowIconPath, "");
@@ -160,7 +161,8 @@ namespace osu.Game.Configuration
         TrackPreviewAccelSource,
         InGameLeaderboardState,
         MvisAutoVSync,
-        MvisPlayerSettingsMaxWidth
+        MvisPlayerSettingsMaxWidth,
+        MvisUseTriangleV2
     }
 
     public enum GamemodeActivateCondition

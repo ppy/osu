@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace Mvis.Plugin.BottomBar.Buttons
 {
-    public class BottomBarButton : CompositeDrawable, IHasTooltip
+    public partial class BottomBarButton : CompositeDrawable, IHasTooltip
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
@@ -223,7 +223,7 @@ namespace Mvis.Plugin.BottomBar.Buttons
 
         public void DoFlash() => OnClickAnimation();
 
-        private class RippleSprite : Sprite
+        private partial class RippleSprite : Sprite
         {
             [BackgroundDependencyLoader]
             private void load(LargeTextureStore textureStore)

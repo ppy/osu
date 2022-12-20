@@ -3,11 +3,11 @@
 
 namespace osu.Game.Overlays.Mf.Header
 {
-    public class MfMenuHeader : OverlayHeader
+    public partial class MfMenuHeader : OverlayHeader
     {
         protected override OverlayTitle CreateTitle() => new MfTitle();
 
-        private class MfTitle : OverlayTitle
+        private partial class MfTitle : OverlayTitle
         {
             public MfTitle()
             {

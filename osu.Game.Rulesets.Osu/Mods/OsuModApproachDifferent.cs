@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon { get; } = FontAwesome.Regular.Circle;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles) };
+        public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles), typeof(OsuModFreezeFrame) };
 
         [SettingSource("初始大小", "更改缩圈相较与圆圈的的初始大小。", 0)]
         public BindableFloat Scale { get; } = new BindableFloat(4)

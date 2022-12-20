@@ -25,7 +25,7 @@ using osu.Game.Users;
 
 namespace osu.Desktop.DBus
 {
-    public class DBusManagerContainer : Component, IDBusManagerContainer<IMDBusObject>
+    public partial class DBusManagerContainer : Component, IDBusManagerContainer<IMDBusObject>
     {
         public DBusManager<IMDBusObject> DBusManager;
 
@@ -327,7 +327,7 @@ namespace osu.Desktop.DBus
             {
                 if (!sdl2DesktopWindow.Visible) sdl2DesktopWindow.Visible = true;
 
-                sdl2DesktopWindow.Raise();
+                //sdl2DesktopWindow.Raise();
             });
         }
 

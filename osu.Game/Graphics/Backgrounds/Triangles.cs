@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Rendering.Vertices;
@@ -21,11 +20,10 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    public class Triangles : Drawable
+    public partial class Triangles : Drawable
     {
         [Resolved]
         private Bindable<WorkingBeatmap> b { get; set; }
@@ -35,12 +33,13 @@ namespace osu.Game.Graphics.Backgrounds
             Value = true
         };
 
-        private float extraY;
-        public bool IgnoreSettings;
-        public bool EnableBeatSync;
-        private float alphaOrig = 1;
         private const float triangle_size = 100;
         private const float base_velocity = 50;
+
+        /// <summary>
+        /// sqrt(3) / 2
+        /// </summary>
+        private const float equilateral_triangle_ratio = 0.866f;
 
         /// <summary>
         /// How many screen-space pixels are smoothed over.
@@ -86,7 +85,13 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         protected virtual float SpawnRatio => 1;
 
-        private float triangleScale = 1;
+        private readonly BindableFloat triangleScale = new BindableFloat(1f);
+
+        public float TriangleScale
+        {
+            get => triangleScale.Value;
+            set => triangleScale.Value = value;
+        }
 
         /// <summary>
         /// Whether we should drop-off alpha values of triangles more quickly to improve
@@ -116,87 +121,22 @@ namespace osu.Game.Graphics.Backgrounds
                 stableRandom = new Random(seed.Value);
         }
 
-        [Resolved(CanBeNull = true)]
-        private MConfigManager config { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(IRenderer renderer, ShaderManager shaders)
         {
             texture = renderer.WhitePixel;
-            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
-
-            alphaOrig = Alpha;
-            config?.BindWith(MSetting.TrianglesEnabled, trianglesEnabled);
-
-            trianglesEnabled.ValueChanged += _ => updateIcons();
-        }
-
-        private void updateFreq()
-        {
-            float[] sum = b.Value?.Track.CurrentAmplitudes.FrequencyAmplitudes.ToArray() ?? new float[256];
-            float totalSum = 0.1f;
-            bool isKiai = b.Value?.Beatmap.ControlPointInfo.EffectPointAt(b.Value?.Track?.CurrentTime ?? 0).KiaiMode ?? false;
-
-            sum.ForEach(a => totalSum += a);
-
-            if (isKiai) totalSum *= 1.5f;
-
-            extraY = totalSum;
-        }
-
-        private void updateIcons()
-        {
-            if (IgnoreSettings) return;
-
-            switch (trianglesEnabled.Value)
-            {
-                case true:
-                    this.FadeTo(alphaOrig, 250);
-                    break;
-
-                case false:
-                    this.FadeOut(250);
-                    break;
-            }
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            addTriangles(true);
-
-            updateIcons();
-        }
-
-        public float TriangleScale
-        {
-            get => triangleScale;
-            set
-            {
-                float change = value / triangleScale;
-                triangleScale = value;
-
-                for (int i = 0; i < parts.Count; i++)
-                {
-                    TriangleParticle newParticle = parts[i];
-                    newParticle.Scale *= change;
-                    parts[i] = newParticle;
-                }
-            }
+            triangleScale.BindValueChanged(_ => Reset(), true);
         }
 
         protected override void Update()
         {
             base.Update();
-
-            if (EnableBeatSync)
-            {
-                updateFreq();
-            }
-            else
-            {
-                extraY = 1;
-            }
 
             Invalidate(Invalidation.DrawNode);
 
@@ -212,7 +152,7 @@ namespace osu.Game.Graphics.Backgrounds
             // Since position is relative, the velocity needs to scale inversely with DrawHeight.
             // Since we will later multiply by the scale of individual triangles we normalize by
             // dividing by triangleScale.
-            float movedDistance = (-elapsedSeconds * Velocity * base_velocity * extraY) / (DrawHeight * triangleScale);
+            float movedDistance = -elapsedSeconds * Velocity * base_velocity / (DrawHeight * TriangleScale);
 
             for (int i = 0; i < parts.Count; i++)
             {
@@ -224,7 +164,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 parts[i] = newParticle;
 
-                float bottomPos = parts[i].Position.Y + triangle_size * parts[i].Scale * 0.866f / DrawHeight;
+                float bottomPos = parts[i].Position.Y + triangle_size * parts[i].Scale * equilateral_triangle_ratio / DrawHeight;
                 if (bottomPos < 0)
                     parts.RemoveAt(i);
             }
@@ -250,9 +190,11 @@ namespace osu.Game.Graphics.Backgrounds
             // Limited by the maximum size of QuadVertexBuffer for safety.
             const int max_triangles = ushort.MaxValue / (IRenderer.VERTICES_PER_QUAD + 2);
 
-            AimCount = (int)Math.Min(max_triangles, (DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio));
+            AimCount = (int)Math.Min(max_triangles, DrawWidth * DrawHeight * 0.002f / (TriangleScale * TriangleScale) * SpawnRatio);
 
-            for (int i = 0; i < AimCount - parts.Count; i++)
+            int currentCount = parts.Count;
+
+            for (int i = 0; i < AimCount - currentCount; i++)
                 parts.Add(createTriangle(randomY));
         }
 
@@ -260,11 +202,25 @@ namespace osu.Game.Graphics.Backgrounds
         {
             TriangleParticle particle = CreateTriangle();
 
-            particle.Position = new Vector2(nextRandom(), randomY ? nextRandom() : 1);
+            particle.Position = getRandomPosition(randomY, particle.Scale);
             particle.ColourShade = nextRandom();
             particle.Colour = CreateTriangleShade(particle.ColourShade);
 
             return particle;
+        }
+
+        private Vector2 getRandomPosition(bool randomY, float scale)
+        {
+            float y = 1;
+
+            if (randomY)
+            {
+                // since triangles are drawn from the top - allow them to be positioned a bit above the screen
+                float maxOffset = triangle_size * scale * equilateral_triangle_ratio / DrawHeight;
+                y = Interpolation.ValueAt(nextRandom(), -maxOffset, 1f, 0f, 1f);
+            }
+
+            return new Vector2(nextRandom(), y);
         }
 
         /// <summary>
@@ -279,7 +235,7 @@ namespace osu.Game.Graphics.Backgrounds
             float u1 = 1 - nextRandom(); //uniform(0,1] random floats
             float u2 = 1 - nextRandom();
             float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); // random normal(0,1)
-            float scale = Math.Max(triangleScale * (mean + std_dev * randStdNormal), 0.1f); // random normal(mean,stdDev^2)
+            float scale = Math.Max(TriangleScale * (mean + std_dev * randStdNormal), 0.1f); // random normal(mean,stdDev^2)
 
             return new TriangleParticle { Scale = scale };
         }
@@ -349,7 +305,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 foreach (TriangleParticle particle in parts)
                 {
-                    var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
+                    var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * equilateral_triangle_ratio);
 
                     var triangle = new Triangle(
                         Vector2Extensions.Transform(particle.Position * size, DrawInfo.Matrix),

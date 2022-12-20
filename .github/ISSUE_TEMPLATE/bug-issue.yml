@@ -58,7 +58,8 @@ body:
 
         The default places to find the logs on desktop platforms are as follows:
           - `%AppData%/osu/logs` *on Windows*
-          - `~/.local/share/osu/logs` *on Linux & macOS*
+          - `~/.local/share/osu/logs` *on Linux*
+          - `~/Library/Application Support/osu/logs` *on macOS*
 
         If you have selected a custom location for the game files, you can find the `logs` folder there.
 

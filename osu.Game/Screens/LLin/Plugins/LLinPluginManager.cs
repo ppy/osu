@@ -26,7 +26,7 @@ using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
 namespace osu.Game.Screens.LLin.Plugins
 {
-    public class LLinPluginManager : CompositeDrawable
+    public partial class LLinPluginManager : CompositeDrawable
     {
         #region 插件管理
 
@@ -96,19 +96,17 @@ namespace osu.Game.Screens.LLin.Plugins
         internal Type GetAudioControlTypeByPath([NotNull] string path) => resolver.GetAudioControlPluginByPath(path);
         internal Type GetFunctionBarProviderTypeByPath([NotNull] string path) => resolver.GetFunctionBarProviderByPath(path);
 
-        [CanBeNull]
-        internal IProvideAudioControlPlugin GetAudioControlByPath([NotNull] string path)
-            => (IProvideAudioControlPlugin)avaliablePlugins.FirstOrDefault(pl => pl is IProvideAudioControlPlugin && resolver.ToPath(pl) == path);
+        internal IProvideAudioControlPlugin? GetAudioControlByPath([NotNull] string path)
+            => (IProvideAudioControlPlugin?)avaliablePlugins.FirstOrDefault(pl => pl is IProvideAudioControlPlugin && resolver.ToPath(pl) == path);
 
-        [CanBeNull]
-        internal IFunctionBarProvider GetFunctionBarProviderByPath([NotNull] string path)
-            => (IFunctionBarProvider)avaliablePlugins.FirstOrDefault(pl => pl is IFunctionBarProvider && resolver.ToPath(pl) == path);
+        internal IFunctionBarProvider? GetFunctionBarProviderByPath([NotNull] string path)
+            => (IFunctionBarProvider?)avaliablePlugins.FirstOrDefault(pl => pl is IFunctionBarProvider && resolver.ToPath(pl) == path);
 
         private bool platformSupportsDBus => RuntimeInfo.OS == RuntimeInfo.Platform.Linux;
 
-        internal bool AddPlugin(LLinPlugin pl)
+        internal bool AddPlugin(LLinPlugin? pl)
         {
-            if (avaliablePlugins.Contains(pl) || pl == null) return false;
+            if (pl == null || avaliablePlugins.Contains(pl)) return false;
 
             if (pl.Version < MinimumPluginVersion)
                 Logger.Log($"插件 \"{pl.Name}\" 是为旧版本的mf-osu打造的, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);
@@ -122,15 +120,17 @@ namespace osu.Game.Screens.LLin.Plugins
             return true;
         }
 
-        internal bool UnLoadPlugin(LLinPlugin pl, bool blockFromFutureLoad = false)
+        internal bool UnLoadPlugin(LLinPlugin? pl, bool blockFromFutureLoad = false)
         {
-            if (!avaliablePlugins.Contains(pl) || pl == null) return false;
+            if (pl == null || !avaliablePlugins.Contains(pl)) return false;
 
             var provider = providers.Find(p => p.CreatePlugin.GetType() == pl.GetType());
 
             activePlugins.Remove(pl);
             avaliablePlugins.Remove(pl);
-            providers.Remove(provider);
+
+            if (provider != null)
+                providers.Remove(provider);
 
             try
             {
@@ -143,10 +143,10 @@ namespace osu.Game.Screens.LLin.Plugins
                 pl.UnLoad();
                 OnPluginUnLoad?.Invoke(pl);
 
-                var providerAssembly = provider.GetType().Assembly;
+                var providerAssembly = provider?.GetType().Assembly;
                 var gameAssembly = GetType().Assembly;
 
-                if (providerAssembly != gameAssembly && blockFromFutureLoad)
+                if (providerAssembly != null && providerAssembly != gameAssembly && blockFromFutureLoad)
                 {
                     blockedProviders.Add(providerAssembly.ToString());
 

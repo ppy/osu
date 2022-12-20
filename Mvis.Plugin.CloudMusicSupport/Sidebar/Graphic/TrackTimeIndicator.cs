@@ -11,7 +11,7 @@ using osu.Game.Screens.LLin.Plugins;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
-    public class TrackTimeIndicator : CompositeDrawable
+    public partial class TrackTimeIndicator : CompositeDrawable
     {
         [Resolved]
         private IImplementLLin mvisScreen { get; set; }

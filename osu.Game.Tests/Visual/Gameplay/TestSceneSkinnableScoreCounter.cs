@@ -13,7 +13,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableScoreCounter : SkinnableHUDComponentTestScene
+    public partial class TestSceneSkinnableScoreCounter : SkinnableHUDComponentTestScene
     {
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());

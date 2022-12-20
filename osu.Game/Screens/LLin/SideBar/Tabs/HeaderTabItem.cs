@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.SideBar.Tabs
 {
-    internal class TabControlItem : OsuClickableContainer
+    internal partial class TabControlItem : OsuClickableContainer
     {
         private readonly Box activeBox;
         private readonly SpriteIcon icon;

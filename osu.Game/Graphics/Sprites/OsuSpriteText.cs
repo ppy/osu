@@ -2,13 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Utils;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public class OsuSpriteText : SpriteText
+    public partial class OsuSpriteText : SpriteText
     {
         public bool NoFontAutoUpdate;
 
@@ -18,6 +16,7 @@ namespace osu.Game.Graphics.Sprites
             Font = OsuFont.Default;
         }
 
+        /*
         [Resolved]
         private CustomFontHelper helper { get; set; }
 
@@ -41,5 +40,6 @@ namespace osu.Game.Graphics.Sprites
 
             base.Dispose(isDisposing);
         }
+        */
     }
 }

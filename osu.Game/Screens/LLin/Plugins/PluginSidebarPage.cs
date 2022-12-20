@@ -12,7 +12,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.LLin.Plugins
 {
-    public abstract class PluginSidebarPage : Container, ISidebarContent
+    public abstract partial class PluginSidebarPage : Container, ISidebarContent
     {
         private readonly ClickablePlaceholder placeholder;
         private readonly Container content;

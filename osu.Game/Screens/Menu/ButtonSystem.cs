@@ -35,7 +35,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
-    public class ButtonSystem : Container, IStateful<ButtonSystemState>, IKeyBindingHandler<GlobalAction>
+    public partial class ButtonSystem : Container, IStateful<ButtonSystemState>, IKeyBindingHandler<GlobalAction>
     {
         public event Action<ButtonSystemState> StateChanged;
 

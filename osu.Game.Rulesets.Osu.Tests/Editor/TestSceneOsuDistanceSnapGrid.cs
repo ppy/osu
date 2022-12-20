@@ -4,12 +4,15 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Overlays;
@@ -24,7 +27,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneOsuDistanceSnapGrid : OsuManualInputManagerTestScene
+    public partial class TestSceneOsuDistanceSnapGrid : OsuManualInputManagerTestScene
     {
         private const float beat_length = 100;
 
@@ -52,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         };
 
         private OsuDistanceSnapGrid grid;
+        private SnappingCursorContainer cursor;
 
         public TestSceneOsuDistanceSnapGrid()
         {
@@ -88,8 +92,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.SlateGray
                 },
+                cursor = new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position },
                 grid = new OsuDistanceSnapGrid(new HitCircle { Position = grid_position }),
-                new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position }
             };
         });
 
@@ -155,6 +159,37 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
+        public void TestReferenceObjectNotOnSnapGrid()
+        {
+            AddStep("create grid", () =>
+            {
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.SlateGray
+                    },
+                    cursor = new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position },
+                    grid = new OsuDistanceSnapGrid(new HitCircle
+                    {
+                        Position = grid_position,
+                        // This is important. It sets the reference object to a point in time that isn't on the current snap divisor's grid.
+                        // We are testing that the grid's display is offset correctly.
+                        StartTime = 40,
+                    }),
+                };
+            });
+
+            AddStep("move mouse to point", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2(beat_length, 0) * 2)));
+
+            AddAssert("Ensure cursor is on a grid line", () =>
+            {
+                return grid.ChildrenOfType<CircularProgress>().Any(p => Precision.AlmostEquals(p.ScreenSpaceDrawQuad.TopRight.X, grid.ToScreenSpace(cursor.LastSnappedPosition).X));
+            });
+        }
+
+        [Test]
         public void TestLimitedDistance()
         {
             AddStep("create limited grid", () =>
@@ -166,8 +201,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.SlateGray
                     },
+                    cursor = new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position },
                     grid = new OsuDistanceSnapGrid(new HitCircle { Position = grid_position }, new HitCircle { StartTime = 200 }),
-                    new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position }
                 };
             });
 
@@ -182,9 +217,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             return Precision.AlmostEquals(expectedDistance, Vector2.Distance(snappedPosition, grid_position));
         });
 
-        private class SnappingCursorContainer : CompositeDrawable
+        private partial class SnappingCursorContainer : CompositeDrawable
         {
             public Func<Vector2, Vector2> GetSnapPosition;
+
+            public Vector2 LastSnappedPosition { get; private set; }
 
             private readonly Drawable cursor;
 
@@ -214,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             protected override void Update()
             {
                 base.Update();
-                cursor.Position = GetSnapPosition.Invoke(inputManager.CurrentState.Mouse.Position);
+                cursor.Position = LastSnappedPosition = GetSnapPosition.Invoke(inputManager.CurrentState.Mouse.Position);
             }
         }
     }
