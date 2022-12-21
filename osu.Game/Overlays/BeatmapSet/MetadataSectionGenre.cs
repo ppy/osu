@@ -2,24 +2,29 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using Humanizer;
 using osu.Framework.Extensions;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.BeatmapListing;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public partial class MetadataSectionGenre : MetadataSection
+    public partial class MetadataSectionGenre : MetadataSection<BeatmapSetOnlineGenre>
     {
-        public MetadataSectionGenre(Action<string>? searchAction = null)
+        public MetadataSectionGenre(Action<BeatmapSetOnlineGenre>? searchAction = null)
             : base(MetadataType.Genre, searchAction)
         {
         }
 
-        protected override void AddMetadata(string text, LinkFlowContainer loaded)
+        protected override void AddMetadata(BeatmapSetOnlineGenre text, LinkFlowContainer loaded)
         {
-            loaded.AddLink(text.DehumanizeTo<SearchGenre>().GetLocalisableDescription(), LinkAction.FilterBeatmapSetGenre, text);
+            var genre = (SearchGenre)text.Id;
+
+            if (Enum.IsDefined(genre))
+                loaded.AddLink(genre.GetLocalisableDescription(), LinkAction.FilterBeatmapSetGenre, genre);
+            else
+                loaded.AddText(text.Name);
         }
     }
 }
