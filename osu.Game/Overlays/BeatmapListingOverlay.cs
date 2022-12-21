@@ -110,13 +110,13 @@ namespace osu.Game.Overlays
             ScrollFlow.ScrollToStart();
         }
 
-        public void ShowWithGenreFilter(string genre)
+        public void ShowWithGenreFilter(SearchGenre genre)
         {
             ShowWithSearch(string.Empty);
             filterControl.FilterGenre(genre);
         }
 
-        public void ShowWithLanguageFilter(string language)
+        public void ShowWithLanguageFilter(SearchLanguage language)
         {
             ShowWithSearch(string.Empty);
             filterControl.FilterLanguage(language);
