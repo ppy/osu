@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 [BackgroundDependencyLoader]
                 private void load()
                 {
-                    InternalChildren = new Drawable[]
+                    AddRange(new Drawable[]
                     {
                         backgroundBox = new Box
                         {
@@ -162,7 +162,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                             Colour = colourProvider.Light1,
                             Text = Language.GetDescription(),
                         }
-                    };
+                    });
                 }
 
                 protected override void LoadComplete()
