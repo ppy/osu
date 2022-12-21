@@ -12,6 +12,7 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -544,19 +545,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
             waitForChannel1Visible();
 
-            AddStep("Right click username", () =>
-            {
-                var username = this.ChildrenOfType<DrawableUsername>().First();
-                InputManager.MoveMouseTo(username);
-                InputManager.Click(MouseButton.Right);
-            });
-
-            AddStep("Click report", () =>
-            {
-                var btn = this.ChildrenOfType<OsuSpriteText>().First(x => x.Text == "Report");
-                InputManager.MoveMouseTo(btn);
-                InputManager.Click(MouseButton.Left);
-            });
+            AddStep("Show report popover", () => this.ChildrenOfType<DrawableUsername>().First().ShowPopover());
 
             AddStep("Try to report", () =>
             {
