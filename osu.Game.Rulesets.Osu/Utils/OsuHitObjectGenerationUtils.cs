@@ -250,7 +250,42 @@ namespace osu.Game.Rulesets.Osu.Utils
         {
             double streamSpacing = timingPoint.BeatLength / spacing;
 
-            if (slider.RepeatCount % 2 == 1)
+            if (slider.RepeatCount >= 7)
+            {
+                // repeat is long, creating square pattern
+
+                int i = 0;
+                double time = slider.StartTime;
+                Vector2 len = slider.Path.PositionAt(1);
+                Vector2 lenHalf = len / 2;
+                Vector2 start = slider.Position;
+                Vector2[] points =
+                {
+                    start,
+                    start + lenHalf + lenHalf.PerpendicularLeft,
+                    start + len,
+                    start + lenHalf + lenHalf.PerpendicularRight
+                };
+
+                while (!Precision.DefinitelyBigger(time, slider.GetEndTime(), 1))
+                {
+                    var samplePoint = (SampleControlPoint)slider.SampleControlPoint.DeepClone();
+                    samplePoint.Time = time;
+
+                    yield return new HitCircle
+                    {
+                        StartTime = time,
+                        Position = points[i % 4],
+                        NewCombo = i == 0 && slider.NewCombo,
+                        SampleControlPoint = samplePoint,
+                        Samples = slider.HeadCircle.Samples.Select(s => s.With()).ToList()
+                    };
+
+                    i += 1;
+                    time = slider.StartTime + i * streamSpacing;
+                }
+            }
+            else if (slider.RepeatCount % 2 == 1)
             {
                 // slider head and tail are in the same place - creating a stack.
 
