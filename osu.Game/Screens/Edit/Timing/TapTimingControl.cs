@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -29,9 +30,13 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
 
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
+
         private readonly BindableBool isHandlingTapping = new BindableBool();
 
         private MetronomeDisplay metronome = null!;
+        private Container<WaveformComparisonDisplay> waveformContainer = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
@@ -88,7 +93,11 @@ namespace osu.Game.Screens.Edit.Timing
                                                     Anchor = Anchor.CentreLeft,
                                                     Origin = Anchor.CentreLeft,
                                                 },
-                                                new WaveformComparisonDisplay(),
+                                                waveformContainer = new Container<WaveformComparisonDisplay>
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Child = new WaveformComparisonDisplay(),
+                                                }
                                             }
                                         },
                                     }
@@ -179,6 +188,13 @@ namespace osu.Game.Screens.Edit.Timing
                 if (handling.NewValue)
                     start();
             }, true);
+
+            musicController.TrackChanged += onTrackReload;
+        }
+
+        private void onTrackReload(WorkingBeatmap beatmap, TrackChangeDirection tcd)
+        {
+            waveformContainer.Child = new WaveformComparisonDisplay();
         }
 
         private void start()
@@ -231,6 +247,12 @@ namespace osu.Game.Screens.Edit.Timing
                 return;
 
             timing.BeatLength = 60000 / (timing.BPM + adjust);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            musicController.TrackChanged -= onTrackReload;
+            base.Dispose(isDisposing);
         }
 
         private partial class InlineButton : OsuButton
