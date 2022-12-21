@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 using osuTK.Input;
@@ -35,13 +36,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public readonly Bindable<bool> TicksVisible = new Bindable<bool>();
 
-        public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
-
         [Resolved]
         private EditorClock editorClock { get; set; }
 
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; }
+
+        [Resolved]
+        private MusicController musicController { get; set; }
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
@@ -139,11 +141,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
 
-            Beatmap.BindTo(beatmap);
-            Beatmap.BindValueChanged(b =>
-            {
-                waveform.Waveform = b.NewValue.Waveform;
-            }, true);
+            musicController.TrackChanged += onTrackReload;
+            waveform.Waveform = beatmap.Value.Waveform;
 
             Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
         }
@@ -180,6 +179,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateWaveformOpacity() =>
             waveform.FadeTo(WaveformVisible.Value ? waveformOpacity.Value : 0, 200, Easing.OutQuint);
+
+        private void onTrackReload(WorkingBeatmap beatmap, TrackChangeDirection tcd)
+        {
+            waveform.Waveform = beatmap.Waveform;
+        }
 
         protected override void Update()
         {
@@ -320,6 +324,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             double time = TimeAtPosition(Content.ToLocalSpace(screenSpacePosition).X);
             return new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(time));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            musicController.TrackChanged -= onTrackReload;
+            base.Dispose(isDisposing);
         }
     }
 }
