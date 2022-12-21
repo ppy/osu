@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatchCursorContainer(Mod[] mods) : base(mods)
         {
-
         }
     }
 }
