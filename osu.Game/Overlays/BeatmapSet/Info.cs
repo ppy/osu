@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = new MetadataSection(MetadataType.Description),
+                                Child = new MetadataSectionDescription(),
                             },
                         },
                         new Container
@@ -78,10 +78,10 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Direction = FillDirection.Full,
                                 Children = new[]
                                 {
-                                    source = new MetadataSection(MetadataType.Source),
-                                    genre = new MetadataSection(MetadataType.Genre) { Width = 0.5f },
-                                    language = new MetadataSection(MetadataType.Language) { Width = 0.5f },
-                                    tags = new MetadataSection(MetadataType.Tags),
+                                    source = new MetadataSectionSource(),
+                                    genre = new MetadataSectionGenre { Width = 0.5f },
+                                    language = new MetadataSectionLanguage { Width = 0.5f },
+                                    tags = new MetadataSectionTags(),
                                 },
                             },
                         },
