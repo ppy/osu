@@ -48,7 +48,7 @@ namespace osu.Game.Beatmaps
 
         private readonly object beatmapFetchLock = new object();
 
-        private readonly Lazy<Waveform> waveform;
+        private Lazy<Waveform> waveform;
         private readonly Lazy<Storyboard> storyboard;
         private readonly Lazy<ISkin> skin;
         private Track track; // track is not Lazy as we allow transferring and loading multiple times.
@@ -328,6 +328,12 @@ namespace osu.Game.Beatmaps
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
         #endregion
+
+        public void InvalidateWaveform()
+        {
+            if (waveform.IsValueCreated)
+                waveform = new Lazy<Waveform>(GetWaveform);
+        }
 
         public override string ToString() => BeatmapInfo.ToString();
 
