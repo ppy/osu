@@ -29,7 +29,7 @@ namespace osu.Game.Online.Solo
         private IAPIProvider api { get; set; } = null!;
 
         private readonly Dictionary<long, StatisticsUpdateCallback> callbacks = new Dictionary<long, StatisticsUpdateCallback>();
-        private readonly HashSet<long> scoresWithoutCallback = new HashSet<long>();
+        private long? lastProcessedScoreId;
 
         private readonly Dictionary<string, UserStatistics> latestStatistics = new Dictionary<string, UserStatistics>();
 
@@ -53,7 +53,7 @@ namespace osu.Game.Online.Solo
 
             var callback = new StatisticsUpdateCallback(score, onUpdateReady);
 
-            if (scoresWithoutCallback.Remove(score.OnlineID))
+            if (lastProcessedScoreId == score.OnlineID)
             {
                 requestStatisticsUpdate(api.LocalUser.Value.Id, callback);
                 return;
@@ -65,7 +65,7 @@ namespace osu.Game.Online.Solo
         private void onUserChanged(APIUser? localUser) => Schedule(() =>
         {
             callbacks.Clear();
-            scoresWithoutCallback.Clear();
+            lastProcessedScoreId = null;
             latestStatistics.Clear();
 
             if (!api.IsLoggedIn)
@@ -87,11 +87,10 @@ namespace osu.Game.Online.Solo
             if (userId != api.LocalUser.Value?.OnlineID)
                 return;
 
+            lastProcessedScoreId = scoreId;
+
             if (!callbacks.TryGetValue(scoreId, out var callback))
-            {
-                scoresWithoutCallback.Add(scoreId);
                 return;
-            }
 
             requestStatisticsUpdate(userId, callback);
             callbacks.Remove(scoreId);
