@@ -105,7 +105,14 @@ namespace osu.Game.Beatmaps
 
         public virtual bool TrackLoaded => track != null;
 
-        public Track LoadTrack() => track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+        public Track LoadTrack()
+        {
+            // track could be changed, clearing waveform cache
+            waveform = null;
+
+            track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+            return track;
+        }
 
         public void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0)
         {
@@ -171,12 +178,6 @@ namespace osu.Game.Beatmaps
         #region Waveform
 
         public Waveform Waveform => waveform ??= GetWaveform();
-
-        /// <summary>
-        /// Reloads waveform of beatmap's track even if one is already cached.
-        /// </summary>
-        /// <returns>Newly loaded waveform.</returns>
-        public Waveform LoadWaveform() => waveform = GetWaveform();
 
         #endregion
 

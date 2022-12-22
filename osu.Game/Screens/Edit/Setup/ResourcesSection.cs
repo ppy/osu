@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.Setup
             }
 
             working.Value.Metadata.AudioFile = destination.Name;
-            working.Value.LoadWaveform();
+
             editorBeatmap.SaveState();
             music.ReloadCurrentTrack();
 
