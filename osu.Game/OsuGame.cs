@@ -1040,9 +1040,7 @@ namespace osu.Game
 
             Logger.NewEntry += entry =>
             {
-                if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database) return;
-
-                Debug.Assert(entry.Target != null);
+                if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database || entry.Target == null) return;
 
                 const int short_term_display_limit = 3;
 
