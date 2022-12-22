@@ -74,7 +74,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             if (Client.LocalUser?.Equals(user) == true)
             {
                 clickableContent.Action = changeTeam;
-                clickableContent.TooltipText = "Change team";
+                clickableContent.TooltipText = "change team";
             }
 
             sampleTeamSwap = audio.Samples.Get(@"Multiplayer/team-swap");

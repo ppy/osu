@@ -157,7 +157,7 @@ namespace osu.Game.Screens.Select.Carousel
             else
             {
                 Enabled.Value = true;
-                TooltipText = "Update beatmap with online changes";
+                TooltipText = "update beatmap with online changes";
 
                 progressFill.ResizeWidthTo(0, 100, Easing.OutQuint);
             }

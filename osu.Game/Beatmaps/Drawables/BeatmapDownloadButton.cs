@@ -100,7 +100,7 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     case DownloadState.LocallyAvailable:
                         button.Enabled.Value = true;
-                        button.TooltipText = "Go to beatmap";
+                        button.TooltipText = "go to beatmap";
                         break;
 
                     default:

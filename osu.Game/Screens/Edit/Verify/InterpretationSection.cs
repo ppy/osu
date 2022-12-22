@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Verify
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                TooltipText = "Affects checks that depend on difficulty level",
+                TooltipText = "affects checks that depend on difficulty level",
                 Current = verify.InterpretedDifficulty.GetBoundCopy()
             });
         }

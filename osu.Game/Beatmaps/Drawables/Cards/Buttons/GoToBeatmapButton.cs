@@ -22,7 +22,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             this.beatmapSet = beatmapSet;
 
             Icon.Icon = FontAwesome.Solid.AngleDoubleRight;
-            TooltipText = "Go to beatmap";
+            TooltipText = "go to beatmap";
         }
 
         [BackgroundDependencyLoader(true)]

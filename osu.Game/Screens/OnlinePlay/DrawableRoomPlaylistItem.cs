@@ -461,7 +461,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Size = new Vector2(30, 30),
                 Action = () => RequestResults?.Invoke(Item),
                 Alpha = AllowShowingResults ? 1 : 0,
-                TooltipText = "View results"
+                TooltipText = "view results"
             },
             beatmap == null ? Empty() : new PlaylistDownloadButton(beatmap),
             editButton = new PlaylistEditButton
@@ -476,7 +476,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Size = new Vector2(30, 30),
                 Alpha = AllowDeletion ? 1 : 0,
                 Action = () => RequestDeletion?.Invoke(Item),
-                TooltipText = "Remove from playlist"
+                TooltipText = "remove from playlist"
             },
         };
 

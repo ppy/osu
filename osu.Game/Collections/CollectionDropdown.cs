@@ -206,7 +206,7 @@ namespace osu.Game.Collections
 
                         addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
                         addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
-                        addOrRemoveButton.TooltipText = beatmapInCollection ? "Remove selected beatmap" : "Add selected beatmap";
+                        addOrRemoveButton.TooltipText = beatmapInCollection ? "remove selected beatmap" : "add selected beatmap";
 
                         updateButtonVisibility();
                     }, true);

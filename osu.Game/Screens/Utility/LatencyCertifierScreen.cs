@@ -335,7 +335,7 @@ namespace osu.Game.Screens.Utility
                     buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
                     {
                         Text = "Retry",
-                        TooltipText = "Are you even trying..?",
+                        TooltipText = "are you even trying..?",
                         BackgroundColour = colours.Pink2,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -360,8 +360,8 @@ namespace osu.Game.Screens.Utility
                             changeDifficulty(DifficultyLevel - 1);
                         },
                         TooltipText = isPass
-                            ? $"Chain {rounds_to_complete_certified} rounds to confirm your perception!"
-                            : "You've reached your limits. Go to the previous level to complete certification!",
+                            ? $"chain {rounds_to_complete_certified} rounds to confirm your perception!"
+                            : "you've reached your limits. go to the previous level to complete certification!",
                     });
                 }
             }

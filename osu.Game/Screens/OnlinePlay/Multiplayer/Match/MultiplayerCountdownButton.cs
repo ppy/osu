@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             base.Action = this.ShowPopover;
 
-            TooltipText = "Countdown settings";
+            TooltipText = "countdown settings";
         }
 
         [BackgroundDependencyLoader]

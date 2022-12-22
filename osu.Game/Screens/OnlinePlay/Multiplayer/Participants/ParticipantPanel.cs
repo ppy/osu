@@ -255,7 +255,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             public KickButton()
             {
                 Icon = FontAwesome.Solid.UserTimes;
-                TooltipText = "Kick";
+                TooltipText = "kick";
             }
 
             [BackgroundDependencyLoader]
