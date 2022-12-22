@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Osu.Utils
                     yield return new HitCircle
                     {
                         StartTime = time,
-                        Position = points[i % 4],
+                        Position = clampToPlayfieldWithPadding(points[i % 4], (float)slider.Radius),
                         NewCombo = i == 0 && slider.NewCombo,
                         SampleControlPoint = samplePoint,
                         Samples = slider.HeadCircle.Samples.Select(s => s.With()).ToList()
