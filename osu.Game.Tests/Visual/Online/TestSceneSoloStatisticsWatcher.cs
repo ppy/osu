@@ -218,6 +218,34 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("update not received", () => update == null);
         }
 
+        // the behaviour exercised in this test may not be final, it is mostly assumed for simplicity.
+        // in the long run we may want each score's update to be entirely isolated from others, rather than have prior unobserved updates merge into the latest.
+        [Test]
+        public void TestIgnoredScoreUpdateIsMergedIntoNextOne()
+        {
+            int userId = getUserId();
+            setUpUser(userId);
+
+            long firstScoreId = getScoreId();
+            var ruleset = new OsuRuleset().RulesetInfo;
+
+            feignScoreProcessing(userId, ruleset, 5_000_000);
+
+            AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, firstScoreId));
+
+            long secondScoreId = getScoreId();
+
+            feignScoreProcessing(userId, ruleset, 6_000_000);
+
+            SoloStatisticsUpdate? update = null;
+            registerForUpdates(secondScoreId, ruleset, receivedUpdate => update = receivedUpdate);
+
+            AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, secondScoreId));
+            AddUntilStep("update received", () => update != null);
+            AddAssert("values before are correct", () => update!.Before.TotalScore, () => Is.EqualTo(4_000_000));
+            AddAssert("values after are correct", () => update!.After.TotalScore, () => Is.EqualTo(6_000_000));
+        }
+
         private int nextUserId = 2000;
         private long nextScoreId = 50000;
 
