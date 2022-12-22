@@ -3,13 +3,13 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -30,8 +30,7 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
 
-        [Resolved]
-        private MusicController musicController { get; set; } = null!;
+        private readonly IBindable<Track> track = new Bindable<Track>();
 
         private readonly BindableBool isHandlingTapping = new BindableBool();
 
@@ -39,7 +38,7 @@ namespace osu.Game.Screens.Edit.Timing
         private Container<WaveformComparisonDisplay> waveformContainer = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours, EditorClock clock)
         {
             const float padding = 10;
 
@@ -189,12 +188,8 @@ namespace osu.Game.Screens.Edit.Timing
                     start();
             }, true);
 
-            musicController.TrackChanged += onTrackReload;
-        }
-
-        private void onTrackReload(WorkingBeatmap beatmap, TrackChangeDirection tcd)
-        {
-            waveformContainer.Child = new WaveformComparisonDisplay();
+            track.BindTo(clock.Track);
+            track.ValueChanged += _ => waveformContainer.Child = new WaveformComparisonDisplay();
         }
 
         private void start()
@@ -247,12 +242,6 @@ namespace osu.Game.Screens.Edit.Timing
                 return;
 
             timing.BeatLength = 60000 / (timing.BPM + adjust);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            musicController.TrackChanged -= onTrackReload;
-            base.Dispose(isDisposing);
         }
 
         private partial class InlineButton : OsuButton
