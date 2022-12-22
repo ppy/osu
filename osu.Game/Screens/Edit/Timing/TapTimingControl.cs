@@ -189,6 +189,10 @@ namespace osu.Game.Screens.Edit.Timing
             }, true);
 
             track.BindTo(clock.Track);
+        }
+
+        protected override void LoadComplete()
+        {
             track.ValueChanged += _ => waveformContainer.Child = new WaveformComparisonDisplay();
         }
 
