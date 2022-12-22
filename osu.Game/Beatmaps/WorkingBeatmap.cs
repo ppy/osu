@@ -46,10 +46,11 @@ namespace osu.Game.Beatmaps
 
         private readonly object beatmapFetchLock = new object();
 
-        private Waveform waveform;
         private readonly Lazy<Storyboard> storyboard;
         private readonly Lazy<ISkin> skin;
+
         private Track track; // track is not Lazy as we allow transferring and loading multiple times.
+        private Waveform waveform; // waveform is also not Lazy as the track may change.
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
@@ -107,10 +108,12 @@ namespace osu.Game.Beatmaps
 
         public Track LoadTrack()
         {
-            // track could be changed, clearing waveform cache
+            track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+
+            // the track may have changed, recycle the current waveform.
+            waveform?.Dispose();
             waveform = null;
 
-            track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
             return track;
         }
 
