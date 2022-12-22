@@ -34,8 +34,6 @@ namespace osu.Game.Beatmaps
         // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
         public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
-        public Waveform Waveform => waveform.Value;
-
         public Storyboard Storyboard => storyboard.Value;
 
         public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
@@ -48,7 +46,7 @@ namespace osu.Game.Beatmaps
 
         private readonly object beatmapFetchLock = new object();
 
-        private Lazy<Waveform> waveform;
+        private Waveform waveform;
         private readonly Lazy<Storyboard> storyboard;
         private readonly Lazy<ISkin> skin;
         private Track track; // track is not Lazy as we allow transferring and loading multiple times.
@@ -60,7 +58,6 @@ namespace osu.Game.Beatmaps
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet ?? new BeatmapSetInfo();
 
-            waveform = new Lazy<Waveform>(GetWaveform);
             storyboard = new Lazy<Storyboard>(GetStoryboard);
             skin = new Lazy<ISkin>(GetSkin);
         }
@@ -168,6 +165,18 @@ namespace osu.Game.Beatmaps
 
             return audioManager.Tracks.GetVirtual(length);
         }
+
+        #endregion
+
+        #region Waveform
+
+        public Waveform Waveform => waveform ??= GetWaveform();
+
+        /// <summary>
+        /// Reloads waveform of beatmap's track even if one is already cached.
+        /// </summary>
+        /// <returns>Newly loaded waveform.</returns>
+        public Waveform LoadWaveform() => waveform = GetWaveform();
 
         #endregion
 
@@ -328,12 +337,6 @@ namespace osu.Game.Beatmaps
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
         #endregion
-
-        public void InvalidateWaveform()
-        {
-            if (waveform.IsValueCreated)
-                waveform = new Lazy<Waveform>(GetWaveform);
-        }
 
         public override string ToString() => BeatmapInfo.ToString();
 
