@@ -50,7 +50,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var osuBeatmap = (OsuBeatmap)beatmap;
             var newObjects = new List<OsuHitObject>();
-            double minAllowedBeatLength = (beatmap.ControlPointInfo.TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength / 1.5d;
+
+            var points = beatmap.ControlPointInfo.TimingPoints.OrderByDescending(c => c.BeatLength);
+            double minAllowedBeatLength = (points.FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength / 1.5d;
 
             foreach (var hitObject in osuBeatmap.HitObjects)
             {
@@ -74,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
 
                 // this will be true if span is going to be converted into 1, 2, or 3 circles.
-                bool spanTooShort = s.SpanDuration <= point.BeatLength * 2d / BeatDivisor.Value;
+                bool spanTooShort = s.SpanDuration <= point.BeatLength * 4d / BeatDivisor.Value;
                 // an attempt to fix too fast turns. I chose 250ms by eye, but if it is still going to be a problem this can be calculated based on AR.
                 bool spanTooFast = s.SpanDuration <= 250d;
 
