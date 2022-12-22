@@ -71,7 +71,7 @@ namespace osu.Game.Online.Solo
             if (!api.IsLoggedIn)
                 return;
 
-            Debug.Assert(localUser != null && localUser.OnlineID > 1);
+            Debug.Assert(localUser != null);
 
             var userRequest = new GetUsersRequest(new[] { localUser.OnlineID });
             userRequest.Success += response => Schedule(() =>
