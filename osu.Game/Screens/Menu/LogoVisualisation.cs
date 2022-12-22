@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Menu
 
         private void addAmplitudesFromSource(IHasAmplitudes source)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
 
             var amplitudes = source.CurrentAmplitudes.FrequencyAmplitudes.Span;
 

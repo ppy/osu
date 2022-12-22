@@ -211,8 +211,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public static T BinarySearch<T>(IReadOnlyList<T> list, double time)
             where T : class, IControlPoint
         {
-            if (list == null)
-                throw new ArgumentNullException(nameof(list));
+            ArgumentNullException.ThrowIfNull(list);
 
             if (list.Count == 0)
                 return null;
