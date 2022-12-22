@@ -1040,7 +1040,7 @@ namespace osu.Game
 
             Logger.NewEntry += entry =>
             {
-                if (entry.Level < LogLevel.Important || entry.Target is null or > LoggingTarget.Database) return;
+                if (entry.Level < LogLevel.Important || entry.Target == null || entry.Target > LoggingTarget.Database) return;
 
                 Debug.Assert(entry.Target != null);
 
