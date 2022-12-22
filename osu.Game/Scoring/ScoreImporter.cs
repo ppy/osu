@@ -71,8 +71,8 @@ namespace osu.Game.Scoring
 
             // These properties are known to be non-null, but these final checks ensure a null hasn't come from somewhere (or the refetch has failed).
             // Under no circumstance do we want these to be written to realm as null.
-            if (model.BeatmapInfo == null) throw new ArgumentNullException(nameof(model.BeatmapInfo));
-            if (model.Ruleset == null) throw new ArgumentNullException(nameof(model.Ruleset));
+            ArgumentNullException.ThrowIfNull(model.BeatmapInfo);
+            ArgumentNullException.ThrowIfNull(model.Ruleset);
 
             PopulateMaximumStatistics(model);
 
