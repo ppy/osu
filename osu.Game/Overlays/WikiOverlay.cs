@@ -21,6 +21,8 @@ namespace osu.Game.Overlays
     {
         private const string index_path = @"main_page";
 
+        public string CurrentPath => path.Value;
+
         private readonly Bindable<string> path = new Bindable<string>(index_path);
 
         private readonly Bindable<APIWikiPage> wikiData = new Bindable<APIWikiPage>();
@@ -105,6 +107,9 @@ namespace osu.Game.Overlays
             if (e.NewValue == wikiData.Value?.Path)
                 return;
 
+            if (e.NewValue == "error")
+                return;
+
             cancellationToken?.Cancel();
             request?.Cancel();
 
@@ -152,6 +157,7 @@ namespace osu.Game.Overlays
 
         private void onFail()
         {
+            path.Value = "error";
             LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
                 $"Something went wrong when trying to fetch page \"{path.Value}\".\n\n[Return to the main page](Main_Page)."));
         }
