@@ -11,7 +11,10 @@ namespace osu.Game.Overlays.Comments
 {
     public partial class CommentMarkdownContainer : OsuMarkdownContainer
     {
-        protected override bool Autolinks => true;
+        protected override OsuMarkdownContainerOptions Options => new OsuMarkdownContainerOptions
+        {
+            Autolinks = true
+        };
 
         protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new CommentMarkdownHeading(headingBlock);
 

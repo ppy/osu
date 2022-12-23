@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps
 
         public override async Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original)
         {
-            var imported = await Import(notification, new[] { importTask });
+            var imported = await Import(notification, new[] { importTask }).ConfigureAwait(true);
 
             if (!imported.Any())
                 return null;

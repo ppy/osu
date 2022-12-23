@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -59,9 +58,7 @@ namespace osu.Game.Skinning.Editor
         {
             try
             {
-                var instance = (Drawable)Activator.CreateInstance(type);
-
-                Debug.Assert(instance != null);
+                Drawable instance = (Drawable)Activator.CreateInstance(type)!;
 
                 if (!((ISkinnableDrawable)instance).IsEditable) return;
 
