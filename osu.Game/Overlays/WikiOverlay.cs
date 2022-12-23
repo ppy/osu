@@ -118,7 +118,11 @@ namespace osu.Game.Overlays
             Loading.Show();
 
             request.Success += response => Schedule(() => onSuccess(response));
-            request.Failure += _ => Schedule(onFail);
+            request.Failure += ex =>
+            {
+                if (ex is not OperationCanceledException)
+                    Schedule(onFail);
+            };
 
             api.PerformAsync(request);
         }
