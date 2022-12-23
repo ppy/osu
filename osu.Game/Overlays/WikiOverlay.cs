@@ -126,7 +126,7 @@ namespace osu.Game.Overlays
             request.Failure += ex =>
             {
                 if (ex is not OperationCanceledException)
-                    Schedule(onFail);
+                    Schedule(onFail, request.Path);
             };
 
             api.PerformAsync(request);
@@ -155,11 +155,11 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void onFail()
+        private void onFail(string originalPath)
         {
             path.Value = "error";
             LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
-                $"Something went wrong when trying to fetch page \"{path.Value}\".\n\n[Return to the main page](Main_Page)."));
+                $"Something went wrong when trying to fetch page \"{originalPath}\".\n\n[Return to the main page](Main_Page)."));
         }
 
         private void showParentPage()
