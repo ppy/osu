@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.BeatmapListing;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -123,8 +124,8 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 source.Metadata = b.NewValue?.Source ?? string.Empty;
                 tags.Metadata = b.NewValue?.Tags ?? string.Empty;
-                genre.Metadata = b.NewValue?.Genre ?? new BeatmapSetOnlineGenre { Id = 1 };
-                language.Metadata = b.NewValue?.Language ?? new BeatmapSetOnlineLanguage { Id = 1 };
+                genre.Metadata = b.NewValue?.Genre ?? new BeatmapSetOnlineGenre { Id = (int)SearchGenre.Unspecified };
+                language.Metadata = b.NewValue?.Language ?? new BeatmapSetOnlineLanguage { Id = (int)SearchLanguage.Unspecified };
                 bool setHasLeaderboard = b.NewValue?.Status > 0;
                 successRate.Alpha = setHasLeaderboard ? 1 : 0;
                 notRankedPlaceholder.Alpha = setHasLeaderboard ? 0 : 1;
