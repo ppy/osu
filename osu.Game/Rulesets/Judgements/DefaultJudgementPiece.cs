@@ -4,10 +4,7 @@
 #nullable disable
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
@@ -15,18 +12,14 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Judgements
 {
-    public partial class DefaultJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public partial class DefaultJudgementPiece : JudgementPiece, IAnimatableJudgement
     {
-        protected readonly HitResult Result;
-
-        protected SpriteText JudgementText { get; private set; }
-
         [Resolved]
         private OsuColour colours { get; set; }
 
         public DefaultJudgementPiece(HitResult result)
+            : base(result)
         {
-            Result = result;
             Origin = Anchor.Centre;
         }
 
@@ -41,7 +34,6 @@ namespace osu.Game.Rulesets.Judgements
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Text = Result.GetDescription().ToUpperInvariant(),
                     Colour = colours.ForHitResult(Result),
                     Font = OsuFont.Numeric.With(size: 20),
                     Scale = new Vector2(0.85f, 1),
