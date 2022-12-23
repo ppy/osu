@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Linq;
 using System.Net;
 using NUnit.Framework;
 using osu.Game.Online.API;
