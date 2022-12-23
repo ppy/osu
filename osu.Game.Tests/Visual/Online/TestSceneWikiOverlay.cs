@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using System.Net;
 using NUnit.Framework;
 using osu.Game.Online.API;
@@ -27,6 +28,15 @@ namespace osu.Game.Tests.Visual.Online
         {
             setUpWikiResponse(responseMainPage);
             AddStep("Show main page", () => wiki.Show());
+        }
+
+        [Test]
+        public void TestCancellationDoesntShowError()
+        {
+            AddStep("Show main page", () => wiki.Show());
+            AddStep("Show another page", () => wiki.ShowPage("Article_styling_criteria/Formatting"));
+
+            AddUntilStep("Current path is not error", () => wiki.CurrentPath != "error");
         }
 
         [Test]
