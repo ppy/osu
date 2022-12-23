@@ -37,7 +37,7 @@ namespace osu.Game.Database
         /// Exports an item to a legacy (.zip based) package.
         /// </summary>
         /// <param name="item">The item to export.</param>
-        public void Export(TModel item)
+        public virtual void Export(TModel item)
         {
             string itemFilename = item.GetDisplayString().GetValidFilename();
 

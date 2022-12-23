@@ -12,6 +12,6 @@ namespace osu.Game.Scoring
         /// <summary>
         /// A user-presentable display title representing this score.
         /// </summary>
-        public static string GetDisplayTitle(this IScoreInfo scoreInfo) => $"{scoreInfo.User.Username} playing {scoreInfo.Beatmap.GetDisplayTitle()} ({scoreInfo.Date.LocalDateTime:yyyy-MM-dd})";
+        public static string GetDisplayTitle(this IScoreInfo scoreInfo) => $"{scoreInfo.User.Username} playing {scoreInfo.Beatmap.GetDisplayTitle()}";
     }
 }
