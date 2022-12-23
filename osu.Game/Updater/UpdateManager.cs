@@ -36,7 +36,7 @@ namespace osu.Game.Updater
         protected INotificationOverlay Notifications { get; private set; } = null!;
 
         [Resolved]
-        private ReleaseNoteDialog releaseNoteDialog { get; set; }
+        private ReleaseNoteDialog releaseNoteDialog { get; set; } = null!;
 
         protected override void LoadComplete()
         {

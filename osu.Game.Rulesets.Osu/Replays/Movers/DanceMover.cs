@@ -8,6 +8,8 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
+#nullable disable
+
 namespace osu.Game.Rulesets.Osu.Replays.Movers
 {
     public abstract class Mover

@@ -106,7 +106,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
                 },
             };
 
-            var plugins = PluginManager.GetAllFunctionBarProviders();
+            var plugins = PluginManager!.GetAllFunctionBarProviders();
 
             string currentFunctionBar = config.Get<string>(MSetting.MvisCurrentFunctionBar);
 
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
         {
             public override Drawable ToSettingsItem() => new ColourPreviewer();
 
-            public override Drawable ToLLinSettingsItem() => null;
+            public override Drawable? ToLLinSettingsItem() => null;
         }
     }
 }

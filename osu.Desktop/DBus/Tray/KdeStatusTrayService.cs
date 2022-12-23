@@ -4,6 +4,8 @@ using M.DBus;
 using M.DBus.Services.Kde;
 using Tmds.DBus;
 
+#nullable disable
+
 namespace osu.Desktop.DBus.Tray
 {
     /// <summary>

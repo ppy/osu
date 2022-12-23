@@ -6,6 +6,8 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osuTK;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Components.Visualizers.Circular
 {
     public partial class RoundedMusicVisualizerDrawable : CircularMusicVisualizerDrawable
@@ -24,7 +26,7 @@ namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Compon
         {
             protected new RoundedMusicVisualizerDrawable Source => (RoundedMusicVisualizerDrawable)base.Source;
 
-            private Texture? circleTexture;
+            private Texture circleTexture;
 
             public RoundedVisualizerDrawNode(RoundedMusicVisualizerDrawable source)
                 : base(source)
@@ -65,7 +67,6 @@ namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Compon
                         Vector2Extensions.Transform(bottomDotPosition + dotBottomOffset + dotAmplitudeOffset, DrawInfo.Matrix)
                     );
 
-                if (circleTexture != null)
                 renderer.DrawQuad(
                     circleTexture,
                     bottomDotQuad,

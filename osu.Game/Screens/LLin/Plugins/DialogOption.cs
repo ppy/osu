@@ -9,7 +9,7 @@ namespace osu.Game.Screens.LLin.Plugins
         /// <summary>
         /// 选项Action
         /// </summary>
-        public Action Action { get; set; }
+        public Action? Action { get; set; }
 
         /// <summary>
         /// 选项文本

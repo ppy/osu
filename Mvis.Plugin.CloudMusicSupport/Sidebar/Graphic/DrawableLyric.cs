@@ -18,7 +18,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             }
         }
 
-        private Lyric value;
+        private Lyric value = null!;
 
         public float CurrentY;
         public abstract int FinalHeight();

@@ -192,12 +192,6 @@ csharp_style_prefer_index_operator = false:silent
 csharp_style_prefer_range_operator = false:silent
 csharp_style_prefer_switch_expression = false:none
 
-#mfosu: pain
-dotnet_diagnostic.CS8618.severity = none
-dotnet_diagnostic.CS8625.severity = none
-dotnet_diagnostic.CS8603.severity = none
-dotnet_diagnostic.CS8601.severity = none
-
 [*.{yaml,yml}]
 insert_final_newline = true
 indent_style = space

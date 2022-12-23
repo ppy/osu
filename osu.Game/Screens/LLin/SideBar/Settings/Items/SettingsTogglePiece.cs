@@ -5,6 +5,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
     public partial class SettingsTogglePiece : SettingsPieceBasePanel, ISettingsItem<bool>

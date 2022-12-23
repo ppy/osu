@@ -19,7 +19,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
             Version = LLinPluginManager.LatestPluginVersion;
         }
 
-        private SettingsEntry[] entries;
+        private SettingsEntry[]? entries;
         private readonly MConfigManager config;
 
         public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
                     }
                 };
 
-                var plugins = PluginManager.GetAllAudioControlPlugin();
+                var plugins = PluginManager!.GetAllAudioControlPlugin();
 
                 foreach (var pl in plugins)
                 {

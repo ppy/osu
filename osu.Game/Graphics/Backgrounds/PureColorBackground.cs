@@ -4,6 +4,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Game.Configuration;
 
+#nullable disable
+
 namespace osu.Game.Graphics.Backgrounds
 {
     public partial class PureColorBackground : Background

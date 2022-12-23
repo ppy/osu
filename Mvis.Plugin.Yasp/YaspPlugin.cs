@@ -26,7 +26,7 @@ namespace Mvis.Plugin.Yasp
 {
     public partial class YaspPlugin : BindableControlledPlugin
     {
-        private Drawable currentContent;
+        private Drawable? currentContent;
 
         /// <summary>
         /// 请参阅 <see cref="LLinPlugin.TargetLayer"/>
@@ -72,7 +72,7 @@ namespace Mvis.Plugin.Yasp
             AutoSizeAxes = Axes.Both;
         }
 
-        private WorkingBeatmap currentWorkingBeatmap;
+        private WorkingBeatmap? currentWorkingBeatmap;
 
         /// <summary>
         /// 请参阅 <see cref="LLinPlugin.CreateContent()"/>
@@ -113,17 +113,17 @@ namespace Mvis.Plugin.Yasp
                         new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
-                            Text = new RomanisableString(currentWorkingBeatmap.Metadata.TitleUnicode, currentWorkingBeatmap.Metadata.Title)
+                            Text = new RomanisableString(currentWorkingBeatmap?.Metadata.TitleUnicode, currentWorkingBeatmap?.Metadata.Title)
                         },
                         new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(size: 25),
-                            Text = new RomanisableString(currentWorkingBeatmap.Metadata.ArtistUnicode, currentWorkingBeatmap.Metadata.Artist)
+                            Text = new RomanisableString(currentWorkingBeatmap?.Metadata.ArtistUnicode, currentWorkingBeatmap?.Metadata.Artist)
                         },
                         new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(size: 25),
-                            Text = currentWorkingBeatmap.Metadata.Source
+                            Text = currentWorkingBeatmap?.Metadata.Source ?? "???"
                         }
                     }
                 }
@@ -162,7 +162,7 @@ namespace Mvis.Plugin.Yasp
             return result;
         }
 
-        private Bindable<float> scaleBindable;
+        private Bindable<float> scaleBindable = new BindableFloat();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -170,7 +170,7 @@ namespace Mvis.Plugin.Yasp
             var config = (YaspConfigManager)Dependencies.Get<LLinPluginManager>().GetConfigManager(this);
 
             config.BindWith(YaspSettings.EnablePlugin, Value);
-            scaleBindable = config.GetBindable<float>(YaspSettings.Scale);
+            config.BindWith<float>(YaspSettings.Scale, scaleBindable);
             scaleBindable.BindValueChanged(v =>
             {
                 this.ScaleTo(v.NewValue, 300, Easing.OutQuint);
@@ -179,7 +179,7 @@ namespace Mvis.Plugin.Yasp
 
         protected override bool PostInit()
         {
-            currentWorkingBeatmap ??= LLin.Beatmap.Value;
+            currentWorkingBeatmap ??= LLin?.Beatmap.Value;
             return true;
         }
 

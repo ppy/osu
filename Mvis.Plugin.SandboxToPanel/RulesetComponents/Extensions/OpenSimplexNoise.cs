@@ -144,7 +144,7 @@ namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Extensions
         {
             public double Dx, Dy;
             public int Xsb, Ysb;
-            public Contribution Next;
+            public Contribution? Next;
 
             public Contribution(double multiplier, int xsb, int ysb)
             {

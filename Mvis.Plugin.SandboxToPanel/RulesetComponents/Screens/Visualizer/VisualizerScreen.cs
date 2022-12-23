@@ -16,6 +16,8 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osuTK;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer
 {
     public partial class VisualizerScreen : SandboxScreenWithSettings, IKeyBindingHandler<GlobalAction>

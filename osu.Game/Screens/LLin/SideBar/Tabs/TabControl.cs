@@ -7,6 +7,8 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.Tabs
 {
     internal partial class TabControl : CompositeDrawable

@@ -109,7 +109,7 @@ namespace Mvis.Plugin.BottomBar
         [BackgroundDependencyLoader]
         private void load()
         {
-            LLin.OnIdle += Hide;
+            LLin!.OnIdle += Hide;
             LLin.OnActive += Show;
 
             progressBar.OnSeek = target =>
@@ -120,7 +120,7 @@ namespace Mvis.Plugin.BottomBar
 
         protected override void Update()
         {
-            progressBar.CurrentTime = LLin.CurrentTrack.CurrentTime;
+            progressBar.CurrentTime = LLin!.CurrentTrack.CurrentTime;
             progressBar.EndTime = LLin.CurrentTrack.Length;
             base.Update();
         }
@@ -254,7 +254,7 @@ namespace Mvis.Plugin.BottomBar
         public void ShowFunctionControlTemporary() => pluginEntriesFillFlow.FadeIn(500, Easing.OutQuint).Then().Delay(2000).FadeOut(500, Easing.OutQuint);
 
         public List<IPluginFunctionProvider> GetAllPluginFunctionButton() => pluginButtons;
-        public Action OnDisable { get; set; }
+        public Action? OnDisable { get; set; }
 
         public override bool Disable()
         {

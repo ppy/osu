@@ -4,6 +4,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osuTK;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.Plugins.Types
 {
     public class ToggleableFakeButton : IToggleableFunctionProvider

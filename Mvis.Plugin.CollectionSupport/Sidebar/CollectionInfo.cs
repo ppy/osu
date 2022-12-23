@@ -17,12 +17,12 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
     public partial class CollectionInfo : CompositeDrawable
     {
-        private OsuSpriteText collectionName;
-        private OsuSpriteText collectionBeatmapCount;
+        private OsuSpriteText collectionName = null!;
+        private OsuSpriteText collectionBeatmapCount = null!;
         private readonly Bindable<BeatmapCollection> collection = new Bindable<BeatmapCollection>();
         private readonly List<IBeatmapSetInfo> beatmapSets = new List<IBeatmapSetInfo>();
 
-        private BeatmapList beatmapList;
+        private BeatmapList? beatmapList;
         private readonly BindableBool isCurrentCollection = new BindableBool();
 
         public CollectionInfo()
@@ -118,13 +118,13 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         }
 
         [Resolved]
-        private BeatmapHashResolver hashResolver { get; set; }
+        private BeatmapHashResolver hashResolver { get; set; } = null!;
 
         private void OnCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
         {
             var c = v.NewValue;
 
-            if (c == null)
+            if (c == CollectionHelper.DEFAULT_COLLECTION)
             {
                 clearInfo();
                 return;
@@ -138,7 +138,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 var item = hashResolver.ResolveHash(hash);
 
                 //获取当前BeatmapSet
-                var currentSet = item.BeatmapSet;
+                var currentSet = item?.BeatmapSet;
 
                 if (currentSet == null) continue;
 
@@ -153,9 +153,9 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             refreshBeatmapSetList();
         }
 
-        private CancellationTokenSource refreshTaskCancellationToken;
-        private Container listContainer;
-        private LoadingSpinner loadingSpinner;
+        private CancellationTokenSource? refreshTaskCancellationToken;
+        private Container listContainer = null!;
+        private LoadingSpinner loadingSpinner = null!;
 
         private void refreshBeatmapSetList()
         {
@@ -194,7 +194,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private void clearInfo()
         {
             beatmapSets.Clear();
-            beatmapList.ClearList();
+            beatmapList?.ClearList();
             collectionName.Text = CollectionStrings.NoCollectionSelected;
             collectionBeatmapCount.Text = CollectionStrings.SelectOneFirst;
         }

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+#nullable disable
+
 namespace Mvis.Plugin.CloudMusicSupport.Misc
 {
     public class APIArtistInfo

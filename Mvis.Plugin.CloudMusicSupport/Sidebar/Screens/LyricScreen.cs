@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Pooling;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 
+#nullable disable
+
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 {
     public abstract partial class LyricScreen<T> : SidebarScreen

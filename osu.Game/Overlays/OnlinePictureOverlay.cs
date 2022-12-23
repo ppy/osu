@@ -15,6 +15,8 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 
+#nullable disable
+
 namespace osu.Game.Overlays
 {
     public partial class OnlinePictureOverlay : OsuFocusedOverlayContainer

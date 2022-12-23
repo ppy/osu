@@ -10,14 +10,14 @@ namespace Mvis.Plugin.BottomBar
 {
     public partial class SongProgressBar : ProgressBar
     {
-        private Indicator indicator;
-        private Indicator songProgressIndicator;
+        private Indicator indicator = null!;
+        private Indicator songProgressIndicator = null!;
 
         [Resolved]
-        private CustomColourProvider colourProvider { get; set; }
+        private CustomColourProvider colourProvider { get; set; } = null!;
 
         [Resolved]
-        private IImplementLLin mvis { get; set; }
+        private IImplementLLin mvis { get; set; } = null!;
 
         private const float idle_alpha = 0.5f;
 

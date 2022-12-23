@@ -14,7 +14,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
 {
     public abstract class SettingsEntry
     {
-        public IBindable Bindable { get; set; }
+        public IBindable Bindable { get; set; } = null!;
 
         public LocalisableString Name
         {
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
         private LocalisableString desc;
 
         public abstract Drawable ToSettingsItem();
-        public abstract Drawable ToLLinSettingsItem();
+        public abstract Drawable? ToLLinSettingsItem();
     }
 
     public class SeparatorSettingsEntry : SettingsEntry
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             };
         }
 
-        public override Drawable ToLLinSettingsItem()
+        public override Drawable? ToLLinSettingsItem()
         {
             return new SettingsSeparatorPiece
             {
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             };
         }
 
-        public override Drawable ToLLinSettingsItem()
+        public override Drawable? ToLLinSettingsItem()
         {
             return new SettingsSliderPiece<T>
             {
@@ -136,7 +136,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             };
         }
 
-        public override Drawable ToLLinSettingsItem()
+        public override Drawable? ToLLinSettingsItem()
         {
             return new SettingsTogglePiece
             {
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
 
     public class ListSettingsEntry<T> : SettingsEntry
     {
-        public IEnumerable<T> Values;
+        public IEnumerable<T>? Values;
 
         public ListSettingsEntry()
         {
@@ -167,7 +167,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             };
         }
 
-        public override Drawable ToLLinSettingsItem()
+        public override Drawable? ToLLinSettingsItem()
         {
             return new SettingsListPiece<T>
             {
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
                 TooltipText = Description,
                 Bindable = (Bindable<T>)Bindable.GetBoundCopy(),
                 Icon = this.Icon,
-                Values = this.Values.ToList()
+                Values = this.Values?.ToList() ?? new List<T>()
             };
         }
     }
@@ -197,7 +197,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             };
         }
 
-        public override Drawable ToLLinSettingsItem()
+        public override Drawable? ToLLinSettingsItem()
         {
             return new SettingsStringPiece
             {
@@ -227,7 +227,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             };
         }
 
-        public override Drawable ToLLinSettingsItem()
+        public override Drawable? ToLLinSettingsItem()
         {
             return new SettingsEnumPiece<T>
             {

@@ -28,7 +28,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         ///<summary>
         ///判断该panel所显示的BeatmapCollection
         ///</summary>
-        public readonly BeatmapCollection Collection;
+        public readonly BeatmapCollection Collection = null!;
 
         ///<summary>
         ///用于触发<see cref="CollectionPluginPage"/>的SelectedCollection变更
@@ -40,18 +40,18 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private readonly List<IBeatmapSetInfo> beatmapSets = new List<IBeatmapSetInfo>();
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private CustomColourProvider colourProvider { get; set; }
+        private CustomColourProvider colourProvider { get; set; } = null!;
 
-        private OsuSpriteText collectionName;
-        private OsuSpriteText collectionBeatmapCount;
-        private OsuScrollContainer thumbnailScroll;
-        private readonly Action doubleClick;
+        private OsuSpriteText collectionName = null!;
+        private OsuSpriteText collectionBeatmapCount = null!;
+        private OsuScrollContainer thumbnailScroll = null!;
+        private readonly Action? doubleClick;
 
         public Bindable<ActiveState> State = new Bindable<ActiveState>();
-        private Box stateBox;
+        private Box stateBox = null!;
 
         /// <summary>
         /// ...
@@ -223,7 +223,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         }
 
         [Resolved]
-        private BeatmapHashResolver hashResolver { get; set; }
+        private BeatmapHashResolver hashResolver { get; set; } = null!;
 
         private void sortBeatmapCollection()
         {
@@ -233,7 +233,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 var item = hashResolver.ResolveHash(hash);
 
                 //获取当前BeatmapSet
-                var currentSet = item.BeatmapSet;
+                var currentSet = item?.BeatmapSet;
 
                 if (currentSet == null) continue;
 
@@ -267,7 +267,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             //如果已经被选中了，则触发双击
             if (State.Value == ActiveState.Selected)
             {
-                doubleClick.Invoke();
+                doubleClick?.Invoke();
                 State.Value = ActiveState.Active;
 
                 return base.OnClick(e);
@@ -298,7 +298,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private partial class BeatmapThumbnailFlow : FillFlowContainer<TooltipContainer>
         {
             [Resolved]
-            private BeatmapManager beatmaps { get; set; }
+            private BeatmapManager beatmaps { get; set; } = null!;
 
             private readonly List<IBeatmapSetInfo> beatmapSetList;
 

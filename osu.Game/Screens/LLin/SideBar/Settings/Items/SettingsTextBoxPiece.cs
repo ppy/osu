@@ -5,6 +5,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
     public partial class SettingsTextBoxPiece : SettingsPieceBasePanel, ISettingsItem<string>

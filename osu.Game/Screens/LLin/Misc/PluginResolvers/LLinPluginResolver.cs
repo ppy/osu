@@ -90,7 +90,7 @@ namespace osu.Game.Screens.LLin.Misc.PluginResolvers
             return null;
         }
 
-        private List<TypeWrapper> cachedAudioControlPluginList;
+        private List<TypeWrapper>? cachedAudioControlPluginList;
 
         internal List<TypeWrapper> GetAllAudioControlPlugin()
         {
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.LLin.Misc.PluginResolvers
             return list;
         }
 
-        private List<TypeWrapper> cachedFunctionBarPluginList;
+        private List<TypeWrapper>? cachedFunctionBarPluginList;
 
         internal List<TypeWrapper> GetAllFunctionBarProviders()
         {

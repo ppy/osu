@@ -1,6 +1,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.Plugins.Types
 {
     public abstract partial class BindableControlledPlugin : LLinPlugin

@@ -11,6 +11,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.LLin.Plugins.Config;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
     public partial class SettingsStringPiece : SettingsPieceBasePanel, ISettingsItem<string>

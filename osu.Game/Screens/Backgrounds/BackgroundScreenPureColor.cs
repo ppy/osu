@@ -6,6 +6,8 @@ using osu.Game.Configuration;
 using osu.Game.Screens.Menu;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace osu.Game.Screens.Backgrounds
 {
     public partial class BackgroundScreenPureColor : BackgroundScreen

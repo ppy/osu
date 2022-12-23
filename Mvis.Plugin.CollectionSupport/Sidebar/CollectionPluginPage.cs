@@ -24,19 +24,19 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         //private CollectionManager collectionManager { get; set; }
 
         [Resolved]
-        private IImplementLLin mvisScreen { get; set; }
+        private IImplementLLin mvisScreen { get; set; } = null!;
 
         private readonly CollectionHelper collectionHelper;
 
         private readonly Bindable<BeatmapCollection> selectedCollection = new Bindable<BeatmapCollection>();
         private readonly Bindable<CollectionPanel> selectedPanel = new Bindable<CollectionPanel>();
 
-        private FillFlowContainer<CollectionPanel> collectionsFillFlow;
-        private CollectionPanel selectedpanel;
-        private CollectionPanel prevPanel;
-        private OsuScrollContainer collectionScroll;
-        private Container scrollContainer;
-        private CollectionInfo info;
+        private FillFlowContainer<CollectionPanel> collectionsFillFlow = null!;
+        private CollectionPanel? selectedpanel;
+        private CollectionPanel? prevPanel;
+        private OsuScrollContainer collectionScroll = null!;
+        private Container scrollContainer = null!;
+        private CollectionInfo info = null!;
 
         public CollectionPluginPage(LLinPlugin plugin)
             : base(plugin)
@@ -46,7 +46,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             collectionHelper = (CollectionHelper)plugin;
         }
 
-        private DependencyContainer dependencies;
+        private DependencyContainer dependencies = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -54,7 +54,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         public override IPluginFunctionProvider GetFunctionEntry() => new CollectionFunctionProvider(this);
         public override Key ShortcutKey => Key.Period;
 
-        private Bindable<TabControlPosition> tabControlPos;
+        private Bindable<TabControlPosition> tabControlPos = null!;
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
@@ -157,7 +157,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         }
 
         [Resolved]
-        private BeatmapManager bm { get; set; }
+        private BeatmapManager bm { get; set; } = null!;
 
         private void searchForCurrentSelection()
         {
@@ -185,10 +185,10 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
 
             //清空界面
             collectionsFillFlow.Clear();
-            info.UpdateCollection(null, false);
+            info.UpdateCollection(CollectionHelper.DEFAULT_COLLECTION, false);
             selectedpanel = null;
 
-            selectedCollection.Value = null;
+            selectedCollection.Value = CollectionHelper.DEFAULT_COLLECTION;
 
             //如果收藏夹被删除，则留null
             if (!collectionHelper.AvaliableCollections.Contains(oldCollection))
@@ -211,7 +211,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             }
 
             //重新赋值
-            collectionHelper.CurrentCollection.Value = selectedCollection.Value = oldCollection;
+            collectionHelper.CurrentCollection.Value = selectedCollection.Value = oldCollection ?? CollectionHelper.DEFAULT_COLLECTION;
 
             //根据选中的收藏夹寻找对应的BeatmapPanel
             searchForCurrentSelection();

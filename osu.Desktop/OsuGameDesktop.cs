@@ -36,9 +36,9 @@ namespace osu.Desktop
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
 
-        private DBusManagerContainer dBusManagerContainer;
+        private DBusManagerContainer? dBusManagerContainer;
 
-        public OsuGameDesktop(string[]? args = null, string hashOverride = null)
+        public OsuGameDesktop(string[]? args = null, string? hashOverride = null)
             : base(args)
         {
             if (!string.IsNullOrEmpty(hashOverride))
@@ -124,7 +124,7 @@ namespace osu.Desktop
             }
         }
 
-        private DependencyContainer dependencies;
+        private DependencyContainer dependencies = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -154,12 +154,7 @@ namespace osu.Desktop
 
             MConfig.BindWith(MSetting.AllowWindowFadeEffect, allowWindowFade);
 
-            windowOpacity = new BindableFloat
-            {
-                Value = allowWindowFade.Value
-                    ? 0
-                    : 1
-            };
+            windowOpacity.Value = allowWindowFade.Value ? 0 : 1;
 
             windowOpacity.BindValueChanged(v => SetWindowOpacity(v.NewValue), true);
         }
@@ -185,7 +180,7 @@ namespace osu.Desktop
             }
         }
 
-        private BindableFloat windowOpacity;
+        private readonly BindableFloat windowOpacity = new BindableFloat();
 
         public override void ForceWindowFadeIn() => TransformWindowOpacity(1, 300);
 

@@ -5,6 +5,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
     public partial class SettingsSlider<T> : OsuSliderBar<T>

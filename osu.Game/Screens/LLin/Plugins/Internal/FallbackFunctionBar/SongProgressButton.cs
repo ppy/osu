@@ -3,6 +3,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Audio;
 using osu.Game.Screens.LLin.Plugins.Types;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
 {
     public partial class SongProgressButton : ToggleableBarButton

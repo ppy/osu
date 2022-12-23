@@ -50,26 +50,26 @@ namespace osu.Game.Screens.LLin
     [Cached(typeof(IImplementLLin))]
     public partial class LLinScreen : ScreenWithBeatmapBackground, IImplementLLin, IKeyBindingHandler<GlobalAction>
     {
-        public Action<bool> OnTrackRunningToggle { get; set; }
-        public Action Exiting { get; set; }
-        public Action Suspending { get; set; }
-        public Action Resuming { get; set; }
-        public Action OnIdle { get; set; }
-        public Action OnActive { get; set; }
+        public Action<bool>? OnTrackRunningToggle { get; set; }
+        public Action? Exiting { get; set; }
+        public Action? Suspending { get; set; }
+        public Action? Resuming { get; set; }
+        public Action? OnIdle { get; set; }
+        public Action? OnActive { get; set; }
 
         #region 全局依赖
 
         [Resolved]
-        private LLinPluginManager pluginManager { get; set; }
+        private LLinPluginManager pluginManager { get; set; } = null!;
 
         [Resolved]
-        private IDialogOverlay dialog { get; set; }
+        private IDialogOverlay dialog { get; set; } = null!;
 
         [Resolved]
-        private INotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        private OsuGame game { get; set; }
+        private OsuGame? game { get; set; }
 
         [Cached]
         private CustomColourProvider colourProvider = new CustomColourProvider();
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.LLin
 
         #region 音频
 
-        private IProvideAudioControlPlugin realAudioControlPlugin;
+        private IProvideAudioControlPlugin? realAudioControlPlugin;
 
         private IProvideAudioControlPlugin audioControlPlugin
         {
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.LLin
             set => realAudioControlPlugin = value;
         }
 
-        public Action<double> OnSeek { get; set; }
+        public Action<double>? OnSeek { get; set; }
 
         public bool SeekTo(double position)
         {
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.LLin
 
         public DrawableTrack CurrentTrack => audioControlPlugin.GetCurrentTrack();
 
-        public void RequestAudioControl(IProvideAudioControlPlugin pacp, LocalisableString message, Action onDeny, Action onAllow)
+        public void RequestAudioControl(IProvideAudioControlPlugin pacp, LocalisableString message, Action? onDeny, Action? onAllow)
         {
             if (!(pacp is LLinPlugin mpl)) return;
 
@@ -132,8 +132,7 @@ namespace osu.Game.Screens.LLin
             Beatmap.Disabled = (pacp != null) && (pacp != pluginManager.DefaultAudioController);
 
             //设置当前控制插件IsCurrent为false
-            if (audioControlPlugin != null)
-                audioControlPlugin.IsCurrent = false;
+            audioControlPlugin.IsCurrent = false;
 
             //切换并设置当前控制插件IsCurrent为true
             audioControlPlugin = pacp ?? pluginManager.DefaultAudioController;
@@ -158,7 +157,7 @@ namespace osu.Game.Screens.LLin
 
         #region 谱面
 
-        private Action<WorkingBeatmap> onBeatmapChangedAction;
+        private Action<WorkingBeatmap>? onBeatmapChangedAction;
 
         public void OnBeatmapChanged(Action<WorkingBeatmap> action, object sender, bool runOnce = false)
         {
@@ -215,7 +214,7 @@ namespace osu.Game.Screens.LLin
             pluginKeyBindings[keybind] = plugin;
         }
 
-        public void UnRegisterPluginKeybind(LLinPlugin plugin, PluginKeybind keybind = null)
+        public void UnRegisterPluginKeybind(LLinPlugin plugin, PluginKeybind? keybind = null)
         {
             //查找插件是pl的绑定
             if (keybind == null)
@@ -579,7 +578,7 @@ namespace osu.Game.Screens.LLin
 
         #endregion
 
-        private InputManager inputManager;
+        private InputManager inputManager = null!;
 
         private readonly PlayerInfo info = new PlayerInfo
         {
@@ -601,7 +600,7 @@ namespace osu.Game.Screens.LLin
         private readonly Container foregroundLayer;
         private readonly Container overlayLayer;
 
-        private LoadingSpinner loadingSpinner;
+        private LoadingSpinner loadingSpinner = null!;
 
         private readonly ModNightcore<HitObject>.NightcoreBeatContainer nightcoreBeatContainer = new ModNightcore<HitObject>.NightcoreBeatContainer();
 
@@ -614,8 +613,8 @@ namespace osu.Game.Screens.LLin
         private readonly BindableBool nightcoreBeat = new BindableBool();
         private readonly BindableBool allowProxy = new BindableBool();
         private readonly BindableBool autoVsync = new BindableBool();
-        private Bindable<string> currentAudioControlProviderSetting;
-        private Bindable<string> currentFunctionbarSetting;
+        private Bindable<string> currentAudioControlProviderSetting = null!;
+        private Bindable<string> currentFunctionbarSetting = null!;
 
         private FrameSync previousFrameSync;
         private readonly Bindable<FrameSync> frameSyncMode = new Bindable<FrameSync>();
@@ -981,7 +980,7 @@ namespace osu.Game.Screens.LLin
             base.Update();
         }
 
-        private IReadOnlyList<Mod> lastScreenMods;
+        private IReadOnlyList<Mod>? lastScreenMods;
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
@@ -1035,7 +1034,7 @@ namespace osu.Game.Screens.LLin
             return base.OnExiting(e);
         }
 
-        private WorkingBeatmap suspendBeatmap;
+        private WorkingBeatmap? suspendBeatmap;
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
@@ -1132,20 +1131,20 @@ namespace osu.Game.Screens.LLin
 
         private readonly List<IFunctionProvider> functionProviders = new List<IFunctionProvider>();
 
-        private FakeButton soloButton;
-        private FakeButton prevButton;
-        private FakeButton nextButton;
-        private FakeButton pluginButton;
-        private FakeButton disableChangesButton;
-        private FakeButton sidebarToggleButton;
+        private FakeButton soloButton = null!;
+        private FakeButton prevButton = null!;
+        private FakeButton nextButton = null!;
+        private FakeButton pluginButton = null!;
+        private FakeButton disableChangesButton = null!;
+        private FakeButton sidebarToggleButton = null!;
 
-        private ToggleableFakeButton loopToggleButton;
-        private ToggleableFakeButton lockButton;
-        private ToggleableFakeButton songProgressButton;
+        private ToggleableFakeButton loopToggleButton = null!;
+        private ToggleableFakeButton lockButton = null!;
+        private ToggleableFakeButton songProgressButton = null!;
 
         private readonly FunctionBar fallbackFunctionbar = new FunctionBar();
 
-        private IFunctionBarProvider userFunctionBar;
+        private IFunctionBarProvider? userFunctionBar;
 
         private IFunctionBarProvider currentFunctionBar
         {

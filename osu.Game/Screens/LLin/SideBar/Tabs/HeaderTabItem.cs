@@ -8,6 +8,8 @@ using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.Tabs
 {
     internal partial class TabControlItem : OsuClickableContainer

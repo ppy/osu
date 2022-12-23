@@ -32,16 +32,16 @@ namespace Mvis.Plugin.CollectionSupport
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        private IDisposable realmSubscription;
+        private IDisposable? realmSubscription;
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private Bindable<WorkingBeatmap> b { get; set; }
+        private Bindable<WorkingBeatmap> b { get; set; } = null!;
 
         [Resolved]
-        private MusicController controller { get; set; }
+        private MusicController controller { get; set; } = null!;
 
         private readonly List<IBeatmapSetInfo> beatmapList = new List<IBeatmapSetInfo>();
 
@@ -92,7 +92,7 @@ namespace Mvis.Plugin.CollectionSupport
 
         private bool trackChangedAfterDisable = true;
 
-        private CollectionDBusObject dBusObject;
+        private readonly CollectionDBusObject dBusObject = new CollectionDBusObject();
 
         private readonly SimpleEntry trayEntry = new SimpleEntry
         {
@@ -111,10 +111,13 @@ namespace Mvis.Plugin.CollectionSupport
                 if (!IsCurrent) trackChangedAfterDisable = true;
             });
 
-            PluginManager.RegisterDBusObject(dBusObject = new CollectionDBusObject());
+            PluginManager!.RegisterDBusObject(dBusObject);
 
-            LLin.Resuming += UpdateBeatmaps;
-            LLin.Exiting += onMvisExiting;
+            if (LLin != null)
+            {
+                LLin.Resuming += UpdateBeatmaps;
+                LLin.Exiting += onMvisExiting;
+            }
 
             realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), onCollectionChange);
         }
@@ -127,7 +130,7 @@ namespace Mvis.Plugin.CollectionSupport
 
         private void onMvisExiting()
         {
-            PluginManager.UnRegisterDBusObject(new CollectionDBusObject());
+            PluginManager!.UnRegisterDBusObject(new CollectionDBusObject());
 
             if (!Disabled.Value)
                 PluginManager.RemoveDBusMenuEntry(trayEntry);
@@ -166,7 +169,7 @@ namespace Mvis.Plugin.CollectionSupport
             this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
 
             resetDBusMessage();
-            PluginManager.RemoveDBusMenuEntry(trayEntry);
+            PluginManager!.RemoveDBusMenuEntry(trayEntry);
 
             return base.Disable();
         }
@@ -175,9 +178,9 @@ namespace Mvis.Plugin.CollectionSupport
         {
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
-                dBusObject.Position = currentPosition;
+                dBusObject!.Position = currentPosition;
                 dBusObject.CollectionName = CurrentCollection.Value?.Name ?? "-";
-                PluginManager.AddDBusMenuEntry(trayEntry);
+                PluginManager!.AddDBusMenuEntry(trayEntry);
             }
 
             return base.Enable();
@@ -187,7 +190,7 @@ namespace Mvis.Plugin.CollectionSupport
         {
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
-                dBusObject.Position = -1;
+                dBusObject!.Position = -1;
                 dBusObject.CollectionName = string.Empty;
             }
         }
@@ -199,7 +202,7 @@ namespace Mvis.Plugin.CollectionSupport
             return true;
         }
 
-        private DrawableTrack drawableTrack;
+        private DrawableTrack drawableTrack = null!;
 
         public DrawableTrack GetCurrentTrack() => drawableTrack;
 
@@ -276,7 +279,7 @@ namespace Mvis.Plugin.CollectionSupport
         }
 
         [Resolved]
-        private BeatmapHashResolver hashResolver { get; set; }
+        private BeatmapHashResolver hashResolver { get; set; } = null!;
 
         ///<summary>
         ///用来更新<see cref="beatmapList"/>
@@ -294,7 +297,7 @@ namespace Mvis.Plugin.CollectionSupport
                 var item = hashResolver.ResolveHash(hash);
 
                 //获取当前BeatmapSet
-                var currentSet = item.BeatmapSet;
+                var currentSet = item?.BeatmapSet;
 
                 if (currentSet == null)
                 {
@@ -310,7 +313,7 @@ namespace Mvis.Plugin.CollectionSupport
                 {
                     var subEntry = new SimpleEntry
                     {
-                        Label = item.BeatmapSet?.Metadata.GetDisplayTitleRomanisable().GetPreferred(true) ?? item.ToString(),
+                        Label = item!.BeatmapSet?.Metadata.GetDisplayTitleRomanisable().GetPreferred(true) ?? item.ToString(),
                         OnActive = () =>
                         {
                             Schedule(() => Play(beatmaps.GetWorkingBeatmap(item.AsBeatmapInfo())));
@@ -357,6 +360,8 @@ namespace Mvis.Plugin.CollectionSupport
 
         public List<BeatmapCollection> AvaliableCollections { get; private set; } = new List<BeatmapCollection>();
 
+        public static readonly BeatmapCollection DEFAULT_COLLECTION = new BeatmapCollection("未选择任何收藏夹");
+
         private void onCollectionChange(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes, Exception error)
         {
             AvaliableCollections = collections.AsEnumerable().Select(c => c).ToList();
@@ -365,7 +370,7 @@ namespace Mvis.Plugin.CollectionSupport
             {
                 var collectionMatch = AvaliableCollections.Find(c => c.ID == CurrentCollection.Value.ID);
 
-                CurrentCollection.Value = collectionMatch ?? null;
+                CurrentCollection.Value = collectionMatch ?? DEFAULT_COLLECTION;
             }
         }
 
@@ -378,7 +383,8 @@ namespace Mvis.Plugin.CollectionSupport
         {
             //collectionManager.Collections.CollectionChanged -= triggerRefresh;
 
-            LLin.Resuming -= UpdateBeatmaps;
+            if (LLin != null)
+                LLin.Resuming -= UpdateBeatmaps;
 
             base.Dispose(isDisposing);
 

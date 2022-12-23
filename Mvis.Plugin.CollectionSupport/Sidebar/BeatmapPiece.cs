@@ -15,6 +15,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.LLin;
 using osu.Game.Screens.LLin.Misc;
 
+#nullable disable
+
 namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
     public partial class BeatmapPiece : CompositeDrawable

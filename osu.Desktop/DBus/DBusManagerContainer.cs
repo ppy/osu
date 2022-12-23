@@ -23,6 +23,8 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 
+#nullable disable
+
 namespace osu.Desktop.DBus
 {
     public partial class DBusManagerContainer : Component, IDBusManagerContainer<IMDBusObject>

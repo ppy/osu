@@ -19,6 +19,8 @@ using osu.Game.Screens.LLin.Plugins;
 using osuTK;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.PluginsPage
 {
     public partial class PluginPiece : CompositeDrawable, IHasTooltip

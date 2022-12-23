@@ -5,7 +5,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc
     public class APISearchResponseRoot
     {
         [JsonProperty("result")]
-        public APISearchResultInfo Result { get; set; }
+        public APISearchResultInfo? Result { get; set; }
 
         [JsonProperty("code")]
         public int ResponseCode { get; set; }

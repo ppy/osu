@@ -5,6 +5,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osuTK;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Components.Layouts
 {
     public partial class TypeALayout : DrawableVisualizerLayout

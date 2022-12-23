@@ -12,6 +12,8 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace osu.Game.Overlays.Mf.TextBox
 {
     public partial class MfMenuTextBoxContainer : Container

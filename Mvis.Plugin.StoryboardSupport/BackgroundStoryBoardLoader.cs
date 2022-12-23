@@ -34,12 +34,12 @@ namespace Mvis.Plugin.StoryboardSupport
         public readonly BindableBool NeedToHideTriangles = new BindableBool();
         public readonly BindableBool StoryboardReplacesBackground = new BindableBool();
 
-        private BackgroundStoryboard currentStoryboard;
+        private BackgroundStoryboard? currentStoryboard;
 
-        private WorkingBeatmap targetBeatmap;
+        private WorkingBeatmap targetBeatmap = null!;
 
         [Resolved]
-        private MusicController music { get; set; }
+        private MusicController music { get; set; } = null!;
 
         public override int Version => 10;
 
@@ -162,7 +162,7 @@ namespace Mvis.Plugin.StoryboardSupport
             return true;
         }
 
-        private Drawable prevProxy;
+        private Drawable? prevProxy;
 
         protected override bool OnContentLoaded(Drawable content)
         {

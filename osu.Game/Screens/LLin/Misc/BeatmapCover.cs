@@ -15,9 +15,9 @@ namespace osu.Game.Screens.LLin.Misc
     {
         private readonly WorkingBeatmap b;
 
-        private Drawable cover;
+        private Drawable? cover;
 
-        private CancellationTokenSource changeCoverTask;
+        private CancellationTokenSource? changeCoverTask;
 
         public bool BackgroundBox = true;
 
@@ -115,9 +115,9 @@ namespace osu.Game.Screens.LLin.Misc
 
         public partial class Cover : Sprite
         {
-            private readonly WorkingBeatmap b;
+            private readonly WorkingBeatmap? b;
 
-            public Cover(WorkingBeatmap beatmap = null)
+            public Cover(WorkingBeatmap? beatmap = null)
             {
                 RelativeSizeAxes = Axes.Both;
                 FillMode = FillMode.Fill;

@@ -31,13 +31,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             Origin = Anchor.Centre
         };
 
-        private readonly FillFlowContainer contentFillFlow;
-        private OsuTextBox textBox;
+        private readonly FillFlowContainer contentFillFlow = null!;
+        private OsuTextBox textBox = null!;
 
         [Resolved]
-        private LyricPlugin plugin { get; set; }
+        private LyricPlugin plugin { get; set; } = null!;
 
-        private UserDefinitionHelper udh;
+        private UserDefinitionHelper? udh;
 
         public Toolbox()
         {
@@ -81,7 +81,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             };
         }
 
-        public Action OnBackAction { get; set; }
+        public Action? OnBackAction { get; set; }
 
         public string IdText
         {

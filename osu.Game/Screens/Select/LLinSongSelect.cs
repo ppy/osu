@@ -2,6 +2,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Overlays;
 
+#nullable disable
+
 namespace osu.Game.Screens.Select
 {
     public partial class LLinSongSelect : SongSelect

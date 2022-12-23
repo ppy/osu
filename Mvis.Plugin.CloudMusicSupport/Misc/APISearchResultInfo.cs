@@ -6,7 +6,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc
     public class APISearchResultInfo
     {
         [JsonProperty("songs")]
-        public IList<APISongInfo> Songs { get; set; }
+        public IList<APISongInfo>? Songs { get; set; }
 
         [JsonProperty("songCount")]
         public int SongCount { get; set; }

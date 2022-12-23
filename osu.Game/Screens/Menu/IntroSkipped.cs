@@ -12,6 +12,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Screens.Backgrounds;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace osu.Game.Screens.Menu
 {
     public partial class IntroSkipped : IntroScreen

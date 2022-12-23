@@ -5,6 +5,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Mf;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.Misc
 {
     public partial class BgTrianglesContainer : VisibilityContainer

@@ -23,10 +23,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         #region 依赖
 
         [Resolved]
-        private LyricConfigManager config { get; set; }
+        private LyricConfigManager config { get; set; } = null!;
 
         [Resolved]
-        private Storage storage { get; set; }
+        private Storage storage { get; set; } = null!;
 
         #endregion
 
@@ -37,18 +37,18 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         }
 
         [Resolved]
-        private IImplementLLin llin { get; set; }
+        private IImplementLLin llin { get; set; } = null!;
 
         [Resolved]
-        private LyricPlugin plugin { get; set; }
+        private LyricPlugin plugin { get; set; } = null!;
 
         #region 更新定义
 
-        private WebRequest currentRequest;
+        private WebRequest? currentRequest;
 
         private string filePath = "custom/lyrics/definition.json";
 
-        public void UpdateDefinition(string url = null, Action onComplete = null, Action<Exception> onFail = null)
+        public void UpdateDefinition(string? url = null, Action? onComplete = null, Action<Exception>? onFail = null)
         {
             void onRefreshComplete()
             {
@@ -120,7 +120,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             if (onlineID == -1 || mappingRoot == null)
                 return false;
 
-            var result = mappingRoot.Data.FirstOrDefault(d => d.Beatmaps.Contains(onlineID));
+            var result = mappingRoot.Data?.FirstOrDefault(d => d.Beatmaps.Contains(onlineID));
 
             if (result != null) neteaseID = result.TargetNeteaseID;
             return result != null;
@@ -130,10 +130,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         {
             neteaseID = -1;
 
-            if (mappingRoot == null || mappingRoot.Data.Length == 0) return false;
+            if (mappingRoot == null || mappingRoot.Data?.Length == 0) return false;
 
             var metadata = bi.Metadata;
-            var result = mappingRoot.Data.FirstOrDefault(m =>
+            var result = mappingRoot.Data?.FirstOrDefault(m =>
                 (m.ArtistMatchMode == MatchingMode.Contains
                     ? m.MatchingArtist.Any(s => metadata.Artist.Contains(s) || (metadata.ArtistUnicode?.Contains(s) ?? false))
                     : m.MatchingArtist.Any(s => metadata.Artist == s || metadata.ArtistUnicode == s))
@@ -150,7 +150,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
         internal void Debug()
         {
-            if (mappingRoot == null) return;
+            if (mappingRoot?.Data == null) return;
 
             foreach (var mapping in mappingRoot.Data)
             {

@@ -5,6 +5,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
+#nullable disable
+
 namespace Mvis.Plugin.StoryboardSupport.Storyboard
 {
     [LongRunningLoad]

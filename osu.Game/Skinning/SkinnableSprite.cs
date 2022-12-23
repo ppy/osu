@@ -140,6 +140,6 @@ namespace osu.Game.Skinning
             }
         }
 
-        public string LookupName { get; }
+        public string? LookupName { get; }
     }
 }

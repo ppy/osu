@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.Cursor
         private bool changedWhenHidden;
 
         [Resolved]
-        private GameHost host { get; set; }
+        private GameHost host { get; set; } = null!;
         //mfosu end
 
         [BackgroundDependencyLoader]

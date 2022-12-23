@@ -6,6 +6,8 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
+#nullable disable
+
 namespace osu.Game.Rulesets.Osu.Replays.Movers
 {
     public class AxisAlignedMover : Mover

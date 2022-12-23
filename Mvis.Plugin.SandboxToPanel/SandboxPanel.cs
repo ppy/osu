@@ -14,6 +14,8 @@ using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 using osuTK;
 
+#nullable disable
+
 namespace Mvis.Plugin.Sandbox
 {
     [Cached]
@@ -79,7 +81,7 @@ namespace Mvis.Plugin.Sandbox
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new SandboxRulesetConfigManager(storage);
 
-        private SettingsEntry[]? entries;
+        private SettingsEntry[] entries;
 
         public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {

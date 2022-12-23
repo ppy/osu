@@ -6,6 +6,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.UI.Settings
 {
     public abstract partial class SandboxSettingsSection : Container

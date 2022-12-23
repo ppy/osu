@@ -10,7 +10,7 @@ namespace osu.Game.Screens.LLin.Plugins.Config
     public abstract partial class PluginSettingsSubSection : SettingsSubsection
     {
         private readonly LLinPlugin plugin;
-        protected IPluginConfigManager ConfigManager;
+        protected IPluginConfigManager ConfigManager = null!;
 
         protected override LocalisableString Header => plugin.Name;
 
@@ -45,9 +45,14 @@ namespace osu.Game.Screens.LLin.Plugins.Config
         [BackgroundDependencyLoader]
         private void load(LLinPluginManager pluginManager)
         {
-            foreach (var se in pluginManager.GetSettingsFor(plugin))
+            var entries = pluginManager.GetSettingsFor(plugin);
+
+            if (entries != null)
             {
-                Add(se.ToSettingsItem());
+                foreach (var se in entries)
+                {
+                    Add(se.ToSettingsItem());
+                }
             }
         }
     }

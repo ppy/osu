@@ -7,6 +7,8 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
     public partial class SettingsListPiece<T> : SettingsPieceBasePanel, ISettingsItem<T>

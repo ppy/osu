@@ -8,7 +8,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types
     public class FakeButton : IFunctionProvider
     {
         public Vector2 Size { get; set; } = new Vector2(30);
-        public Func<bool> Action { get; set; }
+        public Func<bool>? Action { get; set; }
         public IconUsage Icon { get; set; }
         public LocalisableString Title { get; set; }
         public LocalisableString Description { get; set; }
@@ -23,6 +23,6 @@ namespace osu.Game.Screens.LLin.Plugins.Types
             return success;
         }
 
-        public Action<bool> OnActive { get; set; }
+        public Action<bool>? OnActive { get; set; }
     }
 }

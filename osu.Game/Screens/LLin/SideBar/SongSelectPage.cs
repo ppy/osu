@@ -9,6 +9,8 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar
 {
     public partial class SongSelectPage : CompositeDrawable, ISidebarContent

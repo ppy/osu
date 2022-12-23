@@ -8,6 +8,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays.Mf.Header;
 using osu.Game.Overlays.Mf.Sections;
 
+#nullable disable
+
 namespace osu.Game.Overlays
 {
     public partial class MfMenuOverlay : FullscreenOverlay<MfMenuHeader>

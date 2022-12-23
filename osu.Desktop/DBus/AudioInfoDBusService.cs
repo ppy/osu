@@ -19,7 +19,7 @@ namespace osu.Desktop.DBus
 
         public string CustomRegisterName { get; } = string.Empty;
 
-        public WorkingBeatmap Beatmap { get; set; }
+        public WorkingBeatmap? Beatmap { get; set; }
 
         public Task<double> GetTrackLengthAsync()
             => Task.FromResult(Beatmap?.Track.Length ?? 0d);

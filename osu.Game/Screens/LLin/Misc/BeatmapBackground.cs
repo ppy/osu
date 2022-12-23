@@ -5,6 +5,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.Misc
 {
     public partial class BeatmapBackground : BufferedContainer

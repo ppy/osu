@@ -114,7 +114,7 @@ namespace osu.Game.Graphics.Mf
             }
 
             [Resolved]
-            private IBindable<WorkingBeatmap> b { get; set; }
+            private IBindable<WorkingBeatmap> b { get; set; } = null!;
 
             protected override void Update()
             {

@@ -25,10 +25,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         public LocalisableString TooltipText { get; private set; }
 
         [Resolved]
-        private LyricConfigManager config { get; set; }
+        private LyricConfigManager config { get; set; } = null!;
 
         [Resolved]
-        private LyricPlugin plugin { get; set; }
+        private LyricPlugin plugin { get; set; } = null!;
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
@@ -38,10 +38,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                 () => plugin.Offset.Value = Value.Time - mvisScreen.CurrentTrack.CurrentTime)
         };
 
-        private Box hoverBox;
-        private OsuSpriteText contentText;
-        private OsuSpriteText translateText;
-        private OsuSpriteText timeText;
+        private Box hoverBox = null!;
+        private OsuSpriteText contentText = null!;
+        private OsuSpriteText translateText = null!;
+        private OsuSpriteText timeText = null!;
 
         public LyricPiece(Lyric lrc)
         {
@@ -57,12 +57,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         }
 
         [Resolved]
-        private IImplementLLin mvisScreen { get; set; }
+        private IImplementLLin mvisScreen { get; set; } = null!;
 
         [Resolved]
-        private CustomColourProvider colourProvider { get; set; }
+        private CustomColourProvider colourProvider { get; set; } = null!;
 
-        private Box bgBox;
+        private Box bgBox = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -184,13 +184,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
         protected override void Update()
         {
-            isCurrent = plugin.CurrentLine.Equals(Value);
+            isCurrent = plugin.CurrentLine != null && plugin.CurrentLine.Equals(Value);
 
             base.Update();
         }
 
         private bool haveLyric;
-        private FillFlowContainer textFillFlow;
+        private FillFlowContainer textFillFlow = null!;
 
         protected override void UpdateValue(Lyric lyric)
         {

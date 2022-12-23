@@ -13,6 +13,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
+#nullable disable
+
 namespace osu.Game.Overlays
 {
     public abstract partial class ExpandingButtonContainer : Container, IStateful<ExpandedState>
