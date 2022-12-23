@@ -3,11 +3,9 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -18,20 +16,16 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public partial class ArgonJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public partial class ArgonJudgementPiece : JudgementPiece, IAnimatableJudgement
     {
-        protected readonly HitResult Result;
-
-        protected SpriteText JudgementText { get; private set; } = null!;
-
         private RingExplosion? ringExplosion;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
         public ArgonJudgementPiece(HitResult result)
+            : base(result)
         {
-            Result = result;
             RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.Both;
         }
@@ -45,7 +39,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Text = Result.GetDescription().ToUpperInvariant(),
                     Colour = colours.ForHitResult(Result),
                     Blending = BlendingParameters.Additive,
                     Spacing = new Vector2(10, 0),
