@@ -121,10 +121,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.ValueChanged += b =>
             {
-                source.Text = b.NewValue?.Source ?? string.Empty;
-                tags.Text = b.NewValue?.Tags ?? string.Empty;
-                genre.Text = b.NewValue?.Genre ?? new BeatmapSetOnlineGenre { Id = 1 };
-                language.Text = b.NewValue?.Language ?? new BeatmapSetOnlineLanguage { Id = 1 };
+                source.Metadata = b.NewValue?.Source ?? string.Empty;
+                tags.Metadata = b.NewValue?.Tags ?? string.Empty;
+                genre.Metadata = b.NewValue?.Genre ?? new BeatmapSetOnlineGenre { Id = 1 };
+                language.Metadata = b.NewValue?.Language ?? new BeatmapSetOnlineLanguage { Id = 1 };
                 bool setHasLeaderboard = b.NewValue?.Status > 0;
                 successRate.Alpha = setHasLeaderboard ? 1 : 0;
                 notRankedPlaceholder.Alpha = setHasLeaderboard ? 0 : 1;

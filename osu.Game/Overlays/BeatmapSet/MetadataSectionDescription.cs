@@ -13,9 +13,9 @@ namespace osu.Game.Overlays.BeatmapSet
         {
         }
 
-        protected override void AddMetadata(string text, LinkFlowContainer loaded)
+        protected override void AddMetadata(string metadata, LinkFlowContainer loaded)
         {
-            loaded.AddText(text);
+            loaded.AddText(metadata);
         }
     }
 }
