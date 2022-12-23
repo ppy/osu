@@ -27,6 +27,16 @@ namespace osu.Game.Tests.Chat
         }
 
         [Test]
+        public void TestUnsupportedProtocolLink()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a gopher://really-old-protocol we don't support." });
+
+            Assert.AreEqual(result.Content, result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("gopher://really-old-protocol", result.Links[0].Url);
+        }
+
+        [Test]
         public void TestBareLink()
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a http://www.basic-link.com/?test=test." });

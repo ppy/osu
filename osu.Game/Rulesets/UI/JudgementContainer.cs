@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.UI
     {
         public override void Add(T judgement)
         {
-            if (judgement == null) throw new ArgumentNullException(nameof(judgement));
+            ArgumentNullException.ThrowIfNull(judgement);
 
             // remove any existing judgements for the judged object.
             // this can be the case when rewinding.
