@@ -17,14 +17,14 @@ namespace osu.Game.Overlays.BeatmapSet
         {
         }
 
-        protected override void AddMetadata(BeatmapSetOnlineGenre text, LinkFlowContainer loaded)
+        protected override void AddMetadata(BeatmapSetOnlineGenre metadata, LinkFlowContainer loaded)
         {
-            var genre = (SearchGenre)text.Id;
+            var genre = (SearchGenre)metadata.Id;
 
             if (Enum.IsDefined(genre))
                 loaded.AddLink(genre.GetLocalisableDescription(), LinkAction.FilterBeatmapSetGenre, genre);
             else
-                loaded.AddText(text.Name);
+                loaded.AddText(metadata.Name);
         }
     }
 }

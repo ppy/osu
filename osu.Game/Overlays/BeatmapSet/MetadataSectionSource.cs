@@ -14,12 +14,12 @@ namespace osu.Game.Overlays.BeatmapSet
         {
         }
 
-        protected override void AddMetadata(string text, LinkFlowContainer loaded)
+        protected override void AddMetadata(string metadata, LinkFlowContainer loaded)
         {
             if (SearchAction != null)
-                loaded.AddLink(text, () => SearchAction(text));
+                loaded.AddLink(metadata, () => SearchAction(metadata));
             else
-                loaded.AddLink(text, LinkAction.SearchBeatmapSet, text);
+                loaded.AddLink(metadata, LinkAction.SearchBeatmapSet, metadata);
         }
     }
 }

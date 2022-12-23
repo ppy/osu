@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public abstract partial class MetadataSection : MetadataSection<string>
     {
-        public override string Text
+        public override string Metadata
         {
             set
             {
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     return;
                 }
 
-                base.Text = value;
+                base.Metadata = value;
             }
         }
 
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
-        public virtual T Text
+        public virtual T Metadata
         {
             set
             {
@@ -90,11 +90,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 this.FadeIn(TRANSITION_DURATION);
 
-                setTextAsync(value);
+                setTextFlowAsync(value);
             }
         }
 
-        private void setTextAsync(T text)
+        private void setTextFlowAsync(T metadata)
         {
             LoadComponentAsync(new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
             {
@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 textFlow?.Expire();
 
-                AddMetadata(text, loaded);
+                AddMetadata(metadata, loaded);
 
                 textContainer.Add(textFlow = loaded);
 
@@ -114,6 +114,6 @@ namespace osu.Game.Overlays.BeatmapSet
             });
         }
 
-        protected abstract void AddMetadata(T text, LinkFlowContainer loaded);
+        protected abstract void AddMetadata(T metadata, LinkFlowContainer loaded);
     }
 }

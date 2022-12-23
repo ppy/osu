@@ -187,9 +187,9 @@ namespace osu.Game.Screens.Select
         private void updateStatistics()
         {
             advanced.BeatmapInfo = BeatmapInfo;
-            description.Text = BeatmapInfo?.DifficultyName ?? string.Empty;
-            source.Text = BeatmapInfo?.Metadata.Source ?? string.Empty;
-            tags.Text = BeatmapInfo?.Metadata.Tags ?? string.Empty;
+            description.Metadata = BeatmapInfo?.DifficultyName ?? string.Empty;
+            source.Metadata = BeatmapInfo?.Metadata.Source ?? string.Empty;
+            tags.Metadata = BeatmapInfo?.Metadata.Tags ?? string.Empty;
 
             // failTimes may have been previously fetched
             if (ratings != null && failTimes != null)
