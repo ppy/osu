@@ -20,7 +20,7 @@ namespace osu.Game.Online.Solo
     /// <summary>
     /// A persistent component that binds to the spectator server and API in order to deliver updates about the logged in user's gameplay statistics.
     /// </summary>
-    public partial class SoloStatisticsWatcher : Component
+    public partial class SoloStatisticsWatcher : Component, ISoloStatisticsWatcher
     {
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
