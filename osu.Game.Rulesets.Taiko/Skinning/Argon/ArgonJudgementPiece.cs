@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -33,20 +34,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
-            {
-                JudgementText = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Colour = colours.ForHitResult(Result),
-                    Blending = BlendingParameters.Additive,
-                    Spacing = new Vector2(10, 0),
-                    RelativePositionAxes = Axes.Both,
-                    Font = OsuFont.Default.With(size: 20, weight: FontWeight.Regular),
-                },
-            };
-
             if (Result.IsHit())
             {
                 AddInternal(ringExplosion = new RingExplosion(Result)
@@ -56,6 +43,17 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 });
             }
         }
+
+        protected override SpriteText CreateJudgementText() =>
+            new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Blending = BlendingParameters.Additive,
+                Spacing = new Vector2(10, 0),
+                RelativePositionAxes = Axes.Both,
+                Font = OsuFont.Default.With(size: 20, weight: FontWeight.Regular),
+            };
 
         /// <summary>
         /// Plays the default animation for this judgement piece.
