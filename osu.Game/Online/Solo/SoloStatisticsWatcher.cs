@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -49,6 +50,9 @@ namespace osu.Game.Online.Solo
         public void RegisterForStatisticsUpdateAfter(ScoreInfo score, Action<SoloStatisticsUpdate> onUpdateReady) => Schedule(() =>
         {
             if (!api.IsLoggedIn)
+                return;
+
+            if (!score.Ruleset.IsLegacyRuleset())
                 return;
 
             var callback = new StatisticsUpdateCallback(score, onUpdateReady);
