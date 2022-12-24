@@ -16,11 +16,12 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osuTK;
 
@@ -41,7 +42,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private readonly UpdateableOnlineBeatmapSetCover cover;
         private readonly Box coverGradient;
-        private readonly OsuSpriteText title, artist;
+        private readonly LinkFlowContainer title, artist;
         private readonly AuthorInfo author;
 
         private readonly ExplicitContentBeatmapBadge explicitContent;
@@ -127,9 +128,12 @@ namespace osu.Game.Overlays.BeatmapSet
                                             Margin = new MarginPadding { Top = 15 },
                                             Children = new Drawable[]
                                             {
-                                                title = new OsuSpriteText
+                                                title = new LinkFlowContainer(s =>
                                                 {
-                                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true)
+                                                    s.Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true);
+                                                })
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
                                                 },
                                                 externalLink = new ExternalLinkButton
                                                 {
@@ -160,9 +164,12 @@ namespace osu.Game.Overlays.BeatmapSet
                                             Margin = new MarginPadding { Bottom = 20 },
                                             Children = new Drawable[]
                                             {
-                                                artist = new OsuSpriteText
+                                                artist = new LinkFlowContainer(s =>
                                                 {
-                                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true),
+                                                    s.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true);
+                                                })
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
                                                 },
                                                 featuredArtist = new FeaturedArtistBeatmapBadge
                                                 {
@@ -275,8 +282,14 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     loading.Hide();
 
-                    title.Text = new RomanisableString(setInfo.NewValue.TitleUnicode, setInfo.NewValue.Title);
-                    artist.Text = new RomanisableString(setInfo.NewValue.ArtistUnicode, setInfo.NewValue.Artist);
+                    var titleText = new RomanisableString(setInfo.NewValue.TitleUnicode, setInfo.NewValue.Title);
+                    var artistText = new RomanisableString(setInfo.NewValue.ArtistUnicode, setInfo.NewValue.Artist);
+
+                    title.Clear();
+                    artist.Clear();
+
+                    title.AddLink(titleText, LinkAction.SearchBeatmapSet, titleText);
+                    artist.AddLink(artistText, LinkAction.SearchBeatmapSet, artistText);
 
                     explicitContent.Alpha = setInfo.NewValue.HasExplicitContent ? 1 : 0;
                     spotlight.Alpha = setInfo.NewValue.FeaturedInSpotlight ? 1 : 0;
