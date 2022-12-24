@@ -18,13 +18,10 @@ namespace osu.Game.Screens.Ranking.Statistics.User
 
         private readonly ScoreInfo score;
 
-        private readonly Bindable<SoloStatisticsUpdate?> statisticsUpdate = new Bindable<SoloStatisticsUpdate?>();
+        public Bindable<SoloStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<SoloStatisticsUpdate?>();
 
         private LoadingLayer loadingLayer = null!;
         private FillFlowContainer content = null!;
-
-        [Resolved]
-        private ISoloStatisticsWatcher statisticsWatcher { get; set; } = null!;
 
         public OverallRanking(ScoreInfo score)
         {
@@ -53,12 +50,12 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
-                        new GlobalRankChangeRow { StatisticsUpdate = { BindTarget = statisticsUpdate } },
-                        new AccuracyChangeRow { StatisticsUpdate = { BindTarget = statisticsUpdate } },
-                        new MaximumComboChangeRow { StatisticsUpdate = { BindTarget = statisticsUpdate } },
-                        new RankedScoreChangeRow { StatisticsUpdate = { BindTarget = statisticsUpdate } },
-                        new TotalScoreChangeRow { StatisticsUpdate = { BindTarget = statisticsUpdate } },
-                        new PerformancePointsChangeRow { StatisticsUpdate = { BindTarget = statisticsUpdate } }
+                        new GlobalRankChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
+                        new AccuracyChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
+                        new MaximumComboChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
+                        new RankedScoreChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
+                        new TotalScoreChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
+                        new PerformancePointsChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } }
                     }
                 }
             };
@@ -68,8 +65,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
         {
             base.LoadComplete();
 
-            statisticsWatcher.RegisterForStatisticsUpdateAfter(score, update => statisticsUpdate.Value = update);
-            statisticsUpdate.BindValueChanged(onUpdateReceived, true);
+            StatisticsUpdate.BindValueChanged(onUpdateReceived, true);
             FinishTransforms(true);
         }
 
