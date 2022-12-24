@@ -35,8 +35,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         protected PatternGenerator(LegacyRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
             : base(hitObject, beatmap, previousPattern)
         {
-            if (random == null) throw new ArgumentNullException(nameof(random));
-            if (originalBeatmap == null) throw new ArgumentNullException(nameof(originalBeatmap));
+            ArgumentNullException.ThrowIfNull(random);
+            ArgumentNullException.ThrowIfNull(originalBeatmap);
 
             Random = random;
             OriginalBeatmap = originalBeatmap;
