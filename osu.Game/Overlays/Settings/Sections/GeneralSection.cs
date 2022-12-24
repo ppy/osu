@@ -39,8 +39,8 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
                 new SettingsButton
                 {
-                    Text = GeneralSectionStrings.LearnMoreAboutLazer,
-                    TooltipText = GeneralSectionStrings.CheckOutTheFeatureComparison,
+                    Text = GeneralSettingsStrings.LearnMoreAboutLazer,
+                    TooltipText = GeneralSettingsStrings.LearnMoreAboutLazerTooltip,
                     BackgroundColour = colours.YellowDark,
                     Action = () => game?.ShowWiki(@"Help_centre/Upgrading_to_lazer")
                 },
