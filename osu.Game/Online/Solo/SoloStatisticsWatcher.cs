@@ -3,11 +3,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -31,7 +31,7 @@ namespace osu.Game.Online.Solo
         private readonly Dictionary<long, StatisticsUpdateCallback> callbacks = new Dictionary<long, StatisticsUpdateCallback>();
         private long? lastProcessedScoreId;
 
-        private readonly Dictionary<string, UserStatistics> latestStatistics = new Dictionary<string, UserStatistics>();
+        private Dictionary<string, UserStatistics>? latestStatistics;
 
         protected override void LoadComplete()
         {
@@ -51,6 +51,9 @@ namespace osu.Game.Online.Solo
             if (!api.IsLoggedIn)
                 return;
 
+            if (!score.Ruleset.IsLegacyRuleset())
+                return;
+
             var callback = new StatisticsUpdateCallback(score, onUpdateReady);
 
             if (lastProcessedScoreId == score.OnlineID)
@@ -59,23 +62,22 @@ namespace osu.Game.Online.Solo
                 return;
             }
 
-            callbacks[score.OnlineID] = callback;
+            callbacks.Add(score.OnlineID, callback);
         });
 
         private void onUserChanged(APIUser? localUser) => Schedule(() =>
         {
             callbacks.Clear();
             lastProcessedScoreId = null;
-            latestStatistics.Clear();
+            latestStatistics = null;
 
-            if (!api.IsLoggedIn)
+            if (localUser == null || localUser.OnlineID <= 1)
                 return;
-
-            Debug.Assert(localUser != null);
 
             var userRequest = new GetUsersRequest(new[] { localUser.OnlineID });
             userRequest.Success += response => Schedule(() =>
             {
+                latestStatistics = new Dictionary<string, UserStatistics>();
                 foreach (var rulesetStats in response.Users.Single().RulesetsStatistics)
                     latestStatistics.Add(rulesetStats.Key, rulesetStats.Value);
             });
@@ -107,8 +109,11 @@ namespace osu.Game.Online.Solo
         {
             string rulesetName = callback.Score.Ruleset.ShortName;
 
-            if (!latestStatistics.TryGetValue(rulesetName, out var latestRulesetStatistics))
+            if (latestStatistics == null)
                 return;
+
+            latestStatistics.TryGetValue(rulesetName, out UserStatistics? latestRulesetStatistics);
+            latestRulesetStatistics ??= new UserStatistics();
 
             var update = new SoloStatisticsUpdate(callback.Score, latestRulesetStatistics, updatedStatistics);
             callback.OnUpdateReady.Invoke(update);
