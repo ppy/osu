@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Ranking
             displayUpdate(statistics, statistics);
         }
 
-        private void createDisplay() => AddStep("create display", () => Child = overallRanking = new OverallRanking(new ScoreInfo())
+        private void createDisplay() => AddStep("create display", () => Child = overallRanking = new OverallRanking
         {
             Width = 400,
             Anchor = Anchor.Centre,

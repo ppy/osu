@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Solo;
-using osu.Game.Scoring;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking.Statistics.User
@@ -16,17 +15,10 @@ namespace osu.Game.Screens.Ranking.Statistics.User
     {
         private const float transition_duration = 300;
 
-        private readonly ScoreInfo score;
-
         public Bindable<SoloStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<SoloStatisticsUpdate?>();
 
         private LoadingLayer loadingLayer = null!;
         private FillFlowContainer content = null!;
-
-        public OverallRanking(ScoreInfo score)
-        {
-            this.score = score;
-        }
 
         [BackgroundDependencyLoader]
         private void load()
