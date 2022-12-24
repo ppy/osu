@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
@@ -15,31 +14,24 @@ namespace osu.Game.Rulesets.Judgements
     public partial class DefaultJudgementPiece : JudgementPiece, IAnimatableJudgement
     {
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         public DefaultJudgementPiece(HitResult result)
             : base(result)
         {
+            AutoSizeAxes = Axes.Both;
+
             Origin = Anchor.Centre;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            AutoSizeAxes = Axes.Both;
-
-            InternalChildren = new Drawable[]
+        protected override SpriteText CreateJudgementText() =>
+            new OsuSpriteText
             {
-                JudgementText = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Colour = colours.ForHitResult(Result),
-                    Font = OsuFont.Numeric.With(size: 20),
-                    Scale = new Vector2(0.85f, 1),
-                }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Font = OsuFont.Numeric.With(size: 20),
+                Scale = new Vector2(0.85f, 1),
             };
-        }
 
         /// <summary>
         /// Plays the default animation for this judgement piece.
@@ -67,6 +59,6 @@ namespace osu.Game.Rulesets.Judgements
             this.FadeOutFromOne(800);
         }
 
-        public Drawable GetAboveHitObjectsProxiedContent() => null;
+        public Drawable? GetAboveHitObjectsProxiedContent() => null;
     }
 }
