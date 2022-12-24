@@ -48,9 +48,6 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly LinkFlowContainer title, artist;
         private readonly AuthorInfo author;
 
-        private ExplicitContentBeatmapBadge explicitContent;
-        private SpotlightBeatmapBadge spotlight;
-        private FeaturedArtistBeatmapBadge featuredArtist;
         private ExternalLinkButton externalLink;
 
         private readonly FillFlowContainer downloadButtonsContainer;
@@ -266,7 +263,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         title.AddArbitraryDrawable(new Container
                         {
                             AutoSizeAxes = Axes.Both,
-                            Child = explicitContent = new ExplicitContentBeatmapBadge { Margin = new MarginPadding { Left = 10 } },
+                            Child = new ExplicitContentBeatmapBadge { Margin = new MarginPadding { Left = 10 } },
                         });
                     }
 
@@ -275,7 +272,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         title.AddArbitraryDrawable(new Container
                         {
                             AutoSizeAxes = Axes.Both,
-                            Child = spotlight = new SpotlightBeatmapBadge { Margin = new MarginPadding { Left = 10 } },
+                            Child = new SpotlightBeatmapBadge { Margin = new MarginPadding { Left = 10 } },
                         });
                     }
 
@@ -286,7 +283,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         artist.AddArbitraryDrawable(new Container
                         {
                             AutoSizeAxes = Axes.Both,
-                            Child = featuredArtist = new FeaturedArtistBeatmapBadge { Margin = new MarginPadding { Left = 10 } }
+                            Child = new FeaturedArtistBeatmapBadge { Margin = new MarginPadding { Left = 10 } }
                         });
                     }
 
