@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class PlayButton : Container
+    public partial class PlayButton : Container
     {
         public IBindable<bool> Playing => playing;
 
@@ -147,7 +147,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     {
                         // beatmapset may have changed.
                         if (Preview != preview)
+                        {
+                            preview?.Dispose();
                             return;
+                        }
 
                         AddInternal(preview);
                         loading = false;

@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
     /// </summary>
     /// <typeparam name="TEntry">The type of entries managed by this container.</typeparam>
     /// <typeparam name="TDrawable">The type of drawables corresponding to the entries.</typeparam>
-    public abstract class PooledDrawableWithLifetimeContainer<TEntry, TDrawable> : CompositeDrawable
+    public abstract partial class PooledDrawableWithLifetimeContainer<TEntry, TDrawable> : CompositeDrawable
         where TEntry : LifetimeEntry
         where TDrawable : Drawable
     {
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// <remarks>
         /// Invoked when the entry became dead.
         /// </remarks>
-        protected virtual void RemoveDrawable(TEntry entry, TDrawable drawable) => RemoveInternal(drawable);
+        protected virtual void RemoveDrawable(TEntry entry, TDrawable drawable) => RemoveInternal(drawable, false);
 
         private void entryCrossedBoundary(LifetimeEntry lifetimeEntry, LifetimeBoundaryKind kind, LifetimeBoundaryCrossingDirection direction)
         {

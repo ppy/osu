@@ -28,7 +28,7 @@ using osu.Game.Scoring.Drawables;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoreTable : TableContainer
+    public partial class ScoreTable : TableContainer
     {
         private const float horizontal_inset = 20;
         private const float row_height = 22;
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         /// <summary>
         /// The statistics that appear in the table, in order of appearance.
         /// </summary>
-        private readonly List<(HitResult result, string displayName)> statisticResultTypes = new List<(HitResult, string)>();
+        private readonly List<(HitResult result, LocalisableString displayName)> statisticResultTypes = new List<(HitResult, LocalisableString)>();
 
         private bool showPerformancePoints;
 
@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (result.IsBonus())
                     continue;
 
-                string displayName = ruleset.GetDisplayNameForHitResult(result);
+                var displayName = ruleset.GetDisplayNameForHitResult(result);
 
                 columns.Add(new TableColumn(displayName, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
                 statisticResultTypes.Add((result, displayName));
@@ -207,7 +207,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? default);
 
-        private class HeaderText : OsuSpriteText
+        private partial class HeaderText : OsuSpriteText
         {
             public HeaderText(LocalisableString text)
             {
@@ -222,7 +222,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        private class StatisticText : OsuSpriteText, IHasTooltip
+        private partial class StatisticText : OsuSpriteText, IHasTooltip
         {
             private readonly double? count;
             private readonly double? maxCount;

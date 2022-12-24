@@ -38,15 +38,20 @@ namespace osu.Game.IO
         public override string[] IgnoreDirectories => new[]
         {
             "cache",
-            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.management",
         };
 
         public override string[] IgnoreFiles => new[]
         {
             "framework.ini",
             "storage.ini",
-            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.note",
-            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.lock",
+        };
+
+        public override string[] IgnoreSuffixes => new[]
+        {
+            // Realm pipe files don't play well with copy operations
+            ".note",
+            ".lock",
+            ".management",
         };
 
         public OsuStorage(GameHost host, Storage defaultStorage)

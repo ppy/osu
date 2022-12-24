@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
@@ -12,7 +10,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsSongSelect : OnlinePlaySongSelect
+    public partial class PlaylistsSongSelect : OnlinePlaySongSelect
     {
         public PlaylistsSongSelect(Room room)
             : base(room)

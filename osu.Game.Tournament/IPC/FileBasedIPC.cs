@@ -22,7 +22,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.IPC
 {
-    public class FileBasedIPC : MatchIPCInfo
+    public partial class FileBasedIPC : MatchIPCInfo
     {
         public Storage IPCStorage { get; private set; }
 
@@ -245,8 +245,10 @@ namespace osu.Game.Tournament.IPC
             {
                 string stableInstallPath;
 
+#pragma warning disable CA1416
                 using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
                     stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
+#pragma warning restore CA1416
 
                 if (ipcFileExistsInDirectory(stableInstallPath))
                     return stableInstallPath;

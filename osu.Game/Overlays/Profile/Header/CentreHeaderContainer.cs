@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class CentreHeaderContainer : CompositeDrawable
+    public partial class CentreHeaderContainer : CompositeDrawable
     {
         public readonly BindableBool DetailsVisible = new BindableBool(true);
         public readonly Bindable<APIUser> User = new Bindable<APIUser>();

@@ -11,8 +11,10 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Configuration;
@@ -31,10 +33,13 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneStoryboardSamples : OsuTestScene, IStorageResourceProvider
+    public partial class TestSceneStoryboardSamples : OsuTestScene, IStorageResourceProvider
     {
         [Resolved]
         private OsuConfigManager config { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [Test]
         public void TestRetrieveTopLevelSample()
@@ -72,7 +77,6 @@ namespace osu.Game.Tests.Gameplay
 
                 Add(gameplayContainer = new MasterGameplayClockContainer(working, 0)
                 {
-                    IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
                         Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
@@ -80,12 +84,15 @@ namespace osu.Game.Tests.Gameplay
                 });
             });
 
-            AddStep("reset clock", () => gameplayContainer.Start());
+            AddStep("reset clock", () => gameplayContainer.Reset(startClock: true));
 
             AddUntilStep("sample played", () => sample.RequestedPlaying);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
         }
 
+        /// <summary>
+        /// Sample at 0ms, start time at 1000ms (so the sample should not be played).
+        /// </summary>
         [Test]
         public void TestSampleHasLifetimeEndWithInitialClockTime()
         {
@@ -100,13 +107,13 @@ namespace osu.Game.Tests.Gameplay
 
                 Add(gameplayContainer = new MasterGameplayClockContainer(working, start_time)
                 {
-                    StartTime = start_time,
-                    IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
                         Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
                     }
                 });
+
+                gameplayContainer.Reset(start_time);
             });
 
             AddStep("start time", () => gameplayContainer.Start());
@@ -136,11 +143,11 @@ namespace osu.Game.Tests.Gameplay
 
                 beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
                 {
-                    Clock = gameplayContainer.GameplayClock
+                    Clock = gameplayContainer
                 });
             });
 
-            AddStep("start", () => gameplayContainer.Start());
+            AddStep("reset clock", () => gameplayContainer.Reset(startClock: true));
 
             AddUntilStep("sample played", () => sample.IsPlayed);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
@@ -192,7 +199,7 @@ namespace osu.Game.Tests.Gameplay
             protected internal override ISkin GetSkin() => new TestSkin("test-sample", resources);
         }
 
-        private class TestDrawableStoryboardSample : DrawableStoryboardSample
+        private partial class TestDrawableStoryboardSample : DrawableStoryboardSample
         {
             public TestDrawableStoryboardSample(StoryboardSampleInfo sampleInfo)
                 : base(sampleInfo)
@@ -202,6 +209,7 @@ namespace osu.Game.Tests.Gameplay
 
         #region IResourceStorageProvider
 
+        public IRenderer Renderer => host.Renderer;
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
         public new IResourceStore<byte[]> Resources => base.Resources;

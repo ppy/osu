@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -23,11 +24,11 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Acronym => "AS";
 
-        public override string Description => "Let track speed adapt to you.";
+        public override LocalisableString Description => "Let track speed adapt to you.";
 
         public override ModType Type => ModType.Fun;
 
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier => 0.5;
 
         public override bool ValidForMultiplayer => false;
         public override bool ValidForMultiplayerAsFreeMod => false;
@@ -35,32 +36,24 @@ namespace osu.Game.Rulesets.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp), typeof(ModAutoplay) };
 
         [SettingSource("Initial rate", "The starting speed of the track")]
-        public BindableNumber<double> InitialRate { get; } = new BindableDouble
+        public BindableNumber<double> InitialRate { get; } = new BindableDouble(1)
         {
             MinValue = 0.5,
             MaxValue = 2,
-            Default = 1,
-            Value = 1,
             Precision = 0.01
         };
 
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
-        public BindableBool AdjustPitch { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public BindableBool AdjustPitch { get; } = new BindableBool(true);
 
         /// <summary>
         /// The instantaneous rate of the track.
         /// Every frame this mod will attempt to smoothly adjust this to meet <see cref="targetRate"/>.
         /// </summary>
-        public BindableNumber<double> SpeedChange { get; } = new BindableDouble
+        public BindableNumber<double> SpeedChange { get; } = new BindableDouble(1)
         {
             MinValue = min_allowable_rate,
             MaxValue = max_allowable_rate,
-            Default = 1,
-            Value = 1
         };
 
         // The two constants below denote the maximum allowable range of rates that `SpeedChange` can take.

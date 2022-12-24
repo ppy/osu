@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawableProfileWeightedScore : DrawableProfileScore
+    public partial class DrawableProfileWeightedScore : DrawableProfileScore
     {
         private readonly double weight;
 

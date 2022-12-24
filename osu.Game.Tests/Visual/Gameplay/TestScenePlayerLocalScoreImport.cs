@@ -15,8 +15,10 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -25,7 +27,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePlayerLocalScoreImport : PlayerTestScene
+    public partial class TestScenePlayerLocalScoreImport : PlayerTestScene
     {
         private BeatmapManager beatmaps = null!;
         private RulesetStore rulesets = null!;
@@ -37,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(new ScoreManager(rulesets, () => beatmaps, LocalStorage, Realm, Scheduler, API));
+            Dependencies.Cache(new ScoreManager(rulesets, () => beatmaps, LocalStorage, Realm, API));
             Dependencies.Cache(Realm);
         }
 
@@ -81,9 +83,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             CreateTest();
 
             AddUntilStep("fail screen displayed", () => Player.ChildrenOfType<FailOverlay>().First().State.Value == Visibility.Visible);
+            AddUntilStep("wait for button clickable", () => Player.ChildrenOfType<SaveFailedScoreButton>().First().ChildrenOfType<OsuClickableContainer>().First().Enabled.Value);
+
             AddUntilStep("score not in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) == null));
             AddStep("click save button", () => Player.ChildrenOfType<SaveFailedScoreButton>().First().ChildrenOfType<OsuClickableContainer>().First().TriggerClick());
-            AddUntilStep("score not in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
+            AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
         }
 
         [Test]
@@ -97,6 +101,37 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
             AddUntilStep("wait for last played to update", () => getLastPlayed() != null);
+        }
+
+        [Test]
+        public void TestModReferenceNotRetained()
+        {
+            AddStep("allow fail", () => allowFail = false);
+
+            Mod[] originalMods = { new OsuModDaycore { SpeedChange = { Value = 0.8 } } };
+            Mod[] playerMods = null!;
+
+            AddStep("load player with mods", () => LoadPlayer(originalMods));
+            AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
+
+            AddStep("get mods at start of gameplay", () => playerMods = Player.Score.ScoreInfo.Mods.ToArray());
+
+            // Player creates new instance of mods during load.
+            AddAssert("player score has copied mods", () => playerMods.First(), () => Is.Not.SameAs(originalMods.First()));
+            AddAssert("player score has matching mods", () => playerMods.First(), () => Is.EqualTo(originalMods.First()));
+
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
+
+            AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
+
+            AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
+
+            // Player creates new instance of mods after gameplay to ensure any runtime references to drawables etc. are not retained.
+            AddAssert("results screen score has copied mods", () => (Player.GetChildScreen() as ResultsScreen)?.Score.Mods.First(), () => Is.Not.SameAs(playerMods.First()));
+            AddAssert("results screen score has matching", () => (Player.GetChildScreen() as ResultsScreen)?.Score.Mods.First(), () => Is.EqualTo(playerMods.First()));
+
+            AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
+            AddUntilStep("databased score has correct mods", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID)).Mods.First(), () => Is.EqualTo(playerMods.First()));
         }
 
         [Test]

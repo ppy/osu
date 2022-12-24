@@ -18,7 +18,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public abstract class InputBlockingMod : Mod, IApplicableToDrawableRuleset<OsuHitObject>
+    public abstract partial class InputBlockingMod : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IUpdatableByPlayfield
     {
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(OsuModCinema) };
@@ -62,15 +62,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             gameplayClock = drawableRuleset.FrameStableClock;
         }
 
+        public void Update(Playfield playfield)
+        {
+            if (LastAcceptedAction != null && nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
+                LastAcceptedAction = null;
+        }
+
         protected abstract bool CheckValidNewAction(OsuAction action);
 
         private bool checkCorrectAction(OsuAction action)
         {
             if (nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
-            {
-                LastAcceptedAction = null;
                 return true;
-            }
 
             switch (action)
             {
@@ -93,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             return false;
         }
 
-        private class InputInterceptor : Component, IKeyBindingHandler<OsuAction>
+        private partial class InputInterceptor : Component, IKeyBindingHandler<OsuAction>
         {
             private readonly InputBlockingMod mod;
 

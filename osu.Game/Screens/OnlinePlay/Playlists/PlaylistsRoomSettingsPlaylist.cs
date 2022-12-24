@@ -11,7 +11,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     /// <summary>
     /// A <see cref="DrawableRoomPlaylist"/> which is displayed during the setup stage of a playlists room.
     /// </summary>
-    public class PlaylistsRoomSettingsPlaylist : DrawableRoomPlaylist
+    public partial class PlaylistsRoomSettingsPlaylist : DrawableRoomPlaylist
     {
         public PlaylistsRoomSettingsPlaylist()
         {

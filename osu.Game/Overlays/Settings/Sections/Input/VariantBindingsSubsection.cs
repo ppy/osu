@@ -1,15 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Localisation;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class VariantBindingsSubsection : KeyBindingsSubsection
+    public partial class VariantBindingsSubsection : KeyBindingsSubsection
     {
+        protected override bool AutoAdvanceTarget => true;
+
         protected override LocalisableString Header { get; }
 
         public VariantBindingsSubsection(RulesetInfo ruleset, int variant)

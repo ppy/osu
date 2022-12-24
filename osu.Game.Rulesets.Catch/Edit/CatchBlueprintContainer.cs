@@ -11,7 +11,7 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class CatchBlueprintContainer : ComposeBlueprintContainer
+    public partial class CatchBlueprintContainer : ComposeBlueprintContainer
     {
         public CatchBlueprintContainer(CatchHitObjectComposer composer)
             : base(composer)
@@ -36,5 +36,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             return base.CreateHitObjectBlueprintFor(hitObject);
         }
+
+        protected sealed override DragBox CreateDragBox() => new ScrollingDragBox(Composer.Playfield);
     }
 }

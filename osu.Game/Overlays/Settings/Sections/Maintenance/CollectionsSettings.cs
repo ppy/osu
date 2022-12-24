@@ -10,9 +10,9 @@ using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class CollectionsSettings : SettingsSubsection
+    public partial class CollectionsSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Collections";
+        protected override LocalisableString Header => CommonStrings.Collections;
 
         private SettingsButton importCollectionsButton = null!;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private void deleteAllCollections()
         {
             realm.Write(r => r.RemoveAll<BeatmapCollection>());
-            notificationOverlay?.Post(new ProgressCompletionNotification { Text = "Deleted all collections!" });
+            notificationOverlay?.Post(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.DeletedAllCollections });
         }
     }
 }

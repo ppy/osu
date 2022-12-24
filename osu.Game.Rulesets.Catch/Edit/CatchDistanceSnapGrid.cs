@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Edit
     /// The guide lines used in the osu!catch editor to compose patterns that can be caught with constant speed.
     /// Currently, only forward placement (an object is snapped based on the previous object, not the opposite) is supported.
     /// </summary>
-    public class CatchDistanceSnapGrid : CompositeDrawable
+    public partial class CatchDistanceSnapGrid : CompositeDrawable
     {
         public double StartTime { get; set; }
 
@@ -121,9 +121,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                 return new SnapResult(originPosition, StartTime);
             }
 
-            return enumerateSnappingCandidates(time)
-                   .OrderBy(pos => Vector2.DistanceSquared(screenSpacePosition, pos.ScreenSpacePosition))
-                   .FirstOrDefault();
+            return enumerateSnappingCandidates(time).MinBy(pos => Vector2.DistanceSquared(screenSpacePosition, pos.ScreenSpacePosition));
         }
 
         private IEnumerable<SnapResult> enumerateSnappingCandidates(double time)

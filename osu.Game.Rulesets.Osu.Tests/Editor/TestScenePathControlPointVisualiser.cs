@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestScenePathControlPointVisualiser : OsuManualInputManagerTestScene
+    public partial class TestScenePathControlPointVisualiser : OsuManualInputManagerTestScene
     {
         private Slider slider;
         private PathControlPointVisualiser visualiser;
@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             AddStep($"click context menu item \"{contextMenuText}\"", () =>
             {
-                MenuItem item = visualiser.ContextMenuItems[1].Items.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
+                MenuItem item = visualiser.ContextMenuItems.FirstOrDefault(menuItem => menuItem.Text.Value == "Curve type")?.Items.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
 
                 item?.Action?.Value();
             });

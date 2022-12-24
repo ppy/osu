@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public abstract class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
+    public abstract partial class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
     {
         protected readonly Container Content;
         private readonly Container proxiedContent;
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             isProxied = true;
 
-            nonProxiedContent.Remove(Content);
+            nonProxiedContent.Remove(Content, false);
             proxiedContent.Add(Content);
         }
 
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             isProxied = false;
 
-            proxiedContent.Remove(Content);
+            proxiedContent.Remove(Content, false);
             nonProxiedContent.Add(Content);
         }
 
@@ -105,13 +105,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        private class ProxiedContentContainer : Container
+        private partial class ProxiedContentContainer : Container
         {
             public override bool RemoveWhenNotAlive => false;
         }
     }
 
-    public abstract class DrawableTaikoHitObject<TObject> : DrawableTaikoHitObject
+    public abstract partial class DrawableTaikoHitObject<TObject> : DrawableTaikoHitObject
         where TObject : TaikoHitObject
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
@@ -133,6 +133,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void OnApply()
         {
             base.OnApply();
+
+            // TODO: THIS CANNOT BE HERE, it makes pooling pointless (see https://github.com/ppy/osu/issues/21072).
             RecreatePieces();
         }
 
@@ -141,7 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Size = BaseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
 
             if (MainPiece != null)
-                Content.Remove(MainPiece);
+                Content.Remove(MainPiece, true);
 
             Content.Add(MainPiece = CreateMainPiece());
         }

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Configuration.Tracking;
 using osu.Game.Configuration;
@@ -13,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
 {
     public class ManiaRulesetConfigManager : RulesetConfigManager<ManiaRulesetSetting>
     {
-        public ManiaRulesetConfigManager(SettingsStore settings, RulesetInfo ruleset, int? variant = null)
+        public ManiaRulesetConfigManager(SettingsStore? settings, RulesetInfo ruleset, int? variant = null)
             : base(settings, ruleset, variant)
         {
         }
@@ -33,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
                 scrollTime => new SettingDescription(
                     rawValue: scrollTime,
                     name: "Scroll Speed",
-                    value: $"{(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime)} ({scrollTime}ms)"
+                    value: $"{scrollTime}ms (speed {(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime)})"
                 )
             )
         };

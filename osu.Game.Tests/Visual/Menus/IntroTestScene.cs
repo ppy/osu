@@ -17,7 +17,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public abstract class IntroTestScene : OsuTestScene
+    public abstract partial class IntroTestScene : OsuTestScene
     {
         [Cached]
         private OsuLogo logo;
@@ -52,6 +52,7 @@ namespace osu.Game.Tests.Visual.Menus
                 },
                 notifications = new NotificationOverlay
                 {
+                    Depth = float.MinValue,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                 }
@@ -82,7 +83,14 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public virtual void TestPlayIntroWithFailingAudioDevice()
         {
-            AddStep("hide notifications", () => notifications.Hide());
+            AddStep("reset notifications", () =>
+            {
+                notifications.Show();
+                notifications.Hide();
+            });
+
+            AddUntilStep("wait for no notifications", () => notifications.UnreadCount.Value, () => Is.EqualTo(0));
+
             AddStep("restart sequence", () =>
             {
                 logo.FinishTransforms();

@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    public class SaveFailedScoreButton : CompositeDrawable
+    public partial class SaveFailedScoreButton : CompositeDrawable
     {
         private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
 
@@ -63,8 +63,7 @@ namespace osu.Game.Screens.Play
             if (player != null)
             {
                 importedScore = realm.Run(r => r.Find<ScoreInfo>(player.Score.ScoreInfo.ID)?.Detach());
-                if (importedScore != null)
-                    state.Value = DownloadState.LocallyAvailable;
+                state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded;
             }
 
             state.BindValueChanged(state =>

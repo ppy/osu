@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModPanel : ModSelectPanel
+    public partial class ModPanel : ModSelectPanel
     {
         public Mod Mod => modState.Mod;
         public override BindableBool Active => modState.Active;
@@ -55,6 +55,18 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             Filtered.BindValueChanged(_ => updateFilterState(), true);
+        }
+
+        protected override void Select()
+        {
+            modState.PendingConfiguration = Mod.RequiresConfiguration;
+            Active.Value = true;
+        }
+
+        protected override void Deselect()
+        {
+            modState.PendingConfiguration = false;
+            Active.Value = false;
         }
 
         #region Filtering support

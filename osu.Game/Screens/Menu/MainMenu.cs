@@ -32,7 +32,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class MainMenu : OsuScreen, IHandlePresentBeatmap, IKeyBindingHandler<GlobalAction>
+    public partial class MainMenu : OsuScreen, IHandlePresentBeatmap, IKeyBindingHandler<GlobalAction>
     {
         public const float FADE_IN_DURATION = 300;
 
@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Menu
                 // presume the track is the current beatmap's track. not sure how correct this assumption is but it has worked until now.
                 if (!track.IsRunning)
                 {
-                    Beatmap.Value.PrepareTrackForPreviewLooping();
+                    Beatmap.Value.PrepareTrackForPreview(false);
                     track.Restart();
                 }
             }

@@ -12,7 +12,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class SetupScreen : EditorScreen
+    public partial class SetupScreen : EditorScreen
     {
         [Cached]
         private SectionsContainer<SetupSection> sections { get; } = new SetupScreenSectionsContainer();
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.Setup
             }));
         }
 
-        private class SetupScreenSectionsContainer : SectionsContainer<SetupSection>
+        private partial class SetupScreenSectionsContainer : SectionsContainer<SetupSection>
         {
             protected override UserTrackingScrollContainer CreateScrollContainer()
             {

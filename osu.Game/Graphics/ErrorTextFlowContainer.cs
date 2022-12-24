@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics
 {
-    public class ErrorTextFlowContainer : OsuTextFlowContainer
+    public partial class ErrorTextFlowContainer : OsuTextFlowContainer
     {
         private readonly List<ITextPart> errorTextParts = new List<ITextPart>();
 

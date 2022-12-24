@@ -23,7 +23,7 @@ using osu.Game.Screens.OnlinePlay.Match;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerLoungeSubScreen : LoungeSubScreen
+    public partial class MultiplayerLoungeSubScreen : LoungeSubScreen
     {
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             roomAccessTypeDropdown.Current.BindValueChanged(_ => UpdateFilter());
 
-            return base.CreateFilterControls().Prepend(roomAccessTypeDropdown);
+            return base.CreateFilterControls().Append(roomAccessTypeDropdown);
         }
 
         protected override FilterCriteria CreateFilterCriteria()
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.OpenNewRoom(room);
         }
 
-        private class MultiplayerListingPollingComponent : ListingPollingComponent
+        private partial class MultiplayerListingPollingComponent : ListingPollingComponent
         {
             [Resolved]
             private MultiplayerClient client { get; set; }

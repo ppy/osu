@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.Menus
 {
-    public class EditorScreenSwitcherControl : OsuTabControl<EditorScreenMode>
+    public partial class EditorScreenSwitcherControl : OsuTabControl<EditorScreenMode>
     {
         public EditorScreenSwitcherControl()
         {
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
         protected override TabItem<EditorScreenMode> CreateTabItem(EditorScreenMode value) => new TabItem(value);
 
-        private class TabItem : OsuTabItem
+        private partial class TabItem : OsuTabItem
         {
             private const float transition_length = 250;
 

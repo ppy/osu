@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -19,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneDrawableStoryboardSprite : SkinnableTestScene
+    public partial class TestSceneDrawableStoryboardSprite : SkinnableTestScene
     {
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 
@@ -71,6 +69,18 @@ namespace osu.Game.Tests.Visual.Gameplay
                 s.FlipV = true;
             }));
             AddAssert("origin flipped", () => sprites.All(s => s.Origin == Anchor.BottomRight));
+        }
+
+        [Test]
+        public void TestZeroScale()
+        {
+            const string lookup_name = "hitcircleoverlay";
+
+            AddStep("allow skin lookup", () => storyboard.UseSkinSprites = true);
+            AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
+            AddAssert("sprites present", () => sprites.All(s => s.IsPresent));
+            AddStep("scale sprite", () => sprites.ForEach(s => s.VectorScale = new Vector2(0, 1)));
+            AddAssert("sprites not present", () => sprites.All(s => !s.IsPresent));
         }
 
         [Test]

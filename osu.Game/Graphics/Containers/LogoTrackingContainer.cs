@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// A container that handles tracking of an <see cref="OsuLogo"/> through different layout scenarios.
     /// </summary>
-    public class LogoTrackingContainer : Container
+    public partial class LogoTrackingContainer : Container
     {
         public Facade LogoFacade => facade;
 
@@ -36,8 +36,7 @@ namespace osu.Game.Graphics.Containers
         /// <param name="easing">The easing type of the initial transform.</param>
         public void StartTracking(OsuLogo logo, double duration = 0, Easing easing = Easing.None)
         {
-            if (logo == null)
-                throw new ArgumentNullException(nameof(logo));
+            ArgumentNullException.ThrowIfNull(logo);
 
             if (logo.IsTracking && Logo == null)
                 throw new InvalidOperationException($"Cannot track an instance of {typeof(OsuLogo)} to multiple {typeof(LogoTrackingContainer)}s");
@@ -131,7 +130,7 @@ namespace osu.Game.Graphics.Containers
             base.Dispose(isDisposing);
         }
 
-        private class InternalFacade : Facade
+        private partial class InternalFacade : Facade
         {
             public new void SetSize(Vector2 size)
             {
@@ -142,7 +141,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// A dummy object used to denote another object's location.
         /// </summary>
-        public abstract class Facade : Drawable
+        public abstract partial class Facade : Drawable
         {
             public override Vector2 Size
             {

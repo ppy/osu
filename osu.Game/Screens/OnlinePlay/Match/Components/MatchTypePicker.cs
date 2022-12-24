@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class MatchTypePicker : DisableableTabControl<MatchType>
+    public partial class MatchTypePicker : DisableableTabControl<MatchType>
     {
         private const float height = 40;
         private const float selection_width = 3;
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             AddItem(MatchType.TeamVersus);
         }
 
-        private class GameTypePickerItem : DisableableTabItem
+        private partial class GameTypePickerItem : DisableableTabItem
         {
             private const float transition_duration = 200;
 

@@ -15,7 +15,7 @@ using osu.Game.Tournament.Screens.Gameplay.Components;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneGameplayScreen : TournamentTestScene
+    public partial class TestSceneGameplayScreen : TournamentTestScene
     {
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay { Width = 0.5f };
@@ -53,7 +53,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("setup screen", () =>
             {
-                Remove(chat);
+                Remove(chat, false);
 
                 Children = new Drawable[]
                 {

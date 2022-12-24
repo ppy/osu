@@ -13,7 +13,7 @@ using osu.Game.Screens.OnlinePlay.Lounge;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class Multiplayer : OnlinePlayScreen
+    public partial class Multiplayer : OnlinePlayScreen
     {
         [Resolved]
         private MultiplayerClient client { get; set; }

@@ -24,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSelectPanel : OsuClickableContainer, IHasAccentColour
+    public abstract partial class ModSelectPanel : OsuClickableContainer, IHasAccentColour
     {
         public abstract BindableBool Active { get; }
 
@@ -43,8 +43,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         public const float CORNER_RADIUS = 7;
-
-        protected const float HEIGHT = 42;
+        public const float HEIGHT = 42;
 
         protected virtual float IdleSwitchWidth => 14;
         protected virtual float ExpandedSwitchWidth => 30;
@@ -144,8 +143,24 @@ namespace osu.Game.Overlays.Mods
                 }
             };
 
-            Action = () => Active.Toggle();
+            Action = () =>
+            {
+                if (!Active.Value)
+                    Select();
+                else
+                    Deselect();
+            };
         }
+
+        /// <summary>
+        /// Performs all actions necessary to select this <see cref="ModSelectPanel"/>.
+        /// </summary>
+        protected abstract void Select();
+
+        /// <summary>
+        /// Performs all actions necessary to deselect this <see cref="ModSelectPanel"/>.
+        /// </summary>
+        protected abstract void Deselect();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, ISamplePlaybackDisabler? samplePlaybackDisabler)

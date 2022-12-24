@@ -18,7 +18,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayRulesetTabItem : TabItem<RulesetInfo>, IHasTooltip
+    public partial class OverlayRulesetTabItem : TabItem<RulesetInfo>, IHasTooltip
     {
         private Color4 accentColour;
 

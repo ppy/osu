@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class AimEvaluator
     {
         private const double wide_angle_multiplier = 1.5;
-        private const double acute_angle_multiplier = 2.0;
-        private const double slider_multiplier = 1.5;
+        private const double acute_angle_multiplier = 1.95;
+        private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
             }
 
-            if (osuLastObj.TravelTime != 0)
+            if (osuLastObj.BaseObject is Slider)
             {
                 // Reward sliders based on velocity.
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;

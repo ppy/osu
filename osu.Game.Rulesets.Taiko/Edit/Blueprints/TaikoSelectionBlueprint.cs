@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 {
-    public class TaikoSelectionBlueprint : HitObjectSelectionBlueprint
+    public partial class TaikoSelectionBlueprint : HitObjectSelectionBlueprint
     {
         public TaikoSelectionBlueprint(HitObject hitObject)
             : base(hitObject)

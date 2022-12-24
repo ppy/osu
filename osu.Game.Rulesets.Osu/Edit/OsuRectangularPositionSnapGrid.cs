@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuRectangularPositionSnapGrid : RectangularPositionSnapGrid, IKeyBindingHandler<GlobalAction>
+    public partial class OsuRectangularPositionSnapGrid : RectangularPositionSnapGrid, IKeyBindingHandler<GlobalAction>
     {
         private static readonly int[] grid_sizes = { 4, 8, 16, 32 };
 

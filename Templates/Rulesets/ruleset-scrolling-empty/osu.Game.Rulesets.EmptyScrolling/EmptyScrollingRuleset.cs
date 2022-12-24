@@ -54,5 +54,8 @@ namespace osu.Game.Rulesets.EmptyScrolling
             Text = ShortName[0].ToString(),
             Font = OsuFont.Default.With(size: 18),
         };
+
+        // Leave this line intact. It will bake the correct version into the ruleset on each build/release.
+        public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
     }
 }

@@ -18,7 +18,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     [Cached]
-    public class SelectionBox : CompositeDrawable
+    public partial class SelectionBox : CompositeDrawable
     {
         public const float BORDER_RADIUS = 3;
 

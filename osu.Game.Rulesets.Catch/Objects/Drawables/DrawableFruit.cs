@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableFruit : DrawablePalpableCatchHitObject
+    public partial class DrawableFruit : DrawablePalpableCatchHitObject
     {
         public DrawableFruit()
             : this(null)
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         private void load()
         {
             ScalingContainer.Child = new SkinnableDrawable(
-                new CatchSkinComponent(CatchSkinComponents.Fruit),
+                new CatchSkinComponentLookup(CatchSkinComponents.Fruit),
                 _ => new FruitPiece());
         }
 

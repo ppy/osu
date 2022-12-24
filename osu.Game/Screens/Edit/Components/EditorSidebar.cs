@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.Components
     /// A sidebar area that can be attached to the left or right edge of the screen.
     /// Houses scrolling sectionised content.
     /// </summary>
-    internal class EditorSidebar : Container<EditorSidebarSection>
+    internal partial class EditorSidebar : Container<EditorSidebarSection>
     {
         public const float WIDTH = 250;
 

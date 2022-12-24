@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModHidden : ModHidden, IApplicableToDrawableRuleset<TaikoHitObject>
     {
-        public override string Description => @"Beats fade out before you hit them!";
+        public override LocalisableString Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         /// </summary>
         private const float fade_out_duration = 0.375f;
 
-        private DrawableTaikoRuleset? drawableRuleset;
+        private DrawableTaikoRuleset drawableRuleset = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
@@ -45,8 +45,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            Debug.Assert(drawableRuleset != null);
-
             switch (hitObject)
             {
                 case DrawableDrumRollTick:

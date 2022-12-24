@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -16,7 +17,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneDrawableHitObject : OsuTestScene
+    public partial class TestSceneDrawableHitObject : OsuTestScene
     {
         [Test]
         public void TestEntryLifetime()
@@ -137,7 +138,32 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("DHO state is correct", () => dho.State.Value == ArmedState.Miss);
         }
 
-        private class TestDrawableHitObject : DrawableHitObject
+        [Test]
+        public void TestResultSetBeforeLoadComplete()
+        {
+            TestDrawableHitObject dho = null;
+            HitObjectLifetimeEntry lifetimeEntry = null;
+            AddStep("Create lifetime entry", () =>
+            {
+                var hitObject = new HitObject { StartTime = Time.Current };
+                lifetimeEntry = new HitObjectLifetimeEntry(hitObject)
+                {
+                    Result = new JudgementResult(hitObject, hitObject.CreateJudgement())
+                    {
+                        Type = HitResult.Great
+                    }
+                };
+            });
+            AddStep("Create DHO and apply entry", () =>
+            {
+                dho = new TestDrawableHitObject();
+                dho.Apply(lifetimeEntry);
+                Child = dho;
+            });
+            AddAssert("DHO state is correct", () => dho.State.Value, () => Is.EqualTo(ArmedState.Hit));
+        }
+
+        private partial class TestDrawableHitObject : DrawableHitObject
         {
             public const double INITIAL_LIFETIME_OFFSET = 100;
             public const double LIFETIME_ON_APPLY = 222;

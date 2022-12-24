@@ -13,7 +13,7 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat.Listing
 {
-    public class ChannelListing : VisibilityContainer
+    public partial class ChannelListing : VisibilityContainer
     {
         public event Action<Channel>? OnRequestJoin;
         public event Action<Channel>? OnRequestLeave;

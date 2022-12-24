@@ -27,7 +27,7 @@ using osuTK.Input;
 namespace osu.Game.Tournament
 {
     [Cached(typeof(TournamentGameBase))]
-    public class TournamentGameBase : OsuGameBase
+    public partial class TournamentGameBase : OsuGameBase
     {
         public const string BRACKET_FILENAME = @"bracket.json";
         private LadderInfo ladder;
@@ -238,7 +238,7 @@ namespace osu.Game.Tournament
             var beatmapsRequiringPopulation = ladder.Teams
                                                     .SelectMany(r => r.SeedingResults)
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => b.Beatmap?.OnlineID == 0 && b.ID > 0).ToList();
+                                                    .Where(b => (b.Beatmap == null || b.Beatmap.OnlineID == 0) && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -335,7 +335,7 @@ namespace osu.Game.Tournament
 
         protected override UserInputManager CreateUserInputManager() => new TournamentInputManager();
 
-        private class TournamentInputManager : UserInputManager
+        private partial class TournamentInputManager : UserInputManager
         {
             protected override MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
             {

@@ -4,25 +4,21 @@
 #nullable disable
 
 using Markdig.Syntax;
-using Markdig.Syntax.Inlines;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Game.Graphics.Containers.Markdown;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class CommentMarkdownContainer : OsuMarkdownContainer
+    public partial class CommentMarkdownContainer : OsuMarkdownContainer
     {
-        public override MarkdownTextFlowContainer CreateTextFlow() => new CommentMarkdownTextFlowContainer();
+        protected override OsuMarkdownContainerOptions Options => new OsuMarkdownContainerOptions
+        {
+            Autolinks = true
+        };
 
         protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new CommentMarkdownHeading(headingBlock);
 
-        private class CommentMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
-        {
-            // Don't render image in comment for now
-            protected override void AddImage(LinkInline linkInline) { }
-        }
-
-        private class CommentMarkdownHeading : OsuMarkdownHeading
+        private partial class CommentMarkdownHeading : OsuMarkdownHeading
         {
             public CommentMarkdownHeading(HeadingBlock headingBlock)
                 : base(headingBlock)

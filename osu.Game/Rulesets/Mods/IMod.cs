@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// The user readable description of this mod.
         /// </summary>
-        string Description { get; }
+        LocalisableString Description { get; }
 
         /// <summary>
         /// The type of this mod.
@@ -54,6 +55,6 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Create a fresh <see cref="Mod"/> instance based on this mod.
         /// </summary>
-        Mod CreateInstance() => (Mod)Activator.CreateInstance(GetType());
+        Mod CreateInstance() => (Mod)Activator.CreateInstance(GetType())!;
     }
 }

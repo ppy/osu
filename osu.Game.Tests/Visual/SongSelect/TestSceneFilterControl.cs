@@ -24,7 +24,7 @@ using Realms;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneFilterControl : OsuManualInputManagerTestScene
+    public partial class TestSceneFilterControl : OsuManualInputManagerTestScene
     {
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -150,13 +150,14 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "1"))));
             assertCollectionDropdownContains("1");
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
+
+            assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
 
             AddStep("add beatmap to collection", () => writeAndRefresh(r => getFirstCollection().BeatmapMD5Hashes.Add(Beatmap.Value.BeatmapInfo.MD5Hash)));
-            AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
+            assertFirstButtonIs(FontAwesome.Solid.MinusSquare);
 
             AddStep("remove beatmap from collection", () => writeAndRefresh(r => getFirstCollection().BeatmapMD5Hashes.Clear()));
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
+            assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
         }
 
         [Test]
@@ -168,15 +169,15 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "1"))));
             assertCollectionDropdownContains("1");
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
+            assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
 
             addClickAddOrRemoveButtonStep(1);
             AddAssert("collection contains beatmap", () => getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
-            AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
+            assertFirstButtonIs(FontAwesome.Solid.MinusSquare);
 
             addClickAddOrRemoveButtonStep(1);
             AddAssert("collection does not contain beatmap", () => !getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
+            assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
         }
 
         [Test]
@@ -225,6 +226,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void assertCollectionHeaderDisplays(string collectionName, bool shouldDisplay = true)
             => AddUntilStep($"collection dropdown header displays '{collectionName}'",
                 () => shouldDisplay == (control.ChildrenOfType<CollectionDropdown.CollectionDropdownHeader>().Single().ChildrenOfType<SpriteText>().First().Text == collectionName));
+
+        private void assertFirstButtonIs(IconUsage icon) => AddUntilStep($"button is {icon.Icon.ToString()}", () => getAddOrRemoveButton(1).Icon.Equals(icon));
 
         private void assertCollectionDropdownContains(string collectionName, bool shouldContain = true) =>
             AddUntilStep($"collection dropdown {(shouldContain ? "contains" : "does not contain")} '{collectionName}'",

@@ -15,7 +15,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Menu
 {
-    public class SongTicker : Container
+    public partial class SongTicker : Container
     {
         private const int fade_duration = 800;
 

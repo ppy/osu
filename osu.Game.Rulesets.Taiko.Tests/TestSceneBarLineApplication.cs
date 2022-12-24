@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneBarLineApplication : HitObjectApplicationTestScene
+    public partial class TestSceneBarLineApplication : HitObjectApplicationTestScene
     {
         [Test]
         public void TestApplyNewBarLine()

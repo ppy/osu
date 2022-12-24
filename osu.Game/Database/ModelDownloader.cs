@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Logging;
@@ -13,7 +14,7 @@ using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Database
 {
-    public abstract class ModelDownloader<TModel, T> : IModelDownloader<T>
+    public abstract partial class ModelDownloader<TModel, T> : IModelDownloader<T>
         where TModel : class, IHasGuidPrimaryKey, ISoftDelete, IEquatable<TModel>, T
         where T : class
     {
@@ -44,7 +45,7 @@ namespace osu.Game.Database
 
         public bool Download(T model, bool minimiseDownloadSize = false) => Download(model, minimiseDownloadSize, null);
 
-        public void DownloadAsUpdate(TModel originalModel) => Download(originalModel, false, originalModel);
+        public void DownloadAsUpdate(TModel originalModel, bool minimiseDownloadSize) => Download(originalModel, minimiseDownloadSize, originalModel);
 
         protected bool Download(T model, bool minimiseDownloadSize, TModel? originalModel)
         {
@@ -70,9 +71,9 @@ namespace osu.Game.Database
                     bool importSuccessful;
 
                     if (originalModel != null)
-                        importSuccessful = (await importer.ImportAsUpdate(notification, new ImportTask(filename), originalModel)) != null;
+                        importSuccessful = (await importer.ImportAsUpdate(notification, new ImportTask(filename), originalModel).ConfigureAwait(false)) != null;
                     else
-                        importSuccessful = (await importer.Import(notification, new ImportTask(filename))).Any();
+                        importSuccessful = (await importer.Import(notification, new[] { new ImportTask(filename) }).ConfigureAwait(false)).Any();
 
                     // for now a failed import will be marked as a failed download for simplicity.
                     if (!importSuccessful)
@@ -107,7 +108,15 @@ namespace osu.Game.Database
                 notification.State = ProgressNotificationState.Cancelled;
 
                 if (!(error is OperationCanceledException))
-                    Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} download failed!");
+                {
+                    if (error is WebException webException && webException.Message == @"TooManyRequests")
+                    {
+                        notification.Close(false);
+                        PostNotification?.Invoke(new TooManyDownloadsNotification());
+                    }
+                    else
+                        Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} download failed!");
+                }
             }
         }
 
@@ -115,7 +124,7 @@ namespace osu.Game.Database
 
         private bool canDownload(T model) => GetExistingDownload(model) == null && api != null;
 
-        private class DownloadNotification : ProgressNotification
+        private partial class DownloadNotification : ProgressNotification
         {
             public override bool IsImportant => false;
 
@@ -125,7 +134,7 @@ namespace osu.Game.Database
                 Text = CompletionText
             };
 
-            private class SilencedProgressCompletionNotification : ProgressCompletionNotification
+            private partial class SilencedProgressCompletionNotification : ProgressCompletionNotification
             {
                 public override bool IsImportant => false;
             }

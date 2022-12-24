@@ -13,22 +13,69 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingSortTabControl : OverlaySortTabControl<SortCriteria>
+    public partial class BeatmapListingSortTabControl : OverlaySortTabControl<SortCriteria>
     {
         public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>(Overlays.SortDirection.Descending);
 
-        public BeatmapListingSortTabControl()
+        private SearchCategory? lastCategory;
+        private bool? lastHasQuery;
+
+        protected override void LoadComplete()
         {
-            Current.Value = SortCriteria.Ranked;
+            base.LoadComplete();
+            Reset(SearchCategory.Leaderboard, false);
+        }
+
+        public void Reset(SearchCategory category, bool hasQuery)
+        {
+            if (category != lastCategory || hasQuery != lastHasQuery)
+            {
+                TabControl.Clear();
+
+                TabControl.AddItem(SortCriteria.Title);
+                TabControl.AddItem(SortCriteria.Artist);
+                TabControl.AddItem(SortCriteria.Difficulty);
+
+                if (category == SearchCategory.Any || category > SearchCategory.Loved)
+                    TabControl.AddItem(SortCriteria.Updated);
+
+                if (category < SearchCategory.Pending || category == SearchCategory.Mine)
+                    TabControl.AddItem(SortCriteria.Ranked);
+
+                TabControl.AddItem(SortCriteria.Rating);
+                TabControl.AddItem(SortCriteria.Plays);
+                TabControl.AddItem(SortCriteria.Favourites);
+
+                if (hasQuery)
+                    TabControl.AddItem(SortCriteria.Relevance);
+
+                if (category == SearchCategory.Pending)
+                    TabControl.AddItem(SortCriteria.Nominations);
+            }
+
+            var nonQueryCriteria = category >= SearchCategory.Pending ? SortCriteria.Updated : SortCriteria.Ranked;
+
+            Current.Value = hasQuery ? SortCriteria.Relevance : nonQueryCriteria;
+            SortDirection.Value = Overlays.SortDirection.Descending;
+
+            // if the new criteria isn't different from the previous one,
+            // then re-adding tab items will not mark the current tab as selected.
+            // see: https://github.com/ppy/osu-framework/issues/5412
+            TabControl.Current.TriggerChange();
+
+            lastCategory = category;
+            lastHasQuery = hasQuery;
         }
 
         protected override SortTabControl CreateControl() => new BeatmapSortTabControl
         {
-            SortDirection = { BindTarget = SortDirection }
+            SortDirection = { BindTarget = SortDirection },
         };
 
-        private class BeatmapSortTabControl : SortTabControl
+        private partial class BeatmapSortTabControl : SortTabControl
         {
+            protected override bool AddEnumEntriesAutomatically => false;
+
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
             protected override TabItem<SortCriteria> CreateTabItem(SortCriteria value) => new BeatmapSortTabItem(value)
@@ -37,7 +84,7 @@ namespace osu.Game.Overlays.BeatmapListing
             };
         }
 
-        private class BeatmapSortTabItem : SortTabItem
+        private partial class BeatmapSortTabItem : SortTabItem
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
@@ -53,7 +100,7 @@ namespace osu.Game.Overlays.BeatmapListing
             };
         }
 
-        private class BeatmapTabButton : TabButton
+        private partial class BeatmapTabButton : TabButton
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 

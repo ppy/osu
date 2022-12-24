@@ -17,7 +17,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapCardThumbnail : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatmapCardThumbnail : OsuManualInputManagerTestScene
     {
         private PlayButton playButton => this.ChildrenOfType<PlayButton>().Single();
 
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 };
             });
             AddStep("enable dim", () => thumbnail.Dimmed.Value = true);
-            AddUntilStep("button visible", () => playButton.IsPresent);
+            AddUntilStep("button visible", () => playButton.Alpha == 1);
 
             AddStep("click button", () =>
             {
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
             AddStep("disable dim", () => thumbnail.Dimmed.Value = false);
             AddWaitStep("wait some", 3);
-            AddAssert("button still visible", () => playButton.IsPresent);
+            AddAssert("button still visible", () => playButton.Alpha == 1);
 
             // The track plays in real-time, so we need to check for progress in increments to avoid timeout.
             AddUntilStep("progress > 0.25", () => thumbnail.ChildrenOfType<PlayButton>().Single().Progress.Value > 0.25);
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             AddUntilStep("progress > 0.75", () => thumbnail.ChildrenOfType<PlayButton>().Single().Progress.Value > 0.75);
 
             AddUntilStep("wait for track to end", () => !playButton.Playing.Value);
-            AddUntilStep("button hidden", () => !playButton.IsPresent);
+            AddUntilStep("button hidden", () => playButton.Alpha == 0);
         }
 
         private void iconIs(IconUsage usage) => AddUntilStep("icon is correct", () => playButton.ChildrenOfType<SpriteIcon>().Any(icon => icon.Icon.Equals(usage)));

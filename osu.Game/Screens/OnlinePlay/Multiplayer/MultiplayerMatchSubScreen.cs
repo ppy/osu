@@ -38,7 +38,7 @@ using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.Pa
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     [Cached]
-    public class MultiplayerMatchSubScreen : RoomSubScreen, IHandlePresentBeatmap
+    public partial class MultiplayerMatchSubScreen : RoomSubScreen, IHandlePresentBeatmap
     {
         public override string Title { get; }
 
@@ -48,11 +48,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         [Resolved]
         private MultiplayerClient client { get; set; }
-
-        [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
-
-        private readonly IBindable<bool> isConnected = new Bindable<bool>();
 
         private AddItemButton addItemButton;
 
@@ -227,12 +222,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!this.IsCurrentScreen())
                 return;
 
-            int id = itemToEdit?.Beatmap.OnlineID ?? Room.Playlist.Last().Beatmap.OnlineID;
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == id);
-
-            var workingBeatmap = localBeatmap == null ? null : beatmapManager.GetWorkingBeatmap(localBeatmap);
-
-            this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit?.ID, workingBeatmap));
+            this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit));
         }
 
         protected override Drawable CreateFooter() => new MultiplayerMatchFooter();
@@ -424,7 +414,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            this.Push(new MultiplayerMatchSongSelect(Room, client.Room.Settings.PlaylistItemId, beatmap, ruleset));
+            this.Push(new MultiplayerMatchSongSelect(Room, Room.Playlist.Single(item => item.ID == client.Room.Settings.PlaylistItemId)));
         }
 
         protected override void Dispose(bool isDisposing)
@@ -440,7 +430,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             modSettingChangeTracker?.Dispose();
         }
 
-        public class AddItemButton : PurpleTriangleButton
+        public partial class AddItemButton : PurpleRoundedButton
         {
         }
     }

@@ -111,7 +111,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public bool Equals(IBeatmapInfo? other) => other is APIBeatmap b && this.MatchesOnlineID(b);
 
-        private class APIRuleset : IRulesetInfo
+        public class APIRuleset : IRulesetInfo
         {
             public int OnlineID { get; set; } = -1;
 
@@ -143,7 +143,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             public bool Equals(IRulesetInfo? other) => other is APIRuleset r && this.MatchesOnlineID(r);
 
-            public int CompareTo(IRulesetInfo other)
+            public int CompareTo(IRulesetInfo? other)
             {
                 if (!(other is APIRuleset ruleset))
                     throw new ArgumentException($@"Object is not of type {nameof(APIRuleset)}.", nameof(other));

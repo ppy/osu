@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Threading;
 using osu.Framework.Bindables;
@@ -14,16 +12,18 @@ using osuTK;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class UserTopScoreContainer<TScoreInfo> : VisibilityContainer
+    public partial class UserTopScoreContainer<TScoreInfo> : VisibilityContainer
     {
         private const int duration = 500;
 
-        public Bindable<TScoreInfo> Score = new Bindable<TScoreInfo>();
+        public Bindable<TScoreInfo?> Score = new Bindable<TScoreInfo?>();
 
         private readonly Container scoreContainer;
         private readonly Func<TScoreInfo, LeaderboardScore> createScoreDelegate;
 
         protected override bool StartHidden => true;
+
+        private CancellationTokenSource? loadScoreCancellation;
 
         public UserTopScoreContainer(Func<TScoreInfo, LeaderboardScore> createScoreDelegate)
         {
@@ -65,9 +65,7 @@ namespace osu.Game.Online.Leaderboards
             Score.BindValueChanged(onScoreChanged);
         }
 
-        private CancellationTokenSource loadScoreCancellation;
-
-        private void onScoreChanged(ValueChangedEvent<TScoreInfo> score)
+        private void onScoreChanged(ValueChangedEvent<TScoreInfo?> score)
         {
             var newScore = score.NewValue;
 

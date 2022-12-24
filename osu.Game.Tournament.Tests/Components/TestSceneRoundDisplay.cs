@@ -9,7 +9,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneRoundDisplay : TournamentTestScene
+    public partial class TestSceneRoundDisplay : TournamentTestScene
     {
         public TestSceneRoundDisplay()
         {

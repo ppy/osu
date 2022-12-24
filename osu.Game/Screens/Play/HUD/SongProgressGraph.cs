@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SongProgressGraph : SquareGraph
+    public partial class SongProgressGraph : SquareGraph
     {
         private IEnumerable<HitObject> objects;
 

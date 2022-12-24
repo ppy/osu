@@ -11,7 +11,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Ingests any changes that happen externally to the client, reprocessing as required.
     /// </summary>
-    public class BeatmapOnlineChangeIngest : Component
+    public partial class BeatmapOnlineChangeIngest : Component
     {
         private readonly BeatmapUpdater beatmapUpdater;
         private readonly RealmAccess realm;

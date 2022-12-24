@@ -14,7 +14,7 @@ using osu.Game.Screens.Play.HUD;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneSongProgressGraph : OsuTestScene
+    public partial class TestSceneSongProgressGraph : OsuTestScene
     {
         private TestSongProgressGraph graph;
 
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             graph.Objects = objects;
         }
 
-        private class TestSongProgressGraph : SongProgressGraph
+        private partial class TestSongProgressGraph : SongProgressGraph
         {
             public int CreationCount { get; private set; }
 

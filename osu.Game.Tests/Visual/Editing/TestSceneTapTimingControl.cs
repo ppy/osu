@@ -18,11 +18,12 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneTapTimingControl : EditorClockTestScene
+    public partial class TestSceneTapTimingControl : EditorClockTestScene
     {
         private EditorBeatmap editorBeatmap => editorBeatmapContainer?.EditorBeatmap;
 
@@ -113,7 +114,7 @@ namespace osu.Game.Tests.Visual.Editing
                        .TriggerClick();
             });
 
-            AddUntilStep("wait for track playing", () => Clock.IsRunning);
+            AddUntilStep("wait for track playing", () => EditorClock.IsRunning);
 
             AddStep("click reset button", () =>
             {
@@ -122,7 +123,42 @@ namespace osu.Game.Tests.Visual.Editing
                        .TriggerClick();
             });
 
-            AddUntilStep("wait for track stopped", () => !Clock.IsRunning);
+            AddUntilStep("wait for track stopped", () => !EditorClock.IsRunning);
+        }
+
+        [Test]
+        public void TestNoCrashesWhenNoGroupSelected()
+        {
+            AddStep("unset selected group", () => selectedGroup.Value = null);
+            AddStep("press T to tap", () => InputManager.Key(Key.T));
+
+            AddStep("click tap button", () =>
+            {
+                control.ChildrenOfType<OsuButton>()
+                       .Last()
+                       .TriggerClick();
+            });
+
+            AddStep("click reset button", () =>
+            {
+                control.ChildrenOfType<OsuButton>()
+                       .First()
+                       .TriggerClick();
+            });
+
+            AddStep("adjust offset", () =>
+            {
+                var adjustOffsetButton = control.ChildrenOfType<TimingAdjustButton>().First();
+                InputManager.MoveMouseTo(adjustOffsetButton);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("adjust BPM", () =>
+            {
+                var adjustBPMButton = control.ChildrenOfType<TimingAdjustButton>().Last();
+                InputManager.MoveMouseTo(adjustBPMButton);
+                InputManager.Click(MouseButton.Left);
+            });
         }
 
         protected override void Dispose(bool isDisposing)

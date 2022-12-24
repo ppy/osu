@@ -15,7 +15,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Online
 {
     [HeadlessTest]
-    public class TestSceneBeatmapDownloading : OsuTestScene
+    public partial class TestSceneBeatmapDownloading : OsuTestScene
     {
         private BeatmapModelDownloader beatmaps;
         private ProgressNotification recentNotification;
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Online
         {
             AddStep("download beatmap", () => beatmaps.Download(test_db_model));
 
-            AddStep("cancel download from notification", () => recentNotification.Close());
+            AddStep("cancel download from notification", () => recentNotification.Close(true));
 
             AddUntilStep("is removed from download list", () => beatmaps.GetExistingDownload(test_db_model) == null);
             AddAssert("is notification cancelled", () => recentNotification.State == ProgressNotificationState.Cancelled);

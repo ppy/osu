@@ -12,7 +12,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// A facade of the grid which is used as a dummy object to store the required position/size of cells.
         /// </summary>
-        private class Facade : Drawable
+        private partial class Facade : Drawable
         {
             public Facade()
             {

@@ -8,7 +8,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class EditorToolboxGroup : SettingsToolboxGroup
+    public partial class EditorToolboxGroup : SettingsToolboxGroup
     {
         public EditorToolboxGroup(string title)
             : base(title)

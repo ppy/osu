@@ -1,8 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -13,7 +12,7 @@ using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania
 {
-    public class ManiaSettingsSubsection : RulesetSettingsSubsection
+    public partial class ManiaSettingsSubsection : RulesetSettingsSubsection
     {
         protected override LocalisableString Header => "osu!mania";
 
@@ -34,7 +33,7 @@ namespace osu.Game.Rulesets.Mania
                     LabelText = "Scrolling direction",
                     Current = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
                 },
-                new SettingsSlider<double, TimeSlider>
+                new SettingsSlider<double, ManiaScrollSlider>
                 {
                     LabelText = "Scroll speed",
                     Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
@@ -46,6 +45,11 @@ namespace osu.Game.Rulesets.Mania
                     Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
                 }
             };
+        }
+
+        private partial class ManiaScrollSlider : OsuSliderBar<double>
+        {
+            public override LocalisableString TooltipText => $"{Current.Value}ms (speed {(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / Current.Value)})";
         }
     }
 }

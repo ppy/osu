@@ -4,10 +4,12 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
@@ -19,13 +21,13 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// A decoupled clock which adds editor-specific functionality, such as snapping to a user-defined beat divisor.
     /// </summary>
-    public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
+    public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
         public IBindable<Track> Track => track;
 
         private readonly Bindable<Track> track = new Bindable<Track>();
 
-        public double TrackLength => track.Value?.Length ?? 60000;
+        public double TrackLength => track.Value?.IsLoaded == true ? track.Value.Length : 60000;
 
         public ControlPointInfo ControlPointInfo => Beatmap.ControlPointInfo;
 
@@ -33,7 +35,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly BindableBeatDivisor beatDivisor;
 
-        private readonly DecoupleableInterpolatingFramedClock underlyingClock;
+        private readonly FramedBeatmapClock underlyingClock;
 
         private bool playbackFinished;
 
@@ -52,7 +54,8 @@ namespace osu.Game.Screens.Edit
 
             this.beatDivisor = beatDivisor ?? new BindableBeatDivisor();
 
-            underlyingClock = new DecoupleableInterpolatingFramedClock();
+            underlyingClock = new FramedBeatmapClock(applyOffsets: true) { IsCoupled = false };
+            AddInternal(underlyingClock);
         }
 
         /// <summary>
@@ -155,6 +158,8 @@ namespace osu.Game.Screens.Edit
 
         public double CurrentTime => underlyingClock.CurrentTime;
 
+        public double TotalAppliedOffset => underlyingClock.TotalAppliedOffset;
+
         public void Reset()
         {
             ClearTransforms();
@@ -219,18 +224,7 @@ namespace osu.Game.Screens.Edit
 
         public void ProcessFrame()
         {
-            underlyingClock.ProcessFrame();
-
-            playbackFinished = CurrentTime >= TrackLength;
-
-            if (playbackFinished)
-            {
-                if (IsRunning)
-                    underlyingClock.Stop();
-
-                if (CurrentTime > TrackLength)
-                    underlyingClock.Seek(TrackLength);
-            }
+            // Noop to ensure an external consumer doesn't process the internal clock an extra time.
         }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
@@ -247,17 +241,25 @@ namespace osu.Game.Screens.Edit
 
         public IClock Source => underlyingClock.Source;
 
-        public bool IsCoupled
-        {
-            get => underlyingClock.IsCoupled;
-            set => underlyingClock.IsCoupled = value;
-        }
-
         private const double transform_time = 300;
 
         protected override void Update()
         {
             base.Update();
+
+            // EditorClock wasn't being added in many places. This gives us more certainty that it is.
+            Debug.Assert(underlyingClock.LoadState > LoadState.NotLoaded);
+
+            playbackFinished = CurrentTime >= TrackLength;
+
+            if (playbackFinished)
+            {
+                if (IsRunning)
+                    underlyingClock.Stop();
+
+                if (CurrentTime > TrackLength)
+                    underlyingClock.Seek(TrackLength);
+            }
 
             updateSeekingState();
         }
@@ -268,7 +270,7 @@ namespace osu.Game.Screens.Edit
             {
                 IsSeeking &= Transforms.Any();
 
-                if (track.Value?.IsRunning != true)
+                if (!IsRunning)
                 {
                     // seeking in the editor can happen while the track isn't running.
                     // in this case we always want to expose ourselves as seeking (to avoid sample playback).

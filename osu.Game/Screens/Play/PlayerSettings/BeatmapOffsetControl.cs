@@ -25,14 +25,12 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class BeatmapOffsetControl : CompositeDrawable
+    public partial class BeatmapOffsetControl : CompositeDrawable
     {
-        public Bindable<ScoreInfo> ReferenceScore { get; } = new Bindable<ScoreInfo>();
+        public Bindable<ScoreInfo?> ReferenceScore { get; } = new Bindable<ScoreInfo?>();
 
         public BindableDouble Current { get; } = new BindableDouble
         {
-            Default = 0,
-            Value = 0,
             MinValue = -50,
             MaxValue = 50,
             Precision = 0.1,
@@ -89,11 +87,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
             };
         }
 
-        public class OffsetSliderBar : PlayerSliderBar<double>
+        public partial class OffsetSliderBar : PlayerSliderBar<double>
         {
             protected override Drawable CreateControl() => new CustomSliderBar();
 
-            protected class CustomSliderBar : SliderBar
+            protected partial class CustomSliderBar : SliderBar
             {
                 public override LocalisableString TooltipText =>
                     Current.Value == 0
@@ -178,7 +176,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
         }
 
-        private void scoreChanged(ValueChangedEvent<ScoreInfo> score)
+        private void scoreChanged(ValueChangedEvent<ScoreInfo?> score)
         {
             referenceScoreContainer.Clear();
 

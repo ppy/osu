@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -20,14 +19,14 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModStrictTracking : Mod, IApplicableAfterBeatmapConversion, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
+    public partial class OsuModStrictTracking : Mod, IApplicableAfterBeatmapConversion, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => @"Strict Tracking";
         public override string Acronym => @"ST";
         public override ModType Type => ModType.DifficultyIncrease;
-        public override string Description => @"Once you start a slider, follow precisely or get a miss.";
+        public override LocalisableString Description => @"Once you start a slider, follow precisely or get a miss.";
         public override double ScoreMultiplier => 1.0;
-        public override Type[] IncompatibleMods => new[] { typeof(ModClassic), typeof(OsuModTarget) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModClassic), typeof(OsuModTargetPractice) };
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
@@ -80,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             public override Judgement CreateJudgement() => new OsuJudgement();
         }
 
-        private class StrictTrackingDrawableSliderTail : DrawableSliderTail
+        private partial class StrictTrackingDrawableSliderTail : DrawableSliderTail
         {
             public override bool DisplayResult => true;
         }

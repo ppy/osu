@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.UI
     /// Represents a component responsible for displaying
     /// the appropriate catcher trails when requested to.
     /// </summary>
-    public class CatcherTrailDisplay : PooledDrawableWithLifetimeContainer<CatcherTrailEntry, CatcherTrail>
+    public partial class CatcherTrailDisplay : PooledDrawableWithLifetimeContainer<CatcherTrailEntry, CatcherTrail>
     {
         /// <summary>
         /// The most recent time a dash trail was added to this container.
@@ -93,15 +93,15 @@ namespace osu.Game.Rulesets.Catch.UI
             switch (entry.Animation)
             {
                 case CatcherTrailAnimation.Dashing:
-                    dashTrails.Remove(drawable);
+                    dashTrails.Remove(drawable, false);
                     break;
 
                 case CatcherTrailAnimation.HyperDashing:
-                    hyperDashTrails.Remove(drawable);
+                    hyperDashTrails.Remove(drawable, false);
                     break;
 
                 case CatcherTrailAnimation.HyperDashAfterImage:
-                    hyperDashAfterImages.Remove(drawable);
+                    hyperDashAfterImages.Remove(drawable, false);
                     break;
             }
         }

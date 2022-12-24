@@ -26,7 +26,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneScoresContainer : OsuTestScene
+    public partial class TestSceneScoresContainer : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -154,7 +154,7 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private int onlineID = 1;
+        private ulong onlineID = 1;
 
         private APIScoresCollection createScores()
         {
@@ -313,7 +313,7 @@ namespace osu.Game.Tests.Visual.Online
             Position = 1337,
         };
 
-        private class TestScoresContainer : ScoresContainer
+        private partial class TestScoresContainer : ScoresContainer
         {
             public new APIScoresCollection Scores
             {

@@ -11,9 +11,9 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class BeatmapSettings : SettingsSubsection
+    public partial class BeatmapSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Beatmaps";
+        protected override LocalisableString Header => CommonStrings.Beatmaps;
 
         private SettingsButton importBeatmapsButton = null!;
         private SettingsButton deleteBeatmapsButton = null!;

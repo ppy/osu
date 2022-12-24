@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
@@ -11,9 +9,9 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestSceneStartupImport : OsuGameTestScene
+    public partial class TestSceneStartupImport : OsuGameTestScene
     {
-        private string importFilename;
+        private string? importFilename;
 
         protected override TestOsuGame CreateTestGame() => new TestOsuGame(LocalStorage, API, new[] { importFilename });
 

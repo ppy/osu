@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneModDifficultyAdjustSettings : OsuManualInputManagerTestScene
+    public partial class TestSceneModDifficultyAdjustSettings : OsuManualInputManagerTestScene
     {
         private OsuModDifficultyAdjust modDifficultyAdjust;
 
@@ -124,6 +124,21 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             checkSliderAtValue("Circle Size", 9);
             checkBindableAtValue("Circle Size", 9);
+        }
+
+        [Test]
+        public void TestExtendedLimitsRetainedAfterBoundCopyCreation()
+        {
+            setExtendedLimits(true);
+            setSliderValue("Circle Size", 11);
+
+            checkSliderAtValue("Circle Size", 11);
+            checkBindableAtValue("Circle Size", 11);
+
+            AddStep("create bound copy", () => _ = modDifficultyAdjust.CircleSize.GetBoundCopy());
+
+            checkSliderAtValue("Circle Size", 11);
+            checkBindableAtValue("Circle Size", 11);
         }
 
         [Test]

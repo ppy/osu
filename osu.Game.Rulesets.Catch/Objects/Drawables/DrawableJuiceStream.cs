@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableJuiceStream : DrawableCatchHitObject
+    public partial class DrawableJuiceStream : DrawableCatchHitObject
     {
         private readonly Container dropletContainer;
 

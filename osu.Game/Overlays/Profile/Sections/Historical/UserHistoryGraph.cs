@@ -13,7 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public class UserHistoryGraph : UserGraph<DateTime, long>
+    public partial class UserHistoryGraph : UserGraph<DateTime, long>
     {
         private readonly LocalisableString tooltipCounterName;
 

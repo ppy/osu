@@ -10,7 +10,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneReplayPlayer : RateAdjustedBeatmapTestScene
+    public partial class TestSceneReplayPlayer : RateAdjustedBeatmapTestScene
     {
         protected TestReplayPlayer Player;
 

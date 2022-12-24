@@ -15,7 +15,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerGameplayLeaderboard : MultiplayerGameplayLeaderboardTestScene
+    public partial class TestSceneMultiplayerGameplayLeaderboard : MultiplayerGameplayLeaderboardTestScene
     {
         protected override MultiplayerRoomUser CreateUser(int userId)
         {
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private class TestLeaderboard : MultiplayerGameplayLeaderboard
+        private partial class TestLeaderboard : MultiplayerGameplayLeaderboard
         {
             public Dictionary<int, IReadOnlyList<Mod>> UserMods => UserScores.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ScoreProcessor.Mods);
 
