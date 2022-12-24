@@ -27,7 +27,10 @@ namespace osu.Game.Screens.Ranking.Statistics
         {
             var rows = base.CreateStatisticRows(newScore, playableBeatmap);
 
-            if (newScore.UserID == achievedScore.UserID && newScore.OnlineID == achievedScore.OnlineID)
+            if (newScore.UserID > 1
+                && newScore.UserID == achievedScore.UserID
+                && newScore.OnlineID > 0
+                && newScore.OnlineID == achievedScore.OnlineID)
             {
                 rows = rows.Append(new StatisticRow
                 {
