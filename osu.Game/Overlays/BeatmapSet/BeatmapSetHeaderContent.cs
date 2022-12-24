@@ -48,9 +48,10 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly LinkFlowContainer title, artist;
         private readonly AuthorInfo author;
 
-        private readonly ExplicitContentBeatmapBadge explicitContent;
-        private readonly SpotlightBeatmapBadge spotlight;
-        private readonly FeaturedArtistBeatmapBadge featuredArtist;
+        private ExplicitContentBeatmapBadge explicitContent;
+        private SpotlightBeatmapBadge spotlight;
+        private FeaturedArtistBeatmapBadge featuredArtist;
+        private ExternalLinkButton externalLink;
 
         private readonly FillFlowContainer downloadButtonsContainer;
         private readonly BeatmapAvailability beatmapAvailability;
@@ -69,8 +70,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapSetHeaderContent()
         {
-            ExternalLinkButton externalLink;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             InternalChild = new Container
@@ -124,64 +123,19 @@ namespace osu.Game.Overlays.BeatmapSet
                                             AutoSizeAxes = Axes.Y,
                                             Child = Picker = new BeatmapPicker(),
                                         },
-                                        new FillFlowContainer
+                                        title = new MetadataFlowContainer(s =>
                                         {
-                                            Direction = FillDirection.Horizontal,
-                                            AutoSizeAxes = Axes.Both,
+                                            s.Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true);
+                                        })
+                                        {
                                             Margin = new MarginPadding { Top = 15 },
-                                            Children = new Drawable[]
-                                            {
-                                                title = new MetadataFlowContainer(s =>
-                                                {
-                                                    s.Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true);
-                                                })
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                },
-                                                externalLink = new ExternalLinkButton
-                                                {
-                                                    Anchor = Anchor.BottomLeft,
-                                                    Origin = Anchor.BottomLeft,
-                                                    Margin = new MarginPadding { Left = 5, Bottom = 4 }, // To better lineup with the font
-                                                },
-                                                explicitContent = new ExplicitContentBeatmapBadge
-                                                {
-                                                    Alpha = 0f,
-                                                    Anchor = Anchor.BottomLeft,
-                                                    Origin = Anchor.BottomLeft,
-                                                    Margin = new MarginPadding { Left = 10, Bottom = 4 },
-                                                },
-                                                spotlight = new SpotlightBeatmapBadge
-                                                {
-                                                    Alpha = 0f,
-                                                    Anchor = Anchor.BottomLeft,
-                                                    Origin = Anchor.BottomLeft,
-                                                    Margin = new MarginPadding { Left = 10, Bottom = 4 },
-                                                }
-                                            }
                                         },
-                                        new FillFlowContainer
+                                        artist = new MetadataFlowContainer(s =>
                                         {
-                                            Direction = FillDirection.Horizontal,
-                                            AutoSizeAxes = Axes.Both,
+                                            s.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true);
+                                        })
+                                        {
                                             Margin = new MarginPadding { Bottom = 20 },
-                                            Children = new Drawable[]
-                                            {
-                                                artist = new MetadataFlowContainer(s =>
-                                                {
-                                                    s.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true);
-                                                })
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                },
-                                                featuredArtist = new FeaturedArtistBeatmapBadge
-                                                {
-                                                    Alpha = 0f,
-                                                    Anchor = Anchor.BottomLeft,
-                                                    Origin = Anchor.BottomLeft,
-                                                    Margin = new MarginPadding { Left = 10 }
-                                                }
-                                            }
                                         },
                                         new Container
                                         {
@@ -247,10 +201,15 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.BeatmapInfo = b.NewValue;
-                externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineID}";
+                updateExternalLink();
 
                 onlineStatusPill.Status = b.NewValue?.Status ?? BeatmapOnlineStatus.None;
             };
+        }
+
+        private void updateExternalLink()
+        {
+            if (externalLink != null) externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineID}#{Picker.Beatmap.Value?.Ruleset.ShortName}/{Picker.Beatmap.Value?.OnlineID}";
         }
 
         [BackgroundDependencyLoader]
@@ -292,8 +251,49 @@ namespace osu.Game.Overlays.BeatmapSet
                     artist.Clear();
 
                     title.AddLink(titleText, LinkAction.SearchBeatmapSet, titleText);
+
+                    title.AddArbitraryDrawable(new Container
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Child = externalLink = new ExternalLinkButton
+                        {
+                            Margin = new MarginPadding { Left = 5 },
+                        }
+                    });
+
+                    title.AddArbitraryDrawable(new Container
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Child = explicitContent = new ExplicitContentBeatmapBadge
+                        {
+                            Alpha = 0f,
+                            Margin = new MarginPadding { Left = 10 },
+                        }
+                    });
+
+                    title.AddArbitraryDrawable(new Container
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Child = spotlight = new SpotlightBeatmapBadge
+                        {
+                            Alpha = 0f,
+                            Margin = new MarginPadding { Left = 10 },
+                        }
+                    });
+
                     artist.AddLink(artistText, LinkAction.SearchBeatmapSet, artistText);
 
+                    artist.AddArbitraryDrawable(new Container
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Child = featuredArtist = new FeaturedArtistBeatmapBadge
+                        {
+                            Alpha = 0f,
+                            Margin = new MarginPadding { Left = 10 }
+                        }
+                    });
+
+                    updateExternalLink();
                     explicitContent.Alpha = setInfo.NewValue.HasExplicitContent ? 1 : 0;
                     spotlight.Alpha = setInfo.NewValue.FeaturedInSpotlight ? 1 : 0;
                     featuredArtist.Alpha = setInfo.NewValue.TrackId != null ? 1 : 0;
@@ -349,6 +349,9 @@ namespace osu.Game.Overlays.BeatmapSet
             public MetadataFlowContainer(Action<SpriteText> defaultCreationParameters = null)
                 : base(defaultCreationParameters)
             {
+                TextAnchor = Anchor.CentreLeft;
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
             }
 
             protected override DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new MetadataLinkCompiler(textPart);
