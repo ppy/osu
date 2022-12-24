@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -147,10 +146,6 @@ namespace osu.Game.Graphics.Containers
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            // for mobile platforms, enforcing 2x scale globally fits well rather than using 1024x768 as target size.
-            if (RuntimeInfo.IsMobile)
-                content.TargetDrawSize = targetMode == ScalingMode.Everything ? DrawSize / 2f : DrawSize;
 
             updateSize();
             sizableContainer.FinishTransforms();

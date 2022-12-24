@@ -13,6 +13,7 @@ using osu.Game;
 using osu.Game.Overlays.Settings;
 using osu.Game.Updater;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.iOS
 {
@@ -20,14 +21,19 @@ namespace osu.iOS
     {
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 
-        protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
-
-        protected override BatteryInfo CreateBatteryInfo() => new IOSBatteryInfo();
+        /// <summary>
+        /// For iOS devices, doubling the scale of all game elements fits well rather than using 1024x768 as target size (regardless of the device's DPI scale).
+        /// </summary>
+        protected override Vector2 TargetDrawSize => MainScalingContainer.DrawSize / 2f;
 
         protected override Edges SafeAreaOverrideEdges =>
             // iOS shows a home indicator at the bottom, and adds a safe area to account for this.
             // Because we have the home indicator (mostly) hidden we don't really care about drawing in this region.
             Edges.Bottom;
+
+        protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
+
+        protected override BatteryInfo CreateBatteryInfo() => new IOSBatteryInfo();
 
         public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
         {
