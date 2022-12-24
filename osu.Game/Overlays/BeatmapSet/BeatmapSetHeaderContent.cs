@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics.Cursor;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -24,6 +26,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -128,7 +131,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                             Margin = new MarginPadding { Top = 15 },
                                             Children = new Drawable[]
                                             {
-                                                title = new LinkFlowContainer(s =>
+                                                title = new MetadataFlowContainer(s =>
                                                 {
                                                     s.Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true);
                                                 })
@@ -164,7 +167,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                             Margin = new MarginPadding { Bottom = 20 },
                                             Children = new Drawable[]
                                             {
-                                                artist = new LinkFlowContainer(s =>
+                                                artist = new MetadataFlowContainer(s =>
                                                 {
                                                     s.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true);
                                                 })
@@ -338,6 +341,30 @@ namespace osu.Game.Overlays.BeatmapSet
                     if (BeatmapSet.Value.HasVideo)
                         downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true));
                     break;
+            }
+        }
+
+        public partial class MetadataFlowContainer : LinkFlowContainer
+        {
+            public MetadataFlowContainer(Action<SpriteText> defaultCreationParameters = null)
+                : base(defaultCreationParameters)
+            {
+            }
+
+            protected override DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new MetadataLinkCompiler(textPart);
+
+            public partial class MetadataLinkCompiler : DrawableLinkCompiler
+            {
+                public MetadataLinkCompiler(ITextPart part)
+                    : base(part)
+                {
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    IdleColour = Color4.White;
+                }
             }
         }
     }
