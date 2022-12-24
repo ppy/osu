@@ -58,6 +58,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Utils;
+using osuTK;
 using File = System.IO.File;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
@@ -528,7 +529,12 @@ namespace osu.Game
 
         protected virtual BatteryInfo CreateBatteryInfo() => null;
 
-        protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
+        /// <summary>
+        /// The size at which all game elements would be laid out at, then scaled to the window resolution using the scaling container specified in <see cref="CreateScalingContainer"/>.
+        /// </summary>
+        protected internal virtual Vector2 TargetDrawSize => new Vector2(1024, 768);
+
+        protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer { TargetDrawSize = TargetDrawSize };
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 

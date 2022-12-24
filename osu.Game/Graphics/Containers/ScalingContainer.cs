@@ -116,6 +116,9 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, ISafeArea safeArea)
         {
@@ -151,6 +154,12 @@ namespace osu.Game.Graphics.Containers
 
             updateSize();
             sizableContainer.FinishTransforms();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            content.TargetDrawSize = game.TargetDrawSize;
         }
 
         private bool requiresBackgroundVisible => (scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays) && (sizeX.Value != 1 || sizeY.Value != 1);
