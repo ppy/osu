@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -72,10 +71,8 @@ namespace osu.Game.Online.Solo
             lastProcessedScoreId = null;
             latestStatistics.Clear();
 
-            if (!api.IsLoggedIn)
+            if (localUser == null || localUser.OnlineID <= 1)
                 return;
-
-            Debug.Assert(localUser != null);
 
             var userRequest = new GetUsersRequest(new[] { localUser.OnlineID });
             userRequest.Success += response => Schedule(() =>
