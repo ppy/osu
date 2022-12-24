@@ -62,7 +62,7 @@ namespace osu.Game.Online.Solo
                 return;
             }
 
-            callbacks[score.OnlineID] = callback;
+            callbacks.Add(score.OnlineID, callback);
         });
 
         private void onUserChanged(APIUser? localUser) => Schedule(() =>
