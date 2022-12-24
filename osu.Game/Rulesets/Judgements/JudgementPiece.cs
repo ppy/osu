@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Judgements
         [BackgroundDependencyLoader]
         private void load()
         {
-            JudgementText = CreateJudgementText();
+            AddInternal(JudgementText = CreateJudgementText());
 
             JudgementText.Colour = colours.ForHitResult(Result);
             JudgementText.Text = Result.GetDescription().ToUpperInvariant();
