@@ -261,42 +261,36 @@ namespace osu.Game.Overlays.BeatmapSet
                         }
                     });
 
-                    title.AddArbitraryDrawable(new Container
+                    if (setInfo.NewValue.HasExplicitContent)
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Child = explicitContent = new ExplicitContentBeatmapBadge
+                        title.AddArbitraryDrawable(new Container
                         {
-                            Alpha = 0f,
-                            Margin = new MarginPadding { Left = 10 },
-                        }
-                    });
+                            AutoSizeAxes = Axes.Both,
+                            Child = explicitContent = new ExplicitContentBeatmapBadge { Margin = new MarginPadding { Left = 10 } },
+                        });
+                    }
 
-                    title.AddArbitraryDrawable(new Container
+                    if (setInfo.NewValue.FeaturedInSpotlight)
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Child = spotlight = new SpotlightBeatmapBadge
+                        title.AddArbitraryDrawable(new Container
                         {
-                            Alpha = 0f,
-                            Margin = new MarginPadding { Left = 10 },
-                        }
-                    });
+                            AutoSizeAxes = Axes.Both,
+                            Child = spotlight = new SpotlightBeatmapBadge { Margin = new MarginPadding { Left = 10 } },
+                        });
+                    }
 
                     artist.AddLink(artistText, LinkAction.SearchBeatmapSet, artistText);
 
-                    artist.AddArbitraryDrawable(new Container
+                    if (setInfo.NewValue.TrackId != null)
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Child = featuredArtist = new FeaturedArtistBeatmapBadge
+                        artist.AddArbitraryDrawable(new Container
                         {
-                            Alpha = 0f,
-                            Margin = new MarginPadding { Left = 10 }
-                        }
-                    });
+                            AutoSizeAxes = Axes.Both,
+                            Child = featuredArtist = new FeaturedArtistBeatmapBadge { Margin = new MarginPadding { Left = 10 } }
+                        });
+                    }
 
                     updateExternalLink();
-                    explicitContent.Alpha = setInfo.NewValue.HasExplicitContent ? 1 : 0;
-                    spotlight.Alpha = setInfo.NewValue.FeaturedInSpotlight ? 1 : 0;
-                    featuredArtist.Alpha = setInfo.NewValue.TrackId != null ? 1 : 0;
 
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
 
