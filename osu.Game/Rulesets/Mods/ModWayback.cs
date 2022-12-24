@@ -11,21 +11,15 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Wayback";
         public override string Acronym => "WB";
         public override ModType Type => ModType.Fun;
-        public override double ScoreMultiplier
-        {
-            get
-            {
-				return 1;
-            }
-        }
+        public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new Type[] { typeof(ModNoScope) };
 
-        [SettingSource("Follow speed", "The speed at which the cursor follows your mouse.")]
-        public BindableNumber<float> FollowSpeed { get; } = new BindableFloat(5)
+        [SettingSource("Delay", "The delay (in seconds) of your cursor movement.")]
+        public BindableNumber<float> Delay { get; } = new BindableFloat(5)
         {
-            MinValue = 2.5f,
-            MaxValue = 15f,
-            Precision = 0.01f,
+            MinValue = 0.3f,
+            MaxValue = 5f,
+            Precision = 0.1f,
         };
     }
 }
