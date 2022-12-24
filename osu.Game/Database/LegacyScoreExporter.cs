@@ -3,13 +3,11 @@
 
 #nullable disable
 
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Scoring;
-using osu.Game.Utils;
 
 namespace osu.Game.Database
 {
@@ -17,27 +15,17 @@ namespace osu.Game.Database
     {
         protected override string FileExtension => ".osr";
 
-        private readonly Storage exportStorage;
-
         public LegacyScoreExporter(Storage storage)
             : base(storage)
         {
-            exportStorage = storage.GetStorageForDirectory(@"exports");
         }
 
-        private string GetScoreExportString(ScoreInfo score) => $"{score.GetDisplayString()} ({score.Date.LocalDateTime:yyyy-MM-dd})";
-
-        public override void Export(ScoreInfo score)
+        protected override string GetItemExportString(ScoreInfo score)
         {
-            string scoreExportTitle = GetScoreExportString(score).GetValidFilename();
-
-            IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{scoreExportTitle}*{FileExtension}");
-
-            string scoreExportFilename = NamingUtils.GetNextBestFilename(existingExports, $"{scoreExportTitle}{FileExtension}");
-            using (var stream = exportStorage.CreateFileSafely(scoreExportFilename))
-                ExportModelTo(score, stream);
-
-            exportStorage.PresentFileExternally(scoreExportFilename);
+            string scoreString = score.GetDisplayString();
+            string filename = $"{scoreString} ({score.Date.LocalDateTime:yyyy-MM-dd})";
+            
+            return filename.GetValidFilename();
         }
 
         public override void ExportModelTo(ScoreInfo model, Stream outputStream)
