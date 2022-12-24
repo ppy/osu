@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Reflection;
 using NUnit.Framework;
 using osu.Framework.IO.Stores;
@@ -10,14 +8,13 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneTaikoHitObjectSamples : HitObjectSampleTest
+    public partial class TestSceneTaikoHitObjectSamples : HitObjectSampleTest
     {
         protected override Ruleset CreatePlayerRuleset() => new TaikoRuleset();
 
         protected override IResourceStore<byte[]> RulesetResources => new DllResourceStore(Assembly.GetAssembly(typeof(TestSceneTaikoHitObjectSamples)));
 
         [TestCase("taiko-normal-hitnormal")]
-        [TestCase("normal-hitnormal")]
         [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromBeatmap(string expectedSample)
         {
@@ -29,7 +26,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
         }
 
         [TestCase("taiko-normal-hitnormal")]
-        [TestCase("normal-hitnormal")]
         [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromUserSkinFallback(string expectedSample)
         {
@@ -41,7 +37,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
         }
 
         [TestCase("taiko-normal-hitnormal2")]
-        [TestCase("normal-hitnormal2")]
         public void TestUserSkinLookupIgnoresSampleBank(string unwantedSample)
         {
             SetupSkins(string.Empty, unwantedSample);

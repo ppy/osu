@@ -11,7 +11,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
-    public class ScreenshotSettings : SettingsSubsection
+    public partial class ScreenshotSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GraphicsSettingsStrings.Screenshots;
 

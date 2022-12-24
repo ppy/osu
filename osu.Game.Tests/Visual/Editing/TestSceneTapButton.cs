@@ -13,7 +13,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneTapButton : OsuManualInputManagerTestScene
+    public partial class TestSceneTapButton : OsuManualInputManagerTestScene
     {
         private TapButton tapButton;
 

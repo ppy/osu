@@ -1,11 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,23 +12,24 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinComponentToolbox : EditorSidebarSection
+    public partial class SkinComponentToolbox : EditorSidebarSection
     {
-        public Action<Type> RequestPlacement;
+        public Action<Type>? RequestPlacement;
 
-        private readonly CompositeDrawable target;
+        private readonly CompositeDrawable? target;
 
-        public SkinComponentToolbox(CompositeDrawable target = null)
+        private FillFlowContainer fill = null!;
+
+        public SkinComponentToolbox(CompositeDrawable? target = null)
             : base("Components")
         {
             this.target = target;
         }
-
-        private FillFlowContainer fill;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -52,12 +49,7 @@ namespace osu.Game.Skinning.Editor
         {
             fill.Clear();
 
-            var skinnableTypes = typeof(OsuGame).Assembly.GetTypes()
-                                                .Where(t => !t.IsInterface && !t.IsAbstract)
-                                                .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
-                                                .OrderBy(t => t.Name)
-                                                .ToArray();
-
+            var skinnableTypes = SkinnableInfo.GetAllAvailableDrawables();
             foreach (var type in skinnableTypes)
                 attemptAddComponent(type);
         }
@@ -66,9 +58,7 @@ namespace osu.Game.Skinning.Editor
         {
             try
             {
-                var instance = (Drawable)Activator.CreateInstance(type);
-
-                Debug.Assert(instance != null);
+                Drawable instance = (Drawable)Activator.CreateInstance(type)!;
 
                 if (!((ISkinnableDrawable)instance).IsEditable) return;
 
@@ -88,23 +78,19 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        public class ToolboxComponentButton : OsuButton
+        public partial class ToolboxComponentButton : OsuButton
         {
-            protected override bool ShouldBeConsideredForInput(Drawable child) => false;
-
-            public override bool PropagateNonPositionalInputSubTree => false;
+            public Action<Type>? RequestPlacement;
 
             private readonly Drawable component;
-            private readonly CompositeDrawable dependencySource;
+            private readonly CompositeDrawable? dependencySource;
 
-            public Action<Type> RequestPlacement;
-
-            private Container innerContainer;
+            private Container innerContainer = null!;
 
             private const float contracted_size = 60;
             private const float expanded_size = 120;
 
-            public ToolboxComponentButton(Drawable component, CompositeDrawable dependencySource)
+            public ToolboxComponentButton(Drawable component, CompositeDrawable? dependencySource)
             {
                 this.component = component;
                 this.dependencySource = dependencySource;
@@ -182,11 +168,15 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        public class DependencyBorrowingContainer : Container
+        public partial class DependencyBorrowingContainer : Container
         {
-            private readonly CompositeDrawable donor;
+            protected override bool ShouldBeConsideredForInput(Drawable child) => false;
 
-            public DependencyBorrowingContainer(CompositeDrawable donor)
+            public override bool PropagateNonPositionalInputSubTree => false;
+
+            private readonly CompositeDrawable? donor;
+
+            public DependencyBorrowingContainer(CompositeDrawable? donor)
             {
                 this.donor = donor;
             }

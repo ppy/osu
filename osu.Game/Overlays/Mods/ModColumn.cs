@@ -25,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModColumn : ModSelectColumn
+    public partial class ModColumn : ModSelectColumn
     {
         public readonly ModType ModType;
 
@@ -66,7 +66,10 @@ namespace osu.Game.Overlays.Mods
         private IModHotkeyHandler hotkeyHandler = null!;
 
         private Task? latestLoadTask;
-        internal bool ItemsLoaded => latestLoadTask == null;
+        private ICollection<ModPanel>? latestLoadedPanels;
+        internal bool ItemsLoaded => latestLoadTask?.IsCompleted == true && latestLoadedPanels?.All(panel => panel.Parent != null) == true;
+
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
         public ModColumn(ModType modType, bool allowIncompatibleSelection)
         {
@@ -130,20 +133,14 @@ namespace osu.Game.Overlays.Mods
         {
             cancellationTokenSource?.Cancel();
 
-            var panels = availableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = Vector2.Zero));
+            var panels = availableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = Vector2.Zero)).ToArray();
+            latestLoadedPanels = panels;
 
-            Task? loadTask;
-
-            latestLoadTask = loadTask = LoadComponentsAsync(panels, loaded =>
+            latestLoadTask = LoadComponentsAsync(panels, loaded =>
             {
                 ItemsFlow.ChildrenEnumerable = loaded;
                 updateState();
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
-            loadTask.ContinueWith(_ =>
-            {
-                if (loadTask == latestLoadTask)
-                    latestLoadTask = null;
-            });
         }
 
         private void updateState()
@@ -222,7 +219,7 @@ namespace osu.Game.Overlays.Mods
                 dequeuedAction();
         }
 
-        private class ToggleAllCheckbox : OsuCheckbox
+        private partial class ToggleAllCheckbox : OsuCheckbox
         {
             private Color4 accentColour;
 

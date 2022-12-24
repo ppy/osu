@@ -10,7 +10,7 @@ using osu.Game.Screens.Edit.Timing;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineButton : IconButton
+    public partial class TimelineButton : IconButton
     {
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)

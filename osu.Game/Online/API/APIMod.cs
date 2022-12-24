@@ -1,11 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using MessagePack;
 using Newtonsoft.Json;
@@ -23,7 +20,7 @@ namespace osu.Game.Online.API
     {
         [JsonProperty("acronym")]
         [Key(0)]
-        public string Acronym { get; set; }
+        public string Acronym { get; set; } = string.Empty;
 
         [JsonProperty("settings")]
         [Key(1)]
@@ -42,16 +39,16 @@ namespace osu.Game.Online.API
 
             foreach (var (_, property) in mod.GetSettingsSourceProperties())
             {
-                var bindable = (IBindable)property.GetValue(mod);
+                var bindable = (IBindable)property.GetValue(mod)!;
 
                 if (!bindable.IsDefault)
                     Settings.Add(property.Name.ToSnakeCase(), bindable.GetUnderlyingSettingValue());
             }
         }
 
-        public Mod ToMod([NotNull] Ruleset ruleset)
+        public Mod ToMod(Ruleset ruleset)
         {
-            Mod resultMod = ruleset.CreateModFromAcronym(Acronym);
+            Mod? resultMod = ruleset.CreateModFromAcronym(Acronym);
 
             if (resultMod == null)
             {
@@ -63,16 +60,16 @@ namespace osu.Game.Online.API
             {
                 foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
                 {
-                    if (!Settings.TryGetValue(property.Name.ToSnakeCase(), out object settingValue))
+                    if (!Settings.TryGetValue(property.Name.ToSnakeCase(), out object? settingValue))
                         continue;
 
                     try
                     {
-                        resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
+                        resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod)!, settingValue);
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Failed to copy mod setting value '{settingValue ?? "null"}' to \"{property.Name}\": {ex.Message}");
+                        Logger.Log($"Failed to copy mod setting value '{settingValue}' to \"{property.Name}\": {ex.Message}");
                     }
                 }
             }
@@ -80,7 +77,9 @@ namespace osu.Game.Online.API
             return resultMod;
         }
 
-        public bool Equals(APIMod other)
+        public bool ShouldSerializeSettings() => Settings.Count > 0;
+
+        public bool Equals(APIMod? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;

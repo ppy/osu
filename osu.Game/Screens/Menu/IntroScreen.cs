@@ -32,7 +32,7 @@ using Realms;
 
 namespace osu.Game.Screens.Menu
 {
-    public abstract class IntroScreen : StartupScreen
+    public abstract partial class IntroScreen : StartupScreen
     {
         /// <summary>
         /// Whether we have loaded the menu previously.
@@ -272,11 +272,22 @@ namespace osu.Game.Screens.Menu
                 FadeInBackground(200);
         }
 
-        protected virtual void StartTrack()
+        protected void StartTrack()
         {
-            // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-            if (UsingThemedIntro)
-                Track.Start();
+            var drawableTrack = musicController.CurrentTrack;
+
+            if (!UsingThemedIntro)
+            {
+                initialBeatmap?.PrepareTrackForPreview(false, -2600);
+
+                drawableTrack.VolumeTo(0);
+                drawableTrack.Restart();
+                drawableTrack.VolumeTo(1, 2600, Easing.InCubic);
+            }
+            else
+            {
+                drawableTrack.Restart();
+            }
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

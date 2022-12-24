@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -12,7 +11,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class RulesetBindingsSection : SettingsSection
+    public partial class RulesetBindingsSection : SettingsSection
     {
         public override Drawable CreateIcon() => ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon
         {
@@ -28,8 +27,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             this.ruleset = ruleset;
 
             var r = ruleset.CreateInstance();
-
-            Debug.Assert(r != null);
 
             foreach (int variant in r.AvailableVariants)
                 Add(new VariantBindingsSubsection(ruleset, variant));

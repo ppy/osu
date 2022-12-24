@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
     /// <summary>
     /// Handles playback of the global music track.
     /// </summary>
-    public class MusicController : CompositeDrawable
+    public partial class MusicController : CompositeDrawable
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -58,19 +58,22 @@ namespace osu.Game.Overlays
         [Resolved]
         private RealmAccess realm { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            // Todo: These binds really shouldn't be here, but are unlikely to cause any issues for now.
-            // They are placed here for now since some tests rely on setting the beatmap _and_ their hierarchies inside their load(), which runs before the MusicController's load().
-            beatmap.BindValueChanged(beatmapChanged, true);
+            base.LoadComplete();
+
+            beatmap.BindValueChanged(b => changeBeatmap(b.NewValue), true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
         }
 
         /// <summary>
         /// Forcefully reload the current <see cref="WorkingBeatmap"/>'s track from disk.
         /// </summary>
-        public void ReloadCurrentTrack() => changeTrack();
+        public void ReloadCurrentTrack()
+        {
+            changeTrack();
+            TrackChanged?.Invoke(current, TrackChangeDirection.None);
+        }
 
         /// <summary>
         /// Returns whether the beatmap track is playing.
@@ -258,8 +261,6 @@ namespace osu.Game.Overlays
         private TrackChangeDirection? queuedDirection;
 
         private IQueryable<BeatmapSetInfo> getBeatmapSets() => realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending);
-
-        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap) => changeBeatmap(beatmap.NewValue);
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {

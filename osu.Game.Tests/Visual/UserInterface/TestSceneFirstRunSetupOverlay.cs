@@ -25,7 +25,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneFirstRunSetupOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneFirstRunSetupOverlay : OsuManualInputManagerTestScene
     {
         private FirstRunSetupOverlay overlay;
 
@@ -194,7 +194,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("notification arrived", () => notificationOverlay.Verify(n => n.Post(It.IsAny<Notification>()), Times.Once));
 
-            AddStep("run notification action", () => lastNotification.Activated());
+            AddStep("run notification action", () => lastNotification.Activated?.Invoke());
 
             AddAssert("overlay shown", () => overlay.State.Value == Visibility.Visible);
             AddAssert("is resumed", () => overlay.CurrentScreen is ScreenUIScale);

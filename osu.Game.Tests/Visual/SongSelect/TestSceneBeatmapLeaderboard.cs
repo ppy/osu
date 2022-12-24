@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,17 +27,16 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneBeatmapLeaderboard : OsuTestScene
+    public partial class TestSceneBeatmapLeaderboard : OsuTestScene
     {
         private readonly FailableLeaderboard leaderboard;
 
         [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay;
 
-        private ScoreManager scoreManager;
-
-        private RulesetStore rulesetStore;
-        private BeatmapManager beatmapManager;
+        private ScoreManager scoreManager = null!;
+        private RulesetStore rulesetStore = null!;
+        private BeatmapManager beatmapManager = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -47,7 +44,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             dependencies.Cache(rulesetStore = new RealmRulesetStore(Realm));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, Scheduler, API));
+            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, API));
             Dependencies.Cache(Realm);
 
             return dependencies;
@@ -74,7 +71,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestLocalScoresDisplay()
         {
-            BeatmapInfo beatmapInfo = null;
+            BeatmapInfo beatmapInfo = null!;
 
             AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Local);
 
@@ -384,10 +381,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
-        private class FailableLeaderboard : BeatmapLeaderboard
+        private partial class FailableLeaderboard : BeatmapLeaderboard
         {
             public new void SetErrorState(LeaderboardState state) => base.SetErrorState(state);
-            public new void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo userScore = default) => base.SetScores(scores, userScore);
+            public new void SetScores(IEnumerable<ScoreInfo>? scores, ScoreInfo? userScore = null) => base.SetScores(scores, userScore);
         }
     }
 }

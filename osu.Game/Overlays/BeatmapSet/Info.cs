@@ -14,7 +14,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class Info : Container
+    public partial class Info : Container
     {
         private const float metadata_width = 175;
         private const float spacing = 20;
@@ -70,6 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Width = metadata_width,
                             Padding = new MarginPadding { Horizontal = 10 },
                             Margin = new MarginPadding { Right = BeatmapSetOverlay.RIGHT_WIDTH + spacing },
+                            Masking = true,
                             Child = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,

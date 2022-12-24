@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedButton : OsuClickableContainer
+    public partial class ShearedButton : OsuClickableContainer
     {
         public LocalisableString Text
         {
@@ -97,7 +97,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 backgroundLayer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Y,
                     CornerRadius = corner_radius,
                     Masking = true,
                     BorderThickness = 2,
@@ -128,15 +128,17 @@ namespace osu.Game.Graphics.UserInterface
             if (width != null)
             {
                 Width = width.Value;
+                backgroundLayer.RelativeSizeAxes = Axes.Both;
             }
             else
             {
                 AutoSizeAxes = Axes.X;
+                backgroundLayer.AutoSizeAxes = Axes.X;
                 text.Margin = new MarginPadding { Horizontal = 15 };
             }
         }
 
-        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet) { Enabled = { BindTarget = Enabled } };
 
         protected override void LoadComplete()
         {

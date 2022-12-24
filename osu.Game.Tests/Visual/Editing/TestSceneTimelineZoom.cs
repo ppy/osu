@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneTimelineZoom : TimelineTestScene
+    public partial class TestSceneTimelineZoom : TimelineTestScene
     {
         public override Drawable CreateTestComponent() => Empty();
 
@@ -16,8 +16,6 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestVisibleRangeUpdatesOnZoomChange()
         {
             double initialVisibleRange = 0;
-
-            AddUntilStep("wait for load", () => MusicController.TrackLoaded);
 
             AddStep("reset zoom", () => TimelineArea.Timeline.Zoom = 100);
             AddStep("get initial range", () => initialVisibleRange = TimelineArea.Timeline.VisibleRange);
@@ -35,8 +33,6 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestVisibleRangeConstantOnSizeChange()
         {
             double initialVisibleRange = 0;
-
-            AddUntilStep("wait for load", () => MusicController.TrackLoaded);
 
             AddStep("reset timeline size", () => TimelineArea.Timeline.Width = 1);
             AddStep("get initial range", () => initialVisibleRange = TimelineArea.Timeline.VisibleRange);

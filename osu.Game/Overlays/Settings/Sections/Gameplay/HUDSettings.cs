@@ -11,7 +11,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class HUDSettings : SettingsSubsection
+    public partial class HUDSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.HUDHeader;
 
@@ -37,6 +37,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GameplaySettingsStrings.AlwaysShowKeyOverlay,
                     Current = config.GetBindable<bool>(OsuSetting.KeyOverlay),
                     Keywords = new[] { "counter" },
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = GameplaySettingsStrings.AlwaysShowGameplayLeaderboard,
+                    Current = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard),
                 },
             };
         }

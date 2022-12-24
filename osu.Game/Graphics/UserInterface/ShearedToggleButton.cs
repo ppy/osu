@@ -8,7 +8,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedToggleButton : ShearedButton
+    public partial class ShearedToggleButton : ShearedButton
     {
         private Sample? sampleClick;
         private Sample? sampleOff;
@@ -49,15 +49,15 @@ namespace osu.Game.Graphics.UserInterface
             Active.BindDisabledChanged(disabled => Action = disabled ? null : Active.Toggle, true);
             Active.BindValueChanged(_ =>
             {
-                updateActiveState();
+                UpdateActiveState();
                 playSample();
             });
 
-            updateActiveState();
+            UpdateActiveState();
             base.LoadComplete();
         }
 
-        private void updateActiveState()
+        protected virtual void UpdateActiveState()
         {
             DarkerColour = Active.Value ? ColourProvider.Highlight1 : ColourProvider.Background3;
             LighterColour = Active.Value ? ColourProvider.Colour0 : ColourProvider.Background1;

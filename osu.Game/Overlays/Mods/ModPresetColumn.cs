@@ -2,76 +2,96 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK;
+using Realms;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModPresetColumn : ModSelectColumn
+    public partial class ModPresetColumn : ModSelectColumn
     {
-        private IReadOnlyList<ModPreset> presets = Array.Empty<ModPreset>();
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
-        /// <summary>
-        /// Sets the collection of available mod presets.
-        /// </summary>
-        public IReadOnlyList<ModPreset> Presets
-        {
-            get => presets;
-            set
-            {
-                presets = value;
-
-                if (IsLoaded)
-                    asyncLoadPanels();
-            }
-        }
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AccentColour = colours.Orange1;
             HeaderText = ModSelectOverlayStrings.PersonalPresets;
+
+            AddPresetButton addPresetButton;
+            ItemsFlow.Add(addPresetButton = new AddPresetButton());
+            ItemsFlow.SetLayoutPosition(addPresetButton, float.PositiveInfinity);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            asyncLoadPanels();
+            ruleset.BindValueChanged(_ => rulesetChanged(), true);
+        }
+
+        private IDisposable? presetSubscription;
+
+        private void rulesetChanged()
+        {
+            presetSubscription?.Dispose();
+            presetSubscription = realm.RegisterForNotifications(r =>
+                r.All<ModPreset>()
+                 .Filter($"{nameof(ModPreset.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $0"
+                         + $" && {nameof(ModPreset.DeletePending)} == false", ruleset.Value.ShortName)
+                 .OrderBy(preset => preset.Name), asyncLoadPanels);
         }
 
         private CancellationTokenSource? cancellationTokenSource;
 
         private Task? latestLoadTask;
-        internal bool ItemsLoaded => latestLoadTask == null;
+        internal bool ItemsLoaded => latestLoadTask?.IsCompleted == true;
 
-        private void asyncLoadPanels()
+        private void asyncLoadPanels(IRealmCollection<ModPreset> presets, ChangeSet changes, Exception error)
         {
             cancellationTokenSource?.Cancel();
 
-            var panels = presets.Select(preset => new ModPresetPanel(preset)
+            if (!presets.Any())
+            {
+                removeAndDisposePresetPanels();
+                return;
+            }
+
+            latestLoadTask = LoadComponentsAsync(presets.Select(p => new ModPresetPanel(p.ToLive(realm))
             {
                 Shear = Vector2.Zero
-            });
-
-            Task? loadTask;
-
-            latestLoadTask = loadTask = LoadComponentsAsync(panels, loaded =>
+            }), loaded =>
             {
-                ItemsFlow.ChildrenEnumerable = loaded;
+                removeAndDisposePresetPanels();
+                ItemsFlow.AddRange(loaded);
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
-            loadTask.ContinueWith(_ =>
+
+            void removeAndDisposePresetPanels()
             {
-                if (loadTask == latestLoadTask)
-                    latestLoadTask = null;
-            });
+                foreach (var panel in ItemsFlow.OfType<ModPresetPanel>().ToArray())
+                    panel.RemoveAndDisposeImmediately();
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            presetSubscription?.Dispose();
         }
     }
 }

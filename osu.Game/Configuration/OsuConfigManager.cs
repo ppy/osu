@@ -4,10 +4,8 @@
 #nullable disable
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
@@ -29,13 +27,19 @@ using osu.Game.Skinning;
 namespace osu.Game.Configuration
 {
     [ExcludeFromDynamicCompile]
-    public class OsuConfigManager : IniConfigManager<OsuSetting>
+    public class OsuConfigManager : IniConfigManager<OsuSetting>, IGameplaySettings
     {
+        public OsuConfigManager(Storage storage)
+            : base(storage)
+        {
+            Migrate();
+        }
+
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
             SetDefault(OsuSetting.Ruleset, string.Empty);
-            SetDefault(OsuSetting.Skin, SkinInfo.DEFAULT_SKIN.ToString());
+            SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
             SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
@@ -111,22 +115,21 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MenuParallax, true);
 
             // See https://stackoverflow.com/a/63307411 for default sourcing.
-            SetDefault(OsuSetting.Prefer24HourTime, CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
+            SetDefault(OsuSetting.Prefer24HourTime, !CultureInfoHelper.SystemCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
 
             // Gameplay
-            SetDefault(OsuSetting.PositionalHitsounds, true); // replaced by level setting below, can be removed 20220703.
             SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
-            SetDefault(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
+            SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
-            SetDefault(OsuSetting.ShowProgressGraph, true);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
+            SetDefault(OsuSetting.GameplayLeaderboard, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
             SetDefault(OsuSetting.FloatingComments, false);
@@ -149,6 +152,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.SongSelectRightMouseScroll, false);
 
             SetDefault(OsuSetting.Scaling, ScalingMode.Off);
+            SetDefault(OsuSetting.SafeAreaConsiderations, true);
 
             SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
             SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
@@ -167,29 +171,24 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
-            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
+            SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 0.75f, 0.25f);
+            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
+            SetDefault(OsuSetting.EditorShowHitMarkers, true);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
+
+            SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
         }
 
-        public IDictionary<OsuSetting, string> GetLoggableState() =>
-            new Dictionary<OsuSetting, string>(ConfigStore.Where(kvp => !keyContainsPrivateInformation(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString()));
-
-        private static bool keyContainsPrivateInformation(OsuSetting argKey)
+        protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
         {
-            switch (argKey)
+            switch (lookup)
             {
                 case OsuSetting.Token:
                     return true;
             }
 
             return false;
-        }
-
-        public OsuConfigManager(Storage storage)
-            : base(storage)
-        {
-            Migrate();
         }
 
         public void Migrate()
@@ -207,14 +206,11 @@ namespace osu.Game.Configuration
             if (!int.TryParse(pieces[0], out int year)) return;
             if (!int.TryParse(pieces[1], out int monthDay)) return;
 
+            // ReSharper disable once UnusedVariable
             int combined = (year * 10000) + monthDay;
 
-            if (combined < 20220103)
-            {
-                var positionalHitsoundsEnabled = GetBindable<bool>(OsuSetting.PositionalHitsounds);
-                if (!positionalHitsoundsEnabled.Value)
-                    SetValue(OsuSetting.PositionalHitsoundsLevel, 0);
-            }
+            // migrations can be added here using a condition like:
+            // if (combined < 20220103) { performMigration() }
         }
 
         public override TrackedSettings CreateTrackedSettings()
@@ -282,6 +278,9 @@ namespace osu.Game.Configuration
         public Func<Guid, string> LookupSkinName { private get; set; } = _ => @"unknown";
 
         public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; } = _ => @"unknown";
+
+        IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => GetOriginalBindable<float>(OsuSetting.ComboColourNormalisationAmount);
+        IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => GetOriginalBindable<float>(OsuSetting.PositionalHitsoundsLevel);
     }
 
     // IMPORTANT: These are used in user configuration files.
@@ -296,17 +295,16 @@ namespace osu.Game.Configuration
         GameplayCursorDuringTouch,
         DimLevel,
         BlurLevel,
+        EditorDim,
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
-        PositionalHitsounds,
+        GameplayLeaderboard,
         PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,
         FloatingComments,
         HUDVisibilityMode,
 
-        // This has been migrated to the component itself. can be removed 20221027.
-        ShowProgressGraph,
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
         MouseDisableButtons,
@@ -370,9 +368,12 @@ namespace osu.Game.Configuration
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
         EditorWaveformOpacity,
+        EditorShowHitMarkers,
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
-        LastProcessedMetadataId
+        LastProcessedMetadataId,
+        SafeAreaConsiderations,
+        ComboColourNormalisationAmount,
     }
 }

@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    public class SetupScreen : TournamentScreen
+    public partial class SetupScreen : TournamentScreen
     {
         private FillFlowContainer fillFlow;
 
@@ -130,6 +130,12 @@ namespace osu.Game.Tournament.Screens.Setup
                     {
                         windowSize.Value = new Size((int)(height * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
                     }
+                },
+                new LabelledSwitchButton
+                {
+                    Label = "Auto advance screens",
+                    Description = "Screens will progress automatically from gameplay -> results -> map pool",
+                    Current = LadderInfo.AutoProgressScreens,
                 },
             };
         }

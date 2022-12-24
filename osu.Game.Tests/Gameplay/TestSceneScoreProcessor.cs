@@ -22,7 +22,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneScoreProcessor : OsuTestScene
+    public partial class TestSceneScoreProcessor : OsuTestScene
     {
         [Test]
         public void TestNoScoreIncreaseFromMiss()
@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Gameplay
             // Apply a miss judgement
             scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new TestJudgement()) { Type = HitResult.Miss });
 
-            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(0.0));
+            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(0));
         }
 
         [Test]
@@ -124,14 +124,19 @@ namespace osu.Game.Tests.Gameplay
 
             Assert.That(score.Rank, Is.EqualTo(ScoreRank.F));
             Assert.That(score.Passed, Is.False);
-            Assert.That(score.Statistics.Count(kvp => kvp.Value > 0), Is.EqualTo(7));
+            Assert.That(score.Statistics.Sum(kvp => kvp.Value), Is.EqualTo(4));
+            Assert.That(score.MaximumStatistics.Sum(kvp => kvp.Value), Is.EqualTo(8));
+
             Assert.That(score.Statistics[HitResult.Ok], Is.EqualTo(1));
-            Assert.That(score.Statistics[HitResult.Miss], Is.EqualTo(1));
             Assert.That(score.Statistics[HitResult.LargeTickHit], Is.EqualTo(1));
-            Assert.That(score.Statistics[HitResult.LargeTickMiss], Is.EqualTo(1));
-            Assert.That(score.Statistics[HitResult.SmallTickMiss], Is.EqualTo(2));
+            Assert.That(score.Statistics[HitResult.SmallTickMiss], Is.EqualTo(1));
             Assert.That(score.Statistics[HitResult.SmallBonus], Is.EqualTo(1));
-            Assert.That(score.Statistics[HitResult.IgnoreMiss], Is.EqualTo(1));
+
+            Assert.That(score.MaximumStatistics[HitResult.Perfect], Is.EqualTo(2));
+            Assert.That(score.MaximumStatistics[HitResult.LargeTickHit], Is.EqualTo(2));
+            Assert.That(score.MaximumStatistics[HitResult.SmallTickHit], Is.EqualTo(2));
+            Assert.That(score.MaximumStatistics[HitResult.SmallBonus], Is.EqualTo(1));
+            Assert.That(score.MaximumStatistics[HitResult.LargeBonus], Is.EqualTo(1));
         }
 
         private class TestJudgement : Judgement

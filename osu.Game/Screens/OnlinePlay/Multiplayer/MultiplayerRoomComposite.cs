@@ -10,7 +10,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public abstract class MultiplayerRoomComposite : OnlinePlayComposite
+    public abstract partial class MultiplayerRoomComposite : OnlinePlayComposite
     {
         [CanBeNull]
         protected MultiplayerRoom Room => Client.Room;
@@ -110,6 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (Client != null)
             {
                 Client.RoomUpdated -= invokeOnRoomUpdated;
+                Client.LoadRequested -= invokeOnRoomLoadRequested;
                 Client.UserLeft -= invokeUserLeft;
                 Client.UserKicked -= invokeUserKicked;
                 Client.UserJoined -= invokeUserJoined;

@@ -3,22 +3,20 @@
 
 #nullable disable
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Vertices;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public class LogoAnimation : Sprite
+    public partial class LogoAnimation : Sprite
     {
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, @"LogoAnimation");
-            RoundedTextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, @"LogoAnimation"); // Masking isn't supported for now
         }
 
         private float animationProgress;
@@ -57,11 +55,11 @@ namespace osu.Game.Graphics.Sprites
                 progress = source.animationProgress;
             }
 
-            protected override void Blit(Action<TexturedVertex2D> vertexAction)
+            protected override void Blit(IRenderer renderer)
             {
-                Shader.GetUniform<float>("progress").UpdateValue(ref progress);
+                TextureShader.GetUniform<float>("progress").UpdateValue(ref progress);
 
-                base.Blit(vertexAction);
+                base.Blit(renderer);
             }
 
             protected override bool CanDrawOpaqueInterior => false;

@@ -30,24 +30,43 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                // check for presence affecting commands as an initial pass.
-                double earliestStartTime = TimelineGroup.EarliestDisplayedTime ?? double.MaxValue;
+                // To get the initial start time, we need to check whether the first alpha command to exist (across all loops) has a StartValue of zero.
+                // A StartValue of zero governs, above all else, the first valid display time of a sprite.
+                //
+                // You can imagine that the first command of each type decides that type's start value, so if the initial alpha is zero,
+                // anything before that point can be ignored (the sprite is not visible after all).
+                var alphaCommands = new List<(double startTime, bool isZeroStartValue)>();
 
-                foreach (var l in loops)
+                var command = TimelineGroup.Alpha.Commands.FirstOrDefault();
+                if (command != null) alphaCommands.Add((command.StartTime, command.StartValue == 0));
+
+                foreach (var loop in loops)
                 {
-                    if (l.EarliestDisplayedTime is double loopEarliestDisplayTime)
-                        earliestStartTime = Math.Min(earliestStartTime, l.LoopStartTime + loopEarliestDisplayTime);
+                    command = loop.Alpha.Commands.FirstOrDefault();
+                    if (command != null) alphaCommands.Add((command.StartTime + loop.LoopStartTime, command.StartValue == 0));
                 }
 
-                if (earliestStartTime < double.MaxValue)
-                    return earliestStartTime;
+                if (alphaCommands.Count > 0)
+                {
+                    var firstAlpha = alphaCommands.MinBy(t => t.startTime);
 
-                // if an alpha-affecting command was not found, use the earliest of any command.
-                earliestStartTime = TimelineGroup.StartTime;
+                    if (firstAlpha.isZeroStartValue)
+                        return firstAlpha.startTime;
+                }
 
+                return EarliestTransformTime;
+            }
+        }
+
+        public double EarliestTransformTime
+        {
+            get
+            {
+                // If we got to this point, either no alpha commands were present, or the earliest had a non-zero start value.
+                // The sprite's StartTime will be determined by the earliest command, regardless of type.
+                double earliestStartTime = TimelineGroup.StartTime;
                 foreach (var l in loops)
                     earliestStartTime = Math.Min(earliestStartTime, l.StartTime);
-
                 return earliestStartTime;
             }
         }

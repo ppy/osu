@@ -10,10 +10,11 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class MetadataSection : SetupSection
+    public partial class MetadataSection : SetupSection
     {
         protected LabelledTextBox ArtistTextBox;
         protected LabelledTextBox RomanisedArtistTextBox;
@@ -26,7 +27,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledTextBox sourceTextBox;
         private LabelledTextBox tagsTextBox;
 
-        public override LocalisableString Title => "Metadata";
+        public override LocalisableString Title => EditorSetupStrings.MetadataHeader;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -35,22 +36,22 @@ namespace osu.Game.Screens.Edit.Setup
 
             Children = new[]
             {
-                ArtistTextBox = createTextBox<LabelledTextBox>("Artist",
+                ArtistTextBox = createTextBox<LabelledTextBox>(EditorSetupStrings.Artist,
                     !string.IsNullOrEmpty(metadata.ArtistUnicode) ? metadata.ArtistUnicode : metadata.Artist),
-                RomanisedArtistTextBox = createTextBox<LabelledRomanisedTextBox>("Romanised Artist",
+                RomanisedArtistTextBox = createTextBox<LabelledRomanisedTextBox>(EditorSetupStrings.RomanisedArtist,
                     !string.IsNullOrEmpty(metadata.Artist) ? metadata.Artist : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode)),
 
                 Empty(),
 
-                TitleTextBox = createTextBox<LabelledTextBox>("Title",
+                TitleTextBox = createTextBox<LabelledTextBox>(EditorSetupStrings.Title,
                     !string.IsNullOrEmpty(metadata.TitleUnicode) ? metadata.TitleUnicode : metadata.Title),
-                RomanisedTitleTextBox = createTextBox<LabelledRomanisedTextBox>("Romanised Title",
+                RomanisedTitleTextBox = createTextBox<LabelledRomanisedTextBox>(EditorSetupStrings.RomanisedTitle,
                     !string.IsNullOrEmpty(metadata.Title) ? metadata.Title : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode)),
 
                 Empty(),
 
-                creatorTextBox = createTextBox<LabelledTextBox>("Creator", metadata.Author.Username),
-                difficultyTextBox = createTextBox<LabelledTextBox>("Difficulty Name", Beatmap.BeatmapInfo.DifficultyName),
+                creatorTextBox = createTextBox<LabelledTextBox>(EditorSetupStrings.Creator, metadata.Author.Username),
+                difficultyTextBox = createTextBox<LabelledTextBox>(EditorSetupStrings.DifficultyName, Beatmap.BeatmapInfo.DifficultyName),
                 sourceTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoSource, metadata.Source),
                 tagsTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoTags, metadata.Tags)
             };
@@ -87,7 +88,7 @@ namespace osu.Game.Screens.Edit.Setup
                 target.Current.Value = value;
 
             updateReadOnlyState();
-            updateMetadata();
+            Scheduler.AddOnce(updateMetadata);
         }
 
         private void updateReadOnlyState()
@@ -102,7 +103,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // for now, update on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
-            updateMetadata();
+            Scheduler.AddOnce(updateMetadata);
         }
 
         private void updateMetadata()
@@ -117,6 +118,8 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.BeatmapInfo.DifficultyName = difficultyTextBox.Current.Value;
             Beatmap.Metadata.Source = sourceTextBox.Current.Value;
             Beatmap.Metadata.Tags = tagsTextBox.Current.Value;
+
+            Beatmap.SaveState();
         }
     }
 }

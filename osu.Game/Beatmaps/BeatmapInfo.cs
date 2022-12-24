@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
@@ -102,6 +103,14 @@ namespace osu.Game.Beatmaps
 
         public string OnlineMD5Hash { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The last time of a local modification (via the editor).
+        /// </summary>
+        public DateTimeOffset? LastLocalUpdate { get; set; }
+
+        /// <summary>
+        /// The last time online metadata was applied to this beatmap.
+        /// </summary>
         public DateTimeOffset? LastOnlineUpdate { get; set; }
 
         /// <summary>
@@ -121,7 +130,8 @@ namespace osu.Game.Beatmaps
             OnlineID = -1;
             LastOnlineUpdate = null;
             OnlineMD5Hash = string.Empty;
-            Status = BeatmapOnlineStatus.None;
+            if (Status != BeatmapOnlineStatus.LocallyModified)
+                Status = BeatmapOnlineStatus.None;
         }
 
         #region Properties we may not want persisted (but also maybe no harm?)
@@ -198,10 +208,27 @@ namespace osu.Game.Beatmaps
             Debug.Assert(x.BeatmapSet != null);
             Debug.Assert(y.BeatmapSet != null);
 
-            string? fileHashX = x.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(x.Metadata))?.File.Hash;
-            string? fileHashY = y.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(y.Metadata))?.File.Hash;
+            string? fileHashX = x.BeatmapSet.GetFile(getFilename(x.Metadata))?.File.Hash;
+            string? fileHashY = y.BeatmapSet.GetFile(getFilename(y.Metadata))?.File.Hash;
 
             return fileHashX == fileHashY;
+        }
+
+        /// <summary>
+        /// When updating a beatmap, its hashes will change. Collections currently track beatmaps by hash, so they need to be updated.
+        /// This method will handle updating
+        /// </summary>
+        /// <param name="realm">A realm instance in an active write transaction.</param>
+        /// <param name="previousMD5Hash">The previous MD5 hash of the beatmap before update.</param>
+        public void TransferCollectionReferences(Realm realm, string previousMD5Hash)
+        {
+            var collections = realm.All<BeatmapCollection>().AsEnumerable().Where(c => c.BeatmapMD5Hashes.Contains(previousMD5Hash));
+
+            foreach (var c in collections)
+            {
+                c.BeatmapMD5Hashes.Remove(previousMD5Hash);
+                c.BeatmapMD5Hashes.Add(MD5Hash);
+            }
         }
 
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
@@ -210,14 +237,6 @@ namespace osu.Game.Beatmaps
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
 
         #region Compatibility properties
-
-        [Ignored]
-        [Obsolete("Use BeatmapInfo.Difficulty instead.")] // can be removed 20220719
-        public BeatmapDifficulty BaseDifficulty
-        {
-            get => Difficulty;
-            set => Difficulty = value;
-        }
 
         [Ignored]
         public string? Path => File?.Filename;

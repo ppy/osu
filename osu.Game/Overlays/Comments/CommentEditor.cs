@@ -20,7 +20,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Comments
 {
-    public abstract class CommentEditor : CompositeDrawable
+    public abstract partial class CommentEditor : CompositeDrawable
     {
         private const int side_padding = 8;
 
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Comments
             Current.BindValueChanged(text => commitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
         }
 
-        private class EditorTextBox : BasicTextBox
+        private partial class EditorTextBox : BasicTextBox
         {
             protected override float LeftRightPadding => side_padding;
 
@@ -167,7 +167,7 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
-        private class CommitButton : LoadingButton
+        private partial class CommitButton : LoadingButton
         {
             private const int duration = 200;
 

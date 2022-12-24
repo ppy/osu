@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneTimelineSelection : EditorTestScene
+    public partial class TestSceneTimelineSelection : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -29,16 +29,18 @@ namespace osu.Game.Tests.Visual.Editing
         private TimelineBlueprintContainer blueprintContainer
             => Editor.ChildrenOfType<TimelineBlueprintContainer>().First();
 
+        private Vector2 getPosition(HitObject hitObject) =>
+            blueprintContainer.SelectionBlueprints.First(s => s.Item == hitObject).ScreenSpaceDrawQuad.Centre;
+
+        private Vector2 getMiddlePosition(HitObject hitObject1, HitObject hitObject2) =>
+            (getPosition(hitObject1) + getPosition(hitObject2)) / 2;
+
         private void moveMouseToObject(Func<HitObject> targetFunc)
         {
             AddStep("move mouse to object", () =>
             {
-                var pos = blueprintContainer.SelectionBlueprints
-                                            .First(s => s.Item == targetFunc())
-                                            .ChildrenOfType<TimelineHitObjectBlueprint>()
-                                            .First().ScreenSpaceDrawQuad.Centre;
-
-                InputManager.MoveMouseTo(pos);
+                var hitObject = targetFunc();
+                InputManager.MoveMouseTo(getPosition(hitObject));
             });
         }
 
@@ -260,6 +262,56 @@ namespace osu.Game.Tests.Visual.Editing
             assertSelectionIs(addedObjects.Skip(1));
 
             AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
+        }
+
+        [Test]
+        public void TestBasicDragSelection()
+        {
+            var addedObjects = new[]
+            {
+                new HitCircle { StartTime = 0 },
+                new HitCircle { StartTime = 500, Position = new Vector2(100) },
+                new HitCircle { StartTime = 1000, Position = new Vector2(200) },
+                new HitCircle { StartTime = 1500, Position = new Vector2(300) },
+            };
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
+
+            AddStep("move mouse", () => InputManager.MoveMouseTo(getMiddlePosition(addedObjects[0], addedObjects[1])));
+            AddStep("mouse down", () => InputManager.PressButton(MouseButton.Left));
+
+            AddStep("drag to select", () => InputManager.MoveMouseTo(getMiddlePosition(addedObjects[2], addedObjects[3])));
+            assertSelectionIs(new[] { addedObjects[1], addedObjects[2] });
+
+            AddStep("drag to deselect", () => InputManager.MoveMouseTo(getMiddlePosition(addedObjects[1], addedObjects[2])));
+            assertSelectionIs(new[] { addedObjects[1] });
+
+            AddStep("mouse up", () => InputManager.ReleaseButton(MouseButton.Left));
+            assertSelectionIs(new[] { addedObjects[1] });
+        }
+
+        [Test]
+        public void TestFastDragSelection()
+        {
+            var addedObjects = new[]
+            {
+                new HitCircle { StartTime = 0 },
+                new HitCircle { StartTime = 500 },
+                new HitCircle { StartTime = 20000, Position = new Vector2(100) },
+                new HitCircle { StartTime = 31000, Position = new Vector2(200) },
+                new HitCircle { StartTime = 60000, Position = new Vector2(300) },
+            };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
+
+            AddStep("move mouse", () => InputManager.MoveMouseTo(getMiddlePosition(addedObjects[0], addedObjects[1])));
+            AddStep("mouse down", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("start drag", () => InputManager.MoveMouseTo(getPosition(addedObjects[1])));
+
+            AddStep("jump editor clock", () => EditorClock.Seek(30000));
+            AddStep("jump editor clock", () => EditorClock.Seek(60000));
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
+            assertSelectionIs(addedObjects.Skip(1));
+            AddAssert("all blueprints are present", () => blueprintContainer.SelectionBlueprints.Count == EditorBeatmap.SelectedHitObjects.Count);
         }
 
         private void assertSelectionIs(IEnumerable<HitObject> hitObjects)

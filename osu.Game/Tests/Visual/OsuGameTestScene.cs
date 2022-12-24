@@ -17,6 +17,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -34,13 +35,15 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A scene which tests full game flow.
     /// </summary>
-    public abstract class OsuGameTestScene : OsuManualInputManagerTestScene
+    public abstract partial class OsuGameTestScene : OsuManualInputManagerTestScene
     {
         protected TestOsuGame Game;
 
         protected override bool UseFreshStoragePerRun => true;
 
         protected override bool CreateNestedActionContainer => false;
+
+        protected override bool DisplayCursorForManualInput => false;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -58,10 +61,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Create new game instance", () =>
             {
                 if (Game?.Parent != null)
-                {
-                    Remove(Game);
-                    Game.Dispose();
-                }
+                    Remove(Game, true);
 
                 RecycleLocalStorage(false);
 
@@ -114,13 +114,15 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected void DismissAnyNotifications() => Game.Notifications.State.Value = Visibility.Hidden;
 
-        public class TestOsuGame : OsuGame
+        public partial class TestOsuGame : OsuGame
         {
             public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
 
             public new ScreenStack ScreenStack => base.ScreenStack;
 
             public RealmAccess Realm => Dependencies.Get<RealmAccess>();
+
+            public new GlobalCursorDisplay GlobalCursorDisplay => base.GlobalCursorDisplay;
 
             public new BackButton BackButton => base.BackButton;
 
@@ -187,11 +189,11 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        public class TestLoader : Loader
+        public partial class TestLoader : Loader
         {
             protected override ShaderPrecompiler CreateShaderPrecompiler() => new TestShaderPrecompiler();
 
-            private class TestShaderPrecompiler : ShaderPrecompiler
+            private partial class TestShaderPrecompiler : ShaderPrecompiler
             {
                 protected override bool AllLoaded => true;
             }

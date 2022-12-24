@@ -12,7 +12,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFrameStabilityContainer : OsuTestScene
+    public partial class TestSceneFrameStabilityContainer : OsuTestScene
     {
         private readonly ManualClock manualClock;
 
@@ -137,15 +137,15 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void seekManualTo(double time) => AddStep($"seek manual clock to {time}", () => manualClock.CurrentTime = time);
 
-        private void confirmSeek(double time) => AddUntilStep($"wait for seek to {time}", () => consumer.Clock.CurrentTime == time);
+        private void confirmSeek(double time) => AddUntilStep($"wait for seek to {time}", () => consumer.Clock.CurrentTime, () => Is.EqualTo(time));
 
         private void checkFrameCount(int frames) =>
-            AddAssert($"elapsed frames is {frames}", () => consumer.ElapsedFrames == frames);
+            AddAssert($"elapsed frames is {frames}", () => consumer.ElapsedFrames, () => Is.EqualTo(frames));
 
         private void checkRate(double rate) =>
-            AddAssert($"clock rate is {rate}", () => consumer.Clock.Rate == rate);
+            AddAssert($"clock rate is {rate}", () => consumer.Clock.Rate, () => Is.EqualTo(rate));
 
-        public class ClockConsumingChild : CompositeDrawable
+        public partial class ClockConsumingChild : CompositeDrawable
         {
             private readonly OsuSpriteText text;
             private readonly OsuSpriteText text2;

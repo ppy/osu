@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,14 +15,14 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyCatcherNew : CompositeDrawable
+    public partial class LegacyCatcherNew : CompositeDrawable
     {
         [Resolved]
-        private Bindable<CatcherAnimationState> currentState { get; set; }
+        private Bindable<CatcherAnimationState> currentState { get; set; } = null!;
 
         private readonly Dictionary<CatcherAnimationState, Drawable> drawables = new Dictionary<CatcherAnimationState, Drawable>();
 
-        private Drawable currentDrawable;
+        private Drawable currentDrawable = null!;
 
         public LegacyCatcherNew()
         {
@@ -51,7 +49,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
             Drawable getDrawableFor(CatcherAnimationState state) =>
                 skin.GetAnimation(@$"fruit-catcher-{state.ToString().ToLowerInvariant()}", true, true, true) ??
-                skin.GetAnimation(@"fruit-catcher-idle", true, true, true);
+                skin.GetAnimation(@"fruit-catcher-idle", true, true, true) ??
+                Empty();
         }
 
         protected override void LoadComplete()

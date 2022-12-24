@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Utils;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -14,11 +13,12 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModNoScope : OsuModTestScene
+    public partial class TestSceneOsuModNoScope : OsuModTestScene
     {
         [Test]
         public void TestVisibleDuringBreak()
@@ -147,6 +147,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         private bool isBreak() => Player.IsBreakTime.Value;
 
-        private bool cursorAlphaAlmostEquals(float alpha) => Precision.AlmostEquals(Player.DrawableRuleset.Cursor.Alpha, alpha, 0.1f);
+        private OsuPlayfield playfield => (OsuPlayfield)Player.DrawableRuleset.Playfield;
+
+        private bool cursorAlphaAlmostEquals(float alpha) =>
+            Precision.AlmostEquals(playfield.Cursor.AsNonNull().Alpha, alpha, 0.1f) &&
+            Precision.AlmostEquals(playfield.Smoke.Alpha, alpha, 0.1f);
     }
 }

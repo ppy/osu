@@ -8,12 +8,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// A player instance which supports submitting scores to an online store.
     /// </summary>
-    public abstract class SubmittingPlayer : Player
+    public abstract partial class SubmittingPlayer : Player
     {
         /// <summary>
         /// The token to be used for the current submission. This is fetched via a request created by <see cref="CreateTokenRequest"/>.
@@ -77,6 +77,7 @@ namespace osu.Game.Screens.Play
 
             req.Success += r =>
             {
+                Logger.Log($"Score submission token retrieved ({r.ID})");
                 token = r.ID;
                 tcs.SetResult(true);
             };
@@ -84,11 +85,16 @@ namespace osu.Game.Screens.Play
 
             api.Queue(req);
 
-            tcs.Task.WaitSafely();
+            // Generally a timeout would not happen here as APIAccess will timeout first.
+            if (!tcs.Task.Wait(30000))
+                req.TriggerFailure(new InvalidOperationException("Token retrieval timed out (request never run)"));
+
             return true;
 
             void handleTokenFailure(Exception exception)
             {
+                tcs.SetResult(false);
+
                 if (HandleTokenRetrievalFailure(exception))
                 {
                     if (string.IsNullOrEmpty(exception.Message))
@@ -102,8 +108,12 @@ namespace osu.Game.Screens.Play
                         this.Exit();
                     });
                 }
-
-                tcs.SetResult(false);
+                else
+                {
+                    // Gameplay is allowed to continue, but we still should keep track of the error.
+                    // In the future, this should be visible to the user in some way.
+                    Logger.Log($"Score submission token retrieval failed ({exception.Message})");
+                }
             }
         }
 
@@ -121,6 +131,7 @@ namespace osu.Game.Screens.Play
             score.ScoreInfo.Date = DateTimeOffset.Now;
 
             await submitScore(score).ConfigureAwait(false);
+            spectatorClient.EndPlaying(GameplayState);
         }
 
         [Resolved]
@@ -139,7 +150,7 @@ namespace osu.Game.Screens.Play
                     realmBeatmap.LastPlayed = DateTimeOffset.Now;
             });
 
-            spectatorClient.BeginPlaying(GameplayState, Score);
+            spectatorClient.BeginPlaying(token, GameplayState, Score);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -148,8 +159,11 @@ namespace osu.Game.Screens.Play
 
             if (LoadedBeatmapSuccessfully)
             {
-                submitScore(Score.DeepClone());
-                spectatorClient.EndPlaying(GameplayState);
+                Task.Run(async () =>
+                {
+                    await submitScore(Score.DeepClone()).ConfigureAwait(false);
+                    spectatorClient.EndPlaying(GameplayState);
+                }).FireAndForget();
             }
 
             return exiting;

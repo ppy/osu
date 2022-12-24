@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Timing
     /// <summary>
     /// A button with variable constant output based on hold position and length.
     /// </summary>
-    public class TimingAdjustButton : CompositeDrawable
+    public partial class TimingAdjustButton : CompositeDrawable
     {
         public Action<double> Action;
 
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Edit.Timing
             return true;
         }
 
-        private class IncrementBox : CompositeDrawable
+        private partial class IncrementBox : CompositeDrawable
         {
             public readonly float Multiplier;
 

@@ -22,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tournament.Screens.MapPool
 {
-    public class MapPoolScreen : TournamentMatchScreen
+    public partial class MapPoolScreen : TournamentMatchScreen
     {
         private readonly FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>> mapFlows;
 
@@ -46,7 +46,10 @@ namespace osu.Game.Tournament.Screens.MapPool
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new MatchHeader(),
+                new MatchHeader
+                {
+                    ShowScores = true,
+                },
                 mapFlows = new FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>>
                 {
                     Y = 160,
@@ -197,10 +200,13 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             setNextMode();
 
-            if (pickType == ChoiceType.Pick && CurrentMatch.Value.PicksBans.Any(i => i.Type == ChoiceType.Pick))
+            if (LadderInfo.AutoProgressScreens.Value)
             {
-                scheduledChange?.Cancel();
-                scheduledChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);
+                if (pickType == ChoiceType.Pick && CurrentMatch.Value.PicksBans.Any(i => i.Type == ChoiceType.Pick))
+                {
+                    scheduledChange?.Cancel();
+                    scheduledChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);
+                }
             }
         }
 

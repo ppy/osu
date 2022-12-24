@@ -24,8 +24,10 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays
 {
-    public class OverlaySortTabControl<T> : CompositeDrawable, IHasCurrentValue<T>
+    public partial class OverlaySortTabControl<T> : CompositeDrawable, IHasCurrentValue<T>
     {
+        public TabControl<T> TabControl { get; }
+
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
         public Bindable<T> Current
@@ -59,7 +61,7 @@ namespace osu.Game.Overlays
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                         Text = SortStrings.Default
                     },
-                    CreateControl().With(c =>
+                    TabControl = CreateControl().With(c =>
                     {
                         c.Anchor = Anchor.CentreLeft;
                         c.Origin = Anchor.CentreLeft;
@@ -72,7 +74,7 @@ namespace osu.Game.Overlays
         [NotNull]
         protected virtual SortTabControl CreateControl() => new SortTabControl();
 
-        protected class SortTabControl : OsuTabControl<T>
+        protected partial class SortTabControl : OsuTabControl<T>
         {
             protected override Dropdown<T> CreateDropdown() => null;
 
@@ -91,7 +93,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected class SortTabItem : TabItem<T>
+        protected partial class SortTabItem : TabItem<T>
         {
             public SortTabItem(T value)
                 : base(value)
@@ -115,7 +117,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected class TabButton : HeaderButton
+        protected partial class TabButton : HeaderButton
         {
             public readonly BindableBool Active = new BindableBool();
 

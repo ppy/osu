@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -15,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModHidden : OsuModTestScene
+    public partial class TestSceneOsuModHidden : OsuModTestScene
     {
         [Test]
         public void TestDefaultBeatmapTest() => CreateModTest(new ModTestData
@@ -162,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         private class TestOsuModHidden : OsuModHidden
         {
-            public new HitObject FirstObject => base.FirstObject;
+            public new HitObject? FirstObject => base.FirstObject;
         }
     }
 }

@@ -7,7 +7,7 @@ using osu.Game.Screens.OnlinePlay.Lounge;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class Playlists : OnlinePlayScreen
+    public partial class Playlists : OnlinePlayScreen
     {
         protected override string ScreenTitle => "Playlists";
 

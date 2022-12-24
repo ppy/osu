@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
@@ -57,12 +58,16 @@ namespace osu.Game.Rulesets.Objects
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         foreach (var c in args.NewItems.Cast<PathControlPoint>())
                             c.Changed += invalidate;
                         break;
 
                     case NotifyCollectionChangedAction.Reset:
                     case NotifyCollectionChangedAction.Remove:
+                        Debug.Assert(args.OldItems != null);
+
                         foreach (var c in args.OldItems.Cast<PathControlPoint>())
                             c.Changed -= invalidate;
                         break;

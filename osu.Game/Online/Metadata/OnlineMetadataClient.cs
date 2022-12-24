@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -12,7 +13,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online.Metadata
 {
-    public class OnlineMetadataClient : MetadataClient
+    public partial class OnlineMetadataClient : MetadataClient
     {
         private readonly string endpoint;
 
@@ -67,7 +68,7 @@ namespace osu.Game.Online.Metadata
                         while (true)
                         {
                             Logger.Log($"Requesting catch-up from {lastQueueId.Value}");
-                            var catchUpChanges = await GetChangesSince(lastQueueId.Value);
+                            var catchUpChanges = await GetChangesSince(lastQueueId.Value).ConfigureAwait(true);
 
                             lastQueueId.Value = catchUpChanges.LastProcessedQueueID;
 
@@ -77,8 +78,12 @@ namespace osu.Game.Online.Metadata
                                 break;
                             }
 
-                            await ProcessChanges(catchUpChanges.BeatmapSetIDs);
+                            await ProcessChanges(catchUpChanges.BeatmapSetIDs).ConfigureAwait(true);
                         }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Error while processing catch-up of metadata ({e.Message})");
                     }
                     finally
                     {
@@ -96,7 +101,7 @@ namespace osu.Game.Online.Metadata
             if (!catchingUp)
                 lastQueueId.Value = updates.LastProcessedQueueID;
 
-            await ProcessChanges(updates.BeatmapSetIDs);
+            await ProcessChanges(updates.BeatmapSetIDs).ConfigureAwait(false);
         }
 
         public override Task<BeatmapUpdates> GetChangesSince(int queueId)

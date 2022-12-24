@@ -13,7 +13,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Menus
 {
-    public class TestSceneSideOverlays : OsuGameTestScene
+    public partial class TestSceneSideOverlays : OsuGameTestScene
     {
         [SetUpSteps]
         public override void SetUpSteps()

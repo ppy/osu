@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -20,9 +18,9 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinEditor : PlayerTestScene
+    public partial class TestSceneSkinEditor : PlayerTestScene
     {
-        private SkinEditor skinEditor;
+        private SkinEditor? skinEditor;
 
         protected override bool Autoplay => true;
 
@@ -42,28 +40,32 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Player.ScaleTo(0.4f);
                 LoadComponentAsync(skinEditor = new SkinEditor(Player), Add);
             });
-            AddUntilStep("wait for loaded", () => skinEditor.IsLoaded);
+            AddUntilStep("wait for loaded", () => skinEditor!.IsLoaded);
         }
 
         [Test]
         public void TestToggleEditor()
         {
-            AddToggleStep("toggle editor visibility", _ => skinEditor.ToggleVisibility());
+            AddToggleStep("toggle editor visibility", _ => skinEditor!.ToggleVisibility());
         }
 
         [Test]
         public void TestEditComponent()
         {
-            BarHitErrorMeter hitErrorMeter = null;
+            BarHitErrorMeter hitErrorMeter = null!;
 
             AddStep("select bar hit error blueprint", () =>
             {
                 var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().First(b => b.Item is BarHitErrorMeter);
 
                 hitErrorMeter = (BarHitErrorMeter)blueprint.Item;
-                skinEditor.SelectedComponents.Clear();
+                skinEditor!.SelectedComponents.Clear();
                 skinEditor.SelectedComponents.Add(blueprint.Item);
             });
+
+            AddStep("move by keyboard", () => InputManager.Key(Key.Right));
+
+            AddAssert("hitErrorMeter moved", () => hitErrorMeter.X != 0);
 
             AddAssert("value is default", () => hitErrorMeter.JudgementLineThickness.IsDefault);
 

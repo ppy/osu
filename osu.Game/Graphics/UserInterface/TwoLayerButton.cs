@@ -22,7 +22,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class TwoLayerButton : OsuClickableContainer
+    public partial class TwoLayerButton : OsuClickableContainer
     {
         private readonly BouncingIcon bouncingIcon;
 
@@ -64,8 +64,8 @@ namespace osu.Game.Graphics.UserInterface
 
                 X = value.HasFlagFast(Anchor.x2) ? SIZE_RETRACTED.X * shear.X * 0.5f : 0;
 
-                Remove(c1);
-                Remove(c2);
+                Remove(c1, false);
+                Remove(c2, false);
                 c1.Depth = value.HasFlagFast(Anchor.x2) ? 0 : 1;
                 c2.Depth = value.HasFlagFast(Anchor.x2) ? 1 : 0;
                 Add(c1);
@@ -207,7 +207,7 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnClick(e);
         }
 
-        private class BouncingIcon : BeatSyncedContainer
+        private partial class BouncingIcon : BeatSyncedContainer
         {
             private const double beat_in_time = 60;
 

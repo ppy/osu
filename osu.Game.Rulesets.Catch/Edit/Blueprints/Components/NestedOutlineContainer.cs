@@ -13,7 +13,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
-    public class NestedOutlineContainer : CompositeDrawable
+    public partial class NestedOutlineContainer : CompositeDrawable
     {
         private readonly List<CatchHitObject> nestedHitObjects = new List<CatchHitObject>();
 
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
                                                      .Where(h => !(h is TinyDroplet)));
 
             while (nestedHitObjects.Count < InternalChildren.Count)
-                RemoveInternal(InternalChildren[^1]);
+                RemoveInternal(InternalChildren[^1], true);
 
             while (InternalChildren.Count < nestedHitObjects.Count)
                 AddInternal(new FruitOutline());

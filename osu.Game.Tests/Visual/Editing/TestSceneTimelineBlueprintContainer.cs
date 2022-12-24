@@ -10,14 +10,14 @@ using osu.Game.Screens.Edit.Compose.Components.Timeline;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneTimelineBlueprintContainer : TimelineTestScene
+    public partial class TestSceneTimelineBlueprintContainer : TimelineTestScene
     {
         public override Drawable CreateTestComponent() => new TimelineBlueprintContainer(Composer);
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Clock.Seek(10000);
+            EditorClock.Seek(10000);
         }
     }
 }

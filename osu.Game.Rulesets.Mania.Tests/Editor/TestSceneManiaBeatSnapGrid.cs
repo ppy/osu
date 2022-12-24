@@ -24,13 +24,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public class TestSceneManiaBeatSnapGrid : EditorClockTestScene
+    public partial class TestSceneManiaBeatSnapGrid : EditorClockTestScene
     {
         [Cached(typeof(IScrollingInfo))]
         private ScrollingTestContainer.TestScrollingInfo scrollingInfo = new ScrollingTestContainer.TestScrollingInfo();
 
         [Cached(typeof(EditorBeatmap))]
-        private EditorBeatmap editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition())
+        private EditorBeatmap editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition(2))
         {
             BeatmapInfo =
             {
@@ -56,8 +56,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             {
                 Playfield = new ManiaPlayfield(new List<StageDefinition>
                 {
-                    new StageDefinition { Columns = 4 },
-                    new StageDefinition { Columns = 3 }
+                    new StageDefinition(4),
+                    new StageDefinition(3)
                 })
                 {
                     Clock = new FramedClock(new StopwatchClock())
@@ -83,13 +83,14 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         public ManiaPlayfield Playfield { get; }
     }
 
-    public class TestHitObjectComposer : HitObjectComposer
+    public partial class TestHitObjectComposer : HitObjectComposer
     {
         public override Playfield Playfield { get; }
         public override IEnumerable<DrawableHitObject> HitObjects => Enumerable.Empty<DrawableHitObject>();
         public override bool CursorInPlacementArea => false;
 
         public TestHitObjectComposer(Playfield playfield)
+            : base(new ManiaRuleset())
         {
             Playfield = playfield;
         }

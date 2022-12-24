@@ -13,7 +13,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play
 {
-    public class ComboEffects : CompositeDrawable
+    public partial class ComboEffects : CompositeDrawable
     {
         private readonly ScoreProcessor processor;
 
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Play
         private ISamplePlaybackDisabler samplePlaybackDisabler { get; set; }
 
         [Resolved]
-        private GameplayClock gameplayClock { get; set; }
+        private IGameplayClock gameplayClock { get; set; }
 
         private void onComboChange(ValueChangedEvent<int> combo)
         {

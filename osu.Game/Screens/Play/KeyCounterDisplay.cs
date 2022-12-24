@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterDisplay : Container<KeyCounter>
+    public partial class KeyCounterDisplay : Container<KeyCounter>
     {
         private const int duration = 100;
         private const double key_fade_time = 80;
@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Play
             {
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
+                Alpha = 0,
             };
         }
 
@@ -53,7 +54,7 @@ namespace osu.Game.Screens.Play
 
         public override void Add(KeyCounter key)
         {
-            if (key == null) throw new ArgumentNullException(nameof(key));
+            ArgumentNullException.ThrowIfNull(key);
 
             base.Add(key);
             key.IsCounting = IsCounting;
@@ -140,7 +141,7 @@ namespace osu.Game.Screens.Play
             this.receptor = receptor;
         }
 
-        public class Receptor : Drawable
+        public partial class Receptor : Drawable
         {
             protected readonly KeyCounterDisplay Target;
 

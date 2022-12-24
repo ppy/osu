@@ -3,6 +3,7 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 
@@ -14,15 +15,13 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "HT";
         public override IconUsage? Icon => OsuIcon.ModHalftime;
         public override ModType Type => ModType.DifficultyReduction;
-        public override string Description => "Less zoom...";
+        public override LocalisableString Description => "Less zoom...";
 
         [SettingSource("Speed decrease", "The actual decrease to apply")]
-        public override BindableNumber<double> SpeedChange { get; } = new BindableDouble
+        public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(0.75)
         {
             MinValue = 0.5,
             MaxValue = 0.99,
-            Default = 0.75,
-            Value = 0.75,
             Precision = 0.01,
         };
     }

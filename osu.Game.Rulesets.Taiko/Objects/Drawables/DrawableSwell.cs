@@ -16,13 +16,12 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableSwell : DrawableTaikoHitObject<Swell>
+    public partial class DrawableSwell : DrawableTaikoHitObject<Swell>
     {
         private const float target_ring_thick_border = 1.4f;
         private const float target_ring_thin_border = 1f;
@@ -38,6 +37,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
+
+        public override bool DisplayResult => false;
 
         public DrawableSwell()
             : this(null)
@@ -124,7 +125,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Swell),
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Swell),
             _ => new SwellCirclePiece
             {
                 // to allow for rotation transform
@@ -201,7 +202,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (numHits == HitObject.RequiredHits)
-                    ApplyResult(r => r.Type = HitResult.Great);
+                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
             }
             else
             {
@@ -222,7 +223,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         tick.TriggerResult(false);
                 }
 
-                ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : r.Judgement.MinResult);
+                ApplyResult(r => r.Type = numHits == HitObject.RequiredHits ? r.Judgement.MaxResult : r.Judgement.MinResult);
             }
         }
 

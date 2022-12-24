@@ -16,7 +16,7 @@ namespace osu.Game.Online
     /// <summary>
     /// A component which requires a constant polling process.
     /// </summary>
-    public abstract class PollingComponent : CompositeDrawable // switch away from Component because InternalChildren are used in usages.
+    public abstract partial class PollingComponent : CompositeComponent
     {
         private double? lastTimePolled;
 
