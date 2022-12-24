@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
@@ -13,9 +12,6 @@ namespace osu.Game.Rulesets.Judgements
 {
     public partial class DefaultJudgementPiece : JudgementPiece, IAnimatableJudgement
     {
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
         public DefaultJudgementPiece(HitResult result)
             : base(result)
         {
