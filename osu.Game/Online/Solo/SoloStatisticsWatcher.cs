@@ -77,6 +77,7 @@ namespace osu.Game.Online.Solo
             var userRequest = new GetUsersRequest(new[] { localUser.OnlineID });
             userRequest.Success += response => Schedule(() =>
             {
+                latestStatistics.Clear();
                 foreach (var rulesetStats in response.Users.Single().RulesetsStatistics)
                     latestStatistics.Add(rulesetStats.Key, rulesetStats.Value);
             });
