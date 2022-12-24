@@ -5,8 +5,8 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online.Solo;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking.Statistics.User;
 using osu.Game.Users;
-using OverallRanking = osu.Game.Screens.Ranking.Statistics.User.OverallRanking;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
