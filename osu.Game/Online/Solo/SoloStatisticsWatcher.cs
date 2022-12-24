@@ -31,7 +31,7 @@ namespace osu.Game.Online.Solo
         private readonly Dictionary<long, StatisticsUpdateCallback> callbacks = new Dictionary<long, StatisticsUpdateCallback>();
         private long? lastProcessedScoreId;
 
-        private readonly Dictionary<string, UserStatistics> latestStatistics = new Dictionary<string, UserStatistics>();
+        private Dictionary<string, UserStatistics>? latestStatistics;
 
         protected override void LoadComplete()
         {
@@ -69,7 +69,7 @@ namespace osu.Game.Online.Solo
         {
             callbacks.Clear();
             lastProcessedScoreId = null;
-            latestStatistics.Clear();
+            latestStatistics = null;
 
             if (localUser == null || localUser.OnlineID <= 1)
                 return;
@@ -77,7 +77,7 @@ namespace osu.Game.Online.Solo
             var userRequest = new GetUsersRequest(new[] { localUser.OnlineID });
             userRequest.Success += response => Schedule(() =>
             {
-                latestStatistics.Clear();
+                latestStatistics = new Dictionary<string, UserStatistics>();
                 foreach (var rulesetStats in response.Users.Single().RulesetsStatistics)
                     latestStatistics.Add(rulesetStats.Key, rulesetStats.Value);
             });
@@ -109,8 +109,11 @@ namespace osu.Game.Online.Solo
         {
             string rulesetName = callback.Score.Ruleset.ShortName;
 
-            if (!latestStatistics.TryGetValue(rulesetName, out var latestRulesetStatistics))
+            if (latestStatistics == null)
                 return;
+
+            latestStatistics.TryGetValue(rulesetName, out UserStatistics? latestRulesetStatistics);
+            latestRulesetStatistics ??= new UserStatistics();
 
             var update = new SoloStatisticsUpdate(callback.Score, latestRulesetStatistics, updatedStatistics);
             callback.OnUpdateReady.Invoke(update);
