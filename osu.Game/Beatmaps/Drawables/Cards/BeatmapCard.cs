@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Localisation;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
@@ -101,7 +102,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("View beatmap", MenuItemType.Highlighted, Action),
+            new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, Action),
         };
     }
 }
