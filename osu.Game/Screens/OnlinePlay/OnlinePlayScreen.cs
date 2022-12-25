@@ -45,6 +45,9 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
+        [Resolved(canBeNull: true)]
+        private IPerformFromScreenRunner performer { get; set; }
+
         protected OnlinePlayScreen()
         {
             Anchor = Anchor.Centre;
@@ -148,13 +151,17 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            while (screenStack.CurrentScreen is not LoungeSubScreen)
+            if (screenStack.CurrentScreen is not LoungeSubScreen)
             {
-                var lastSubScreen = screenStack.CurrentScreen;
-                if (((Drawable)lastSubScreen)?.IsLoaded == true)
-                    screenStack.Exit();
+                if (performer != null)
+                {
+                    performer.PerformFromScreen(_ => e.Destination.MakeCurrent(), new[] { typeof(LoungeSubScreen) });
+                    return true;
+                }
 
-                if (lastSubScreen == screenStack.CurrentScreen) return true;
+                // TODO: make isolated tests work with IPerformFromScreenRunner
+                if ((screenStack.CurrentScreen as Drawable)?.IsLoaded == true && screenStack.CurrentScreen.OnExiting(e))
+                    return true;
             }
 
             RoomManager.PartRoom();
