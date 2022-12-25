@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
                 AddStep("go back to song select", () =>
                 {
-                    InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<PurpleTriangleButton>().Single(b => b.Text == "Edit playlist"));
+                    InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<PurpleRoundedButton>().Single(b => b.Text == "Edit playlist"));
                     InputManager.Click(MouseButton.Left);
                 });
 
