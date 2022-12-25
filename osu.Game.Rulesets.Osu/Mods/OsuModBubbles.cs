@@ -86,12 +86,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 //Needs to be done explicitly to avoid being handled by DrawableHitCircle below
                 case DrawableSliderHead:
-                    addBubbleContainer(hitObject.Position);
+                    addBubbleContainer(hitObject.Position, drawableOsuObject);
                     break;
 
                 //Stack leniency causes placement issues if this isn't handled as such.
                 case DrawableHitCircle hitCircle:
-                    addBubbleContainer(hitCircle.Position);
+                    addBubbleContainer(hitCircle.Position, drawableOsuObject);
                     break;
 
                 case DrawableSpinnerTick:
@@ -99,19 +99,24 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
 
                 default:
-                    addBubbleContainer(hitObject.Position);
+                    addBubbleContainer(hitObject.Position, drawableOsuObject);
                     break;
             }
+        }
 
-            void addBubbleContainer(Vector2 position) => bubbleContainer.Add(new BubbleLifeTimeEntry
+        private void addBubbleContainer(Vector2 position, DrawableHitObject hitObject)
+        {
+            bubbleContainer.Add
+            (
+                new BubbleLifeTimeEntry
                 {
                     LifetimeStart = bubbleContainer.Time.Current,
-                    Colour = drawableOsuObject.AccentColour.Value,
+                    Colour = hitObject.AccentColour.Value,
                     Position = position,
                     InitialSize = new Vector2(bubbleRadius),
                     MaxSize = maxSize,
                     FadeTime = bubbleFade,
-                    IsHit = drawableOsuObject.IsHit
+                    IsHit = hitObject.IsHit
                 }
             );
         }
