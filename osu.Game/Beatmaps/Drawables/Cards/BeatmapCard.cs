@@ -5,6 +5,8 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -14,7 +16,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public abstract partial class BeatmapCard : OsuClickableContainer
+    public abstract partial class BeatmapCard : OsuClickableContainer, IHasContextMenu
     {
         public const float TRANSITION_DURATION = 400;
         public const float CORNER_RADIUS = 10;
@@ -96,5 +98,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     throw new ArgumentOutOfRangeException(nameof(size), size, @"Unsupported card size");
             }
         }
+
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem("View beatmap", MenuItemType.Highlighted, Action),
+        };
     }
 }
