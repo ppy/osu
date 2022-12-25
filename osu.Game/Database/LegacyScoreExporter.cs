@@ -20,12 +20,12 @@ namespace osu.Game.Database
         {
         }
 
-        protected override string GetItemExportString(ScoreInfo score)
+        protected override string GetFilename(ScoreInfo score)
         {
             string scoreString = score.GetDisplayString();
             string filename = $"{scoreString} ({score.Date.LocalDateTime:yyyy-MM-dd})";
-            
-            return filename.GetValidFilename();
+
+            return filename;
         }
 
         public override void ExportModelTo(ScoreInfo model, Stream outputStream)

@@ -33,7 +33,7 @@ namespace osu.Game.Database
             UserFileStorage = storage.GetStorageForDirectory(@"files");
         }
 
-        protected virtual string GetItemExportString(TModel item) => item.GetDisplayString().GetValidFilename();
+        protected virtual string GetFilename(TModel item) => item.GetDisplayString();
 
         /// <summary>
         /// Exports an item to a legacy (.zip based) package.
@@ -41,9 +41,11 @@ namespace osu.Game.Database
         /// <param name="item">The item to export.</param>
         public void Export(TModel item)
         {
-            IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{GetItemExportString(item)}*{FileExtension}");
+            string itemFilename = GetFilename(item).GetValidFilename();
 
-            string filename = NamingUtils.GetNextBestFilename(existingExports, $"{GetItemExportString(item)}{FileExtension}");
+            IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
+
+            string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
             using (var stream = exportStorage.CreateFileSafely(filename))
                 ExportModelTo(item, stream);
 
