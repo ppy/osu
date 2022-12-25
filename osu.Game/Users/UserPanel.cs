@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -15,7 +16,10 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Containers;
 using JetBrains.Annotations;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Users
 {
@@ -43,6 +47,15 @@ namespace osu.Game.Users
 
         [Resolved(canBeNull: true)]
         private UserProfileOverlay profileOverlay { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private ChannelManager channelManager { get; set; }
+
+        [Resolved]
+        private ChatOverlay chatOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
         protected OverlayColourProvider ColourProvider { get; private set; }
@@ -89,9 +102,26 @@ namespace osu.Game.Users
             Text = User.Username,
         };
 
-        public MenuItem[] ContextMenuItems => new MenuItem[]
+        public MenuItem[] ContextMenuItems
         {
-            new OsuMenuItem("View Profile", MenuItemType.Highlighted, ViewProfile),
-        };
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>
+                {
+                    new OsuMenuItem("View profile", MenuItemType.Highlighted, ViewProfile)
+                };
+
+                if (!User.Equals(api.LocalUser.Value))
+                {
+                    items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, () =>
+                    {
+                        channelManager?.OpenPrivateChannel(User);
+                        chatOverlay?.Show();
+                    }));
+                }
+
+                return items.ToArray();
+            }
+        }
     }
 }

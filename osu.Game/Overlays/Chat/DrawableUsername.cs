@@ -20,6 +20,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -148,11 +149,11 @@ namespace osu.Game.Overlays.Chat
 
                 List<MenuItem> items = new List<MenuItem>
                 {
-                    new OsuMenuItem("View Profile", MenuItemType.Highlighted, openUserProfile)
+                    new OsuMenuItem("View profile", MenuItemType.Highlighted, openUserProfile)
                 };
 
                 if (!user.Equals(api.LocalUser.Value))
-                    items.Add(new OsuMenuItem("Start Chat", MenuItemType.Standard, openUserChannel));
+                    items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
 
                 return items.ToArray();
             }
