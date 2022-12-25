@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
@@ -149,7 +150,7 @@ namespace osu.Game.Overlays.Chat
 
                 List<MenuItem> items = new List<MenuItem>
                 {
-                    new OsuMenuItem("View profile", MenuItemType.Highlighted, openUserProfile)
+                    new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, openUserProfile)
                 };
 
                 if (!user.Equals(api.LocalUser.Value))

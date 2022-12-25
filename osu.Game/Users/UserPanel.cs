@@ -20,6 +20,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 
 namespace osu.Game.Users
 {
@@ -108,7 +109,7 @@ namespace osu.Game.Users
             {
                 List<MenuItem> items = new List<MenuItem>
                 {
-                    new OsuMenuItem("View profile", MenuItemType.Highlighted, ViewProfile)
+                    new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, ViewProfile)
                 };
 
                 if (!User.Equals(api.LocalUser.Value))
