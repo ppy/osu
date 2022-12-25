@@ -83,6 +83,9 @@ namespace osu.Game.Rulesets.Mods
 
             flashlight.Combo.BindTo(Combo);
             drawableRuleset.KeyBindingInputManager.Add(flashlight);
+
+            // Stop flashlight from being drawn underneath other mods that generate HitObjects.
+            drawableRuleset.KeyBindingInputManager.ChangeChildDepth(flashlight, -1);
         }
 
         protected abstract Flashlight CreateFlashlight();
