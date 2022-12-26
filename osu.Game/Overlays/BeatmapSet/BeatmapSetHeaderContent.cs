@@ -249,42 +249,27 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     title.AddLink(titleText, LinkAction.SearchBeatmapSet, titleText);
 
-                    title.AddArbitraryDrawable(new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Child = externalLink = new ExternalLinkButton
-                        {
-                            Margin = new MarginPadding { Left = 5 },
-                        }
-                    });
+                    title.AddArbitraryDrawable(Empty().With(d => d.Width = 5));
+                    title.AddArbitraryDrawable(externalLink = new ExternalLinkButton());
 
                     if (setInfo.NewValue.HasExplicitContent)
                     {
-                        title.AddArbitraryDrawable(new Container
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Child = new ExplicitContentBeatmapBadge { Margin = new MarginPadding { Left = 10 } },
-                        });
+                        title.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
+                        title.AddArbitraryDrawable(new ExplicitContentBeatmapBadge());
                     }
 
                     if (setInfo.NewValue.FeaturedInSpotlight)
                     {
-                        title.AddArbitraryDrawable(new Container
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Child = new SpotlightBeatmapBadge { Margin = new MarginPadding { Left = 10 } },
-                        });
+                        title.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
+                        title.AddArbitraryDrawable(new SpotlightBeatmapBadge());
                     }
 
                     artist.AddLink(artistText, LinkAction.SearchBeatmapSet, artistText);
 
                     if (setInfo.NewValue.TrackId != null)
                     {
-                        artist.AddArbitraryDrawable(new Container
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Child = new FeaturedArtistBeatmapBadge { Margin = new MarginPadding { Left = 10 } }
-                        });
+                        artist.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
+                        artist.AddArbitraryDrawable(new FeaturedArtistBeatmapBadge());
                     }
 
                     updateExternalLink();
