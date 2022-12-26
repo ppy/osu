@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Game.Graphics.Cursor;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
@@ -91,118 +90,113 @@ namespace osu.Game.Overlays.BeatmapSet
                             },
                         },
                     },
-                    new OsuContextMenuContainer
+                    new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Child = new Container
+                        Padding = new MarginPadding
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding
+                            Vertical = BeatmapSetOverlay.Y_PADDING,
+                            Left = BeatmapSetOverlay.X_PADDING,
+                            Right = BeatmapSetOverlay.X_PADDING + BeatmapSetOverlay.RIGHT_WIDTH,
+                        },
+                        Children = new Drawable[]
+                        {
+                            fadeContent = new FillFlowContainer
                             {
-                                Vertical = BeatmapSetOverlay.Y_PADDING,
-                                Left = BeatmapSetOverlay.X_PADDING,
-                                Right = BeatmapSetOverlay.X_PADDING + BeatmapSetOverlay.RIGHT_WIDTH,
-                            },
-                            Children = new Drawable[]
-                            {
-                                fadeContent = new FillFlowContainer
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
-                                    Children = new Drawable[]
+                                    new Container
                                     {
-                                        new Container
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Child = Picker = new BeatmapPicker(),
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        Direction = FillDirection.Horizontal,
+                                        AutoSizeAxes = Axes.Both,
+                                        Margin = new MarginPadding { Top = 15 },
+                                        Children = new Drawable[]
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Child = Picker = new BeatmapPicker(),
-                                        },
-                                        new FillFlowContainer
-                                        {
-                                            Direction = FillDirection.Horizontal,
-                                            AutoSizeAxes = Axes.Both,
-                                            Margin = new MarginPadding { Top = 15 },
-                                            Children = new Drawable[]
+                                            title = new OsuSpriteText
                                             {
-                                                title = new OsuSpriteText
-                                                {
-                                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true)
-                                                },
-                                                externalLink = new ExternalLinkButton
-                                                {
-                                                    Anchor = Anchor.BottomLeft,
-                                                    Origin = Anchor.BottomLeft,
-                                                    Margin = new MarginPadding { Left = 5, Bottom = 4 }, // To better lineup with the font
-                                                },
-                                                explicitContent = new ExplicitContentBeatmapBadge
-                                                {
-                                                    Alpha = 0f,
-                                                    Anchor = Anchor.BottomLeft,
-                                                    Origin = Anchor.BottomLeft,
-                                                    Margin = new MarginPadding { Left = 10, Bottom = 4 },
-                                                },
-                                                spotlight = new SpotlightBeatmapBadge
-                                                {
-                                                    Alpha = 0f,
-                                                    Anchor = Anchor.BottomLeft,
-                                                    Origin = Anchor.BottomLeft,
-                                                    Margin = new MarginPadding { Left = 10, Bottom = 4 },
-                                                }
+                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true)
+                                            },
+                                            externalLink = new ExternalLinkButton
+                                            {
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Margin = new MarginPadding { Left = 5, Bottom = 4 }, // To better lineup with the font
+                                            },
+                                            explicitContent = new ExplicitContentBeatmapBadge
+                                            {
+                                                Alpha = 0f,
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Margin = new MarginPadding { Left = 10, Bottom = 4 },
+                                            },
+                                            spotlight = new SpotlightBeatmapBadge
+                                            {
+                                                Alpha = 0f,
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Margin = new MarginPadding { Left = 10, Bottom = 4 },
                                             }
-                                        },
-                                        new FillFlowContainer
+                                        }
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        Direction = FillDirection.Horizontal,
+                                        AutoSizeAxes = Axes.Both,
+                                        Margin = new MarginPadding { Bottom = 20 },
+                                        Children = new Drawable[]
                                         {
-                                            Direction = FillDirection.Horizontal,
-                                            AutoSizeAxes = Axes.Both,
-                                            Margin = new MarginPadding { Bottom = 20 },
-                                            Children = new Drawable[]
+                                            artist = new OsuSpriteText
                                             {
-                                                artist = new OsuSpriteText
-                                                {
-                                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true),
-                                                },
-                                                featuredArtist = new FeaturedArtistBeatmapBadge
-                                                {
-                                                    Alpha = 0f,
-                                                    Anchor = Anchor.BottomLeft,
-                                                    Origin = Anchor.BottomLeft,
-                                                    Margin = new MarginPadding { Left = 10 }
-                                                }
+                                                Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true),
+                                            },
+                                            featuredArtist = new FeaturedArtistBeatmapBadge
+                                            {
+                                                Alpha = 0f,
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Margin = new MarginPadding { Left = 10 }
                                             }
-                                        },
-                                        new Container
+                                        }
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Child = author = new AuthorInfo(),
+                                    },
+                                    beatmapAvailability = new BeatmapAvailability(),
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = buttons_height,
+                                        Margin = new MarginPadding { Top = 10 },
+                                        Children = new Drawable[]
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Child = author = new AuthorInfo(),
-                                        },
-                                        beatmapAvailability = new BeatmapAvailability(),
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = buttons_height,
-                                            Margin = new MarginPadding { Top = 10 },
-                                            Children = new Drawable[]
+                                            favouriteButton = new FavouriteButton
                                             {
-                                                favouriteButton = new FavouriteButton
-                                                {
-                                                    BeatmapSet = { BindTarget = BeatmapSet }
-                                                },
-                                                downloadButtonsContainer = new FillFlowContainer
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Padding = new MarginPadding { Left = buttons_height + buttons_spacing },
-                                                    Spacing = new Vector2(buttons_spacing),
-                                                },
+                                                BeatmapSet = { BindTarget = BeatmapSet }
+                                            },
+                                            downloadButtonsContainer = new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Left = buttons_height + buttons_spacing },
+                                                Spacing = new Vector2(buttons_spacing),
                                             },
                                         },
                                     },
                                 },
-                            }
-                        },
+                            },
+                        }
                     },
                     loading = new LoadingSpinner
                     {
