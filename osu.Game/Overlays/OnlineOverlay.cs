@@ -39,25 +39,30 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
-                    Child = new FillFlowContainer
+                    Child = new OsuContextMenuContainer
                     {
-                        AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        AutoSizeAxes = Axes.Y,
+                        Child = new PopoverContainer
                         {
-                            Header.With(h => h.Depth = float.MinValue),
-                            new OsuContextMenuContainer
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Child = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Child = content = new PopoverContainer
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y
+                                    Header.With(h => h.Depth = float.MinValue),
+                                    content = new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y
+                                    }
                                 }
                             }
-                        }
+                        },
                     }
                 },
                 Loading = new LoadingLayer(true)
