@@ -24,12 +24,16 @@ namespace osu.Game.Tests.NonVisual
             sessionStatics.SetValue(Static.MutedAudioNotificationShownOnce, true);
             sessionStatics.SetValue(Static.LowBatteryNotificationShownOnce, true);
             sessionStatics.SetValue(Static.LastHoverSoundPlaybackTime, (double?)1d);
+            sessionStatics.SetValue(Static.ReplayPlaybackSettingExpanded, false);
+            sessionStatics.SetValue(Static.ReplayVisualSettingsExpanded, true);
             sessionStatics.SetValue(Static.SeasonalBackgrounds, new APISeasonalBackgrounds { EndDate = new DateTimeOffset(2022, 1, 1, 0, 0, 0, TimeSpan.Zero) });
 
             Assert.IsFalse(sessionStatics.GetBindable<bool>(Static.LoginOverlayDisplayed).IsDefault);
             Assert.IsFalse(sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).IsDefault);
             Assert.IsFalse(sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).IsDefault);
             Assert.IsFalse(sessionStatics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime).IsDefault);
+            Assert.IsFalse(sessionStatics.GetBindable<bool>(Static.ReplayPlaybackSettingExpanded).IsDefault);
+            Assert.IsFalse(sessionStatics.GetBindable<bool>(Static.ReplayVisualSettingsExpanded).IsDefault);
             Assert.IsFalse(sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds).IsDefault);
 
             sessionStatics.ResetAfterInactivity();
@@ -39,6 +43,8 @@ namespace osu.Game.Tests.NonVisual
             Assert.IsTrue(sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).IsDefault);
             // some statics should not reset despite inactivity.
             Assert.IsFalse(sessionStatics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime).IsDefault);
+            Assert.IsFalse(sessionStatics.GetBindable<bool>(Static.ReplayPlaybackSettingExpanded).IsDefault);
+            Assert.IsFalse(sessionStatics.GetBindable<bool>(Static.ReplayVisualSettingsExpanded).IsDefault);
             Assert.IsFalse(sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds).IsDefault);
         }
     }

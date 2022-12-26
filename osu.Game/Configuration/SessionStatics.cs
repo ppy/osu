@@ -20,6 +20,8 @@ namespace osu.Game.Configuration
             SetDefault(Static.MutedAudioNotificationShownOnce, false);
             SetDefault(Static.LowBatteryNotificationShownOnce, false);
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
+            SetDefault(Static.ReplayPlaybackSettingExpanded, true);
+            SetDefault(Static.ReplayVisualSettingsExpanded, false);
             SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
         }
 
@@ -42,6 +44,8 @@ namespace osu.Game.Configuration
         LoginOverlayDisplayed,
         MutedAudioNotificationShownOnce,
         LowBatteryNotificationShownOnce,
+        ReplayPlaybackSettingExpanded,
+        ReplayVisualSettingsExpanded,
 
         /// <summary>
         /// Info about seasonal backgrounds available fetched from API - see <see cref="APISeasonalBackgrounds"/>.
