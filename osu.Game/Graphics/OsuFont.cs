@@ -21,7 +21,7 @@ namespace osu.Game.Graphics
 
         public static FontUsage Numeric => GetFont(Typeface.Venera, weight: FontWeight.Bold);
 
-        public static FontUsage Torus => GetFont(weight: FontWeight.Regular);
+        public static FontUsage Torus => GetFont(Typeface.Torus, weight: FontWeight.Regular);
 
         public static FontUsage TorusAlternate => GetFont(Typeface.TorusAlternate, weight: FontWeight.Regular);
 
