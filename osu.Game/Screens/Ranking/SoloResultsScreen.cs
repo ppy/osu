@@ -20,6 +20,12 @@ namespace osu.Game.Screens.Ranking
 {
     public partial class SoloResultsScreen : ResultsScreen
     {
+        /// <summary>
+        /// Whether the user's personal statistics should be shown on the extended statistics panel
+        /// after clicking the score panel associated with the <see cref="ResultsScreen.Score"/> being presented.
+        /// </summary>
+        public bool ShowUserStatistics { get; init; }
+
         private GetScoresRequest getScoreRequest;
 
         [Resolved]
@@ -39,13 +45,22 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            soloStatisticsWatcher.RegisterForStatisticsUpdateAfter(Score, update => statisticsUpdate.Value = update);
+            if (ShowUserStatistics)
+                soloStatisticsWatcher.RegisterForStatisticsUpdateAfter(Score, update => statisticsUpdate.Value = update);
         }
 
-        protected override StatisticsPanel CreateStatisticsPanel() => new SoloStatisticsPanel(Score)
+        protected override StatisticsPanel CreateStatisticsPanel()
         {
-            StatisticsUpdate = { BindTarget = statisticsUpdate }
-        };
+            if (ShowUserStatistics)
+            {
+                return new SoloStatisticsPanel(Score)
+                {
+                    StatisticsUpdate = { BindTarget = statisticsUpdate }
+                };
+            }
+
+            return base.CreateStatisticsPanel();
+        }
 
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
