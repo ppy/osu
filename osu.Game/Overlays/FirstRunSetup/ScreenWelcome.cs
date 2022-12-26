@@ -79,8 +79,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 Direction = FillDirection.Full;
                 Spacing = new Vector2(5);
 
-                ChildrenEnumerable = Enum.GetValues(typeof(Language))
-                                         .Cast<Language>()
+                ChildrenEnumerable = Enum.GetValues<Language>()
                                          .Select(l => new LanguageButton(l)
                                          {
                                              Action = () => frameworkLocale.Value = l.ToCultureCode()

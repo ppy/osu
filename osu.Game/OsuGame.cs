@@ -726,7 +726,7 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            var languages = Enum.GetValues(typeof(Language)).OfType<Language>();
+            var languages = Enum.GetValues<Language>();
 
             var mappings = languages.Select(language =>
             {
