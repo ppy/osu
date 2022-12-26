@@ -353,7 +353,10 @@ namespace osu.Game
                     break;
 
                 case LinkAction.SearchBeatmapSet:
-                    SearchBeatmapSet(argString);
+                    if (link.Argument is RomanisableString romanisable)
+                        SearchBeatmapSet(romanisable.GetPreferred(Localisation.CurrentParameters.Value.PreferOriginalScript));
+                    else
+                        SearchBeatmapSet(argString);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
