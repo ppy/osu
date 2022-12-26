@@ -185,7 +185,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"playstyle")]
         private string[] playStyle
         {
-            set => PlayStyles = value?.Select(str => Enum.Parse<APIPlayStyle>(str, true)).Cast<APIPlayStyle>().ToArray();
+            set => PlayStyles = value?.Select(str => Enum.Parse<APIPlayStyle>(str, true)).ToArray();
         }
 
         public APIPlayStyle[] PlayStyles;

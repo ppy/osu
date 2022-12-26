@@ -344,7 +344,7 @@ namespace osu.Game.Beatmaps.Formats
         private AnimationLoopType parseAnimationLoopType(string value)
         {
             var parsed = Enum.Parse<AnimationLoopType>(value);
-            return Enum.IsDefined<AnimationLoopType>(parsed) ? parsed : AnimationLoopType.LoopForever;
+            return Enum.IsDefined(parsed) ? parsed : AnimationLoopType.LoopForever;
         }
 
         private void handleVariables(string line)
