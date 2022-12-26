@@ -354,7 +354,7 @@ namespace osu.Game
 
                 case LinkAction.SearchBeatmapSet:
                     if (link.Argument is RomanisableString romanisable)
-                        SearchBeatmapSet(romanisable.GetPreferred(frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode).Value));
+                        SearchBeatmapSet(romanisable.GetPreferred(Localisation.CurrentParameters.Value.PreferOriginalScript));
                     else
                         SearchBeatmapSet(argString);
                     break;
