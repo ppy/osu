@@ -70,7 +70,7 @@ namespace osu.Game.Overlays
         /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
         public void ShowBuild([NotNull] APIChangelogBuild build)
         {
-            if (build == null) throw new ArgumentNullException(nameof(build));
+            ArgumentNullException.ThrowIfNull(build);
 
             Current.Value = build;
             Show();
@@ -78,8 +78,8 @@ namespace osu.Game.Overlays
 
         public void ShowBuild([NotNull] string updateStream, [NotNull] string version)
         {
-            if (updateStream == null) throw new ArgumentNullException(nameof(updateStream));
-            if (version == null) throw new ArgumentNullException(nameof(version));
+            ArgumentNullException.ThrowIfNull(updateStream);
+            ArgumentNullException.ThrowIfNull(version);
 
             performAfterFetch(() =>
             {
