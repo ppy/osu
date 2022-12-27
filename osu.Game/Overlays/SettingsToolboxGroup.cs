@@ -85,6 +85,8 @@ namespace osu.Game.Overlays
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
+                    AutoSizeDuration = transition_duration,
+                    AutoSizeEasing = Easing.OutQuint,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
