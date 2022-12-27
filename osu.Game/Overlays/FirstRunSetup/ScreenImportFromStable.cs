@@ -22,6 +22,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Screens.Edit.Setup;
@@ -127,7 +128,9 @@ namespace osu.Game.Overlays.FirstRunSetup
             if (available)
             {
                 copyInformation.Text =
-                    "Data migration will use \"hard links\". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation.";
+                    "Data migration will use \"hard links\". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation. ";
+
+                copyInformation.AddLink("Learn more about how \"hard links\" work", LinkAction.OpenWiki, @"Client/Release_stream/Lazer/File_storage#via-hard-links");
             }
             else if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
                 copyInformation.Text = "Lightweight linking of files is not supported on your operating system yet, so a copy of all files will be made during import.";
