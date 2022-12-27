@@ -16,11 +16,11 @@ namespace osu.Game.Screens.Ranking.Statistics.User
 
         protected override LocalisableString Label => UsersStrings.ShowStatsHitAccuracy;
 
-        protected override LocalisableString FormatCurrentValue(double current) => current.FormatAccuracy();
+        protected override LocalisableString FormatCurrentValue(double current) => (current / 100).FormatAccuracy();
 
         protected override int CalculateDifference(double previous, double current, out LocalisableString formattedDifference)
         {
-            double difference = current - previous;
+            double difference = (current - previous) / 100;
 
             if (difference < 0)
                 formattedDifference = difference.FormatAccuracy();
