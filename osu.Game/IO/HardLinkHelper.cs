@@ -25,7 +25,6 @@ namespace osu.Game.IO
 
             cleanupFiles();
 
-
             try
             {
                 File.WriteAllText(testSourcePath, string.Empty);
