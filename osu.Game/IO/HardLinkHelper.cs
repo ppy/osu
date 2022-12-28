@@ -76,7 +76,7 @@ namespace osu.Game.IO
             return result;
         }
 
-        [DllImport("libc",  SetLastError = true)]
+        [DllImport("libc", SetLastError = true)]
         public static extern int link(string oldpath, string newpath);
 
         [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
