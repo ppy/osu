@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             float height = default_relative_height;
 
-            if (LockPlayfieldAspect.Value)
+            if (LockPlayfieldAspect.Value && Parent.ChildSize.X / Parent.ChildSize.Y > default_aspect)
                 height *= Math.Clamp(Parent.ChildSize.X / Parent.ChildSize.Y, 0.4f, 4) / default_aspect;
 
             Height = height;
