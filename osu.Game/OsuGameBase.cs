@@ -46,6 +46,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Solo;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -198,6 +199,7 @@ namespace osu.Game
         protected MultiplayerClient MultiplayerClient { get; private set; }
 
         private MetadataClient metadataClient;
+        private SoloStatisticsWatcher soloStatisticsWatcher;
 
         private RealmAccess realm;
 
@@ -316,6 +318,7 @@ namespace osu.Game
             dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
+            dependencies.CacheAs(soloStatisticsWatcher = new SoloStatisticsWatcher());
 
             AddInternal(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
@@ -365,6 +368,7 @@ namespace osu.Game
             AddInternal(spectatorClient);
             AddInternal(MultiplayerClient);
             AddInternal(metadataClient);
+            AddInternal(soloStatisticsWatcher);
 
             AddInternal(rulesetConfigCache);
 
@@ -624,7 +628,7 @@ namespace osu.Game
 
             try
             {
-                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                foreach (ModType type in Enum.GetValues<ModType>())
                 {
                     dict[type] = instance.GetModsFor(type)
                                          // Rulesets should never return null mods, but let's be defensive just in case.

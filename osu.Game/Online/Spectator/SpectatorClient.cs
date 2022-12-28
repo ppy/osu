@@ -65,6 +65,11 @@ namespace osu.Game.Online.Spectator
         public virtual event Action<int, SpectatorState>? OnUserFinishedPlaying;
 
         /// <summary>
+        /// Called whenever a user-submitted score has been fully processed.
+        /// </summary>
+        public virtual event Action<int, long>? OnUserScoreProcessed;
+
+        /// <summary>
         /// A dictionary containing all users currently being watched, with the number of watching components for each user.
         /// </summary>
         private readonly Dictionary<int, int> watchedUsersRefCounts = new Dictionary<int, int>();
@@ -156,6 +161,13 @@ namespace osu.Game.Online.Spectator
                 data.Frames[^1].Header = data.Header;
 
             Schedule(() => OnNewFrames?.Invoke(userId, data));
+
+            return Task.CompletedTask;
+        }
+
+        Task ISpectatorClient.UserScoreProcessed(int userId, long scoreId)
+        {
+            Schedule(() => OnUserScoreProcessed?.Invoke(userId, scoreId));
 
             return Task.CompletedTask;
         }
