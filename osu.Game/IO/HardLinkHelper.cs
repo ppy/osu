@@ -28,16 +28,9 @@ namespace osu.Game.IO
             try
             {
                 File.WriteAllText(testSourcePath, string.Empty);
+
                 // Test availability by creating an arbitrary hard link between the source and destination paths.
-
-                bool isHardLinkAvailable = false;
-
-                if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
-                    isHardLinkAvailable = CreateHardLink(testDestinationPath, testSourcePath, IntPtr.Zero);
-                else if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-                    isHardLinkAvailable = link(testSourcePath, testDestinationPath) == 0;
-
-                return isHardLinkAvailable;
+                return AttemptHardLink(testDestinationPath, testSourcePath);
             }
             catch
             {
@@ -59,6 +52,18 @@ namespace osu.Game.IO
                 {
                 }
             }
+        }
+
+        public static bool AttemptHardLink(string testDestinationPath, string testSourcePath)
+        {
+            bool isHardLinkAvailable = false;
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+                isHardLinkAvailable = CreateHardLink(testDestinationPath, testSourcePath, IntPtr.Zero);
+            else if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                isHardLinkAvailable = link(testSourcePath, testDestinationPath) == 0;
+
+            return isHardLinkAvailable;
         }
 
         // For future use (to detect if a file is a hard link with other references existing on disk).
