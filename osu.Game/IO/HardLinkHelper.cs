@@ -15,7 +15,7 @@ namespace osu.Game.IO
         public static bool CheckAvailability(string testDestinationPath, string testSourcePath)
         {
             // TODO: Add macOS support for hardlinks.
-            if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows || RuntimeInfo.OS != RuntimeInfo.Platform.Linux)
+            if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows && RuntimeInfo.OS != RuntimeInfo.Platform.Linux)
                 return false;
 
             const string test_filename = "_hard_link_test";
