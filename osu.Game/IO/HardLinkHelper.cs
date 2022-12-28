@@ -145,6 +145,8 @@ namespace osu.Game.IO
 
         #region Linux native methods
 
+#pragma warning disable IDE1006 // Naming rule violation
+
         [DllImport("libc", SetLastError = true)]
         public static extern int link(string oldpath, string newpath);
 
@@ -178,6 +180,8 @@ namespace osu.Game.IO
             public readonly long tv_sec;
             public readonly long tv_nsec;
         }
+
+#pragma warning restore IDE1006
 
         #endregion
     }
