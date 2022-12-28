@@ -51,7 +51,7 @@ namespace osu.Game.Online.Solo
             if (!api.IsLoggedIn)
                 return;
 
-            if (!score.Ruleset.IsLegacyRuleset())
+            if (!score.Ruleset.IsLegacyRuleset() || score.OnlineID <= 0)
                 return;
 
             var callback = new StatisticsUpdateCallback(score, onUpdateReady);
