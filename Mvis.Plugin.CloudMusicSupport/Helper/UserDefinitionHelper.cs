@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Misc.Mapping;
 using osu.Framework.Allocation;
@@ -108,7 +109,21 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             req.Failed += onFail;
 
             currentRequest = req;
-            req.PerformAsync().ConfigureAwait(false);
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await req.PerformAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log("无法更新用户定义：" + e.Message);
+                    Logger.Log(e.StackTrace);
+
+                    this.Schedule(() => onFail?.Invoke(e));
+                }
+            });
         }
 
         #endregion
