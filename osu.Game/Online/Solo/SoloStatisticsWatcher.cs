@@ -75,13 +75,25 @@ namespace osu.Game.Online.Solo
                 return;
 
             var userRequest = new GetUsersRequest(new[] { localUser.OnlineID });
-            userRequest.Success += response => Schedule(() =>
-            {
-                latestStatistics = new Dictionary<string, UserStatistics>();
-                foreach (var rulesetStats in response.Users.Single().RulesetsStatistics)
-                    latestStatistics.Add(rulesetStats.Key, rulesetStats.Value);
-            });
+            userRequest.Success += initialiseUserStatistics;
             api.Queue(userRequest);
+        });
+
+        private void initialiseUserStatistics(GetUsersResponse response) => Schedule(() =>
+        {
+            var user = response.Users.SingleOrDefault();
+
+            // possible if the user is restricted or similar.
+            if (user == null)
+                return;
+
+            latestStatistics = new Dictionary<string, UserStatistics>();
+
+            if (user.RulesetsStatistics != null)
+            {
+                foreach (var rulesetStats in user.RulesetsStatistics)
+                    latestStatistics.Add(rulesetStats.Key, rulesetStats.Value);
+            }
         });
 
         private void userScoreProcessed(int userId, long scoreId)
