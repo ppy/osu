@@ -12,18 +12,16 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.News
 {
-    public partial class NewsCard : OsuHoverContainer, IHasContextMenu
+    public partial class NewsCard : OsuHoverContainer
     {
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
@@ -163,10 +161,5 @@ namespace osu.Game.Overlays.News
 
             DateTimeOffset IHasCustomTooltip<DateTimeOffset>.TooltipContent => date;
         }
-
-        public MenuItem[] ContextMenuItems => new MenuItem[]
-        {
-            new OsuMenuItem("View news in browser", MenuItemType.Highlighted, Action),
-        };
     }
 }
