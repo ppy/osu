@@ -32,6 +32,7 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private SoloStatisticsWatcher soloStatisticsWatcher { get; set; } = null!;
 
+        private IDisposable? statisticsSubscription;
         private readonly Bindable<SoloStatisticsUpdate?> statisticsUpdate = new Bindable<SoloStatisticsUpdate?>();
 
         public SoloResultsScreen(ScoreInfo score, bool allowRetry)
@@ -44,7 +45,7 @@ namespace osu.Game.Screens.Ranking
             base.LoadComplete();
 
             if (ShowUserStatistics)
-                soloStatisticsWatcher.RegisterForStatisticsUpdateAfter(Score, update => statisticsUpdate.Value = update);
+                statisticsSubscription = soloStatisticsWatcher.RegisterForStatisticsUpdateAfter(Score, update => statisticsUpdate.Value = update);
         }
 
         protected override StatisticsPanel CreateStatisticsPanel()
@@ -75,6 +76,7 @@ namespace osu.Game.Screens.Ranking
             base.Dispose(isDisposing);
 
             getScoreRequest?.Cancel();
+            statisticsSubscription?.Dispose();
         }
     }
 }

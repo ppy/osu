@@ -46,24 +46,30 @@ namespace osu.Game.Online.Solo
         /// </summary>
         /// <param name="score">The score to listen for the statistics update for.</param>
         /// <param name="onUpdateReady">The callback to be invoked once the statistics update has been prepared.</param>
-        public void RegisterForStatisticsUpdateAfter(ScoreInfo score, Action<SoloStatisticsUpdate> onUpdateReady) => Schedule(() =>
+        /// <returns>An <see cref="IDisposable"/> representing the subscription. Disposing it is equivalent to unsubscribing from future notifications.</returns>
+        public IDisposable RegisterForStatisticsUpdateAfter(ScoreInfo score, Action<SoloStatisticsUpdate> onUpdateReady)
         {
-            if (!api.IsLoggedIn)
-                return;
-
-            if (!score.Ruleset.IsLegacyRuleset() || score.OnlineID <= 0)
-                return;
-
-            var callback = new StatisticsUpdateCallback(score, onUpdateReady);
-
-            if (lastProcessedScoreId == score.OnlineID)
+            Schedule(() =>
             {
-                requestStatisticsUpdate(api.LocalUser.Value.Id, callback);
-                return;
-            }
+                if (!api.IsLoggedIn)
+                    return;
 
-            callbacks.Add(score.OnlineID, callback);
-        });
+                if (!score.Ruleset.IsLegacyRuleset() || score.OnlineID <= 0)
+                    return;
+
+                var callback = new StatisticsUpdateCallback(score, onUpdateReady);
+
+                if (lastProcessedScoreId == score.OnlineID)
+                {
+                    requestStatisticsUpdate(api.LocalUser.Value.Id, callback);
+                    return;
+                }
+
+                callbacks.Add(score.OnlineID, callback);
+            });
+
+            return new InvokeOnDisposal(() => Schedule(() => callbacks.Remove(score.OnlineID)));
+        }
 
         private void onUserChanged(APIUser? localUser) => Schedule(() =>
         {
