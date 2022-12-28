@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
@@ -61,12 +62,16 @@ namespace osu.Game.Online.Chat
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Debug.Assert(e.NewItems != null);
+
                     foreach (var channel in e.NewItems.Cast<Channel>())
                         channel.NewMessagesArrived += checkNewMessages;
 
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (var channel in e.OldItems.Cast<Channel>())
                         channel.NewMessagesArrived -= checkNewMessages;
 

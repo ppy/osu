@@ -12,7 +12,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         public OsuEnumDropdown()
         {
-            Items = (T[])Enum.GetValues(typeof(T));
+            Items = Enum.GetValues<T>();
         }
     }
 }

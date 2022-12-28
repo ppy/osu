@@ -57,8 +57,7 @@ namespace osu.Game.Beatmaps.Formats
         public static Decoder<T> GetDecoder<T>(LineBufferedReader stream)
             where T : new()
         {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
+            ArgumentNullException.ThrowIfNull(stream);
 
             if (!decoders.TryGetValue(typeof(T), out var typedDecoders))
                 throw new IOException(@"Unknown decoder type");
