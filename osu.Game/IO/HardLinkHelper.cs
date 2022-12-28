@@ -81,19 +81,30 @@ namespace osu.Game.IO
         public static int GetFileLinkCount(string filePath)
         {
             int result = 0;
-            SafeFileHandle handle = CreateFile(filePath, FileAccess.Read, FileShare.Read, IntPtr.Zero, FileMode.Open, FileAttributes.Archive, IntPtr.Zero);
 
-            ByHandleFileInformation fileInfo;
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                    SafeFileHandle handle = CreateFile(filePath, FileAccess.Read, FileShare.Read, IntPtr.Zero, FileMode.Open, FileAttributes.Archive, IntPtr.Zero);
 
-            if (GetFileInformationByHandle(handle, out fileInfo))
-                result = (int)fileInfo.NumberOfLinks;
-            CloseHandle(handle);
+                    ByHandleFileInformation fileInfo;
+
+                    if (GetFileInformationByHandle(handle, out fileInfo))
+                        result = (int)fileInfo.NumberOfLinks;
+                    CloseHandle(handle);
+                    break;
+
+                case RuntimeInfo.Platform.Linux:
+                    if (stat(filePath, out var statbuf) == 0)
+                        result = (int)statbuf.st_nlink;
+
+                    break;
+            }
 
             return result;
         }
 
-        [DllImport("libc", SetLastError = true)]
-        public static extern int link(string oldpath, string newpath);
+        #region Windows native methods
 
         [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
@@ -129,5 +140,45 @@ namespace osu.Game.IO
             public readonly uint FileIndexHigh;
             public readonly uint FileIndexLow;
         }
+
+        #endregion
+
+        #region Linux native methods
+
+        [DllImport("libc", SetLastError = true)]
+        public static extern int link(string oldpath, string newpath);
+
+        [DllImport("libc", SetLastError = true)]
+        private static extern int stat(string pathname, out struct_stat statbuf);
+
+        // ReSharper disable once InconsistentNaming
+        // Struct layout is likely non-portable across unices. Tread with caution.
+        [StructLayout(LayoutKind.Sequential)]
+        private struct struct_stat
+        {
+            public readonly long st_dev;
+            public readonly long st_ino;
+            public readonly long st_nlink;
+            public readonly int st_mode;
+            public readonly int st_uid;
+            public readonly int st_gid;
+            public readonly long st_rdev;
+            public readonly long st_size;
+            public readonly long st_blksize;
+            public readonly long st_blocks;
+            public readonly timespec st_atim;
+            public readonly timespec st_mtim;
+            public readonly timespec st_ctim;
+        }
+
+        // ReSharper disable once InconsistentNaming
+        [StructLayout(LayoutKind.Sequential)]
+        private struct timespec
+        {
+            public readonly long tv_sec;
+            public readonly long tv_nsec;
+        }
+
+        #endregion
     }
 }
