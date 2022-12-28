@@ -277,7 +277,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             var samples = sampleMap[feedbackSampleType];
 
-            if (samples == null || samples.Length == 0)
+            if (samples.Length == 0)
                 return null;
 
             return samples[RNG.Next(0, samples.Length)]?.GetChannel();

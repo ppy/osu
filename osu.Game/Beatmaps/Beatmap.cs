@@ -81,9 +81,14 @@ namespace osu.Game.Beatmaps
 
         public double GetMostCommonBeatLength()
         {
+            double lastTime;
+
             // The last playable time in the beatmap - the last timing point extends to this time.
             // Note: This is more accurate and may present different results because osu-stable didn't have the ability to calculate slider durations in this context.
-            double lastTime = HitObjects.LastOrDefault()?.GetEndTime() ?? ControlPointInfo.TimingPoints.LastOrDefault()?.Time ?? 0;
+            if (!HitObjects.Any())
+                lastTime = ControlPointInfo.TimingPoints.LastOrDefault()?.Time ?? 0;
+            else
+                lastTime = this.GetLastObjectTime();
 
             var mostCommon =
                 // Construct a set of (beatLength, duration) tuples for each individual timing point.

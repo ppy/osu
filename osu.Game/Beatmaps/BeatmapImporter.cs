@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps
 
         public override async Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original)
         {
-            var imported = await Import(notification, importTask);
+            var imported = await Import(notification, new[] { importTask }).ConfigureAwait(true);
 
             if (!imported.Any())
                 return null;
@@ -203,10 +203,10 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected override void PostImport(BeatmapSetInfo model, Realm realm, bool batchImport)
+        protected override void PostImport(BeatmapSetInfo model, Realm realm, ImportParameters parameters)
         {
-            base.PostImport(model, realm, batchImport);
-            ProcessBeatmap?.Invoke((model, batchImport));
+            base.PostImport(model, realm, parameters);
+            ProcessBeatmap?.Invoke((model, parameters.Batch));
         }
 
         private void validateOnlineIds(BeatmapSetInfo beatmapSet, Realm realm)
