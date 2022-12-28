@@ -122,19 +122,36 @@ namespace osu.Game.Overlays.FirstRunSetup
             stableLocatorTextBox.Current.Value = storage.GetFullPath(string.Empty);
             importButton.Enabled.Value = true;
 
-            bool available = legacyImportManager.CheckHardLinkAvailability();
-            Logger.Log($"Hard link support is {available}");
+            bool beatmapsAvailable = legacyImportManager.CheckHardLinkAvailability(StableContent.Beatmaps);
+            bool othersAvailable = legacyImportManager.CheckHardLinkAvailability(StableContent.Scores); // all others use install location
+            Logger.Log($"Hard link support availability - beatmaps:{beatmapsAvailable} others:{othersAvailable}");
 
-            if (available)
+            if (beatmapsAvailable && othersAvailable) // hard links will be use, link to wiki
             {
                 copyInformation.Text =
                     "Data migration will use \"hard links\". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation. ";
 
                 copyInformation.AddLink("Learn more about how \"hard links\" work", LinkAction.OpenWiki, @"Client/Release_stream/Lazer/File_storage#via-hard-links");
             }
-            else if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
-                copyInformation.Text = "Lightweight linking of files is not supported on your operating system yet, so a copy of all files will be made during import.";
-            else
+            else if (beatmapsAvailable) // hard links will be used for beatmaps which the user has cared enough about to manually edit stable .cfg file. Link them to wiki
+            {
+                copyInformation.Text =
+                    "A second copy of scores, skins, and collections will be made during import. Migrating beatmaps will use \"hard links\" thus no extra disk space will be used for them, and you can delete beatmaps at any point without affecting the other installation. ";
+
+                copyInformation.AddLink("Learn more about how \"hard links\" work", LinkAction.OpenWiki, @"Client/Release_stream/Lazer/File_storage#via-hard-links");
+            }
+            else if (othersAvailable) // hard links can not be used for beatmaps, allow the user to change lazer storage location
+            {
+                copyInformation.Text =
+                    "A second copy of beatmaps will be made during import. To avoid this, please make sure the lazer data folder is on the same drive where your previous osu! install stores its beatmaps (and the file system is NTFS). You can find the `BeatmapDirectory` for the previous install in the .cfg file. ";
+                copyInformation.AddLink(GeneralSettingsStrings.ChangeFolderLocation, () =>
+                {
+                    game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()));
+                });
+            }
+            else if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows) // hard links not available
+                copyInformation.Text = "Lightweight linking of files is not supported on your operating system yet, so a copy of all files will be made during import. ";
+            else // hard links should be available, allow the user to change lazer storage location
             {
                 copyInformation.Text =
                     "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system is NTFS). ";

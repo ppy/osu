@@ -54,17 +54,37 @@ namespace osu.Game.Database
 
         public void UpdateStorage(string stablePath) => cachedStorage = new StableStorage(stablePath, gameHost as DesktopGameHost);
 
-        public bool CheckHardLinkAvailability()
+        /// <summary>
+        /// Check whether importing some content from stable can make use of hard links
+        /// </summary>
+        /// <param name="content">Content to check for</param>
+        /// <returns>Whether all content checked can use hard links</returns>
+        public bool CheckHardLinkAvailability(StableContent content = StableContent.All)
         {
             var stableStorage = GetCurrentStableStorage();
 
             if (stableStorage == null || gameHost is not DesktopGameHost desktopGameHost)
                 return false;
 
-            string testExistingPath = stableStorage.GetFullPath(string.Empty);
-            string testDestinationPath = desktopGameHost.Storage.GetFullPath(string.Empty);
+            bool allCanUse = true;
 
-            return HardLinkHelper.CheckAvailability(testDestinationPath, testExistingPath);
+            if (content.HasFlagFast(StableContent.Beatmaps))
+            {
+                string testExistingPath = stableStorage.GetSongStorage().GetFullPath(string.Empty);
+                string testDestinationPath = desktopGameHost.Storage.GetFullPath(string.Empty);
+
+                allCanUse = allCanUse && HardLinkHelper.CheckAvailability(testDestinationPath, testExistingPath);
+            }
+
+            if (content.HasFlagFast(StableContent.Scores) || content.HasFlagFast(StableContent.Skins) || content.HasFlagFast(StableContent.Collections))
+            {
+                string testExistingPath = stableStorage.GetFullPath(string.Empty);
+                string testDestinationPath = desktopGameHost.Storage.GetFullPath(string.Empty);
+
+                allCanUse = allCanUse && HardLinkHelper.CheckAvailability(testDestinationPath, testExistingPath);
+            }
+
+            return allCanUse;
         }
 
         public virtual async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
