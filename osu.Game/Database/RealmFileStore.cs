@@ -63,11 +63,19 @@ namespace osu.Game.Database
 
         private void copyToStore(RealmFile file, Stream data, bool preferHardLinks)
         {
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows && data is FileStream fs && preferHardLinks)
+            // attempt to do a fast hard link rather than copy.
+            if (data is FileStream fs && preferHardLinks)
             {
-                // attempt to do a fast hard link rather than copy.
-                if (HardLinkHelper.CreateHardLink(Storage.GetFullPath(file.GetStoragePath(), true), fs.Name, IntPtr.Zero))
-                    return;
+                if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+                {
+                    if (HardLinkHelper.CreateHardLink(Storage.GetFullPath(file.GetStoragePath(), true), fs.Name, IntPtr.Zero))
+                        return;
+                }
+                else if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                {
+                    if (HardLinkHelper.link(fs.Name, Storage.GetFullPath(file.GetStoragePath(), true)) == 0)
+                        return;
+                }
             }
 
             data.Seek(0, SeekOrigin.Begin);

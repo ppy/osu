@@ -14,9 +14,8 @@ namespace osu.Game.IO
     {
         public static bool CheckAvailability(string testDestinationPath, string testSourcePath)
         {
-            // We can support other operating systems quite easily in the future.
-            // Let's handle the most common one for now, though.
-            if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+            // TODO: Add macOS support for hardlinks.
+            if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows || RuntimeInfo.OS != RuntimeInfo.Platform.Linux)
                 return false;
 
             const string test_filename = "_hard_link_test";
@@ -26,12 +25,20 @@ namespace osu.Game.IO
 
             cleanupFiles();
 
+
             try
             {
                 File.WriteAllText(testSourcePath, string.Empty);
-
                 // Test availability by creating an arbitrary hard link between the source and destination paths.
-                return CreateHardLink(testDestinationPath, testSourcePath, IntPtr.Zero);
+
+                bool isHardLinkAvailable = false;
+
+                if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+                    isHardLinkAvailable = CreateHardLink(testDestinationPath, testSourcePath, IntPtr.Zero);
+                else if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                    isHardLinkAvailable = link(testSourcePath, testDestinationPath) == 0;
+
+                return isHardLinkAvailable;
             }
             catch
             {
@@ -69,6 +76,9 @@ namespace osu.Game.IO
 
             return result;
         }
+
+        [DllImport("libc",  SetLastError = true)]
+        public static extern int link(string oldpath, string newpath);
 
         [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
