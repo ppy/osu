@@ -10,6 +10,8 @@ using osu.Game.Screens.LLin.SideBar;
 using osuTK;
 using osuTK.Input;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.Plugins
 {
     public abstract partial class PluginSidebarPage : Container, ISidebarContent

@@ -14,8 +14,10 @@ namespace osu.Game.Screens.LLin.SideBar.PluginsPage
 {
     internal partial class PluginsSection : Section
     {
-        private LLinPluginManager manager;
-        private FillFlowContainer placeholder;
+        [Resolved]
+        private LLinPluginManager manager { get; set; } = null!;
+
+        private FillFlowContainer? placeholder;
 
         public PluginsSection()
         {
@@ -24,9 +26,8 @@ namespace osu.Game.Screens.LLin.SideBar.PluginsPage
         }
 
         [BackgroundDependencyLoader]
-        private void load(LLinPluginManager pluginManager)
+        private void load()
         {
-            manager = pluginManager;
             FillFlow.RelativeSizeAxes = Axes.None;
             FillFlow.AutoSizeAxes = Axes.Both;
             FillFlow.Direction = FillDirection.Vertical;
@@ -58,8 +59,8 @@ namespace osu.Game.Screens.LLin.SideBar.PluginsPage
                 }
             });
 
-            pluginManager.OnPluginAdd += addPiece;
-            pluginManager.OnPluginUnLoad += removePiece;
+            manager.OnPluginAdd += addPiece;
+            manager.OnPluginUnLoad += removePiece;
         }
 
         protected override void LoadComplete()

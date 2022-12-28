@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -26,18 +25,23 @@ namespace osu.Game.Screens.LLin.Plugins
         /// </summary>
         /// <returns>创建的设置页面</returns>
         [Obsolete("请使用GetSettingEntries")]
-        public virtual PluginSettingsSubSection CreateSettingsSubSection() => null;
+        public virtual PluginSettingsSubSection? CreateSettingsSubSection() => null;
 
         /// <summary>
         /// 为Mvis侧边栏创建设置页面
         /// </summary>
         /// <returns>创建的设置页面</returns>
         [Obsolete("请使用GetSettingEntries")]
-        public virtual PluginSidebarSettingsSection CreateSidebarSettingsSection() => null;
+        public virtual PluginSidebarSettingsSection? CreateSidebarSettingsSection() => null;
 
-        public virtual IPluginConfigManager CreateConfigManager(Storage storage) => null;
+        public virtual IPluginConfigManager CreateConfigManager(Storage storage)
+        {
+            if (storage == null) throw new ArgumentNullException(nameof(storage));
 
-        public virtual SettingsEntry[]? GetSettingEntries(IPluginConfigManager pluginConfigManager) => Array.Empty<SettingsEntry>();
+            return new DefaultPluginConfigManager(storage);
+        }
+
+        public virtual SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager) => Array.Empty<SettingsEntry>();
 
         [Obsolete("请使用带IPluginConfigManager作为参数的新方法")]
         public virtual SettingsEntry[]? GetSettingEntries() => null;
@@ -64,7 +68,7 @@ namespace osu.Game.Screens.LLin.Plugins
         /// <summary>
         /// 插件对应的侧边栏页面(未完全实现)
         /// </summary>
-        public virtual PluginSidebarPage CreateSidebarPage() => null;
+        public virtual PluginSidebarPage? CreateSidebarPage() => null;
 
         /// <summary>
         /// 插件Flags，决定了插件的一系列属性
@@ -89,14 +93,12 @@ namespace osu.Game.Screens.LLin.Plugins
         public abstract int Version { get; }
 
         [Resolved(CanBeNull = true)]
-        private IImplementLLin llin { get; set; }
+        private IImplementLLin? llin { get; set; }
 
-        [CanBeNull]
         [Obsolete("Mvis => LLin")]
-        protected IImplementLLin Mvis => llin;
+        protected IImplementLLin? Mvis => llin;
 
-        [CanBeNull]
-        protected IImplementLLin LLin => llin;
+        protected IImplementLLin? LLin => llin;
 
         #region 异步加载任务相关
 
@@ -114,9 +116,12 @@ namespace osu.Game.Screens.LLin.Plugins
             Value = true
         };
 
-        protected DependencyContainer DependenciesContainer;
+        protected DependencyContainer DependenciesContainer = null!;
 
-        public LLinPluginManager PluginManager { get; internal set; }
+        /// <summary>
+        /// 在load结束前会保持null值
+        /// </summary>
+        public LLinPluginManager? PluginManager { get; internal set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             DependenciesContainer = new DependencyContainer(base.CreateChildDependencies(parent));

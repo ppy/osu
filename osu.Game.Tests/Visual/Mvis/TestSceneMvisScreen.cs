@@ -29,8 +29,8 @@ namespace osu.Game.Tests.Visual.Mvis
         [Cached]
         private DialogOverlay dialog = new DialogOverlay();
 
-        private DependencyContainer dependencies;
-        private NotificationOverlay notifiaction;
+        private DependencyContainer dependencies = null!;
+        private NotificationOverlay notifiaction = null!;
 
         [Test]
         public void CreateMvisScreen()
@@ -70,8 +70,8 @@ namespace osu.Game.Tests.Visual.Mvis
 
         private class MvisTestsPlugin : LLinPlugin
         {
-            private OsuSpriteText songTitle;
-            private OsuSpriteText songArtist;
+            private OsuSpriteText songTitle = null!;
+            private OsuSpriteText songArtist = null!;
 
             protected override Drawable CreateContent() => new FillFlowContainer
             {
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Mvis
 
             protected override void LoadComplete()
             {
-                LLin.OnBeatmapChanged(b =>
+                LLin!.OnBeatmapChanged(b =>
                 {
                     songTitle.Text = b.Metadata.TitleUnicode ?? b.Metadata.Title;
                     songArtist.Text = b.Metadata.ArtistUnicode ?? b.Metadata.Artist;

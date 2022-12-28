@@ -5,6 +5,8 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osuTK;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Components.Visualizers.Linear
 {
     public partial class RoundedLinearMusicVisualizerDrawable : LinearMusicVisualizerDrawable

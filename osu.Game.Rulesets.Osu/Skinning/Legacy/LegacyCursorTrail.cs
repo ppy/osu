@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         }
 
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuRulesetConfigManager rulesetConfig)

@@ -15,7 +15,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 {
     public partial class LyricSidebarSectionContainer : PluginSidebarPage
     {
-        private LoadingSpinner loading;
+        private LoadingSpinner loading = null!;
 
         public LyricSidebarSectionContainer(LLinPlugin plugin)
             : base(plugin)
@@ -27,15 +27,15 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             => new LyricFunctionProvider(this);
 
         [Resolved]
-        private IImplementLLin mvisScreen { get; set; }
+        private IImplementLLin mvisScreen { get; set; } = null!;
 
         private LyricPlugin plugin => (LyricPlugin)Plugin;
 
         public int BeatmapSetId;
 
-        private ScreenStack screenStack;
+        private ScreenStack screenStack = null!;
 
-        private Toolbox toolbox;
+        private Toolbox toolbox = null!;
 
         [BackgroundDependencyLoader]
         private void load(CustomColourProvider provider)

@@ -11,6 +11,8 @@ using osu.Game.Screens.LLin.SideBar.Settings.Sections;
 using osu.Game.Screens.LLin.SideBar.Tabs;
 using osuTK;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.Settings
 {
     public partial class PlayerSettings : OsuScrollContainer, ISidebarContent

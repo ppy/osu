@@ -12,6 +12,8 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osuTK;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Components
 {
     public partial class ParticlesDrawable : Sprite

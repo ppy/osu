@@ -10,7 +10,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
 {
     public partial class ToggleableBarButton : SimpleBarButton
     {
-        private Box indicator;
+        private Box indicator = null!;
 
         public BindableBool Value = new BindableBool();
 

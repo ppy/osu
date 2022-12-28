@@ -106,7 +106,7 @@ namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.UI.Overlays
 
         public partial class SandboxOverlayButton : CompositeDrawable
         {
-            public Action ClickAction;
+            public Action? ClickAction;
 
             private readonly Box bg;
             private readonly Container content;

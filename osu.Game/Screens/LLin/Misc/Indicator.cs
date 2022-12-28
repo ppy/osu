@@ -10,6 +10,8 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.Misc
 {
     public partial class Indicator : CompositeDrawable

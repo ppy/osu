@@ -3,6 +3,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.Misc
 {
     internal class LLinModRateAdjust : ModRateAdjust

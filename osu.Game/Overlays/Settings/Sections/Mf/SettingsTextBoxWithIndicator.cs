@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             Failed
         }
 
-        private Indicator currentIndicator;
+        private Indicator currentIndicator = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             FlowContent.Add(currentIndicator = new Indicator());
         }
 
-        public void ChangeState(ParseState state, string result, IList<string> errors = null)
+        public void ChangeState(ParseState state, string result, IList<string>? errors = null)
         {
             currentIndicator.UpdateInfo(state, result, errors);
         }
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 Y = -3
             };
 
-            public Indicator(ParseState state = ParseState.Working, string result = "等待解析...", List<string> errors = null)
+            public Indicator(ParseState state = ParseState.Working, string result = "等待解析...", List<string>? errors = null)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
@@ -70,9 +70,9 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             }
 
             [Resolved]
-            private OsuColour colors { get; set; }
+            private OsuColour colors { get; set; } = null!;
 
-            public void UpdateInfo(ParseState newState, string result, IList<string> errors = null)
+            public void UpdateInfo(ParseState newState, string result, IList<string>? errors = null)
             {
                 string errorsText = string.Empty;
 

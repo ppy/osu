@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using M.DBus;
 using Tmds.DBus;
 
+#nullable disable
+
 namespace Mvis.Plugin.CollectionSupport.DBus
 {
     [DBusInterface("io.matrix_feather.mvis.collection")]

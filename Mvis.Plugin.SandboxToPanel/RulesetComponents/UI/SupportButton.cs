@@ -4,6 +4,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game.Overlays.Settings;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.UI
 {
     public partial class SupportButton : CompositeDrawable

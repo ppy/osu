@@ -20,12 +20,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
     {
         #region 歌词获取
 
-        private OsuJsonWebRequest<APISearchResponseRoot> currentSearchRequest;
-        private OsuJsonWebRequest<APILyricResponseRoot> currentLyricRequest;
+        private OsuJsonWebRequest<APISearchResponseRoot>? currentSearchRequest;
+        private OsuJsonWebRequest<APILyricResponseRoot>? currentLyricRequest;
 
-        private CancellationTokenSource cancellationTokenSource;
+        private CancellationTokenSource cancellationTokenSource = null!;
 
-        private UrlEncoder encoder;
+        private UrlEncoder? encoder;
 
         public void StartFetchByBeatmap(
             WorkingBeatmap beatmap,
@@ -136,9 +136,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         #region 歌词读取、写入
 
         [Resolved]
-        private Storage storage { get; set; }
+        private Storage storage { get; set; } = null!;
 
-        public void WriteLrcToFile(APILyricResponseRoot responseRoot, WorkingBeatmap working)
+        public void WriteLrcToFile(APILyricResponseRoot? responseRoot, WorkingBeatmap working)
         {
             try
             {

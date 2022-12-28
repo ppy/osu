@@ -12,6 +12,8 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osuTK;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Components.Visualizers
 {
     public abstract partial class MusicVisualizerDrawable : Drawable

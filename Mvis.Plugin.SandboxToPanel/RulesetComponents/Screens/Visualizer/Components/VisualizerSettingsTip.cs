@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Components
 {
     public partial class VisualizerSettingsTip : SandboxOverlay

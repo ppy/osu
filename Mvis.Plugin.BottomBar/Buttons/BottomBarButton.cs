@@ -18,6 +18,8 @@ using osu.Game.Screens.LLin.Plugins.Types;
 using osuTK;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace Mvis.Plugin.BottomBar.Buttons
 {
     public partial class BottomBarButton : CompositeDrawable, IHasTooltip

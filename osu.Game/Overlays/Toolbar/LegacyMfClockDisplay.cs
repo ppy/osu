@@ -8,6 +8,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
+#nullable disable
+
 namespace osu.Game.Overlays.Toolbar
 {
     public partial class LegacyMfClockDisplay : ClockDisplay

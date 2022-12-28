@@ -71,6 +71,6 @@ namespace osu.Game.Screens.LLin.Plugins.Types
         /// <summary>
         /// 被禁用时触发
         /// </summary>
-        public Action OnDisable { get; set; }
+        public Action? OnDisable { get; set; }
     }
 }

@@ -11,6 +11,8 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.UI.Overlays
 {
     public partial class SandboxCheckbox : CompositeDrawable

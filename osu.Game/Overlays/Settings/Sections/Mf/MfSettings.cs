@@ -11,14 +11,16 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Configuration.AccelUtils;
 
+#nullable disable
+
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public partial class MfSettings : SettingsSubsection
     {
-        private SettingsCheckbox systemCursor;
-        private SettingsTextBoxWithIndicator accelTextBox;
-        private SettingsTextBoxWithIndicator previewAccelTextBox;
-        private SettingsTextBoxWithIndicator coverAccelTextBox;
+        private SettingsCheckbox systemCursor = null!;
+        private SettingsTextBoxWithIndicator accelTextBox = null!;
+        private SettingsTextBoxWithIndicator previewAccelTextBox = null!;
+        private SettingsTextBoxWithIndicator coverAccelTextBox = null!;
 
         protected override LocalisableString Header => "Mf-osu";
 

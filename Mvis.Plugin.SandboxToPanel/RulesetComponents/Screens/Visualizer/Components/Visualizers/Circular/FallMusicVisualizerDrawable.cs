@@ -6,6 +6,8 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osuTK;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Components.Visualizers.Circular
 {
     public partial class FallMusicVisualizerDrawable : CircularMusicVisualizerDrawable

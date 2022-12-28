@@ -34,7 +34,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new LyricConfigManager(storage);
 
-        private SettingsEntry[] entries;
+        private SettingsEntry[]? entries;
 
         public bool IsContentLoaded => ContentLoaded;
 
@@ -135,23 +135,21 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         public override int Version => 10;
 
-        internal WorkingBeatmap CurrentWorkingBeatmap;
-        private LyricLineHandler lrcLine;
+        internal WorkingBeatmap CurrentWorkingBeatmap = null!;
+        private readonly LyricLineHandler lrcLine = new LyricLineHandler();
 
         /// <summary>
         /// 请参阅 <see cref="LLinPlugin.CreateContent()"/>
         /// </summary>
-        protected override Drawable CreateContent() => lrcLine = new LyricLineHandler();
+        protected override Drawable CreateContent() => lrcLine;
 
         private readonly LyricProcessor processor = new LyricProcessor();
 
-        [CanBeNull]
-        private List<Lyric> cachedLyrics;
+        private List<Lyric>? cachedLyrics;
 
         public readonly List<Lyric> EmptyLyricList = new List<Lyric>();
 
-        [CanBeNull]
-        private APILyricResponseRoot currentResponseRoot;
+        private APILyricResponseRoot? currentResponseRoot;
 
         [NotNull]
         public List<Lyric> Lyrics
@@ -178,7 +176,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             processor.StartFetchById(id, onLyricRequestFinished, onLyricRequestFail);
         }
 
-        private Track track;
+        private Track track = null!;
 
         public readonly BindableDouble Offset = new BindableDouble
         {
@@ -186,7 +184,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             MinValue = -3000
         };
 
-        private Bindable<bool> autoSave;
+        private readonly Bindable<bool> autoSave = new Bindable<bool>();
 
         public readonly Bindable<Status> CurrentStatus = new Bindable<Status>();
 
@@ -226,14 +224,15 @@ namespace Mvis.Plugin.CloudMusicSupport
             var config = (LyricConfigManager)Dependencies.Get<LLinPluginManager>().GetConfigManager(this);
 
             config.BindWith(LyricSettings.EnablePlugin, Value);
-            autoSave = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish);
+            config.BindWith(LyricSettings.SaveLrcWhenFetchFinish, autoSave);
 
             AddInternal(processor);
             AddInternal(UserDefinitionHelper);
 
-            PluginManager.RegisterDBusObject(dbusObject = new LyricDBusObject());
+            PluginManager!.RegisterDBusObject(dbusObject);
 
-            LLin.Exiting += onMvisExiting;
+            if (LLin != null)
+                LLin.Exiting += onMvisExiting;
 
             Offset.BindValueChanged(v =>
             {
@@ -245,13 +244,13 @@ namespace Mvis.Plugin.CloudMusicSupport
         private void onMvisExiting()
         {
             resetDBusMessage();
-            PluginManager.UnRegisterDBusObject(new LyricDBusObject());
+            PluginManager!.UnRegisterDBusObject(dbusObject);
 
             if (!Disabled.Value)
                 PluginManager.RemoveDBusMenuEntry(lyricEntry);
         }
 
-        public void WriteLyricToDisk(WorkingBeatmap currentBeatmap = null)
+        public void WriteLyricToDisk(WorkingBeatmap? currentBeatmap = null)
         {
             currentBeatmap ??= CurrentWorkingBeatmap;
             processor.WriteLrcToFile(currentResponseRoot, currentBeatmap);
@@ -326,7 +325,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
 
             resetDBusMessage();
-            PluginManager.RemoveDBusMenuEntry(lyricEntry);
+            PluginManager!.RemoveDBusMenuEntry(lyricEntry);
 
             return base.Disable();
         }
@@ -344,7 +343,7 @@ namespace Mvis.Plugin.CloudMusicSupport
                 dbusObject.RawLyric = currentLine?.Content;
                 dbusObject.TranslatedLyric = currentLine?.TranslatedString;
 
-                PluginManager.AddDBusMenuEntry(lyricEntry);
+                PluginManager!.AddDBusMenuEntry(lyricEntry);
             }
 
             return result;
@@ -361,10 +360,10 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         protected override bool PostInit() => true;
 
-        private Lyric currentLine;
+        private Lyric? currentLine;
         private readonly Lyric emptyLine = new Lyric();
 
-        public Lyric CurrentLine
+        public Lyric? CurrentLine
         {
             get => currentLine;
             set
@@ -384,7 +383,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         }
 
         private readonly Lyric defaultLrc = new Lyric();
-        private LyricDBusObject dbusObject;
+        private readonly LyricDBusObject dbusObject = new LyricDBusObject();
 
         protected override void Update()
         {

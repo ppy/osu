@@ -82,7 +82,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (Link != null)
                 {
-                    items.Add(new OsuMenuItem("打开", MenuItemType.Standard, () => host.OpenUrlExternally(Link)));
+                    items.Add(new OsuMenuItem("打开", MenuItemType.Highlighted, () => host.OpenUrlExternally(Link)));
                     items.Add(new OsuMenuItem("复制URL", MenuItemType.Standard, copyUrl));
                 }
 

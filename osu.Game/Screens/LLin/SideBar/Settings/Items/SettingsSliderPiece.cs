@@ -4,6 +4,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
     public partial class SettingsSliderPiece<T> : SettingsPieceBasePanel, ISettingsItem<T>

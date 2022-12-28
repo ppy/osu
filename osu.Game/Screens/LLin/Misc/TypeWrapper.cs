@@ -1,5 +1,7 @@
 using System;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.Misc
 {
     public class TypeWrapper

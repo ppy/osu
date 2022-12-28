@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps
         protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set, bool minimiseDownloadSize) =>
             new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
 
-        protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateAccelDownloadRequest(IBeatmapSetInfo model, bool isMini)
+        protected override ArchiveDownloadRequest<IBeatmapSetInfo>? CreateAccelDownloadRequest(IBeatmapSetInfo model, bool isMini)
         {
             try
             {

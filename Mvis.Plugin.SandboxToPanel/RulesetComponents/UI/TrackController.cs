@@ -15,6 +15,8 @@ using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.UI
 {
     public partial class TrackController : CompositeDrawable

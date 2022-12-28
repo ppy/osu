@@ -14,7 +14,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc.Mapping
         /// <summary>
         /// 数据
         /// </summary>
-        public APIBeatmapLyricMapping[] Data { get; set; }
+        public APIBeatmapLyricMapping[]? Data { get; set; }
 
         public void Dispose()
         {

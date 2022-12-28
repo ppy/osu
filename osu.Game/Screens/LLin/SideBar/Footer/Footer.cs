@@ -5,6 +5,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.Footer
 {
     public partial class Footer : CompositeDrawable

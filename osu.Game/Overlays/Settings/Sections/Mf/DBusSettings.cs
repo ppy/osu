@@ -5,6 +5,8 @@ using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
+#nullable disable
+
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public partial class DBusSettings : SettingsSubsection

@@ -71,6 +71,6 @@ namespace osu.Game.Screens.LLin.Plugins.Internal
             throw new NotImplementedException();
         }
 
-        public Action OnDisable { get; set; }
+        public Action? OnDisable { get; set; }
     }
 }

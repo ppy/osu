@@ -6,6 +6,8 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Settings;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Components.Settings
 {
     public partial class TrackSection : SandboxSettingsSection

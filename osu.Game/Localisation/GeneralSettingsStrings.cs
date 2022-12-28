@@ -65,6 +65,16 @@ namespace osu.Game.Localisation
         public static LocalisableString RunSetupWizard => new TranslatableString(getKey(@"llin_run_setup_wizard"), @"打开设置向导");
 
         /// <summary>
+        /// "Learn more about lazer"
+        /// </summary>
+        public static LocalisableString LearnMoreAboutLazer => new TranslatableString(getKey(@"learn_more_about_lazer"), @"Learn more about lazer");
+
+        /// <summary>
+        /// "Check out the feature comparison and FAQ"
+        /// </summary>
+        public static LocalisableString LearnMoreAboutLazerTooltip => new TranslatableString(getKey(@"check_out_the_feature_comparison"), @"Check out the feature comparison and FAQ");
+
+        /// <summary>
         /// "You are running the latest release ({0})"
         /// </summary>
         public static LocalisableString RunningLatestRelease(string version) => new TranslatableString(getKey(@"running_latest_release"), @"You are running the latest release ({0})", version);

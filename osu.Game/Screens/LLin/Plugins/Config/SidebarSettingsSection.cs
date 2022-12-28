@@ -11,7 +11,7 @@ namespace osu.Game.Screens.LLin.Plugins.Config
     public abstract partial class PluginSidebarSettingsSection : Section
     {
         private readonly LLinPlugin plugin;
-        protected IPluginConfigManager ConfigManager;
+        protected IPluginConfigManager ConfigManager = null!;
 
         protected PluginSidebarSettingsSection(LLinPlugin plugin)
         {
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.LLin.Plugins.Config
         }
 
         public int MaxRows { get; private set; } = 1;
-        public Action<int> OnNewMaxRows;
+        public Action<int>? OnNewMaxRows;
 
         protected override void LoadComplete()
         {

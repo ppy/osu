@@ -43,7 +43,7 @@ namespace osu.Game.Database
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadRequest<T> CreateDownloadRequest(T model, bool isMini);
 
-        protected abstract ArchiveDownloadRequest<T> CreateAccelDownloadRequest(T model, bool isMini);
+        protected abstract ArchiveDownloadRequest<T>? CreateAccelDownloadRequest(T model, bool isMini);
 
         private bool accel;
 

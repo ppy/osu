@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -31,13 +32,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             Origin = Anchor.Centre
         };
 
-        private readonly FillFlowContainer contentFillFlow;
-        private OsuTextBox textBox;
+        private readonly FillFlowContainer contentFillFlow = null!;
+        private OsuTextBox textBox = null!;
 
         [Resolved]
-        private LyricPlugin plugin { get; set; }
+        private LyricPlugin plugin { get; set; } = null!;
 
-        private UserDefinitionHelper udh;
+        private UserDefinitionHelper? udh;
 
         public Toolbox()
         {
@@ -81,7 +82,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             };
         }
 
-        public Action OnBackAction { get; set; }
+        public Action? OnBackAction { get; set; }
 
         public string IdText
         {
@@ -143,7 +144,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                             TooltipText = "更新定义",
                             Action = () =>
                             {
-                                udh.UpdateDefinition();
+                                udh.UpdateDefinition(onFail: e =>
+                                {
+                                    Logger.Log("用户定义更新失败，请检查网络环境：" + e.Message);
+                                });
 
                                 if (lcm.Get<bool>(LyricSettings.OutputDefinitionInLogs))
                                     udh.Debug();

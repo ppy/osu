@@ -14,6 +14,8 @@ using osu.Game.Screens.LLin;
 using osu.Game.Screens.LLin.Plugins;
 using osuTK;
 
+#nullable disable
+
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 {
     public partial class LyricViewScreen : LyricScreen<LyricPiece>

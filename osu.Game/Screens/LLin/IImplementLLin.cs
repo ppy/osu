@@ -31,38 +31,38 @@ namespace osu.Game.Screens.LLin
         /// true: 暂停<br/>
         /// false: 播放<br/>
         /// </summary>
-        public Action<bool> OnTrackRunningToggle { get; set; }
+        public Action<bool>? OnTrackRunningToggle { get; set; }
 
         /// <summary>
         /// 播放器屏幕退出时调用
         /// </summary>
-        public Action Exiting { get; set; }
+        public Action? Exiting { get; set; }
 
         /// <summary>
         /// 播放器屏幕进入后台时调用
         /// </summary>
-        public Action Suspending { get; set; }
+        public Action? Suspending { get; set; }
 
         /// <summary>
         /// 播放器屏幕进入前台时调用
         /// </summary>
-        public Action Resuming { get; set; }
+        public Action? Resuming { get; set; }
 
         /// <summary>
         /// 进入空闲状态(长时间没有输入)时调用
         /// </summary>
-        public Action OnIdle { get; set; }
+        public Action? OnIdle { get; set; }
 
         /// <summary>
         /// 从空闲状态退出时调用
         /// </summary>
-        public Action OnActive { get; set; }
+        public Action? OnActive { get; set; }
 
         /// <summary>
         /// 拖动歌曲进度条时调用<br/><br/>
         /// 传递: 拖动的目标时间
         /// </summary>
-        public Action<double> OnSeek { get; set; }
+        public Action<double>? OnSeek { get; set; }
 
         /// <summary>
         /// 调整歌曲进度
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.LLin
         /// </summary>
         /// <param name="plugin">发起插件</param>
         /// <param name="keybind">目标KeyBind, 如果是null则撤销该插件的所有按键绑定</param>
-        public void UnRegisterPluginKeybind(LLinPlugin plugin, PluginKeybind keybind = null);
+        public void UnRegisterPluginKeybind(LLinPlugin plugin, PluginKeybind? keybind = null);
 
         /// <summary>
         /// 获取当前播放器信息
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.LLin
         /// <param name="message">要显示的消息</param>
         /// <param name="onDeny">请求拒绝时的动作</param>
         /// <param name="onAllow">请求接受时的动作</param>
-        public void RequestAudioControl(IProvideAudioControlPlugin pacp, LocalisableString message, Action onDeny, Action onAllow);
+        public void RequestAudioControl(IProvideAudioControlPlugin pacp, LocalisableString message, Action? onDeny, Action? onAllow);
 
         /// <summary>
         /// 释放音频控制插件

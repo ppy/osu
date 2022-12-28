@@ -33,7 +33,7 @@ namespace osu.Game.Screens.LLin.Plugins
         private readonly BindableList<LLinPlugin> avaliablePlugins = new BindableList<LLinPlugin>();
         private readonly BindableList<LLinPlugin> activePlugins = new BindableList<LLinPlugin>();
         private readonly List<LLinPluginProvider> providers = new List<LLinPluginProvider>();
-        private List<string> blockedProviders;
+        private readonly List<string> blockedProviders = new List<string>();
 
         private readonly LLinPluginResolver resolver;
 
@@ -51,11 +51,10 @@ namespace osu.Game.Screens.LLin.Plugins
         #region 依赖
 
         [Resolved]
-        private Storage storage { get; set; }
+        private Storage storage { get; set; } = null!;
 
         [Resolved(canBeNull: true)]
-        [CanBeNull]
-        private IDBusManagerContainer<IMDBusObject> dBusManagerContainer { get; set; }
+        private IDBusManagerContainer<IMDBusObject>? dBusManagerContainer { get; set; }
 
         public readonly IProvideAudioControlPlugin DefaultAudioController = new OsuMusicControllerWrapper();
 
@@ -75,13 +74,12 @@ namespace osu.Game.Screens.LLin.Plugins
 
         #region 内部方法/参数
 
-        internal Action<LLinPlugin> OnPluginAdd;
-        internal Action<LLinPlugin> OnPluginUnLoad;
+        internal Action<LLinPlugin>? OnPluginAdd;
+        internal Action<LLinPlugin>? OnPluginUnLoad;
 
         internal static int LatestPluginVersion => 10;
 
-        [CanBeNull]
-        internal SettingsEntry[] GetSettingsFor(LLinPlugin pl)
+        internal SettingsEntry[]? GetSettingsFor(LLinPlugin pl)
         {
             if (!entryMap.ContainsKey(pl.GetType()))
                 Logger.Log($"entryMap中没有和{pl}有关的数据。");
@@ -93,8 +91,8 @@ namespace osu.Game.Screens.LLin.Plugins
 
         internal List<TypeWrapper> GetAllAudioControlPlugin() => resolver.GetAllAudioControlPlugin();
 
-        internal Type GetAudioControlTypeByPath([NotNull] string path) => resolver.GetAudioControlPluginByPath(path);
-        internal Type GetFunctionBarProviderTypeByPath([NotNull] string path) => resolver.GetFunctionBarProviderByPath(path);
+        internal Type? GetAudioControlTypeByPath([NotNull] string path) => resolver.GetAudioControlPluginByPath(path);
+        internal Type? GetFunctionBarProviderTypeByPath([NotNull] string path) => resolver.GetFunctionBarProviderByPath(path);
 
         internal IProvideAudioControlPlugin? GetAudioControlByPath([NotNull] string path)
             => (IProvideAudioControlPlugin?)avaliablePlugins.FirstOrDefault(pl => pl is IProvideAudioControlPlugin && resolver.ToPath(pl) == path);
@@ -283,8 +281,7 @@ namespace osu.Game.Screens.LLin.Plugins
 
         #endregion
 
-        [CanBeNull]
-        internal PluginStore PluginStore;
+        internal PluginStore? PluginStore;
 
         public LLinPluginManager()
         {
@@ -294,22 +291,22 @@ namespace osu.Game.Screens.LLin.Plugins
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase gameBase, Storage storage, MConfigManager config)
+        private void load(OsuGameBase gameBase, MConfigManager config)
         {
             try
             {
                 using (var writer = new StreamReader(File.OpenRead(blockedPluginFilePath)))
                 {
-                    blockedProviders = JsonConvert.DeserializeObject<List<string>>(writer.ReadToEnd())
-                                       ?? new List<string>();
+                    var obj = JsonConvert.DeserializeObject<List<string>>(writer.ReadToEnd());
+
+                    if (obj != null)
+                        blockedProviders.AddRange(obj);
                 }
             }
             catch (Exception e)
             {
                 if (!(e is FileNotFoundException))
                     Logger.Error(e, "读取黑名单插件列表时出现了问题");
-
-                blockedProviders = new List<string>();
             }
 
             try

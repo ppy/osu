@@ -13,6 +13,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.ReleaseNote;
 using osuTK;
 
+#nullable disable
+
 namespace osu.Game.Overlays
 {
     public partial class ReleaseNoteDialog : OsuFocusedOverlayContainer

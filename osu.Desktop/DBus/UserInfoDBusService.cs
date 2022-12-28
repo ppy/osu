@@ -6,6 +6,8 @@ using M.DBus;
 using osu.Game.Online.API.Requests.Responses;
 using Tmds.DBus;
 
+#nullable disable
+
 namespace osu.Desktop.DBus
 {
     [DBusInterface("io.matrix_feather.mfosu.CurrentUser")]

@@ -17,6 +17,8 @@ using osu.Game.Screens.LLin;
 using osuTK;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
     public partial class EditableLyricPiece : DrawableLyric, IHasTooltip

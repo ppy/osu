@@ -12,6 +12,8 @@ using osu.Game.Graphics.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Components.Layouts.TypeA
 {
     public partial class UpdateableBeatmapBackground : CurrentBeatmapProvider

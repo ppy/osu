@@ -13,6 +13,8 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public partial class ExperimentalSettings : SettingsSubsection

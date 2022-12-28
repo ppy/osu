@@ -2,6 +2,8 @@ using osu.Game.Overlays.Settings;
 using osu.Framework.Graphics;
 using System;
 
+#nullable disable
+
 namespace osu.Game.Screens.Select
 {
     public partial class MvisBeatmapDetailArea : BeatmapDetailArea

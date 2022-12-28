@@ -9,6 +9,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.LLin;
 using osu.Game.Screens.LLin.Plugins;
 
+#nullable disable
+
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
     public partial class TrackTimeIndicator : CompositeDrawable

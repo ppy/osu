@@ -7,6 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using Tmds.DBus;
 
+#nullable disable
+
 namespace osu.Desktop.DBus.Tray
 {
     public partial class TrayManager : Component, IHandleTrayManagement

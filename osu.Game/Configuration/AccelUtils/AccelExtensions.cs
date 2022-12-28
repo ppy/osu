@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 
+#nullable disable
+
 namespace osu.Game.Configuration.AccelUtils
 {
     public static class AccelExtensionsUtil
@@ -97,7 +99,7 @@ namespace osu.Game.Configuration.AccelUtils
                     if (!string.IsNullOrEmpty(propertyInfo.extensionName))
                     {
                         //查询支持的处理器
-                        IExtensionHandler? handler;
+                        IExtensionHandler handler;
                         ExtensionHandlers.TryGetValue(propertyInfo.extensionName, out handler);
 
                         //如果没查到，则转换到大写再试一次

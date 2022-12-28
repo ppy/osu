@@ -16,6 +16,8 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
+#nullable disable
+
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
     public partial class SettingsPieceBasePanel : CompositeDrawable

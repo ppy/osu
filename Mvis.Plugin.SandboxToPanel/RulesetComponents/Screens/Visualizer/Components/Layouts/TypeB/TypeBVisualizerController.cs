@@ -11,6 +11,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace Mvis.Plugin.SandboxToPanel.RulesetComponents.Screens.Visualizer.Components.Layouts.TypeB
 {
     public partial class TypeBVisualizerController : MusicAmplitudesProvider

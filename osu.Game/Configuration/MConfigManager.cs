@@ -11,6 +11,8 @@ using osu.Framework.Platform;
 using osu.Game.Screens.LLin.SideBar.Tabs;
 using osuTK.Graphics;
 
+#nullable disable
+
 namespace osu.Game.Configuration
 {
     public class MConfigManager : IniConfigManager<MSetting>

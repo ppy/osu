@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+#nullable disable
+
 namespace osu.Game.Configuration.AccelUtils
 {
     //https://chimu.moe/zh-CN/docs

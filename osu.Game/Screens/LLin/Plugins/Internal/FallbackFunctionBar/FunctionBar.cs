@@ -84,8 +84,11 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
         [BackgroundDependencyLoader]
         private void load()
         {
-            LLin.OnIdle += onIdle;
-            LLin.OnActive += resumeFromIdle;
+            if (LLin != null)
+            {
+                LLin.OnIdle += onIdle;
+                LLin.OnActive += resumeFromIdle;
+            }
         }
 
         private void resumeFromIdle()
@@ -178,7 +181,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
 
         public List<IPluginFunctionProvider> GetAllPluginFunctionButton() => pluginButtons;
 
-        public Action OnDisable { get; set; }
+        public Action? OnDisable { get; set; }
 
         public override bool Disable()
         {

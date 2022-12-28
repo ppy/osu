@@ -2,6 +2,8 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
+#nullable disable
+
 namespace osu.Game.Overlays.OnlinePicture
 {
     public partial class OnlinePictureContentContainer : Container

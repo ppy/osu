@@ -12,17 +12,17 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
     public partial class ColourPreviewer : Container
     {
         private readonly CustomColourProvider provider = new CustomColourProvider();
-        private Box bg6;
-        private Box bg5;
-        private Box bg4;
-        private Box bg3;
-        private Box bg2;
-        private Box bg1;
-        private Box hl;
-        private Box l4;
-        private Box l3;
-        private Box c2;
-        private OsuSpriteText hueText;
+        private Box bg6 = null!;
+        private Box bg5 = null!;
+        private Box bg4 = null!;
+        private Box bg3 = null!;
+        private Box bg2 = null!;
+        private Box bg1 = null!;
+        private Box hl = null!;
+        private Box l4 = null!;
+        private Box l3 = null!;
+        private Box c2 = null!;
+        private OsuSpriteText hueText = null!;
 
         private readonly BindableFloat iR = new BindableFloat();
         private readonly BindableFloat iG = new BindableFloat();
