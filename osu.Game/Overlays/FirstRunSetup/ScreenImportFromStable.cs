@@ -137,8 +137,8 @@ namespace osu.Game.Overlays.FirstRunSetup
             else
             {
                 copyInformation.Text = RuntimeInfo.OS == RuntimeInfo.Platform.Windows
-                    ? "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system is NTFS)."
-                    : "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system supports hard links).";
+                    ? "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system is NTFS). "
+                    : "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system supports hard links). ";
                 copyInformation.AddLink(GeneralSettingsStrings.ChangeFolderLocation, () =>
                 {
                     game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()));
