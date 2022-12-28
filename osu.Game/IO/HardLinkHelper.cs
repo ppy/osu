@@ -30,7 +30,7 @@ namespace osu.Game.IO
                 File.WriteAllText(testSourcePath, string.Empty);
 
                 // Test availability by creating an arbitrary hard link between the source and destination paths.
-                return AttemptHardLink(testDestinationPath, testSourcePath);
+                return TryCreateHardLink(testDestinationPath, testSourcePath);
             }
             catch
             {
@@ -54,15 +54,23 @@ namespace osu.Game.IO
             }
         }
 
-        public static bool AttemptHardLink(string testDestinationPath, string testSourcePath)
+        /// <summary>
+        /// Attempts to create a hard link from <paramref name="sourcePath"/> to <paramref name="destinationPath"/>,
+        /// using platform-specific native methods.
+        /// </summary>
+        /// <remarks>
+        /// Hard links are only available on Windows and Linux.
+        /// </remarks>
+        /// <returns>Whether the hard link was successfully created.</returns>
+        public static bool TryCreateHardLink(string destinationPath, string sourcePath)
         {
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
-                    return CreateHardLink(testDestinationPath, testSourcePath, IntPtr.Zero);
+                    return CreateHardLink(destinationPath, sourcePath, IntPtr.Zero);
 
                 case RuntimeInfo.Platform.Linux:
-                    return link(testSourcePath, testDestinationPath) == 0;
+                    return link(sourcePath, destinationPath) == 0;
 
                 default:
                     return false;
