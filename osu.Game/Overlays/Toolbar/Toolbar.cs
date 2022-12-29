@@ -235,7 +235,11 @@ namespace osu.Game.Overlays.Toolbar
             protected override void Update()
             {
                 base.Update();
-                showGradient.Value = Contains(inputManager.CurrentState.Mouse.Position);
+
+                var currentMousePosition = inputManager.CurrentState.Mouse.Position;
+                // ensure that the gradient is not shown if the mouse is above the window.
+                // this is relevant when the background is moving due to the toolbar being toggled.
+                showGradient.Value = currentMousePosition.Y >= 0 && Contains(inputManager.CurrentState.Mouse.Position);
             }
 
             private void updateState()
