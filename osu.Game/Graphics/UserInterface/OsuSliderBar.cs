@@ -40,6 +40,7 @@ namespace osu.Game.Graphics.UserInterface
         protected readonly Nub Nub;
         protected readonly Box LeftBox;
         protected readonly Box RightBox;
+        private readonly SliderSounds<T> sounds;
         private readonly Container nubContainer;
 
         public virtual LocalisableString TooltipText { get; private set; }
@@ -129,6 +130,7 @@ namespace osu.Game.Graphics.UserInterface
                         Current = { Value = true }
                     },
                 },
+                sounds = new SliderSounds<T>(),
                 hoverClickSounds = new HoverClickSounds()
             };
         }
@@ -189,7 +191,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnUserChange(T value)
         {
             base.OnUserChange(value);
-            playSample(value);
+            sounds.PlaySample(value, NormalizedValue);
             TooltipText = getTooltipText(value);
         }
 
