@@ -704,6 +704,36 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestSortingFallback()
+        {
+            var sets = new List<BeatmapSetInfo>();
+
+            const string zzz_string = "zzzzz";
+
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+
+                for (int i = 0; i < 20; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo();
+
+                    set.Beatmaps.ForEach(b => b.Metadata.Artist = "Same Artist");
+
+                    if (i == 5)
+                        set.Beatmaps.ForEach(b => b.Metadata.Title = zzz_string);
+
+                    sets.Add(set);
+                }
+            });
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
+            AddAssert($"Check {zzz_string} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Title == zzz_string);
+        }
+
+        [Test]
         public void TestRemoveAll()
         {
             loadBeatmaps();
