@@ -87,14 +87,6 @@ namespace osu.Game.Online.Chat
             channelManager ??= manager;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            if (channelManager != null)
-                TextBox?.Current.BindTo(channelManager.CurrentChannel.Value.TextBoxMessage);
-        }
-
         protected virtual StandAloneDrawableChannel CreateDrawableChannel(Channel channel) =>
             new StandAloneDrawableChannel(channel);
 
@@ -119,7 +111,12 @@ namespace osu.Game.Online.Chat
         {
             drawableChannel?.Expire();
 
+            if (e.OldValue != null)
+                TextBox?.Current.UnbindFrom(e.OldValue.TextBoxMessage);
+
             if (e.NewValue == null) return;
+
+            TextBox?.Current.BindTo(e.NewValue.TextBoxMessage);
 
             drawableChannel = CreateDrawableChannel(e.NewValue);
             drawableChannel.CreateChatLineAction = CreateMessage;
