@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                 copyInformation.AddLink("Learn more about how \"hard links\" work", LinkAction.OpenWiki, @"Client/Release_stream/Lazer/File_storage#via-hard-links");
             }
-            else if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows && RuntimeInfo.OS != RuntimeInfo.Platform.Linux)
+            else if (!RuntimeInfo.IsDesktop)
                 copyInformation.Text = "Lightweight linking of files is not supported on your operating system yet, so a copy of all files will be made during import.";
             else
             {
