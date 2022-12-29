@@ -30,10 +30,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     switch (osuComponent.Component)
                     {
                         case OsuSkinComponents.HitCircle:
-                            return new ArgonMainCirclePiece(true);
+                            return new ArgonMainCirclePiece(true, Skin is ArgonProSkin);
 
                         case OsuSkinComponents.SliderHeadHitCircle:
-                            return new ArgonMainCirclePiece(false);
+                            return new ArgonMainCirclePiece(false, Skin is ArgonProSkin);
 
                         case OsuSkinComponents.SliderBody:
                             return new ArgonSliderBody();
