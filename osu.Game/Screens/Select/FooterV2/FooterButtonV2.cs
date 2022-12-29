@@ -119,8 +119,9 @@ namespace osu.Game.Screens.Select.FooterV2
                         },
                         new Container
                         {
-                            //Offset the bar to centre it with consideration for the shearing
-                            Position = new Vector2(-0.15f * 35, -10),
+                            // The X offset has to multiplied as such to account for the fact that we only want to offset by the distance from the CenterLeft point of the container
+                            // not the whole shear width
+                            Position = new Vector2(-SHEAR.X * (button_height / 2 - 10), -10),
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(120, 6),
