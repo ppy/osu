@@ -13,6 +13,7 @@ using osuTK;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
 using osu.Framework.Input.Bindings;
@@ -196,6 +197,9 @@ namespace osu.Game.Overlays.Toolbar
 
         public partial class ToolbarBackground : Container
         {
+            private InputManager inputManager;
+            private Bindable<bool> showGradient { get; } = new BindableBool();
+
             private readonly Box gradientBackground;
 
             public ToolbarBackground()
@@ -220,15 +224,26 @@ namespace osu.Game.Overlays.Toolbar
                 };
             }
 
-            protected override bool OnHover(HoverEvent e)
+            protected override void LoadComplete()
             {
-                gradientBackground.FadeIn(transition_time, Easing.OutQuint);
-                return true;
+                base.LoadComplete();
+
+                inputManager = GetContainingInputManager();
+                showGradient.BindValueChanged(_ => updateState(), true);
             }
 
-            protected override void OnHoverLost(HoverLostEvent e)
+            protected override void Update()
             {
-                gradientBackground.FadeOut(transition_time, Easing.OutQuint);
+                base.Update();
+                showGradient.Value = Contains(inputManager.CurrentState.Mouse.Position);
+            }
+
+            private void updateState()
+            {
+                if (showGradient.Value)
+                    gradientBackground.FadeIn(transition_time, Easing.OutQuint);
+                else
+                    gradientBackground.FadeOut(transition_time, Easing.OutQuint);
             }
         }
 
