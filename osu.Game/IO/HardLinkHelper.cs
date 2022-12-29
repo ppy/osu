@@ -14,8 +14,8 @@ namespace osu.Game.IO
     {
         public static bool CheckAvailability(string testDestinationPath, string testSourcePath)
         {
-            // TODO: Add macOS support for hardlinks.
-            if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows && RuntimeInfo.OS != RuntimeInfo.Platform.Linux)
+            // For simplicity, only support desktop operating systems for now.
+            if (!RuntimeInfo.IsDesktop)
                 return false;
 
             const string test_filename = "_hard_link_test";
@@ -59,7 +59,7 @@ namespace osu.Game.IO
         /// using platform-specific native methods.
         /// </summary>
         /// <remarks>
-        /// Hard links are only available on Windows and Linux.
+        /// Hard links are only available on desktop platforms.
         /// </remarks>
         /// <returns>Whether the hard link was successfully created.</returns>
         public static bool TryCreateHardLink(string destinationPath, string sourcePath)
@@ -70,6 +70,7 @@ namespace osu.Game.IO
                     return CreateHardLink(destinationPath, sourcePath, IntPtr.Zero);
 
                 case RuntimeInfo.Platform.Linux:
+                case RuntimeInfo.Platform.macOS:
                     return link(sourcePath, destinationPath) == 0;
 
                 default:
@@ -95,6 +96,7 @@ namespace osu.Game.IO
                     break;
 
                 case RuntimeInfo.Platform.Linux:
+                case RuntimeInfo.Platform.macOS:
                     if (stat(filePath, out var statbuf) == 0)
                         result = (int)statbuf.st_nlink;
 
