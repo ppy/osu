@@ -63,42 +63,74 @@ namespace osu.Game.Screens.Select.Carousel
             if (!(other is CarouselBeatmapSet otherSet))
                 return base.CompareTo(criteria, other);
 
+            int i = 0;
+
             switch (criteria.Sort)
             {
                 default:
                 case SortMode.Artist:
-                    return string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.OrdinalIgnoreCase);
+                    i = string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.OrdinalIgnoreCase);
+
+                    if (i != 0) return i;
+                    goto case SortMode.Title;
 
                 case SortMode.Title:
-                    return string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase);
+                    i = string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase);
+
+                    if (i != 0) return i;
+                    goto case SortMode.Author;
 
                 case SortMode.Author:
-                    return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
+                    i = string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
+
+                    if (i != 0) return i;
+                    goto case SortMode.Source;
 
                 case SortMode.Source:
-                    return string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
+                    i = string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
+
+                    if (i != 0) return i;
+                    goto case SortMode.DateAdded;
 
                 case SortMode.DateAdded:
-                    return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
+                    i = otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
+
+                    if (i != 0) return i;
+                    goto case SortMode.DateRanked;
 
                 case SortMode.DateRanked:
                     // Beatmaps which have no ranked date should already be filtered away in this mode.
                     if (BeatmapSet.DateRanked == null || otherSet.BeatmapSet.DateRanked == null)
-                        return 0;
+                        goto case SortMode.LastPlayed;
 
-                    return otherSet.BeatmapSet.DateRanked.Value.CompareTo(BeatmapSet.DateRanked.Value);
+                    i = otherSet.BeatmapSet.DateRanked.Value.CompareTo(BeatmapSet.DateRanked.Value);
+
+                    if (i != 0) return i;
+                    goto case SortMode.LastPlayed;
 
                 case SortMode.LastPlayed:
-                    return -compareUsingAggregateMax(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    i = -compareUsingAggregateMax(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+
+                    if (i != 0) return i;
+                    goto case SortMode.BPM;
 
                 case SortMode.BPM:
-                    return compareUsingAggregateMax(otherSet, b => b.BPM);
+                    i = compareUsingAggregateMax(otherSet, b => b.BPM);
+
+                    if (i != 0) return i;
+                    goto case SortMode.Length;
 
                 case SortMode.Length:
-                    return compareUsingAggregateMax(otherSet, b => b.Length);
+                    i = compareUsingAggregateMax(otherSet, b => b.Length);
+
+                    if (i != 0) return i;
+                    goto case SortMode.Difficulty;
 
                 case SortMode.Difficulty:
-                    return compareUsingAggregateMax(otherSet, b => b.StarRating);
+                    i = compareUsingAggregateMax(otherSet, b => b.StarRating);
+
+                    if (i != 0) return i;
+                    goto case SortMode.DateSubmitted;
 
                 case SortMode.DateSubmitted:
                     // Beatmaps which have no submitted date should already be filtered away in this mode.
