@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -22,13 +22,17 @@ using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
+    public partial class ShearedSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         /// <summary>
         /// Maximum number of decimal digits to be displayed in the tooltip.
         /// </summary>
         private const int max_decimal_digits = 5;
+
+        public const int HEIGHT = 30;
+
+        private readonly Vector2 sliderShear = new Vector2(4.7f / HEIGHT, 0);
 
         protected readonly Nub Nub;
         protected readonly Box LeftBox;
@@ -71,8 +75,9 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public OsuSliderBar()
+        public ShearedSliderBar()
         {
+            Shear = sliderShear;
             Height = Nub.HEIGHT;
             RangePadding = Nub.EXPANDED_SIZE / 2;
             Children = new Drawable[]
@@ -84,19 +89,19 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Padding = new MarginPadding { Horizontal = 2 },
-                    Child = new CircularContainer
+                    Child = new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Masking = true,
-                        CornerRadius = 5f,
+                        CornerRadius = 5,
                         Children = new Drawable[]
                         {
                             LeftBox = new Box
                             {
-                                Height = 5,
+                                Height = HEIGHT,
                                 EdgeSmoothness = new Vector2(0, 0.5f),
                                 RelativeSizeAxes = Axes.None,
                                 Anchor = Anchor.CentreLeft,
@@ -104,7 +109,7 @@ namespace osu.Game.Graphics.UserInterface
                             },
                             RightBox = new Box
                             {
-                                Height = 5,
+                                Height = HEIGHT,
                                 EdgeSmoothness = new Vector2(0, 0.5f),
                                 RelativeSizeAxes = Axes.None,
                                 Anchor = Anchor.CentreRight,
