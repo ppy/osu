@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,6 +16,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
+using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -29,6 +31,9 @@ namespace osu.Game.Overlays
         private ProfileSectionsContainer? sectionsContainer;
         private ProfileSectionTabControl? tabs;
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
         public const float CONTENT_X_MARGIN = 70;
 
         public UserProfileOverlay()
@@ -40,7 +45,7 @@ namespace osu.Game.Overlays
 
         protected override Color4 BackgroundColour => ColourProvider.Background6;
 
-        public void ShowUser(IUser user)
+        public void ShowUser(IUser user, IRulesetInfo? ruleset = null)
         {
             if (user.OnlineID == APIUser.SYSTEM_USER_ID)
                 return;
@@ -117,15 +122,17 @@ namespace osu.Game.Overlays
             sectionsContainer.ScrollToTop();
 
             userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID) : new GetUserRequest(user.Username);
-            userReq.Success += userLoadComplete;
+            userReq.Success += u => userLoadComplete(u, ruleset);
             API.Queue(userReq);
         }
 
-        private void userLoadComplete(APIUser user)
+        private void userLoadComplete(APIUser user, IRulesetInfo? ruleset)
         {
             Debug.Assert(sections != null && sectionsContainer != null && tabs != null);
 
-            var userProfile = new UserProfile(user);
+            var actualRuleset = rulesets.GetRuleset(ruleset?.ShortName ?? user.PlayMode).AsNonNull();
+
+            var userProfile = new UserProfile(user, actualRuleset);
             Header.UserProfile.Value = userProfile;
 
             if (user.ProfileOrder != null)
