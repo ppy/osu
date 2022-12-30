@@ -116,15 +116,6 @@ namespace osu.Game.Overlays
 
             sectionsContainer.ScrollToTop();
 
-            // Check arbitrarily whether this user has already been populated.
-            // This is only generally used by tests, but should be quite safe unless we want to force a refresh on loading a previous user in the future.
-            if (user is APIUser apiUser && apiUser.JoinDate != default)
-            {
-                userReq = null;
-                userLoadComplete(apiUser);
-                return;
-            }
-
             userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID) : new GetUserRequest(user.Username);
             userReq.Success += userLoadComplete;
             API.Queue(userReq);
