@@ -12,8 +12,8 @@ namespace osu.Game.Screens.Play.HUD
 {
     public abstract partial class GameplayAccuracyCounter : PercentageCounter
     {
-        [SettingSource("Accuracy Display Mode", "Which Accuracy will display")]
-        public Bindable<AccuracyType> AccuracyDisplay { get; } = new Bindable<AccuracyType>();
+        [SettingSource("Accuracy display mode", "Which accuracy mode should be displayed.")]
+        public Bindable<AccuracyDisplayMode> AccuracyDisplay { get; } = new Bindable<AccuracyDisplayMode>();
 
         [BackgroundDependencyLoader]
         private void load(ScoreProcessor scoreProcessor)
@@ -24,31 +24,31 @@ namespace osu.Game.Screens.Play.HUD
 
                 switch (mod.NewValue)
                 {
-                    case AccuracyType.Rolling:
+                    case AccuracyDisplayMode.Standard:
                         Current.BindTo(scoreProcessor.Accuracy);
                         break;
 
-                    case AccuracyType.Increase:
-                        Current.BindTo(scoreProcessor.IncreaseAccuracy);
+                    case AccuracyDisplayMode.MinimumAchievable:
+                        Current.BindTo(scoreProcessor.MinimumAccuracy);
                         break;
 
-                    case AccuracyType.Decrease:
-                        Current.BindTo(scoreProcessor.DecreaseAccuracy);
+                    case AccuracyDisplayMode.MaximumAchievable:
+                        Current.BindTo(scoreProcessor.MaximumAccuracy);
                         break;
                 }
             }, true);
         }
 
-        public enum AccuracyType
+        public enum AccuracyDisplayMode
         {
-            [Description("Rolling")]
-            Rolling,
+            [Description("Standard")]
+            Standard,
 
-            [Description("Best achievable")]
-            Increase,
+            [Description("Maximum achievable")]
+            MaximumAchievable,
 
-            [Description("Worst achievable")]
-            Decrease
+            [Description("Minimum achievable")]
+            MinimumAchievable
         }
     }
 }
