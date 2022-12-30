@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.Scoring
             Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
             MinimumAccuracy.Value = maximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / maximumScoringValues.BaseScore : 0;
             MaximumAccuracy.Value = maximumScoringValues.BaseScore > 0
-                ? (double)(maximumScoringValues.BaseScore - (currentMaximumScoringValues.BaseScore - currentScoringValues.BaseScore)) / maximumScoringValues.BaseScore
+                ? (double)(currentScoringValues.BaseScore + (maximumScoringValues.BaseScore - currentMaximumScoringValues.BaseScore)) / maximumScoringValues.BaseScore
                 : 1;
             TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues);
         }
