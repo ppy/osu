@@ -15,9 +15,13 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource("Accuracy display mode", "Which accuracy mode should be displayed.")]
         public Bindable<AccuracyDisplayMode> AccuracyDisplay { get; } = new Bindable<AccuracyDisplayMode>();
 
-        [BackgroundDependencyLoader]
-        private void load(ScoreProcessor scoreProcessor)
+        [Resolved]
+        private ScoreProcessor scoreProcessor { get; set; } = null!;
+
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             AccuracyDisplay.BindValueChanged(mod =>
             {
                 Current.UnbindBindings();
