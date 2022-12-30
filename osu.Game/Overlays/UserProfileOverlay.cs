@@ -13,6 +13,8 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile;
@@ -26,6 +28,11 @@ namespace osu.Game.Overlays
 {
     public partial class UserProfileOverlay : FullscreenOverlay<ProfileHeader>
     {
+        protected override Container<Drawable> Content => onlineViewContainer;
+
+        private readonly OnlineViewContainer onlineViewContainer;
+        private readonly LoadingLayer loadingLayer;
+
         private ProfileSection? lastSection;
         private ProfileSection[]? sections;
         private GetUserRequest? userReq;
@@ -40,6 +47,14 @@ namespace osu.Game.Overlays
         public UserProfileOverlay()
             : base(OverlayColourScheme.Pink)
         {
+            base.Content.AddRange(new Drawable[]
+            {
+                onlineViewContainer = new OnlineViewContainer($"Sign in to view the {Header.Title.Title}")
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                loadingLayer = new LoadingLayer(true)
+            });
         }
 
         protected override ProfileHeader CreateHeader() => new ProfileHeader();
@@ -125,6 +140,7 @@ namespace osu.Game.Overlays
             userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID, ruleset) : new GetUserRequest(user.Username, ruleset);
             userReq.Success += u => userLoadComplete(u, ruleset);
             API.Queue(userReq);
+            loadingLayer.Show();
         }
 
         private void userLoadComplete(APIUser user, IRulesetInfo? ruleset)
@@ -151,6 +167,8 @@ namespace osu.Game.Overlays
                     }
                 }
             }
+
+            loadingLayer.Hide();
         }
 
         private partial class ProfileSectionTabControl : OverlayTabControl<ProfileSection>
