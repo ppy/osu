@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Game.Resources.Localisation.Web;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
@@ -27,8 +26,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             ItemsContainer.Spacing = new Vector2(0, 8);
         }
 
-        protected override APIRequest<List<APIRecentActivity>> CreateRequest(APIUser user, PaginationParameters pagination) =>
-            new GetUserRecentActivitiesRequest(user.Id, pagination);
+        protected override APIRequest<List<APIRecentActivity>> CreateRequest(UserProfile userProfile, PaginationParameters pagination) =>
+            new GetUserRecentActivitiesRequest(userProfile.User.Id, pagination);
 
         protected override Drawable CreateDrawableItem(APIRecentActivity model) => new DrawableRecentActivity(model);
     }
