@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly Vector2 sliderShear = new Vector2(4.7f / HEIGHT, 0);
 
-        protected readonly Nub Nub;
+        protected readonly SquareNub Nub;
         protected readonly Box LeftBox;
         protected readonly Box RightBox;
         private readonly SliderSounds<T> sounds;
@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                LeftBox.Colour = value;
+                LeftBox.Colour = value.Darken(0.1f);
             }
         }
 
@@ -78,8 +78,8 @@ namespace osu.Game.Graphics.UserInterface
         public ShearedSliderBar()
         {
             Shear = sliderShear;
-            Height = Nub.HEIGHT;
-            RangePadding = Nub.EXPANDED_SIZE / 2;
+            Height = SquareNub.HEIGHT;
+            RangePadding = SquareNub.EXPANDED_SIZE / 2;
             Children = new Drawable[]
             {
                 new Container
@@ -121,7 +121,7 @@ namespace osu.Game.Graphics.UserInterface
                 nubContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = Nub = new Nub
+                    Child = Nub = new SquareNub
                     {
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
@@ -213,8 +213,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, Math.Max(0, DrawWidth)), 1);
-            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2, 0, Math.Max(0, DrawWidth)), 1);
+            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X, 0, Math.Max(0, DrawWidth)), 1);
+            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding, 0, Math.Max(0, DrawWidth)), 1);
         }
 
         protected override void UpdateValue(float value)
