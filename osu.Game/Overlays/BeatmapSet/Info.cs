@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -36,6 +37,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public Info()
         {
+            MetadataSectionNominators nominators;
             MetadataSection source, tags;
             MetadataSectionGenre genre;
             MetadataSectionLanguage language;
@@ -82,6 +84,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Direction = FillDirection.Full,
                                 Children = new Drawable[]
                                 {
+                                    nominators = new MetadataSectionNominators(),
                                     source = new MetadataSectionSource(),
                                     genre = new MetadataSectionGenre { Width = 0.5f },
                                     language = new MetadataSectionLanguage { Width = 0.5f },
@@ -122,6 +125,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.ValueChanged += b =>
             {
+                nominators.Metadata = (b.NewValue?.CurrentNominations ?? Array.Empty<BeatmapSetOnlineNominations>(), b.NewValue?.RelatedUsers ?? Array.Empty<APIUser>());
                 source.Metadata = b.NewValue?.Source ?? string.Empty;
                 tags.Metadata = b.NewValue?.Tags ?? string.Empty;
                 genre.Metadata = b.NewValue?.Genre ?? new BeatmapSetOnlineGenre { Id = (int)SearchGenre.Unspecified };
