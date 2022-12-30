@@ -4,6 +4,8 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 
@@ -11,10 +13,38 @@ namespace osu.Game.Screens.Play.HUD
 {
     public abstract partial class GameplayAccuracyCounter : PercentageCounter
     {
+        [SettingSource("Accuracy Display Mode")]
+        public Bindable<AccuracyType> AccType { get; } = new Bindable<AccuracyType>();
+
         [BackgroundDependencyLoader]
         private void load(ScoreProcessor scoreProcessor)
         {
-            Current.BindTo(scoreProcessor.Accuracy);
+            AccType.BindValueChanged(mod =>
+            {
+                Current.UnbindBindings();
+
+                switch (mod.NewValue)
+                {
+                    case AccuracyType.Current:
+                        Current.BindTo(scoreProcessor.Accuracy);
+                        break;
+
+                    case AccuracyType.Increase:
+                        Current.BindTo(scoreProcessor.IncreaseAccuracy);
+                        break;
+
+                    case AccuracyType.Decrease:
+                        Current.BindTo(scoreProcessor.DecreaseAccuracy);
+                        break;
+                }
+            }, true);
+        }
+
+        public enum AccuracyType
+        {
+            Current,
+            Increase,
+            Decrease
         }
     }
 }
