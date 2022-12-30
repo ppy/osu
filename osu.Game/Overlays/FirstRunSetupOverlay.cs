@@ -301,7 +301,7 @@ namespace osu.Game.Overlays
 
             if (currentStepIndex < steps.Count)
             {
-                var nextScreen = (Screen)Activator.CreateInstance(steps[currentStepIndex.Value]);
+                var nextScreen = (Screen)Activator.CreateInstance(steps[currentStepIndex.Value])!;
 
                 loadingShowDelegate = Scheduler.AddDelayed(() => loading.Show(), 200);
                 nextScreen.OnLoadComplete += _ =>

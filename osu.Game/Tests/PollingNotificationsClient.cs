@@ -24,8 +24,8 @@ namespace osu.Game.Tests
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    await API.PerformAsync(CreateFetchMessagesRequest());
-                    await Task.Delay(1000, cancellationToken);
+                    await API.PerformAsync(CreateInitialFetchRequest()).ConfigureAwait(true);
+                    await Task.Delay(1000, cancellationToken).ConfigureAwait(true);
                 }
             }, cancellationToken);
 

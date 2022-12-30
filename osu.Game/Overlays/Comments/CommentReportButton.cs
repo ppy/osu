@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -53,7 +54,7 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            link.AddLink(UsersStrings.ReportButtonText, this.ShowPopover);
+            link.AddLink(ReportStrings.CommentButton.ToLower(), this.ShowPopover);
         }
 
         private void report(CommentReportReason reason, string comments)

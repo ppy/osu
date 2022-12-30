@@ -164,6 +164,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"guest_beatmapset_count")]
         public int GuestBeatmapsetCount;
 
+        [JsonProperty(@"nominated_beatmapset_count")]
+        public int NominatedBeatmapsetCount;
+
         [JsonProperty(@"scores_best_count")]
         public int ScoresBestCount;
 
@@ -182,7 +185,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"playstyle")]
         private string[] playStyle
         {
-            set => PlayStyles = value?.Select(str => Enum.Parse(typeof(APIPlayStyle), str, true)).Cast<APIPlayStyle>().ToArray();
+            set => PlayStyles = value?.Select(str => Enum.Parse<APIPlayStyle>(str, true)).ToArray();
         }
 
         public APIPlayStyle[] PlayStyles;

@@ -1,33 +1,28 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
-using osuTK;
-using osuTK.Graphics;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat
 {
     public partial class ChatLine : CompositeDrawable
     {
+        private Message message = null!;
+
         public Message Message
         {
             get => message;
@@ -44,49 +39,35 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        public LinkFlowContainer ContentFlow { get; private set; } = null!;
+        public IReadOnlyCollection<Drawable> DrawableContentFlow => drawableContentFlow;
 
-        protected virtual float TextSize => 20;
+        protected virtual float FontSize => 20;
 
         protected virtual float Spacing => 15;
 
         protected virtual float UsernameWidth => 130;
 
-        private Color4 usernameColour;
-
-        private OsuSpriteText timestamp = null!;
-
-        private Message message = null!;
-
-        private OsuSpriteText username = null!;
-
-        private Container? highlight;
-
-        private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
-
-        private bool senderHasColour => !string.IsNullOrEmpty(message.Sender.Colour);
-
-        private bool messageHasColour => Message.IsAction && senderHasColour;
-
         [Resolved]
         private ChannelManager? chatManager { get; set; }
 
         [Resolved]
-        private OsuColour colours { get; set; } = null!;
+        private OverlayColourProvider? colourProvider { get; set; }
+
+        private readonly OsuSpriteText drawableTimestamp;
+
+        private readonly DrawableUsername drawableUsername;
+
+        private readonly LinkFlowContainer drawableContentFlow;
+
+        private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
+
+        private Container? highlight;
 
         public ChatLine(Message message)
         {
             Message = message;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider? colourProvider, OsuConfigManager configManager)
-        {
-            usernameColour = senderHasColour
-                ? Color4Extensions.FromHex(message.Sender.Colour)
-                : username_colours[message.Sender.Id % username_colours.Length];
 
             InternalChild = new GridContainer
             {
@@ -103,30 +84,24 @@ namespace osu.Game.Overlays.Chat
                 {
                     new Drawable[]
                     {
-                        timestamp = new OsuSpriteText
+                        drawableTimestamp = new OsuSpriteText
                         {
                             Shadow = false,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
-                            Colour = colourProvider?.Background1 ?? Colour4.White,
+                            Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
                             AlwaysPresent = true,
                         },
-                        new MessageSender(message.Sender)
+                        drawableUsername = new DrawableUsername(message.Sender)
                         {
                             Width = UsernameWidth,
+                            FontSize = FontSize,
                             AutoSizeAxes = Axes.Y,
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
-                            Child = createUsername(),
                             Margin = new MarginPadding { Horizontal = Spacing },
                         },
-                        ContentFlow = new LinkFlowContainer(t =>
-                        {
-                            t.Shadow = false;
-                            t.Font = t.Font.With(size: TextSize, italics: Message.IsAction);
-                            t.Colour = messageHasColour ? Color4Extensions.FromHex(message.Sender.Colour) : colourProvider?.Content1 ?? Colour4.White;
-                        })
+                        drawableContentFlow = new LinkFlowContainer(styleMessageContent)
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
@@ -134,18 +109,23 @@ namespace osu.Game.Overlays.Chat
                     },
                 }
             };
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager configManager)
+        {
             configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
+            prefer24HourTime.BindValueChanged(_ => updateTimestamp());
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            drawableTimestamp.Colour = colourProvider?.Background1 ?? Colour4.White;
+
             updateMessageContent();
             FinishTransforms(true);
-
-            prefer24HourTime.BindValueChanged(_ => updateTimestamp());
         }
 
         /// <summary>
@@ -160,7 +140,7 @@ namespace osu.Game.Overlays.Chat
                     CornerRadius = 2f,
                     Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = usernameColour.Darken(1f),
+                    Colour = drawableUsername.AccentColour.Darken(1f),
                     Depth = float.MaxValue,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 });
@@ -170,166 +150,33 @@ namespace osu.Game.Overlays.Chat
             highlight.Expire();
         }
 
+        private void styleMessageContent(SpriteText text)
+        {
+            text.Shadow = false;
+            text.Font = text.Font.With(size: FontSize, italics: Message.IsAction);
+
+            bool messageHasColour = Message.IsAction && !string.IsNullOrEmpty(message.Sender.Colour);
+            text.Colour = messageHasColour ? Color4Extensions.FromHex(message.Sender.Colour) : colourProvider?.Content1 ?? Colour4.White;
+        }
+
         private void updateMessageContent()
         {
             this.FadeTo(message is LocalEchoMessage ? 0.4f : 1.0f, 500, Easing.OutQuint);
-            timestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
+            drawableTimestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
 
             updateTimestamp();
-            username.Text = $@"{message.Sender.Username}";
+            drawableUsername.Text = $@"{message.Sender.Username}";
 
             // remove non-existent channels from the link list
             message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument.ToString()) != true);
 
-            ContentFlow.Clear();
-            ContentFlow.AddLinks(message.DisplayContent, message.Links);
+            drawableContentFlow.Clear();
+            drawableContentFlow.AddLinks(message.DisplayContent, message.Links);
         }
 
         private void updateTimestamp()
         {
-            timestamp.Text = prefer24HourTime.Value
-                ? $@"{message.Timestamp.LocalDateTime:HH:mm:ss}"
-                : $@"{message.Timestamp.LocalDateTime:hh:mm:ss tt}";
+            drawableTimestamp.Text = message.Timestamp.LocalDateTime.ToLocalisableString(prefer24HourTime.Value ? @"HH:mm:ss" : @"hh:mm:ss tt");
         }
-
-        private Drawable createUsername()
-        {
-            username = new OsuSpriteText
-            {
-                Shadow = false,
-                Colour = senderHasColour ? colours.ChatBlue : usernameColour,
-                Truncate = true,
-                EllipsisString = "…",
-                Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true),
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                MaxWidth = UsernameWidth,
-            };
-
-            if (!senderHasColour)
-                return username;
-
-            // Background effect
-            return new Container
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = 4,
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Roundness = 1,
-                    Radius = 1,
-                    Colour = Color4.Black.Opacity(0.3f),
-                    Offset = new Vector2(0, 1),
-                    Type = EdgeEffectType.Shadow,
-                },
-                Child = new Container
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = 4,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = usernameColour,
-                        },
-                        new Container
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = 4, Right = 4, Bottom = 1, Top = -2 },
-                            Child = username
-                        }
-                    }
-                }
-            };
-        }
-
-        private partial class MessageSender : OsuClickableContainer, IHasContextMenu
-        {
-            private readonly APIUser sender;
-
-            private Action startChatAction = null!;
-
-            [Resolved]
-            private IAPIProvider api { get; set; } = null!;
-
-            public MessageSender(APIUser sender)
-            {
-                this.sender = sender;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(UserProfileOverlay? profile, ChannelManager? chatManager, ChatOverlay? chatOverlay)
-            {
-                Action = () => profile?.ShowUser(sender);
-                startChatAction = () =>
-                {
-                    chatManager?.OpenPrivateChannel(sender);
-                    chatOverlay?.Show();
-                };
-            }
-
-            public MenuItem[] ContextMenuItems
-            {
-                get
-                {
-                    if (sender.Equals(APIUser.SYSTEM_USER))
-                        return Array.Empty<MenuItem>();
-
-                    List<MenuItem> items = new List<MenuItem>
-                    {
-                        new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action)
-                    };
-
-                    if (!sender.Equals(api.LocalUser.Value))
-                        items.Add(new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction));
-
-                    return items.ToArray();
-                }
-            }
-        }
-
-        private static readonly Color4[] username_colours =
-        {
-            Color4Extensions.FromHex("588c7e"),
-            Color4Extensions.FromHex("b2a367"),
-            Color4Extensions.FromHex("c98f65"),
-            Color4Extensions.FromHex("bc5151"),
-            Color4Extensions.FromHex("5c8bd6"),
-            Color4Extensions.FromHex("7f6ab7"),
-            Color4Extensions.FromHex("a368ad"),
-            Color4Extensions.FromHex("aa6880"),
-
-            Color4Extensions.FromHex("6fad9b"),
-            Color4Extensions.FromHex("f2e394"),
-            Color4Extensions.FromHex("f2ae72"),
-            Color4Extensions.FromHex("f98f8a"),
-            Color4Extensions.FromHex("7daef4"),
-            Color4Extensions.FromHex("a691f2"),
-            Color4Extensions.FromHex("c894d3"),
-            Color4Extensions.FromHex("d895b0"),
-
-            Color4Extensions.FromHex("53c4a1"),
-            Color4Extensions.FromHex("eace5c"),
-            Color4Extensions.FromHex("ea8c47"),
-            Color4Extensions.FromHex("fc4f4f"),
-            Color4Extensions.FromHex("3d94ea"),
-            Color4Extensions.FromHex("7760ea"),
-            Color4Extensions.FromHex("af52c6"),
-            Color4Extensions.FromHex("e25696"),
-
-            Color4Extensions.FromHex("677c66"),
-            Color4Extensions.FromHex("9b8732"),
-            Color4Extensions.FromHex("8c5129"),
-            Color4Extensions.FromHex("8c3030"),
-            Color4Extensions.FromHex("1f5d91"),
-            Color4Extensions.FromHex("4335a5"),
-            Color4Extensions.FromHex("812a96"),
-            Color4Extensions.FromHex("992861"),
-        };
     }
 }
