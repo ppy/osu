@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override Container<Drawable> Content => content;
 
-        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
+        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
 
         protected ProfileSection()
         {

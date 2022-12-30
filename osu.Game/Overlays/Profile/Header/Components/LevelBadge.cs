@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class LevelBadge : CompositeDrawable, IHasTooltip
     {
-        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
+        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
 
         public LocalisableString TooltipText { get; private set; }
 
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 }
             };
 
-            User.BindValueChanged(user => updateLevel(user.NewValue));
+            UserProfile.BindValueChanged(user => updateLevel(user.NewValue?.User));
         }
 
         private void updateLevel(APIUser? user)

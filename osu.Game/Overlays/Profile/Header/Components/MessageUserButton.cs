@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
@@ -16,7 +15,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class MessageUserButton : ProfileHeaderButton
     {
-        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
+        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
 
         public override LocalisableString TooltipText => UsersStrings.CardSendMessage;
 
@@ -49,12 +48,16 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 if (!Content.IsPresent) return;
 
-                channelManager?.OpenPrivateChannel(User.Value);
+                channelManager?.OpenPrivateChannel(UserProfile.Value?.User);
                 userOverlay?.Hide();
                 chatOverlay?.Show();
             };
 
-            User.ValueChanged += e => Content.Alpha = e.NewValue != null && !e.NewValue.PMFriendsOnly && apiProvider.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0;
+            UserProfile.ValueChanged += e =>
+            {
+                var user = e.NewValue?.User;
+                Content.Alpha = user != null && !user.PMFriendsOnly && apiProvider.LocalUser.Value.Id != user.Id ? 1 : 0;
+            };
         }
     }
 }

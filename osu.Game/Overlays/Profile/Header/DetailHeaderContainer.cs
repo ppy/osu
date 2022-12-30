@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
@@ -30,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Header
         private FillFlowContainer? fillFlow;
         private RankGraph rankGraph = null!;
 
-        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
+        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
 
         private bool expanded = true;
 
@@ -61,7 +60,7 @@ namespace osu.Game.Overlays.Profile.Header
         {
             AutoSizeAxes = Axes.Y;
 
-            User.ValueChanged += e => updateDisplay(e.NewValue);
+            UserProfile.ValueChanged += e => updateDisplay(e.NewValue);
 
             InternalChildren = new Drawable[]
             {
@@ -99,7 +98,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     {
                                         new OverlinedTotalPlayTime
                                         {
-                                            User = { BindTarget = User }
+                                            UserProfile = { BindTarget = UserProfile }
                                         },
                                         medalInfo = new OverlinedInfoContainer
                                         {
@@ -171,8 +170,10 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private void updateDisplay(APIUser? user)
+        private void updateDisplay(UserProfile? userProfile)
         {
+            var user = userProfile?.User;
+
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
             ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
 

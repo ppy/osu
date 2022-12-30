@@ -6,24 +6,23 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
-using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract partial class ProfileSubsection : FillFlowContainer
     {
-        protected readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
+        protected readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
 
         private readonly LocalisableString headerText;
         private readonly CounterVisibilityState counterVisibilityState;
 
         private ProfileSubsectionHeader header = null!;
 
-        protected ProfileSubsection(Bindable<APIUser?> user, LocalisableString? headerText = null, CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+        protected ProfileSubsection(Bindable<UserProfile?> userProfile, LocalisableString? headerText = null, CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
         {
             this.headerText = headerText ?? string.Empty;
             this.counterVisibilityState = counterVisibilityState;
-            User.BindTo(user);
+            UserProfile.BindTo(userProfile);
         }
 
         [BackgroundDependencyLoader]
