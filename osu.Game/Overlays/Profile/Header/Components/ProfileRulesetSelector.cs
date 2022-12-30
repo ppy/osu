@@ -4,19 +4,25 @@
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class ProfileRulesetSelector : OverlayRulesetSelector
     {
-        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
+        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            User.BindValueChanged(u => SetDefaultRuleset(Rulesets.GetRuleset(u.NewValue?.PlayMode ?? "osu").AsNonNull()), true);
+
+            UserProfile.BindValueChanged(userProfile => updateState(userProfile.NewValue), true);
+        }
+
+        private void updateState(UserProfile? userProfile)
+        {
+            Current.Value = userProfile?.Ruleset;
+            SetDefaultRuleset(Rulesets.GetRuleset(userProfile?.User.PlayMode ?? @"osu").AsNonNull());
         }
 
         public void SetDefaultRuleset(RulesetInfo ruleset)
