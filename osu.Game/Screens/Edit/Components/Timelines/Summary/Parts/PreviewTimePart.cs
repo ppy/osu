@@ -22,10 +22,13 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
         private partial class PreviewTimeVisualisation : PointVisualisation
         {
+            private BindableInt previewTime = new BindableInt();
+
             public PreviewTimeVisualisation(BindableInt time)
                 : base(time.Value)
             {
-                time.BindValueChanged(s => X = s.NewValue);
+                previewTime.BindTo(time);
+                previewTime.BindValueChanged(s => X = s.NewValue);
             }
 
             [BackgroundDependencyLoader]
