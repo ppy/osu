@@ -40,6 +40,16 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableDouble Accuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
+        /// The accuracy which increase from 0%.
+        /// </summary>
+        public readonly BindableDouble IncreaseAccuracy = new BindableDouble(0) { MinValue = 0, MaxValue = 1 };
+
+        /// <summary>
+        /// The accuracy which Decrease from 100%.
+        /// </summary>
+        public readonly BindableDouble DecreaseAccuracy = new BindableDouble(0) { MinValue = 0, MaxValue = 1 };
+
+        /// <summary>
         /// The current combo.
         /// </summary>
         public readonly BindableInt Combo = new BindableInt();
@@ -264,6 +274,10 @@ namespace osu.Game.Rulesets.Scoring
         private void updateScore()
         {
             Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
+            IncreaseAccuracy.Value = maximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / maximumScoringValues.BaseScore : 0;
+            DecreaseAccuracy.Value = maximumScoringValues.BaseScore > 0
+                ? (double)(maximumScoringValues.BaseScore - (currentMaximumScoringValues.BaseScore - currentScoringValues.BaseScore)) / maximumScoringValues.BaseScore
+                : 1;
             TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues);
         }
 
