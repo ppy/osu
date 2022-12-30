@@ -41,6 +41,12 @@ namespace osu.Game.Screens.Play.HUD
                         break;
                 }
             }, true);
+
+            // if the accuracy counter is using the "minimum achievable" mode,
+            // then its initial value is 0%, rather than the 100% that the base PercentageCounter assumes.
+            // to counteract this, manually finish transforms on DisplayedCount once after the initial callback above
+            // to stop it from rolling down from 100% to 0%.
+            FinishTransforms(targetMember: nameof(DisplayedCount));
         }
 
         public enum AccuracyDisplayMode
