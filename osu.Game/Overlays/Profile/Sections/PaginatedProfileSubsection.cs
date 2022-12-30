@@ -46,8 +46,8 @@ namespace osu.Game.Overlays.Profile.Sections
         private OsuSpriteText missing = null!;
         private readonly LocalisableString? missingText;
 
-        protected PaginatedProfileSubsection(Bindable<APIUser?> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
-            : base(user, headerText, CounterVisibilityState.AlwaysVisible)
+        protected PaginatedProfileSubsection(Bindable<UserProfile?> userProfile, LocalisableString? headerText = null, LocalisableString? missingText = null)
+            : base(userProfile, headerText, CounterVisibilityState.AlwaysVisible)
         {
             this.missingText = missingText;
         }
@@ -89,10 +89,10 @@ namespace osu.Game.Overlays.Profile.Sections
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            User.BindValueChanged(onUserChanged, true);
+            UserProfile.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(ValueChangedEvent<APIUser?> e)
+        private void onUserChanged(ValueChangedEvent<UserProfile?> e)
         {
             loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
@@ -100,23 +100,23 @@ namespace osu.Game.Overlays.Profile.Sections
             CurrentPage = null;
             ItemsContainer.Clear();
 
-            if (e.NewValue != null)
+            if (e.NewValue?.User != null)
             {
                 showMore();
-                SetCount(GetCount(e.NewValue));
+                SetCount(GetCount(e.NewValue.User));
             }
         }
 
         private void showMore()
         {
-            if (User.Value == null)
+            if (UserProfile.Value?.User == null)
                 return;
 
             loadCancellation = new CancellationTokenSource();
 
             CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new PaginationParameters(InitialItemsCount);
 
-            retrievalRequest = CreateRequest(User.Value, CurrentPage.Value);
+            retrievalRequest = CreateRequest(UserProfile.Value.User, CurrentPage.Value);
             retrievalRequest.Success += items => UpdateItems(items, loadCancellation);
 
             api.Queue(retrievalRequest);

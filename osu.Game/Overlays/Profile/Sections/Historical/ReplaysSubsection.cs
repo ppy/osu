@@ -12,8 +12,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     {
         protected override LocalisableString GraphCounterName => UsersStrings.ShowExtraHistoricalReplaysWatchedCountsCountLabel;
 
-        public ReplaysSubsection(Bindable<APIUser?> user)
-            : base(user, UsersStrings.ShowExtraHistoricalReplaysWatchedCountsTitle)
+        public ReplaysSubsection(Bindable<UserProfile?> userProfile)
+            : base(userProfile, UsersStrings.ShowExtraHistoricalReplaysWatchedCountsTitle)
         {
         }
 

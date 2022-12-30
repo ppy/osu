@@ -18,8 +18,8 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new Drawable[]
             {
-                new KudosuInfo(User),
-                new PaginatedKudosuHistoryContainer(User),
+                new KudosuInfo(UserProfile),
+                new PaginatedKudosuHistoryContainer(UserProfile),
             };
         }
     }

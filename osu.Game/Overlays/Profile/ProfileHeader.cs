@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
@@ -20,7 +19,7 @@ namespace osu.Game.Overlays.Profile
     {
         private UserCoverBackground coverContainer = null!;
 
-        public Bindable<APIUser?> User = new Bindable<APIUser?>();
+        public Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
 
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays.Profile
         {
             ContentSidePadding = UserProfileOverlay.CONTENT_X_MARGIN;
 
-            User.ValueChanged += e => updateDisplay(e.NewValue);
+            UserProfile.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem(LayoutStrings.HeaderUsersShow);
 
@@ -73,34 +72,34 @@ namespace osu.Game.Overlays.Profile
                 new TopHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User },
+                    UserProfile = { BindTarget = UserProfile },
                 },
                 centreHeaderContainer = new CentreHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User },
+                    UserProfile = { BindTarget = UserProfile },
                 },
                 detailHeaderContainer = new DetailHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User },
+                    UserProfile = { BindTarget = UserProfile },
                 },
                 new MedalHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User },
+                    UserProfile = { BindTarget = UserProfile },
                 },
                 new BottomHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User },
+                    UserProfile = { BindTarget = UserProfile },
                 },
             }
         };
 
         protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();
 
-        private void updateDisplay(APIUser? user) => coverContainer.User = user;
+        private void updateDisplay(UserProfile? userProfile) => coverContainer.User = userProfile?.User;
 
         private partial class ProfileHeaderTitle : OverlayTitle
         {

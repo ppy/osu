@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
 
             Show();
 
-            if (user.OnlineID == Header?.User.Value?.Id)
+            if (user.OnlineID == Header?.UserProfile.Value?.User.Id)
                 return;
 
             if (sectionsContainer != null)
@@ -134,7 +134,8 @@ namespace osu.Game.Overlays
         {
             Debug.Assert(sections != null && sectionsContainer != null && tabs != null);
 
-            Header.User.Value = user;
+            var userProfile = new UserProfile(user);
+            Header.UserProfile.Value = userProfile;
 
             if (user.ProfileOrder != null)
             {
@@ -144,7 +145,7 @@ namespace osu.Game.Overlays
 
                     if (sec != null)
                     {
-                        sec.User.Value = user;
+                        sec.UserProfile.Value = userProfile;
 
                         sectionsContainer.Add(sec);
                         tabs.AddItem(sec);
