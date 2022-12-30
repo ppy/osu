@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
@@ -11,7 +12,7 @@ namespace osu.Game.Screens.Play.HUD
 {
     public abstract partial class GameplayAccuracyCounter : PercentageCounter
     {
-        [SettingSource("Accuracy Display Mode")]
+        [SettingSource("Accuracy Display Mode", "Which Accuracy will display")]
         public Bindable<AccuracyType> AccuracyDisplay { get; } = new Bindable<AccuracyType>();
 
         [BackgroundDependencyLoader]
@@ -23,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD
 
                 switch (mod.NewValue)
                 {
-                    case AccuracyType.Current:
+                    case AccuracyType.Rolling:
                         Current.BindTo(scoreProcessor.Accuracy);
                         break;
 
@@ -40,8 +41,13 @@ namespace osu.Game.Screens.Play.HUD
 
         public enum AccuracyType
         {
-            Current,
+            [Description("Rolling")]
+            Rolling,
+
+            [Description("Best achievable")]
             Increase,
+
+            [Description("Worst achievable")]
             Decrease
         }
     }
