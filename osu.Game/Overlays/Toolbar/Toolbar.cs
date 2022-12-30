@@ -13,7 +13,6 @@ using osuTK;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
 using osu.Framework.Input.Bindings;
@@ -66,9 +65,12 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osuGame)
         {
+            ToolbarBackground background;
+            HoverInterceptor interceptor;
+
             Children = new Drawable[]
             {
-                new ToolbarBackground(),
+                background = new ToolbarBackground(),
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -181,8 +183,14 @@ namespace osu.Game.Overlays.Toolbar
                             },
                         },
                     }
+                },
+                interceptor = new HoverInterceptor
+                {
+                    RelativeSizeAxes = Axes.Both
                 }
             };
+
+            ((IBindable<bool>)background.ShowGradient).BindTo(interceptor.ReceivedHover);
 
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
@@ -197,8 +205,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public partial class ToolbarBackground : Container
         {
-            private InputManager inputManager;
-            private Bindable<bool> showGradient { get; } = new BindableBool();
+            public Bindable<bool> ShowGradient { get; } = new BindableBool();
 
             private readonly Box gradientBackground;
 
@@ -228,26 +235,39 @@ namespace osu.Game.Overlays.Toolbar
             {
                 base.LoadComplete();
 
-                inputManager = GetContainingInputManager();
-                showGradient.BindValueChanged(_ => updateState(), true);
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                var currentMousePosition = inputManager.CurrentState.Mouse.Position;
-                // ensure that the gradient is not shown if the mouse is above the window.
-                // this is relevant when the background is moving due to the toolbar being toggled.
-                showGradient.Value = currentMousePosition.Y >= 0 && Contains(inputManager.CurrentState.Mouse.Position);
+                ShowGradient.BindValueChanged(_ => updateState(), true);
             }
 
             private void updateState()
             {
-                if (showGradient.Value)
+                if (ShowGradient.Value)
                     gradientBackground.FadeIn(transition_time, Easing.OutQuint);
                 else
                     gradientBackground.FadeOut(transition_time, Easing.OutQuint);
+            }
+        }
+
+        /// <summary>
+        /// Whenever the mouse cursor is within the bounds of the toolbar, we want the background gradient to show, for toolbar button descriptions to be legible.
+        /// Unfortunately we also need to ensure that the toolbar buttons handle hover, to prevent the possibility of multiple descriptions being shown
+        /// due to hover events passing through multiple buttons.
+        /// This drawable is a workaround, that when placed front-most in the toolbar, allows to see whether hover events have been propagated through it without handling them.
+        /// </summary>
+        private partial class HoverInterceptor : Drawable
+        {
+            public IBindable<bool> ReceivedHover => receivedHover;
+            private readonly Bindable<bool> receivedHover = new BindableBool();
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                receivedHover.Value = true;
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                receivedHover.Value = false;
+                base.OnHoverLost(e);
             }
         }
 
