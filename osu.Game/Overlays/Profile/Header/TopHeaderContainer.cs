@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -29,19 +27,19 @@ namespace osu.Game.Overlays.Profile.Header
     {
         private const float avatar_size = 110;
 
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
-        private SupporterIcon supporterTag;
-        private UpdateableAvatar avatar;
-        private OsuSpriteText usernameText;
-        private ExternalLinkButton openUserExternally;
-        private OsuSpriteText titleText;
-        private UpdateableFlag userFlag;
-        private OsuSpriteText userCountryText;
-        private FillFlowContainer userStats;
+        private SupporterIcon supporterTag = null!;
+        private UpdateableAvatar avatar = null!;
+        private OsuSpriteText usernameText = null!;
+        private ExternalLinkButton openUserExternally = null!;
+        private OsuSpriteText titleText = null!;
+        private UpdateableFlag userFlag = null!;
+        private OsuSpriteText userCountryText = null!;
+        private FillFlowContainer userStats = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -176,7 +174,7 @@ namespace osu.Game.Overlays.Profile.Header
             User.BindValueChanged(user => updateUser(user.NewValue));
         }
 
-        private void updateUser(APIUser user)
+        private void updateUser(APIUser? user)
         {
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
