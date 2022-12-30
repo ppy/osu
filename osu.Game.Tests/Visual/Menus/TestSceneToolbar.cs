@@ -201,6 +201,22 @@ namespace osu.Game.Tests.Visual.Menus
             AddAssert("volume not changed", () => Audio.Volume.Value == 0.5);
         }
 
+        [Test]
+        public void TestRulesetSelectorOverflow()
+        {
+            AddStep("set toolbar width", () =>
+            {
+                toolbar.RelativeSizeAxes = Axes.None;
+                toolbar.Width = 0;
+            });
+            AddStep("move mouse over news toggle button", () =>
+            {
+                var button = toolbar.ChildrenOfType<ToolbarNewsButton>().Single();
+                InputManager.MoveMouseTo(button);
+            });
+            AddAssert("no ruleset toggle buttons hovered", () => !toolbar.ChildrenOfType<ToolbarRulesetTabButton>().Any(button => button.IsHovered));
+        }
+
         public partial class TestToolbar : Toolbar
         {
             public new Bindable<OverlayActivation> OverlayActivationMode => base.OverlayActivationMode as Bindable<OverlayActivation>;
