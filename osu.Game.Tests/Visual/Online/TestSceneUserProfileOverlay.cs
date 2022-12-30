@@ -98,6 +98,7 @@ namespace osu.Game.Tests.Visual.Online
             Title = "osu!volunteer",
             Colour = "ff0000",
             Achievements = Array.Empty<APIUserAchievement>(),
+            PlayMode = "osu"
         };
     }
 }
