@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays
 
             Show();
 
-            if (user.OnlineID == Header?.UserProfile.Value?.User.Id)
+            if (user.OnlineID == Header.UserProfile.Value?.User.Id && ruleset?.MatchesOnlineID(Header.UserProfile.Value?.Ruleset) == true)
                 return;
 
             if (sectionsContainer != null)
@@ -121,7 +122,7 @@ namespace osu.Game.Overlays
 
             sectionsContainer.ScrollToTop();
 
-            userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID) : new GetUserRequest(user.Username);
+            userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID, ruleset) : new GetUserRequest(user.Username, ruleset);
             userReq.Success += u => userLoadComplete(u, ruleset);
             API.Queue(userReq);
         }

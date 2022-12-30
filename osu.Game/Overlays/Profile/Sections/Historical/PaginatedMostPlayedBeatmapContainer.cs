@@ -29,8 +29,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         protected override int GetCount(APIUser user) => user.BeatmapPlayCountsCount;
 
-        protected override APIRequest<List<APIUserMostPlayedBeatmap>> CreateRequest(APIUser user, PaginationParameters pagination) =>
-            new GetUserMostPlayedBeatmapsRequest(user.Id, pagination);
+        protected override APIRequest<List<APIUserMostPlayedBeatmap>> CreateRequest(UserProfile userProfile, PaginationParameters pagination) =>
+            new GetUserMostPlayedBeatmapsRequest(userProfile.User.Id, pagination);
 
         protected override Drawable CreateDrawableItem(APIUserMostPlayedBeatmap mostPlayed) =>
             new DrawableMostPlayedBeatmap(mostPlayed);

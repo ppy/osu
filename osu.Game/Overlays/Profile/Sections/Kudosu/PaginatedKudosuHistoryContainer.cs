@@ -8,7 +8,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.API;
 using System.Collections.Generic;
 using osu.Game.Resources.Localisation.Web;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
@@ -19,8 +18,8 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         {
         }
 
-        protected override APIRequest<List<APIKudosuHistory>> CreateRequest(APIUser user, PaginationParameters pagination)
-            => new GetUserKudosuHistoryRequest(user.Id, pagination);
+        protected override APIRequest<List<APIKudosuHistory>> CreateRequest(UserProfile userProfile, PaginationParameters pagination)
+            => new GetUserKudosuHistoryRequest(userProfile.User.Id, pagination);
 
         protected override Drawable CreateDrawableItem(APIKudosuHistory item) => new DrawableKudosuHistoryItem(item);
     }
