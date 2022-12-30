@@ -14,12 +14,12 @@ namespace osu.Game.Screens.Play.HUD
     public abstract partial class GameplayAccuracyCounter : PercentageCounter
     {
         [SettingSource("Accuracy Display Mode")]
-        public Bindable<AccuracyType> AccType { get; } = new Bindable<AccuracyType>();
+        public Bindable<AccuracyType> AccuracyDisplay { get; } = new Bindable<AccuracyType>();
 
         [BackgroundDependencyLoader]
         private void load(ScoreProcessor scoreProcessor)
         {
-            AccType.BindValueChanged(mod =>
+            AccuracyDisplay.BindValueChanged(mod =>
             {
                 Current.UnbindBindings();
 
