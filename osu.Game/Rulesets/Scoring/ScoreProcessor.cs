@@ -40,12 +40,14 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableDouble Accuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
-        /// The accuracy which increase from 0%.
+        /// The minimum achievable accuracy for the whole beatmap at this stage of gameplay.
+        /// Assumes that all objects that have not been judged yet will receive the minimum hit result.
         /// </summary>
         public readonly BindableDouble MinimumAccuracy = new BindableDouble(0) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
-        /// The accuracy which Decrease from 100%.
+        /// The maximum achievable accuracy for the whole beatmap at this stage of gameplay.
+        /// Assumes that all objects that have not been judged yet will receive the maximum hit result.
         /// </summary>
         public readonly BindableDouble MaximumAccuracy = new BindableDouble(0) { MinValue = 0, MaxValue = 1 };
 
