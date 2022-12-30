@@ -23,10 +23,10 @@ namespace osu.Game.Overlays
     /// <typeparam name="T">The type of item to be represented by tabs.</typeparam>
     public abstract partial class TabControlOverlayHeader<T> : OverlayHeader, IHasCurrentValue<T>
     {
-        protected OsuTabControl<T> TabControl;
+        protected OsuTabControl<T> TabControl { get; }
+        protected Container TabControlContainer { get; }
 
         private readonly Box controlBackground;
-        private readonly Container tabControlContainer;
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
         public Bindable<T> Current
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays
             set
             {
                 base.ContentSidePadding = value;
-                tabControlContainer.Padding = new MarginPadding { Horizontal = value };
+                TabControlContainer.Padding = new MarginPadding { Horizontal = value };
             }
         }
 
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    tabControlContainer = new Container
+                    TabControlContainer = new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
