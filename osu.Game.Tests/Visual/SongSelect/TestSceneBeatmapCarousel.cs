@@ -708,8 +708,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             var sets = new List<BeatmapSetInfo>();
 
-            const string zzz_string = "zzzzz";
-
             AddStep("Populuate beatmap sets", () =>
             {
                 sets.Clear();
@@ -721,7 +719,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     set.Beatmaps.ForEach(b => b.Metadata.Artist = "Same Artist");
 
                     if (i == 5)
-                        set.Beatmaps.ForEach(b => b.Metadata.Title = zzz_string);
+                        set.DateAdded = DateTimeOffset.MaxValue;
 
                     sets.Add(set);
                 }
@@ -730,7 +728,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             loadBeatmaps(sets);
 
             AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            AddAssert($"Check {zzz_string} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Title == zzz_string);
+            AddAssert($"Check if newest is at the top", () => carousel.BeatmapSets.First().DateAdded == DateTimeOffset.MaxValue);
         }
 
         [Test]
