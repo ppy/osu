@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -73,8 +73,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double starRating = basePerformance > 0.00001 ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
 
-            double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
-            double drainRate = beatmap.Difficulty.DrainRate;
+            var beatmapDifficulty = beatmap.Difficulty;
+
+            var difficultyAdjust = mods.FirstOrDefault(x => x is OsuModDifficultyAdjust);
+
+            (difficultyAdjust as ModDifficultyAdjust)?.ApplyToDifficulty(beatmapDifficulty);
+
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmapDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+            double drainRate = beatmapDifficulty.DrainRate;
             int maxCombo = beatmap.GetMaxCombo();
 
             int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
@@ -82,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
             HitWindows hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+            hitWindows.SetDifficulty(beatmapDifficulty.OverallDifficulty);
 
             double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
 
