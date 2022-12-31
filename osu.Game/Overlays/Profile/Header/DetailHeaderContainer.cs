@@ -53,9 +53,39 @@ namespace osu.Game.Overlays.Profile.Header
                     Masking = true,
                     Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 20),
+                    Spacing = new Vector2(0, 15),
                     Children = new Drawable[]
                     {
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(20),
+                            Children = new Drawable[]
+                            {
+                                detailGlobalRank = new ProfileValueDisplay(true)
+                                {
+                                    Title = UsersStrings.ShowRankGlobalSimple,
+                                },
+                                detailCountryRank = new ProfileValueDisplay(true)
+                                {
+                                    Title = UsersStrings.ShowRankCountrySimple,
+                                },
+                            }
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 60,
+                            Children = new Drawable[]
+                            {
+                                rankGraph = new RankGraph
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                            }
+                        },
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
@@ -103,39 +133,6 @@ namespace osu.Game.Overlays.Profile.Header
                                 }
                             }
                         },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Right = 130 },
-                            Children = new Drawable[]
-                            {
-                                rankGraph = new RankGraph
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Y,
-                                    Width = 130,
-                                    Anchor = Anchor.TopRight,
-                                    Direction = FillDirection.Vertical,
-                                    Padding = new MarginPadding { Horizontal = 10 },
-                                    Spacing = new Vector2(0, 20),
-                                    Children = new Drawable[]
-                                    {
-                                        detailGlobalRank = new ProfileValueDisplay(true, 110)
-                                        {
-                                            Title = UsersStrings.ShowRankGlobalSimple,
-                                        },
-                                        detailCountryRank = new ProfileValueDisplay(false, 110)
-                                        {
-                                            Title = UsersStrings.ShowRankCountrySimple,
-                                        },
-                                    }
-                                }
-                            }
-                        },
                     }
                 },
             };
@@ -172,14 +169,14 @@ namespace osu.Game.Overlays.Profile.Header
                 InternalChild = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
-                    Width = 56,
+                    Width = 44,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
                         new DrawableRank(rank)
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 30,
+                            Height = 22,
                         },
                         rankCount = new OsuSpriteText
                         {
