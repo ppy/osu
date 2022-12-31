@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Select.Carousel
             return ValidBeatmaps.Max(func).CompareTo(other.ValidBeatmaps.Max(func));
         }
 
-        private int fallbackWhenZero(CarouselBeatmapSet other, int i) => (i == 0) ? other.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded) : i;
+        private int fallbackWhenZero(CarouselBeatmapSet other, int i) => (i == 0) ? -other.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded) : i;
 
         public override void Filter(FilterCriteria criteria)
         {
