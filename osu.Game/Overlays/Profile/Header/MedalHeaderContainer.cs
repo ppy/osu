@@ -4,7 +4,6 @@
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
@@ -43,14 +41,8 @@ namespace osu.Game.Overlays.Profile.Header
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = new ColourInfo
-                        {
-                            TopLeft = Color4.Black.Opacity(0.2f),
-                            TopRight = Color4.Black.Opacity(0.2f),
-                            BottomLeft = Color4.Black.Opacity(0),
-                            BottomRight = Color4.Black.Opacity(0)
-                        }
-                    },
+                        Colour = ColourInfo.GradientVertical(Colour4.Black.Opacity(0.2f), Colour4.Black.Opacity(0))
+                    }
                 },
                 badgeFlowContainer = new FillFlowContainer
                 {

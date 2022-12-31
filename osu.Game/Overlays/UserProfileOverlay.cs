@@ -42,7 +42,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        public const float CONTENT_X_MARGIN = 70;
+        public const float CONTENT_X_MARGIN = 50;
 
         public UserProfileOverlay()
             : base(OverlayColourScheme.Pink)
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays
 
         protected override ProfileHeader CreateHeader() => new ProfileHeader();
 
-        protected override Color4 BackgroundColour => ColourProvider.Background6;
+        protected override Color4 BackgroundColour => ColourProvider.Background5;
 
         public void ShowUser(IUser user, IRulesetInfo? ruleset = null)
         {
