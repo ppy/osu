@@ -23,7 +23,8 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public partial class TopHeaderContainer : CompositeDrawable
     {
-        private const float avatar_size = 120;
+        private const float content_height = 65;
+        private const float vertical_padding = 10;
 
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
@@ -39,6 +40,7 @@ namespace osu.Game.Overlays.Profile.Header
         private UpdateableFlag userFlag = null!;
         private OsuSpriteText userCountryText = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
+        private ToggleCoverButton coverToggle = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -63,7 +65,6 @@ namespace osu.Game.Overlays.Profile.Header
                         cover = new ProfileCoverBackground
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 250,
                         },
                         new Container
                         {
@@ -77,10 +78,10 @@ namespace osu.Game.Overlays.Profile.Header
                                     Padding = new MarginPadding
                                     {
                                         Left = UserProfileOverlay.CONTENT_X_MARGIN,
-                                        Vertical = 10
+                                        Vertical = vertical_padding
                                     },
                                     Spacing = new Vector2(20, 0),
-                                    Height = 85,
+                                    Height = content_height + 2 * vertical_padding,
                                     RelativeSizeAxes = Axes.X,
                                     Children = new Drawable[]
                                     {
@@ -88,9 +89,7 @@ namespace osu.Game.Overlays.Profile.Header
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            Size = new Vector2(avatar_size),
                                             Masking = true,
-                                            CornerRadius = avatar_size * 0.25f,
                                             EdgeEffect = new EdgeEffectParameters
                                             {
                                                 Type = EdgeEffectType.Shadow,
@@ -172,7 +171,7 @@ namespace osu.Game.Overlays.Profile.Header
                                         },
                                     }
                                 },
-                                new ToggleCoverButton
+                                coverToggle = new ToggleCoverButton
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
@@ -183,8 +182,15 @@ namespace osu.Game.Overlays.Profile.Header
                     },
                 },
             };
+        }
 
-            User.BindValueChanged(user => updateUser(user.NewValue));
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            User.BindValueChanged(user => updateUser(user.NewValue), true);
+            coverToggle.CoverVisible.BindValueChanged(_ => updateCoverState(), true);
+            FinishTransforms(true);
         }
 
         private void updateUser(UserProfileData? data)
@@ -201,6 +207,15 @@ namespace osu.Game.Overlays.Profile.Header
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
             groupBadgeFlow.User.Value = user;
+        }
+
+        private void updateCoverState()
+        {
+            const float transition_duration = 250;
+
+            cover.ResizeHeightTo(coverToggle.CoverVisible.Value ? 250 : 0, transition_duration, Easing.OutQuint);
+            avatar.ResizeTo(new Vector2(coverToggle.CoverVisible.Value ? 120 : content_height), transition_duration, Easing.OutQuint);
+            avatar.TransformTo(nameof(avatar.CornerRadius), coverToggle.CoverVisible.Value ? 40f : 20f, transition_duration, Easing.OutQuint);
         }
 
         private partial class ProfileCoverBackground : UserCoverBackground

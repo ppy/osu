@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class ToggleCoverButton : ProfileHeaderButton
     {
-        public readonly BindableBool CoverVisible = new BindableBool();
+        public readonly BindableBool CoverVisible = new BindableBool(true);
 
         public override LocalisableString TooltipText => CoverVisible.Value ? UsersStrings.ShowCoverTo0 : UsersStrings.ShowCoverTo1;
 
