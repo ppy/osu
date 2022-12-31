@@ -67,16 +67,16 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 default:
                 case SortMode.Artist:
-                    return fallbackWhenZero(otherSet, string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.OrdinalIgnoreCase));
+                    return string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.Title:
-                    return fallbackWhenZero(otherSet, string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase));
+                    return string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.Author:
-                    return fallbackWhenZero(otherSet, string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase));
+                    return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.Source:
-                    return fallbackWhenZero(otherSet, string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase));
+                    return string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.DateAdded:
                     return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
@@ -86,19 +86,19 @@ namespace osu.Game.Screens.Select.Carousel
                     if (BeatmapSet.DateRanked == null || otherSet.BeatmapSet.DateRanked == null)
                         return 0;
 
-                    return fallbackWhenZero(otherSet, otherSet.BeatmapSet.DateRanked.Value.CompareTo(BeatmapSet.DateRanked.Value));
+                    return otherSet.BeatmapSet.DateRanked.Value.CompareTo(BeatmapSet.DateRanked.Value);
 
                 case SortMode.LastPlayed:
                     return -compareUsingAggregateMax(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
 
                 case SortMode.BPM:
-                    return fallbackWhenZero(otherSet, compareUsingAggregateMax(otherSet, b => b.BPM));
+                    return compareUsingAggregateMax(otherSet, b => b.BPM);
 
                 case SortMode.Length:
-                    return fallbackWhenZero(otherSet, compareUsingAggregateMax(otherSet, b => b.Length));
+                    return compareUsingAggregateMax(otherSet, b => b.Length);
 
                 case SortMode.Difficulty:
-                    return fallbackWhenZero(otherSet, compareUsingAggregateMax(otherSet, b => b.StarRating));
+                    return compareUsingAggregateMax(otherSet, b => b.StarRating);
 
                 case SortMode.DateSubmitted:
                     // Beatmaps which have no submitted date should already be filtered away in this mode.
@@ -125,8 +125,6 @@ namespace osu.Game.Screens.Select.Carousel
 
             return ValidBeatmaps.Max(func).CompareTo(other.ValidBeatmaps.Max(func));
         }
-
-        private int fallbackWhenZero(CarouselBeatmapSet other, int i) => (i == 0) ? -other.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded) : i;
 
         public override void Filter(FilterCriteria criteria)
         {

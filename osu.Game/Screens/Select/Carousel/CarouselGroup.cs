@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -92,7 +93,7 @@ namespace osu.Game.Screens.Select.Carousel
                 if (comparison != 0)
                     return comparison;
 
-                return x.ItemID.CompareTo(y.ItemID);
+                return -x.CompareTo(new FilterCriteria { Sort = SortMode.DateAdded }, y);
             });
 
             items.Sort(criteriaComparer);
