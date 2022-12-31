@@ -43,7 +43,7 @@ namespace osu.Game.Tournament.Screens.Editors
         {
             var countries = new List<TournamentTeam>();
 
-            foreach (var country in Enum.GetValues(typeof(CountryCode)).Cast<CountryCode>().Skip(1))
+            foreach (var country in Enum.GetValues<CountryCode>().Skip(1))
             {
                 countries.Add(new TournamentTeam
                 {

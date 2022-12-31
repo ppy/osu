@@ -84,6 +84,7 @@ namespace osu.Game.Skinning
                 DefaultClassicSkin = new DefaultLegacySkin(this),
                 trianglesSkin = new TrianglesSkin(this),
                 argonSkin = new ArgonSkin(this),
+                new ArgonProSkin(this),
             };
 
             // Ensure the default entries are present.
