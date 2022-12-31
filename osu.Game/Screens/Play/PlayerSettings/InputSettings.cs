@@ -12,6 +12,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public partial class InputSettings : PlayerSettingsGroup
     {
+        public override bool AutoSizeEasingEnabled => false;
+
         private readonly PlayerCheckbox mouseButtonsCheckbox;
 
         public InputSettings()

@@ -24,6 +24,7 @@ namespace osu.Game.Overlays
     {
         private readonly string title;
         public const int CONTAINER_WIDTH = 270;
+        public virtual bool AutoSizeEasingEnabled { get; set; }
 
         private const float transition_duration = 250;
         private const int header_height = 30;
@@ -50,6 +51,8 @@ namespace osu.Game.Overlays
         private OsuSpriteText headerText = null!;
 
         private Container headerContent = null!;
+
+        private FillFlowContainer settingsContainer = null!;
 
         private Box background = null!;
 
@@ -81,12 +84,10 @@ namespace osu.Game.Overlays
                     Alpha = 0.1f,
                     Colour = colourProvider?.Background4 ?? Color4.Black,
                 },
-                new FillFlowContainer
+                settingsContainer = new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeDuration = transition_duration,
-                    AutoSizeEasing = Easing.OutQuint,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
@@ -127,6 +128,9 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            if (AutoSizeEasingEnabled)
+                enableAutoSizeEasing();
 
             Expanded.BindValueChanged(updateExpandedState, true);
 
@@ -186,6 +190,12 @@ namespace osu.Game.Overlays
 
             background.FadeTo(IsHovered ? 1 : 0.1f, fade_duration, Easing.OutQuint);
             expandButton.FadeTo(IsHovered ? 1 : 0, fade_duration, Easing.OutQuint);
+        }
+
+        private void enableAutoSizeEasing()
+        {
+            settingsContainer.AutoSizeDuration = transition_duration;
+            settingsContainer.AutoSizeEasing = Easing.OutQuint;
         }
     }
 }

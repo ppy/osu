@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Play
                         Padding = new MarginPadding { Horizontal = padding },
                         Children = new PlayerSettingsGroup[]
                         {
-                            VisualSettings = new VisualSettings(),
+                            VisualSettings = new VisualSettings { AutoSizeEasingEnabled = false },
                             AudioSettings = new AudioSettings(),
                             new InputSettings()
                         }

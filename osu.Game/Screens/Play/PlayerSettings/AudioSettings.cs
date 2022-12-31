@@ -16,6 +16,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         public Bindable<ScoreInfo> ReferenceScore { get; } = new Bindable<ScoreInfo>();
 
+        public override bool AutoSizeEasingEnabled => false;
+
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
 
         public AudioSettings()

@@ -10,6 +10,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public partial class VisualSettings : PlayerSettingsGroup
     {
+        public override bool AutoSizeEasingEnabled { get; set; }
+
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
         private readonly PlayerSliderBar<float> comboColourNormalisationSliderBar;
