@@ -22,16 +22,16 @@ namespace osu.Game.Overlays.Profile.Header
     public partial class DetailHeaderContainer : CompositeDrawable
     {
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
-        private OverlinedInfoContainer medalInfo = null!;
-        private OverlinedInfoContainer ppInfo = null!;
-        private OverlinedInfoContainer detailGlobalRank = null!;
-        private OverlinedInfoContainer detailCountryRank = null!;
+        private ProfileValueDisplay medalInfo = null!;
+        private ProfileValueDisplay ppInfo = null!;
+        private ProfileValueDisplay detailGlobalRank = null!;
+        private ProfileValueDisplay detailCountryRank = null!;
         private RankGraph rankGraph = null!;
 
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             AutoSizeAxes = Axes.Y;
 
@@ -71,19 +71,17 @@ namespace osu.Game.Overlays.Profile.Header
                                     Spacing = new Vector2(10, 0),
                                     Children = new Drawable[]
                                     {
-                                        new OverlinedTotalPlayTime
-                                        {
-                                            User = { BindTarget = User }
-                                        },
-                                        medalInfo = new OverlinedInfoContainer
+                                        medalInfo = new ProfileValueDisplay
                                         {
                                             Title = UsersStrings.ShowStatsMedals,
-                                            LineColour = colours.GreenLight,
                                         },
-                                        ppInfo = new OverlinedInfoContainer
+                                        ppInfo = new ProfileValueDisplay
                                         {
                                             Title = "pp",
-                                            LineColour = colours.Red,
+                                        },
+                                        new TotalPlayTime
+                                        {
+                                            User = { BindTarget = User }
                                         },
                                     }
                                 },
@@ -126,15 +124,13 @@ namespace osu.Game.Overlays.Profile.Header
                                     Spacing = new Vector2(0, 20),
                                     Children = new Drawable[]
                                     {
-                                        detailGlobalRank = new OverlinedInfoContainer(true, 110)
+                                        detailGlobalRank = new ProfileValueDisplay(true, 110)
                                         {
                                             Title = UsersStrings.ShowRankGlobalSimple,
-                                            LineColour = colourProvider.Highlight1,
                                         },
-                                        detailCountryRank = new OverlinedInfoContainer(false, 110)
+                                        detailCountryRank = new ProfileValueDisplay(false, 110)
                                         {
                                             Title = UsersStrings.ShowRankCountrySimple,
-                                            LineColour = colourProvider.Highlight1,
                                         },
                                     }
                                 }
