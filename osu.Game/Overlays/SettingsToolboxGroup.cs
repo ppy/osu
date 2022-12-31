@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
     {
         private readonly string title;
         public const int CONTAINER_WIDTH = 270;
-        public virtual bool AutoSizeEasingEnabled { get; set; }
+        public virtual bool AutoSizeEasingEnabled { get; set; } = true;
 
         private const float transition_duration = 250;
         private const int header_height = 30;
