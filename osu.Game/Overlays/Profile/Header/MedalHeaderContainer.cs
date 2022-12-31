@@ -49,9 +49,8 @@ namespace osu.Game.Overlays.Profile.Header
                     Direction = FillDirection.Full,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Margin = new MarginPadding { Top = 5 },
                     Spacing = new Vector2(10, 10),
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Top = 10 },
                 }
             };
         }
