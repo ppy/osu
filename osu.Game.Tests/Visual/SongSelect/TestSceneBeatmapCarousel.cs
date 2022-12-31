@@ -728,7 +728,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             loadBeatmaps(sets);
 
             AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            AddAssert("Check if top is the newest", () => carousel.BeatmapSets.First().DateAdded == DateTimeOffset.MaxValue);
+            AddAssert("Check if bottom is the newest", () => carousel.BeatmapSets.Last().DateAdded == DateTimeOffset.MaxValue);
         }
 
         [Test]
