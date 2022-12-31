@@ -12,7 +12,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Extensions;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests;
@@ -171,46 +173,72 @@ namespace osu.Game.Overlays
             loadingLayer.Hide();
         }
 
-        private partial class ProfileSectionTabControl : OverlayTabControl<ProfileSection>
+        private partial class ProfileSectionTabControl : OsuTabControl<ProfileSection>
         {
-            private const float bar_height = 2;
-
             public ProfileSectionTabControl()
             {
-                TabContainer.RelativeSizeAxes &= ~Axes.X;
-                TabContainer.AutoSizeAxes |= Axes.X;
-                TabContainer.Anchor |= Anchor.x1;
-                TabContainer.Origin |= Anchor.x1;
-
-                Height = 36 + bar_height;
-                BarHeight = bar_height;
+                Height = 40;
+                Padding = new MarginPadding { Horizontal = CONTENT_X_MARGIN };
+                TabContainer.Spacing = new Vector2(20);
             }
 
-            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileSectionTabItem(value)
-            {
-                AccentColour = AccentColour,
-            };
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                AccentColour = colourProvider.Highlight1;
-            }
+            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileSectionTabItem(value);
 
             protected override bool OnClick(ClickEvent e) => true;
 
             protected override bool OnHover(HoverEvent e) => true;
 
-            private partial class ProfileSectionTabItem : OverlayTabItem
+            private partial class ProfileSectionTabItem : TabItem<ProfileSection>
             {
+                private OsuSpriteText text = null!;
+
+                [Resolved]
+                private OverlayColourProvider colourProvider { get; set; } = null!;
+
                 public ProfileSectionTabItem(ProfileSection value)
                     : base(value)
                 {
-                    Text.Text = value.Title;
-                    Text.Font = Text.Font.With(size: 16);
-                    Text.Margin = new MarginPadding { Bottom = 10 + bar_height };
-                    Bar.ExpandedSize = 10;
-                    Bar.Margin = new MarginPadding { Bottom = bar_height };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    AutoSizeAxes = Axes.Both;
+                    Anchor = Anchor.CentreLeft;
+                    Origin = Anchor.CentreLeft;
+
+                    InternalChild = text = new OsuSpriteText
+                    {
+                        Text = Value.Title
+                    };
+
+                    updateState();
+                }
+
+                protected override void OnActivated() => updateState();
+
+                protected override void OnDeactivated() => updateState();
+
+                protected override bool OnHover(HoverEvent e)
+                {
+                    updateState();
+                    return true;
+                }
+
+                protected override void OnHoverLost(HoverLostEvent e) => updateState();
+
+                private void updateState()
+                {
+                    text.Font = OsuFont.Default.With(size: 14, weight: Active.Value ? FontWeight.SemiBold : FontWeight.Regular);
+
+                    Colour4 textColour;
+
+                    if (IsHovered)
+                        textColour = colourProvider.Light1;
+                    else
+                        textColour = Active.Value ? colourProvider.Content1 : colourProvider.Light2;
+
+                    text.FadeColour(textColour, 300, Easing.OutQuint);
                 }
             }
         }
