@@ -1,11 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Globalization;
-using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -14,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Overlays;
@@ -35,14 +31,11 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Vector2 sliderShear = new Vector2(4.7f / HEIGHT, 0);
 
         protected readonly SquareNub Nub;
-        protected readonly Box LeftBox;
-        protected readonly Box RightBox;
         private readonly SliderSounds<T> sounds;
         private readonly Container nubContainer;
+        private readonly SliderBoxes sliderBoxes;
 
         public virtual LocalisableString TooltipText { get; private set; }
-
-        public bool PlaySamplesOnAdjust { get; set; } = true;
 
         private readonly HoverClickSounds hoverClickSounds;
 
@@ -59,7 +52,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                LeftBox.Colour = value.Darken(0.1f);
+                sliderBoxes.LeftBox.Colour = value.Darken(0.1f);
             }
         }
 
@@ -71,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 backgroundColour = value;
-                RightBox.Colour = value;
+                sliderBoxes.RightBox.Colour = value;
             }
         }
 
@@ -97,25 +90,11 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.CentreLeft,
                         Masking = true,
                         CornerRadius = 5,
-                        Children = new Drawable[]
+                        Child = sliderBoxes = new SliderBoxes
                         {
-                            LeftBox = new Box
-                            {
-                                Height = HEIGHT,
-                                EdgeSmoothness = new Vector2(0, 0.5f),
-                                RelativeSizeAxes = Axes.None,
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                            },
-                            RightBox = new Box
-                            {
-                                Height = HEIGHT,
-                                EdgeSmoothness = new Vector2(0, 0.5f),
-                                RelativeSizeAxes = Axes.None,
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                            },
-                        },
+                            RelativeSizeAxes = Axes.X,
+                            Height = 5
+                        }
                     },
                 },
                 nubContainer = new Container
@@ -134,7 +113,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider? colourProvider, OsuColour colours)
         {
             AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
             BackgroundColour = colourProvider?.Background5 ?? colours.PinkDarker.Darken(1);
@@ -213,8 +192,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X, 0, Math.Max(0, DrawWidth)), 1);
-            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding, 0, Math.Max(0, DrawWidth)), 1);
+            sliderBoxes.LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X, 0, Math.Max(0, DrawWidth)), 1);
+            sliderBoxes.RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding, 0, Math.Max(0, DrawWidth)), 1);
         }
 
         protected override void UpdateValue(float value)

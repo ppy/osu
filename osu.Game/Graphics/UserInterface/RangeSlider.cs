@@ -133,7 +133,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 base.LoadComplete();
 
-                LeftBox.Height = 6; // hide any colour bleeding from overlap
+                SliderBoxes.LeftBox.Height = 6; // hide any colour bleeding from overlap
 
                 AccentColour = BackgroundColour;
                 BackgroundColour = Color4.Transparent;
@@ -150,7 +150,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 base.LoadComplete();
 
-                RightBox.Height = 6; // just to match the left bar height really
+                SliderBoxes.RightBox.Height = 6; // just to match the left bar height really
             }
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
