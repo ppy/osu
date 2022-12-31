@@ -26,34 +26,9 @@ namespace osu.Game.Overlays.Profile.Header
         private OverlinedInfoContainer ppInfo = null!;
         private OverlinedInfoContainer detailGlobalRank = null!;
         private OverlinedInfoContainer detailCountryRank = null!;
-        private FillFlowContainer? fillFlow;
         private RankGraph rankGraph = null!;
 
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
-
-        private bool expanded = true;
-
-        public bool Expanded
-        {
-            set
-            {
-                if (expanded == value) return;
-
-                expanded = value;
-
-                if (fillFlow == null) return;
-
-                fillFlow.ClearTransforms();
-
-                if (expanded)
-                    fillFlow.AutoSizeAxes = Axes.Y;
-                else
-                {
-                    fillFlow.AutoSizeAxes = Axes.None;
-                    fillFlow.ResizeHeightTo(0, 200, Easing.OutQuint);
-                }
-            }
-        }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
@@ -69,10 +44,10 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
                 },
-                fillFlow = new FillFlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = expanded ? Axes.Y : Axes.None,
+                    AutoSizeAxes = Axes.Y,
                     AutoSizeDuration = 200,
                     AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
