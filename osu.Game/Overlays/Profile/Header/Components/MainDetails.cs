@@ -40,7 +40,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 AutoSizeDuration = 200,
                 AutoSizeEasing = Easing.OutQuint,
                 Masking = true,
-                Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 15),
                 Children = new Drawable[]

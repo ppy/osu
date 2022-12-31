@@ -26,10 +26,50 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
                 },
-                new MainDetails
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User }
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                    Child = new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        RowDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        ColumnDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
+                            {
+                                new MainDetails
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    User = { BindTarget = User }
+                                },
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Y,
+                                    Width = 2,
+                                    Colour = colourProvider.Background6,
+                                    Margin = new MarginPadding { Horizontal = 15 }
+                                },
+                                new ExtendedDetails
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    User = { BindTarget = User }
+                                }
+                            }
+                        }
+                    }
                 }
             };
         }

@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class ExtendedDetails : CompositeDrawable
     {
-        public Bindable<UserProfile?> UserProfile { get; } = new Bindable<UserProfile?>();
+        public Bindable<UserProfileData?> User { get; } = new Bindable<UserProfileData?>();
 
         private SpriteText rankedScore = null!;
         private SpriteText hitAccuracy = null!;
@@ -46,6 +46,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     new FillFlowContainer
                     {
                         Name = @"Labels",
+                        AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, vertical_spacing),
                         Children = new Drawable[]
@@ -62,6 +63,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     new FillFlowContainer
                     {
                         Name = @"Values",
+                        AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, vertical_spacing),
                         Children = new Drawable[]
@@ -83,7 +85,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             base.LoadComplete();
 
-            UserProfile.BindValueChanged(userProfile => updateStatistics(userProfile.NewValue?.User.Statistics), true);
+            User.BindValueChanged(user => updateStatistics(user.NewValue?.User.Statistics), true);
         }
 
         private void updateStatistics(UserStatistics? statistics)
