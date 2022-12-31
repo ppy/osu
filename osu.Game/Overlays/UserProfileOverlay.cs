@@ -259,7 +259,9 @@ namespace osu.Game.Overlays
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-                Spacing = new Vector2(0, 20),
+                Spacing = new Vector2(0, 10),
+                Padding = new MarginPadding { Horizontal = 10 },
+                Margin = new MarginPadding { Bottom = 10 },
             };
         }
     }
