@@ -44,9 +44,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                 new PreviewTimePart
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Both,
-                    Y = -10,
                     Height = 0.35f
                 },
                 new Container
