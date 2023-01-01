@@ -87,13 +87,15 @@ namespace osu.Game.Screens.Select.Carousel
 
             items.ForEach(c => c.Filter(criteria));
 
+            var sortByDateAdded = new FilterCriteria { Sort = SortMode.DateAdded };
+
             criteriaComparer = Comparer<CarouselItem>.Create((x, y) =>
             {
                 int comparison = x.CompareTo(criteria, y);
                 if (comparison != 0)
                     return comparison;
 
-                return -x.CompareTo(new FilterCriteria { Sort = SortMode.DateAdded }, y);
+                return -x.CompareTo(sortByDateAdded, y);
             });
 
             items.Sort(criteriaComparer);
