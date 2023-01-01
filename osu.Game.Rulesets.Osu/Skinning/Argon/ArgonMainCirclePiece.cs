@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         double fadeOutTime = useFlash ? 800 : 240;
 
                         double flashInDuration = fadeOutTime * (150 / 800.0);
-                        double resizeDuration = fadeOutTime / 2;
+                        const double resize_duration = 400;
 
                         const float shrink_size = 0.8f;
 
@@ -182,13 +182,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                         // The outer ring shrinks immediately, but accounts for its thickness so it doesn't overlap the inner
                         // gradient layers.
-                        border.ResizeTo(Size * shrink_size + new Vector2(border.BorderThickness), resizeDuration, easingOutEh);
+                        border.ResizeTo(Size * shrink_size + new Vector2(border.BorderThickness), resize_duration, Easing.OutElasticHalf);
 
                         // The outer gradient is resize with a slight delay from the border.
                         // This is to give it a bomb-like effect, with the border "triggering" its animation when getting close.
                         using (BeginDelayedSequence(flashInDuration / 12))
                         {
-                            outerGradient.ResizeTo(OUTER_GRADIENT_SIZE * shrink_size, resizeDuration, easingOutEh);
+                            outerGradient.ResizeTo(OUTER_GRADIENT_SIZE * shrink_size, resize_duration, Easing.OutElasticHalf);
 
                             if (useFlash)
                             {
@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                                     .FadeOut(flashInDuration);
                             }
                             else
-                                outerGradient.FadeOut(resizeDuration);
+                                outerGradient.FadeOut(resize_duration);
                         }
 
                         if (useFlash)
