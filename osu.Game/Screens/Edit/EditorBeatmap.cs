@@ -111,7 +111,12 @@ namespace osu.Game.Screens.Edit
                 trackStartTime(obj);
 
             PreviewTime = new BindableInt(playableBeatmap.Metadata.PreviewTime);
-            PreviewTime.BindValueChanged(s => this.beatmapInfo.Metadata.PreviewTime = s.NewValue);
+            PreviewTime.BindValueChanged(s =>
+            {
+                BeginChange();
+                this.beatmapInfo.Metadata.PreviewTime = s.NewValue;
+                EndChange();
+            });
         }
 
         /// <summary>
