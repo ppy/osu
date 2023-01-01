@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -43,6 +44,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
         private readonly FlashPiece flash;
+        private IBindable<bool> hitLightingEnabled = null!;
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
@@ -96,8 +98,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            hitLightingEnabled = config.GetBindable<bool>(OsuSetting.HitLighting);
             var drawableOsuObject = (DrawableOsuHitObject)drawableObject;
 
             accentColour.BindTo(drawableObject.AccentColour);
@@ -167,24 +170,40 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                             accentColour.Value.Opacity(0.5f),
                             accentColour.Value.Opacity(0)), fade_out_time);
 
-                        // The outer ring shrinks immediately, but accounts for its thickness so it doesn't overlap the inner
-                        // gradient layers.
-                        border.ResizeTo(Size * shrink_size + new Vector2(border.BorderThickness), resize_duration, Easing.OutElasticHalf);
-
-                        // The outer gradient is resize with a slight delay from the border.
-                        // This is to give it a bomb-like effect, with the border "triggering" its animation when getting close.
-                        using (BeginDelayedSequence(flash_in_duration / 12))
+                        if (hitLightingEnabled.Value)
                         {
-                            outerGradient.ResizeTo(OUTER_GRADIENT_SIZE * shrink_size, resize_duration, Easing.OutElasticHalf);
-                            outerGradient
-                                .FadeColour(Color4.White, 80)
-                                .Then()
-                                .FadeOut(flash_in_duration);
+                            // The outer ring shrinks immediately, but accounts for its thickness so it doesn't overlap the inner
+                            // gradient layers.
+                            border.ResizeTo(Size * shrink_size + new Vector2(border.BorderThickness), resize_duration, Easing.OutElasticHalf);
+
+                            // The outer gradient is resize with a slight delay from the border.
+                            // This is to give it a bomb-like effect, with the border "triggering" its animation when getting close.
+                            using (BeginDelayedSequence(flash_in_duration / 12))
+                            {
+                                outerGradient.ResizeTo(OUTER_GRADIENT_SIZE * shrink_size, resize_duration, Easing.OutElasticHalf);
+                                outerGradient
+                                    .FadeColour(Color4.White, 80)
+                                    .Then()
+                                    .FadeOut(flash_in_duration);
+                            }
+
+                            flash.FadeTo(1, flash_in_duration, Easing.OutQuint);
+
+                            this.FadeOut(fade_out_time, Easing.OutQuad);
+                        }
+                        else
+                        {
+                            // If hit lighting is disabled, use legacy fade out behavior for border and outer gradient.
+                            const double legacy_fade_duration = 240;
+                            border.FadeOut(legacy_fade_duration);
+                            border.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+
+                            outerGradient.FadeOut(legacy_fade_duration);
+                            outerGradient.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+
+                            this.FadeOut(legacy_fade_duration, Easing.OutQuad);
                         }
 
-                        flash.FadeTo(1, flash_in_duration, Easing.OutQuint);
-
-                        this.FadeOut(fade_out_time, Easing.OutQuad);
                         break;
                 }
             }
