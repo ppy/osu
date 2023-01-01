@@ -134,6 +134,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override void Dispose(bool isDisposing)
         {
+            // must happen before children are disposed in base call to prevent illegal accesses to the hit explosion pool.
+            NewResult -= OnNewResult;
+
             base.Dispose(isDisposing);
 
             if (skin != null)

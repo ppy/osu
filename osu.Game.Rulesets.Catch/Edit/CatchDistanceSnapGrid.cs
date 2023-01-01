@@ -121,9 +121,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                 return new SnapResult(originPosition, StartTime);
             }
 
-            return enumerateSnappingCandidates(time)
-                   .OrderBy(pos => Vector2.DistanceSquared(screenSpacePosition, pos.ScreenSpacePosition))
-                   .FirstOrDefault();
+            return enumerateSnappingCandidates(time).MinBy(pos => Vector2.DistanceSquared(screenSpacePosition, pos.ScreenSpacePosition));
         }
 
         private IEnumerable<SnapResult> enumerateSnappingCandidates(double time)

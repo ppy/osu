@@ -32,7 +32,7 @@ namespace osu.Game.Online.Notifications.WebSocket
             req.Failure += ex => tcs.SetException(ex);
             api.Queue(req);
 
-            string endpoint = await tcs.Task;
+            string endpoint = await tcs.Task.ConfigureAwait(false);
 
             ClientWebSocket socket = new ClientWebSocket();
             socket.Options.SetRequestHeader(@"Authorization", @$"Bearer {api.AccessToken}");

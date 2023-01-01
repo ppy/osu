@@ -36,8 +36,7 @@ namespace osu.Game.Users
         protected UserPanel(APIUser user)
             : base(HoverSampleSet.Button)
         {
-            if (user == null)
-                throw new ArgumentNullException(nameof(user));
+            ArgumentNullException.ThrowIfNull(user);
 
             User = user;
         }
