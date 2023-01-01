@@ -30,7 +30,7 @@ namespace osu.Game.Input
             {
                 var rulesetInstance = rulesetInfo.CreateInstance();
 
-                foreach (var variant in rulesetInstance.AvailableVariants)
+                foreach (int variant in rulesetInstance.AvailableVariants)
                 {
                     var defaults = rulesetInstance.GetDefaultKeyBindings(variant).OrderBy(d => d.Action).ToList();
 
@@ -44,10 +44,10 @@ namespace osu.Game.Input
                     int keyBindingsUniqueCount = bindingsWithoutUnassigned.Select(b => b.KeyCombination).Distinct().Count();
                     string variantName = rulesetInstance.GetVariantName(variant).ToString();
 
-                    if (bindingsWithoutUnassigned.Count() == keyBindingsUniqueCount)
+                    if (bindingsWithoutUnassigned.Count == keyBindingsUniqueCount)
                         continue;
 
-                    post(rulesetInfo.Name, rulesetInstance.GetVariantName(variant).ToString());
+                    post(rulesetInfo.Name, variantName);
 
                     int i = 0;
 
