@@ -40,9 +40,9 @@ namespace osu.Game.Localisation
         public static LocalisableString DisableMouseWheelVolumeAdjust => new TranslatableString(getKey(@"disable_mouse_wheel_volume_adjust"), @"Disable mouse wheel adjusting volume during gameplay");
 
         /// <summary>
-        /// "volume can still be adjusted using the mouse wheel by holding "Alt""
+        /// "volume can still be adjusted using the mouse wheel by holding "alt""
         /// </summary>
-        public static LocalisableString DisableMouseWheelVolumeAdjustTooltip => new TranslatableString(getKey(@"disable_mouse_wheel_volume_adjust_tooltip"), @"volume can still be adjusted using the mouse wheel by holding ""Alt""");
+        public static LocalisableString DisableMouseWheelVolumeAdjustTooltip => new TranslatableString(getKey(@"disable_mouse_wheel_volume_adjust_tooltip"), @"volume can still be adjusted using the mouse wheel by holding ""alt""");
 
         /// <summary>
         /// "Disable mouse buttons during gameplay"

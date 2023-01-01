@@ -49,19 +49,19 @@ namespace osu.Game.Graphics.UserInterface
                     Background.FadeColour(colours.Gray4, 500, Easing.InOutExpo);
                     Icon.MoveToX(0, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
-                    TooltipText = "download";
+                    TooltipText = BeatmapsetsStrings.PanelDownloadAll;
                     break;
 
                 case DownloadState.Downloading:
                     Background.FadeColour(colours.Blue, 500, Easing.InOutExpo);
                     Icon.MoveToX(0, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
-                    TooltipText = "downloading...";
+                    TooltipText = CommonStrings.Downloading.ToLower();
                     break;
 
                 case DownloadState.Importing:
                     Background.FadeColour(colours.Yellow, 500, Easing.InOutExpo);
-                    TooltipText = "importing";
+                    TooltipText = CommonStrings.Importing.ToLower();
                     break;
 
                 case DownloadState.LocallyAvailable:
