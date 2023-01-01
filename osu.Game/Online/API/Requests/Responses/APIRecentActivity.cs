@@ -21,7 +21,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty]
         private string type
         {
-            set => Type = (RecentActivityType)Enum.Parse(typeof(RecentActivityType), value.ToPascalCase());
+            set => Type = Enum.Parse<RecentActivityType>(value.ToPascalCase());
         }
 
         public RecentActivityType Type;
@@ -29,7 +29,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty]
         private string scoreRank
         {
-            set => ScoreRank = (ScoreRank)Enum.Parse(typeof(ScoreRank), value);
+            set => ScoreRank = Enum.Parse<ScoreRank>(value);
         }
 
         public ScoreRank ScoreRank;

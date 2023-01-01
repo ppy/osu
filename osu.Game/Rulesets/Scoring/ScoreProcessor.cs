@@ -40,6 +40,18 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableDouble Accuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
+        /// The minimum achievable accuracy for the whole beatmap at this stage of gameplay.
+        /// Assumes that all objects that have not been judged yet will receive the minimum hit result.
+        /// </summary>
+        public readonly BindableDouble MinimumAccuracy = new BindableDouble { MinValue = 0, MaxValue = 1 };
+
+        /// <summary>
+        /// The maximum achievable accuracy for the whole beatmap at this stage of gameplay.
+        /// Assumes that all objects that have not been judged yet will receive the maximum hit result.
+        /// </summary>
+        public readonly BindableDouble MaximumAccuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
+
+        /// <summary>
         /// The current combo.
         /// </summary>
         public readonly BindableInt Combo = new BindableInt();
@@ -264,6 +276,10 @@ namespace osu.Game.Rulesets.Scoring
         private void updateScore()
         {
             Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
+            MinimumAccuracy.Value = maximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / maximumScoringValues.BaseScore : 0;
+            MaximumAccuracy.Value = maximumScoringValues.BaseScore > 0
+                ? (double)(currentScoringValues.BaseScore + (maximumScoringValues.BaseScore - currentMaximumScoringValues.BaseScore)) / maximumScoringValues.BaseScore
+                : 1;
             TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues);
         }
 
@@ -534,7 +550,7 @@ namespace osu.Game.Rulesets.Scoring
                             break;
 
                         default:
-                            maxResult = maxBasicResult ??= ruleset.GetHitResults().OrderByDescending(kvp => Judgement.ToNumericResult(kvp.result)).First().result;
+                            maxResult = maxBasicResult ??= ruleset.GetHitResults().MaxBy(kvp => Judgement.ToNumericResult(kvp.result)).result;
                             break;
                     }
 
