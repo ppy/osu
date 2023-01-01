@@ -143,6 +143,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     case ArmedState.Hit:
                         // Fade out time is at a maximum of 800. Must match `DrawableHitCircle`'s arbitrary lifetime spec.
                         const double fade_out_time = 800;
+                        const double legacy_fade_duration = 240;
 
                         const double flash_in_duration = 150;
                         const double resize_duration = 400;
@@ -162,16 +163,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         // a few milliseconds before it's hidden by the flash, so it's pointless overhead to bother with it.
                         innerGradient.FadeOut(flash_in_duration, Easing.OutQuint);
 
-                        // The border is always white, but after hit it gets coloured by the skin/beatmap's colouring.
-                        // A gradient is applied to make the border less prominent over the course of the animation.
-                        // Without this, the border dominates the visual presence of the explosion animation in a bad way.
-                        border.TransformTo(nameof
-                            (BorderColour), ColourInfo.GradientVertical(
-                            accentColour.Value.Opacity(0.5f),
-                            accentColour.Value.Opacity(0)), fade_out_time);
-
                         if (hitLightingEnabled.Value)
                         {
+                            // The border is always white, but after hit it gets coloured by the skin/beatmap's colouring.
+                            // A gradient is applied to make the border less prominent over the course of the animation.
+                            // Without this, the border dominates the visual presence of the explosion animation in a bad way.
+                            border.TransformTo(nameof
+                                (BorderColour), ColourInfo.GradientVertical(
+                                accentColour.Value.Opacity(0.5f),
+                                accentColour.Value.Opacity(0)), fade_out_time);
+
                             // The outer ring shrinks immediately, but accounts for its thickness so it doesn't overlap the inner
                             // gradient layers.
                             border.ResizeTo(Size * shrink_size + new Vector2(border.BorderThickness), resize_duration, Easing.OutElasticHalf);
@@ -194,7 +195,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         else
                         {
                             // If hit lighting is disabled, use legacy fade out behavior for border and outer gradient.
-                            const double legacy_fade_duration = 240;
                             border.FadeOut(legacy_fade_duration);
                             border.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
