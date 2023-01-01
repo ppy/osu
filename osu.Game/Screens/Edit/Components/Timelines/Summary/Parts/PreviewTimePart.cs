@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         protected override void LoadBeatmap(EditorBeatmap beatmap)
         {
             base.LoadBeatmap(beatmap);
-            Add(new PreviewTimeVisualisation(beatmap.PreviewTime));
+            Add(new PreviewTimeVisualisation(beatmap));
             beatmap.PreviewTime.BindValueChanged(s =>
             {
                 Alpha = s.NewValue == -1 ? 0 : 1;
@@ -24,11 +24,10 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             private readonly BindableInt previewTime = new BindableInt();
 
-            public PreviewTimeVisualisation(BindableInt time)
-                : base(time.Value)
+            public PreviewTimeVisualisation(EditorBeatmap editorBeatmap)
             {
-                previewTime.BindTo(time);
-                previewTime.BindValueChanged(s => X = s.NewValue);
+                previewTime.BindTo(editorBeatmap.PreviewTime);
+                previewTime.BindValueChanged(s => X = s.NewValue, true);
             }
 
             [BackgroundDependencyLoader]
