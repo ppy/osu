@@ -154,10 +154,17 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             scoreRetrievalRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
 
-            scoreRetrievalRequest.Success += response => SetScores(
-                scoreManager.OrderByTotalScore(response.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
-                response.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
-            );
+            scoreRetrievalRequest.Success += response => Schedule(() =>
+            {
+                // Beatmap may have changed since fetch request. Can't rely on request cancellation due to Schedule inside SetScores.
+                if (!fetchBeatmapInfo.Equals(BeatmapInfo))
+                    return;
+
+                SetScores(
+                    scoreManager.OrderByTotalScore(response.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
+                    response.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
+                );
+            });
 
             return scoreRetrievalRequest;
         }
