@@ -81,6 +81,7 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
+                case GlobalAction.PauseGameplay:
                     if (GameplayClockContainer.IsPaused.Value)
                         GameplayClockContainer.Start();
                     else
