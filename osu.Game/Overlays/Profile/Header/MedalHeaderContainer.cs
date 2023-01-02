@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,9 +18,9 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public partial class MedalHeaderContainer : CompositeDrawable
     {
-        private FillFlowContainer badgeFlowContainer;
+        private FillFlowContainer badgeFlowContainer = null!;
 
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -66,16 +64,16 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private CancellationTokenSource cancellationTokenSource;
+        private CancellationTokenSource? cancellationTokenSource;
 
-        private void updateDisplay(APIUser user)
+        private void updateDisplay(APIUser? user)
         {
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
 
             badgeFlowContainer.Clear();
 
-            var badges = user.Badges;
+            var badges = user?.Badges;
 
             if (badges?.Length > 0)
             {
