@@ -4,6 +4,7 @@
 #nullable disable
 
 using NUnit.Framework;
+using osu.Framework.Screens;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osuTK.Input;
@@ -23,14 +24,29 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player loaded", () => Player.IsLoaded);
         }
 
-        [Test]
-        public void TestPause()
+        [TestCase("space")]
+        [TestCase("mouse middle")]
+        public void TestPause(string action)
         {
             double? lastTime = null;
 
             AddUntilStep("wait for first hit", () => Player.ScoreProcessor.TotalScore.Value > 0);
 
-            AddStep("Pause playback", () => InputManager.Key(Key.Space));
+            AddStep("Pause playback", () =>
+            {
+                switch (action)
+                {
+                    case "space":
+                        InputManager.Key(Key.Space);
+                        break;
+
+                    case "mouse middle":
+                        InputManager.Click(MouseButton.Middle);
+                        break;
+                }
+            });
+
+            AddAssert("player not exited", () => Player.IsCurrentScreen());
 
             AddUntilStep("Time stopped progressing", () =>
             {
