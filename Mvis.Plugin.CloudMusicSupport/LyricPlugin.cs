@@ -107,6 +107,13 @@ namespace Mvis.Plugin.CloudMusicSupport
                     Bindable = config.GetBindable<float>(LyricSettings.LyricPositionY),
                     DisplayAsPercentage = true
                 },
+                new NumberSettingsEntry<float>
+                {
+                    Name = "歌曲相似度阈值",
+                    Bindable = config.GetBindable<float>(LyricSettings.TitleSimilarThreshold),
+                    DisplayAsPercentage = true,
+                    Description = "网易云搜出的歌词有时不一定能和当前谱面匹配。 阈值越高, 对网易云返回的搜索结果检查越严格，搜索成功率也就越低"
+                },
                 new BooleanSettingsEntry
                 {
                     Name = "启用用户定义",
@@ -173,7 +180,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         public void GetLyricFor(int id)
         {
             CurrentStatus.Value = Status.Working;
-            processor.SearchByNeteaseID(id, onLyricRequestFinished, onLyricRequestFail);
+            processor.SearchByNeteaseID(id, onLyricRequestFinished, onLyricRequestFail, TitleSimilarThreshold.Value);
         }
 
         private Track track = null!;
@@ -187,6 +194,8 @@ namespace Mvis.Plugin.CloudMusicSupport
         private readonly Bindable<bool> autoSave = new Bindable<bool>();
 
         public readonly Bindable<Status> CurrentStatus = new Bindable<Status>();
+
+        public readonly Bindable<float> TitleSimilarThreshold = new Bindable<float>();
 
         public LyricPlugin()
         {
@@ -225,6 +234,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             config.BindWith(LyricSettings.EnablePlugin, Value);
             config.BindWith(LyricSettings.SaveLrcWhenFetchFinish, autoSave);
+            config.BindWith(LyricSettings.TitleSimilarThreshold, TitleSimilarThreshold);
 
             AddInternal(processor);
             AddInternal(UserDefinitionHelper);
@@ -275,7 +285,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             else if (UserDefinitionHelper.OnlineIDHaveDefinition(CurrentWorkingBeatmap.BeatmapSetInfo.OnlineID, out neid))
                 GetLyricFor(neid);
             else
-                processor.Search(SearchOption.From(CurrentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail));
+                processor.Search(SearchOption.From(CurrentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail, TitleSimilarThreshold.Value));
         }
 
         private double targetTime => track.CurrentTime + Offset.Value;

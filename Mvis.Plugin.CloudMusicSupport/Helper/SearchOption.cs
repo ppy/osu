@@ -30,15 +30,22 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         public bool NoLocalFile;
 
         /// <summary>
+        /// 标题匹配阈值，值越高要求越严格
+        /// </summary>
+        public float TitleSimiliarThreshold;
+
+        /// <summary>
         /// 通过给定的参数构建<see cref="SearchOption"/>.
         /// </summary>
         /// <param name="sourceBeatmap">目标<see cref="WorkingBeatmap"/>></param>
         /// <param name="noLocalFile"><see cref="NoLocalFile"/></param>
         /// <param name="onFinish">完成时要进行的动作</param>
         /// <param name="onFail">失败时要进行的动作</param>
+        /// <param name="titleSimiliarThreshold"><see cref="TitleSimiliarThreshold"/></param>
         /// <returns>通过参数构建的<see cref="SearchOption"/>></returns>
         public static SearchOption From(WorkingBeatmap sourceBeatmap, bool noLocalFile,
-                                        Action<APILyricResponseRoot>? onFinish, Action<string> onFail)
+                                        Action<APILyricResponseRoot>? onFinish, Action<string> onFail,
+                                        float titleSimiliarThreshold)
         {
             return new SearchOption
             {
@@ -47,7 +54,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                 OnFinish = onFinish,
                 OnFail = onFail,
 
-                NoLocalFile = noLocalFile
+                NoLocalFile = noLocalFile,
+
+                TitleSimiliarThreshold = titleSimiliarThreshold
             };
         }
 
@@ -65,7 +74,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                 Beatmap = requestFinishMeta.SourceBeatmap,
 
                 OnFinish = requestFinishMeta.OnFinish,
-                OnFail = requestFinishMeta.OnFail
+                OnFail = requestFinishMeta.OnFail,
+
+                TitleSimiliarThreshold = requestFinishMeta.TitleSimiliarThreshold
             };
         }
     }

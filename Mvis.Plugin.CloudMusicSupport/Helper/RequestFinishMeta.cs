@@ -17,6 +17,11 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         public WorkingBeatmap? SourceBeatmap;
 
         /// <summary>
+        /// 标题匹配阈值，值越高要求越严格
+        /// </summary>
+        public float TitleSimiliarThreshold;
+
+        /// <summary>
         /// 请求是否成功？
         /// </summary>
         public bool Success;
@@ -30,6 +35,28 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         /// 歌曲ID，未搜到歌曲时返回-1
         /// </summary>
         public int SongID => (SearchResponseRoot.Result?.Songs?.First().ID ?? -1);
+
+        /// <summary>
+        /// 获取网易云歌曲标题和搜索标题的相似度
+        /// </summary>
+        /// <returns>相似度百分比</returns>
+        public float GetSimiliarPrecentage()
+        {
+            string neteaseTitle = GetNeteaseTitle();
+            string ourTitle = SourceBeatmap?.Metadata.GetTitle() ?? string.Empty;
+
+            if (string.IsNullOrEmpty(neteaseTitle) || string.IsNullOrEmpty(ourTitle)) return 0;
+
+            int distance = LevenshteinDistance.Compute(neteaseTitle, ourTitle);
+            float precentage = 1 - (distance / (float)ourTitle.Length);
+
+            return precentage;
+        }
+
+        public string GetNeteaseTitle()
+        {
+            return SearchResponseRoot?.Result?.Songs?.First().Name ?? string.Empty;
+        }
 
         /// <summary>
         /// 返回一个失败的<see cref="RequestFinishMeta"/>
@@ -58,9 +85,11 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         /// <param name="sourceBeatmap">和此Meta对应的<see cref="WorkingBeatmap"/>></param>
         /// <param name="onFinish">完成时要进行的动作</param>
         /// <param name="onFail">失败时要进行的动作</param>
+        /// <param name="titleSimiliarThreshold"><see cref="TitleSimiliarThreshold"/></param>
         /// <returns>通过参数构建的<see cref="RequestFinishMeta"/>></returns>
         public static RequestFinishMeta From(APISearchResponseRoot responseRoot, WorkingBeatmap? sourceBeatmap,
-                                             Action<APILyricResponseRoot>? onFinish, Action<string>? onFail)
+                                             Action<APILyricResponseRoot>? onFinish, Action<string>? onFail,
+                                             float titleSimiliarThreshold)
         {
             return new RequestFinishMeta
             {
@@ -68,7 +97,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                 OnFail = onFail,
                 SearchResponseRoot = responseRoot,
                 Success = (responseRoot.Result?.Songs?.First().ID ?? -1) > 0,
-                SourceBeatmap = sourceBeatmap
+                SourceBeatmap = sourceBeatmap,
+                TitleSimiliarThreshold = titleSimiliarThreshold
             };
         }
     }
