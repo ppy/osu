@@ -5,7 +5,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModVisualAdjusts : ModWithVisibilityAdjustment
+    public abstract class ModVisualAdjusts : Mod
     {
         public override string Name => "Visual Adjusts";
         public override LocalisableString Description => "Adjust some gameplay elements that can bring some visual challenge.";

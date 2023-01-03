@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModVisualAdjusts : ModVisualAdjusts, IApplicableToDrawableRuleset<OsuHitObject>
+    internal class OsuModVisualAdjusts : ModVisualAdjusts, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToDrawableHitObject
     {
         [SettingSource("Disable follow points", "No more hints for where to follow...")]
         public BindableBool DisableFollowPoints { get; } = new BindableBool();
@@ -26,20 +26,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                 ((DrawableOsuRuleset)drawableRuleset).Playfield.FollowPoints.Hide();
         }
 
-        private void tryApplyNoComboColours(DrawableHitObject hitObject)
+        public void ApplyToDrawableHitObject(DrawableHitObject dho)
         {
-            if (NoComboColours.Value)
-                hitObject.AccentColour.Value = Color4.White;
-        }
-
-        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
-        {
-            tryApplyNoComboColours(hitObject);
-        }
-
-        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
-        {
-            tryApplyNoComboColours(hitObject);
+            dho.ApplyCustomUpdateState += (o, _) =>
+            {
+                if (NoComboColours.Value)
+                    o.AccentColour.Value = Color4.White;
+            };
         }
     }
 }
