@@ -152,12 +152,14 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            scoreRetrievalRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
+            scoreRetrievalRequest?.Cancel();
 
-            scoreRetrievalRequest.Success += response => Schedule(() =>
+            var newRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
+            newRequest.Success += response => Schedule(() =>
             {
-                // Beatmap may have changed since fetch request. Can't rely on request cancellation due to Schedule inside SetScores.
-                if (!fetchBeatmapInfo.Equals(BeatmapInfo))
+                // Request may have changed since fetch request.
+                // Can't rely on request cancellation due to Schedule inside SetScores so let's play it safe.
+                if (!newRequest.Equals(scoreRetrievalRequest))
                     return;
 
                 SetScores(
@@ -166,7 +168,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 );
             });
 
-            return scoreRetrievalRequest;
+            return scoreRetrievalRequest = newRequest;
         }
 
         protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope)
