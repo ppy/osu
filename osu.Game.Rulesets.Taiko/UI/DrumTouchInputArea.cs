@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -45,8 +46,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             // Container should handle input everywhere.
             RelativeSizeAxes = Axes.Both;
 
-            const float centre_region = 0.80f;
+            const TaikoTouchControls touchControls = TaikoTouchControls.KKDD;
 
+            const float centre_region = 0.80f;
+            
             Children = new Drawable[]
             {
                 new Container
@@ -65,27 +68,51 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(TaikoAction.LeftCentre, colours.Pink)
+                                leftRim = new QuarterCircle(touchControls == TaikoTouchControls.KDDK ? TaikoAction.LeftRim :
+                                                            touchControls == TaikoTouchControls.DDKK ? TaikoAction.LeftCentre :
+                                                          /*touchControls == TaikoTouchControls.KKDD*/ TaikoAction.LeftRim,
+
+                                                            touchControls == TaikoTouchControls.KDDK ? colours.Blue :
+                                                            touchControls == TaikoTouchControls.DDKK ? colours.Pink :
+                                                          /*touchControls == TaikoTouchControls.KKDD*/ colours.Blue)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                rightRim = new QuarterCircle(TaikoAction.RightRim, colours.Blue)
+                                rightRim = new QuarterCircle(touchControls == TaikoTouchControls.KDDK ? TaikoAction.RightRim :
+                                                             touchControls == TaikoTouchControls.DDKK ? TaikoAction.RightRim :
+                                                           /*touchControls == TaikoTouchControls.KKDD*/ TaikoAction.RightCentre,
+
+                                                             touchControls == TaikoTouchControls.KDDK ? colours.Blue :
+                                                             touchControls == TaikoTouchControls.DDKK ? colours.Blue :
+                                                           /*touchControls == TaikoTouchControls.KKDD*/ colours.Pink)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                leftCentre = new QuarterCircle(TaikoAction.RightCentre, colours.Pink)
+                                leftCentre = new QuarterCircle(touchControls == TaikoTouchControls.KDDK ? TaikoAction.LeftCentre :
+                                                               touchControls == TaikoTouchControls.DDKK ? TaikoAction.RightCentre :
+                                                             /*touchControls == TaikoTouchControls.KKDD*/ TaikoAction.RightRim,
+
+                                                               touchControls == TaikoTouchControls.KDDK ? colours.Pink :
+                                                               touchControls == TaikoTouchControls.DDKK ? colours.Pink :
+                                                             /*touchControls == TaikoTouchControls.KKDD*/ colours.Blue)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new QuarterCircle(TaikoAction.LeftRim, colours.Blue)
+                                rightCentre = new QuarterCircle(touchControls == TaikoTouchControls.KDDK ? TaikoAction.RightCentre :
+                                                                touchControls == TaikoTouchControls.DDKK ? TaikoAction.LeftRim :
+                                                              /*touchControls == TaikoTouchControls.KKDD*/ TaikoAction.LeftCentre,
+
+                                                                touchControls == TaikoTouchControls.KDDK ? colours.Pink :
+                                                                touchControls == TaikoTouchControls.DDKK ? colours.Blue :
+                                                              /*touchControls == TaikoTouchControls.KKDD*/ colours.Pink)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -136,22 +163,34 @@ namespace osu.Game.Rulesets.Taiko.UI
             handleUp(e.Touch.Source);
             base.OnTouchUp(e);
         }
-        private TaikoAction KDDKtoDDKK(TaikoAction input) {
-            switch(input) {
-                case TaikoAction.LeftRim: return TaikoAction.LeftCentre;
-                case TaikoAction.LeftCentre: return TaikoAction.RightCentre;
-                case TaikoAction.RightCentre: return TaikoAction.LeftRim;
-              //case TaikoAction.RightRim: return TaikoAction.RightRim;
+        private TaikoAction convertInput(TaikoAction input, TaikoTouchControls controlType) {
+            switch(controlType) {
+                default:
+                    return input; // Using default controls; Nothing needs to be done
+                case TaikoTouchControls.DDKK:
+                    switch(input) {
+                        case TaikoAction.LeftRim: return TaikoAction.LeftCentre;
+                        case TaikoAction.LeftCentre: return TaikoAction.RightCentre;
+                        case TaikoAction.RightCentre: return TaikoAction.LeftRim;
+                      //case TaikoAction.RightRim: return TaikoAction.RightRim;
+                    }
+                    return TaikoAction.RightRim;
+                case TaikoTouchControls.KKDD:
+                    switch(input) {
+                        case TaikoAction.RightRim: return TaikoAction.RightCentre;
+                        case TaikoAction.LeftCentre: return TaikoAction.RightRim;
+                        case TaikoAction.RightCentre: return TaikoAction.LeftCentre;
+                      //case TaikoAction.LeftRim: return TaikoAction.LeftRim;
+                    }
+                    return TaikoAction.LeftRim;
             }
-            return TaikoAction.RightRim;
-            
         }
         private void handleDown(object source, Vector2 position)
         {
             Show();
 
-            TaikoAction taikoAction = KDDKtoDDKK(getTaikoActionFromInput(position));
-            
+            TaikoAction taikoAction = convertInput(getTaikoActionFromInput(position), TaikoTouchControls.KKDD);
+
             // Not too sure how this can happen, but let's avoid throwing.
             if (trackedActions.ContainsKey(source))
                 return;
