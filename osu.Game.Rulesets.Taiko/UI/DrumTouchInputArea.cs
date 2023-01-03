@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(TaikoAction.LeftRim, colours.Blue)
+                                leftRim = new QuarterCircle(TaikoAction.LeftCentre, colours.Pink)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -78,14 +78,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                leftCentre = new QuarterCircle(TaikoAction.LeftCentre, colours.Pink)
+                                leftCentre = new QuarterCircle(TaikoAction.RightCentre, colours.Pink)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new QuarterCircle(TaikoAction.RightCentre, colours.Pink)
+                                rightCentre = new QuarterCircle(TaikoAction.LeftRim, colours.Blue)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -136,13 +136,22 @@ namespace osu.Game.Rulesets.Taiko.UI
             handleUp(e.Touch.Source);
             base.OnTouchUp(e);
         }
-
+        private TaikoAction KDDKtoDDKK(TaikoAction input) {
+            switch(input) {
+                case TaikoAction.LeftRim: return TaikoAction.LeftCentre;
+                case TaikoAction.LeftCentre: return TaikoAction.RightCentre;
+                case TaikoAction.RightCentre: return TaikoAction.LeftRim;
+              //case TaikoAction.RightRim: return TaikoAction.RightRim;
+            }
+            return TaikoAction.RightRim;
+            
+        }
         private void handleDown(object source, Vector2 position)
         {
             Show();
 
-            TaikoAction taikoAction = getTaikoActionFromInput(position);
-
+            TaikoAction taikoAction = KDDKtoDDKK(getTaikoActionFromInput(position));
+            
             // Not too sure how this can happen, but let's avoid throwing.
             if (trackedActions.ContainsKey(source))
                 return;
