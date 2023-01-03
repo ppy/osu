@@ -3,9 +3,11 @@
 
 using System;
 using osu.Framework.Audio.Track;
+using osu.Game.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Skinning
 {
@@ -14,6 +16,14 @@ namespace osu.Game.Skinning
         private readonly Drawable flashingDrawable;
 
         private const float flash_opacity = 0.55f;
+
+        private bool is_kiai_flashing_enabled = true;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            is_kiai_flashing_enabled = config.Get<bool>(OsuSetting.KiaiFlashing);
+        }
 
         public LegacyKiaiFlashingDrawable(Func<Drawable?> creationFunc)
         {
@@ -38,7 +48,7 @@ namespace osu.Game.Skinning
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
-            if (!effectPoint.KiaiMode)
+            if (!effectPoint.KiaiMode || !is_kiai_flashing_enabled)
                 return;
 
             flashingDrawable
