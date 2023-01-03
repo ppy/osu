@@ -26,6 +26,9 @@ namespace osu.Game.Rulesets.Catch.Mods
             var catchPlayfield = (CatchPlayfield)playfield;
             bool shouldAlwaysShowCatcher = IsBreakTime.Value;
             float targetAlpha = shouldAlwaysShowCatcher ? 1 : ComboBasedAlpha;
+
+            // AlwaysPresent required for catcher to still act on input when fully hidden.
+            catchPlayfield.CatcherArea.AlwaysPresent = true;
             catchPlayfield.CatcherArea.Alpha = (float)Interpolation.Lerp(catchPlayfield.CatcherArea.Alpha, targetAlpha, Math.Clamp(catchPlayfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
         }
     }
