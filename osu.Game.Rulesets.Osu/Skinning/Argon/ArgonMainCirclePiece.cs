@@ -45,15 +45,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
         private readonly FlashPiece flash;
 
-        private readonly bool isPro;
-
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        public ArgonMainCirclePiece(bool withOuterFill, bool isPro = false)
+        public ArgonMainCirclePiece(bool withOuterFill)
         {
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
@@ -99,8 +97,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 flash = new FlashPiece(),
                 border = new RingPiece(BORDER_THICKNESS),
             };
-
-            this.isPro = isPro;
         }
 
         [BackgroundDependencyLoader]
@@ -147,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 {
                     case ArmedState.Hit:
 
-                        bool useFlash = !isPro || config.Get<bool>(OsuSetting.HitLighting);
+                        bool useFlash = config.Get<bool>(OsuSetting.HitLighting);
                         var easingOutQuint = useFlash ? Easing.OutQuint : Easing.Out;
 
                         // Fade out time is at a maximum of 800. Must match `DrawableHitCircle`'s arbitrary lifetime spec.
