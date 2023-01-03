@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Text.Encodings.Web;
 using System.Threading;
@@ -12,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API;
 
 namespace Mvis.Plugin.CloudMusicSupport.Helper
 {
@@ -20,20 +18,23 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
     {
         #region 歌词获取
 
-        private OsuJsonWebRequest<APISearchResponseRoot>? currentSearchRequest;
-        private OsuJsonWebRequest<APILyricResponseRoot>? currentLyricRequest;
+        private APISearchRequest? currentSearchRequest;
+        private APILyricRequest? currentLyricRequest;
 
         private CancellationTokenSource cancellationTokenSource = null!;
 
         private UrlEncoder? encoder;
 
-        public void StartFetchByBeatmap(
-            WorkingBeatmap beatmap,
-            bool noLocalFile,
-            Action<APILyricResponseRoot>? onFinish,
-            Action<string>? onFail)
+        public void Search(SearchOption searchOption)
         {
-            if (!noLocalFile)
+            var beatmap = searchOption.Beatmap;
+
+            if (beatmap == null) return;
+
+            var onFinish = searchOption.OnFinish;
+            var onFail = searchOption.OnFail;
+
+            if (!searchOption.NoLocalFile)
             {
                 try
                 {
@@ -64,15 +65,21 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             currentSearchRequest?.Dispose();
             currentLyricRequest?.Dispose();
 
-            //处理要搜索的歌名: "艺术家 标题"
+            //处理要搜索的歌名: "标题 艺术家"
             string title = beatmap.Metadata.TitleUnicode;
-            string artist = beatmap.Metadata.ArtistUnicode;
-            string target = encoder.Encode($"{artist} {title}");
+            string artist = searchOption.NoArtist ? string.Empty : $" {beatmap.Metadata.ArtistUnicode}";
+            string target = encoder.Encode($"{title}{artist}");
 
-            var req = new OsuJsonWebRequest<APISearchResponseRoot>(
-                $"https://music.163.com/api/search/get/web?hlpretag=&hlposttag=&s={target}&type=1&total=true&limit=1");
+            var req = new APISearchRequest(target);
 
-            req.Finished += () => onRequestFinish(req.ResponseObject, onFinish, onFail);
+            req.Finished += () =>
+            {
+                var meta = RequestFinishMeta.From(req.ResponseObject, beatmap, onFinish, onFail);
+                meta.NoRetry = searchOption.NoRetry;
+
+                onRequestFinish(meta);
+            };
+
             req.Failed += e =>
             {
                 string message = "查询歌曲失败";
@@ -88,7 +95,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             currentSearchRequest = req;
         }
 
-        public void StartFetchById(int id, Action<APILyricResponseRoot> onFinish, Action<string> onFail)
+        public void SearchByNeteaseID(int id, Action<APILyricResponseRoot> onFinish, Action<string> onFail)
         {
             //处理之前的请求
             cancellationTokenSource?.Cancel();
@@ -109,22 +116,32 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                 }
             };
 
-            onRequestFinish(fakeResponse, onFinish, onFail);
+            onRequestFinish(RequestFinishMeta.From(fakeResponse, null, onFinish, onFail));
         }
 
-        private void onRequestFinish(APISearchResponseRoot responseRoot, Action<APILyricResponseRoot>? onFinish, Action<string>? onFail)
+        private void onRequestFinish(RequestFinishMeta meta)
         {
-            int id = responseRoot.Result?.Songs?.First().ID ?? -1;
-
-            if (id <= 0)
+            if (!meta.Success)
             {
-                onFail?.Invoke("未搜索到对应歌曲!");
+                //如果没成功，尝试使用标题重搜
+                if (meta.SourceBeatmap != null && !meta.NoRetry)
+                {
+                    var searchMeta = SearchOption.FromRequestFinishMeta(meta);
+                    searchMeta.NoArtist = true;
+                    searchMeta.NoRetry = true;
+                    searchMeta.NoLocalFile = true;
+
+                    Logger.Log("精准搜索失败, 将尝试只搜索标题...", level: LogLevel.Important);
+                    Search(searchMeta);
+                }
+                else
+                    meta.OnFail?.Invoke("未搜索到对应歌曲!");
+
                 return;
             }
 
-            string target = $"https://music.163.com/api/song/lyric?os=pc&id={id}&lv=-1&kv=-1&tv=-1";
-            var req = new OsuJsonWebRequest<APILyricResponseRoot>(target);
-            req.Finished += () => onFinish?.Invoke(req.ResponseObject);
+            var req = new APILyricRequest(meta.SongID);
+            req.Finished += () => meta.OnFinish?.Invoke(req.ResponseObject);
             req.Failed += e => Logger.Error(e, "获取歌词失败");
             req.PerformAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 

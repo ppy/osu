@@ -173,7 +173,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         public void GetLyricFor(int id)
         {
             CurrentStatus.Value = Status.Working;
-            processor.StartFetchById(id, onLyricRequestFinished, onLyricRequestFail);
+            processor.SearchByNeteaseID(id, onLyricRequestFinished, onLyricRequestFail);
         }
 
         private Track track = null!;
@@ -275,7 +275,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             else if (UserDefinitionHelper.OnlineIDHaveDefinition(CurrentWorkingBeatmap.BeatmapSetInfo.OnlineID, out neid))
                 GetLyricFor(neid);
             else
-                processor.StartFetchByBeatmap(CurrentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
+                processor.Search(SearchOption.From(CurrentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail));
         }
 
         private double targetTime => track.CurrentTime + Offset.Value;
