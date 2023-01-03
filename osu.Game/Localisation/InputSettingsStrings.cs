@@ -59,6 +59,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString KeyBindingPanelDescription => new TranslatableString(getKey(@"key_binding_panel_description"), @"Customise your keys!");
 
+        /// <summary>
+        /// "Taiko touch control type"
+        /// </summary>
+        public static LocalisableString TaikoTouchControlType => new TranslatableString(getKey(@"taiko_touch_control_type"), @"Taiko touch control type");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

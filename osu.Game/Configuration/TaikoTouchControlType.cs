@@ -7,7 +7,7 @@ namespace osu.Game.Configuration
 {
     public enum TaikoTouchControlType
     {
-        KDDK,
+        Default, // KDDK
         DDKK,
         KKDD
     }

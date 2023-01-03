@@ -101,6 +101,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MouseDisableButtons, false);
             SetDefault(OsuSetting.MouseDisableWheel, false);
             SetDefault(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
+            SetDefault(OsuSetting.TaikoTouchControlType, TaikoTouchControlType.Default);
 
             // Graphics
             SetDefault(OsuSetting.ShowFpsDisplay, false);
@@ -375,5 +376,6 @@ namespace osu.Game.Configuration
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
+        TaikoTouchControlType,
     }
 }

@@ -11,6 +11,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Input;
+using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -47,6 +48,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
+
         public partial class HandlerSection : SettingsSubsection
         {
             private readonly InputHandler handler;
@@ -57,7 +59,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OsuConfigManager osuConfig)
             {
                 Children = new Drawable[]
                 {
@@ -65,6 +67,11 @@ namespace osu.Game.Overlays.Settings.Sections
                     {
                         LabelText = CommonStrings.Enabled,
                         Current = handler.Enabled
+                    },
+                    new SettingsEnumDropdown<TaikoTouchControlType>
+                    {
+                        LabelText = InputSettingsStrings.TaikoTouchControlType,
+                        Current = osuConfig.GetBindable<TaikoTouchControlType>(OsuSetting.TaikoTouchControlType)
                     },
                 };
             }

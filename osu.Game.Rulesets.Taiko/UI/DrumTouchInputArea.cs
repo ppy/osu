@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -14,6 +16,7 @@ using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -37,8 +40,10 @@ namespace osu.Game.Rulesets.Taiko.UI
         private QuarterCircle leftRim = null!;
         private QuarterCircle rightRim = null!;
 
+        private Bindable<TaikoTouchControlType> touchControlsType;
+
         [BackgroundDependencyLoader]
-        private void load(TaikoInputManager taikoInputManager, OsuColour colours)
+        private void load(TaikoInputManager taikoInputManager, OsuColour colours, OsuConfigManager config)
         {
             Debug.Assert(taikoInputManager.KeyBindingContainer != null);
             keyBindingContainer = taikoInputManager.KeyBindingContainer;
@@ -46,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             // Container should handle input everywhere.
             RelativeSizeAxes = Axes.Both;
 
-            const TaikoTouchControlType touchControls = TaikoTouchControlType.KKDD;
+            touchControlsType = config.GetBindable<TaikoTouchControlType>(OsuSetting.TaikoTouchControlType);
 
             const float centre_region = 0.80f;
             
@@ -68,51 +73,51 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(touchControls == TaikoTouchControlType.KDDK ? TaikoAction.LeftRim :
-                                                            touchControls == TaikoTouchControlType.DDKK ? TaikoAction.LeftCentre :
-                                                          /*touchControls == TaikoTouchControlType.KKDD*/ TaikoAction.LeftRim,
+                                leftRim = new QuarterCircle(touchControlsType.Value == TaikoTouchControlType.Default ? TaikoAction.LeftRim :
+                                                            touchControlsType.Value == TaikoTouchControlType.DDKK ? TaikoAction.LeftCentre :
+                                                          /*touchControlsType.Value == TaikoTouchControlType.KKDD*/ TaikoAction.LeftRim,
 
-                                                            touchControls == TaikoTouchControlType.KDDK ? colours.Blue :
-                                                            touchControls == TaikoTouchControlType.DDKK ? colours.Pink :
-                                                          /*touchControls == TaikoTouchControlType.KKDD*/ colours.Blue)
+                                                            touchControlsType.Value == TaikoTouchControlType.Default ? colours.Blue :
+                                                            touchControlsType.Value == TaikoTouchControlType.DDKK ? colours.Pink :
+                                                          /*touchControlsType.Value == TaikoTouchControlType.KKDD*/ colours.Blue)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                rightRim = new QuarterCircle(touchControls == TaikoTouchControlType.KDDK ? TaikoAction.RightRim :
-                                                             touchControls == TaikoTouchControlType.DDKK ? TaikoAction.RightRim :
-                                                           /*touchControls == TaikoTouchControlType.KKDD*/ TaikoAction.RightCentre,
+                                rightRim = new QuarterCircle(touchControlsType.Value == TaikoTouchControlType.Default ? TaikoAction.RightRim :
+                                                             touchControlsType.Value == TaikoTouchControlType.DDKK ? TaikoAction.RightRim :
+                                                           /*touchControlsType.Value == TaikoTouchControlType.KKDD*/ TaikoAction.RightCentre,
 
-                                                             touchControls == TaikoTouchControlType.KDDK ? colours.Blue :
-                                                             touchControls == TaikoTouchControlType.DDKK ? colours.Blue :
-                                                           /*touchControls == TaikoTouchControlType.KKDD*/ colours.Pink)
+                                                             touchControlsType.Value == TaikoTouchControlType.Default ? colours.Blue :
+                                                             touchControlsType.Value == TaikoTouchControlType.DDKK ? colours.Blue :
+                                                           /*touchControlsType.Value == TaikoTouchControlType.KKDD*/ colours.Pink)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                leftCentre = new QuarterCircle(touchControls == TaikoTouchControlType.KDDK ? TaikoAction.LeftCentre :
-                                                               touchControls == TaikoTouchControlType.DDKK ? TaikoAction.RightCentre :
-                                                             /*touchControls == TaikoTouchControlType.KKDD*/ TaikoAction.RightRim,
+                                leftCentre = new QuarterCircle(touchControlsType.Value == TaikoTouchControlType.Default ? TaikoAction.LeftCentre :
+                                                               touchControlsType.Value == TaikoTouchControlType.DDKK ? TaikoAction.RightCentre :
+                                                             /*touchControlsType.Value == TaikoTouchControlType.KKDD*/ TaikoAction.RightRim,
 
-                                                               touchControls == TaikoTouchControlType.KDDK ? colours.Pink :
-                                                               touchControls == TaikoTouchControlType.DDKK ? colours.Pink :
-                                                             /*touchControls == TaikoTouchControlType.KKDD*/ colours.Blue)
+                                                               touchControlsType.Value == TaikoTouchControlType.Default ? colours.Pink :
+                                                               touchControlsType.Value == TaikoTouchControlType.DDKK ? colours.Pink :
+                                                             /*touchControlsType.Value == TaikoTouchControlType.KKDD*/ colours.Blue)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new QuarterCircle(touchControls == TaikoTouchControlType.KDDK ? TaikoAction.RightCentre :
-                                                                touchControls == TaikoTouchControlType.DDKK ? TaikoAction.LeftRim :
-                                                              /*touchControls == TaikoTouchControlType.KKDD*/ TaikoAction.LeftCentre,
+                                rightCentre = new QuarterCircle(touchControlsType.Value == TaikoTouchControlType.Default ? TaikoAction.RightCentre :
+                                                                touchControlsType.Value == TaikoTouchControlType.DDKK ? TaikoAction.LeftRim :
+                                                              /*touchControlsType.Value == TaikoTouchControlType.KKDD*/ TaikoAction.LeftCentre,
 
-                                                                touchControls == TaikoTouchControlType.KDDK ? colours.Pink :
-                                                                touchControls == TaikoTouchControlType.DDKK ? colours.Blue :
-                                                              /*touchControls == TaikoTouchControlType.KKDD*/ colours.Pink)
+                                                                touchControlsType.Value == TaikoTouchControlType.Default ? colours.Pink :
+                                                                touchControlsType.Value == TaikoTouchControlType.DDKK ? colours.Blue :
+                                                              /*touchControlsType.Value == TaikoTouchControlType.KKDD*/ colours.Pink)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -189,7 +194,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             Show();
 
-            TaikoAction taikoAction = convertInput(getTaikoActionFromInput(position), TaikoTouchControlType.KKDD);
+            TaikoAction taikoAction = convertInput(getTaikoActionFromInput(position), touchControlsType.Value);
 
             // Not too sure how this can happen, but let's avoid throwing.
             if (trackedActions.ContainsKey(source))
