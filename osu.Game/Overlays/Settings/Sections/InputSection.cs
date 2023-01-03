@@ -48,7 +48,6 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-
         public partial class HandlerSection : SettingsSubsection
         {
             private readonly InputHandler handler;
