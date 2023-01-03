@@ -179,7 +179,8 @@ namespace osu.Game.Screens.Backgrounds
 
             protected override bool ShowDimContent
                 // The background needs to be hidden in the case of it being replaced by the storyboard
-                => (!ShowStoryboard.Value && !IgnoreUserSettings.Value) || !StoryboardReplacesBackground.Value;
+                // But it should show when dim set to 100% anyway to avoid showing Scaling background.
+                => (!ShowStoryboard.Value && !IgnoreUserSettings.Value) || !StoryboardReplacesBackground.Value || DimLevel == 1;
 
             protected override void UpdateVisuals()
             {
