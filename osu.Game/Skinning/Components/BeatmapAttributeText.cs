@@ -149,10 +149,6 @@ namespace osu.Game.Skinning.Components
             starDifficultyCancellationSource?.Cancel();
             starDifficultyCancellationSource = new CancellationTokenSource();
 
-            // var starDifficultyTask = DifficultyAdjust.Value
-                // ? difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token)
-                // : difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token)
-
             difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token).ContinueWith(starDifficultyTaskMods => Schedule(() =>
             {
                 StarDifficulty? starRating = starDifficultyTaskMods.GetResultSafely();
