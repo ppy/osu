@@ -101,7 +101,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MouseDisableButtons, false);
             SetDefault(OsuSetting.MouseDisableWheel, false);
             SetDefault(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
-            SetDefault(OsuSetting.TaikoTouchControlType, TaikoTouchControlType.Default);
+            SetDefault(OsuSetting.TaikoTouchControlType, TaikoTouchControlType.KDDK);
 
             // Graphics
             SetDefault(OsuSetting.ShowFpsDisplay, false);
