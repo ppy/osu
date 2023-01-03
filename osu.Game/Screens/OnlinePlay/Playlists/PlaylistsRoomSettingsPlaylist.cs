@@ -24,7 +24,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 Items.Remove(item);
 
-                SelectedItem.Value = nextItem ?? Items.LastOrDefault();
+                if (AllowSelection && SelectedItem.Value == item)
+                    SelectedItem.Value = nextItem ?? Items.LastOrDefault();
             };
         }
     }
