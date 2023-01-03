@@ -38,9 +38,6 @@ namespace osu.Game.Skinning.Components
         [SettingSource("Template", "Supports {Label} and {Value}, but also including arbitrary attributes like {StarRating} (see attribute list for supported values).")]
         public Bindable<string> Template { get; set; } = new Bindable<string>("{Label}: {Value}");
 
-        [SettingSource("Adjust Difficulty", "Should Mods that change Beatmap Statistics be applied to the shown Stats?")]
-        public BindableBool DifficultyAdjust { get; set; } = new BindableBool(true);
-
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
@@ -56,7 +53,6 @@ namespace osu.Game.Skinning.Components
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         private CancellationTokenSource? starDifficultyCancellationSource;
-        private StarDifficulty? starRating;
 
         private BeatmapDifficulty difficulty = null!;
 
@@ -65,19 +61,28 @@ namespace osu.Game.Skinning.Components
         private static readonly ImmutableDictionary<BeatmapAttribute, LocalisableString> label_dictionary = new Dictionary<BeatmapAttribute, LocalisableString>
         {
             [BeatmapAttribute.CircleSize] = BeatmapsetsStrings.ShowStatsCs,
+            [BeatmapAttribute.PreModCircleSize] = "Pre Mod " + BeatmapsetsStrings.ShowStatsCs,
             [BeatmapAttribute.Accuracy] = BeatmapsetsStrings.ShowStatsAccuracy,
+            [BeatmapAttribute.PreModAccuracy] = "Pre Mod " + BeatmapsetsStrings.ShowStatsAccuracy,
             [BeatmapAttribute.HPDrain] = BeatmapsetsStrings.ShowStatsDrain,
+            [BeatmapAttribute.PreModHPDrain] = "Pre Mod " + BeatmapsetsStrings.ShowStatsDrain,
             [BeatmapAttribute.ApproachRate] = BeatmapsetsStrings.ShowStatsAr,
+            [BeatmapAttribute.PreModApproachRate] = "Pre Mod " + BeatmapsetsStrings.ShowStatsAr,
             [BeatmapAttribute.StarRating] = BeatmapsetsStrings.ShowStatsStars,
+            [BeatmapAttribute.PreModStarRating] = "Pre Mod " + BeatmapsetsStrings.ShowStatsStars,
             [BeatmapAttribute.Title] = EditorSetupStrings.Title,
             [BeatmapAttribute.Artist] = EditorSetupStrings.Artist,
             [BeatmapAttribute.DifficultyName] = EditorSetupStrings.DifficultyHeader,
             [BeatmapAttribute.Creator] = EditorSetupStrings.Creator,
             [BeatmapAttribute.Length] = ArtistStrings.TracklistLength.ToTitle(),
+            [BeatmapAttribute.PreModLength] = "Pre Mod " + ArtistStrings.TracklistLength.ToTitle(),
             [BeatmapAttribute.RankedStatus] = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault,
             [BeatmapAttribute.BPM] = BeatmapsetsStrings.ShowStatsBpm,
+            [BeatmapAttribute.PreModBPM] = "Pre Mod " + BeatmapsetsStrings.ShowStatsBpm,
             [BeatmapAttribute.BPMMinimum] = ArtistStrings.TracksIndexFormBpmGte,
+            [BeatmapAttribute.PreModBPMMinimum] = "Pre Mod " + ArtistStrings.TracksIndexFormBpmGte,
             [BeatmapAttribute.BPMMaximum] = ArtistStrings.TracksIndexFormBpmLte,
+            [BeatmapAttribute.PreModBPMMaximum] = "Pre Mod " + ArtistStrings.TracksIndexFormBpmLte,
         }.ToImmutableDictionary();
 
         private readonly OsuSpriteText text;
@@ -111,22 +116,8 @@ namespace osu.Game.Skinning.Components
             mods.BindValueChanged(_ =>
             {
                 modSettingChangeTracker?.Dispose();
-                Action modsSettingsChangedAction = () =>
-                {
-                    //if we only dispaly base stats, mods are ignored anyways.
-                    //so then we can skip checking for a StarRating Update
-                    if (DifficultyAdjust.Value) updateStarRating();
-                    updateBpmAndLength();
-                    updateBeatmapContent();
-                    updateLabel();
-                };
-
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.Value);
-                modSettingChangeTracker.SettingChanged += _ => modsSettingsChangedAction();
-                modsSettingsChangedAction();
-            });
-            DifficultyAdjust.BindValueChanged(_ =>
-            {
+                modSettingChangeTracker.SettingChanged += _ => updateAllInfo();
                 updateAllInfo();
             });
             workingBeatmap.BindValueChanged(_ =>
@@ -146,9 +137,6 @@ namespace osu.Game.Skinning.Components
         private void updateDifficulty()
         {
             difficulty = new BeatmapDifficulty(workingBeatmap.Value.BeatmapInfo.Difficulty);
-
-            if (!DifficultyAdjust.Value) return;
-
             foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(difficulty);
         }
@@ -156,31 +144,47 @@ namespace osu.Game.Skinning.Components
         private void updateStarRating()
         {
             //set implicit default, whilst calculating beatmap difficulty.
-            valueDictionary[BeatmapAttribute.StarRating] = workingBeatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.StarRating] = valueDictionary[BeatmapAttribute.PreModStarRating] = workingBeatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
 
             starDifficultyCancellationSource?.Cancel();
             starDifficultyCancellationSource = new CancellationTokenSource();
 
-            var starDifficultyTask = DifficultyAdjust.Value
-                ? difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token)
-                : difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token);
-            starDifficultyTask.ContinueWith(_ => Schedule(() =>
+            // var starDifficultyTask = DifficultyAdjust.Value
+                // ? difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token)
+                // : difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token)
+
+            difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token).ContinueWith(starDifficultyTaskMods => Schedule(() =>
             {
-                starRating = starDifficultyTask.GetResultSafely();
+                StarDifficulty? starRating = starDifficultyTaskMods.GetResultSafely();
 
                 double? stars = starRating?.Stars;
                 if (stars is not null) valueDictionary[BeatmapAttribute.StarRating] = stars.ToLocalisableString(@"F2");
+                updateLabel();
+            }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
+            difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token).ContinueWith(starDifficultyTaskNoMods => Schedule(() =>
+            {
+                StarDifficulty? starRating = starDifficultyTaskNoMods.GetResultSafely();
+
+                double? stars = starRating?.Stars;
+                if (stars is not null) valueDictionary[BeatmapAttribute.PreModStarRating] = stars.ToLocalisableString(@"F2");
                 updateLabel();
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
 
         private void updateBpmAndLength()
         {
-            var (bpmMax, mostCommonBPM, bpmMin, length) = workingBeatmap.Value.Beatmap.GetBPMAndLength(mods.Value.OfType<ModRateAdjust>());
+            var (preModBpmMin, preModMostCommonBPM, preModBpmMax, preModLength) = workingBeatmap.Value.Beatmap.GetBPMAndLength(Enumerable.Empty<IApplicableToRate>());
+
+            valueDictionary[BeatmapAttribute.PreModBPMMinimum] = preModBpmMin.ToLocalisableString(@"F0");
+            valueDictionary[BeatmapAttribute.PreModBPM] = preModMostCommonBPM.ToLocalisableString(@"F0");
+            valueDictionary[BeatmapAttribute.PreModBPMMaximum] = preModBpmMax.ToLocalisableString(@"F0");
+            valueDictionary[BeatmapAttribute.PreModLength] = TimeSpan.FromMilliseconds(preModLength).ToFormattedDuration();
+
+            var (bpmMin, mostCommonBPM, bpmMax, length) = workingBeatmap.Value.Beatmap.GetBPMAndLength(mods.Value.OfType<ModRateAdjust>());
 
             valueDictionary[BeatmapAttribute.BPMMaximum] = bpmMax.ToLocalisableString(@"F0");
-            valueDictionary[BeatmapAttribute.BPMMinimum] = mostCommonBPM.ToLocalisableString(@"F0");
-            valueDictionary[BeatmapAttribute.BPM] = bpmMin.ToLocalisableString(@"F0");
+            valueDictionary[BeatmapAttribute.BPMMinimum] = bpmMin.ToLocalisableString(@"F0");
+            valueDictionary[BeatmapAttribute.BPM] = mostCommonBPM.ToLocalisableString(@"F0");
             valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(length).ToFormattedDuration();
         }
 
@@ -197,6 +201,10 @@ namespace osu.Game.Skinning.Components
             valueDictionary[BeatmapAttribute.HPDrain] = ((double)difficulty.DrainRate).ToLocalisableString(@"F2");
             valueDictionary[BeatmapAttribute.Accuracy] = ((double)difficulty.OverallDifficulty).ToLocalisableString(@"F2");
             valueDictionary[BeatmapAttribute.ApproachRate] = ((double)difficulty.ApproachRate).ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.PreModCircleSize] = ((double)beatmapInfo.Difficulty.CircleSize).ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.PreModHPDrain] = ((double)beatmapInfo.Difficulty.DrainRate).ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.PreModAccuracy] = ((double)beatmapInfo.Difficulty.OverallDifficulty).ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.PreModApproachRate] = ((double)beatmapInfo.Difficulty.ApproachRate).ToLocalisableString(@"F2");
         }
 
         private void updateLabel()
@@ -245,5 +253,14 @@ namespace osu.Game.Skinning.Components
         BPM,
         BPMMinimum,
         BPMMaximum,
+        PreModCircleSize,
+        PreModHPDrain,
+        PreModAccuracy,
+        PreModApproachRate,
+        PreModStarRating,
+        PreModLength,
+        PreModBPM,
+        PreModBPMMinimum,
+        PreModBPMMaximum,
     }
 }
