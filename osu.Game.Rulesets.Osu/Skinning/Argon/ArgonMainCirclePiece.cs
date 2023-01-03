@@ -149,7 +149,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                         bool useFlash = !isPro || config.Get<bool>(OsuSetting.HitLighting);
                         var easingOutQuint = useFlash ? Easing.OutQuint : Easing.Out;
-                        var easingOutEh = useFlash ? Easing.OutElasticHalf : Easing.Out;
 
                         // Fade out time is at a maximum of 800. Must match `DrawableHitCircle`'s arbitrary lifetime spec.
                         double fadeOutTime = useFlash ? 800 : 240;
@@ -198,7 +197,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                                     .FadeOut(flashInDuration);
                             }
                             else
+                            {
+                                outerGradient.FlashColour(Colour4.White, resize_duration / 3.5f);
                                 outerGradient.FadeOut(resize_duration);
+                            }
                         }
 
                         if (useFlash)
