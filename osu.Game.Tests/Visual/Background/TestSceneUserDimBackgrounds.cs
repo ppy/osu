@@ -254,6 +254,23 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.CheckBackgroundBlur(playerLoader.ExpectedBackgroundBlur));
         }
 
+        /// <summary>
+        /// Make sure to show the background when 100% dim.
+        /// </summary>
+        [Test]
+        public void TestFullDim()
+        {
+            performFullSetup();
+            createFakeStoryboard();
+            AddStep("Enable Storyboard", () =>
+            {
+                player.ReplacesBackground.Value = true;
+                player.StoryboardEnabled.Value = true;
+            });
+            AddStep("Set dim level to 1", () => songSelect.DimLevel.Value = 1f);
+            AddUntilStep("Background is visible", () => songSelect.IsBackgroundVisible());
+        }
+
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
             player.StoryboardEnabled.Value = false;
