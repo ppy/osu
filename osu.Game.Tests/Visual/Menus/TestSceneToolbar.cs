@@ -207,7 +207,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("set toolbar width", () =>
             {
                 toolbar.RelativeSizeAxes = Axes.None;
-                toolbar.Width = 0;
+                toolbar.Width = 400;
             });
             AddStep("move mouse over news toggle button", () =>
             {
@@ -215,6 +215,7 @@ namespace osu.Game.Tests.Visual.Menus
                 InputManager.MoveMouseTo(button);
             });
             AddAssert("no ruleset toggle buttons hovered", () => !toolbar.ChildrenOfType<ToolbarRulesetTabButton>().Any(button => button.IsHovered));
+            AddUntilStep("toolbar gradient visible", () => toolbar.ChildrenOfType<Toolbar.ToolbarBackground>().Single().Children.All(d => d.Alpha > 0));
         }
 
         public partial class TestToolbar : Toolbar
