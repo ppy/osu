@@ -118,8 +118,7 @@ namespace osu.Game.Online.Chat
         /// <param name="name"></param>
         public void OpenChannel(string name)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            ArgumentNullException.ThrowIfNull(name);
 
             CurrentChannel.Value = AvailableChannels.FirstOrDefault(c => c.Name == name) ?? throw new ChannelNotFoundException(name);
         }
@@ -130,8 +129,7 @@ namespace osu.Game.Online.Chat
         /// <param name="user">The user the private channel is opened with.</param>
         public void OpenPrivateChannel(APIUser user)
         {
-            if (user == null)
-                throw new ArgumentNullException(nameof(user));
+            ArgumentNullException.ThrowIfNull(user);
 
             if (user.Id == api.LocalUser.Value.Id)
                 return;

@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -197,11 +198,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Debug.Assert(e.NewItems != null);
+
                     foreach (var added in e.NewItems.OfType<APIUser>())
                         addUser(added);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (var removed in e.OldItems.OfType<APIUser>())
                         removeUser(removed);
                     break;

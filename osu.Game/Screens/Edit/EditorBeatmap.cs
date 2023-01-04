@@ -304,7 +304,7 @@ namespace osu.Game.Screens.Edit
         /// <param name="index">The index of the <see cref="HitObject"/> to remove.</param>
         public void RemoveAt(int index)
         {
-            var hitObject = (HitObject)mutableHitObjects[index];
+            HitObject hitObject = (HitObject)mutableHitObjects[index]!;
 
             mutableHitObjects.RemoveAt(index);
 
