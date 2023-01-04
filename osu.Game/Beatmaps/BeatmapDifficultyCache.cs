@@ -87,10 +87,10 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> that follows the currently-selected ruleset, and mods if <paramref name="applyMods"/> is <c>true</c>.
+        /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> that follows the currently-selected ruleset, along with mods if <paramref name="applyMods"/> is <c>true</c>.
         /// </summary>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
-        /// <param name="applyMods">Whether mods should be applied in the star difficulty calculation.</param>
+        /// <param name="applyMods">Whether the currently-selected mods should be applied to the star difficulty calculation in this bindable.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
         /// <returns>A bindable that is updated to contain the star difficulty when it becomes available. Will be null while in an initial calculating state (but not during updates to ruleset and mods if a stale value is already propagated).</returns>
         public IBindable<StarDifficulty?> GetBindableDifficulty(IBeatmapInfo beatmapInfo, bool applyMods = true, CancellationToken cancellationToken = default)
