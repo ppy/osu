@@ -481,7 +481,7 @@ namespace osu.Game.Skinning.Editor
             return Task.CompletedTask;
         }
 
-        public Task Import(params ImportTask[] tasks) => throw new NotImplementedException();
+        Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
         public IEnumerable<string> HandledExtensions => new[] { ".jpg", ".jpeg", ".png" };
 

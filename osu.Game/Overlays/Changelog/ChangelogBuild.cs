@@ -68,11 +68,15 @@ namespace osu.Game.Overlays.Changelog
             Anchor = Anchor.TopCentre,
             Origin = Anchor.TopCentre,
             AutoSizeAxes = Axes.Both,
-            Direction = FillDirection.Horizontal,
+            Direction = FillDirection.Vertical,
             Margin = new MarginPadding { Top = 20 },
-            Children = new Drawable[]
+            Child = new FillFlowContainer
             {
-                new OsuHoverContainer
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Child = new OsuHoverContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

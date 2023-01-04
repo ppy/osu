@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -24,11 +23,11 @@ namespace osu.Game.Overlays
 {
     public partial class UserProfileOverlay : FullscreenOverlay<ProfileHeader>
     {
-        private ProfileSection lastSection;
-        private ProfileSection[] sections;
-        private GetUserRequest userReq;
-        private ProfileSectionsContainer sectionsContainer;
-        private ProfileSectionTabControl tabs;
+        private ProfileSection? lastSection;
+        private ProfileSection[]? sections;
+        private GetUserRequest? userReq;
+        private ProfileSectionsContainer? sectionsContainer;
+        private ProfileSectionTabControl? tabs;
 
         public const float CONTENT_X_MARGIN = 70;
 
@@ -133,6 +132,8 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(APIUser user)
         {
+            Debug.Assert(sections != null && sectionsContainer != null && tabs != null);
+
             Header.User.Value = user;
 
             if (user.ProfileOrder != null)

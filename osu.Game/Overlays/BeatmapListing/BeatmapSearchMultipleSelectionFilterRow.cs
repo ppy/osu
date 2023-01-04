@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -18,6 +19,7 @@ using osuTK;
 namespace osu.Game.Overlays.BeatmapListing
 {
     public partial class BeatmapSearchMultipleSelectionFilterRow<T> : BeatmapSearchFilterRow<List<T>>
+        where T : Enum
     {
         public new readonly BindableList<T> Current = new BindableList<T>();
 
@@ -31,7 +33,7 @@ namespace osu.Game.Overlays.BeatmapListing
         [BackgroundDependencyLoader]
         private void load()
         {
-            Current.BindTo(filter.Current);
+            filter.Current.BindTo(Current);
         }
 
         protected sealed override Drawable CreateFilter() => filter = CreateMultipleSelectionFilter();
@@ -64,6 +66,14 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 foreach (var item in Children)
                     item.Active.BindValueChanged(active => toggleItem(item.Value, active.NewValue));
+
+                Current.BindCollectionChanged(currentChanged, true);
+            }
+
+            private void currentChanged(object sender, NotifyCollectionChangedEventArgs e)
+            {
+                foreach (var c in Children)
+                    c.Active.Value = Current.Contains(c.Value);
             }
 
             /// <summary>
@@ -79,7 +89,10 @@ namespace osu.Game.Overlays.BeatmapListing
             private void toggleItem(T value, bool active)
             {
                 if (active)
-                    Current.Add(value);
+                {
+                    if (!Current.Contains(value))
+                        Current.Add(value);
+                }
                 else
                     Current.Remove(value);
             }

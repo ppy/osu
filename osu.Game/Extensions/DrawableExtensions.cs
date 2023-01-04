@@ -67,10 +67,10 @@ namespace osu.Game.Extensions
 
                 foreach (var (_, property) in component.GetSettingsSourceProperties())
                 {
-                    if (!info.Settings.TryGetValue(property.Name.ToSnakeCase(), out object settingValue))
+                    if (!info.Settings.TryGetValue(property.Name.ToSnakeCase(), out object? settingValue))
                         continue;
 
-                    skinnable.CopyAdjustedSetting((IBindable)property.GetValue(component), settingValue);
+                    skinnable.CopyAdjustedSetting(((IBindable)property.GetValue(component)!), settingValue);
                 }
             }
 
