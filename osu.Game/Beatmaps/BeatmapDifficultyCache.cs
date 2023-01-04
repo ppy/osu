@@ -317,7 +317,7 @@ namespace osu.Game.Beatmaps
             public BindableStarDifficulty(IBeatmapInfo beatmapInfo, bool applyMods, CancellationToken cancellationToken)
             {
                 BeatmapInfo = beatmapInfo;
-                this.ApplyMods = applyMods;
+                ApplyMods = applyMods;
                 CancellationToken = cancellationToken;
             }
         }
