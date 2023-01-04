@@ -32,7 +32,8 @@ namespace osu.Game.Tests.Beatmaps
 
         private TestBeatmapDifficultyCache difficultyCache;
 
-        private IBindable<StarDifficulty?> starDifficultyBindable;
+        private IBindable<StarDifficulty?> normalStarDifficultyBindable;
+        private IBindable<StarDifficulty?> moddedStarDifficultyBindable;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osu)
@@ -49,10 +50,12 @@ namespace osu.Game.Tests.Beatmaps
 
                 Child = difficultyCache = new TestBeatmapDifficultyCache();
 
-                starDifficultyBindable = difficultyCache.GetBindableDifficulty(importedSet.Beatmaps.First());
+                normalStarDifficultyBindable = difficultyCache.GetBindableDifficulty(importedSet.Beatmaps.First(), false);
+                moddedStarDifficultyBindable = difficultyCache.GetBindableDifficulty(importedSet.Beatmaps.First());
             });
 
-            AddUntilStep($"star difficulty -> {BASE_STARS}", () => starDifficultyBindable.Value?.Stars == BASE_STARS);
+            AddUntilStep($"normal star difficulty = {BASE_STARS}", () => normalStarDifficultyBindable.Value?.Stars == BASE_STARS);
+            AddUntilStep($"modded star difficulty = {BASE_STARS}", () => moddedStarDifficultyBindable.Value?.Stars == BASE_STARS);
         }
 
         [Test]
@@ -67,13 +70,16 @@ namespace osu.Game.Tests.Beatmaps
             });
 
             AddStep("change selected mod to DT", () => SelectedMods.Value = new[] { dt = new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
-            AddUntilStep($"star difficulty -> {BASE_STARS + 1.5}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.5);
+            AddUntilStep($"normal star difficulty = {BASE_STARS}", () => normalStarDifficultyBindable.Value?.Stars == BASE_STARS);
+            AddUntilStep($"modded star difficulty = {BASE_STARS + 1.5}", () => moddedStarDifficultyBindable.Value?.Stars == BASE_STARS + 1.5);
 
             AddStep("change DT speed to 1.25", () => dt.SpeedChange.Value = 1.25);
-            AddUntilStep($"star difficulty -> {BASE_STARS + 1.25}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.25);
+            AddUntilStep($"normal star difficulty = {BASE_STARS}", () => normalStarDifficultyBindable.Value?.Stars == BASE_STARS);
+            AddUntilStep($"modded star difficulty = {BASE_STARS + 1.25}", () => moddedStarDifficultyBindable.Value?.Stars == BASE_STARS + 1.25);
 
             AddStep("change selected mod to NC", () => SelectedMods.Value = new[] { new OsuModNightcore { SpeedChange = { Value = 1.75 } } });
-            AddUntilStep($"star difficulty -> {BASE_STARS + 1.75}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.75);
+            AddUntilStep($"normal star difficulty = {BASE_STARS}", () => normalStarDifficultyBindable.Value?.Stars == BASE_STARS);
+            AddUntilStep($"modded star difficulty = {BASE_STARS + 1.75}", () => moddedStarDifficultyBindable.Value?.Stars == BASE_STARS + 1.75);
         }
 
         [Test]
@@ -88,15 +94,17 @@ namespace osu.Game.Tests.Beatmaps
             });
 
             AddStep("change selected mod to DA", () => SelectedMods.Value = new[] { difficultyAdjust = new OsuModDifficultyAdjust() });
-            AddUntilStep($"star difficulty -> {BASE_STARS}", () => starDifficultyBindable.Value?.Stars == BASE_STARS);
+            AddUntilStep($"normal star difficulty = {BASE_STARS}", () => normalStarDifficultyBindable.Value?.Stars == BASE_STARS);
+            AddUntilStep($"modded star difficulty = {BASE_STARS}", () => moddedStarDifficultyBindable.Value?.Stars == BASE_STARS);
 
             AddStep("change DA difficulty to 0.5", () => difficultyAdjust.OverallDifficulty.Value = 0.5f);
-            AddUntilStep($"star difficulty -> {BASE_STARS * 0.5f}", () => starDifficultyBindable.Value?.Stars == BASE_STARS / 2);
+            AddUntilStep($"normal star difficulty = {BASE_STARS}", () => normalStarDifficultyBindable.Value?.Stars == BASE_STARS);
+            AddUntilStep($"modded star difficulty = {BASE_STARS * 0.5f}", () => moddedStarDifficultyBindable.Value?.Stars == BASE_STARS / 2);
 
             // hash code of 0 (the value) conflicts with the hash code of null (the initial/default value).
             // it's important that the mod reference and its underlying bindable references stay the same to demonstrate this failure.
             AddStep("change DA difficulty to 0", () => difficultyAdjust.OverallDifficulty.Value = 0);
-            AddUntilStep("star difficulty -> 0", () => starDifficultyBindable.Value?.Stars == 0);
+            AddUntilStep("modded star difficulty = 0", () => moddedStarDifficultyBindable.Value?.Stars == 0);
         }
 
         [Test]
