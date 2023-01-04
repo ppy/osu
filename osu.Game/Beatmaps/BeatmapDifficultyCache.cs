@@ -87,14 +87,15 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> that follows the currently-selected ruleset and mods.
+        /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> that follows the currently-selected ruleset, and mods if <paramref name="applyMods"/> is <c>true</c>.
         /// </summary>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
+        /// <param name="applyMods">Whether mods should be applied in the star difficulty calculation.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
         /// <returns>A bindable that is updated to contain the star difficulty when it becomes available. Will be null while in an initial calculating state (but not during updates to ruleset and mods if a stale value is already propagated).</returns>
-        public IBindable<StarDifficulty?> GetBindableDifficulty(IBeatmapInfo beatmapInfo, CancellationToken cancellationToken = default)
+        public IBindable<StarDifficulty?> GetBindableDifficulty(IBeatmapInfo beatmapInfo, bool applyMods = true, CancellationToken cancellationToken = default)
         {
-            var bindable = new BindableStarDifficulty(beatmapInfo, cancellationToken);
+            var bindable = new BindableStarDifficulty(beatmapInfo, applyMods, cancellationToken);
 
             updateBindable(bindable, currentRuleset.Value, currentMods.Value, cancellationToken);
 
@@ -203,7 +204,7 @@ namespace osu.Game.Beatmaps
         {
             // GetDifficultyAsync will fall back to existing data from IBeatmapInfo if not locally available
             // (contrary to GetAsync)
-            GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, mods, cancellationToken)
+            GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, bindable.ApplyMods ? mods : null, cancellationToken)
                 .ContinueWith(task =>
                 {
                     // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
@@ -309,11 +310,14 @@ namespace osu.Game.Beatmaps
         private class BindableStarDifficulty : Bindable<StarDifficulty?>
         {
             public readonly IBeatmapInfo BeatmapInfo;
+            public readonly bool ApplyMods;
+
             public readonly CancellationToken CancellationToken;
 
-            public BindableStarDifficulty(IBeatmapInfo beatmapInfo, CancellationToken cancellationToken)
+            public BindableStarDifficulty(IBeatmapInfo beatmapInfo, bool applyMods, CancellationToken cancellationToken)
             {
                 BeatmapInfo = beatmapInfo;
+                this.ApplyMods = applyMods;
                 CancellationToken = cancellationToken;
             }
         }

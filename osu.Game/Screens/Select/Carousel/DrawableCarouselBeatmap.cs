@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (Item.State.Value != CarouselItemState.Collapsed)
             {
                 // We've potentially cancelled the computation above so a new bindable is required.
-                starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmapInfo, (starDifficultyCancellationSource = new CancellationTokenSource()).Token);
+                starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmapInfo, cancellationToken: (starDifficultyCancellationSource = new CancellationTokenSource()).Token);
                 starDifficultyBindable.BindValueChanged(d =>
                 {
                     starCounter.Current = (float)(d.NewValue?.Stars ?? 0);

@@ -329,7 +329,7 @@ namespace osu.Game.Screens.Select
                     difficultyColourBar.Colour = colours.ForStarDifficulty(s.NewValue);
                 }, true);
 
-                starDifficulty = difficultyCache.GetBindableDifficulty(working.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
+                starDifficulty = difficultyCache.GetBindableDifficulty(working.BeatmapInfo, cancellationToken: (cancellationSource = new CancellationTokenSource()).Token);
                 starDifficulty.BindValueChanged(s =>
                 {
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
