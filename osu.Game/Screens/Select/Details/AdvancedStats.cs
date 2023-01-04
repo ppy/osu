@@ -17,8 +17,6 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using osu.Framework.Extensions;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -53,7 +51,7 @@ namespace osu.Game.Screens.Select.Details
 
                 beatmapInfo = value;
 
-                updateStatistics();
+                beatmapChanged();
             }
         }
 
@@ -80,12 +78,44 @@ namespace osu.Game.Screens.Select.Details
             starDifficulty.AccentColour = colours.Yellow;
         }
 
+        private IBindable<StarDifficulty?> normalStarDifficulty;
+        private IBindable<StarDifficulty?> moddedStarDifficulty;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             ruleset.BindValueChanged(_ => updateStatistics());
             mods.BindValueChanged(modsChanged, true);
+        }
+
+        private CancellationTokenSource starDifficultyCancellationSource;
+
+        private void beatmapChanged()
+        {
+            updateStatistics();
+
+            starDifficultyCancellationSource?.Cancel();
+            starDifficultyCancellationSource = null;
+
+            if (beatmapInfo == null)
+                return;
+
+            starDifficultyCancellationSource = new CancellationTokenSource();
+
+            normalStarDifficulty = difficultyCache.GetBindableDifficulty(beatmapInfo, false, starDifficultyCancellationSource.Token);
+            normalStarDifficulty.ValueChanged += _ => updateStarDifficulty();
+
+            moddedStarDifficulty = difficultyCache.GetBindableDifficulty(beatmapInfo, true, starDifficultyCancellationSource.Token);
+            moddedStarDifficulty.ValueChanged += _ => updateStarDifficulty();
+        }
+
+        private void updateStarDifficulty()
+        {
+            if (normalStarDifficulty.Value is not StarDifficulty normalDifficulty || moddedStarDifficulty.Value is not StarDifficulty moddedDifficulty)
+                return;
+
+            starDifficulty.Value = ((float)normalDifficulty.Stars, (float)moddedDifficulty.Stars);
         }
 
         private ModSettingChangeTracker modSettingChangeTracker;
@@ -136,34 +166,6 @@ namespace osu.Game.Screens.Select.Details
             HpDrain.Value = (baseDifficulty?.DrainRate ?? 0, adjustedDifficulty?.DrainRate);
             Accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty);
             ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate);
-
-            updateStarDifficulty();
-        }
-
-        private CancellationTokenSource starDifficultyCancellationSource;
-
-        private void updateStarDifficulty()
-        {
-            starDifficultyCancellationSource?.Cancel();
-
-            if (BeatmapInfo == null)
-                return;
-
-            starDifficultyCancellationSource = new CancellationTokenSource();
-
-            var normalStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token);
-            var moddedStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
-
-            Task.WhenAll(normalStarDifficultyTask, moddedStarDifficultyTask).ContinueWith(_ => Schedule(() =>
-            {
-                var normalDifficulty = normalStarDifficultyTask.GetResultSafely();
-                var moddedDifficulty = moddedStarDifficultyTask.GetResultSafely();
-
-                if (normalDifficulty == null || moddedDifficulty == null)
-                    return;
-
-                starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
-            }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
 
         protected override void Dispose(bool isDisposing)
