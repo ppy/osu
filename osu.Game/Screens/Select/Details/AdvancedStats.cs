@@ -150,7 +150,14 @@ namespace osu.Game.Screens.Select.Details
 
         private CancellationTokenSource starDifficultyCancellationSource;
 
-        private void updateStarDifficulty()
+        /// <summary>
+        /// Updates the displayed star difficulty statistics with the values provided by the currently-selected beatmap, ruleset, and selected mods.
+        /// </summary>
+        /// <remarks>
+        /// This is scheduled to avoid scenarios wherein a ruleset changes first before selected mods do,
+        /// potentially resulting in failure during difficulty calculation due to incomplete bindable state updates.
+        /// </remarks>
+        private void updateStarDifficulty() => Scheduler.AddOnce(() =>
         {
             starDifficultyCancellationSource?.Cancel();
 
@@ -172,7 +179,7 @@ namespace osu.Game.Screens.Select.Details
 
                 starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
-        }
+        });
 
         protected override void Dispose(bool isDisposing)
         {
