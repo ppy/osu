@@ -282,7 +282,7 @@ namespace osu.Game.Screens.Menu
 
             if (beatIndex < 0) return;
 
-            if (IsHovered)
+            if (Action != null && IsHovered)
             {
                 this.Delay(early_activation).Schedule(() =>
                 {
@@ -361,11 +361,11 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override bool HandlePositionalInput => base.HandlePositionalInput && Action != null && Alpha > 0.2f;
+        public override bool HandlePositionalInput => base.HandlePositionalInput && Alpha > 0.2f;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (e.Button != MouseButton.Left) return false;
+            if (Action == null || e.Button != MouseButton.Left) return false;
 
             logoBounceContainer.ScaleTo(0.9f, 1000, Easing.Out);
             return true;
@@ -380,7 +380,9 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Action?.Invoke() ?? true)
+            if (Action == null) return false;
+
+            if (Action.Invoke())
                 sampleClick.Play();
 
             flashLayer.ClearTransforms();
@@ -391,6 +393,8 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnHover(HoverEvent e)
         {
+            if (Action == null) return false;
+
             logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
             return true;
         }
