@@ -22,6 +22,7 @@ using osu.Desktop.Windows;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Platform.MacOS;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.IO;
@@ -29,6 +30,7 @@ using osu.Game.Screens.Menu;
 using osu.Game.IPC;
 using osu.Game.Utils;
 using SDL2;
+using osu.Framework.Platform.Windows;
 
 namespace osu.Desktop
 {
@@ -201,7 +203,14 @@ namespace osu.Desktop
             //mfosu: Find SDLWindowHandle
             if (windowHandle == null)
             {
-                var fields = desktopWindow.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+                const BindingFlags binding_flag = BindingFlags.Instance | BindingFlags.NonPublic;
+
+                FieldInfo[] fields = desktopWindow switch
+                {
+                    WindowsWindow windowsWindow => windowsWindow.GetType().BaseType!.GetFields(binding_flag),
+                    MacOSWindow macOSWindow => macOSWindow.GetType().BaseType!.GetFields(binding_flag),
+                    _ => desktopWindow.GetType().GetFields(binding_flag)
+                };
 
                 foreach (var fieldInfo in fields)
                 {

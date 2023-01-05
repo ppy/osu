@@ -29,6 +29,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
             SetDefault(LyricSettings.EnableUserDefinitions, false);
             SetDefault(LyricSettings.UserDefinitionURL, "https://raw.githubusercontent.com/MATRIX-feather/random-stuffs/master/assets/netease_to_llin.json");
             SetDefault(LyricSettings.OutputDefinitionInLogs, false);
+            SetDefault(LyricSettings.TitleSimilarThreshold, 0.8f, 0f, 1f);
             base.InitialiseDefaults();
         }
 
@@ -50,6 +51,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
         EnableUserDefinitions,
         UserDefinitionURL,
         CurrentDefinition,
-        OutputDefinitionInLogs
+        OutputDefinitionInLogs,
+        TitleSimilarThreshold
     }
 }
