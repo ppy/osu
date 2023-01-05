@@ -113,6 +113,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Shift, InputKey.Tab }, GlobalAction.ToggleInGameInterface),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
             new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
+            new KeyBinding(InputKey.MouseMiddle, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.Left, GlobalAction.SeekReplayBackward),
             new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
