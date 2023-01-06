@@ -17,15 +17,23 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Threading;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
+using osu.Game.Users.Drawables;
+using osuTK;
 
 namespace osu.Game.Overlays.Comments
 {
+    [Cached]
     public partial class CommentsContainer : CompositeDrawable
     {
+        private const string cid = "commentableId";
+
+        [Cached]
         private readonly Bindable<CommentableType> type = new Bindable<CommentableType>();
+
+        [Cached(name: cid)]
         private readonly BindableLong id = new BindableLong();
 
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
@@ -46,12 +54,14 @@ namespace osu.Game.Overlays.Comments
         private DeletedCommentsCounter deletedCommentsCounter;
         private CommentsShowMoreButton moreButton;
         private TotalCommentsCounter commentCounter;
+        private UpdateableAvatar avatar;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
             AddRangeInternal(new Drawable[]
             {
                 new Box
@@ -85,6 +95,29 @@ namespace osu.Game.Overlays.Comments
                                     Direction = FillDirection.Vertical,
                                 },
                             },
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding { Horizontal = 50, Vertical = 20 },
+                            Children = new Drawable[]
+                            {
+                                avatar = new UpdateableAvatar(api.LocalUser.Value)
+                                {
+                                    Size = new Vector2(50),
+                                    CornerExponent = 2,
+                                    CornerRadius = 25,
+                                    Masking = true,
+                                },
+                                new Container
+                                {
+                                    Padding = new MarginPadding { Left = 60 },
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Child = new NewCommentEditor()
+                                }
+                            }
                         },
                         new CommentsHeader
                         {
@@ -146,6 +179,7 @@ namespace osu.Game.Overlays.Comments
             });
 
             User.BindTo(api.LocalUser);
+            User.BindValueChanged(e => avatar.User = e.NewValue);
         }
 
         protected override void LoadComplete()
@@ -334,6 +368,38 @@ namespace osu.Game.Overlays.Comments
                         Text = CommentsStrings.Empty
                     }
                 });
+            }
+        }
+
+        private partial class NewCommentEditor : CommentEditor
+        {
+            [Resolved]
+            public Bindable<CommentableType> CommentableType { get; set; }
+
+            [Resolved(name: cid)]
+            public BindableLong CommentableId { get; set; }
+
+            protected override LocalisableString FooterText => default;
+            protected override LocalisableString CommitButtonText => CommonStrings.ButtonsPost;
+            protected override LocalisableString TextBoxPlaceholder => CommentsStrings.PlaceholderNew;
+
+            [Resolved]
+            private IAPIProvider api { get; set; }
+
+            protected override void OnCommit(string text)
+            {
+                CommitButton.IsLoadingSpinnerShown = true;
+                CommentPostRequest req = new CommentPostRequest(CommentableType.Value, CommentableId.Value, text);
+                req.Failure += _ => Schedule(() =>
+                {
+                    CommitButton.IsLoadingSpinnerShown = false;
+                });
+                req.Success += cb => Schedule(() =>
+                {
+                    CommitButton.IsLoadingSpinnerShown = false;
+                    Current.Value = string.Empty;
+                });
+                api.Queue(req);
             }
         }
     }
