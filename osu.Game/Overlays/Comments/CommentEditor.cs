@@ -11,7 +11,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Sprites;
 using osuTK.Graphics;
 using osu.Game.Graphics.UserInterface;
-using System;
 using osuTK;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
@@ -22,8 +21,6 @@ namespace osu.Game.Overlays.Comments
     public abstract partial class CommentEditor : CompositeDrawable
     {
         private const int side_padding = 8;
-
-        public Action<string>? OnCommit;
 
         protected abstract LocalisableString FooterText { get; }
 
@@ -98,11 +95,7 @@ namespace osu.Game.Overlays.Comments
                                         Text = CommitButtonText,
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
-                                        Action = () =>
-                                        {
-                                            OnCommit?.Invoke(Current.Value);
-                                            Current.Value = string.Empty;
-                                        }
+                                        Action = () => OnCommit(Current.Value)
                                     }
                                 }
                             }
@@ -120,6 +113,8 @@ namespace osu.Game.Overlays.Comments
 
             Current.BindValueChanged(text => CommitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
         }
+
+        protected abstract void OnCommit(string text);
 
         private partial class EditorTextBox : BasicTextBox
         {
@@ -151,7 +146,7 @@ namespace osu.Game.Overlays.Comments
             protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
             {
                 AutoSizeAxes = Axes.Both,
-                Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) },
+                Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) }
             };
         }
 
