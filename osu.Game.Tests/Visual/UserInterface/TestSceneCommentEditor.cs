@@ -118,12 +118,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public bool ButtonLoading => CommitButton.ChildrenOfType<LoadingSpinner>().Single().IsPresent && !CommitButton.ChildrenOfType<SpriteText>().Single().IsPresent;
 
-            public TestCommentEditor()
-            {
-                OnCommit = onCommit;
-            }
-
-            private void onCommit(string value)
+            protected override void OnCommit(string value)
             {
                 CommitButton.IsLoadingSpinnerShown = true;
                 CommittedText = value;
@@ -138,6 +133,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private partial class TestCancellableCommentEditor : CancellableCommentEditor
         {
             public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
+
             protected override LocalisableString FooterText => @"Wow, another one. Sicc";
 
             public bool Cancelled { get; private set; }
@@ -145,6 +141,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             public TestCancellableCommentEditor()
             {
                 OnCancel = () => Cancelled = true;
+            }
+
+            protected override void OnCommit(string text)
+            {
             }
 
             protected override LocalisableString CommitButtonText => @"Save";
