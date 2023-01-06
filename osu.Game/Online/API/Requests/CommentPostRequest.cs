@@ -27,7 +27,7 @@ namespace osu.Game.Online.API.Requests
             var req = base.CreateWebRequest();
             req.Method = HttpMethod.Post;
 
-            req.AddParameter(@"comment[commentable_type]", Commentable.ToString());
+            req.AddParameter(@"comment[commentable_type]", Commentable.ToString().ToLowerInvariant());
             req.AddParameter(@"comment[commentable_id]", $"{CommentableId}");
             req.AddParameter(@"comment[message]", Message);
             if (ReplyTo.HasValue)
