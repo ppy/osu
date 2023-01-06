@@ -52,33 +52,33 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             base.LoadComplete();
 
-            updateState();
+            UpdateState();
             FinishTransforms(true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            updateState();
+            UpdateState();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            updateState();
+            UpdateState();
         }
 
-        protected override void OnActivated() => updateState();
+        protected override void OnActivated() => UpdateState();
 
-        protected override void OnDeactivated() => updateState();
+        protected override void OnDeactivated() => UpdateState();
 
         /// <summary>
         /// Returns the label text to be used for the supplied <paramref name="value"/>.
         /// </summary>
         protected virtual LocalisableString LabelFor(T value) => (value as Enum)?.GetLocalisableDescription() ?? value.ToString();
 
-        private void updateState()
+        protected virtual void UpdateState()
         {
             text.FadeColour(IsHovered ? colourProvider.Light1 : GetStateColour(), 200, Easing.OutQuint);
             text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Regular);
