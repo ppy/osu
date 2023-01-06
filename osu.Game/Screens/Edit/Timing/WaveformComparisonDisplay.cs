@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Edit.Timing
             if (!displayLocked.Value)
             {
                 float trackLength = (float)beatmap.Value.Track.Length;
-                int totalBeatsAvailable = (int)(trackLength / timingPoint.BeatLength);
+                int totalBeatsAvailable = (int)((trackLength - timingPoint.Time) / timingPoint.BeatLength);
 
                 Scheduler.AddOnce(showFromBeat, (int)(e.MousePosition.X / DrawWidth * totalBeatsAvailable));
             }
