@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.BeatmapListing
     public partial class FilterTabItem<T> : TabItem<T>
     {
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        protected OverlayColourProvider ColourProvider { get; private set; }
 
         private OsuSpriteText text;
 
@@ -78,12 +78,16 @@ namespace osu.Game.Overlays.BeatmapListing
         /// </summary>
         protected virtual LocalisableString LabelFor(T value) => (value as Enum)?.GetLocalisableDescription() ?? value.ToString();
 
+        protected virtual bool HighlightOnHoverWhenActive => false;
+
         protected virtual void UpdateState()
         {
-            text.FadeColour(IsHovered ? colourProvider.Light1 : GetStateColour(), 200, Easing.OutQuint);
+            bool highlightHover = IsHovered && (!Active.Value || HighlightOnHoverWhenActive);
+
+            text.FadeColour(highlightHover ? ColourProvider.Content2 : GetStateColour(), 200, Easing.OutQuint);
             text.Font = text.Font.With(weight: Active.Value ? FontWeight.SemiBold : FontWeight.Regular);
         }
 
-        protected virtual Color4 GetStateColour() => Active.Value ? colourProvider.Content1 : colourProvider.Light2;
+        protected virtual Color4 GetStateColour() => Active.Value ? ColourProvider.Content1 : ColourProvider.Light2;
     }
 }
