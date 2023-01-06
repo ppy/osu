@@ -7,18 +7,20 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public partial class RestoreDefaultValueButton<T> : OsuButton, IHasTooltip, IHasCurrentValue<T>
+    public partial class RestoreDefaultValueButton<T> : OsuClickableContainer, IHasCurrentValue<T>
     {
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
@@ -51,15 +53,32 @@ namespace osu.Game.Overlays
 
         private const float size = 4;
 
+        private CircularContainer circle = null!;
+        private Box background = null!;
+
+        public RestoreDefaultValueButton()
+            : base(HoverSampleSet.Button)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            BackgroundColour = colour.Lime1;
+            // size intentionally much larger than actual drawn content, so that the button is easier to click.
             Size = new Vector2(3 * size);
 
-            Content.RelativeSizeAxes = Axes.None;
-            Content.Size = new Vector2(size);
-            Content.CornerRadius = size / 2;
+            Add(circle = new CircularContainer
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(size),
+                Masking = true,
+                Child = background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colour.Lime1
+                }
+            });
 
             Alpha = 0f;
 
@@ -77,7 +96,7 @@ namespace osu.Game.Overlays
             FinishTransforms(true);
         }
 
-        public LocalisableString TooltipText => "revert to default";
+        public override LocalisableString TooltipText => "revert to default";
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -104,8 +123,8 @@ namespace osu.Game.Overlays
             if (!Current.Disabled)
             {
                 this.FadeTo(Current.IsDefault ? 0 : 1, fade_duration, Easing.OutQuint);
-                Background.FadeColour(IsHovered ? colours.Lime0 : colours.Lime1, fade_duration, Easing.OutQuint);
-                Content.TweenEdgeEffectTo(new EdgeEffectParameters
+                background.FadeColour(IsHovered ? colours.Lime0 : colours.Lime1, fade_duration, Easing.OutQuint);
+                circle.TweenEdgeEffectTo(new EdgeEffectParameters
                 {
                     Colour = (IsHovered ? colours.Lime1 : colours.Lime3).Opacity(0.4f),
                     Radius = IsHovered ? 8 : 4,
@@ -114,8 +133,8 @@ namespace osu.Game.Overlays
             }
             else
             {
-                Background.FadeColour(colours.Lime3, fade_duration, Easing.OutQuint);
-                Content.TweenEdgeEffectTo(new EdgeEffectParameters
+                background.FadeColour(colours.Lime3, fade_duration, Easing.OutQuint);
+                circle.TweenEdgeEffectTo(new EdgeEffectParameters
                 {
                     Colour = colours.Lime3.Opacity(0.1f),
                     Radius = 2,
