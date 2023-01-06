@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,15 +29,12 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
 
-        private readonly IBindable<Track> track = new Bindable<Track>();
-
         private readonly BindableBool isHandlingTapping = new BindableBool();
 
         private MetronomeDisplay metronome = null!;
-        private Container<WaveformComparisonDisplay> waveformContainer = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours, EditorClock clock)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
             const float padding = 10;
 
@@ -92,11 +88,7 @@ namespace osu.Game.Screens.Edit.Timing
                                                     Anchor = Anchor.CentreLeft,
                                                     Origin = Anchor.CentreLeft,
                                                 },
-                                                waveformContainer = new Container<WaveformComparisonDisplay>
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Child = new WaveformComparisonDisplay(),
-                                                }
+                                                new WaveformComparisonDisplay()
                                             }
                                         },
                                     }
@@ -187,13 +179,6 @@ namespace osu.Game.Screens.Edit.Timing
                 if (handling.NewValue)
                     start();
             }, true);
-
-            track.BindTo(clock.Track);
-        }
-
-        protected override void LoadComplete()
-        {
-            track.ValueChanged += _ => waveformContainer.Child = new WaveformComparisonDisplay();
         }
 
         private void start()
