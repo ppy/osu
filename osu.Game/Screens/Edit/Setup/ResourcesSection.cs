@@ -34,6 +34,9 @@ namespace osu.Game.Screens.Edit.Setup
         private EditorBeatmap editorBeatmap { get; set; }
 
         [Resolved]
+        private Editor editor { get; set; }
+
+        [Resolved]
         private SetupScreenHeader header { get; set; }
 
         [BackgroundDependencyLoader]
@@ -92,6 +95,8 @@ namespace osu.Game.Screens.Edit.Setup
 
             working.Value.Metadata.BackgroundFile = destination.Name;
             header.Background.UpdateBackground();
+
+            editor.ApplyToBackground(bg => bg.RefreshBackground());
 
             return true;
         }
