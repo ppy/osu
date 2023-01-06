@@ -20,7 +20,6 @@ using osu.Game.Skinning;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osuTK;
-using osu.Framework.Logging;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
@@ -88,16 +87,18 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 cursorTrail.Scale = newScale;
             }, true);
 
+            if (Mods.OfType<IHidesCursorTrail>().Any())
+            {
+                cursorTrail.Hide();
+            }
+
             calculateScale();
         }
 
-		protected override void Update() {
-			foreach (IHidesCursorTrail modifier in Mods.OfType<IHidesCursorTrail>())
-            {
-                cursorTrail.Alpha = 0;
-            } // FIXME: Don't do this every frame. It's only like this right now because for some reason it won't work if I only do it once. 
-			base.Update();
-		}
+        protected override void Update()
+        {
+            base.Update();
+        }
 
         /// <summary>
         /// Get the scale applicable to the ActiveCursor based on a beatmap's circle size.
