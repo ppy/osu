@@ -208,8 +208,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public void Apply([NotNull] HitObject hitObject)
         {
-            if (hitObject == null)
-                throw new ArgumentNullException($"Cannot apply a null {nameof(HitObject)}.");
+            ArgumentNullException.ThrowIfNull(hitObject);
 
             Apply(new SyntheticHitObjectEntry(hitObject));
         }

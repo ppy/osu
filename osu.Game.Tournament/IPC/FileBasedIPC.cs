@@ -127,7 +127,7 @@ namespace osu.Game.Tournament.IPC
                             using (var stream = IPCStorage.GetStream(file_ipc_state_filename))
                             using (var sr = new StreamReader(stream))
                             {
-                                State.Value = (TourneyState)Enum.Parse(typeof(TourneyState), sr.ReadLine().AsNonNull());
+                                State.Value = Enum.Parse<TourneyState>(sr.ReadLine().AsNonNull());
                             }
                         }
                         catch (Exception)

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -31,7 +29,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override Container<Drawable> Content => content;
 
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
 
         protected ProfileSection()
         {
