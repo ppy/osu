@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.BeatmapListing
         protected virtual void UpdateState()
         {
             text.FadeColour(IsHovered ? colourProvider.Light1 : GetStateColour(), 200, Easing.OutQuint);
-            text.Font = text.Font.With(weight: Active.Value ? FontWeight.SemiBold : FontWeight.Regular);
+            text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Regular);
         }
 
         protected virtual Color4 GetStateColour() => Active.Value ? colourProvider.Content1 : colourProvider.Light2;
