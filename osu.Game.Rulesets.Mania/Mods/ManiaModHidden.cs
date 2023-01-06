@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         [SettingSource("Coverage", "The proportion of playfield height that notes will be hidden for.")]
         public BindableNumber<float> CoverageAmount { get; } = new BindableFloat(0.5f)
         {
-            Precision = 0.01f,
+            Precision = 0.1f,
             MinValue = 0.2f,
             MaxValue = 0.8f,
             Default = 0.5f,
