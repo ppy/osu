@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Bindables;
 using osuTK;
 using osu.Framework.Graphics;
@@ -22,9 +20,9 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public partial class KudosuInfo : Container
     {
-        private readonly Bindable<APIUser> user = new Bindable<APIUser>();
+        private readonly Bindable<APIUser?> user = new Bindable<APIUser?>();
 
-        public KudosuInfo(Bindable<APIUser> user)
+        public KudosuInfo(Bindable<APIUser?> user)
         {
             this.user.BindTo(user);
             CountSection total;
