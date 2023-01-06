@@ -126,7 +126,8 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            Expanded.BindValueChanged(updateExpandedState, true);
+            Expanded.BindValueChanged(_ => updateExpandedState(true));
+            updateExpandedState(false);
 
             this.Delay(600).Schedule(updateFadeState);
         }
@@ -161,21 +162,25 @@ namespace osu.Game.Overlays
             return base.OnInvalidate(invalidation, source);
         }
 
-        private void updateExpandedState(ValueChangedEvent<bool> expanded)
+        private void updateExpandedState(bool animate)
         {
             // clearing transforms is necessary to avoid a previous height transform
             // potentially continuing to get processed while content has changed to autosize.
             content.ClearTransforms();
 
-            if (expanded.NewValue)
+            if (Expanded.Value)
+            {
                 content.AutoSizeAxes = Axes.Y;
+                content.AutoSizeDuration = animate ? transition_duration : 0;
+                content.AutoSizeEasing = Easing.OutQuint;
+            }
             else
             {
                 content.AutoSizeAxes = Axes.None;
-                content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+                content.ResizeHeightTo(0, animate ? transition_duration : 0, Easing.OutQuint);
             }
 
-            headerContent.FadeColour(expanded.NewValue ? Color4.White : OsuColour.Gray(0.5f), 200, Easing.OutQuint);
+            headerContent.FadeColour(Expanded.Value ? Color4.White : OsuColour.Gray(0.5f), 200, Easing.OutQuint);
         }
 
         private void updateFadeState()

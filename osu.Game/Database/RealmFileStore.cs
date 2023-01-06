@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -63,10 +62,10 @@ namespace osu.Game.Database
 
         private void copyToStore(RealmFile file, Stream data, bool preferHardLinks)
         {
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows && data is FileStream fs && preferHardLinks)
+            if (data is FileStream fs && preferHardLinks)
             {
                 // attempt to do a fast hard link rather than copy.
-                if (HardLinkHelper.CreateHardLink(Storage.GetFullPath(file.GetStoragePath(), true), fs.Name, IntPtr.Zero))
+                if (HardLinkHelper.TryCreateHardLink(Storage.GetFullPath(file.GetStoragePath(), true), fs.Name))
                     return;
             }
 
