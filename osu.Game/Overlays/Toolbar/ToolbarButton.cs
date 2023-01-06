@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.Toolbar
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
 
-            return base.OnHover(e);
+            return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)

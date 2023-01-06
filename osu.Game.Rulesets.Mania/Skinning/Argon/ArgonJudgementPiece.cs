@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -18,20 +17,18 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    public partial class ArgonJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public partial class ArgonJudgementPiece : JudgementPiece, IAnimatableJudgement
     {
-        protected readonly HitResult Result;
-
-        protected SpriteText JudgementText { get; private set; } = null!;
-
         private RingExplosion? ringExplosion;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
         public ArgonJudgementPiece(HitResult result)
+            : base(result)
         {
-            Result = result;
+            AutoSizeAxes = Axes.Both;
+
             Origin = Anchor.Centre;
             Y = 160;
         }
@@ -39,22 +36,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         [BackgroundDependencyLoader]
         private void load()
         {
-            AutoSizeAxes = Axes.Both;
-
-            InternalChildren = new Drawable[]
-            {
-                JudgementText = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Text = Result.GetDescription().ToUpperInvariant(),
-                    Colour = colours.ForHitResult(Result),
-                    Blending = BlendingParameters.Additive,
-                    Spacing = new Vector2(10, 0),
-                    Font = OsuFont.Default.With(size: 28, weight: FontWeight.Regular),
-                },
-            };
-
             if (Result.IsHit())
             {
                 AddInternal(ringExplosion = new RingExplosion(Result)
@@ -63,6 +44,16 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 });
             }
         }
+
+        protected override SpriteText CreateJudgementText() =>
+            new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Blending = BlendingParameters.Additive,
+                Spacing = new Vector2(10, 0),
+                Font = OsuFont.Default.With(size: 28, weight: FontWeight.Regular),
+            };
 
         /// <summary>
         /// Plays the default animation for this judgement piece.
