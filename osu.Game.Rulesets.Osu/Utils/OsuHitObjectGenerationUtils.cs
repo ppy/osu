@@ -234,6 +234,13 @@ namespace osu.Game.Rulesets.Osu.Utils
             return mean + stdDev * (float)stdNormal;
         }
 
+        /// <summary>
+        /// Creates stream on slider's path.
+        /// </summary>
+        /// <param name="slider">Slider which path will be converted.</param>
+        /// <param name="timingPoint">Timing point at which slider is placed.</param>
+        /// <param name="beatDivisor">Beat divisor to create stream with, i.e. if 4 is passed, a circle will be placed each 1/4 of a beat.</param>
+        /// <returns>List of circles in generated stream.</returns>
         public static IEnumerable<HitCircle> ConvertSliderToStream(Slider slider, TimingControlPoint timingPoint, double beatDivisor)
         {
             double streamSpacing = timingPoint.BeatLength / beatDivisor;
@@ -272,6 +279,39 @@ namespace osu.Game.Rulesets.Osu.Utils
             }
 
             return hitCircles;
+        }
+
+        /// <summary>
+        /// Creates stream on slider's path ignoring its span count.
+        /// </summary>
+        /// <param name="slider">Slider which path will be converted.</param>
+        /// <param name="streamSpacing">Time between circles in created stream.</param>
+        /// <returns>List of circles in generated stream.</returns>
+        public static IEnumerable<HitCircle> ConvertSliderToStreamIgnoringRepeats(Slider slider, double streamSpacing)
+        {
+            int i = 0;
+            double time = slider.StartTime;
+
+            while (!Precision.DefinitelyBigger(time, slider.GetEndTime(), 1))
+            {
+                double pathPosition = (time - slider.StartTime) / slider.Duration;
+                Vector2 position = slider.Position + slider.Path.PositionAt(pathPosition);
+
+                var samplePoint = (SampleControlPoint)slider.SampleControlPoint.DeepClone();
+                samplePoint.Time = time;
+
+                yield return new HitCircle
+                {
+                    StartTime = time,
+                    Position = position,
+                    NewCombo = i == 0 && slider.NewCombo,
+                    SampleControlPoint = samplePoint,
+                    Samples = slider.HeadCircle.Samples.Select(s => s.With()).ToList()
+                };
+
+                i += 1;
+                time = slider.StartTime + i * streamSpacing;
+            }
         }
     }
 }
