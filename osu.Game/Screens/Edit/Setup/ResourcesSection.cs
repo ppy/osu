@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void backgroundChanged(ValueChangedEvent<FileInfo?> file)
         {
-            if (!ChangeBackgroundImage(file.NewValue!))
+            if (file.NewValue == null || !ChangeBackgroundImage(file.NewValue))
                 backgroundChooser.Current.Value = file.OldValue;
 
             updatePlaceholderText();
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void audioTrackChanged(ValueChangedEvent<FileInfo?> file)
         {
-            if (!ChangeAudioTrack(file.NewValue!))
+            if (file.NewValue == null || !ChangeAudioTrack(file.NewValue))
                 audioTrackChooser.Current.Value = file.OldValue;
 
             updatePlaceholderText();
