@@ -110,11 +110,11 @@ namespace osu.Game.Screens.Edit
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
 
-            PreviewTime = new BindableInt(playableBeatmap.Metadata.PreviewTime);
+            PreviewTime = new BindableInt(BeatmapInfo.Metadata.PreviewTime);
             PreviewTime.BindValueChanged(s =>
             {
                 BeginChange();
-                this.beatmapInfo.Metadata.PreviewTime = s.NewValue;
+                BeatmapInfo.Metadata.PreviewTime = s.NewValue;
                 EndChange();
             });
         }
