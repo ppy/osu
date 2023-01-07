@@ -10,24 +10,28 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
     public partial class PreviewTimePart : TimelinePart
     {
+        private readonly BindableInt previewTime = new BindableInt();
+
         protected override void LoadBeatmap(EditorBeatmap beatmap)
         {
             base.LoadBeatmap(beatmap);
-            Add(new PreviewTimeVisualisation(beatmap));
-            beatmap.PreviewTime.BindValueChanged(s =>
+
+            previewTime.UnbindAll();
+            previewTime.BindTo(beatmap.PreviewTime);
+            previewTime.BindValueChanged(t =>
             {
-                Alpha = s.NewValue == -1 ? 0 : 1;
+                Clear();
+
+                if (t.NewValue >= 0)
+                    Add(new PreviewTimeVisualisation(t.NewValue));
             }, true);
         }
 
         private partial class PreviewTimeVisualisation : PointVisualisation
         {
-            private readonly BindableInt previewTime = new BindableInt();
-
-            public PreviewTimeVisualisation(EditorBeatmap editorBeatmap)
+            public PreviewTimeVisualisation(double time)
+                : base(time)
             {
-                previewTime.BindTo(editorBeatmap.PreviewTime);
-                previewTime.BindValueChanged(s => X = s.NewValue, true);
             }
 
             [BackgroundDependencyLoader]
