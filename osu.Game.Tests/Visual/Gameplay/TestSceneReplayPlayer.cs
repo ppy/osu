@@ -24,27 +24,39 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player loaded", () => Player.IsLoaded);
         }
 
-        [TestCase("space")]
-        [TestCase("mouse middle")]
-        public void TestPause(string action)
+        [Test]
+        public void TestPauseViaSpace()
         {
             double? lastTime = null;
 
             AddUntilStep("wait for first hit", () => Player.ScoreProcessor.TotalScore.Value > 0);
 
-            AddStep("Pause playback", () =>
-            {
-                switch (action)
-                {
-                    case "space":
-                        InputManager.Key(Key.Space);
-                        break;
+            AddStep("Pause playback with space", () => InputManager.Key(Key.Space));
 
-                    case "mouse middle":
-                        InputManager.Click(MouseButton.Middle);
-                        break;
-                }
+            AddAssert("player not exited", () => Player.IsCurrentScreen());
+
+            AddUntilStep("Time stopped progressing", () =>
+            {
+                double current = Player.GameplayClockContainer.CurrentTime;
+                bool changed = lastTime != current;
+                lastTime = current;
+
+                return !changed;
             });
+
+            AddWaitStep("wait some", 10);
+
+            AddAssert("Time still stopped", () => lastTime == Player.GameplayClockContainer.CurrentTime);
+        }
+
+        [Test]
+        public void TestPauseViaMiddleMouse()
+        {
+            double? lastTime = null;
+
+            AddUntilStep("wait for first hit", () => Player.ScoreProcessor.TotalScore.Value > 0);
+
+            AddStep("Pause playback with middle mouse", () => InputManager.Click(MouseButton.Middle));
 
             AddAssert("player not exited", () => Player.IsCurrentScreen());
 
