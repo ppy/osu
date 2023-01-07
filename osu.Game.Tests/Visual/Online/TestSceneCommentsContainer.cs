@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -140,7 +139,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Submit", () => this.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<RoundedButton>().First().TriggerClick());
             AddUntilStep("Comment sent", () =>
             {
-                var text = this.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<TextBox>().Single().Current.Value;
+                string text = this.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<TextBox>().Single().Current.Value;
                 return this.ChildrenOfType<DrawableComment>().Any(x =>
                 {
                     return x.ChildrenOfType<SpriteText>().Any(y => y.Text == text);
@@ -187,7 +186,7 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-        private CommentBundle getExampleComments(bool withPinned = false)
+        private static CommentBundle getExampleComments(bool withPinned = false)
         {
             var bundle = new CommentBundle
             {
