@@ -114,7 +114,7 @@ namespace osu.Game.Skinning.Components
             {
                 //we only need to compute the starRating if we need it and there are mods, that could influence it.
                 if (needsStarRating() && mods.Value.Count > 0) updateStarRating();
-                if (needsPreStarRating() || needsStarRating() && mods.Value.Count == 0) updatePreStarRating();
+                if (needsPreStarRating() || (needsStarRating() && mods.Value.Count == 0)) updatePreStarRating();
 
                 updateLabel();
             });
@@ -131,7 +131,7 @@ namespace osu.Game.Skinning.Components
 
                 //we only need to compute the starRating if we need it and there are mods, that could influence it.
                 if (needsStarRating() && mods.Value.Count > 0) updateStarRating();
-                if (needsPreStarRating() || needsStarRating() && mods.Value.Count == 0) updatePreStarRating();
+                if (needsPreStarRating() || (needsStarRating() && mods.Value.Count == 0)) updatePreStarRating();
 
                 updateLabel();
             });
@@ -155,8 +155,8 @@ namespace osu.Game.Skinning.Components
                 mod.ApplyToDifficulty(difficulty);
         }
 
-        private bool needsStarRating() => Template.Value.Contains($"{{{nameof(BeatmapAttribute.StarRating)}}}") || Template.Value.Contains("{Value}") && Attribute.Value == BeatmapAttribute.StarRating;
-        private bool needsPreStarRating() => Template.Value.Contains($"{{{nameof(BeatmapAttribute.PreModStarRating)}}}") || Template.Value.Contains("{Value}") && Attribute.Value == BeatmapAttribute.PreModStarRating;
+        private bool needsStarRating() => Template.Value.Contains($"{{{nameof(BeatmapAttribute.StarRating)}}}") || (Template.Value.Contains("{Value}") && Attribute.Value == BeatmapAttribute.StarRating);
+        private bool needsPreStarRating() => Template.Value.Contains($"{{{nameof(BeatmapAttribute.PreModStarRating)}}}") || (Template.Value.Contains("{Value}") && Attribute.Value == BeatmapAttribute.PreModStarRating);
 
         private void updatePreStarRating()
         {
