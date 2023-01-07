@@ -353,6 +353,7 @@ namespace osu.Game.Screens.Select
             if (selectedBeatmapSet?.BeatmapSet.ID == beatmapSet.ID)
                 previouslySelectedID = selectedBeatmap?.BeatmapInfo.ID;
 
+            int oldIndex = root.FindIndex(beatmapSet.ID);
             var newSet = createCarouselSet(beatmapSet);
             var removedSet = root.RemoveChild(beatmapSet.ID);
 
@@ -364,7 +365,10 @@ namespace osu.Game.Screens.Select
 
             if (newSet != null)
             {
-                root.AddItem(newSet);
+                if (oldIndex == -1)
+                    root.AddItem(newSet);
+                else
+                    root.InsertItem(oldIndex, newSet);
 
                 // check if we can/need to maintain our current selection.
                 if (previouslySelectedID != null)
@@ -1047,6 +1051,14 @@ namespace osu.Game.Screens.Select
                 base.AddItem(i);
             }
 
+            public override void InsertItem(int index, CarouselItem i)
+            {
+                CarouselBeatmapSet set = (CarouselBeatmapSet)i;
+                BeatmapSetsByID.Add(set.BeatmapSet.ID, set);
+
+                base.InsertItem(index, i);
+            }
+
             public CarouselBeatmapSet? RemoveChild(Guid beatmapSetID)
             {
                 if (BeatmapSetsByID.TryGetValue(beatmapSetID, out var carouselBeatmapSet))
@@ -1064,6 +1076,16 @@ namespace osu.Game.Screens.Select
                 BeatmapSetsByID.Remove(set.BeatmapSet.ID);
 
                 base.RemoveItem(i);
+            }
+
+            public int FindIndex(Guid beatmapSetID)
+            {
+                if (BeatmapSetsByID.TryGetValue(beatmapSetID, out var carouselBeatmapSet))
+                {
+                    return base.FindIndex(carouselBeatmapSet);
+                }
+
+                return -1;
             }
 
             protected override void PerformSelection()

@@ -57,6 +57,15 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
+        public virtual void InsertItem(int index, CarouselItem i)
+        {
+            i.State.ValueChanged += state => ChildItemStateChanged(i, state.NewValue);
+            i.ItemID = ++currentItemID;
+
+            i.Filter(lastCriteria);
+            items.Insert(index, i);
+        }
+
         public CarouselGroup(List<CarouselItem>? items = null)
         {
             if (items != null) this.items = items;
@@ -114,6 +123,11 @@ namespace osu.Game.Screens.Select.Carousel
 
                 State.Value = CarouselItemState.Selected;
             }
+        }
+
+        public int FindIndex(CarouselItem item)
+        {
+            return items.FindIndex(i => i == item);
         }
     }
 }

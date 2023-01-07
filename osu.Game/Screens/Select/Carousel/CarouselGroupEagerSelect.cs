@@ -78,6 +78,13 @@ namespace osu.Game.Screens.Select.Carousel
                 attemptSelection();
         }
 
+        public override void InsertItem(int index, CarouselItem i)
+        {
+            base.InsertItem(index, i);
+            if (!addingItems)
+                attemptSelection();
+        }
+
         protected override void ChildItemStateChanged(CarouselItem item, CarouselItemState value)
         {
             base.ChildItemStateChanged(item, value);
