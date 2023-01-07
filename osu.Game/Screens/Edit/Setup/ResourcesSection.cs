@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -34,7 +32,7 @@ namespace osu.Game.Screens.Edit.Setup
         private EditorBeatmap editorBeatmap { get; set; }
 
         [Resolved]
-        private Editor editor { get; set; }
+        private Editor? editor { get; set; }
 
         [Resolved]
         private SetupScreenHeader header { get; set; }
@@ -96,7 +94,7 @@ namespace osu.Game.Screens.Edit.Setup
             working.Value.Metadata.BackgroundFile = destination.Name;
             header.Background.UpdateBackground();
 
-            editor.ApplyToBackground(bg => bg.RefreshBackground());
+            editor?.ApplyToBackground(bg => bg.RefreshBackground());
 
             return true;
         }
