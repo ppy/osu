@@ -37,9 +37,15 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; }
+
         protected Container DisplayedContent { get; private set; }
 
         protected WedgeInfoText Info { get; private set; }
+
+        private IBindable<StarDifficulty?> starDifficulty;
+        private CancellationTokenSource cancellationSource;
 
         public BeatmapInfoWedgeV2()
         {
@@ -98,6 +104,19 @@ namespace osu.Game.Screens.Select
 
         private Container loadingInfo;
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            starDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            cancellationSource?.Cancel();
+        }
+
         private void updateDisplay()
         {
             Scheduler.AddOnce(perform);
@@ -127,7 +146,7 @@ namespace osu.Game.Screens.Select
                     Children = new Drawable[]
                     {
                         new BeatmapInfoWedgeBackground(beatmap),
-                        Info = new WedgeInfoText(beatmap),
+                        Info = new WedgeInfoText(beatmap, starDifficulty),
                     }
                 }, loaded =>
                 {
@@ -154,25 +173,21 @@ namespace osu.Game.Screens.Select
             private ILocalisedBindableString artistBinding;
 
             private readonly WorkingBeatmap working;
+            private readonly IBindable<StarDifficulty?> starDifficulty;
 
             [Resolved]
             private IBindable<IReadOnlyList<Mod>> mods { get; set; }
-
-            [Resolved]
-            private BeatmapDifficultyCache difficultyCache { get; set; }
 
             [Resolved]
             private OsuColour colours { get; set; }
 
             private ModSettingChangeTracker settingChangeTracker;
 
-            public WedgeInfoText(WorkingBeatmap working)
+            public WedgeInfoText(WorkingBeatmap working, IBindable<StarDifficulty?> starDifficulty)
             {
                 this.working = working;
+                this.starDifficulty = starDifficulty;
             }
-
-            private CancellationTokenSource cancellationSource;
-            private IBindable<StarDifficulty?> starDifficulty;
 
             [BackgroundDependencyLoader]
             private void load(LocalisationManager localisation)
@@ -309,7 +324,6 @@ namespace osu.Game.Screens.Select
                     difficultyColourBar.Colour = colours.ForStarDifficulty(s.NewValue);
                 }, true);
 
-                starDifficulty = difficultyCache.GetBindableDifficulty(working.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
                 starDifficulty.BindValueChanged(s =>
                 {
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
@@ -349,7 +363,6 @@ namespace osu.Game.Screens.Select
             {
                 base.Dispose(isDisposing);
                 settingChangeTracker?.Dispose();
-                cancellationSource?.Cancel();
             }
         }
     }
