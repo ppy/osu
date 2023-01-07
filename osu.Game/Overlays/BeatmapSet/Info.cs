@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.ValueChanged += b =>
             {
-                nominators.Metadata = (b.NewValue?.CurrentNominations ?? Array.Empty<BeatmapSetOnlineNominations>(), b.NewValue?.RelatedUsers ?? Array.Empty<APIUser>());
+                nominators.Metadata = (b.NewValue?.CurrentNominations ?? Array.Empty<BeatmapSetOnlineNomination>(), b.NewValue?.RelatedUsers ?? Array.Empty<APIUser>());
                 source.Metadata = b.NewValue?.Source ?? string.Empty;
                 tags.Metadata = b.NewValue?.Tags ?? string.Empty;
                 genre.Metadata = b.NewValue?.Genre ?? new BeatmapSetOnlineGenre { Id = (int)SearchGenre.Unspecified };

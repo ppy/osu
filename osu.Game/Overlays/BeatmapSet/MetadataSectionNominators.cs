@@ -4,15 +4,16 @@
 using System;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public partial class MetadataSectionNominators : MetadataSection<(BeatmapSetOnlineNominations[] CurrentNominations, APIUser[] RelatedUsers)>
+    public partial class MetadataSectionNominators : MetadataSection<(BeatmapSetOnlineNomination[] CurrentNominations, APIUser[] RelatedUsers)>
     {
-        public override (BeatmapSetOnlineNominations[] CurrentNominations, APIUser[] RelatedUsers) Metadata
+        public override (BeatmapSetOnlineNomination[] CurrentNominations, APIUser[] RelatedUsers) Metadata
         {
             set
             {
@@ -26,12 +27,12 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        public MetadataSectionNominators(Action<(BeatmapSetOnlineNominations[] CurrentNominations, APIUser[] RelatedUsers)>? searchAction = null)
+        public MetadataSectionNominators(Action<(BeatmapSetOnlineNomination[] CurrentNominations, APIUser[] RelatedUsers)>? searchAction = null)
             : base(MetadataType.Nominators, searchAction)
         {
         }
 
-        protected override void AddMetadata((BeatmapSetOnlineNominations[] CurrentNominations, APIUser[] RelatedUsers) metadata, LinkFlowContainer loaded)
+        protected override void AddMetadata((BeatmapSetOnlineNomination[] CurrentNominations, APIUser[] RelatedUsers) metadata, LinkFlowContainer loaded)
         {
             int[] nominatorIds = metadata.CurrentNominations.Select(n => n.UserId).ToArray();
 

@@ -3,9 +3,9 @@
 
 using Newtonsoft.Json;
 
-namespace osu.Game.Online.API.Requests.Responses
+namespace osu.Game.Beatmaps
 {
-    public struct BeatmapSetOnlineNominations
+    public struct BeatmapSetOnlineNomination
     {
         [JsonProperty(@"beatmapset_id")]
         public int BeatmapsetId { get; set; }
