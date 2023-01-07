@@ -11,7 +11,11 @@ using osu.Game.Overlays;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -126,6 +130,24 @@ namespace osu.Game.Tests.Visual.Online
                 commentsContainer.ChildrenOfType<DrawableComment>().Count(d => d.Comment.Pinned == withPinned) == 1);
         }
 
+        [TestCase]
+        public void TestPost()
+        {
+            setUpCommentsResponse(getExampleComments());
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            setUpPostResponse();
+            AddStep("Enter text", () => this.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<TextBox>().Single().Current.Value = "comm");
+            AddStep("Submit", () => this.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<RoundedButton>().First().TriggerClick());
+            AddUntilStep("Comment sent", () =>
+            {
+                var text = this.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<TextBox>().Single().Current.Value;
+                return this.ChildrenOfType<DrawableComment>().Any(x =>
+                {
+                    return x.ChildrenOfType<SpriteText>().Any(y => y.Text == text);
+                });
+            });
+        }
+
         private void setUpCommentsResponse(CommentBundle commentBundle)
             => AddStep("set up response", () =>
             {
@@ -135,6 +157,32 @@ namespace osu.Game.Tests.Visual.Online
                         return false;
 
                     getCommentsRequest.TriggerSuccess(commentBundle);
+                    return true;
+                };
+            });
+
+        private void setUpPostResponse()
+            => AddStep("set up response", () =>
+            {
+                dummyAPI.HandleRequest = request =>
+                {
+                    if (!(request is CommentPostRequest req))
+                        return false;
+
+                    req.TriggerSuccess(new CommentBundle
+                    {
+                        Comments = new List<Comment>
+                        {
+                            new Comment
+                            {
+                                Id = 98,
+                                Message = req.Message,
+                                LegacyName = "FirstUser",
+                                CreatedAt = DateTimeOffset.Now,
+                                VotesCount = 98,
+                            }
+                        }
+                    });
                     return true;
                 };
             });
