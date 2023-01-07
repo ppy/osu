@@ -393,7 +393,7 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (Action == null) return false;
+            if (Action == null) return true;
 
             logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
             return true;
