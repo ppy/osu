@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
@@ -115,7 +116,10 @@ namespace osu.Game.Overlays.Comments
                                     Padding = new MarginPadding { Left = 60 },
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Child = new NewCommentEditor()
+                                    Child = new NewCommentEditor
+                                    {
+                                        OnPost = prependPostedComments
+                                    }
                                 }
                             }
                         },
@@ -279,7 +283,6 @@ namespace osu.Game.Overlays.Comments
                 {
                     pinnedContent.AddRange(loaded.Where(d => d.Comment.Pinned));
                     content.AddRange(loaded.Where(d => !d.Comment.Pinned));
-
                     deletedCommentsCounter.Count.Value += topLevelComments.Select(d => d.Comment).Count(c => c.IsDeleted && c.IsTopLevel);
 
                     if (bundle.HasMore)
@@ -319,6 +322,42 @@ namespace osu.Game.Overlays.Comments
                     // Since this comment has now been seen, any further children can be added to it without being orphaned themselves.
                     orphaned.Add(comment);
                 }
+            }
+        }
+
+        private void prependPostedComments(CommentBundle bundle)
+        {
+            var topLevelComments = new List<DrawableComment>();
+
+            foreach (var comment in bundle.Comments)
+            {
+                // Exclude possible duplicated comments.
+                if (CommentDictionary.ContainsKey(comment.Id))
+                    continue;
+
+                topLevelComments.Add(getDrawableComment(comment));
+            }
+
+            if (topLevelComments.Any())
+            {
+                LoadComponentsAsync(topLevelComments, loaded =>
+                {
+                    if (content[0] is NoCommentsPlaceholder placeholder)
+                        content.Remove(placeholder, true);
+
+                    foreach (var comment in loaded)
+                    {
+                        int pos = -1;
+
+                        if (content.Count > 0)
+                        {
+                            var first = content.FlowingChildren.First();
+                            pos = (int)(content.GetLayoutPosition(first) - 1);
+                        }
+
+                        content.Insert(pos, comment);
+                    }
+                }, (loadCancellation = new CancellationTokenSource()).Token);
             }
         }
 
@@ -386,6 +425,8 @@ namespace osu.Game.Overlays.Comments
             [Resolved]
             private IAPIProvider api { get; set; }
 
+            public Action<CommentBundle> OnPost;
+
             protected override void OnCommit(string text)
             {
                 CommitButton.IsLoadingSpinnerShown = true;
@@ -398,6 +439,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     CommitButton.IsLoadingSpinnerShown = false;
                     Current.Value = string.Empty;
+                    OnPost?.Invoke(cb);
                 });
                 api.Queue(req);
             }
