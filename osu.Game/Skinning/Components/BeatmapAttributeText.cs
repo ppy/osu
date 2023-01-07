@@ -217,9 +217,10 @@ namespace osu.Game.Skinning.Components
                                             .Cast<object?>()
                                             .ToArray();
 
-            foreach (var type in Enum.GetValues<BeatmapAttribute>())
-            {
-                numberedTemplate = numberedTemplate.Replace($"{{{{{type}}}}}", $"{{{1 + (int)type}}}");
+                if (numberedTemplate.Contains(rankedStatus = "{{" + nameof(BeatmapAttribute.RankedStatus) + "}}"))
+                {
+                    numberedTemplate = numberedTemplate.Replace(rankedStatus, workingBeatmap.Value.BeatmapInfo.Status.GetLocalisableDescription().ToString());
+                }
             }
 
             text.Text = LocalisableString.Format(numberedTemplate, args);
