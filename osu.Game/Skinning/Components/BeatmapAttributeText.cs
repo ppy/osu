@@ -53,10 +53,12 @@ namespace osu.Game.Skinning.Components
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         private CancellationTokenSource? starDifficultyCancellationSource;
+        private StarDifficulty? starRating;
+
+        private CancellationTokenSource? preStarDifficultyCancellationSource;
+        private StarDifficulty? preStarRating;
 
         private BeatmapDifficulty difficulty = null!;
-
-        private readonly Dictionary<BeatmapAttribute, LocalisableString> valueDictionary = new Dictionary<BeatmapAttribute, LocalisableString>();
 
         private static readonly ImmutableDictionary<BeatmapAttribute, LocalisableString> label_dictionary = new Dictionary<BeatmapAttribute, LocalisableString>
         {
@@ -110,28 +112,40 @@ namespace osu.Game.Skinning.Components
             Template.BindValueChanged(_ => updateLabel());
             ruleset.BindValueChanged(_ =>
             {
-                updateAllInfo();
-                //custom rulesets might not provide all of the same mods, and in that case we do need to update all info
+                //we only need to compute the starRating if we need it and there are mods, that could influence it.
+                if (needsStarRating() && mods.Value.Count > 0) updateStarRating();
+                if (needsPreStarRating() || needsStarRating() && mods.Value.Count == 0) updatePreStarRating();
+
+                updateLabel();
             });
             mods.BindValueChanged(_ =>
             {
                 modSettingChangeTracker?.Dispose();
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.Value);
-                modSettingChangeTracker.SettingChanged += _ => updateAllInfo();
-                updateAllInfo();
+                modSettingChangeTracker.SettingChanged += _ =>
+                {
+                    //we only need to compute the starRating if we need it and there are mods, that could influence it.
+                    if (needsStarRating() && mods.Value.Count > 0) updateStarRating();
+                    updateLabel();
+                };
+
+                //we only need to compute the starRating if we need it and there are mods, that could influence it.
+                if (needsStarRating() && mods.Value.Count > 0) updateStarRating();
+                if (needsPreStarRating() || needsStarRating() && mods.Value.Count == 0) updatePreStarRating();
+
+                updateLabel();
             });
             workingBeatmap.BindValueChanged(_ =>
             {
-                updateAllInfo();
-            }, true);
-        }
+                if (needsStarRating())
+                {
+                    if (mods.Value.Count > 0) updateStarRating();
+                    else updatePreStarRating();
+                }
 
-        private void updateAllInfo()
-        {
-            updateStarRating();
-            updateBpmAndLength();
-            updateBeatmapContent();
-            updateLabel();
+                if (needsPreStarRating()) updatePreStarRating();
+                updateLabel();
+            }, true);
         }
 
         private void updateDifficulty()
@@ -141,66 +155,32 @@ namespace osu.Game.Skinning.Components
                 mod.ApplyToDifficulty(difficulty);
         }
 
+        private bool needsStarRating() => Template.Value.Contains($"{{{nameof(BeatmapAttribute.StarRating)}}}") || Template.Value.Contains("{Value}") && Attribute.Value == BeatmapAttribute.StarRating;
+        private bool needsPreStarRating() => Template.Value.Contains($"{{{nameof(BeatmapAttribute.PreModStarRating)}}}") || Template.Value.Contains("{Value}") && Attribute.Value == BeatmapAttribute.PreModStarRating;
+
+        private void updatePreStarRating()
+        {
+            preStarDifficultyCancellationSource?.Cancel();
+            preStarRating = null;
+            preStarDifficultyCancellationSource = new CancellationTokenSource();
+
+            difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, null, preStarDifficultyCancellationSource.Token).ContinueWith(starDifficultyTaskNoMods => Schedule(() =>
+            {
+                preStarRating = starDifficultyTaskNoMods.GetResultSafely();
+                updateLabel();
+            }), preStarDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
+        }
+
         private void updateStarRating()
         {
-            //set implicit default, whilst calculating beatmap difficulty.
-            valueDictionary[BeatmapAttribute.StarRating] = valueDictionary[BeatmapAttribute.PreModStarRating] = workingBeatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
-
             starDifficultyCancellationSource?.Cancel();
             starDifficultyCancellationSource = new CancellationTokenSource();
 
             difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token).ContinueWith(starDifficultyTaskMods => Schedule(() =>
             {
-                StarDifficulty? starRating = starDifficultyTaskMods.GetResultSafely();
-
-                double? stars = starRating?.Stars;
-                if (stars is not null) valueDictionary[BeatmapAttribute.StarRating] = stars.ToLocalisableString(@"F2");
+                starRating = starDifficultyTaskMods.GetResultSafely();
                 updateLabel();
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
-            difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token).ContinueWith(starDifficultyTaskNoMods => Schedule(() =>
-            {
-                StarDifficulty? starRating = starDifficultyTaskNoMods.GetResultSafely();
-
-                double? stars = starRating?.Stars;
-                if (stars is not null) valueDictionary[BeatmapAttribute.PreModStarRating] = stars.ToLocalisableString(@"F2");
-                updateLabel();
-            }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
-        }
-
-        private void updateBpmAndLength()
-        {
-            var (preModBpmMin, preModMostCommonBPM, preModBpmMax, preModLength) = workingBeatmap.Value.Beatmap.GetBPMAndLength(Enumerable.Empty<IApplicableToRate>());
-
-            valueDictionary[BeatmapAttribute.PreModBPMMinimum] = preModBpmMin.ToLocalisableString(@"F0");
-            valueDictionary[BeatmapAttribute.PreModBPM] = preModMostCommonBPM.ToLocalisableString(@"F0");
-            valueDictionary[BeatmapAttribute.PreModBPMMaximum] = preModBpmMax.ToLocalisableString(@"F0");
-            valueDictionary[BeatmapAttribute.PreModLength] = TimeSpan.FromMilliseconds(preModLength).ToFormattedDuration();
-
-            var (bpmMin, mostCommonBPM, bpmMax, length) = workingBeatmap.Value.Beatmap.GetBPMAndLength(mods.Value.OfType<ModRateAdjust>());
-
-            valueDictionary[BeatmapAttribute.BPMMaximum] = bpmMax.ToLocalisableString(@"F0");
-            valueDictionary[BeatmapAttribute.BPMMinimum] = bpmMin.ToLocalisableString(@"F0");
-            valueDictionary[BeatmapAttribute.BPM] = mostCommonBPM.ToLocalisableString(@"F0");
-            valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(length).ToFormattedDuration();
-        }
-
-        private void updateBeatmapContent()
-        {
-            updateDifficulty();
-            var beatmapInfo = workingBeatmap.Value.BeatmapInfo;
-            valueDictionary[BeatmapAttribute.Title] = beatmapInfo.Metadata.Title;
-            valueDictionary[BeatmapAttribute.Artist] = beatmapInfo.Metadata.Artist;
-            valueDictionary[BeatmapAttribute.DifficultyName] = beatmapInfo.DifficultyName;
-            valueDictionary[BeatmapAttribute.Creator] = beatmapInfo.Metadata.Author.Username;
-            valueDictionary[BeatmapAttribute.RankedStatus] = beatmapInfo.Status.GetLocalisableDescription();
-            valueDictionary[BeatmapAttribute.CircleSize] = ((double)difficulty.CircleSize).ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.HPDrain] = ((double)difficulty.DrainRate).ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.Accuracy] = ((double)difficulty.OverallDifficulty).ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.ApproachRate] = ((double)difficulty.ApproachRate).ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.PreModCircleSize] = ((double)beatmapInfo.Difficulty.CircleSize).ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.PreModHPDrain] = ((double)beatmapInfo.Difficulty.DrainRate).ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.PreModAccuracy] = ((double)beatmapInfo.Difficulty.OverallDifficulty).ToLocalisableString(@"F2");
-            valueDictionary[BeatmapAttribute.PreModApproachRate] = ((double)beatmapInfo.Difficulty.ApproachRate).ToLocalisableString(@"F2");
         }
 
         private void updateLabel()
@@ -209,20 +189,102 @@ namespace osu.Game.Skinning.Components
                                               .Replace("{", "{{")
                                               .Replace("}", "}}")
                                               .Replace(@"{{Label}}", "{0}")
-                                              .Replace(@"{{Value}}", $"{{{1 + (int)Attribute.Value}}}");
+                                              .Replace(@"{{Value}}", "{{" + Attribute.Value + "}}")
+                                              .Replace("{{" + nameof(BeatmapAttribute.PreModCircleSize) + "}}", workingBeatmap.Value.BeatmapInfo.Difficulty.CircleSize.ToString(@"F2"))
+                                              .Replace("{{" + nameof(BeatmapAttribute.PreModHPDrain) + "}}", workingBeatmap.Value.BeatmapInfo.Difficulty.DrainRate.ToString(@"F2"))
+                                              .Replace("{{" + nameof(BeatmapAttribute.PreModAccuracy) + "}}", workingBeatmap.Value.BeatmapInfo.Difficulty.OverallDifficulty.ToString(@"F2"))
+                                              .Replace("{{" + nameof(BeatmapAttribute.PreModApproachRate) + "}}", workingBeatmap.Value.BeatmapInfo.Difficulty.ApproachRate.ToString(@"F2"))
+                                              .Replace("{{" + nameof(BeatmapAttribute.Title) + "}}", workingBeatmap.Value.Metadata.Title)
+                                              .Replace("{{" + nameof(BeatmapAttribute.Artist) + "}}", workingBeatmap.Value.Metadata.Artist)
+                                              .Replace("{{" + nameof(BeatmapAttribute.DifficultyName) + "}}", workingBeatmap.Value.BeatmapInfo.DifficultyName)
+                                              .Replace("{{" + nameof(BeatmapAttribute.Creator) + "}}", workingBeatmap.Value.Metadata.Author.Username);
 
-            object?[] args = valueDictionary.OrderBy(pair => pair.Key)
-                                            .Select(pair => pair.Value)
-                                            .Prepend(label_dictionary[Attribute.Value])
-                                            .Cast<object?>()
-                                            .ToArray();
-
-            foreach (var type in Enum.GetValues(typeof(BeatmapAttribute)).Cast<BeatmapAttribute>())
+            //conditionally insert CS, HP, OD, AR
             {
-                numberedTemplate = numberedTemplate.Replace($"{{{{{type}}}}}", $"{{{1 + (int)type}}}");
+                string[] beatmapDiffStrings = { nameof(BeatmapAttribute.CircleSize), nameof(BeatmapAttribute.HPDrain), nameof(BeatmapAttribute.Accuracy), nameof(BeatmapAttribute.ApproachRate) };
+                bool diffCompute = false;
+
+                for (int i = 0; i < beatmapDiffStrings.Length; i++)
+                {
+                    diffCompute |= numberedTemplate.Contains("{{" + beatmapDiffStrings[i] + "}}");
+                    if (diffCompute) break;
+                }
+
+                if (diffCompute)
+                {
+                    updateDifficulty();
+                    numberedTemplate = numberedTemplate.Replace("{{" + nameof(BeatmapAttribute.CircleSize) + "}}", difficulty.CircleSize.ToString(@"F2"))
+                                                       .Replace("{{" + nameof(BeatmapAttribute.HPDrain) + "}}", difficulty.DrainRate.ToString(@"F2"))
+                                                       .Replace("{{" + nameof(BeatmapAttribute.Accuracy) + "}}", difficulty.OverallDifficulty.ToString(@"F2"))
+                                                       .Replace("{{" + nameof(BeatmapAttribute.ApproachRate) + "}}", difficulty.ApproachRate.ToString(@"F2"));
+                }
             }
 
-            text.Text = LocalisableString.Format(numberedTemplate, args);
+            //Conditionally insert RankedStatus
+            {
+                string rankedStatus;
+
+                if (numberedTemplate.Contains(rankedStatus = "{{" + nameof(BeatmapAttribute.RankedStatus) + "}}"))
+                {
+                    numberedTemplate = numberedTemplate.Replace(rankedStatus, workingBeatmap.Value.BeatmapInfo.Status.GetLocalisableDescription().ToString());
+                }
+            }
+
+            if (needsStarRating())
+            {
+                numberedTemplate = numberedTemplate.Replace($"{{{{{nameof(BeatmapAttribute.StarRating)}}}}}",
+                    (mods.Value.Count > 0 ? starRating : preStarRating)?.Stars.ToString(@"F2") ?? workingBeatmap.Value.BeatmapInfo.StarRating.ToString(@"F2"));
+            }
+
+            if (needsPreStarRating())
+            {
+                numberedTemplate = numberedTemplate.Replace($"{{{{{nameof(BeatmapAttribute.PreModStarRating)}}}}}",
+                    preStarRating?.Stars.ToString(@"F2") ?? workingBeatmap.Value.BeatmapInfo.StarRating.ToString(@"F2"));
+            }
+
+            //conditionally insert BPM, BPMMinimum, BPMMaximum, Length
+            {
+                string[] beatmapDiffStrings = { nameof(BeatmapAttribute.BPMMinimum), nameof(BeatmapAttribute.BPM), nameof(BeatmapAttribute.BPMMaximum), nameof(BeatmapAttribute.Length) };
+                bool bpmCompute = false;
+
+                for (int i = 0; i < beatmapDiffStrings.Length; i++)
+                {
+                    bpmCompute |= numberedTemplate.Contains("{{" + beatmapDiffStrings[i] + "}}");
+                    if (bpmCompute) break;
+                }
+
+                if (bpmCompute)
+                {
+                    var (bpmMin, bpm, bpmMax, length) = workingBeatmap.Value.Beatmap.GetBPMAndLength(mods.Value.OfType<ModRateAdjust>());
+                    numberedTemplate = numberedTemplate.Replace("{{" + nameof(BeatmapAttribute.BPMMinimum) + "}}", bpmMin.ToString(@"N"))
+                                                       .Replace("{{" + nameof(BeatmapAttribute.BPM) + "}}", bpm.ToString(@"N"))
+                                                       .Replace("{{" + nameof(BeatmapAttribute.BPMMaximum) + "}}", bpmMax.ToString(@"N"))
+                                                       .Replace("{{" + nameof(BeatmapAttribute.Length) + "}}", TimeSpan.FromMilliseconds(length).ToFormattedDuration().ToString());
+                }
+            }
+
+            //conditionally insert PreModBPM, PreModBPMMinimum, PreModBPMMaximum, PreModLength
+            {
+                string[] beatmapDiffStrings = { nameof(BeatmapAttribute.PreModBPMMinimum), nameof(BeatmapAttribute.PreModBPM), nameof(BeatmapAttribute.PreModBPMMaximum), nameof(BeatmapAttribute.PreModLength) };
+                bool bpmCompute = false;
+
+                for (int i = 0; i < beatmapDiffStrings.Length; i++)
+                {
+                    bpmCompute |= numberedTemplate.Contains("{{" + beatmapDiffStrings[i] + "}}");
+                    if (bpmCompute) break;
+                }
+
+                if (bpmCompute)
+                {
+                    var (bpmMin, bpm, bpmMax, length) = workingBeatmap.Value.Beatmap.GetBPMAndLength(Enumerable.Empty<IApplicableToRate>());
+                    numberedTemplate = numberedTemplate.Replace("{{" + nameof(BeatmapAttribute.PreModBPMMinimum) + "}}", bpmMin.ToString(@"N"))
+                                                       .Replace("{{" + nameof(BeatmapAttribute.PreModBPM) + "}}", bpm.ToString(@"N"))
+                                                       .Replace("{{" + nameof(BeatmapAttribute.PreModBPMMaximum) + "}}", bpmMax.ToString(@"N"))
+                                                       .Replace("{{" + nameof(BeatmapAttribute.PreModLength) + "}}", TimeSpan.FromMilliseconds(length).ToFormattedDuration().ToString());
+                }
+            }
+
+            text.Text = LocalisableString.Format(numberedTemplate, label_dictionary[Attribute.Value]);
         }
 
         protected override void Dispose(bool isDisposing)
