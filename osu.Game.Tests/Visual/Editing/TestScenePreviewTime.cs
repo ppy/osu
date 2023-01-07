@@ -27,9 +27,9 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestScenePreviewTimeline()
         {
             AddStep("set preview time to -1", () => EditorBeatmap.PreviewTime.Value = -1);
-            AddAssert("preview time line should not show", () => Editor.ChildrenOfType<PreviewTimePart>().Single().Alpha == 0);
+            AddAssert("preview time line should not show", () => !Editor.ChildrenOfType<PreviewTimePart>().Single().Children.Any());
             AddStep("set preview time to 1000", () => EditorBeatmap.PreviewTime.Value = 1000);
-            AddAssert("preview time line should show", () => Editor.ChildrenOfType<PreviewTimePart>().Single().Alpha == 1);
+            AddAssert("preview time line should show", () => Editor.ChildrenOfType<PreviewTimePart>().Single().Children.Single().Alpha == 1);
         }
     }
 }
