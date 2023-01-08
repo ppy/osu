@@ -51,8 +51,6 @@ namespace osu.Game.Skinning
             if (!effectPoint.KiaiMode)
                 return;
 
-            Logger.Log($"Current Kiai Glow: {opacityValue}");
-
             flashingDrawable
                 .FadeTo(opacityValue)
                 .Then()
