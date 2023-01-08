@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,17 +34,11 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / wedge_height, 0);
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
+        protected Container? DisplayedContent { get; private set; }
 
-        protected Container DisplayedContent { get; private set; }
-
-        protected WedgeInfoText Info { get; private set; }
-
-        private IBindable<StarDifficulty?> starDifficulty = new Bindable<StarDifficulty?>();
-        private CancellationTokenSource cancellationSource;
+        protected WedgeInfoText? Info { get; private set; }
 
         private readonly Container difficultyColourBar;
         private readonly StarCounter starCounter;
@@ -117,9 +109,9 @@ namespace osu.Game.Screens.Select
             this.FadeOut(transition_duration * 2, Easing.In);
         }
 
-        private WorkingBeatmap beatmap;
+        private WorkingBeatmap? beatmap;
 
-        public WorkingBeatmap Beatmap
+        public WorkingBeatmap? Beatmap
         {
             get => beatmap;
             set
@@ -127,7 +119,6 @@ namespace osu.Game.Screens.Select
                 if (beatmap == value) return;
 
                 beatmap = value;
-                starDifficulty = difficultyCache.GetBindableDifficulty(value.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
 
                 updateDisplay();
             }
@@ -135,14 +126,7 @@ namespace osu.Game.Screens.Select
 
         public override bool IsPresent => base.IsPresent || DisplayedContent == null; // Visibility is updated in the LoadComponentAsync callback
 
-        private Container loadingInfo;
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            cancellationSource?.Cancel();
-        }
+        private Container? loadingInfo;
 
         private void updateDisplay()
         {
@@ -190,30 +174,36 @@ namespace osu.Game.Screens.Select
 
         public partial class WedgeInfoText : Container
         {
-            public OsuSpriteText TitleLabel { get; private set; }
-            public OsuSpriteText ArtistLabel { get; private set; }
+            public OsuSpriteText TitleLabel { get; private set; } = null!;
+            public OsuSpriteText ArtistLabel { get; private set; } = null!;
 
-            private StarRatingDisplay starRatingDisplay;
+            private StarRatingDisplay starRatingDisplay = null!;
 
-            private ILocalisedBindableString titleBinding;
-            private ILocalisedBindableString artistBinding;
-
-            [Resolved]
-            private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+            private ILocalisedBindableString titleBinding = null!;
+            private ILocalisedBindableString artistBinding = null!;
 
             [Resolved]
-            private BeatmapInfoWedgeV2 wedge { get; set; }
+            private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
             [Resolved]
-            private OsuColour colours { get; set; }
+            private BeatmapInfoWedgeV2 wedge { get; set; } = null!;
 
-            private ModSettingChangeTracker settingChangeTracker;
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            [Resolved]
+            private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
+
+            private ModSettingChangeTracker? settingChangeTracker;
+
+            private IBindable<StarDifficulty?>? starDifficulty;
+            private CancellationTokenSource? cancellationSource;
 
             [BackgroundDependencyLoader]
             private void load(LocalisationManager localisation)
             {
-                var beatmapInfo = wedge.Beatmap.BeatmapInfo;
-                var metadata = wedge.beatmap.Metadata;
+                var beatmapInfo = wedge.Beatmap!.BeatmapInfo;
+                var metadata = wedge.beatmap!.Metadata;
 
                 RelativeSizeAxes = Axes.Both;
 
@@ -274,6 +264,7 @@ namespace osu.Game.Screens.Select
                             },
                             ArtistLabel = new OsuSpriteText
                             {
+                                //figma design has a diffused shadow, instead of the solid one present here.
                                 Shadow = true,
                                 Current = { BindTarget = artistBinding },
                                 //Not sure if this should be semi bold or medium
@@ -298,7 +289,8 @@ namespace osu.Game.Screens.Select
                     wedge.difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
                 }, true);
 
-                wedge.starDifficulty.BindValueChanged(s =>
+                starDifficulty = difficultyCache.GetBindableDifficulty(wedge.beatmap!.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
+                starDifficulty.BindValueChanged(s =>
                 {
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
 
@@ -320,6 +312,8 @@ namespace osu.Game.Screens.Select
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
+
+                cancellationSource?.Cancel();
                 settingChangeTracker?.Dispose();
             }
         }
