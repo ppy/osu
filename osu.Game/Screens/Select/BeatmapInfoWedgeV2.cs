@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -27,9 +28,9 @@ namespace osu.Game.Screens.Select
     public partial class BeatmapInfoWedgeV2 : VisibilityContainer
     {
         private const float shear_width = 21;
-        private const int wedge_height = 120;
-
+        private const float wedge_height = 120;
         private const float transition_duration = 250;
+        private const float corner_radius = 10;
 
         private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / wedge_height, 0);
 
@@ -45,14 +46,20 @@ namespace osu.Game.Screens.Select
 
         public BeatmapInfoWedgeV2()
         {
-            CornerRadius = 10;
             Shear = wedged_container_shear;
             Masking = true;
-            Alpha = 0;
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Colour = Colour4.Black.Opacity(.25f),
+                Type = EdgeEffectType.Shadow,
+                Radius = corner_radius,
+                Roundness = corner_radius
+            };
+            CornerRadius = corner_radius;
 
             Children = new Drawable[]
             {
-                //These elements can't be grouped with the rest of the content, due to being present either outside or under the backgrounds area
+                // These elements can't be grouped with the rest of the content, due to being present either outside or under the backgrounds area
                 difficultyColourBar = new Container
                 {
                     Colour = Colour4.Transparent,
@@ -61,7 +68,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,
 
-                    //By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
+                    // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
                     Width = 40,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
@@ -70,7 +77,7 @@ namespace osu.Game.Screens.Select
                     Colour = Colour4.Transparent,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.Centre,
-                    Scale = new Vector2(0.4f),
+                    Scale = new Vector2(0.35f),
                     Shear = -wedged_container_shear,
                     X = -15,
                     Direction = FillDirection.Vertical
@@ -85,10 +92,10 @@ namespace osu.Game.Screens.Select
 
             float starAngle = (float)(Math.Atan(shear_width / wedge_height) * (180 / Math.PI));
 
-            //Applying the rotation directly to the StarCounter distorts the stars, hence it is applied to the child container
+            // Applying the rotation directly to the StarCounter distorts the stars, hence it is applied to the child container
             starCounter.Children.First().Rotation = starAngle;
 
-            //Makes sure the stars center themselves properly in the colour bar
+            // Makes sure the stars center themselves properly in the colour bar
             starCounter.Children.First().Anchor = Anchor.Centre;
             starCounter.Children.First().Origin = Anchor.Centre;
         }
@@ -153,13 +160,13 @@ namespace osu.Game.Screens.Select
                 {
                     Masking = true,
                     X = -30,
-                    CornerRadius = 10,
+                    CornerRadius = corner_radius,
                     RelativeSizeAxes = Axes.Both,
                     Depth = DisplayedContent?.Depth + 1 ?? 0,
                     Children = new Drawable[]
                     {
                         new BeatmapInfoWedgeBackground(beatmap) { Shear = -Shear },
-                        Info = new WedgeInfoText { Shear = -Shear }
+                        Info = new WedgeInfoText(beatmap) { Shear = -Shear }
                     }
                 }, loaded =>
                 {
@@ -182,11 +189,10 @@ namespace osu.Game.Screens.Select
             private ILocalisedBindableString titleBinding = null!;
             private ILocalisedBindableString artistBinding = null!;
 
-            [Resolved]
-            private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+            private readonly WorkingBeatmap working;
 
             [Resolved]
-            private BeatmapInfoWedgeV2 wedge { get; set; } = null!;
+            private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
@@ -194,16 +200,24 @@ namespace osu.Game.Screens.Select
             [Resolved]
             private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
+            [Resolved]
+            private BeatmapInfoWedgeV2 wedge { get; set; } = null!;
+
             private ModSettingChangeTracker? settingChangeTracker;
 
             private IBindable<StarDifficulty?>? starDifficulty;
             private CancellationTokenSource? cancellationSource;
 
+            public WedgeInfoText(WorkingBeatmap working)
+            {
+                this.working = working;
+            }
+
             [BackgroundDependencyLoader]
             private void load(LocalisationManager localisation)
             {
-                var beatmapInfo = wedge.Beatmap!.BeatmapInfo;
-                var metadata = wedge.beatmap!.Metadata;
+                var beatmapInfo = working.BeatmapInfo;
+                var metadata = working.Metadata;
 
                 RelativeSizeAxes = Axes.Both;
 
@@ -249,7 +263,7 @@ namespace osu.Game.Screens.Select
                         Name = "Top-left aligned metadata",
                         Direction = FillDirection.Vertical,
                         Position = new Vector2(80, 12),
-                        Width = .8f,
+                        Width = .7f,
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
@@ -289,7 +303,7 @@ namespace osu.Game.Screens.Select
                     wedge.difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
                 }, true);
 
-                starDifficulty = difficultyCache.GetBindableDifficulty(wedge.beatmap!.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
+                starDifficulty = difficultyCache.GetBindableDifficulty(working.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
                 starDifficulty.BindValueChanged(s =>
                 {
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
