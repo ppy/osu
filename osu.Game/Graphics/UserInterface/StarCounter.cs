@@ -32,6 +32,11 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float star_spacing = 4;
 
+        public virtual FillDirection Direction
+        {
+            set => stars.Direction = value;
+        }
+
         private float current;
 
         /// <summary>
@@ -66,7 +71,6 @@ namespace osu.Game.Graphics.UserInterface
                 stars = new FillFlowContainer<Star>
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(star_spacing),
                     ChildrenEnumerable = Enumerable.Range(0, StarCount).Select(_ => CreateStar())
                 }

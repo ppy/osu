@@ -3,7 +3,9 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using osuTK;
 using osu.Framework.Allocation;
@@ -17,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 
@@ -25,11 +28,12 @@ namespace osu.Game.Screens.Select
     [Cached]
     public partial class BeatmapInfoWedgeV2 : VisibilityContainer
     {
-        private const float shear_width = 36.75f;
+        private const float shear_width = 21;
+        private const int wedge_height = 120;
 
         private const float transition_duration = 250;
 
-        private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGE_HEIGHT, 0);
+        private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / wedge_height, 0);
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
@@ -45,6 +49,7 @@ namespace osu.Game.Screens.Select
         private CancellationTokenSource cancellationSource;
 
         private readonly Container difficultyColourBar;
+        private readonly StarCounter starCounter;
 
         public BeatmapInfoWedgeV2()
         {
@@ -52,14 +57,27 @@ namespace osu.Game.Screens.Select
             Shear = wedged_container_shear;
             Masking = true;
             Alpha = 0;
-            Child = difficultyColourBar = new Container
+
+            Children = new Drawable[]
             {
-                Depth = float.MaxValue,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                RelativeSizeAxes = Axes.Y,
-                Width = 40,
-                Child = new Box { RelativeSizeAxes = Axes.Both }
+                difficultyColourBar = new Container
+                {
+                    Depth = float.MaxValue,
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 40,
+                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                },
+                starCounter = new StarCounter
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(0.4f),
+                    Shear = -wedged_container_shear,
+                    X = -15,
+                    Direction = FillDirection.Vertical
+                }
             };
         }
 
@@ -67,6 +85,15 @@ namespace osu.Game.Screens.Select
         private void load()
         {
             ruleset.BindValueChanged(_ => updateDisplay());
+
+            float starAngle = (float)(Math.Atan(shear_width / wedge_height) * (180 / Math.PI));
+
+            //Applying the rotation directly to the StarCounter distorts the stars, hence it is applied to the child container
+            starCounter.Children.First().Rotation = starAngle;
+
+            //Makes sure the stars center themselves properly in the colour bar
+            starCounter.Children.First().Anchor = Anchor.Centre;
+            starCounter.Children.First().Origin = Anchor.Centre;
         }
 
         private const double animation_duration = 800;
@@ -267,8 +294,12 @@ namespace osu.Game.Screens.Select
 
                 starRatingDisplay.DisplayedStars.BindValueChanged(s =>
                 {
-                    wedge.difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
+                    wedge.starCounter.Colour = s.NewValue >= 6.5 ? colours.Orange1 : Colour4.Black.Opacity(0.75f);
+                    wedge.starCounter.Current = (float)s.NewValue;
+
+                    wedge.difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue), 750, Easing.OutQuint);
                 }, true);
+
                 starDifficulty.BindValueChanged(s =>
                 {
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
