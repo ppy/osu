@@ -103,8 +103,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             private readonly Box selectedUnderline;
 
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; }
+            protected override bool HighlightOnHoverWhenActive => true;
 
             public MultipleSelectionFilterTabItem(T value)
                 : base(value)
@@ -125,7 +124,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 base.UpdateState();
                 selectedUnderline.FadeTo(Active.Value ? 1 : 0, 200, Easing.OutQuint);
-                selectedUnderline.FadeColour(IsHovered ? colourProvider.Light1 : GetStateColour(), 200, Easing.OutQuint);
+                selectedUnderline.FadeColour(IsHovered ? ColourProvider.Content2 : GetStateColour(), 200, Easing.OutQuint);
             }
 
             protected override bool OnClick(ClickEvent e)
