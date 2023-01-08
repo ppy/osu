@@ -161,6 +161,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f);
 
             SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
+            SetDefault(OsuSetting.GlowStrength, 0.15f, 0.10f, 0.5f, 0.01f);
 
             SetDefault(OsuSetting.UIHoldActivationDelay, 200.0, 0.0, 500.0, 50.0);
 
@@ -272,6 +273,12 @@ namespace osu.Game.Configuration
                         // TODO: implement lookup for framework platform key bindings
                     )
                 ),
+                new TrackedSetting<float>(OsuSetting.GlowStrength, strength => new SettingDescription(
+                        rawValue: strength,
+                        name: GraphicsSettingsStrings.GlowStrength,
+                        value: $"{strength * 100:N0}%"
+                    )
+                ),
             };
         }
 
@@ -359,6 +366,8 @@ namespace osu.Game.Configuration
         ScalingSizeX,
         ScalingSizeY,
         UIScale,
+        GlowStrength,
+
         IntroSequence,
         NotifyOnUsernameMentioned,
         NotifyOnPrivateMessage,

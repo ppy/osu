@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 new RendererSettings(),
                 new VideoSettings(),
                 new ScreenshotSettings(),
+                new KiaiSettings(),
             };
         }
     }

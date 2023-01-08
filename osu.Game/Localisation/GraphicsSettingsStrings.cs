@@ -144,6 +144,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Png => new TranslatableString(getKey(@"png_lossless"), @"PNG (lossless)");
 
+        /// <summary>
+        /// "Kiai"
+        /// </summary>
+        public static LocalisableString KiaiHeader => new TranslatableString(getKey(@"kiai_header"), @"Kiai");
+
+        /// <summary>
+        /// "Glow Strength"
+        /// </summary>
+        public static LocalisableString GlowStrength => new TranslatableString(getKey(@"kiai_glow"), @"Glow Strength");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
