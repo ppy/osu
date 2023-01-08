@@ -60,17 +60,22 @@ namespace osu.Game.Screens.Select
 
             Children = new Drawable[]
             {
+                //These elements can't be grouped with the rest of the content, due to being present either outside or under the backgrounds area
                 difficultyColourBar = new Container
                 {
+                    Colour = Colour4.Transparent,
                     Depth = float.MaxValue,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,
+
+                    //By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
                     Width = 40,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
                 starCounter = new StarCounter
                 {
+                    Colour = Colour4.Transparent,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.Centre,
                     Scale = new Vector2(0.4f),
@@ -170,7 +175,7 @@ namespace osu.Game.Screens.Select
                     Children = new Drawable[]
                     {
                         new BeatmapInfoWedgeBackground(beatmap) { Shear = -Shear },
-                        Info = new WedgeInfoText(beatmap, starDifficulty) { Shear = -Shear }
+                        Info = new WedgeInfoText { Shear = -Shear }
                     }
                 }, loaded =>
                 {
@@ -193,9 +198,6 @@ namespace osu.Game.Screens.Select
             private ILocalisedBindableString titleBinding;
             private ILocalisedBindableString artistBinding;
 
-            private readonly WorkingBeatmap working;
-            private readonly IBindable<StarDifficulty?> starDifficulty;
-
             [Resolved]
             private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
@@ -207,17 +209,11 @@ namespace osu.Game.Screens.Select
 
             private ModSettingChangeTracker settingChangeTracker;
 
-            public WedgeInfoText(WorkingBeatmap working, IBindable<StarDifficulty?> starDifficulty)
-            {
-                this.working = working;
-                this.starDifficulty = starDifficulty;
-            }
-
             [BackgroundDependencyLoader]
             private void load(LocalisationManager localisation)
             {
-                var beatmapInfo = working.BeatmapInfo;
-                var metadata = beatmapInfo.Metadata;
+                var beatmapInfo = wedge.Beatmap.BeatmapInfo;
+                var metadata = wedge.beatmap.Metadata;
 
                 RelativeSizeAxes = Axes.Both;
 
@@ -262,7 +258,7 @@ namespace osu.Game.Screens.Select
                     {
                         Name = "Top-left aligned metadata",
                         Direction = FillDirection.Vertical,
-                        Position = new Vector2(50, 12),
+                        Position = new Vector2(80, 12),
                         Width = .8f,
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
@@ -270,6 +266,7 @@ namespace osu.Game.Screens.Select
                         {
                             TitleLabel = new OsuSpriteText
                             {
+                                Shadow = true,
                                 Current = { BindTarget = titleBinding },
                                 Font = OsuFont.TorusAlternate.With(size: 40, weight: FontWeight.SemiBold),
                                 RelativeSizeAxes = Axes.X,
@@ -277,6 +274,7 @@ namespace osu.Game.Screens.Select
                             },
                             ArtistLabel = new OsuSpriteText
                             {
+                                Shadow = true,
                                 Current = { BindTarget = artistBinding },
                                 //Not sure if this should be semi bold or medium
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
@@ -297,10 +295,10 @@ namespace osu.Game.Screens.Select
                     wedge.starCounter.Colour = s.NewValue >= 6.5 ? colours.Orange1 : Colour4.Black.Opacity(0.75f);
                     wedge.starCounter.Current = (float)s.NewValue;
 
-                    wedge.difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue), 750, Easing.OutQuint);
+                    wedge.difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
                 }, true);
 
-                starDifficulty.BindValueChanged(s =>
+                wedge.starDifficulty.BindValueChanged(s =>
                 {
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
 
