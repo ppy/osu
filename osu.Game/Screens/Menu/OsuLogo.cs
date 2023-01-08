@@ -365,7 +365,7 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (Action == null || e.Button != MouseButton.Left) return false;
+            if (e.Button != MouseButton.Left) return true;
 
             logoBounceContainer.ScaleTo(0.9f, 1000, Easing.Out);
             return true;
@@ -380,22 +380,21 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Action == null) return false;
-
-            if (Action.Invoke())
-                sampleClick.Play();
-
             flashLayer.ClearTransforms();
             flashLayer.Alpha = 0.4f;
             flashLayer.FadeOut(1500, Easing.OutExpo);
+
+            if (Action?.Invoke() == true)
+                sampleClick.Play();
+
             return true;
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (Action == null) return true;
+            if (Action != null)
+                logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
 
-            logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
             return true;
         }
 
