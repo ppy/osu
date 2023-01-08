@@ -8,8 +8,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -55,6 +57,18 @@ namespace osu.Game.Screens.Play
             base.PopOut();
 
             pauseLoop.VolumeTo(0, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
+        }
+
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.PauseGameplay:
+                    BackAction.Invoke();
+                    return true;
+            }
+
+            return base.OnPressed(e);
         }
     }
 }

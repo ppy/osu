@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Play
             InternalButtons.Add(button);
         }
 
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
