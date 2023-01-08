@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,31 +45,31 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly BeatmapInfo beatmapInfo;
 
-        private Sprite background;
+        private Sprite background = null!;
 
-        private Action<BeatmapInfo> startRequested;
-        private Action<BeatmapInfo> editRequested;
-        private Action<BeatmapInfo> hideRequested;
+        private Action<BeatmapInfo>? startRequested;
+        private Action<BeatmapInfo>? editRequested;
+        private Action<BeatmapInfo>? hideRequested;
 
-        private Triangles triangles;
+        private Triangles triangles = null!;
 
-        private StarCounter starCounter;
-        private DifficultyIcon difficultyIcon;
-
-        [Resolved(CanBeNull = true)]
-        private BeatmapSetOverlay beatmapOverlay { get; set; }
+        private StarCounter starCounter = null!;
+        private DifficultyIcon difficultyIcon = null!;
 
         [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+        private BeatmapSetOverlay? beatmapOverlay { get; set; }
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
-        private IBindable<StarDifficulty?> starDifficultyBindable;
-        private CancellationTokenSource starDifficultyCancellationSource;
+        [Resolved]
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        private IBindable<StarDifficulty?> starDifficultyBindable = null!;
+        private CancellationTokenSource? starDifficultyCancellationSource;
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
         {
@@ -79,8 +77,8 @@ namespace osu.Game.Screens.Select.Carousel
             Item = panel;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager manager, SongSelect songSelect)
+        [BackgroundDependencyLoader]
+        private void load(BeatmapManager? manager, SongSelect? songSelect)
         {
             Header.Height = height;
 
@@ -194,7 +192,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Item.State.Value == CarouselItemState.Selected)
+            if (Item!.State.Value == CarouselItemState.Selected)
                 startRequested?.Invoke(beatmapInfo);
 
             return base.OnClick(e);
@@ -202,7 +200,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override void ApplyState()
         {
-            if (Item.State.Value != CarouselItemState.Collapsed && Alpha == 0)
+            if (Item!.State.Value != CarouselItemState.Collapsed && Alpha == 0)
                 starCounter.ReplayAnimation();
 
             starDifficultyCancellationSource?.Cancel();

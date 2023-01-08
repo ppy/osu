@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// A function to optionally decide on a recommended difficulty from a beatmap set.
         /// </summary>
-        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo>? GetRecommendedBeatmap;
+        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo?>? GetRecommendedBeatmap;
 
         private CarouselBeatmapSet? selectedBeatmapSet;
 
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Select
         {
             CarouselRoot newRoot = new CarouselRoot(this);
 
-            newRoot.AddItems(beatmapSets.Select(s => createCarouselSet(s.Detach())).Where(g => g != null));
+            newRoot.AddItems(beatmapSets.Select(s => createCarouselSet(s.Detach())).Where(g => g != null)!);
 
             root = newRoot;
 
@@ -739,7 +739,7 @@ namespace osu.Game.Screens.Select
 
                     foreach (var panel in Scroll.Children)
                     {
-                        if (toDisplay.Remove(panel.Item))
+                        if (toDisplay.Remove(panel.Item!))
                         {
                             // panel already displayed.
                             continue;
@@ -770,7 +770,7 @@ namespace osu.Game.Screens.Select
             {
                 updateItem(item);
 
-                if (item.Item.Visible)
+                if (item.Item!.Visible)
                 {
                     bool isSelected = item.Item.State.Value == CarouselItemState.Selected;
 

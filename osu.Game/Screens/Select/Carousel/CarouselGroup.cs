@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Select.Carousel
     /// </summary>
     public class CarouselGroup : CarouselItem
     {
-        public override DrawableCarouselItem? CreateDrawableRepresentation() => null;
+        public override DrawableCarouselItem CreateDrawableRepresentation() => null!;
 
         public IReadOnlyList<CarouselItem> Items => items;
 
