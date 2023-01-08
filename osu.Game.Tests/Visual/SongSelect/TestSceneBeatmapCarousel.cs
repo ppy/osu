@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
 
                 return visibleBeatmapPanels.Length == 1
-                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1;
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item)!.BeatmapInfo.Ruleset.OnlineID == 0) == 1;
             });
 
             AddStep("filter to ruleset 1", () => carousel.Filter(new FilterCriteria
@@ -86,8 +86,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
 
                 return visibleBeatmapPanels.Length == 2
-                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1
-                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 1) == 1;
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item)!.BeatmapInfo.Ruleset.OnlineID == 0) == 1
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item)!.BeatmapInfo.Ruleset.OnlineID == 1) == 1;
             });
 
             AddStep("filter to ruleset 2", () => carousel.Filter(new FilterCriteria
@@ -101,8 +101,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
 
                 return visibleBeatmapPanels.Length == 2
-                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1
-                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 2) == 1;
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item!).BeatmapInfo.Ruleset.OnlineID == 0) == 1
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item!).BeatmapInfo.Ruleset.OnlineID == 2) == 1;
             });
         }
 
@@ -1069,7 +1069,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return Precision.AlmostEquals(
                     carousel.ScreenSpaceDrawQuad.Centre,
                     carousel.Items
-                            .First(i => i.Item.State.Value == CarouselItemState.Selected)
+                            .First(i => i.Item!.State.Value == CarouselItemState.Selected)
                             .ScreenSpaceDrawQuad.Centre, 100);
             });
         }
@@ -1103,7 +1103,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             if (currentlySelected == null)
                 return true;
 
-            return currentlySelected.Item.Visible;
+            return currentlySelected.Item!.Visible;
         }
 
         private void checkInvisibleDifficultiesUnselectable()
