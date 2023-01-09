@@ -111,7 +111,12 @@ namespace osu.Game.Online.Chat
         {
             drawableChannel?.Expire();
 
+            if (e.OldValue != null)
+                TextBox?.Current.UnbindFrom(e.OldValue.TextBoxMessage);
+
             if (e.NewValue == null) return;
+
+            TextBox?.Current.BindTo(e.NewValue.TextBoxMessage);
 
             drawableChannel = CreateDrawableChannel(e.NewValue);
             drawableChannel.CreateChatLineAction = CreateMessage;
