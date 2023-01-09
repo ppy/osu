@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,15 +18,22 @@ namespace osu.Game.Screens.Ranking
 {
     public partial class SoloResultsScreen : ResultsScreen
     {
-        private GetScoresRequest getScoreRequest;
+        /// <summary>
+        /// Whether the user's personal statistics should be shown on the extended statistics panel
+        /// after clicking the score panel associated with the <see cref="ResultsScreen.Score"/> being presented.
+        /// </summary>
+        public bool ShowUserStatistics { get; init; }
+
+        private GetScoresRequest? getScoreRequest;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private RulesetStore rulesets { get; set; } = null!;
 
         [Resolved]
-        private SoloStatisticsWatcher soloStatisticsWatcher { get; set; }
+        private SoloStatisticsWatcher soloStatisticsWatcher { get; set; } = null!;
 
-        private readonly Bindable<SoloStatisticsUpdate> statisticsUpdate = new Bindable<SoloStatisticsUpdate>();
+        private IDisposable? statisticsSubscription;
+        private readonly Bindable<SoloStatisticsUpdate?> statisticsUpdate = new Bindable<SoloStatisticsUpdate?>();
 
         public SoloResultsScreen(ScoreInfo score, bool allowRetry)
             : base(score, allowRetry)
@@ -39,15 +44,24 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            soloStatisticsWatcher.RegisterForStatisticsUpdateAfter(Score, update => statisticsUpdate.Value = update);
+            if (ShowUserStatistics)
+                statisticsSubscription = soloStatisticsWatcher.RegisterForStatisticsUpdateAfter(Score, update => statisticsUpdate.Value = update);
         }
 
-        protected override StatisticsPanel CreateStatisticsPanel() => new SoloStatisticsPanel(Score)
+        protected override StatisticsPanel CreateStatisticsPanel()
         {
-            StatisticsUpdate = { BindTarget = statisticsUpdate }
-        };
+            if (ShowUserStatistics)
+            {
+                return new SoloStatisticsPanel(Score)
+                {
+                    StatisticsUpdate = { BindTarget = statisticsUpdate }
+                };
+            }
 
-        protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+            return base.CreateStatisticsPanel();
+        }
+
+        protected override APIRequest? FetchScores(Action<IEnumerable<ScoreInfo>>? scoresCallback)
         {
             if (Score.BeatmapInfo.OnlineID <= 0 || Score.BeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
                 return null;
@@ -62,6 +76,7 @@ namespace osu.Game.Screens.Ranking
             base.Dispose(isDisposing);
 
             getScoreRequest?.Cancel();
+            statisticsSubscription?.Dispose();
         }
     }
 }
