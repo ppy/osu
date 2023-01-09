@@ -2,19 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Graphics.Sprites;
-using osuTK.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
-using osu.Framework.Bindables;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -159,17 +159,17 @@ namespace osu.Game.Overlays.Comments
 
             public readonly BindableBool IsBlocked = new BindableBool();
 
-            private bool isLoadingSpinnerShown;
+            private bool showLoadingSpinner;
 
             /// <summary>
             /// Whether loading spinner shown.
             /// </summary>
-            public bool IsLoadingSpinnerShown
+            public bool ShowLoadingSpinner
             {
-                get => isLoadingSpinnerShown;
+                get => showLoadingSpinner;
                 set
                 {
-                    isLoadingSpinnerShown = value;
+                    showLoadingSpinner = value;
                     Enabled.Value = !value && !IsBlocked.Value;
                     spinner.FadeTo(value ? 1f : 0f, duration, Easing.OutQuint);
                     text.FadeTo(value ? 0f : 1f, duration, Easing.OutQuint);
@@ -194,7 +194,7 @@ namespace osu.Game.Overlays.Comments
                 base.LoadComplete();
                 IsBlocked.BindValueChanged(e =>
                 {
-                    Enabled.Value = !IsLoadingSpinnerShown && !e.NewValue;
+                    Enabled.Value = !ShowLoadingSpinner && !e.NewValue;
                 }, true);
             }
 
