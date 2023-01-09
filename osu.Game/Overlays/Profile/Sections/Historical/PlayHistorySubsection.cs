@@ -12,8 +12,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     {
         protected override LocalisableString GraphCounterName => UsersStrings.ShowExtraHistoricalMonthlyPlaycountsCountLabel;
 
-        public PlayHistorySubsection(Bindable<UserProfileData?> userProfile)
-            : base(userProfile, UsersStrings.ShowExtraHistoricalMonthlyPlaycountsTitle)
+        public PlayHistorySubsection(Bindable<UserProfileData?> userProfileData)
+            : base(userProfileData, UsersStrings.ShowExtraHistoricalMonthlyPlaycountsTitle)
         {
         }
 

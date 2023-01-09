@@ -19,11 +19,11 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public partial class KudosuInfo : Container
     {
-        private readonly Bindable<UserProfileData?> userProfile = new Bindable<UserProfileData?>();
+        private readonly Bindable<UserProfileData?> userProfileData = new Bindable<UserProfileData?>();
 
-        public KudosuInfo(Bindable<UserProfileData?> userProfile)
+        public KudosuInfo(Bindable<UserProfileData?> userProfileData)
         {
-            this.userProfile.BindTo(userProfile);
+            this.userProfileData.BindTo(userProfileData);
             CountSection total;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             CornerRadius = 3;
             Child = total = new CountTotal();
 
-            this.userProfile.ValueChanged += u => total.Count = u.NewValue?.User.Kudosu.Total ?? 0;
+            this.userProfileData.ValueChanged += u => total.Count = u.NewValue?.User.Kudosu.Total ?? 0;
         }
 
         protected override bool OnClick(ClickEvent e) => true;

@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile
     {
         private UserCoverBackground coverContainer = null!;
 
-        public Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
+        public Bindable<UserProfileData?> UserProfileData = new Bindable<UserProfileData?>();
 
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile
         {
             ContentSidePadding = UserProfileOverlay.CONTENT_X_MARGIN;
 
-            UserProfile.ValueChanged += e => updateDisplay(e.NewValue);
+            UserProfileData.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem(LayoutStrings.HeaderUsersShow);
 
@@ -72,34 +72,34 @@ namespace osu.Game.Overlays.Profile
                 new TopHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    UserProfile = { BindTarget = UserProfile },
+                    UserProfileData = { BindTarget = UserProfileData },
                 },
                 centreHeaderContainer = new CentreHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    UserProfile = { BindTarget = UserProfile },
+                    UserProfileData = { BindTarget = UserProfileData },
                 },
                 detailHeaderContainer = new DetailHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    UserProfile = { BindTarget = UserProfile },
+                    UserProfileData = { BindTarget = UserProfileData },
                 },
                 new MedalHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    UserProfile = { BindTarget = UserProfile },
+                    UserProfileData = { BindTarget = UserProfileData },
                 },
                 new BottomHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    UserProfile = { BindTarget = UserProfile },
+                    UserProfileData = { BindTarget = UserProfileData },
                 },
             }
         };
 
         protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();
 
-        private void updateDisplay(UserProfileData? userProfile) => coverContainer.User = userProfile?.User;
+        private void updateDisplay(UserProfileData? data) => coverContainer.User = data?.User;
 
         private partial class ProfileHeaderTitle : OverlayTitle
         {

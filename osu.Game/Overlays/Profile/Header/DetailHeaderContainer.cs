@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Header
         private FillFlowContainer? fillFlow;
         private RankGraph rankGraph = null!;
 
-        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
+        public readonly Bindable<UserProfileData?> UserProfileData = new Bindable<UserProfileData?>();
 
         private bool expanded = true;
 
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Profile.Header
         {
             AutoSizeAxes = Axes.Y;
 
-            UserProfile.ValueChanged += e => updateDisplay(e.NewValue);
+            UserProfileData.ValueChanged += e => updateDisplay(e.NewValue);
 
             InternalChildren = new Drawable[]
             {
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     {
                                         new OverlinedTotalPlayTime
                                         {
-                                            UserProfile = { BindTarget = UserProfile }
+                                            UserProfileData = { BindTarget = UserProfileData }
                                         },
                                         medalInfo = new OverlinedInfoContainer
                                         {
@@ -170,9 +170,9 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private void updateDisplay(UserProfileData? userProfile)
+        private void updateDisplay(UserProfileData? data)
         {
-            var user = userProfile?.User;
+            var user = data?.User;
 
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
             ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";

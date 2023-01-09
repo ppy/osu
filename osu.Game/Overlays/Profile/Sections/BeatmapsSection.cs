@@ -18,13 +18,13 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new[]
             {
-                new PaginatedBeatmapContainer(BeatmapSetType.Favourite, UserProfile, UsersStrings.ShowExtraBeatmapsFavouriteTitle),
-                new PaginatedBeatmapContainer(BeatmapSetType.Ranked, UserProfile, UsersStrings.ShowExtraBeatmapsRankedTitle),
-                new PaginatedBeatmapContainer(BeatmapSetType.Loved, UserProfile, UsersStrings.ShowExtraBeatmapsLovedTitle),
-                new PaginatedBeatmapContainer(BeatmapSetType.Guest, UserProfile, UsersStrings.ShowExtraBeatmapsGuestTitle),
-                new PaginatedBeatmapContainer(BeatmapSetType.Pending, UserProfile, UsersStrings.ShowExtraBeatmapsPendingTitle),
-                new PaginatedBeatmapContainer(BeatmapSetType.Graveyard, UserProfile, UsersStrings.ShowExtraBeatmapsGraveyardTitle),
-                new PaginatedBeatmapContainer(BeatmapSetType.Nominated, UserProfile, UsersStrings.ShowExtraBeatmapsNominatedTitle),
+                new PaginatedBeatmapContainer(BeatmapSetType.Favourite, UserProfileData, UsersStrings.ShowExtraBeatmapsFavouriteTitle),
+                new PaginatedBeatmapContainer(BeatmapSetType.Ranked, UserProfileData, UsersStrings.ShowExtraBeatmapsRankedTitle),
+                new PaginatedBeatmapContainer(BeatmapSetType.Loved, UserProfileData, UsersStrings.ShowExtraBeatmapsLovedTitle),
+                new PaginatedBeatmapContainer(BeatmapSetType.Guest, UserProfileData, UsersStrings.ShowExtraBeatmapsGuestTitle),
+                new PaginatedBeatmapContainer(BeatmapSetType.Pending, UserProfileData, UsersStrings.ShowExtraBeatmapsPendingTitle),
+                new PaginatedBeatmapContainer(BeatmapSetType.Graveyard, UserProfileData, UsersStrings.ShowExtraBeatmapsGraveyardTitle),
+                new PaginatedBeatmapContainer(BeatmapSetType.Nominated, UserProfileData, UsersStrings.ShowExtraBeatmapsNominatedTitle),
             };
         }
     }

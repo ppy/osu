@@ -18,11 +18,11 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private ProfileSubsectionHeader header = null!;
 
-        protected ProfileSubsection(Bindable<UserProfileData?> userProfile, LocalisableString? headerText = null, CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+        protected ProfileSubsection(Bindable<UserProfileData?> userProfileData, LocalisableString? headerText = null, CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
         {
             this.headerText = headerText ?? string.Empty;
             this.counterVisibilityState = counterVisibilityState;
-            UserProfile.BindTo(userProfile);
+            UserProfile.BindTo(userProfileData);
         }
 
         [BackgroundDependencyLoader]

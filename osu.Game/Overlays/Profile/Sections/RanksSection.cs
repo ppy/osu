@@ -18,9 +18,9 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new[]
             {
-                new PaginatedScoreContainer(ScoreType.Pinned, UserProfile, UsersStrings.ShowExtraTopRanksPinnedTitle),
-                new PaginatedScoreContainer(ScoreType.Best, UserProfile, UsersStrings.ShowExtraTopRanksBestTitle),
-                new PaginatedScoreContainer(ScoreType.Firsts, UserProfile, UsersStrings.ShowExtraTopRanksFirstTitle)
+                new PaginatedScoreContainer(ScoreType.Pinned, UserProfileData, UsersStrings.ShowExtraTopRanksPinnedTitle),
+                new PaginatedScoreContainer(ScoreType.Best, UserProfileData, UsersStrings.ShowExtraTopRanksBestTitle),
+                new PaginatedScoreContainer(ScoreType.Firsts, UserProfileData, UsersStrings.ShowExtraTopRanksFirstTitle)
             };
         }
     }

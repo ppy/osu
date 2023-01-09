@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class MessageUserButton : ProfileHeaderButton
     {
-        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
+        public readonly Bindable<UserProfileData?> UserProfileData = new Bindable<UserProfileData?>();
 
         public override LocalisableString TooltipText => UsersStrings.CardSendMessage;
 
@@ -48,12 +48,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 if (!Content.IsPresent) return;
 
-                channelManager?.OpenPrivateChannel(UserProfile.Value?.User);
+                channelManager?.OpenPrivateChannel(UserProfileData.Value?.User);
                 userOverlay?.Hide();
                 chatOverlay?.Show();
             };
 
-            UserProfile.ValueChanged += e =>
+            UserProfileData.ValueChanged += e =>
             {
                 var user = e.NewValue?.User;
                 Content.Alpha = user != null && !user.PMFriendsOnly && apiProvider.LocalUser.Value.Id != user.Id ? 1 : 0;

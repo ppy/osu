@@ -20,8 +20,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         /// </summary>
         protected abstract LocalisableString GraphCounterName { get; }
 
-        protected ChartProfileSubsection(Bindable<UserProfileData?> userProfile, LocalisableString headerText)
-            : base(userProfile, headerText)
+        protected ChartProfileSubsection(Bindable<UserProfileData?> userProfileData, LocalisableString headerText)
+            : base(userProfileData, headerText)
         {
         }
 
