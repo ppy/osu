@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void updateBeatmapDifficulties()
         {
-            if (Item == null) return;
+            Debug.Assert(Item != null);
 
             var carouselBeatmapSet = (CarouselBeatmapSet)Item;
 
@@ -197,10 +197,12 @@ namespace osu.Game.Screens.Select.Carousel
 
             foreach (var panel in beatmapContainer.Children)
             {
+                Debug.Assert(panel.Item != null);
+
                 if (isSelected)
                 {
                     panel.MoveToY(yPos, 800, Easing.OutQuint);
-                    yPos += panel.Item!.TotalHeight;
+                    yPos += panel.Item.TotalHeight;
                 }
                 else
                     panel.MoveToY(0, 800, Easing.OutQuint);

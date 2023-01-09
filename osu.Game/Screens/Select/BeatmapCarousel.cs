@@ -739,7 +739,9 @@ namespace osu.Game.Screens.Select
 
                     foreach (var panel in Scroll.Children)
                     {
-                        if (toDisplay.Remove(panel.Item!))
+                        Debug.Assert(panel.Item != null);
+
+                        if (toDisplay.Remove(panel.Item))
                         {
                             // panel already displayed.
                             continue;
