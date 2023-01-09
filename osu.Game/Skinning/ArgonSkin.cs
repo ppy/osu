@@ -30,7 +30,7 @@ namespace osu.Game.Skinning
             InstantiationInfo = typeof(ArgonSkin).GetInvariantInstantiationInfo()
         };
 
-        private readonly IStorageResourceProvider resources;
+        protected readonly IStorageResourceProvider Resources;
 
         public ArgonSkin(IStorageResourceProvider resources)
             : this(CreateInfo(), resources)
@@ -41,7 +41,7 @@ namespace osu.Game.Skinning
         public ArgonSkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(skin, resources)
         {
-            this.resources = resources;
+            Resources = resources;
 
             Configuration.CustomComboColours = new List<Color4>
             {
@@ -72,7 +72,7 @@ namespace osu.Game.Skinning
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
-                var sample = Samples?.Get(lookup) ?? resources.AudioManager?.Samples.Get(lookup);
+                var sample = Samples?.Get(lookup) ?? Resources.AudioManager?.Samples.Get(lookup);
                 if (sample != null)
                     return sample;
             }

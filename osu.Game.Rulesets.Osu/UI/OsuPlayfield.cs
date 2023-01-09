@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.UI
             HitPolicy = new StartTimeOrderedHitPolicy();
 
             var hitWindows = new OsuHitWindows();
-            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
+            foreach (var result in Enum.GetValues<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
                 poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgementLoaded));
 
             AddRangeInternal(poolDictionary.Values);

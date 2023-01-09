@@ -54,6 +54,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 overlay.ShowBeatmapSet(new APIBeatmapSet
                 {
+                    Genre = new BeatmapSetOnlineGenre { Id = 15, Name = "Future genre" },
+                    Language = new BeatmapSetOnlineLanguage { Id = 15, Name = "Future language" },
                     OnlineID = 1235,
                     Title = @"an awesome beatmap",
                     Artist = @"naru narusegawa",
