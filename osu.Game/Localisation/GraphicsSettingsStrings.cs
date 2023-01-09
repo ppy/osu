@@ -145,14 +145,9 @@ namespace osu.Game.Localisation
         public static LocalisableString Png => new TranslatableString(getKey(@"png_lossless"), @"PNG (lossless)");
 
         /// <summary>
-        /// "Kiai"
+        /// "Kiai Glow"
         /// </summary>
-        public static LocalisableString KiaiHeader => new TranslatableString(getKey(@"kiai_header"), @"Kiai");
-
-        /// <summary>
-        /// "Glow Strength"
-        /// </summary>
-        public static LocalisableString GlowStrength => new TranslatableString(getKey(@"kiai_glow"), @"Glow Strength");
+        public static LocalisableString KiaiFlash => new TranslatableString(getKey(@"kiai_glow"), @"Kiai Glow");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }
