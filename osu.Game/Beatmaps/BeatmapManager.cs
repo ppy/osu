@@ -44,6 +44,16 @@ namespace osu.Game.Beatmaps
 
         public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
 
+        public override bool PauseImports
+        {
+            get => base.PauseImports;
+            set
+            {
+                base.PauseImports = value;
+                beatmapImporter.PauseImports = value;
+            }
+        }
+
         public BeatmapManager(Storage storage, RealmAccess realm, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
                               WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
             : base(storage, realm)
@@ -62,7 +72,6 @@ namespace osu.Game.Beatmaps
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm);
-            beatmapImporter.PauseImports.BindTo(PauseImports);
             beatmapImporter.ProcessBeatmap = args => ProcessBeatmap?.Invoke(args);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 

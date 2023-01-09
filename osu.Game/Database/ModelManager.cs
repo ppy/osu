@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -22,7 +21,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Temporarily pause imports to avoid performance overheads affecting gameplay scenarios.
         /// </summary>
-        public readonly BindableBool PauseImports = new BindableBool();
+        public virtual bool PauseImports { get; set; }
 
         protected RealmAccess Realm { get; }
 
