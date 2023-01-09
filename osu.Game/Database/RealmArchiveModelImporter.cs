@@ -569,6 +569,7 @@ namespace osu.Game.Database
                 Thread.Sleep(500);
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             Logger.Log($@"{GetType().Name} is being resumed.");
         }
 
