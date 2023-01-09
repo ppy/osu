@@ -132,12 +132,13 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                 copyInformation.AddLink("Learn more about how \"hard links\" work", LinkAction.OpenWiki, @"Client/Release_stream/Lazer/File_storage#via-hard-links");
             }
-            else if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+            else if (!RuntimeInfo.IsDesktop)
                 copyInformation.Text = "Lightweight linking of files is not supported on your operating system yet, so a copy of all files will be made during import.";
             else
             {
-                copyInformation.Text =
-                    "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system is NTFS). ";
+                copyInformation.Text = RuntimeInfo.OS == RuntimeInfo.Platform.Windows
+                    ? "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system is NTFS). "
+                    : "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system supports hard links). ";
                 copyInformation.AddLink(GeneralSettingsStrings.ChangeFolderLocation, () =>
                 {
                     game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()));

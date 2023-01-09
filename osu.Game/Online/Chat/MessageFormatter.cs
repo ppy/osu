@@ -341,6 +341,8 @@ namespace osu.Game.Online.Chat
         OpenWiki,
         Custom,
         OpenChangelog,
+        FilterBeatmapSetGenre,
+        FilterBeatmapSetLanguage,
     }
 
     public class Link : IComparable<Link>
