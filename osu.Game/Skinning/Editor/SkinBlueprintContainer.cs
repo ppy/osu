@@ -72,7 +72,7 @@ namespace osu.Game.Skinning.Editor
             editor.LayerSidebarList.List.Items.RemoveAll(element => element.RepresentedItem == item);
         }
 
-        private void componentsChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
+        private void componentsChanged(object? sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
             switch (e.Action)
             {
@@ -104,9 +104,9 @@ namespace osu.Game.Skinning.Editor
             }
         });
 
-        protected override void AddBlueprintFor(ISkinnableDrawable item)
+        protected override void AddBlueprintFor(ISkinnableDrawable? item)
         {
-            if (!item.IsEditable)
+            if (item is null || !item.IsEditable)
                 return;
 
             base.AddBlueprintFor(item);

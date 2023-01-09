@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Edit.List
             SetAllDepths();
         }
 
-        private void collectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void collectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -200,8 +200,10 @@ namespace osu.Game.Screens.Edit.List
             }
         }
 
-        private void removeItems(IList items)
+        private void removeItems(IList? items)
         {
+            if (items is null) return;
+
             foreach (var item in items.Cast<DrawableListRepresetedItem<T>>())
             {
                 if (currentlyDraggedItem != null && EqualityComparer<DrawableListRepresetedItem<T>>.Default.Equals(currentlyDraggedItem.Model, item))
@@ -219,8 +221,10 @@ namespace osu.Game.Screens.Edit.List
             OnItemsChanged();
         }
 
-        private void addItems(IList items)
+        private void addItems(IList? items)
         {
+            if (items is null) return;
+
             Action<int, T> setItemPosition = (oldIndex, item) =>
             {
                 //Lazers default positions for new items was at the top of the list.

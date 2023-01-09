@@ -411,7 +411,10 @@ namespace osu.Game.Skinning.Editor
             availableTargets?.ForEach(currentSkin.Value.UpdateDrawableTarget);
 
             skins.Save(skins.CurrentSkin.Value);
-            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString()));
+            Schedule(() =>
+            {
+                onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.Value.Name));
+            });
         }
 
         protected override bool OnHover(HoverEvent e) => true;
