@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Header
     public partial class CentreHeaderContainer : CompositeDrawable
     {
         public readonly BindableBool DetailsVisible = new BindableBool(true);
-        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
 
         private OverlinedInfoContainer hiddenDetailGlobal = null!;
         private OverlinedInfoContainer hiddenDetailCountry = null!;

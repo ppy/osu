@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class FollowersButton : ProfileHeaderStatisticsButton
     {
-        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
 
         public override LocalisableString TooltipText => FriendsStrings.ButtonsDisabled;
 

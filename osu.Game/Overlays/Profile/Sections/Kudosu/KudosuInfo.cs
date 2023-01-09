@@ -19,9 +19,9 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public partial class KudosuInfo : Container
     {
-        private readonly Bindable<UserProfile?> userProfile = new Bindable<UserProfile?>();
+        private readonly Bindable<UserProfileData?> userProfile = new Bindable<UserProfileData?>();
 
-        public KudosuInfo(Bindable<UserProfile?> userProfile)
+        public KudosuInfo(Bindable<UserProfileData?> userProfile)
         {
             this.userProfile.BindTo(userProfile);
             CountSection total;

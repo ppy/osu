@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class OverlinedTotalPlayTime : CompositeDrawable, IHasTooltip
     {
-        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
 
         public LocalisableString TooltipText { get; set; }
 
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             UserProfile.BindValueChanged(updateTime, true);
         }
 
-        private void updateTime(ValueChangedEvent<UserProfile?> userProfile)
+        private void updateTime(ValueChangedEvent<UserProfileData?> userProfile)
         {
             int? playTime = userProfile.NewValue?.User.Statistics?.PlayTime;
             TooltipText = (playTime ?? 0) / 3600 + " hours";

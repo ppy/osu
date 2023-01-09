@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Header
         private FillFlowContainer? fillFlow;
         private RankGraph rankGraph = null!;
 
-        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
 
         private bool expanded = true;
 
@@ -170,7 +170,7 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private void updateDisplay(UserProfile? userProfile)
+        private void updateDisplay(UserProfileData? userProfile)
         {
             var user = userProfile?.User;
 

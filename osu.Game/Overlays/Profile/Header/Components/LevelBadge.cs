@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class LevelBadge : CompositeDrawable, IHasTooltip
     {
-        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
 
         public LocalisableString TooltipText { get; private set; }
 

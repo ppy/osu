@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile
     {
         private UserCoverBackground coverContainer = null!;
 
-        public Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
 
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();
 
-        private void updateDisplay(UserProfile? userProfile) => coverContainer.User = userProfile?.User;
+        private void updateDisplay(UserProfileData? userProfile) => coverContainer.User = userProfile?.User;
 
         private partial class ProfileHeaderTitle : OverlayTitle
         {

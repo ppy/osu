@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override Container<Drawable> Content => content;
 
-        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
 
         protected ProfileSection()
         {

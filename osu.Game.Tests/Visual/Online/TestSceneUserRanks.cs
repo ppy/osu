@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            AddStep("Show cookiezi", () => ranks.UserProfile.Value = new UserProfile(new APIUser { Id = 124493 }));
+            AddStep("Show cookiezi", () => ranks.UserProfile.Value = new UserProfileData(new APIUser { Id = 124493 }));
         }
     }
 }
