@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract partial class ProfileSubsection : FillFlowContainer
     {
-        protected readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
+        protected readonly Bindable<UserProfileData?> UserProfileData = new Bindable<UserProfileData?>();
 
         private readonly LocalisableString headerText;
         private readonly CounterVisibilityState counterVisibilityState;
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             this.headerText = headerText ?? string.Empty;
             this.counterVisibilityState = counterVisibilityState;
-            UserProfile.BindTo(userProfileData);
+            UserProfileData.BindTo(userProfileData);
         }
 
         [BackgroundDependencyLoader]

@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            UserProfile.BindValueChanged(onUserChanged, true);
+            UserProfileData.BindValueChanged(onUserChanged, true);
         }
 
         private void onUserChanged(ValueChangedEvent<UserProfileData?> e)
