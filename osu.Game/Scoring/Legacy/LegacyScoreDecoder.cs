@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
@@ -46,10 +47,12 @@ namespace osu.Game.Scoring.Legacy
                 score.ScoreInfo = scoreInfo;
 
                 int version = sr.ReadInt32();
+                string beatmapHash = sr.ReadString();
 
-                workingBeatmap = GetBeatmap(sr.ReadString());
+                workingBeatmap = GetBeatmap(beatmapHash);
+
                 if (workingBeatmap is DummyWorkingBeatmap)
-                    throw new BeatmapNotFoundException();
+                    throw new BeatmapNotFoundException(beatmapHash);
 
                 scoreInfo.User = new APIUser { Username = sr.ReadString() };
 
@@ -334,9 +337,11 @@ namespace osu.Game.Scoring.Legacy
 
         public class BeatmapNotFoundException : Exception
         {
-            public BeatmapNotFoundException()
-                : base("No corresponding beatmap for the score could be found.")
+            public string Hash { get; }
+
+            public BeatmapNotFoundException(string hash)
             {
+                Hash = hash;
             }
         }
     }
