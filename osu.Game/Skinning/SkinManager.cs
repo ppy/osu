@@ -79,6 +79,8 @@ namespace osu.Game.Skinning
                 PostNotification = obj => PostNotification?.Invoke(obj),
             };
 
+            skinImporter.PauseImports.BindTo(PauseImports);
+
             var defaultSkins = new[]
             {
                 DefaultClassicSkin = new DefaultLegacySkin(this),

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -18,6 +19,11 @@ namespace osu.Game.Database
     public class ModelManager<TModel> : IModelManager<TModel>, IModelFileManager<TModel, RealmNamedFileUsage>
         where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
+        /// <summary>
+        /// Temporarily pause imports to avoid performance overheads affecting gameplay scenarios.
+        /// </summary>
+        public readonly BindableBool PauseImports = new BindableBool();
+
         protected RealmAccess Realm { get; }
 
         private readonly RealmFileStore realmFileStore;

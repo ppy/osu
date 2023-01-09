@@ -307,6 +307,10 @@ namespace osu.Game
             // Transfer any runtime changes back to configuration file.
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
 
+            BeatmapManager.PauseImports.BindTo(LocalUserPlaying);
+            SkinManager.PauseImports.BindTo(LocalUserPlaying);
+            ScoreManager.PauseImports.BindTo(LocalUserPlaying);
+
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
 
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);

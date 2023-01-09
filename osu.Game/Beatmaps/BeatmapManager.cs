@@ -62,6 +62,7 @@ namespace osu.Game.Beatmaps
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm);
+            beatmapImporter.PauseImports.BindTo(PauseImports);
             beatmapImporter.ProcessBeatmap = args => ProcessBeatmap?.Invoke(args);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
@@ -458,7 +459,8 @@ namespace osu.Game.Beatmaps
 
         public Task Import(ImportTask[] tasks, ImportParameters parameters = default) => beatmapImporter.Import(tasks, parameters);
 
-        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) => beatmapImporter.Import(notification, tasks, parameters);
+        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) =>
+            beatmapImporter.Import(notification, tasks, parameters);
 
         public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
             beatmapImporter.Import(task, parameters, cancellationToken);

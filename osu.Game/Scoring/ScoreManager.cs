@@ -38,6 +38,8 @@ namespace osu.Game.Scoring
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
+
+            scoreImporter.PauseImports.BindTo(PauseImports);
         }
 
         public Score GetScore(ScoreInfo score) => scoreImporter.GetScore(score);
