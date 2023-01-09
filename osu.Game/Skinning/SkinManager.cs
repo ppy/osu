@@ -64,6 +64,16 @@ namespace osu.Game.Skinning
 
         private Skin trianglesSkin { get; }
 
+        public override bool PauseImports
+        {
+            get => base.PauseImports;
+            set
+            {
+                base.PauseImports = value;
+                skinImporter.PauseImports = value;
+            }
+        }
+
         public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
             : base(storage, realm)
         {
@@ -78,8 +88,6 @@ namespace osu.Game.Skinning
             {
                 PostNotification = obj => PostNotification?.Invoke(obj),
             };
-
-            skinImporter.PauseImports.BindTo(PauseImports);
 
             var defaultSkins = new[]
             {

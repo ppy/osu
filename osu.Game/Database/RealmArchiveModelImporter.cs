@@ -8,7 +8,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
@@ -60,7 +59,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Temporarily pause imports to avoid performance overheads affecting gameplay scenarios.
         /// </summary>
-        public readonly BindableBool PauseImports = new BindableBool();
+        public bool PauseImports { get; set; }
 
         public abstract IEnumerable<string> HandledExtensions { get; }
 
@@ -559,12 +558,12 @@ namespace osu.Game.Database
 
         private void pauseIfNecessary(CancellationToken cancellationToken)
         {
-            if (!PauseImports.Value)
+            if (!PauseImports)
                 return;
 
             Logger.Log(@"Import is being paused.");
 
-            while (PauseImports.Value)
+            while (PauseImports)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 Thread.Sleep(500);
