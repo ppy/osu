@@ -3,10 +3,12 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -20,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
         private const double pre_beat_transition_time = 80;
 
-        private const float flash_opacity = 0.3f;
+        private readonly Bindable<float> flashOpacity = new BindableFloat();
 
         private ColourInfo accentColour;
 
@@ -99,6 +101,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             }
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.KiaiFlash, flashOpacity);
+        }
+
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (!effectPoint.KiaiMode)
@@ -107,7 +115,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             if (drawableHitObject.State.Value == ArmedState.Idle)
             {
                 flash
-                    .FadeTo(flash_opacity)
+                    .FadeTo(flashOpacity.Value)
                     .Then()
                     .FadeOut(timingPoint.BeatLength * 0.75, Easing.OutSine);
             }
