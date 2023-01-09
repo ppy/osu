@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Select.Carousel
@@ -41,7 +42,7 @@ namespace osu.Game.Screens.Select.Carousel
         /// <summary>
         /// Create a fresh drawable version of this item.
         /// </summary>
-        public abstract DrawableCarouselItem CreateDrawableRepresentation();
+        public abstract DrawableCarouselItem? CreateDrawableRepresentation();
 
         public virtual void Filter(FilterCriteria criteria)
         {
@@ -49,7 +50,12 @@ namespace osu.Game.Screens.Select.Carousel
 
         public virtual int CompareTo(FilterCriteria criteria, CarouselItem other) => ItemID.CompareTo(other.ItemID);
 
-        public int CompareTo(CarouselItem? other) => CarouselYPosition.CompareTo(other!.CarouselYPosition);
+        public int CompareTo(CarouselItem? other)
+        {
+            Debug.Assert(other != null);
+
+            return CarouselYPosition.CompareTo(other.CarouselYPosition);
+        }
     }
 
     public enum CarouselItemState

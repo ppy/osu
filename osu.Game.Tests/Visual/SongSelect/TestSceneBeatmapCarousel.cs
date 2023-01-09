@@ -1069,7 +1069,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return Precision.AlmostEquals(
                     carousel.ScreenSpaceDrawQuad.Centre,
                     carousel.Items
-                            .First(i => i.Item!.State.Value == CarouselItemState.Selected)
+                            .First(i => i.Item?.State.Value == CarouselItemState.Selected)
                             .ScreenSpaceDrawQuad.Centre, 100);
             });
         }

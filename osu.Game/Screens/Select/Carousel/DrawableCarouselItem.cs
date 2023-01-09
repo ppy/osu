@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual void UpdateItem()
         {
-            if (item == null || Item == null)
+            if (Item == null)
                 return;
 
             Scheduler.AddOnce(ApplyState);
@@ -126,9 +126,11 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual void ApplyState()
         {
+            if (Item == null) return;
+
             // Use the fact that we know the precise height of the item from the model to avoid the need for AutoSize overhead.
             // Additionally, AutoSize doesn't work well due to content starting off-screen and being masked away.
-            Height = Item!.TotalHeight;
+            Height = Item.TotalHeight;
 
             switch (Item.State.Value)
             {
@@ -158,7 +160,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnClick(ClickEvent e)
         {
-            Item!.State.Value = CarouselItemState.Selected;
+            Debug.Assert(Item != null);
+
+            Item.State.Value = CarouselItemState.Selected;
             return true;
         }
     }
