@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -44,7 +43,7 @@ namespace osu.Game.Tournament.Screens.Editors
         {
             var countries = new List<TournamentTeam>();
 
-            foreach (var country in Enum.GetValues(typeof(CountryCode)).Cast<CountryCode>().Skip(1))
+            foreach (var country in Enum.GetValues<CountryCode>().Skip(1))
             {
                 countries.Add(new TournamentTeam
                 {
@@ -53,8 +52,6 @@ namespace osu.Game.Tournament.Screens.Editors
                     Acronym = { Value = country.GetAcronym() },
                 });
             }
-
-            Debug.Assert(countries != null);
 
             foreach (var c in countries)
                 Storage.Add(c);

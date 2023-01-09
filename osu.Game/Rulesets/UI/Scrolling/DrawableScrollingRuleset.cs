@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     break;
             }
 
-            double lastObjectTime = Objects.LastOrDefault()?.GetEndTime() ?? double.MaxValue;
+            double lastObjectTime = Beatmap.HitObjects.Any() ? Beatmap.GetLastObjectTime() : double.MaxValue;
             double baseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
             if (RelativeScaleBeatLengths)

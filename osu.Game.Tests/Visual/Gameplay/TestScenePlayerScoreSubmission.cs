@@ -257,7 +257,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTestAPI(true);
 
-            createPlayerTest(false, createRuleset: () => new OsuRuleset
+            createPlayerTest(createRuleset: () => new OsuRuleset
             {
                 RulesetInfo =
                 {

@@ -197,7 +197,7 @@ namespace osu.Game.Graphics.UserInterface
                 }, true);
             }
 
-            [BackgroundDependencyLoader]
+            [BackgroundDependencyLoader(true)]
             private void load(OverlayColourProvider? colourProvider)
             {
                 if (colourProvider == null) return;

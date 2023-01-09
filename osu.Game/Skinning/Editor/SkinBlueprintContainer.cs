@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -65,17 +66,24 @@ namespace osu.Game.Skinning.Editor
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Debug.Assert(e.NewItems != null);
+
                     foreach (var item in e.NewItems.Cast<ISkinnableDrawable>())
                         AddBlueprintFor(item);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                 case NotifyCollectionChangedAction.Reset:
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (var item in e.OldItems.Cast<ISkinnableDrawable>())
                         RemoveBlueprintFor(item);
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
+                    Debug.Assert(e.NewItems != null);
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (var item in e.OldItems.Cast<ISkinnableDrawable>())
                         RemoveBlueprintFor(item);
 
