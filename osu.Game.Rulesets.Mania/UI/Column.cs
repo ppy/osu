@@ -209,18 +209,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 keyBindingContainer = maniaInputManager?.KeyBindingContainer;
             }
 
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                keyBindingContainer?.TriggerPressed(column.Action.Value);
-                return base.OnMouseDown(e);
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                keyBindingContainer?.TriggerReleased(column.Action.Value);
-                base.OnMouseUp(e);
-            }
-
             protected override bool OnTouchDown(TouchDownEvent e)
             {
                 keyBindingContainer?.TriggerPressed(column.Action.Value);
