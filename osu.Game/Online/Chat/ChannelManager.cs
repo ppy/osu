@@ -328,7 +328,7 @@ namespace osu.Game.Online.Chat
         {
             // This request is self-retrying until it succeeds.
             // To avoid requests piling up when not logged in (ie. API is unavailable) exit early.
-            if (api.IsLoggedIn)
+            if (!api.IsLoggedIn)
                 return;
 
             var req = new ListChannelsRequest();
