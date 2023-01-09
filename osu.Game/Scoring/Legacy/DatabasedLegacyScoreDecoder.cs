@@ -4,6 +4,7 @@
 #nullable disable
 
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Scoring.Legacy
@@ -17,10 +18,11 @@ namespace osu.Game.Scoring.Legacy
         private readonly IRulesetStore rulesets;
         private readonly BeatmapManager beatmaps;
 
-        public DatabasedLegacyScoreDecoder(IRulesetStore rulesets, BeatmapManager beatmaps)
+        public DatabasedLegacyScoreDecoder(IRulesetStore rulesets, BeatmapManager beatmaps, IAPIProvider api = null)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
+            API = api;
         }
 
         protected override Ruleset GetRuleset(int rulesetId) => rulesets.GetRuleset(rulesetId)?.CreateInstance();

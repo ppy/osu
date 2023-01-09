@@ -12,6 +12,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO.Legacy;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
@@ -28,6 +30,7 @@ namespace osu.Game.Scoring.Legacy
         private Ruleset currentRuleset;
 
         private float beatmapOffset;
+        protected IAPIProvider API;
 
         public Score Parse(Stream stream)
         {
@@ -47,9 +50,14 @@ namespace osu.Game.Scoring.Legacy
 
                 int version = sr.ReadInt32();
 
-                workingBeatmap = GetBeatmap(sr.ReadString());
+                string md5Hash = sr.ReadString();
+                workingBeatmap = GetBeatmap(md5Hash);
                 if (workingBeatmap is DummyWorkingBeatmap)
-                    throw new BeatmapNotFoundException();
+                {
+                    GetBeatmapRequest request = new GetBeatmapRequest(new BeatmapInfo() { MD5Hash = md5Hash });
+                    API?.Perform(request);
+                    throw new BeatmapNotFoundException(request.Response);
+                }
 
                 scoreInfo.User = new APIUser { Username = sr.ReadString() };
 
@@ -334,8 +342,8 @@ namespace osu.Game.Scoring.Legacy
 
         public class BeatmapNotFoundException : Exception
         {
-            public BeatmapNotFoundException()
-                : base("No corresponding beatmap for the score could be found.")
+            public BeatmapNotFoundException(IBeatmapInfo beatmapInfo)
+                : base(beatmapInfo is not null ? $"Cannot find a corresponding beatmap for {beatmapInfo.Metadata.ArtistUnicode} - {beatmapInfo.Metadata.TitleUnicode}[{beatmapInfo.DifficultyName}] in library." : "No corresponding beatmap for the score could be found.")
             {
             }
         }
