@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Header
     {
         private FillFlowContainer badgeFlowContainer = null!;
 
-        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)

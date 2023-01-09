@@ -38,8 +38,8 @@ namespace osu.Game.Tests.Visual.Online
                 Child = section = new HistoricalSection(),
             });
 
-            AddStep("Show peppy", () => section.UserProfile.Value = new UserProfile(new APIUser { Id = 2 }));
-            AddStep("Show WubWoofWolf", () => section.UserProfile.Value = new UserProfile(new APIUser { Id = 39828 }));
+            AddStep("Show peppy", () => section.UserProfile.Value = new UserProfileData(new APIUser { Id = 2 }));
+            AddStep("Show WubWoofWolf", () => section.UserProfile.Value = new UserProfileData(new APIUser { Id = 39828 }));
         }
     }
 }

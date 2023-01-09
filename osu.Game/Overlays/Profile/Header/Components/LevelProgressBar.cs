@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class LevelProgressBar : CompositeDrawable, IHasTooltip
     {
-        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
 
         public LocalisableString TooltipText { get; }
 

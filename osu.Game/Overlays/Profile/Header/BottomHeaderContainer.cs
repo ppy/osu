@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public partial class BottomHeaderContainer : CompositeDrawable
     {
-        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
 
         private LinkFlowContainer topLinkContainer = null!;
         private LinkFlowContainer bottomLinkContainer = null!;

@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Red);
 
-        private readonly Bindable<UserProfile?> user = new Bindable<UserProfile?>();
+        private readonly Bindable<UserProfileData?> user = new Bindable<UserProfileData?>();
         private readonly PlayHistorySubsection section;
 
         public TestScenePlayHistorySubsection()
@@ -44,49 +44,49 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestNullValues()
         {
-            AddStep("Load user", () => user.Value = new UserProfile(user_with_null_values));
+            AddStep("Load user", () => user.Value = new UserProfileData(user_with_null_values));
             AddAssert("Section is hidden", () => section.Alpha == 0);
         }
 
         [Test]
         public void TestEmptyValues()
         {
-            AddStep("Load user", () => user.Value = new UserProfile(user_with_empty_values));
+            AddStep("Load user", () => user.Value = new UserProfileData(user_with_empty_values));
             AddAssert("Section is hidden", () => section.Alpha == 0);
         }
 
         [Test]
         public void TestOneValue()
         {
-            AddStep("Load user", () => user.Value = new UserProfile(user_with_one_value));
+            AddStep("Load user", () => user.Value = new UserProfileData(user_with_one_value));
             AddAssert("Section is hidden", () => section.Alpha == 0);
         }
 
         [Test]
         public void TestTwoValues()
         {
-            AddStep("Load user", () => user.Value = new UserProfile(user_with_two_values));
+            AddStep("Load user", () => user.Value = new UserProfileData(user_with_two_values));
             AddAssert("Section is visible", () => section.Alpha == 1);
         }
 
         [Test]
         public void TestConstantValues()
         {
-            AddStep("Load user", () => user.Value = new UserProfile(user_with_constant_values));
+            AddStep("Load user", () => user.Value = new UserProfileData(user_with_constant_values));
             AddAssert("Section is visible", () => section.Alpha == 1);
         }
 
         [Test]
         public void TestConstantZeroValues()
         {
-            AddStep("Load user", () => user.Value = new UserProfile(user_with_zero_values));
+            AddStep("Load user", () => user.Value = new UserProfileData(user_with_zero_values));
             AddAssert("Section is visible", () => section.Alpha == 1);
         }
 
         [Test]
         public void TestFilledValues()
         {
-            AddStep("Load user", () => user.Value = new UserProfile(user_with_filled_values));
+            AddStep("Load user", () => user.Value = new UserProfileData(user_with_filled_values));
             AddAssert("Section is visible", () => section.Alpha == 1);
             AddAssert("Array length is the same", () => user_with_filled_values.MonthlyPlayCounts.Length == getChartValuesLength());
         }
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestMissingValues()
         {
-            AddStep("Load user", () => user.Value = new UserProfile(user_with_missing_values));
+            AddStep("Load user", () => user.Value = new UserProfileData(user_with_missing_values));
             AddAssert("Section is visible", () => section.Alpha == 1);
             AddAssert("Array length is 7", () => getChartValuesLength() == 7);
         }

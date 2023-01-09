@@ -125,7 +125,7 @@ namespace osu.Game.Overlays
         {
             Debug.Assert(sections != null && sectionsContainer != null && tabs != null);
 
-            var userProfile = new UserProfile(user);
+            var userProfile = new UserProfileData(user);
             Header.UserProfile.Value = userProfile;
 
             if (user.ProfileOrder != null)
