@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public partial class KiaiSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => GraphicsSettingsStrings.KiaiHeader;
+        protected override LocalisableString Header => GraphicsSettingsStrings.KiaiFlash;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig)
@@ -20,9 +20,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 new SettingsSlider<float>
                 {
-                    LabelText = GraphicsSettingsStrings.GlowStrength,
+                    LabelText = GraphicsSettingsStrings.KiaiFlash,
                     TransferValueOnCommit = true,
-                    Current = osuConfig.GetBindable<float>(OsuSetting.GlowStrength),
+                    Current = osuConfig.GetBindable<float>(OsuSetting.KiaiFlash),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                     Keywords = new[] { "kiai", "glow", "highlight" },

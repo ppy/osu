@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Gameplay;
+using osu.Game.Overlays.Settings.Sections.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -28,6 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 new AudioSettings(),
                 new BeatmapSettings(),
                 new BackgroundSettings(),
+                new KiaiSettings(),
                 new HUDSettings(),
                 new InputSettings(),
                 new ModsSettings(),
