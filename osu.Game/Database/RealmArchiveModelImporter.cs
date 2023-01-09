@@ -561,7 +561,7 @@ namespace osu.Game.Database
             if (!PauseImports)
                 return;
 
-            Logger.Log(@"Import is being paused.");
+            Logger.Log($@"{GetType().Name} is being paused.");
 
             while (PauseImports)
             {
@@ -569,7 +569,7 @@ namespace osu.Game.Database
                 Thread.Sleep(500);
             }
 
-            Logger.Log(@"Import is being resumed.");
+            Logger.Log($@"{GetType().Name} is being resumed.");
         }
 
         private IEnumerable<string> getIDs(IEnumerable<INamedFile> files)
