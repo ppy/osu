@@ -13,7 +13,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
         private readonly PlayerSliderBar<float> comboColourNormalisationSliderBar;
-        private readonly PlayerSliderBar<float> kiaiGlowSliderBar;
         private readonly PlayerCheckbox showStoryboardToggle;
         private readonly PlayerCheckbox beatmapSkinsToggle;
         private readonly PlayerCheckbox beatmapColorsToggle;
@@ -41,11 +40,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     LabelText = GraphicsSettingsStrings.ComboColourNormalisation,
                     DisplayAsPercentage = true,
                 },
-                kiaiGlowSliderBar = new PlayerSliderBar<float>
-                {
-                    LabelText = GraphicsSettingsStrings.GlowStrength,
-                    DisplayAsPercentage = true,
-                }
             };
         }
 
@@ -58,7 +52,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
             beatmapSkinsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
             beatmapColorsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapColours);
             comboColourNormalisationSliderBar.Current = config.GetBindable<float>(OsuSetting.ComboColourNormalisationAmount);
-            kiaiGlowSliderBar.Current = config.GetBindable<float>(OsuSetting.GlowStrength);
         }
     }
 }
