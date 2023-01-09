@@ -72,6 +72,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Drawable CreateDefaultImplementation() => new DefaultSongProgress();
 
+        protected override Drawable CreateArgonImplementation() => new ArgonSongProgress();
+
         protected override Drawable CreateLegacyImplementation() => new LegacySongProgress();
     }
 }
