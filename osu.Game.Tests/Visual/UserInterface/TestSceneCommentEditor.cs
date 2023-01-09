@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
@@ -56,9 +55,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("press Enter", () => InputManager.Key(Key.Enter));
 
-            AddUntilStep("button is loading", () => commentEditor.ButtonLoading);
+            AddUntilStep("button is loading", () => commentEditor.IsSpinnerShown);
             AddAssert("text committed", () => commentEditor.CommittedText == "text");
-            AddUntilStep("button is not loading", () => !commentEditor.ButtonLoading);
+            AddUntilStep("button is not loading", () => !commentEditor.IsSpinnerShown);
         }
 
         [Test]
@@ -72,7 +71,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("press Enter", () => InputManager.Key(Key.Enter));
 
-            AddAssert("button is not loading", () => !commentEditor.ButtonLoading);
+            AddAssert("button is not loading", () => !commentEditor.IsSpinnerShown);
             AddAssert("no text committed", () => commentEditor.CommittedText.Length == 0);
         }
 
@@ -92,9 +91,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("button is loading", () => commentEditor.ButtonLoading);
+            AddUntilStep("button is loading", () => commentEditor.IsSpinnerShown);
             AddAssert("text committed", () => commentEditor.CommittedText == "some other text");
-            AddUntilStep("button is not loading", () => !commentEditor.ButtonLoading);
+            AddUntilStep("button is not loading", () => !commentEditor.IsSpinnerShown);
         }
 
         [Test]
@@ -116,13 +115,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public string CommittedText { get; private set; } = string.Empty;
 
-            public bool ButtonLoading => CommitButton.ChildrenOfType<LoadingSpinner>().Single().IsPresent && !CommitButton.ChildrenOfType<SpriteText>().Single().IsPresent;
+            public bool IsSpinnerShown => this.ChildrenOfType<LoadingSpinner>().Single().IsPresent;
 
             protected override void OnCommit(string value)
             {
-                CommitButton.ShowLoadingSpinner = true;
+                ShowLoadingSpinner = true;
                 CommittedText = value;
-                Scheduler.AddDelayed(() => CommitButton.ShowLoadingSpinner = false, 1000);
+                Scheduler.AddDelayed(() => ShowLoadingSpinner = false, 1000);
             }
 
             protected override LocalisableString FooterText => @"Footer text. And it is pretty long. Cool.";

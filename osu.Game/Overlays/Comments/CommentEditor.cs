@@ -32,7 +32,24 @@ namespace osu.Game.Overlays.Comments
 
         protected readonly Bindable<string> Current = new Bindable<string>();
 
-        protected EditorCommitButton CommitButton = null!;
+        private RoundedButton commitButton = null!;
+        private LoadingSpinner loadingSpinner = null!;
+
+        private bool showLoadingSpinner;
+
+        protected bool ShowLoadingSpinner
+        {
+            set
+            {
+                commitButton.Enabled.Value = !value && !string.IsNullOrEmpty(Current.Value);
+                showLoadingSpinner = value;
+
+                if (value)
+                    loadingSpinner.Show();
+                else
+                    loadingSpinner.Hide();
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -82,36 +99,57 @@ namespace osu.Game.Overlays.Comments
                                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
                                     Text = FooterText
                                 },
-                                ButtonsContainer = new FillFlowContainer
+                                new FillFlowContainer
                                 {
-                                    Name = @"Buttons",
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(5, 0),
-                                    Child = CommitButton = new EditorCommitButton
+                                    Children = new Drawable[]
                                     {
-                                        Text = CommitButtonText,
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                        Action = () => OnCommit(Current.Value)
+                                        ButtonsContainer = new FillFlowContainer
+                                        {
+                                            Name = @"Buttons",
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(5, 0),
+                                            Child = commitButton = new RoundedButton
+                                            {
+                                                Width = 100,
+                                                Height = 30,
+                                                Text = CommitButtonText,
+                                                Anchor = Anchor.CentreRight,
+                                                Origin = Anchor.CentreRight,
+                                                Action = () => OnCommit(Current.Value)
+                                            }
+                                        },
+                                        loadingSpinner = new LoadingSpinner
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            Size = new Vector2(18),
+                                        },
                                     }
-                                }
+                                },
                             }
                         }
                     }
                 }
             });
 
-            textBox.OnCommit += (_, _) => CommitButton.TriggerClick();
+            textBox.OnCommit += (_, _) => commitButton.TriggerClick();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            Current.BindValueChanged(text => CommitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
+            Current.BindValueChanged(text =>
+            {
+                commitButton.Enabled.Value = !showLoadingSpinner && !string.IsNullOrEmpty(text.NewValue);
+            }, true);
         }
 
         protected abstract void OnCommit(string text);
@@ -148,60 +186,6 @@ namespace osu.Game.Overlays.Comments
                 AutoSizeAxes = Axes.Both,
                 Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) }
             };
-        }
-
-        protected sealed partial class EditorCommitButton : RoundedButton
-        {
-            private const int duration = 200;
-
-            private readonly LoadingSpinner spinner;
-            private SpriteText text = null!;
-
-            public readonly BindableBool IsBlocked = new BindableBool();
-
-            private bool showLoadingSpinner;
-
-            /// <summary>
-            /// Whether loading spinner shown.
-            /// </summary>
-            public bool ShowLoadingSpinner
-            {
-                get => showLoadingSpinner;
-                set
-                {
-                    showLoadingSpinner = value;
-                    Enabled.Value = !value && !IsBlocked.Value;
-                    spinner.FadeTo(value ? 1f : 0f, duration, Easing.OutQuint);
-                    text.FadeTo(value ? 0f : 1f, duration, Easing.OutQuint);
-                }
-            }
-
-            public EditorCommitButton()
-            {
-                Width = 100;
-                Height = 30;
-                Add(spinner = new LoadingSpinner
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(16),
-                    Depth = -2,
-                });
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                IsBlocked.BindValueChanged(e =>
-                {
-                    Enabled.Value = !ShowLoadingSpinner && !e.NewValue;
-                }, true);
-            }
-
-            protected override SpriteText CreateText()
-            {
-                return text = base.CreateText();
-            }
         }
     }
 }
