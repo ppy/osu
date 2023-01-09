@@ -16,15 +16,13 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 1;
 
         [SettingSource("Coverage", "The proportion of playfield height that notes will be hidden for.")]
-        public BindableNumber<float> CoverageAmount { get; } = new BindableFloat(0.5f)
+        public override BindableNumber<float> Coverage { get; } = new BindableFloat(0.5f)
         {
             Precision = 0.1f,
             MinValue = 0.2f,
             MaxValue = 0.8f,
             Default = 0.5f,
         };
-
-        protected override float Coverage => CoverageAmount.Value;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ManiaModFadeIn)).ToArray();
 

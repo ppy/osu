@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Objects;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// </summary>
         protected abstract CoverExpandDirection ExpandDirection { get; }
 
-        protected virtual float Coverage => 0.5f;
+        public abstract BindableNumber<float> Coverage { get; }
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
@@ -38,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.Direction = ExpandDirection;
-                    c.Coverage = Coverage;
+                    c.Coverage = Coverage.Value;
                 }));
             }
         }
