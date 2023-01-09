@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -17,6 +18,7 @@ using osu.Game.Scoring.Legacy;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using Realms;
@@ -44,7 +46,9 @@ namespace osu.Game.Scoring
 
         protected override ScoreInfo? CreateModel(ArchiveReader archive)
         {
-            using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase))))
+            string name = archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase));
+
+            using (var stream = archive.GetStream(name))
             {
                 try
                 {
@@ -52,7 +56,9 @@ namespace osu.Game.Scoring
                 }
                 catch (LegacyScoreDecoder.BeatmapNotFoundException e)
                 {
-                    Logger.Log(e.Message, LoggingTarget.Information, LogLevel.Error);
+                    Logger.Log($@"Score '{name}' failed to import: no corresponding beatmap with the hash '{e.Hash}' could be found.", LoggingTarget.Database);
+                    Logger.Log($@"Score '{name}' failed to import due to missing beatmap. Check database logs for more info.", LoggingTarget.Information, LogLevel.Error);
+
                     return null;
                 }
             }
