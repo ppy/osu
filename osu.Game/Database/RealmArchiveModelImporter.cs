@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
@@ -55,6 +56,11 @@ namespace osu.Game.Database
         /// See https://gist.github.com/peppy/f0e118a14751fc832ca30dd48ba3876b for an incomplete version of this.
         /// </summary>
         private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
+
+        /// <summary>
+        /// Temporarily pause imports to avoid performance overheads affecting gameplay scenarios.
+        /// </summary>
+        public readonly BindableBool PauseImports = new BindableBool();
 
         public abstract IEnumerable<string> HandledExtensions { get; }
 
@@ -253,7 +259,7 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            pauseIfNecessary(cancellationToken);
 
             TModel? existing;
 
@@ -550,6 +556,22 @@ namespace osu.Game.Database
         /// <param name="path">The path for consideration. May be a file or a directory.</param>
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
+
+        private void pauseIfNecessary(CancellationToken cancellationToken)
+        {
+            if (!PauseImports.Value)
+                return;
+
+            Logger.Log(@"Import is being paused.");
+
+            while (PauseImports.Value)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                Thread.Sleep(500);
+            }
+
+            Logger.Log(@"Import is being resumed.");
+        }
 
         private IEnumerable<string> getIDs(IEnumerable<INamedFile> files)
         {
