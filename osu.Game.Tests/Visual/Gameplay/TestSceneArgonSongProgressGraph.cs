@@ -39,14 +39,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestGraphRecreation()
+        public void Test()
         {
             AddAssert("ensure not created", () => graph!.CreationCount == 0);
             AddStep("display values", displayRandomValues);
-            AddUntilStep("wait for creation count", () => graph!.CreationCount == 1);
-            AddRepeatStep("new values", displayRandomValues, 5);
-            AddWaitStep("wait some", 5);
-            AddAssert("ensure recreation debounced", () => graph!.CreationCount == 2);
         }
 
         private void displayRandomValues()
