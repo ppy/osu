@@ -145,6 +145,12 @@ namespace osu.Game.Overlays.BeatmapListing
         public void Search(string query)
             => Schedule(() => searchControl.Query.Value = query);
 
+        public void FilterGenre(SearchGenre genre)
+            => Schedule(() => searchControl.Genre.Value = genre);
+
+        public void FilterLanguage(SearchLanguage language)
+            => Schedule(() => searchControl.Language.Value = language);
+
         protected override void LoadComplete()
         {
             base.LoadComplete();

@@ -35,6 +35,8 @@ namespace osu.Game.Tests.Visual.Online
         private Action<GetUsersRequest>? handleGetUsersRequest;
         private Action<GetUserRequest>? handleGetUserRequest;
 
+        private IDisposable? subscription;
+
         private readonly Dictionary<(int userId, string rulesetName), UserStatistics> serverSideStatistics = new Dictionary<(int userId, string rulesetName), UserStatistics>();
 
         [SetUpSteps]
@@ -246,6 +248,26 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("values after are correct", () => update!.After.TotalScore, () => Is.EqualTo(6_000_000));
         }
 
+        [Test]
+        public void TestStatisticsUpdateNotFiredAfterSubscriptionDisposal()
+        {
+            int userId = getUserId();
+            setUpUser(userId);
+
+            long scoreId = getScoreId();
+            var ruleset = new OsuRuleset().RulesetInfo;
+
+            SoloStatisticsUpdate? update = null;
+            registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
+            AddStep("unsubscribe", () => subscription!.Dispose());
+
+            feignScoreProcessing(userId, ruleset, 5_000_000);
+
+            AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, scoreId));
+            AddWaitStep("wait a bit", 5);
+            AddAssert("update not received", () => update == null);
+        }
+
         private int nextUserId = 2000;
         private long nextScoreId = 50000;
 
@@ -266,7 +288,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         private void registerForUpdates(long scoreId, RulesetInfo rulesetInfo, Action<SoloStatisticsUpdate> onUpdateReady) =>
-            AddStep("register for updates", () => watcher.RegisterForStatisticsUpdateAfter(
+            AddStep("register for updates", () => subscription = watcher.RegisterForStatisticsUpdateAfter(
                 new ScoreInfo(Beatmap.Value.BeatmapInfo, new OsuRuleset().RulesetInfo, new RealmUser())
                 {
                     Ruleset = rulesetInfo,

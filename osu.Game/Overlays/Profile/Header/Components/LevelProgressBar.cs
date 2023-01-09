@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -21,12 +19,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class LevelProgressBar : CompositeDrawable, IHasTooltip
     {
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
 
         public LocalisableString TooltipText { get; }
 
-        private Bar levelProgressBar;
-        private OsuSpriteText levelProgressText;
+        private Bar levelProgressBar = null!;
+        private OsuSpriteText levelProgressText = null!;
 
         public LevelProgressBar()
         {
@@ -61,7 +59,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             User.BindValueChanged(user => updateProgress(user.NewValue));
         }
 
-        private void updateProgress(APIUser user)
+        private void updateProgress(APIUser? user)
         {
             levelProgressBar.Length = user?.Statistics?.Level.Progress / 100f ?? 0;
             levelProgressText.Text = user?.Statistics?.Level.Progress.ToLocalisableString("0'%'") ?? default;
