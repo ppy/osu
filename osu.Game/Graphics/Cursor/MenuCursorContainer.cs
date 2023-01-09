@@ -234,7 +234,7 @@ namespace osu.Game.Graphics.Cursor
             SampleChannel channel = tapSample.GetChannel();
 
             // Scale to [-0.75, 0.75] so that the sample isn't fully panned left or right (sounds weird)
-            channel.Balance.Value = ((activeCursor.X / DrawWidth) * 2 - 1) * 0.75;
+            channel.Balance.Value = ((activeCursor.X / DrawWidth) * 2 - 1) * OsuGameBase.SFX_STEREO_STRENGTH;
             channel.Frequency.Value = baseFrequency - (random_range / 2f) + RNG.NextDouble(random_range);
             channel.Volume.Value = baseFrequency;
 
