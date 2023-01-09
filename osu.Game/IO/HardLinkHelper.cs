@@ -14,9 +14,8 @@ namespace osu.Game.IO
     {
         public static bool CheckAvailability(string testDestinationPath, string testSourcePath)
         {
-            // We can support other operating systems quite easily in the future.
-            // Let's handle the most common one for now, though.
-            if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+            // For simplicity, only support desktop operating systems for now.
+            if (!RuntimeInfo.IsDesktop)
                 return false;
 
             const string test_filename = "_hard_link_test";
@@ -31,7 +30,7 @@ namespace osu.Game.IO
                 File.WriteAllText(testSourcePath, string.Empty);
 
                 // Test availability by creating an arbitrary hard link between the source and destination paths.
-                return CreateHardLink(testDestinationPath, testSourcePath, IntPtr.Zero);
+                return TryCreateHardLink(testDestinationPath, testSourcePath);
             }
             catch
             {
@@ -55,20 +54,59 @@ namespace osu.Game.IO
             }
         }
 
+        /// <summary>
+        /// Attempts to create a hard link from <paramref name="sourcePath"/> to <paramref name="destinationPath"/>,
+        /// using platform-specific native methods.
+        /// </summary>
+        /// <remarks>
+        /// Hard links are only available on desktop platforms.
+        /// </remarks>
+        /// <returns>Whether the hard link was successfully created.</returns>
+        public static bool TryCreateHardLink(string destinationPath, string sourcePath)
+        {
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                    return CreateHardLink(destinationPath, sourcePath, IntPtr.Zero);
+
+                case RuntimeInfo.Platform.Linux:
+                case RuntimeInfo.Platform.macOS:
+                    return link(sourcePath, destinationPath) == 0;
+
+                default:
+                    return false;
+            }
+        }
+
         // For future use (to detect if a file is a hard link with other references existing on disk).
         public static int GetFileLinkCount(string filePath)
         {
             int result = 0;
-            SafeFileHandle handle = CreateFile(filePath, FileAccess.Read, FileShare.Read, IntPtr.Zero, FileMode.Open, FileAttributes.Archive, IntPtr.Zero);
 
-            ByHandleFileInformation fileInfo;
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                    SafeFileHandle handle = CreateFile(filePath, FileAccess.Read, FileShare.Read, IntPtr.Zero, FileMode.Open, FileAttributes.Archive, IntPtr.Zero);
 
-            if (GetFileInformationByHandle(handle, out fileInfo))
-                result = (int)fileInfo.NumberOfLinks;
-            CloseHandle(handle);
+                    ByHandleFileInformation fileInfo;
+
+                    if (GetFileInformationByHandle(handle, out fileInfo))
+                        result = (int)fileInfo.NumberOfLinks;
+                    CloseHandle(handle);
+                    break;
+
+                case RuntimeInfo.Platform.Linux:
+                case RuntimeInfo.Platform.macOS:
+                    if (stat(filePath, out var statbuf) == 0)
+                        result = (int)statbuf.st_nlink;
+
+                    break;
+            }
 
             return result;
         }
+
+        #region Windows native methods
 
         [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
@@ -104,5 +142,49 @@ namespace osu.Game.IO
             public readonly uint FileIndexHigh;
             public readonly uint FileIndexLow;
         }
+
+        #endregion
+
+        #region Linux native methods
+
+#pragma warning disable IDE1006 // Naming rule violation
+
+        [DllImport("libc", SetLastError = true)]
+        public static extern int link(string oldpath, string newpath);
+
+        [DllImport("libc", SetLastError = true)]
+        private static extern int stat(string pathname, out struct_stat statbuf);
+
+        // ReSharper disable once InconsistentNaming
+        // Struct layout is likely non-portable across unices. Tread with caution.
+        [StructLayout(LayoutKind.Sequential)]
+        private struct struct_stat
+        {
+            public readonly long st_dev;
+            public readonly long st_ino;
+            public readonly long st_nlink;
+            public readonly int st_mode;
+            public readonly int st_uid;
+            public readonly int st_gid;
+            public readonly long st_rdev;
+            public readonly long st_size;
+            public readonly long st_blksize;
+            public readonly long st_blocks;
+            public readonly timespec st_atim;
+            public readonly timespec st_mtim;
+            public readonly timespec st_ctim;
+        }
+
+        // ReSharper disable once InconsistentNaming
+        [StructLayout(LayoutKind.Sequential)]
+        private struct timespec
+        {
+            public readonly long tv_sec;
+            public readonly long tv_nsec;
+        }
+
+#pragma warning restore IDE1006
+
+        #endregion
     }
 }
