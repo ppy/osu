@@ -71,7 +71,6 @@ namespace osu.Game.Online.Chat
         private UserLookupCache users { get; set; }
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-        private bool channelsInitialised;
         private ScheduledDelegate scheduledAck;
 
         private long? lastSilenceMessageId;
@@ -95,15 +94,7 @@ namespace osu.Game.Online.Chat
 
             connector.NewMessages += msgs => Schedule(() => addMessages(msgs));
 
-            connector.PresenceReceived += () => Schedule(() =>
-            {
-                if (!channelsInitialised)
-                {
-                    channelsInitialised = true;
-                    // we want this to run after the first presence so we can see if the user is in any channels already.
-                    initializeChannels();
-                }
-            });
+            connector.PresenceReceived += () => Schedule(initializeChannels);
 
             connector.Start();
 
