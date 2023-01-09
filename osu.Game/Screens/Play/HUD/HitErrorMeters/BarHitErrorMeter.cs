@@ -42,6 +42,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [SettingSource("Label style", "How to show early/late extremities")]
         public Bindable<LabelStyles> LabelStyle { get; } = new Bindable<LabelStyles>(LabelStyles.Icons);
 
+        [SettingSource("Bar visibility")]
+        public Bindable<bool> BarVisibility { get; } = new Bindable<bool>(true);
+
         private const int judgement_line_width = 14;
 
         private const int max_concurrent_judgements = 50;
@@ -178,6 +181,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             CentreMarkerStyle.BindValueChanged(style => recreateCentreMarker(style.NewValue), true);
             LabelStyle.BindValueChanged(style => recreateLabels(style.NewValue), true);
+            BarVisibility.BindValueChanged(visible =>
+            {
+                colourBarsEarly.FadeTo(visible.NewValue ? 1 : 0, 500, Easing.OutQuint);
+                colourBarsLate.FadeTo(visible.NewValue ? 1 : 0, 500, Easing.OutQuint);
+            }, true);
 
             // delay the appearance animations for only the initial appearance.
             using (arrowContainer.BeginDelayedSequence(450))
