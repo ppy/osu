@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Profile.Sections
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            UserProfile.BindValueChanged(onUserChanged, true);
+            UserProfileData.BindValueChanged(onUserChanged, true);
         }
 
         private void onUserChanged(ValueChangedEvent<UserProfileData?> e)
@@ -109,14 +109,14 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void showMore()
         {
-            if (UserProfile.Value?.User == null)
+            if (UserProfileData.Value?.User == null)
                 return;
 
             loadCancellation = new CancellationTokenSource();
 
             CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new PaginationParameters(InitialItemsCount);
 
-            retrievalRequest = CreateRequest(UserProfile.Value.User, CurrentPage.Value);
+            retrievalRequest = CreateRequest(UserProfileData.Value.User, CurrentPage.Value);
             retrievalRequest.Success += items => UpdateItems(items, loadCancellation);
 
             api.Queue(retrievalRequest);
