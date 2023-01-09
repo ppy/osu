@@ -335,6 +335,11 @@ namespace osu.Game.Online.Chat
 
         private void initializeChannels()
         {
+            // This request is self-retrying until it succeeds.
+            // To avoid requests piling up when not logged in (ie. API is unavailable) exit early.
+            if (api.IsLoggedIn)
+                return;
+
             var req = new ListChannelsRequest();
 
             bool joinDefaults = JoinedChannels.Count == 0;
@@ -350,10 +355,11 @@ namespace osu.Game.Online.Chat
                         joinChannel(ch);
                 }
             };
+
             req.Failure += error =>
             {
                 Logger.Error(error, "Fetching channel list failed");
-                initializeChannels();
+                Scheduler.AddDelayed(initializeChannels, 60000);
             };
 
             api.Queue(req);
