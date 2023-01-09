@@ -46,8 +46,8 @@ namespace osu.Game.Overlays.Profile.Sections
         private OsuSpriteText missing = null!;
         private readonly LocalisableString? missingText;
 
-        protected PaginatedProfileSubsection(Bindable<UserProfileData?> userProfile, LocalisableString? headerText = null, LocalisableString? missingText = null)
-            : base(userProfile, headerText, CounterVisibilityState.AlwaysVisible)
+        protected PaginatedProfileSubsection(Bindable<UserProfileData?> userProfileData, LocalisableString? headerText = null, LocalisableString? missingText = null)
+            : base(userProfileData, headerText, CounterVisibilityState.AlwaysVisible)
         {
             this.missingText = missingText;
         }

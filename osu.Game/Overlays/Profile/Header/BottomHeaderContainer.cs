@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public partial class BottomHeaderContainer : CompositeDrawable
     {
-        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
+        public readonly Bindable<UserProfileData?> UserProfileData = new Bindable<UserProfileData?>();
 
         private LinkFlowContainer topLinkContainer = null!;
         private LinkFlowContainer bottomLinkContainer = null!;
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            UserProfile.BindValueChanged(user => updateDisplay(user.NewValue?.User));
+            UserProfileData.BindValueChanged(data => updateDisplay(data.NewValue?.User));
         }
 
         private void updateDisplay(APIUser? user)

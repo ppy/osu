@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Header
     public partial class CentreHeaderContainer : CompositeDrawable
     {
         public readonly BindableBool DetailsVisible = new BindableBool(true);
-        public readonly Bindable<UserProfileData?> UserProfile = new Bindable<UserProfileData?>();
+        public readonly Bindable<UserProfileData?> UserProfileData = new Bindable<UserProfileData?>();
 
         private OverlinedInfoContainer hiddenDetailGlobal = null!;
         private OverlinedInfoContainer hiddenDetailCountry = null!;
@@ -53,15 +53,15 @@ namespace osu.Game.Overlays.Profile.Header
                     {
                         new FollowersButton
                         {
-                            UserProfile = { BindTarget = UserProfile }
+                            UserProfileData = { BindTarget = UserProfileData }
                         },
                         new MappingSubscribersButton
                         {
-                            UserProfile = { BindTarget = UserProfile }
+                            UserProfileData = { BindTarget = UserProfileData }
                         },
                         new MessageUserButton
                         {
-                            UserProfile = { BindTarget = UserProfile }
+                            UserProfileData = { BindTarget = UserProfileData }
                         },
                     }
                 },
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Header
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Size = new Vector2(40),
-                            UserProfile = { BindTarget = UserProfile }
+                            UserProfileData = { BindTarget = UserProfileData }
                         },
                         expandedDetailContainer = new Container
                         {
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Profile.Header
                             Child = new LevelProgressBar
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                UserProfile = { BindTarget = UserProfile }
+                                UserProfileData = { BindTarget = UserProfileData }
                             }
                         },
                         hiddenDetailContainer = new FillFlowContainer
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Profile.Header
                 expandedDetailContainer.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
             });
 
-            UserProfile.BindValueChanged(userProfile => updateDisplay(userProfile.NewValue?.User));
+            UserProfileData.BindValueChanged(data => updateDisplay(data.NewValue?.User));
         }
 
         private void updateDisplay(APIUser? user)
