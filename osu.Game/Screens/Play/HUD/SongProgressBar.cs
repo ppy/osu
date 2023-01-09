@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osuTK;
 using osuTK.Graphics;
@@ -15,9 +13,9 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class SongProgressBar : SliderBar<double>
+    public partial class SongProgressBar : SliderBar<double>, ISongProgressBar
     {
-        public Action<double> OnSeek;
+        public Action<double>? OnSeek { get; set; }
 
         private readonly Box fill;
         private readonly Container handleBase;
@@ -25,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private bool showHandle;
 
-        public bool ShowHandle
+        public bool Interactive
         {
             get => showHandle;
             set
@@ -142,7 +140,7 @@ namespace osu.Game.Screens.Play.HUD
             handleBase.X = newX;
         }
 
-        private ScheduledDelegate scheduledSeek;
+        private ScheduledDelegate? scheduledSeek;
 
         protected override void OnUserChange(double value)
         {

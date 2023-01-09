@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestInputDoesntWorkWhenHUDHidden()
         {
-            SongProgressBar? getSongProgress() => hudOverlay.ChildrenOfType<SongProgressBar>().SingleOrDefault();
+            ISongProgressBar? getSongProgress() => hudOverlay.ChildrenOfType<ISongProgressBar>().SingleOrDefault();
 
             bool seeked = false;
 
@@ -204,7 +204,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 Debug.Assert(progress != null);
 
-                progress.ShowHandle = true;
+                progress.Interactive = true;
                 progress.OnSeek += _ => seeked = true;
             });
 
@@ -213,7 +213,17 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("attempt seek", () =>
             {
-                InputManager.MoveMouseTo(getSongProgress());
+                switch (getSongProgress())
+                {
+                    case SongProgressBar defaultBar:
+                        InputManager.MoveMouseTo(defaultBar);
+                        break;
+
+                    case ArgonSongProgressBar argonBar:
+                        InputManager.MoveMouseTo(argonBar);
+                        break;
+                }
+
                 InputManager.Click(MouseButton.Left);
             });
 

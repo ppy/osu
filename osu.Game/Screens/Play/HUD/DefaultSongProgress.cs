@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateBarVisibility()
         {
-            bar.ShowHandle = AllowSeeking.Value;
+            bar.Interactive = AllowSeeking.Value;
 
             updateInfoMargin();
         }
