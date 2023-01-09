@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Item!.State.Value == CarouselItemState.Selected)
+            if (Item?.State.Value == CarouselItemState.Selected)
                 startRequested?.Invoke(beatmapInfo);
 
             return base.OnClick(e);
@@ -200,13 +200,13 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override void ApplyState()
         {
-            if (Item!.State.Value != CarouselItemState.Collapsed && Alpha == 0)
+            if (Item?.State.Value != CarouselItemState.Collapsed && Alpha == 0)
                 starCounter.ReplayAnimation();
 
             starDifficultyCancellationSource?.Cancel();
 
             // Only compute difficulty when the item is visible.
-            if (Item.State.Value != CarouselItemState.Collapsed)
+            if (Item?.State.Value != CarouselItemState.Collapsed)
             {
                 // We've potentially cancelled the computation above so a new bindable is required.
                 starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmapInfo, (starDifficultyCancellationSource = new CancellationTokenSource()).Token);

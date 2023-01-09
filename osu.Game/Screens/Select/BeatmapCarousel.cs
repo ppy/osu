@@ -770,7 +770,9 @@ namespace osu.Game.Screens.Select
             {
                 updateItem(item);
 
-                if (item.Item!.Visible)
+                Debug.Assert(item.Item != null);
+
+                if (item.Item.Visible)
                 {
                     bool isSelected = item.Item.State.Value == CarouselItemState.Selected;
 
