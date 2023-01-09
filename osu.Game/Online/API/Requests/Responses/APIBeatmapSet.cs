@@ -111,6 +111,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"language")]
         public BeatmapSetOnlineLanguage Language { get; set; }
 
+        [JsonProperty(@"current_nominations")]
+        public BeatmapSetOnlineNomination[]? CurrentNominations { get; set; }
+
+        [JsonProperty(@"related_users")]
+        public APIUser[]? RelatedUsers { get; set; }
+
         public string Source { get; set; } = string.Empty;
 
         [JsonProperty(@"tags")]
