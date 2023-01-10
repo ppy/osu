@@ -238,7 +238,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                         Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
+                        Padding = new MarginPadding { Top = 3, Right = 8 },
                         AutoSizeAxes = Axes.Both,
                         Shear = wedged_container_shear,
                         Spacing = new Vector2(0f, 5f),
