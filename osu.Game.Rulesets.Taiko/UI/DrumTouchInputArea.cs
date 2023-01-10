@@ -46,8 +46,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private Bindable<TaikoTouchControlScheme> configTouchControlScheme = new Bindable<TaikoTouchControlScheme>();
 
-        private static OsuColour colours;
-
         [BackgroundDependencyLoader]
         private void load(TaikoInputManager taikoInputManager, TaikoRulesetConfigManager config, OsuColour _colours)
         {
@@ -60,7 +58,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             const float centre_region = 0.80f;
 
             config.BindWith(TaikoRulesetSetting.TouchControlScheme, configTouchControlScheme);
-            colours = _colours;
 
             Children = new Drawable[]
             {
@@ -230,6 +227,9 @@ namespace osu.Game.Rulesets.Taiko.UI
             private readonly Circle circle;
 
             public override bool Contains(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
 
             public QuarterCircle(TaikoAction handledAction)
             {
