@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -186,7 +187,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     }
                     break;
             }
-            return TaikoAction.LeftCentre;
+            throw new ArgumentOutOfRangeException();
         }
 
         private TaikoAction getTaikoActionFromPosition(Vector2 inputPosition)
@@ -224,7 +225,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case TaikoAction.RightCentre:
                     return colours.Red;
             }
-            return colours.Red;
+            throw new ArgumentOutOfRangeException();
         }
         private partial class QuarterCircle : CompositeDrawable, IKeyBindingHandler<TaikoAction>
         {
