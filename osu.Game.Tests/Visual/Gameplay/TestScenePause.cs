@@ -51,6 +51,22 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestTogglePauseViaBackAction()
+        {
+            pauseViaBackAction();
+            pauseViaBackAction();
+            confirmPausedWithNoOverlay();
+        }
+
+        [Test]
+        public void TestTogglePauseViaPauseGameplayAction()
+        {
+            pauseViaPauseGameplayAction();
+            pauseViaPauseGameplayAction();
+            confirmPausedWithNoOverlay();
+        }
+
+        [Test]
         public void TestPauseWithLargeOffset()
         {
             double lastTime;
@@ -382,6 +398,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void restart() => AddStep("restart", () => Player.Restart());
         private void pauseViaBackAction() => AddStep("press escape", () => InputManager.Key(Key.Escape));
+        private void pauseViaPauseGameplayAction() => AddStep("press middle mouse", () => InputManager.Click(MouseButton.Middle));
 
         private void exitViaQuickExitAction() => AddStep("press ctrl-tilde", () =>
         {
