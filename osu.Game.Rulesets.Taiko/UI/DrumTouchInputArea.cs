@@ -243,7 +243,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             public QuarterCircle(TaikoAction handledAction, Color4 colour)
             {
-
                 this.handledAction = handledAction;
                 RelativeSizeAxes = Axes.Both;
 
