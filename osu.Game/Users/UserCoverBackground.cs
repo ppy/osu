@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -17,15 +15,15 @@ using osuTK.Graphics;
 
 namespace osu.Game.Users
 {
-    public partial class UserCoverBackground : ModelBackedDrawable<APIUser>
+    public partial class UserCoverBackground : ModelBackedDrawable<APIUser?>
     {
-        public APIUser User
+        public APIUser? User
         {
             get => Model;
             set => Model = value;
         }
 
-        protected override Drawable CreateDrawable(APIUser user) => new Cover(user);
+        protected override Drawable CreateDrawable(APIUser? user) => new Cover(user);
 
         protected override double LoadDelay => 300;
 
@@ -40,9 +38,9 @@ namespace osu.Game.Users
         [LongRunningLoad]
         private partial class Cover : CompositeDrawable
         {
-            private readonly APIUser user;
+            private readonly APIUser? user;
 
-            public Cover(APIUser user)
+            public Cover(APIUser? user)
             {
                 this.user = user;
 
