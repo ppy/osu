@@ -73,27 +73,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(TaikoInput.LeftRim, touchControlScheme, colours)
+                                leftRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftRim), touchControlScheme, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                rightRim = new QuarterCircle(TaikoInput.RightRim, touchControlScheme, colours)
+                                rightRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightRim), touchControlScheme, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                leftCentre = new QuarterCircle(TaikoInput.LeftCentre, touchControlScheme, colours)
+                                leftCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftCentre), touchControlScheme, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new QuarterCircle(TaikoInput.RightCentre, touchControlScheme, colours)
+                                rightCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightCentre), touchControlScheme, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             leftRim.Contains(e.ScreenSpaceMouseDownPosition) || rightRim.Contains(e.ScreenSpaceMouseDownPosition);
 
 #pragma warning disable format
-        private TaikoAction getTaikoActionFromPosition(TaikoInput input)
+        private TaikoAction getTaikoActionFromInput(TaikoInput input)
         {
             switch (TaikoTouchControlScheme.DDKK)
             {
@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             else
                 input = centreHit ? TaikoInput.RightCentre : TaikoInput.RightRim;
 
-            return getTaikoActionFromPosition(input);
+            return getTaikoActionFromInput(input);
         }
 
         protected override void PopIn()
