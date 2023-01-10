@@ -46,21 +46,23 @@ namespace osu.Game.Tests.Visual
         {
             var mainContent = content = new Container { RelativeSizeAxes = Axes.Both };
 
+            var inputContainer = new Container { RelativeSizeAxes = Axes.Both };
+
             if (DisplayCursorForManualInput)
             {
                 var cursorDisplay = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both };
 
-                cursorDisplay.Add(new OsuTooltipContainer(cursorDisplay.MenuCursor)
+                cursorDisplay.Add(content = new OsuTooltipContainer(cursorDisplay.MenuCursor)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = mainContent
                 });
 
-                mainContent = cursorDisplay;
+                inputContainer.Add(cursorDisplay);
+                mainContent = inputContainer;
             }
 
             if (CreateNestedActionContainer)
-                mainContent = new GlobalActionContainer(null).WithChild(mainContent);
+                inputContainer.Add(new GlobalActionContainer(null));
 
             base.Content.AddRange(new Drawable[]
             {
