@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Select
         private const float transition_duration = 250;
         private const float corner_radius = 10;
 
+        /// Todo: move this const out to song select when more new design elements are implemented for the beatmap details area, since it applies to text alignment of various elements
+        private const float text_margin = 62;
+
         private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / wedge_height, 0);
 
         [Resolved]
@@ -159,18 +162,21 @@ namespace osu.Game.Screens.Select
                 LoadComponentAsync(loadingInfo = new Container
                 {
                     Masking = true,
+                    // We offset this by the portion of the colour bar underneath we wish to show
                     X = -30,
                     CornerRadius = corner_radius,
                     RelativeSizeAxes = Axes.Both,
                     Depth = DisplayedContent?.Depth + 1 ?? 0,
                     Children = new Drawable[]
                     {
+                        // TODO: New wedge design uses a coloured horizontal gradient for its background, however this lacks implementation information in the figma draft.
+                        // pending https://www.figma.com/file/DXKwqZhD5yyb1igc3mKo1P?node-id=2980:3361#340801912 being answered.
                         new BeatmapInfoWedgeBackground(beatmap) { Shear = -Shear },
                         Info = new WedgeInfoText(beatmap) { Shear = -Shear }
                     }
                 }, loaded =>
                 {
-                    // ensure we are the most recent loaded wedge.
+                    // Ensure we are the most recent loaded wedge.
                     if (loaded != loadingInfo) return;
 
                     removeOldInfo();
@@ -262,7 +268,7 @@ namespace osu.Game.Screens.Select
                     {
                         Name = "Top-left aligned metadata",
                         Direction = FillDirection.Vertical,
-                        Position = new Vector2(80, 12),
+                        Position = new Vector2(text_margin + shear_width, 12),
                         Width = .7f,
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
@@ -278,10 +284,10 @@ namespace osu.Game.Screens.Select
                             },
                             ArtistLabel = new OsuSpriteText
                             {
-                                //figma design has a diffused shadow, instead of the solid one present here.
+                                // TODO : figma design has a diffused shadow, instead of the solid one present here, not possible currently as far as i'm aware.
                                 Shadow = true,
                                 Current = { BindTarget = artistBinding },
-                                //Not sure if this should be semi bold or medium
+                                // Not sure if this should be semi bold or medium
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true
@@ -297,8 +303,8 @@ namespace osu.Game.Screens.Select
 
                 starRatingDisplay.DisplayedStars.BindValueChanged(s =>
                 {
-                    wedge.starCounter.Colour = s.NewValue >= 6.5 ? colours.Orange1 : Colour4.Black.Opacity(0.75f);
                     wedge.starCounter.Current = (float)s.NewValue;
+                    wedge.starCounter.Colour = s.NewValue >= 6.5 ? colours.Orange1 : Colour4.Black.Opacity(0.75f);
 
                     wedge.difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
                 }, true);
