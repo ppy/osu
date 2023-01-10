@@ -111,6 +111,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Origin = Anchor.TopCentre,
                                 Width = bar_width,
                                 RelativeSizeAxes = Axes.Y,
+                                Alpha = 0,
                                 Height = 0.5f,
                                 Scale = new Vector2(1, -1),
                             },
@@ -118,6 +119,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.TopCentre,
+                                Alpha = 0,
                                 Width = bar_width,
                                 RelativeSizeAxes = Axes.Y,
                                 Height = 0.5f,
