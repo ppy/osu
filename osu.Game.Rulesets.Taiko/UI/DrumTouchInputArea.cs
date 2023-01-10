@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private QuarterCircle leftRim = null!;
         private QuarterCircle rightRim = null!;
 
-        private Bindable<TaikoTouchControlScheme> configTouchControlScheme = new Bindable<TaikoTouchControlScheme>();
+        private readonly Bindable<TaikoTouchControlScheme> configTouchControlScheme = new Bindable<TaikoTouchControlScheme>();
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
