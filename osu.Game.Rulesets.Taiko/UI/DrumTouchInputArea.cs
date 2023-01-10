@@ -88,19 +88,19 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
+                                rightRim = new QuarterCircle(getTaikoActionFromDrumSegment(3), getColourFromTaikoAction(getTaikoActionFromDrumSegment(3)))
+                                {
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomRight,
+                                    X = 2,
+                                    Rotation = 90,
+                                },
                                 rightCentre = new QuarterCircle(getTaikoActionFromDrumSegment(2), getColourFromTaikoAction(getTaikoActionFromDrumSegment(2)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Scale = new Vector2(centre_region),
-                                    Rotation = 90,
-                                },
-                                rightRim = new QuarterCircle(getTaikoActionFromDrumSegment(3), getColourFromTaikoAction(getTaikoActionFromDrumSegment(3)))
-                                {
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomRight,
-                                    X = 2,
                                     Rotation = 90,
                                 }
                             }
