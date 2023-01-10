@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -24,8 +21,8 @@ namespace osu.Game.Tests.Visual.SongSelect
     [TestFixture]
     public partial class TestSceneBeatmapInfoWedgeV2 : OsuTestScene
     {
-        private RulesetStore rulesets;
-        private TestBeatmapInfoWedgeV2 infoWedge;
+        private RulesetStore rulesets = null!;
+        private TestBeatmapInfoWedgeV2 infoWedge = null!;
         private readonly List<IBeatmap> beatmaps = new List<IBeatmap>();
 
         [BackgroundDependencyLoader]
@@ -80,8 +77,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void testBeatmapLabels(Ruleset ruleset)
         {
-            AddAssert("check title", () => infoWedge.Info.TitleLabel.Current.Value == $"{ruleset.ShortName}Title");
-            AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Current.Value == $"{ruleset.ShortName}Artist");
+            AddAssert("check title", () => infoWedge.Info!.TitleLabel.Current.Value == $"{ruleset.ShortName}Title");
+            AddAssert("check artist", () => infoWedge.Info!.ArtistLabel.Current.Value == $"{ruleset.ShortName}Artist");
         }
 
         [SetUpSteps]
@@ -98,7 +95,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void setRuleset(RulesetInfo rulesetInfo)
         {
-            Container containerBefore = null;
+            Container? containerBefore = null;
 
             AddStep("set ruleset", () =>
             {
@@ -112,9 +109,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("wait for async load", () => infoWedge.DisplayedContent != containerBefore);
         }
 
-        private void selectBeatmap([CanBeNull] IBeatmap b)
+        private void selectBeatmap(IBeatmap? b)
         {
-            Container containerBefore = null;
+            Container? containerBefore = null;
 
             AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
             {
@@ -172,9 +169,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private partial class TestBeatmapInfoWedgeV2 : BeatmapInfoWedgeV2
         {
-            public new Container DisplayedContent => base.DisplayedContent;
+            public new Container? DisplayedContent => base.DisplayedContent;
 
-            public new WedgeInfoText Info => base.Info;
+            public new WedgeInfoText? Info => base.Info;
         }
 
         private class TestHitObject : ConvertHitObject, IHasPosition
