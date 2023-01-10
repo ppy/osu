@@ -20,6 +20,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Scoring;
+using osu.Game.Rulesets.Mods;
+using osu.Framework.Threading;
 
 namespace osu.Game.Skinning.Components
 {
@@ -37,6 +40,12 @@ namespace osu.Game.Skinning.Components
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> currentMods { get; set; } = null!;
+
+        private ModSettingChangeTracker? modSettingChangeTracker;
+        private ScheduledDelegate? debouncedModSettingsChange;
+
         private readonly Dictionary<BeatmapAttribute, LocalisableString> valueDictionary = new Dictionary<BeatmapAttribute, LocalisableString>();
 
         private static readonly ImmutableDictionary<BeatmapAttribute, LocalisableString> label_dictionary = new Dictionary<BeatmapAttribute, LocalisableString>
@@ -53,6 +62,7 @@ namespace osu.Game.Skinning.Components
             [BeatmapAttribute.Length] = ArtistStrings.TracklistLength.ToTitle(),
             [BeatmapAttribute.RankedStatus] = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault,
             [BeatmapAttribute.BPM] = BeatmapsetsStrings.ShowStatsBpm,
+            [BeatmapAttribute.MaxPP] = "Max PP", //There is currently no localized string for this value
         }.ToImmutableDictionary();
 
         private readonly OsuSpriteText text;
@@ -81,7 +91,26 @@ namespace osu.Game.Skinning.Components
             beatmap.BindValueChanged(b =>
             {
                 updateBeatmapContent(b.NewValue);
-                updateLabel();
+                getMaxPP();
+                // updateLabel() will call by getMaxPP()
+            }, true);
+
+            currentMods.BindValueChanged(s =>
+            {
+                // prevent the freeze caused by fast switching mods, usually deselecting all will cause this situation.
+                debouncedModSettingsChange?.Cancel();
+                debouncedModSettingsChange = Scheduler.AddDelayed(getMaxPP, 100);
+
+                modSettingChangeTracker?.Dispose();
+
+                // Mod settings will affect specific pp values, so values should be updated when changing settings
+                modSettingChangeTracker = new ModSettingChangeTracker(s.NewValue);
+                modSettingChangeTracker.SettingChanged += _ =>
+                {
+                    // Avoid fast changes in values when dragging the slider
+                    debouncedModSettingsChange?.Cancel();
+                    debouncedModSettingsChange = Scheduler.AddDelayed(getMaxPP, 100);
+                };
             }, true);
         }
 
@@ -99,6 +128,19 @@ namespace osu.Game.Skinning.Components
             valueDictionary[BeatmapAttribute.Accuracy] = ((double)workingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty).ToLocalisableString(@"F2");
             valueDictionary[BeatmapAttribute.ApproachRate] = ((double)workingBeatmap.BeatmapInfo.Difficulty.ApproachRate).ToLocalisableString(@"F2");
             valueDictionary[BeatmapAttribute.StarRating] = workingBeatmap.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
+        }
+
+        private void getMaxPP()
+        {
+            // this is a null score to pass mod.
+            ScoreInfo score = new ScoreInfo(beatmap.Value.BeatmapInfo, beatmap.Value.BeatmapInfo.Ruleset) { Mods = currentMods.Value.ToArray() };
+
+            var performanceCalculator = beatmap.Value.BeatmapInfo.Ruleset.CreateInstance().CreatePerformanceCalculator();
+
+            valueDictionary[BeatmapAttribute.MaxPP] = performanceCalculator?.CalculatePerfectPerformance(score, beatmap.Value).Total.ToLocalisableString(@"F2")
+                                                      ?? string.Empty;
+            // Need update after get max PP value.
+            updateLabel();
         }
 
         private void updateLabel()
@@ -138,5 +180,6 @@ namespace osu.Game.Skinning.Components
         Length,
         RankedStatus,
         BPM,
+        MaxPP,
     }
 }
