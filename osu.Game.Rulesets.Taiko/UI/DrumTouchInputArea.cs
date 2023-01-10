@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private Bindable<TaikoTouchControlScheme> configTouchControlScheme = new Bindable<TaikoTouchControlScheme>();
 
         [BackgroundDependencyLoader]
-        private void load(TaikoInputManager taikoInputManager, TaikoRulesetConfigManager config, OsuColour _colours)
+        private void load(TaikoInputManager taikoInputManager, TaikoRulesetConfigManager config)
         {
             Debug.Assert(taikoInputManager.KeyBindingContainer != null);
             keyBindingContainer = taikoInputManager.KeyBindingContainer;
