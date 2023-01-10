@@ -74,6 +74,7 @@ namespace osu.Game.Screens.Select.Carousel
             base.Update();
 
             Debug.Assert(Item != null);
+
             // position updates should not occur if the item is filtered away.
             // this avoids panels flying across the screen only to be eventually off-screen or faded out.
             if (!Item.Visible) return;
