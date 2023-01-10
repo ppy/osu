@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -27,6 +28,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     public partial class DrumTouchInputArea : VisibilityContainer
     {
+
         // visibility state affects our child. we always want to handle input.
         public override bool PropagatePositionalInputSubTree => true;
         public override bool PropagateNonPositionalInputSubTree => true;
@@ -43,6 +45,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         private QuarterCircle leftRim = null!;
         private QuarterCircle rightRim = null!;
 
+        private Bindable<TaikoTouchControlScheme> touchControlScheme = new Bindable<TaikoTouchControlScheme>();
+
         [BackgroundDependencyLoader]
         private void load(TaikoInputManager taikoInputManager, TaikoRulesetConfigManager config, OsuColour colours)
         {
@@ -54,7 +58,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             const float centre_region = 0.80f;
 
-            var touchControlScheme = config.GetBindable<TaikoTouchControlScheme>(TaikoRulesetSetting.TouchControlScheme).Value;
+            config.BindWith(TaikoRulesetSetting.TouchControlScheme, touchControlScheme);
             Children = new Drawable[]
             {
                 new Container
@@ -73,27 +77,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftRim), touchControlScheme, colours)
+                                leftRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftRim), touchControlScheme.Value, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                rightRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightRim), touchControlScheme, colours)
+                                rightRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightRim), touchControlScheme.Value, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                leftCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftCentre), touchControlScheme, colours)
+                                leftCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftCentre), touchControlScheme.Value, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightCentre), touchControlScheme, colours)
+                                rightCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightCentre), touchControlScheme.Value, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -153,10 +157,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 #pragma warning disable format
         private TaikoAction getTaikoActionFromInput(TaikoInput input)
         {
-            switch (TaikoTouchControlScheme.DDKK)
+            switch (touchControlScheme.Value)
             {
                 case TaikoTouchControlScheme.KDDK:
-#pragma warning disable CS0162 // Unreachable code detected
+
                     switch (input)
                     {
                         case TaikoInput.LeftRim:     return TaikoAction.LeftRim;
@@ -164,7 +168,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                         case TaikoInput.RightCentre: return TaikoAction.RightCentre;
                         case TaikoInput.RightRim:    return TaikoAction.RightRim;
                     }
-#pragma warning restore CS0162 // Unreachable code detected
                     break;
 
                 case TaikoTouchControlScheme.DDKK:
@@ -178,7 +181,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     break;
 
                 case TaikoTouchControlScheme.KKDD:
-#pragma warning disable CS0162 // Unreachable code detected
                     switch (input)
                     {
                         case TaikoInput.LeftRim: return TaikoAction.LeftRim;
@@ -186,7 +188,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                         case TaikoInput.RightCentre: return TaikoAction.LeftCentre;
                         case TaikoInput.RightRim: return TaikoAction.RightCentre;
                     }
-#pragma warning restore CS0162 // Unreachable code detected
                     break;
             }
             return TaikoAction.LeftCentre;
