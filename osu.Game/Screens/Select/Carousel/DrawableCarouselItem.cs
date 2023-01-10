@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual void ApplyState()
         {
-            if (Item == null) return;
+            Debug.Assert(Item != null);
 
             // Use the fact that we know the precise height of the item from the model to avoid the need for AutoSize overhead.
             // Additionally, AutoSize doesn't work well due to content starting off-screen and being masked away.
