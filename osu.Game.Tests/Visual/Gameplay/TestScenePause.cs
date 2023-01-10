@@ -177,7 +177,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseAndConfirm();
 
             resume();
-            AddStep("pause via exit key", () => Player.ExitViaQuickExit());
+            exitViaQuickExitAction();
 
             confirmResumed();
             AddAssert("exited", () => !Player.IsCurrentScreen());
@@ -252,7 +252,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestQuickExitFromFailedGameplay()
         {
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
-            AddStep("quick exit", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyExitOverlay>().First().Action?.Invoke());
+            exitViaQuickExitAction();
 
             confirmExited();
         }
@@ -268,7 +268,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestQuickExitFromGameplay()
         {
-            AddStep("quick exit", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyExitOverlay>().First().Action?.Invoke());
+            exitViaQuickExitAction();
 
             confirmExited();
         }
@@ -382,6 +382,15 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void restart() => AddStep("restart", () => Player.Restart());
         private void pauseViaBackAction() => AddStep("press escape", () => InputManager.Key(Key.Escape));
+
+        private void exitViaQuickExitAction() => AddStep("press ctrl-tilde", () =>
+        {
+            InputManager.PressKey(Key.ControlLeft);
+            InputManager.PressKey(Key.Tilde);
+            InputManager.ReleaseKey(Key.Tilde);
+            InputManager.ReleaseKey(Key.ControlLeft);
+        });
+
         private void resume() => AddStep("resume", () => Player.Resume());
 
         private void confirmPauseOverlayShown(bool isShown) =>
@@ -411,8 +420,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public bool FailOverlayVisible => FailOverlay.State.Value == Visibility.Visible;
 
             public bool PauseOverlayVisible => PauseOverlay.State.Value == Visibility.Visible;
-
-            public void ExitViaQuickExit() => PerformExit(false);
 
             public override void OnEntering(ScreenTransitionEvent e)
             {
