@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Comments
 
         protected FillFlowContainer ButtonsContainer { get; private set; } = null!;
 
-        protected readonly Bindable<string> Current = new Bindable<string>();
+        protected readonly Bindable<string> Current = new Bindable<string>(string.Empty);
 
         private RoundedButton commitButton = null!;
         private LoadingSpinner loadingSpinner = null!;
