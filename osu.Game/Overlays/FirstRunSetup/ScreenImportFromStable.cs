@@ -122,8 +122,8 @@ namespace osu.Game.Overlays.FirstRunSetup
             stableLocatorTextBox.Current.Value = storage.GetFullPath(string.Empty);
             importButton.Enabled.Value = true;
 
-            bool available = legacyImportManager.CheckHardLinkAvailability();
-            Logger.Log($"Hard link support is {available}");
+            bool available = legacyImportManager.CheckSongsFolderHardLinkAvailability();
+            Logger.Log($"Hard link support for beatmaps is {available}");
 
             if (available)
             {
