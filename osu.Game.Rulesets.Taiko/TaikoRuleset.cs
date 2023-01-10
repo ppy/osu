@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Taiko
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new TaikoRulesetConfigManager(settings, RulesetInfo);
-        
+
         public override RulesetSettingsSubsection CreateSettings() => new TaikoSettingsSubsection(this);
 
         protected override IEnumerable<HitResult> GetValidHitResults()
