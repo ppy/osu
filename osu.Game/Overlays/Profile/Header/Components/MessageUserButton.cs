@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,21 +16,21 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class MessageUserButton : ProfileHeaderButton
     {
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
 
         public override LocalisableString TooltipText => UsersStrings.CardSendMessage;
 
-        [Resolved(CanBeNull = true)]
-        private ChannelManager channelManager { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private UserProfileOverlay userOverlay { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private ChatOverlay chatOverlay { get; set; }
+        [Resolved]
+        private ChannelManager? channelManager { get; set; }
 
         [Resolved]
-        private IAPIProvider apiProvider { get; set; }
+        private UserProfileOverlay? userOverlay { get; set; }
+
+        [Resolved]
+        private ChatOverlay? chatOverlay { get; set; }
+
+        [Resolved]
+        private IAPIProvider apiProvider { get; set; } = null!;
 
         public MessageUserButton()
         {
@@ -56,7 +54,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 chatOverlay?.Show();
             };
 
-            User.ValueChanged += e => Content.Alpha = !e.NewValue.PMFriendsOnly && apiProvider.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0;
+            User.ValueChanged += e => Content.Alpha = e.NewValue != null && !e.NewValue.PMFriendsOnly && apiProvider.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0;
         }
     }
 }

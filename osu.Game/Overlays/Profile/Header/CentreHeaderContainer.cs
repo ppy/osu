@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -20,10 +18,10 @@ namespace osu.Game.Overlays.Profile.Header
     public partial class CentreHeaderContainer : CompositeDrawable
     {
         public readonly BindableBool DetailsVisible = new BindableBool(true);
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
 
-        private OverlinedInfoContainer hiddenDetailGlobal;
-        private OverlinedInfoContainer hiddenDetailCountry;
+        private OverlinedInfoContainer hiddenDetailGlobal = null!;
+        private OverlinedInfoContainer hiddenDetailCountry = null!;
 
         public CentreHeaderContainer()
         {
@@ -146,7 +144,7 @@ namespace osu.Game.Overlays.Profile.Header
             User.BindValueChanged(user => updateDisplay(user.NewValue));
         }
 
-        private void updateDisplay(APIUser user)
+        private void updateDisplay(APIUser? user)
         {
             hiddenDetailGlobal.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
             hiddenDetailCountry.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
