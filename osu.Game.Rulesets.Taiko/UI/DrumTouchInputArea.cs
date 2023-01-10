@@ -3,7 +3,6 @@
 
 #pragma warning disable IDE0001 // Simplify Names
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -44,6 +43,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private Bindable<TaikoTouchControlScheme> configTouchControlScheme = new Bindable<TaikoTouchControlScheme>();
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load(TaikoInputManager taikoInputManager, TaikoRulesetConfigManager config)
         {
@@ -75,27 +77,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftRim))
+                                leftRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftRim), getColourFromTaikoAction(getTaikoActionFromInput(TaikoInput.LeftRim)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                rightRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightRim))
+                                rightRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightRim), getColourFromTaikoAction(getTaikoActionFromInput(TaikoInput.RightRim)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                leftCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftCentre))
+                                leftCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftCentre), getColourFromTaikoAction(getTaikoActionFromInput(TaikoInput.LeftCentre)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightCentre))
+                                rightCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightCentre), getColourFromTaikoAction(getTaikoActionFromInput(TaikoInput.RightCentre)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -216,6 +218,19 @@ namespace osu.Game.Rulesets.Taiko.UI
             mainContent.FadeOut(300);
         }
 
+        private Color4 getColourFromTaikoAction(TaikoAction handledAction)
+        {
+            #pragma warning disable format
+            switch (handledAction)
+            {
+                case TaikoAction.LeftRim:     return colours.Blue;
+                case TaikoAction.LeftCentre:  return colours.Red;
+                case TaikoAction.RightCentre: return colours.Red;
+                case TaikoAction.RightRim:    return colours.Blue;
+            }
+            #pragma warning restore format
+            return colours.Red;
+        }
         private partial class QuarterCircle : CompositeDrawable, IKeyBindingHandler<TaikoAction>
         {
             private readonly Circle overlay;
@@ -226,24 +241,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             public override bool Contains(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
 
-            [Resolved]
-            private OsuColour colours { get; set; } = null!;
-
-            public QuarterCircle(TaikoAction handledAction)
+            public QuarterCircle(TaikoAction handledAction, Color4 colour)
             {
-                Color4 colour = ((Func<Color4>)(() =>
-                {
-                    #pragma warning disable format
-                    switch (handledAction)
-                    {
-                        case TaikoAction.LeftRim:     return colours.Blue;
-                        case TaikoAction.LeftCentre:  return colours.Red;
-                        case TaikoAction.RightCentre: return colours.Red;
-                        case TaikoAction.RightRim:    return colours.Blue;
-                    }
-                    #pragma warning restore format
-                    return colours.Red;
-                }))();
 
                 this.handledAction = handledAction;
                 RelativeSizeAxes = Axes.Both;
