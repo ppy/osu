@@ -47,8 +47,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private Bindable<TaikoTouchControlScheme> configTouchControlScheme = new Bindable<TaikoTouchControlScheme>();
 
+        private static OsuColour colours;
+
         [BackgroundDependencyLoader]
-        private void load(TaikoInputManager taikoInputManager, TaikoRulesetConfigManager config, OsuColour colours)
+        private void load(TaikoInputManager taikoInputManager, TaikoRulesetConfigManager config, OsuColour _colours)
         {
             Debug.Assert(taikoInputManager.KeyBindingContainer != null);
             keyBindingContainer = taikoInputManager.KeyBindingContainer;
@@ -59,6 +61,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             const float centre_region = 0.80f;
 
             config.BindWith(TaikoRulesetSetting.TouchControlScheme, configTouchControlScheme);
+            colours = _colours;
+
             Children = new Drawable[]
             {
                 new Container
@@ -77,27 +81,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftRim), configTouchControlScheme.Value, colours)
+                                leftRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftRim))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                rightRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightRim), configTouchControlScheme.Value, colours)
+                                rightRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightRim))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                leftCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftCentre), configTouchControlScheme.Value, colours)
+                                leftCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftCentre))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightCentre), configTouchControlScheme.Value, colours)
+                                rightCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightCentre))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -228,7 +232,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             public override bool Contains(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
 
-            public QuarterCircle(TaikoAction handledAction, TaikoTouchControlScheme touchControlScheme, OsuColour colours)
+            public QuarterCircle(TaikoAction handledAction)
             {
                 Color4 colour = ((Func<Color4>)(() =>
                 {
