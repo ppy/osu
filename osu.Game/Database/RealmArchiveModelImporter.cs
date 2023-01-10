@@ -154,9 +154,12 @@ namespace osu.Game.Database
             }
             else
             {
-                notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First().GetDisplayString()}!"
-                    : $"Imported {imported.Count} {HumanisedModelName}s!";
+                if (tasks.Length > imported.Count)
+                    notification.CompletionText = $"Imported {imported.Count} of {tasks.Length} {HumanisedModelName}s.";
+                else if (imported.Count > 1)
+                    notification.CompletionText = $"Imported {imported.Count} {HumanisedModelName}s!";
+                else
+                    notification.CompletionText = $"Imported {imported.First().GetDisplayString()}!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
