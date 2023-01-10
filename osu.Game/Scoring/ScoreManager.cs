@@ -28,6 +28,16 @@ namespace osu.Game.Scoring
         private readonly OsuConfigManager configManager;
         private readonly ScoreImporter scoreImporter;
 
+        public override bool PauseImports
+        {
+            get => base.PauseImports;
+            set
+            {
+                base.PauseImports = value;
+                scoreImporter.PauseImports = value;
+            }
+        }
+
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, IAPIProvider api,
                             OsuConfigManager configManager = null)
             : base(storage, realm)
