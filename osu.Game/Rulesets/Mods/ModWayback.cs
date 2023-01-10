@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override Type[] IncompatibleMods => new Type[] { typeof(ModNoScope) };
 
         [SettingSource("Delay", "The delay (in seconds) of your cursor movement.")]
-        public BindableNumber<float> Delay { get; } = new BindableFloat(5)
+        public BindableNumber<float> Delay { get; } = new BindableFloat(0.3f)
         {
             MinValue = 0.3f,
             MaxValue = 5f,
