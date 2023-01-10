@@ -155,7 +155,7 @@ namespace osu.Game.Database
             else
             {
                 if (tasks.Length > imported.Count)
-                    notification.CompletionText = $"Imported {imported.Count} out of {tasks.Length} {HumanisedModelName}s.";
+                    notification.CompletionText = $"Imported {imported.Count} of {tasks.Length} {HumanisedModelName}s.";
                 else if (imported.Count > 1)
                     notification.CompletionText = $"Imported {imported.Count} {HumanisedModelName}s!";
                 else
