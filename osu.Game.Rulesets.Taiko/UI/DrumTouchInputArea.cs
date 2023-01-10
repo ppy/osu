@@ -27,13 +27,11 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     public partial class DrumTouchInputArea : VisibilityContainer
     {
-
         // visibility state affects our child. we always want to handle input.
         public override bool PropagatePositionalInputSubTree => true;
         public override bool PropagateNonPositionalInputSubTree => true;
 
         private KeyBindingContainer<TaikoAction> keyBindingContainer = null!;
-
 
         private readonly Dictionary<object, TaikoAction> trackedActions = new Dictionary<object, TaikoAction>();
 
@@ -246,7 +244,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     #pragma warning restore format
                     return colours.Red;
                 }))();
-
 
                 this.handledAction = handledAction;
                 RelativeSizeAxes = Axes.Both;
