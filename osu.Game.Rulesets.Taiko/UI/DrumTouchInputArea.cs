@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
-                                },
+                                }
                             }
                         },
                     }
