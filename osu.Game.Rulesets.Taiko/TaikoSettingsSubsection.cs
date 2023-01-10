@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko
             {
                 new SettingsEnumDropdown<TaikoTouchControlScheme>
                 {
-                    LabelText = "Touch Control Scheme",
+                    LabelText = "Touch control scheme",
                     Current = config.GetBindable<TaikoTouchControlScheme>(TaikoRulesetSetting.TouchControlScheme)
                 }
             };
