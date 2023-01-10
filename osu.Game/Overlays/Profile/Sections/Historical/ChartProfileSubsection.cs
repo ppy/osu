@@ -20,8 +20,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         /// </summary>
         protected abstract LocalisableString GraphCounterName { get; }
 
-        protected ChartProfileSubsection(Bindable<UserProfileData?> userProfileData, LocalisableString headerText)
-            : base(userProfileData, headerText)
+        protected ChartProfileSubsection(Bindable<UserProfileData?> user, LocalisableString headerText)
+            : base(user, headerText)
         {
         }
 
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            UserProfileData.BindValueChanged(onUserChanged, true);
+            User.BindValueChanged(onUserChanged, true);
         }
 
         private void onUserChanged(ValueChangedEvent<UserProfileData?> e)

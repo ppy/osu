@@ -46,8 +46,8 @@ namespace osu.Game.Overlays.Profile.Sections
         private OsuSpriteText missing = null!;
         private readonly LocalisableString? missingText;
 
-        protected PaginatedProfileSubsection(Bindable<UserProfileData?> userProfileData, LocalisableString? headerText = null, LocalisableString? missingText = null)
-            : base(userProfileData, headerText, CounterVisibilityState.AlwaysVisible)
+        protected PaginatedProfileSubsection(Bindable<UserProfileData?> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
+            : base(user, headerText, CounterVisibilityState.AlwaysVisible)
         {
             this.missingText = missingText;
         }
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Profile.Sections
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            UserProfileData.BindValueChanged(onUserChanged, true);
+            User.BindValueChanged(onUserChanged, true);
         }
 
         private void onUserChanged(ValueChangedEvent<UserProfileData?> e)
@@ -109,14 +109,14 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void showMore()
         {
-            if (UserProfileData.Value?.User == null)
+            if (User.Value?.User == null)
                 return;
 
             loadCancellation = new CancellationTokenSource();
 
             CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new PaginationParameters(InitialItemsCount);
 
-            retrievalRequest = CreateRequest(UserProfileData.Value.User, CurrentPage.Value);
+            retrievalRequest = CreateRequest(User.Value.User, CurrentPage.Value);
             retrievalRequest.Success += items => UpdateItems(items, loadCancellation);
 
             api.Queue(retrievalRequest);

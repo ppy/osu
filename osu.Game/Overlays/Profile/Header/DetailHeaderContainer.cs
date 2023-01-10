@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Header
         private FillFlowContainer? fillFlow;
         private RankGraph rankGraph = null!;
 
-        public readonly Bindable<UserProfileData?> UserProfileData = new Bindable<UserProfileData?>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         private bool expanded = true;
 
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Profile.Header
         {
             AutoSizeAxes = Axes.Y;
 
-            UserProfileData.ValueChanged += e => updateDisplay(e.NewValue);
+            User.ValueChanged += e => updateDisplay(e.NewValue);
 
             InternalChildren = new Drawable[]
             {
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     {
                                         new OverlinedTotalPlayTime
                                         {
-                                            UserProfileData = { BindTarget = UserProfileData }
+                                            User = { BindTarget = User }
                                         },
                                         medalInfo = new OverlinedInfoContainer
                                         {

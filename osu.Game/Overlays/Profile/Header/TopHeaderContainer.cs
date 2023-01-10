@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Profile.Header
     {
         private const float avatar_size = 110;
 
-        public readonly Bindable<UserProfileData?> UserProfileData = new Bindable<UserProfileData?>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -170,7 +170,7 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            UserProfileData.BindValueChanged(data => updateUser(data.NewValue));
+            User.BindValueChanged(user => updateUser(user.NewValue));
         }
 
         private void updateUser(UserProfileData? data)

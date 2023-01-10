@@ -22,8 +22,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         protected override int InitialItemsCount => type == BeatmapSetType.Graveyard ? 2 : 6;
 
-        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<UserProfileData?> userProfileData, LocalisableString headerText)
-            : base(userProfileData, headerText)
+        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<UserProfileData?> user, LocalisableString headerText)
+            : base(user, headerText)
         {
             this.type = type;
         }
