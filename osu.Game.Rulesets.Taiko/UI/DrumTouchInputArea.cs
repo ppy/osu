@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#pragma warning disable IDE0001 // Simplify Names
-
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -153,7 +151,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         private bool validMouse(MouseButtonEvent e) =>
             leftRim.Contains(e.ScreenSpaceMouseDownPosition) || rightRim.Contains(e.ScreenSpaceMouseDownPosition);
 
-        #pragma warning disable format
         private TaikoAction getTaikoActionFromInput(TaikoAction input)
         {
             switch (configTouchControlScheme.Value)
@@ -162,36 +159,35 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                     switch (input)
                     {
-                        case TaikoAction.LeftRim:     return TaikoAction.LeftRim;
-                        case TaikoAction.LeftCentre:  return TaikoAction.LeftCentre;
+                        case TaikoAction.LeftRim: return TaikoAction.LeftRim;
+                        case TaikoAction.LeftCentre: return TaikoAction.LeftCentre;
                         case TaikoAction.RightCentre: return TaikoAction.RightCentre;
-                        case TaikoAction.RightRim:    return TaikoAction.RightRim;
+                        case TaikoAction.RightRim: return TaikoAction.RightRim;
                     }
                     break;
 
                 case TaikoTouchControlScheme.DDKK:
                     switch (input)
                     {
-                        case TaikoAction.LeftRim:     return TaikoAction.LeftCentre;
-                        case TaikoAction.LeftCentre:  return TaikoAction.RightCentre;
+                        case TaikoAction.LeftRim: return TaikoAction.LeftCentre;
+                        case TaikoAction.LeftCentre: return TaikoAction.RightCentre;
                         case TaikoAction.RightCentre: return TaikoAction.LeftRim;
-                        case TaikoAction.RightRim:    return TaikoAction.RightRim;
+                        case TaikoAction.RightRim: return TaikoAction.RightRim;
                     }
                     break;
 
                 case TaikoTouchControlScheme.KKDD:
                     switch (input)
                     {
-                        case TaikoAction.LeftRim:     return TaikoAction.LeftRim;
-                        case TaikoAction.LeftCentre:  return TaikoAction.RightRim;
+                        case TaikoAction.LeftRim: return TaikoAction.LeftRim;
+                        case TaikoAction.LeftCentre: return TaikoAction.RightRim;
                         case TaikoAction.RightCentre: return TaikoAction.LeftCentre;
-                        case TaikoAction.RightRim:    return TaikoAction.RightCentre;
+                        case TaikoAction.RightRim: return TaikoAction.RightCentre;
                     }
                     break;
             }
             return TaikoAction.LeftCentre;
         }
-        #pragma warning restore format
 
         private TaikoAction getTaikoActionFromPosition(Vector2 inputPosition)
         {
@@ -219,7 +215,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private Color4 getColourFromTaikoAction(TaikoAction handledAction)
         {
-            #pragma warning disable format
             switch (handledAction)
             {
                 case TaikoAction.LeftRim:
@@ -229,7 +224,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case TaikoAction.RightCentre:
                     return colours.Red;
             }
-            #pragma warning restore format
             return colours.Red;
         }
         private partial class QuarterCircle : CompositeDrawable, IKeyBindingHandler<TaikoAction>
