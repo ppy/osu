@@ -35,19 +35,16 @@ namespace osu.Game.Overlays.Comments
         private RoundedButton commitButton = null!;
         private LoadingSpinner loadingSpinner = null!;
 
-        private bool showLoadingSpinner;
-
         protected bool ShowLoadingSpinner
         {
             set
             {
-                commitButton.Enabled.Value = !value && !string.IsNullOrEmpty(Current.Value);
-                showLoadingSpinner = value;
-
                 if (value)
                     loadingSpinner.Show();
                 else
                     loadingSpinner.Hide();
+
+                updateCommitButtonState();
             }
         }
 
@@ -146,13 +143,13 @@ namespace osu.Game.Overlays.Comments
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Current.BindValueChanged(text =>
-            {
-                commitButton.Enabled.Value = !showLoadingSpinner && !string.IsNullOrEmpty(text.NewValue);
-            }, true);
+            Current.BindValueChanged(_ => updateCommitButtonState(), true);
         }
 
         protected abstract void OnCommit(string text);
+
+        private void updateCommitButtonState() =>
+            commitButton.Enabled.Value = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
 
         private partial class EditorTextBox : BasicTextBox
         {
