@@ -130,6 +130,11 @@ namespace osu.Game.Rulesets.Edit
         public virtual Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.Centre;
 
         /// <summary>
+        /// The screen-space point that mark end of this <see cref="HitObjectSelectionBlueprint"/>.
+        /// </summary>
+        public virtual Vector2 ScreenSpaceEndPoint => ScreenSpaceDrawQuad.Centre;
+
+        /// <summary>
         /// The screen-space quad that outlines this <see cref="HitObjectSelectionBlueprint"/> for selections.
         /// </summary>
         public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
