@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Select
         {
             CarouselRoot newRoot = new CarouselRoot(this);
 
-            newRoot.AddItems(beatmapSets.Select(s => createCarouselSet(s.Detach())).Where(g => g != null)!);
+            newRoot.AddItems(beatmapSets.Select(s => createCarouselSet(s.Detach())).OfType<CarouselBeatmapSet>());
 
             root = newRoot;
 
