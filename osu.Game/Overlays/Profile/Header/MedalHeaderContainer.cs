@@ -20,14 +20,14 @@ namespace osu.Game.Overlays.Profile.Header
     {
         private FillFlowContainer badgeFlowContainer = null!;
 
-        public readonly Bindable<UserProfileData?> UserProfileData = new Bindable<UserProfileData?>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
             Alpha = 0;
             AutoSizeAxes = Axes.Y;
-            UserProfileData.ValueChanged += e => updateDisplay(e.NewValue?.User);
+            User.ValueChanged += e => updateDisplay(e.NewValue?.User);
 
             InternalChildren = new Drawable[]
             {

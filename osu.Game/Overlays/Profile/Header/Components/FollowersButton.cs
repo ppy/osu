@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class FollowersButton : ProfileHeaderStatisticsButton
     {
-        public readonly Bindable<UserProfileData?> UserProfileData = new Bindable<UserProfileData?>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         public override LocalisableString TooltipText => FriendsStrings.ButtonsDisabled;
 
@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void load()
         {
             // todo: when friending/unfriending is implemented, the APIAccess.Friends list should be updated accordingly.
-            UserProfileData.BindValueChanged(data => SetValue(data.NewValue?.User.FollowerCount ?? 0), true);
+            User.BindValueChanged(user => SetValue(user.NewValue?.User.FollowerCount ?? 0), true);
         }
     }
 }

@@ -16,8 +16,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public partial class PaginatedRecentActivityContainer : PaginatedProfileSubsection<APIRecentActivity>
     {
-        public PaginatedRecentActivityContainer(Bindable<UserProfileData?> userProfileData)
-            : base(userProfileData, missingText: EventsStrings.Empty)
+        public PaginatedRecentActivityContainer(Bindable<UserProfileData?> user)
+            : base(user, missingText: EventsStrings.Empty)
         {
         }
 

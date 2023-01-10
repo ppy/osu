@@ -29,13 +29,13 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestBasic()
         {
-            AddStep("Show example user", () => header.UserProfileData.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER));
+            AddStep("Show example user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER));
         }
 
         [Test]
         public void TestOnlineState()
         {
-            AddStep("Show online user", () => header.UserProfileData.Value = new UserProfileData(new APIUser
+            AddStep("Show online user", () => header.User.Value = new UserProfileData(new APIUser
             {
                 Id = 1001,
                 Username = "IAmOnline",
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Online
                 IsOnline = true,
             }));
 
-            AddStep("Show offline user", () => header.UserProfileData.Value = new UserProfileData(new APIUser
+            AddStep("Show offline user", () => header.User.Value = new UserProfileData(new APIUser
             {
                 Id = 1002,
                 Username = "IAmOffline",
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestRankedState()
         {
-            AddStep("Show ranked user", () => header.UserProfileData.Value = new UserProfileData(new APIUser
+            AddStep("Show ranked user", () => header.User.Value = new UserProfileData(new APIUser
             {
                 Id = 2001,
                 Username = "RankedUser",
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Online
                 }
             }));
 
-            AddStep("Show unranked user", () => header.UserProfileData.Value = new UserProfileData(new APIUser
+            AddStep("Show unranked user", () => header.User.Value = new UserProfileData(new APIUser
             {
                 Id = 2002,
                 Username = "UnrankedUser",

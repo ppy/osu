@@ -14,8 +14,8 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public partial class PaginatedKudosuHistoryContainer : PaginatedProfileSubsection<APIKudosuHistory>
     {
-        public PaginatedKudosuHistoryContainer(Bindable<UserProfileData?> userProfileData)
-            : base(userProfileData, missingText: UsersStrings.ShowExtraKudosuEntryEmpty)
+        public PaginatedKudosuHistoryContainer(Bindable<UserProfileData?> user)
+            : base(user, missingText: UsersStrings.ShowExtraKudosuEntryEmpty)
         {
         }
 

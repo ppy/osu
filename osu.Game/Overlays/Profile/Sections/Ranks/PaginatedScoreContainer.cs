@@ -19,8 +19,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     {
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<UserProfileData?> userProfileData, LocalisableString headerText)
-            : base(userProfileData, headerText)
+        public PaginatedScoreContainer(ScoreType type, Bindable<UserProfileData?> user, LocalisableString headerText)
+            : base(user, headerText)
         {
             this.type = type;
         }
