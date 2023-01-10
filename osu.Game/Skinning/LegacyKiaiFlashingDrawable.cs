@@ -13,7 +13,7 @@ namespace osu.Game.Skinning
     {
         private readonly Drawable flashingDrawable;
 
-        private const float flash_opacity = 0.55f;
+        private const float flash_opacity = 0.3f;
 
         public LegacyKiaiFlashingDrawable(Func<Drawable?> creationFunc)
         {
