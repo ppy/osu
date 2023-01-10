@@ -223,10 +223,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             #pragma warning disable format
             switch (handledAction)
             {
-                case TaikoAction.LeftRim:     return colours.Blue;
-                case TaikoAction.LeftCentre:  return colours.Red;
-                case TaikoAction.RightCentre: return colours.Red;
-                case TaikoAction.RightRim:    return colours.Blue;
+                case TaikoAction.LeftRim:
+                case TaikoAction.RightRim:
+                    return colours.Blue;
+                case TaikoAction.LeftCentre:
+                case TaikoAction.RightCentre:
+                    return colours.Red;
             }
             #pragma warning restore format
             return colours.Red;
