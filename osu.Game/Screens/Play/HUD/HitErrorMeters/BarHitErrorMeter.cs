@@ -33,6 +33,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             Precision = 0.1f,
         };
 
+        [SettingSource("Show colour bars")]
+        public Bindable<bool> ColourBarVisibility { get; } = new Bindable<bool>(true);
+
         [SettingSource("Show moving average arrow", "Whether an arrow should move beneath the bar showing the average error.")]
         public Bindable<bool> ShowMovingAverage { get; } = new BindableBool(true);
 
@@ -41,9 +44,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         [SettingSource("Label style", "How to show early/late extremities")]
         public Bindable<LabelStyles> LabelStyle { get; } = new Bindable<LabelStyles>(LabelStyles.Icons);
-
-        [SettingSource("Show colour bars")]
-        public Bindable<bool> ColourBarVisibility { get; } = new Bindable<bool>(true);
 
         private const int judgement_line_width = 14;
 
