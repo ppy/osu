@@ -75,39 +75,65 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(getTaikoActionFromInput(TaikoAction.LeftRim), getColourFromTaikoAction(getTaikoActionFromInput(TaikoAction.LeftRim)))
+                                leftRim = new QuarterCircle(getTaikoActionFromDrumSegment(0), getColourFromTaikoAction(getTaikoActionFromDrumSegment(0)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                rightRim = new QuarterCircle(getTaikoActionFromInput(TaikoAction.RightRim), getColourFromTaikoAction(getTaikoActionFromInput(TaikoAction.RightRim)))
-                                {
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomRight,
-                                    X = 2,
-                                    Rotation = 90,
-                                },
-                                leftCentre = new QuarterCircle(getTaikoActionFromInput(TaikoAction.LeftCentre), getColourFromTaikoAction(getTaikoActionFromInput(TaikoAction.LeftCentre)))
+                                leftCentre = new QuarterCircle(getTaikoActionFromDrumSegment(1), getColourFromTaikoAction(getTaikoActionFromDrumSegment(1)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new QuarterCircle(getTaikoActionFromInput(TaikoAction.RightCentre), getColourFromTaikoAction(getTaikoActionFromInput(TaikoAction.RightCentre)))
+                                rightCentre = new QuarterCircle(getTaikoActionFromDrumSegment(2), getColourFromTaikoAction(getTaikoActionFromDrumSegment(2)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Scale = new Vector2(centre_region),
                                     Rotation = 90,
-                                }
+                                },
+                                rightRim = new QuarterCircle(getTaikoActionFromDrumSegment(3), getColourFromTaikoAction(getTaikoActionFromDrumSegment(3)))
+                                {
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomRight,
+                                    X = 2,
+                                    Rotation = 90,
+                                },
                             }
                         },
                     }
                 },
             };
+        }
+
+        private readonly TaikoAction[,] mappedTaikoAction = {
+            { // KDDK
+                TaikoAction.LeftRim,
+                TaikoAction.LeftCentre,
+                TaikoAction.RightCentre,
+                TaikoAction.RightRim
+            },
+            { // DDKK
+                TaikoAction.LeftCentre,
+                TaikoAction.RightCentre,
+                TaikoAction.LeftRim,
+                TaikoAction.RightRim
+            },
+            { // KKDD
+                TaikoAction.LeftRim,
+                TaikoAction.RightRim,
+                TaikoAction.LeftCentre,
+                TaikoAction.RightCentre
+            }
+        };
+
+        private TaikoAction getTaikoActionFromDrumSegment(int drumSegment)
+        {
+            return mappedTaikoAction[(int)configTouchControlScheme.Value, drumSegment];
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -152,56 +178,18 @@ namespace osu.Game.Rulesets.Taiko.UI
         private bool validMouse(MouseButtonEvent e) =>
             leftRim.Contains(e.ScreenSpaceMouseDownPosition) || rightRim.Contains(e.ScreenSpaceMouseDownPosition);
 
-        private TaikoAction getTaikoActionFromInput(TaikoAction input)
-        {
-            switch (configTouchControlScheme.Value)
-            {
-                case TaikoTouchControlScheme.KDDK:
-
-                    switch (input)
-                    {
-                        case TaikoAction.LeftRim: return TaikoAction.LeftRim;
-                        case TaikoAction.LeftCentre: return TaikoAction.LeftCentre;
-                        case TaikoAction.RightCentre: return TaikoAction.RightCentre;
-                        case TaikoAction.RightRim: return TaikoAction.RightRim;
-                    }
-                    break;
-
-                case TaikoTouchControlScheme.DDKK:
-                    switch (input)
-                    {
-                        case TaikoAction.LeftRim: return TaikoAction.LeftCentre;
-                        case TaikoAction.LeftCentre: return TaikoAction.RightCentre;
-                        case TaikoAction.RightCentre: return TaikoAction.LeftRim;
-                        case TaikoAction.RightRim: return TaikoAction.RightRim;
-                    }
-                    break;
-
-                case TaikoTouchControlScheme.KKDD:
-                    switch (input)
-                    {
-                        case TaikoAction.LeftRim: return TaikoAction.LeftRim;
-                        case TaikoAction.LeftCentre: return TaikoAction.RightRim;
-                        case TaikoAction.RightCentre: return TaikoAction.LeftCentre;
-                        case TaikoAction.RightRim: return TaikoAction.RightCentre;
-                    }
-                    break;
-            }
-            throw new ArgumentOutOfRangeException();
-        }
-
         private TaikoAction getTaikoActionFromPosition(Vector2 inputPosition)
         {
             bool centreHit = leftCentre.Contains(inputPosition) || rightCentre.Contains(inputPosition);
             bool leftSide = ToLocalSpace(inputPosition).X < DrawWidth / 2;
-            TaikoAction input;
+            int drumSegment;
 
             if (leftSide)
-                input = centreHit ? TaikoAction.LeftCentre : TaikoAction.LeftRim;
+                drumSegment = centreHit ? 1 : 0;
             else
-                input = centreHit ? TaikoAction.RightCentre : TaikoAction.RightRim;
+                drumSegment = centreHit ? 2 : 3;
 
-            return getTaikoActionFromInput(input);
+            return getTaikoActionFromDrumSegment(drumSegment);
         }
 
         protected override void PopIn()
