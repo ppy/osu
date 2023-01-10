@@ -49,7 +49,12 @@ namespace osu.Game.Screens.Select.Carousel
 
         public virtual int CompareTo(FilterCriteria criteria, CarouselItem other) => ItemID.CompareTo(other.ItemID);
 
-        public int CompareTo(CarouselItem? other) => CarouselYPosition.CompareTo(other?.CarouselYPosition);
+        public int CompareTo(CarouselItem? other)
+        {
+            if (other == null) return 1;
+
+            return CarouselYPosition.CompareTo(other.CarouselYPosition);
+        }
     }
 
     public enum CarouselItemState
