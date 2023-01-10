@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         private ScorePerformanceCache performanceCache { get; set; }
 
         [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
+        private BeatmapManager beatmapManager { get; set; }
 
         public PerformanceBreakdownChart(ScoreInfo score, IBeatmap playableBeatmap)
         {
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             spinner.Show();
 
-            new PerformanceBreakdownCalculator(playableBeatmap, difficultyCache, performanceCache)
+            new PerformanceBreakdownCalculator(playableBeatmap, performanceCache, beatmapManager)
                 .CalculateAsync(score, cancellationTokenSource.Token)
                 .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely())));
         }
