@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select next and enter", () =>
             {
                 InputManager.MoveMouseTo(songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmap>()
-                                                    .First(b => !((CarouselBeatmap)b.Item).BeatmapInfo.Equals(songSelect!.Carousel.SelectedBeatmapInfo)));
+                                                    .First(b => !((CarouselBeatmap)b.Item!).BeatmapInfo.Equals(songSelect!.Carousel.SelectedBeatmapInfo)));
 
                 InputManager.Click(MouseButton.Left);
 
@@ -235,7 +235,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select next and enter", () =>
             {
                 InputManager.MoveMouseTo(songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmap>()
-                                                    .First(b => !((CarouselBeatmap)b.Item).BeatmapInfo.Equals(songSelect!.Carousel.SelectedBeatmapInfo)));
+                                                    .First(b => !((CarouselBeatmap)b.Item!).BeatmapInfo.Equals(songSelect!.Carousel.SelectedBeatmapInfo)));
 
                 InputManager.PressButton(MouseButton.Left);
 
@@ -614,7 +614,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("selected only shows expected ruleset (plus converts)", () =>
             {
-                var selectedPanel = songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First(s => s.Item.State.Value == CarouselItemState.Selected);
+                var selectedPanel = songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First(s => s.Item!.State.Value == CarouselItemState.Selected);
 
                 // special case for converts checked here.
                 return selectedPanel.ChildrenOfType<FilterableDifficultyIcon>().All(i =>
