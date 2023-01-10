@@ -7,8 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osuTK;
 using osu.Framework.Input.Events;
-using osu.Game.Rulesets.Mods;
-using System.Linq;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -22,11 +20,11 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public Visibility LastFrameState;
         public Vector2 TargetPosition = Vector2.Zero;
-        public Mod[] Mods;
+        public Playfield Playfield;
 
-        public GameplayCursorContainer(Mod[] mods)
+        public GameplayCursorContainer(Playfield playfield)
         {
-            Mods = mods;
+            Playfield = playfield;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -38,11 +36,7 @@ namespace osu.Game.Rulesets.UI
         protected override void Update()
         {
             base.Update();
-            Position = TargetPosition;
-            foreach (IModifiesCursorMovement modifier in Mods.OfType<IModifiesCursorMovement>())
-            {
-                Position = modifier.UpdatePosition(TargetPosition, (float)Time.Elapsed / 1000f);
-            }
+            Position = Playfield.CalculateCursorPosition(TargetPosition);
         }
     }
 }

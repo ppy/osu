@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.UI
             this.difficulty = difficulty;
         }
 
-        protected override GameplayCursorContainer CreateCursor(Mod[] mods) => new CatchCursorContainer(mods);
+        protected override GameplayCursorContainer CreateCursor(Mod[] mods) => new CatchCursorContainer(this);
 
         [BackgroundDependencyLoader]
         private void load()

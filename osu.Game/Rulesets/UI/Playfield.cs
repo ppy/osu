@@ -254,6 +254,20 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
+        #region Cursor Code
+
+        public virtual Vector2 CalculateCursorPosition(Vector2 actualCursorPosition)
+        {
+            Vector2 outputPosition = actualCursorPosition;
+            foreach (IModifiesCursorMovement modifier in Mods.OfType<IModifiesCursorMovement>())
+            {
+                outputPosition = modifier.UpdatePosition(outputPosition, (float)Time.Elapsed / 1000f);
+            }
+            return outputPosition;
+        }
+
+        #endregion
+
         /// <summary>
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>

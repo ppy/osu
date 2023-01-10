@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
-        protected override GameplayCursorContainer CreateCursor(Mod[] mods) => new OsuCursorContainer(mods);
+        protected override GameplayCursorContainer CreateCursor(Mod[] mods) => new OsuCursorContainer(this, mods);
 
         private readonly IDictionary<HitResult, DrawablePool<DrawableOsuJudgement>> poolDictionary = new Dictionary<HitResult, DrawablePool<DrawableOsuJudgement>>();
 
