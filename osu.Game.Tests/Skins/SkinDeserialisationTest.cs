@@ -42,7 +42,9 @@ namespace osu.Game.Tests.Skins
             // Covers longest combo counter
             "Archives/modified-default-20221012.osk",
             // Covers TextElement and BeatmapInfoDrawable
-            "Archives/modified-default-20221102.osk"
+            "Archives/modified-default-20221102.osk",
+            // Covers BPM counter.
+            "Archives/modified-default-20221205.osk"
         };
 
         /// <summary>
