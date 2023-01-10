@@ -20,7 +20,6 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    using TaikoInput = TaikoAction; // Functionally identical to TaikoAction, it's just a readability thing
     /// <summary>
     /// An overlay that captures and displays osu!taiko mouse and touch input.
     /// </summary>
@@ -77,27 +76,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftRim), getColourFromTaikoAction(getTaikoActionFromInput(TaikoInput.LeftRim)))
+                                leftRim = new QuarterCircle(getTaikoActionFromInput(TaikoAction.LeftRim), getColourFromTaikoAction(getTaikoActionFromInput(TaikoAction.LeftRim)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                rightRim = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightRim), getColourFromTaikoAction(getTaikoActionFromInput(TaikoInput.RightRim)))
+                                rightRim = new QuarterCircle(getTaikoActionFromInput(TaikoAction.RightRim), getColourFromTaikoAction(getTaikoActionFromInput(TaikoAction.RightRim)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                leftCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.LeftCentre), getColourFromTaikoAction(getTaikoActionFromInput(TaikoInput.LeftCentre)))
+                                leftCentre = new QuarterCircle(getTaikoActionFromInput(TaikoAction.LeftCentre), getColourFromTaikoAction(getTaikoActionFromInput(TaikoAction.LeftCentre)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new QuarterCircle(getTaikoActionFromInput(TaikoInput.RightCentre), getColourFromTaikoAction(getTaikoActionFromInput(TaikoInput.RightCentre)))
+                                rightCentre = new QuarterCircle(getTaikoActionFromInput(TaikoAction.RightCentre), getColourFromTaikoAction(getTaikoActionFromInput(TaikoAction.RightCentre)))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -135,14 +134,14 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             Show();
 
-            TaikoInput taikoInput = getTaikoActionFromPosition(position);
+            TaikoAction TaikoAction = getTaikoActionFromPosition(position);
 
             // Not too sure how this can happen, but let's avoid throwing.
             if (trackedActions.ContainsKey(source))
                 return;
 
-            trackedActions.Add(source, taikoInput);
-            keyBindingContainer.TriggerPressed(taikoInput);
+            trackedActions.Add(source, TaikoAction);
+            keyBindingContainer.TriggerPressed(TaikoAction);
         }
 
         private void handleUp(object source)
@@ -155,7 +154,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             leftRim.Contains(e.ScreenSpaceMouseDownPosition) || rightRim.Contains(e.ScreenSpaceMouseDownPosition);
 
         #pragma warning disable format
-        private TaikoAction getTaikoActionFromInput(TaikoInput input)
+        private TaikoAction getTaikoActionFromInput(TaikoAction input)
         {
             switch (configTouchControlScheme.Value)
             {
@@ -163,30 +162,30 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                     switch (input)
                     {
-                        case TaikoInput.LeftRim:     return TaikoAction.LeftRim;
-                        case TaikoInput.LeftCentre:  return TaikoAction.LeftCentre;
-                        case TaikoInput.RightCentre: return TaikoAction.RightCentre;
-                        case TaikoInput.RightRim:    return TaikoAction.RightRim;
+                        case TaikoAction.LeftRim:     return TaikoAction.LeftRim;
+                        case TaikoAction.LeftCentre:  return TaikoAction.LeftCentre;
+                        case TaikoAction.RightCentre: return TaikoAction.RightCentre;
+                        case TaikoAction.RightRim:    return TaikoAction.RightRim;
                     }
                     break;
 
                 case TaikoTouchControlScheme.DDKK:
                     switch (input)
                     {
-                        case TaikoInput.LeftRim:     return TaikoAction.LeftCentre;
-                        case TaikoInput.LeftCentre:  return TaikoAction.RightCentre;
-                        case TaikoInput.RightCentre: return TaikoAction.LeftRim;
-                        case TaikoInput.RightRim:    return TaikoAction.RightRim;
+                        case TaikoAction.LeftRim:     return TaikoAction.LeftCentre;
+                        case TaikoAction.LeftCentre:  return TaikoAction.RightCentre;
+                        case TaikoAction.RightCentre: return TaikoAction.LeftRim;
+                        case TaikoAction.RightRim:    return TaikoAction.RightRim;
                     }
                     break;
 
                 case TaikoTouchControlScheme.KKDD:
                     switch (input)
                     {
-                        case TaikoInput.LeftRim:     return TaikoAction.LeftRim;
-                        case TaikoInput.LeftCentre:  return TaikoAction.RightRim;
-                        case TaikoInput.RightCentre: return TaikoAction.LeftCentre;
-                        case TaikoInput.RightRim:    return TaikoAction.RightCentre;
+                        case TaikoAction.LeftRim:     return TaikoAction.LeftRim;
+                        case TaikoAction.LeftCentre:  return TaikoAction.RightRim;
+                        case TaikoAction.RightCentre: return TaikoAction.LeftCentre;
+                        case TaikoAction.RightRim:    return TaikoAction.RightCentre;
                     }
                     break;
             }
@@ -198,12 +197,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             bool centreHit = leftCentre.Contains(inputPosition) || rightCentre.Contains(inputPosition);
             bool leftSide = ToLocalSpace(inputPosition).X < DrawWidth / 2;
-            TaikoInput input;
+            TaikoAction input;
 
             if (leftSide)
-                input = centreHit ? TaikoInput.LeftCentre : TaikoInput.LeftRim;
+                input = centreHit ? TaikoAction.LeftCentre : TaikoAction.LeftRim;
             else
-                input = centreHit ? TaikoInput.RightCentre : TaikoInput.RightRim;
+                input = centreHit ? TaikoAction.RightCentre : TaikoAction.RightRim;
 
             return getTaikoActionFromInput(input);
         }
