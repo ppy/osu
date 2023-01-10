@@ -5,6 +5,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -32,6 +33,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         public TestScenePause()
         {
             base.Content.Add(content = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0);
         }
 
         [SetUpSteps]
@@ -144,7 +151,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("disable pause support", () => Player.Configuration.AllowPause = false);
 
-            pauseFromUserExitKey();
+            pauseViaBackAction();
             confirmExited();
         }
 
@@ -156,7 +163,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseAndConfirm();
 
             resume();
-            pauseFromUserExitKey();
+            pauseViaBackAction();
 
             confirmResumed();
             confirmNotExited();
@@ -214,7 +221,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             confirmClockRunning(false);
 
-            AddStep("exit via user pause", () => Player.ExitViaPause());
+            pauseViaBackAction();
             confirmExited();
         }
 
@@ -224,11 +231,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
 
             // will finish the fail animation and show the fail/pause screen.
-            AddStep("attempt exit via pause key", () => Player.ExitViaPause());
+            pauseViaBackAction();
             AddAssert("fail overlay shown", () => Player.FailOverlayVisible);
 
             // will actually exit.
-            AddStep("exit via pause key", () => Player.ExitViaPause());
+            pauseViaBackAction();
             confirmExited();
         }
 
@@ -327,7 +334,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void pauseAndConfirm()
         {
-            pauseFromUserExitKey();
+            pauseViaBackAction();
             confirmPaused();
         }
 
@@ -374,7 +381,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private void restart() => AddStep("restart", () => Player.Restart());
-        private void pauseFromUserExitKey() => AddStep("user pause", () => Player.ExitViaPause());
+        private void pauseViaBackAction() => AddStep("press escape", () => InputManager.Key(Key.Escape));
         private void resume() => AddStep("resume", () => Player.Resume());
 
         private void confirmPauseOverlayShown(bool isShown) =>
@@ -404,8 +411,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public bool FailOverlayVisible => FailOverlay.State.Value == Visibility.Visible;
 
             public bool PauseOverlayVisible => PauseOverlay.State.Value == Visibility.Visible;
-
-            public void ExitViaPause() => PerformExit(true);
 
             public void ExitViaQuickExit() => PerformExit(false);
 
