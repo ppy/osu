@@ -48,6 +48,8 @@ namespace osu.Game.Rulesets.Edit
 
         public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.ScreenSpaceDrawQuad.Centre;
 
+        public override Vector2 ScreenSpaceEndPoint => DrawableObject.ScreenSpaceDrawQuad.Centre;
+
         public override Quad SelectionQuad => DrawableObject.ScreenSpaceDrawQuad;
     }
 
