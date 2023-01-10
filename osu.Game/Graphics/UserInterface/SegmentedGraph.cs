@@ -5,20 +5,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Threading;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Textures;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract partial class SegmentedGraph<T> : Container
+    public abstract partial class SegmentedGraph<T> : Drawable
         where T : struct, IComparable<T>, IConvertible, IEquatable<T>
     {
-        private BufferedContainer? rectSegments;
-        private float previousDrawWidth;
         private bool graphNeedsUpdate;
 
         private T[]? values;
@@ -44,51 +43,31 @@ namespace osu.Game.Graphics.UserInterface
                 values = value;
                 recalculateTiers(values);
                 graphNeedsUpdate = true;
+                Invalidate(Invalidation.DrawNode);
             }
         }
 
         public readonly Colour4[] TierColours;
 
-        private CancellationTokenSource? cts;
-        private ScheduledDelegate? scheduledCreate;
+        private Texture texture = null!;
+        private IShader shader = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(IRenderer renderer, ShaderManager shaders)
+        {
+            texture = renderer.WhitePixel;
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
+        }
 
         protected override void Update()
         {
             base.Update();
 
-            if (graphNeedsUpdate || (values != null && DrawWidth != previousDrawWidth))
+            if (graphNeedsUpdate)
             {
-                rectSegments?.FadeOut(150, Easing.OutQuint).Expire();
-
-                scheduledCreate?.Cancel();
-                scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 150);
-
-                previousDrawWidth = DrawWidth;
-                graphNeedsUpdate = false;
+                recalculateSegments();
+                Invalidate(Invalidation.DrawNode);
             }
-        }
-
-        protected virtual void RecreateGraph()
-        {
-            var newSegments = new BufferedContainer(cachedFrameBuffer: true)
-            {
-                RedrawOnScale = false,
-                RelativeSizeAxes = Axes.Both
-            };
-
-            cts?.Cancel();
-            recalculateSegments();
-            redrawSegments(newSegments);
-
-            LoadComponentAsync(newSegments, s =>
-            {
-                Children = new Drawable[]
-                {
-                    rectSegments = s
-                };
-
-                s.FadeInFromZero(100);
-            }, (cts = new CancellationTokenSource()).Token);
         }
 
         private void recalculateTiers(T[]? arr)
@@ -159,32 +138,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private Colour4 tierToColour(int tier) => tier >= 0 ? TierColours[tier] : new Colour4(0, 0, 0, 0);
 
-        // Base implementation, could be drawn with draw node if preferred
-        private void redrawSegments(BufferedContainer container)
-        {
-            if (segments.Count == 0)
-                return;
-
-            foreach (SegmentInfo segment in segments) // Lower tiers will be drawn first, putting them in the back
-            {
-                float width = segment.Length * DrawWidth;
-
-                // If the segment width exceeds the DrawWidth, just fill the rest
-                if (width >= DrawWidth)
-                    width = DrawWidth;
-
-                container.Add(new Box
-                {
-                    Name = $"Tier {segment.Tier} segment",
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.Y,
-                    Position = new Vector2(segment.Start * DrawWidth, 0),
-                    Width = width,
-                    Colour = tierToColour(segment.Tier)
-                });
-            }
-        }
+        protected override DrawNode CreateDrawNode() => new SegmentedGraphDrawNode(this);
 
         protected struct SegmentInfo
         {
@@ -216,6 +170,58 @@ namespace osu.Game.Graphics.UserInterface
             /// The value is a normalized float (from 0 to 1).
             /// </remarks>
             public float Length => End - Start;
+        }
+
+        private class SegmentedGraphDrawNode : DrawNode
+        {
+            public new SegmentedGraph<T> Source => (SegmentedGraph<T>)base.Source;
+
+            private Texture texture = null!;
+            private IShader shader = null!;
+            private readonly List<SegmentInfo> segments = new List<SegmentInfo>();
+            private Vector2 drawSize;
+
+            public SegmentedGraphDrawNode(SegmentedGraph<T> source)
+                : base(source)
+            {
+            }
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                texture = Source.texture;
+                shader = Source.shader;
+                drawSize = Source.DrawSize;
+                segments.Clear();
+                segments.AddRange(Source.segments);
+            }
+
+            public override void Draw(IRenderer renderer)
+            {
+                base.Draw(renderer);
+
+                shader.Bind();
+
+                foreach (SegmentInfo segment in segments)
+                {
+                    Vector2 topLeft = new Vector2(segment.Start * drawSize.X, 0);
+                    Vector2 topRight = new Vector2(segment.End * drawSize.X, 0);
+                    Vector2 bottomLeft = new Vector2(segment.Start * drawSize.X, drawSize.Y);
+                    Vector2 bottomRight = new Vector2(segment.End * drawSize.X, drawSize.Y);
+
+                    renderer.DrawQuad(
+                        texture,
+                        new Quad(
+                            Vector2Extensions.Transform(topLeft, DrawInfo.Matrix),
+                            Vector2Extensions.Transform(topRight, DrawInfo.Matrix),
+                            Vector2Extensions.Transform(bottomLeft, DrawInfo.Matrix),
+                            Vector2Extensions.Transform(bottomRight, DrawInfo.Matrix)),
+                        Source.tierToColour(segment.Tier));
+                }
+
+                shader.Unbind();
+            }
         }
 
         protected class SegmentManager : IEnumerable<SegmentInfo>
