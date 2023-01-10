@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet;
@@ -29,6 +30,14 @@ namespace osu.Game.Overlays
         public const float RIGHT_WIDTH = 275;
 
         private readonly Bindable<APIBeatmapSet> beatmapSet = new Bindable<APIBeatmapSet>();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        private IBindable<APIUser> apiUser;
+
+        private int? lastRequestedBeatmapId;
+        private BeatmapSetLookupType? lastBeatmapSetLookupType;
 
         /// <remarks>
         /// Isolates the beatmap set overlay from the game-wide selected mods bindable
@@ -72,6 +81,17 @@ namespace osu.Game.Overlays
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            apiUser = api.LocalUser.GetBoundCopy();
+            apiUser.BindValueChanged(_ => Schedule(() =>
+            {
+                if (api.IsLoggedIn)
+                    fetchAndSetLastRequestedBeatmap();
+            }));
+        }
+
         protected override BeatmapSetHeader CreateHeader() => new BeatmapSetHeader();
 
         protected override Color4 BackgroundColour => ColourProvider.Background6;
@@ -84,26 +104,24 @@ namespace osu.Game.Overlays
 
         public void FetchAndShowBeatmap(int beatmapId)
         {
+            lastRequestedBeatmapId = beatmapId;
+            lastBeatmapSetLookupType = BeatmapSetLookupType.BeatmapId;
+
             beatmapSet.Value = null;
 
-            var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
-            req.Success += res =>
-            {
-                beatmapSet.Value = res;
-                Header.HeaderContent.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineID == beatmapId);
-            };
-            API.Queue(req);
+            fetchAndSetBeatmap(beatmapId);
 
             Show();
         }
 
         public void FetchAndShowBeatmapSet(int beatmapSetId)
         {
+            lastRequestedBeatmapId = beatmapSetId;
+            lastBeatmapSetLookupType = BeatmapSetLookupType.SetId;
+
             beatmapSet.Value = null;
 
-            var req = new GetBeatmapSetRequest(beatmapSetId);
-            req.Success += res => beatmapSet.Value = res;
-            API.Queue(req);
+            fetchAndSetBeatmapSet(beatmapSetId);
 
             Show();
         }
@@ -116,6 +134,47 @@ namespace osu.Game.Overlays
         {
             beatmapSet.Value = set;
             Show();
+        }
+
+        private void fetchAndSetBeatmap(int beatmapId)
+        {
+            if (!api.IsLoggedIn)
+                return;
+
+            var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
+            req.Success += res =>
+            {
+                beatmapSet.Value = res;
+                Header.HeaderContent.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineID == beatmapId);
+            };
+            API.Queue(req);
+        }
+
+        private void fetchAndSetBeatmapSet(int beatmapSetId)
+        {
+            if (!api.IsLoggedIn)
+                return;
+
+            var req = new GetBeatmapSetRequest(beatmapSetId);
+            req.Success += res => beatmapSet.Value = res;
+            API.Queue(req);
+        }
+
+        private void fetchAndSetLastRequestedBeatmap()
+        {
+            if (lastRequestedBeatmapId == null)
+                return;
+
+            switch (lastBeatmapSetLookupType)
+            {
+                case BeatmapSetLookupType.SetId:
+                    fetchAndSetBeatmapSet(lastRequestedBeatmapId.Value);
+                    break;
+
+                case BeatmapSetLookupType.BeatmapId:
+                    fetchAndSetBeatmap(lastRequestedBeatmapId.Value);
+                    break;
+            }
         }
 
         private partial class CommentsSection : BeatmapSetLayoutSection
