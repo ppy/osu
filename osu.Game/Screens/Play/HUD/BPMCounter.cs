@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
-            //We dont want it going to 0 when we pause. so we block the updates
+            //We don't want it going to 0 when we pause. so we block the updates
             if (gameplayClock.IsPaused.Value) return;
 
             // We want to check Rate every update to cover windup/down
@@ -84,9 +84,9 @@ namespace osu.Game.Screens.Play.HUD
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.Numeric.With(size: 8, fixedWidth: true),
+                            Font = OsuFont.Numeric.With(size: 8),
                             Text = @"BPM",
-                            Padding = new MarginPadding { Bottom = 1.5f }, // align baseline better
+                            Padding = new MarginPadding { Bottom = 2f }, // align baseline better
                         }
                     }
                 };
