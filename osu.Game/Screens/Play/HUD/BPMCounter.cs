@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
-        protected IGameplayClock GameplayClock { get; private set; } = null!;
+        private IGameplayClock gameplayClock { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
@@ -38,10 +38,10 @@ namespace osu.Game.Screens.Play.HUD
             base.Update();
 
             //We dont want it going to 0 when we pause. so we block the updates
-            if (GameplayClock.IsPaused.Value) return;
+            if (gameplayClock.IsPaused.Value) return;
 
             // We want to check Rate every update to cover windup/down
-            Current.Value = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(GameplayClock.CurrentTime).BPM * GameplayClock.Rate;
+            Current.Value = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(gameplayClock.CurrentTime).BPM * gameplayClock.Rate;
         }
 
         protected override OsuSpriteText CreateSpriteText()
