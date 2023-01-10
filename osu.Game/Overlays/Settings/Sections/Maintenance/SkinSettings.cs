@@ -4,7 +4,6 @@
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
-using osu.Game.Database;
 using osu.Game.Localisation;
 using osu.Game.Skinning;
 
@@ -14,25 +13,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         protected override LocalisableString Header => CommonStrings.Skins;
 
-        private SettingsButton importSkinsButton = null!;
         private SettingsButton deleteSkinsButton = null!;
 
         [BackgroundDependencyLoader]
-        private void load(SkinManager skins, LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
+        private void load(SkinManager skins, IDialogOverlay? dialogOverlay)
         {
-            if (legacyImportManager?.SupportsImportFromStable == true)
-            {
-                Add(importSkinsButton = new SettingsButton
-                {
-                    Text = MaintenanceSettingsStrings.ImportSkinsFromStable,
-                    Action = () =>
-                    {
-                        importSkinsButton.Enabled.Value = false;
-                        legacyImportManager.ImportFromStableAsync(StableContent.Skins).ContinueWith(_ => Schedule(() => importSkinsButton.Enabled.Value = true));
-                    }
-                });
-            }
-
             Add(deleteSkinsButton = new DangerousSettingsButton
             {
                 Text = MaintenanceSettingsStrings.DeleteAllSkins,
