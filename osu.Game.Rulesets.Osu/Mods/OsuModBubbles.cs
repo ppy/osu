@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Pooling;
@@ -21,6 +22,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -178,21 +180,38 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private partial class BubbleDrawable : CompositeDrawable
+        private partial class BubbleDrawable : CompositeDrawable, IHasAccentColour
         {
+            public Color4 AccentColour { get; set; }
+
+            private Circle outerCircle = null!;
+            private Circle innerCircle = null!;
+
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = new Circle
+                InternalChildren = new Drawable[]
                 {
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
+                    outerCircle = new Circle
                     {
-                        Colour = Colour4.Black.Opacity(0.05f),
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 5
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        MaskingSmoothness = 2,
+                        BorderThickness = 0,
+                        BorderColour = Colour4.Transparent,
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Shadow,
+                            Radius = 3,
+                            Colour = Colour4.Black.Opacity(0.05f)
+                        }
+                    },
+                    innerCircle = new Circle
+                    {
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.5f)
                     }
                 };
             }
@@ -202,12 +221,25 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Size = entry.InitialSize;
                 this
                     .ScaleTo(entry.MaxSize, entry.FadeTime * 6, Easing.OutSine)
-                    .FadeColour(entry.IsHit ? entry.Colour : Colour4.Black, entry.FadeTime, Easing.OutSine)
-                    .Delay(entry.FadeTime)
-                    .FadeColour(entry.IsHit ? entry.Colour.Darken(.4f) : Colour4.Black, entry.FadeTime * 5, Easing.OutSine)
                     .Then()
                     .ScaleTo(entry.MaxSize * 1.5f, entry.FadeTime, Easing.OutSine)
-                    .FadeTo(0, entry.FadeTime, Easing.OutQuint);
+                    .FadeTo(0, entry.FadeTime, Easing.OutExpo);
+
+                animateCircles(entry);
+            }
+
+            private void animateCircles(BubbleLifeTimeEntry entry)
+            {
+                innerCircle.FadeColour(entry.IsHit ? entry.Colour.Darken(0.2f) : Colour4.Black)
+                           .FadeColour(entry.IsHit ? entry.Colour.Lighten(0.2f) : Colour4.Black, entry.FadeTime * 7);
+
+                innerCircle.FadeTo(0.5f, entry.FadeTime * 7, Easing.InExpo)
+                           .ScaleTo(1.1f, entry.FadeTime * 7, Easing.InSine);
+
+                outerCircle
+                    .FadeColour(entry.IsHit ? entry.Colour : Colour4.Black, entry.FadeTime, Easing.OutSine)
+                    .Delay(entry.FadeTime)
+                    .FadeColour(entry.IsHit ? entry.Colour.Darken(.4f) : Colour4.Black, entry.FadeTime * 5, Easing.OutSine);
             }
         }
 
