@@ -21,6 +21,8 @@ namespace osu.Game.Tests.Visual
         protected readonly Container HitObjectContainer;
         protected PlacementBlueprint CurrentBlueprint { get; private set; }
 
+        protected EditorClock EditorClock { get; private set; }
+
         protected PlacementBlueprintTestScene()
         {
             base.Content.Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
@@ -32,9 +34,9 @@ namespace osu.Game.Tests.Visual
 
             var playable = GetPlayableBeatmap();
 
-            var editorClock = new EditorClock();
-            base.Content.Add(editorClock);
-            dependencies.CacheAs(editorClock);
+            EditorClock = new EditorClock();
+            base.Content.Add(EditorClock);
+            dependencies.CacheAs(EditorClock);
 
             var editorBeatmap = new EditorBeatmap(playable);
             // Not adding to hierarchy as we don't satisfy its dependencies. Probably not good.

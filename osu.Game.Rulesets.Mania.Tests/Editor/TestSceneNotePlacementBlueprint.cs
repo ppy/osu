@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
@@ -36,21 +37,11 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestPlaceBeforeCurrentTimeDownwards()
         {
-            AddStep("move mouse before current time", () =>
+            AddStep("seek", () =>
             {
-                var column = this.ChildrenOfType<Column>().Single();
-                InputManager.MoveMouseTo(column.ScreenSpacePositionAtTime(-100));
+                EditorClock.Seek(200);
             });
-
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-
-            AddAssert("note start time < 0", () => getNote().StartTime < 0);
-        }
-
-        [Test]
-        public void TestPlaceAfterCurrentTimeDownwards()
-        {
-            AddStep("move mouse after current time", () =>
+            AddStep("move mouse before current time", () =>
             {
                 var column = this.ChildrenOfType<Column>().Single();
                 InputManager.MoveMouseTo(column.ScreenSpacePositionAtTime(100));
@@ -58,8 +49,28 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("note start time > 0", () => getNote().StartTime > 0);
+            AddAssert("note start time < 0", () => getNote().StartTime < 200);
         }
+
+        [Test]
+        public void TestPlaceAfterCurrentTimeDownwards()
+        {
+            AddStep("seek", () =>
+            {
+                EditorClock.Seek(200);
+            });
+            AddStep("move mouse after current time", () =>
+            {
+                var column = this.ChildrenOfType<Column>().Single();
+                InputManager.MoveMouseTo(column.ScreenSpacePositionAtTime(300));
+            });
+
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("note start time > 0", () => getNote().StartTime > 200);
+        }
+
+        protected override IClock ColumnClock { get; } = new ManualClock { CurrentTime = 200 };
 
         private Note getNote() => this.ChildrenOfType<DrawableNote>().FirstOrDefault()?.HitObject;
 

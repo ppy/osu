@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AccentColour = { Value = Color4.OrangeRed },
-                Clock = new FramedClock(new StopwatchClock()), // No scroll
+                Clock = new FramedClock(ColumnClock), // No scroll
             });
         }
 
@@ -54,6 +54,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             return new SnapResult(pos, time, column);
         }
+
+        protected virtual IClock ColumnClock => new StopwatchClock();
 
         protected override Container CreateHitObjectContainer() => new ScrollingTestContainer(ScrollingDirection.Down) { RelativeSizeAxes = Axes.Both };
 
