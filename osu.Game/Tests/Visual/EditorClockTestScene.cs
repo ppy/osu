@@ -70,7 +70,9 @@ namespace osu.Game.Tests.Visual
 
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
-            e.OldValue?.Track.RemoveAdjustment(AdjustableProperty.Frequency, frequencyAdjustment);
+            if (e.OldValue?.TrackLoaded == true)
+                e.OldValue?.Track.RemoveAdjustment(AdjustableProperty.Frequency, frequencyAdjustment);
+
             if (!e.NewValue.TrackLoaded)
                 e.NewValue.LoadTrack();
             e.NewValue.Track.AddAdjustment(AdjustableProperty.Frequency, frequencyAdjustment);
