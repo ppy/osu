@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.Setup
                         {
                             Label = EditorSetupStrings.CountdownSpeed,
                             Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None ? Beatmap.BeatmapInfo.Countdown : CountdownType.Normal },
-                            Items = Enum.GetValues(typeof(CountdownType)).Cast<CountdownType>().Where(type => type != CountdownType.None)
+                            Items = Enum.GetValues<CountdownType>().Where(type => type != CountdownType.None)
                         },
                         CountdownOffset = new LabelledNumberBox
                         {

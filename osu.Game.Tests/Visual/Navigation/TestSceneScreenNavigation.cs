@@ -27,6 +27,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Lounge;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -80,7 +81,25 @@ namespace osu.Game.Tests.Visual.Navigation
 
                 AddUntilStep("wait for return to playlist screen", () => playlistScreen.CurrentSubScreen is PlaylistsRoomSubScreen);
 
+                AddStep("go back to song select", () =>
+                {
+                    InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<PurpleRoundedButton>().Single(b => b.Text == "Edit playlist"));
+                    InputManager.Click(MouseButton.Left);
+                });
+
+                AddUntilStep("wait for song select", () => (playlistScreen.CurrentSubScreen as PlaylistsSongSelect)?.BeatmapSetsLoaded == true);
+
+                AddStep("press home button", () =>
+                {
+                    InputManager.MoveMouseTo(Game.Toolbar.ChildrenOfType<ToolbarHomeButton>().Single());
+                    InputManager.Click(MouseButton.Left);
+                });
+
+                AddAssert("confirmation dialog shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is not null);
+
                 pushEscape();
+                pushEscape();
+
                 AddAssert("confirmation dialog shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is not null);
 
                 AddStep("confirm exit", () => InputManager.Key(Key.Enter));

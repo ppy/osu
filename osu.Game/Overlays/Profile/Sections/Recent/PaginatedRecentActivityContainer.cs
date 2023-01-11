@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Bindables;
@@ -18,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public partial class PaginatedRecentActivityContainer : PaginatedProfileSubsection<APIRecentActivity>
     {
-        public PaginatedRecentActivityContainer(Bindable<APIUser> user)
+        public PaginatedRecentActivityContainer(Bindable<UserProfileData?> user)
             : base(user, missingText: EventsStrings.Empty)
         {
         }
@@ -29,8 +27,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             ItemsContainer.Spacing = new Vector2(0, 8);
         }
 
-        protected override APIRequest<List<APIRecentActivity>> CreateRequest(PaginationParameters pagination) =>
-            new GetUserRecentActivitiesRequest(User.Value.Id, pagination);
+        protected override APIRequest<List<APIRecentActivity>> CreateRequest(APIUser user, PaginationParameters pagination) =>
+            new GetUserRecentActivitiesRequest(user.Id, pagination);
 
         protected override Drawable CreateDrawableItem(APIRecentActivity model) => new DrawableRecentActivity(model);
     }

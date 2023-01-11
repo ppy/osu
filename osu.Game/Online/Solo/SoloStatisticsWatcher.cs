@@ -46,24 +46,30 @@ namespace osu.Game.Online.Solo
         /// </summary>
         /// <param name="score">The score to listen for the statistics update for.</param>
         /// <param name="onUpdateReady">The callback to be invoked once the statistics update has been prepared.</param>
-        public void RegisterForStatisticsUpdateAfter(ScoreInfo score, Action<SoloStatisticsUpdate> onUpdateReady) => Schedule(() =>
+        /// <returns>An <see cref="IDisposable"/> representing the subscription. Disposing it is equivalent to unsubscribing from future notifications.</returns>
+        public IDisposable RegisterForStatisticsUpdateAfter(ScoreInfo score, Action<SoloStatisticsUpdate> onUpdateReady)
         {
-            if (!api.IsLoggedIn)
-                return;
-
-            if (!score.Ruleset.IsLegacyRuleset())
-                return;
-
-            var callback = new StatisticsUpdateCallback(score, onUpdateReady);
-
-            if (lastProcessedScoreId == score.OnlineID)
+            Schedule(() =>
             {
-                requestStatisticsUpdate(api.LocalUser.Value.Id, callback);
-                return;
-            }
+                if (!api.IsLoggedIn)
+                    return;
 
-            callbacks.Add(score.OnlineID, callback);
-        });
+                if (!score.Ruleset.IsLegacyRuleset() || score.OnlineID <= 0)
+                    return;
+
+                var callback = new StatisticsUpdateCallback(score, onUpdateReady);
+
+                if (lastProcessedScoreId == score.OnlineID)
+                {
+                    requestStatisticsUpdate(api.LocalUser.Value.Id, callback);
+                    return;
+                }
+
+                callbacks.Add(score.OnlineID, callback);
+            });
+
+            return new InvokeOnDisposal(() => Schedule(() => callbacks.Remove(score.OnlineID)));
+        }
 
         private void onUserChanged(APIUser? localUser) => Schedule(() =>
         {
@@ -75,13 +81,25 @@ namespace osu.Game.Online.Solo
                 return;
 
             var userRequest = new GetUsersRequest(new[] { localUser.OnlineID });
-            userRequest.Success += response => Schedule(() =>
-            {
-                latestStatistics = new Dictionary<string, UserStatistics>();
-                foreach (var rulesetStats in response.Users.Single().RulesetsStatistics)
-                    latestStatistics.Add(rulesetStats.Key, rulesetStats.Value);
-            });
+            userRequest.Success += initialiseUserStatistics;
             api.Queue(userRequest);
+        });
+
+        private void initialiseUserStatistics(GetUsersResponse response) => Schedule(() =>
+        {
+            var user = response.Users.SingleOrDefault();
+
+            // possible if the user is restricted or similar.
+            if (user == null)
+                return;
+
+            latestStatistics = new Dictionary<string, UserStatistics>();
+
+            if (user.RulesetsStatistics != null)
+            {
+                foreach (var rulesetStats in user.RulesetsStatistics)
+                    latestStatistics.Add(rulesetStats.Key, rulesetStats.Value);
+            }
         });
 
         private void userScoreProcessed(int userId, long scoreId)
