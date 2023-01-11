@@ -20,13 +20,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Direction = FillDirection.Horizontal;
             Spacing = new Vector2(2);
 
-            User.BindValueChanged(val =>
+            User.BindValueChanged(user =>
             {
-                if (val.NewValue?.Groups?.Length > 0)
-                {
-                    Clear(true);
-                    Children = val.NewValue?.Groups.Select(g => new GroupBadge(g)).ToList();
-                }
+                Clear(true);
+
+                if (user.NewValue != null)
+                    AddRange(user.NewValue.Groups.Select(g => new GroupBadge(g)));
             });
         }
     }
