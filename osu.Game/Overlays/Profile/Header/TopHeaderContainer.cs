@@ -15,7 +15,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users.Drawables;
@@ -27,7 +26,7 @@ namespace osu.Game.Overlays.Profile.Header
     {
         private const float avatar_size = 110;
 
-        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -174,8 +173,10 @@ namespace osu.Game.Overlays.Profile.Header
             User.BindValueChanged(user => updateUser(user.NewValue));
         }
 
-        private void updateUser(APIUser? user)
+        private void updateUser(UserProfileData? data)
         {
+            var user = data?.User;
+
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
             openUserExternally.Link = $@"{api.WebsiteRootUrl}/users/{user?.Id ?? 0}";

@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Header
     public partial class CentreHeaderContainer : CompositeDrawable
     {
         public readonly BindableBool DetailsVisible = new BindableBool(true);
-        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         private OverlinedInfoContainer hiddenDetailGlobal = null!;
         private OverlinedInfoContainer hiddenDetailCountry = null!;
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Profile.Header
                 expandedDetailContainer.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
             });
 
-            User.BindValueChanged(user => updateDisplay(user.NewValue));
+            User.BindValueChanged(user => updateDisplay(user.NewValue?.User));
         }
 
         private void updateDisplay(APIUser? user)

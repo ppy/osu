@@ -29,33 +29,33 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestBasic()
         {
-            AddStep("Show example user", () => header.User.Value = TestSceneUserProfileOverlay.TEST_USER);
+            AddStep("Show example user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER));
         }
 
         [Test]
         public void TestOnlineState()
         {
-            AddStep("Show online user", () => header.User.Value = new APIUser
+            AddStep("Show online user", () => header.User.Value = new UserProfileData(new APIUser
             {
                 Id = 1001,
                 Username = "IAmOnline",
                 LastVisit = DateTimeOffset.Now,
                 IsOnline = true,
-            });
+            }));
 
-            AddStep("Show offline user", () => header.User.Value = new APIUser
+            AddStep("Show offline user", () => header.User.Value = new UserProfileData(new APIUser
             {
                 Id = 1002,
                 Username = "IAmOffline",
                 LastVisit = DateTimeOffset.Now.AddDays(-10),
                 IsOnline = false,
-            });
+            }));
         }
 
         [Test]
         public void TestRankedState()
         {
-            AddStep("Show ranked user", () => header.User.Value = new APIUser
+            AddStep("Show ranked user", () => header.User.Value = new UserProfileData(new APIUser
             {
                 Id = 2001,
                 Username = "RankedUser",
@@ -70,9 +70,9 @@ namespace osu.Game.Tests.Visual.Online
                         Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
                     },
                 }
-            });
+            }));
 
-            AddStep("Show unranked user", () => header.User.Value = new APIUser
+            AddStep("Show unranked user", () => header.User.Value = new UserProfileData(new APIUser
             {
                 Id = 2002,
                 Username = "UnrankedUser",
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Online
                         Data = Enumerable.Range(2345, 85).ToArray()
                     },
                 }
-            });
+            }));
         }
     }
 }
