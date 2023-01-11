@@ -255,6 +255,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [CanBeNull]
         public Dictionary<string, UserStatistics> RulesetsStatistics { get; set; }
 
+        [JsonProperty("groups")]
+        public APIUserGroup[] Groups;
+
         public override string ToString() => Username;
 
         /// <summary>

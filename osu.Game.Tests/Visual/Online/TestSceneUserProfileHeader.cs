@@ -59,6 +59,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Id = 2001,
                 Username = "RankedUser",
+                Groups = new[] { new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" } },
                 Statistics = new UserStatistics
                 {
                     IsRanked = true,
