@@ -22,25 +22,25 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneProfileRulesetSelector()
         {
-            var userProfile = new Bindable<UserProfile?>();
+            var user = new Bindable<UserProfileData?>();
 
             Child = new ProfileRulesetSelector
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                UserProfile = { BindTarget = userProfile }
+                User = { BindTarget = user }
             };
-            AddStep("User on osu ruleset", () => userProfile.Value = new UserProfile(new APIUser { Id = 0, PlayMode = "osu" }, new OsuRuleset().RulesetInfo));
-            AddStep("User on taiko ruleset", () => userProfile.Value = new UserProfile(new APIUser { Id = 1, PlayMode = "osu" }, new TaikoRuleset().RulesetInfo));
-            AddStep("User on catch ruleset", () => userProfile.Value = new UserProfile(new APIUser { Id = 2, PlayMode = "osu" }, new CatchRuleset().RulesetInfo));
-            AddStep("User on mania ruleset", () => userProfile.Value = new UserProfile(new APIUser { Id = 3, PlayMode = "osu" }, new ManiaRuleset().RulesetInfo));
+            AddStep("User on osu ruleset", () => user.Value = new UserProfileData(new APIUser { Id = 0, PlayMode = "osu" }, new OsuRuleset().RulesetInfo));
+            AddStep("User on taiko ruleset", () => user.Value = new UserProfileData(new APIUser { Id = 1, PlayMode = "osu" }, new TaikoRuleset().RulesetInfo));
+            AddStep("User on catch ruleset", () => user.Value = new UserProfileData(new APIUser { Id = 2, PlayMode = "osu" }, new CatchRuleset().RulesetInfo));
+            AddStep("User on mania ruleset", () => user.Value = new UserProfileData(new APIUser { Id = 3, PlayMode = "osu" }, new ManiaRuleset().RulesetInfo));
 
-            AddStep("User with osu as default", () => userProfile.Value = new UserProfile(new APIUser { Id = 0, PlayMode = "osu" }, new OsuRuleset().RulesetInfo));
-            AddStep("User with taiko as default", () => userProfile.Value = new UserProfile(new APIUser { Id = 1, PlayMode = "taiko" }, new OsuRuleset().RulesetInfo));
-            AddStep("User with catch as default", () => userProfile.Value = new UserProfile(new APIUser { Id = 2, PlayMode = "fruits" }, new OsuRuleset().RulesetInfo));
-            AddStep("User with mania as default", () => userProfile.Value = new UserProfile(new APIUser { Id = 3, PlayMode = "mania" }, new OsuRuleset().RulesetInfo));
+            AddStep("User with osu as default", () => user.Value = new UserProfileData(new APIUser { Id = 0, PlayMode = "osu" }, new OsuRuleset().RulesetInfo));
+            AddStep("User with taiko as default", () => user.Value = new UserProfileData(new APIUser { Id = 1, PlayMode = "taiko" }, new OsuRuleset().RulesetInfo));
+            AddStep("User with catch as default", () => user.Value = new UserProfileData(new APIUser { Id = 2, PlayMode = "fruits" }, new OsuRuleset().RulesetInfo));
+            AddStep("User with mania as default", () => user.Value = new UserProfileData(new APIUser { Id = 3, PlayMode = "mania" }, new OsuRuleset().RulesetInfo));
 
-            AddStep("null user", () => userProfile.Value = null);
+            AddStep("null user", () => user.Value = null);
         }
     }
 }

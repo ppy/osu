@@ -87,6 +87,11 @@ namespace osu.Game.Tests.Visual.Online
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
             ProfileOrder = new[] { "me" },
+            Groups = new[]
+            {
+                new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" },
+                new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators", Playmodes = new[] { "osu", "taiko" } }
+            },
             Statistics = new UserStatistics
             {
                 IsRanked = true,

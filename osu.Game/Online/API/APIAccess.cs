@@ -259,7 +259,11 @@ namespace osu.Game.Online.API
 
             var friendsReq = new GetFriendsRequest();
             friendsReq.Failure += _ => state.Value = APIState.Failing;
-            friendsReq.Success += res => friends.AddRange(res);
+            friendsReq.Success += res =>
+            {
+                friends.Clear();
+                friends.AddRange(res);
+            };
 
             if (!handleRequest(friendsReq))
             {

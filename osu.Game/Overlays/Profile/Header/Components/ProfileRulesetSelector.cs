@@ -16,24 +16,24 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [Resolved]
         private UserProfileOverlay? profileOverlay { get; set; }
 
-        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            UserProfile.BindValueChanged(userProfile => updateState(userProfile.NewValue), true);
+            User.BindValueChanged(user => updateState(user.NewValue), true);
             Current.BindValueChanged(ruleset =>
             {
-                if (UserProfile.Value != null && !ruleset.NewValue.Equals(UserProfile.Value.Ruleset))
-                    profileOverlay?.ShowUser(UserProfile.Value.User, ruleset.NewValue);
+                if (User.Value != null && !ruleset.NewValue.Equals(User.Value.Ruleset))
+                    profileOverlay?.ShowUser(User.Value.User, ruleset.NewValue);
             });
         }
 
-        private void updateState(UserProfile? userProfile)
+        private void updateState(UserProfileData? user)
         {
-            Current.Value = Items.SingleOrDefault(ruleset => userProfile?.Ruleset.MatchesOnlineID(ruleset) == true);
-            SetDefaultRuleset(Rulesets.GetRuleset(userProfile?.User.PlayMode ?? @"osu").AsNonNull());
+            Current.Value = Items.SingleOrDefault(ruleset => user?.Ruleset.MatchesOnlineID(ruleset) == true);
+            SetDefaultRuleset(Rulesets.GetRuleset(user?.User.PlayMode ?? @"osu").AsNonNull());
         }
 
         public void SetDefaultRuleset(RulesetInfo ruleset)

@@ -15,8 +15,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public partial class PaginatedRecentActivityContainer : PaginatedProfileSubsection<APIRecentActivity>
     {
-        public PaginatedRecentActivityContainer(Bindable<UserProfile?> userProfile)
-            : base(userProfile, missingText: EventsStrings.Empty)
+        public PaginatedRecentActivityContainer(Bindable<UserProfileData?> user)
+            : base(user, missingText: EventsStrings.Empty)
         {
         }
 
@@ -26,8 +26,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             ItemsContainer.Spacing = new Vector2(0, 8);
         }
 
-        protected override APIRequest<List<APIRecentActivity>> CreateRequest(UserProfile userProfile, PaginationParameters pagination) =>
-            new GetUserRecentActivitiesRequest(userProfile.User.Id, pagination);
+        protected override APIRequest<List<APIRecentActivity>> CreateRequest(UserProfileData user, PaginationParameters pagination) =>
+            new GetUserRecentActivitiesRequest(user.User.Id, pagination);
 
         protected override Drawable CreateDrawableItem(APIRecentActivity model) => new DrawableRecentActivity(model);
     }

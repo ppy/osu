@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Profile
     /// <summary>
     /// Contains data about a profile presented on the <see cref="UserProfileOverlay"/>.
     /// </summary>
-    public class UserProfile
+    public class UserProfileData
     {
         /// <summary>
         /// The user whose profile is being presented.
@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Profile
         /// </summary>
         public RulesetInfo Ruleset { get; }
 
-        public UserProfile(APIUser user, RulesetInfo ruleset)
+        public UserProfileData(APIUser user, RulesetInfo ruleset)
         {
             User = user;
             Ruleset = ruleset;

@@ -19,8 +19,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     {
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<UserProfile?> userProfile, LocalisableString headerText)
-            : base(userProfile, headerText)
+        public PaginatedScoreContainer(ScoreType type, Bindable<UserProfileData?> user, LocalisableString headerText)
+            : base(user, headerText)
         {
             this.type = type;
         }
@@ -60,8 +60,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<SoloScoreInfo>> CreateRequest(UserProfile userProfile, PaginationParameters pagination) =>
-            new GetUserScoresRequest(userProfile.User.Id, type, pagination, userProfile.Ruleset);
+        protected override APIRequest<List<SoloScoreInfo>> CreateRequest(UserProfileData user, PaginationParameters pagination) =>
+            new GetUserScoresRequest(user.User.Id, type, pagination, user.Ruleset);
 
         private int drawableItemIndex;
 
