@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public partial class PaginatedMostPlayedBeatmapContainer : PaginatedProfileSubsection<APIUserMostPlayedBeatmap>
     {
-        public PaginatedMostPlayedBeatmapContainer(Bindable<APIUser?> user)
+        public PaginatedMostPlayedBeatmapContainer(Bindable<UserProfileData?> user)
             : base(user, UsersStrings.ShowExtraHistoricalMostPlayedTitle)
         {
         }

@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 
 namespace osu.Game.Tests.Visual.Online
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            AddStep("Show cookiezi", () => ranks.User.Value = new APIUser { Id = 124493 });
+            AddStep("Show cookiezi", () => ranks.User.Value = new UserProfileData(new APIUser { Id = 124493 }));
         }
     }
 }
