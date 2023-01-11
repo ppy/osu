@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract partial class SegmentedGraph<T> : Drawable
+    public partial class SegmentedGraph<T> : Drawable
         where T : struct, IComparable<T>, IConvertible, IEquatable<T>
     {
         private bool graphNeedsUpdate;
