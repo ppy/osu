@@ -114,20 +114,24 @@ namespace osu.Game.Rulesets.Taiko.UI
             };
         }
 
-        private readonly TaikoAction[,] mappedTaikoAction = {
-            { // KDDK
+        private readonly TaikoAction[,] mappedTaikoAction =
+        {
+            {
+                // KDDK
                 TaikoAction.LeftRim,
                 TaikoAction.LeftCentre,
                 TaikoAction.RightCentre,
                 TaikoAction.RightRim
             },
-            { // DDKK
+            {
+                // DDKK
                 TaikoAction.LeftCentre,
                 TaikoAction.RightCentre,
                 TaikoAction.LeftRim,
                 TaikoAction.RightRim
             },
-            { // KKDD
+            {
+                // KKDD
                 TaikoAction.LeftRim,
                 TaikoAction.RightRim,
                 TaikoAction.LeftCentre,
