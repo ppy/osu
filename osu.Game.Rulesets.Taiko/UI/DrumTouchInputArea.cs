@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (ForceControlScheme == null)
                 config.BindWith(TaikoRulesetSetting.TouchControlScheme, configTouchControlScheme);
             else
-                configTouchControlScheme.Value = (TaikoTouchControlScheme)ForceControlScheme;
+                configTouchControlScheme.Value = ForceControlScheme.Value;
 
             Children = new Drawable[]
             {
