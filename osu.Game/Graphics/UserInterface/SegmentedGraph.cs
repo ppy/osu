@@ -194,7 +194,7 @@ namespace osu.Game.Graphics.UserInterface
                 shader = Source.shader;
                 drawSize = Source.DrawSize;
                 segments.Clear();
-                segments.AddRange(Source.segments);
+                segments.AddRange(Source.segments.Where(s => s.Length * drawSize.X > 1));
             }
 
             public override void Draw(IRenderer renderer)
