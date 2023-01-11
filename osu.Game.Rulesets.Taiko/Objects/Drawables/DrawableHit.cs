@@ -209,6 +209,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                     this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
 
+                    if (Result.Type == HitResult.Great)
+                        MainPiece.X = -X;
+
                     this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
                         .Then()
                         .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
