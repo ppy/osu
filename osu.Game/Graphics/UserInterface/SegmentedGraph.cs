@@ -136,7 +136,7 @@ namespace osu.Game.Graphics.UserInterface
             segments.Sort();
         }
 
-        private Colour4 tierToColour(int tier) => tier >= 0 ? TierColours[tier] : new Colour4(0, 0, 0, 0);
+        private Colour4 getTierColour(int tier) => tier >= 0 ? TierColours[tier] : new Colour4(0, 0, 0, 0);
 
         protected override DrawNode CreateDrawNode() => new SegmentedGraphDrawNode(this);
 
@@ -217,7 +217,7 @@ namespace osu.Game.Graphics.UserInterface
                             Vector2Extensions.Transform(topRight, DrawInfo.Matrix),
                             Vector2Extensions.Transform(bottomLeft, DrawInfo.Matrix),
                             Vector2Extensions.Transform(bottomRight, DrawInfo.Matrix)),
-                        Source.tierToColour(segment.Tier));
+                        Source.getTierColour(segment.Tier));
                 }
 
                 shader.Unbind();
@@ -263,12 +263,12 @@ namespace osu.Game.Graphics.UserInterface
             {
                 foreach (SegmentInfo? pendingSegment in pendingSegments)
                 {
-                    if (pendingSegment != null)
-                    {
-                        SegmentInfo finalizedSegment = pendingSegment.Value;
-                        finalizedSegment.End = 1;
-                        segments.Add(finalizedSegment);
-                    }
+                    if (pendingSegment == null)
+                        continue;
+
+                    SegmentInfo finalizedSegment = pendingSegment.Value;
+                    finalizedSegment.End = 1;
+                    segments.Add(finalizedSegment);
                 }
             }
 
@@ -305,13 +305,7 @@ namespace osu.Game.Graphics.UserInterface
                 Add(segment);
             }
 
-            public bool IsTierStarted(int tier)
-            {
-                if (tier < 0)
-                    return false;
-
-                return pendingSegments[tier].HasValue;
-            }
+            public bool IsTierStarted(int tier) => tier >= 0 && pendingSegments[tier].HasValue;
 
             public IEnumerator<SegmentInfo> GetEnumerator() => segments.GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
