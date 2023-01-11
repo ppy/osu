@@ -4,8 +4,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
@@ -54,6 +56,21 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                 }
             }
         });
+
+        [Test]
+        public void TestGameCursorHidden()
+        {
+            CreateModTest(new ModTestData
+            {
+                Mod = new CatchModRelax(),
+                Autoplay = false,
+                PassCondition = () =>
+                {
+                    InputManager.MoveMouseTo(this.ChildrenOfType<DrawableCatchRuleset>().Single());
+                    return this.ChildrenOfType<MenuCursorContainer>().Single().State.Value == Visibility.Hidden;
+                }
+            });
+        }
 
         private bool passCondition()
         {

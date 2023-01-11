@@ -127,6 +127,21 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestExtendedLimitsRetainedAfterBoundCopyCreation()
+        {
+            setExtendedLimits(true);
+            setSliderValue("Circle Size", 11);
+
+            checkSliderAtValue("Circle Size", 11);
+            checkBindableAtValue("Circle Size", 11);
+
+            AddStep("create bound copy", () => _ = modDifficultyAdjust.CircleSize.GetBoundCopy());
+
+            checkSliderAtValue("Circle Size", 11);
+            checkBindableAtValue("Circle Size", 11);
+        }
+
+        [Test]
         public void TestResetToDefault()
         {
             setBeatmapWithDifficultyParameters(2);

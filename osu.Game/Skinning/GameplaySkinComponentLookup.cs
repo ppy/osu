@@ -16,7 +16,7 @@ namespace osu.Game.Skinning
         }
 
         protected virtual string RulesetPrefix => string.Empty;
-        protected virtual string ComponentName => Component.ToString();
+        protected virtual string ComponentName => Component.ToString() ?? string.Empty;
 
         public string LookupName =>
             string.Join('/', new[] { "Gameplay", RulesetPrefix, ComponentName }.Where(s => !string.IsNullOrEmpty(s)));
