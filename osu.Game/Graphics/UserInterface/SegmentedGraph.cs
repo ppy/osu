@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly int tierCount;
 
-        protected SegmentedGraph(int tierCount)
+        public SegmentedGraph(int tierCount)
         {
             this.tierCount = tierCount;
             TierColours = new Colour4[tierCount];
