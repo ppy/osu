@@ -20,8 +20,12 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         protected override CoverExpandDirection ExpandDirection => CoverExpandDirection.AlongScroll;
 
-        // This could be customisable like ManiaModHidden in the future if there's any demand.
-        // At that point, the bindable could be moved to `ManiaModPlayfieldCover`.
-        public override BindableNumber<float> Coverage { get; } = new BindableFloat(0.5f);
+        public override BindableNumber<float> Coverage { get; } = new BindableFloat(0.5f)
+        {
+            Precision = 0.1f,
+            MinValue = 0.1f,
+            MaxValue = 0.7f,
+            Default = 0.5f,
+        };
     }
 }
