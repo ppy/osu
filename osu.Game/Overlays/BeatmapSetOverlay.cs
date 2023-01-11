@@ -36,8 +36,7 @@ namespace osu.Game.Overlays
 
         private IBindable<APIUser> apiUser;
 
-        private int? lastRequestedBeatmapId;
-        private BeatmapSetLookupType? lastBeatmapSetLookupType;
+        private (BeatmapSetLookupType type, int id)? lastLookup;
 
         /// <remarks>
         /// Isolates the beatmap set overlay from the game-wide selected mods bindable
@@ -88,7 +87,7 @@ namespace osu.Game.Overlays
             apiUser.BindValueChanged(_ => Schedule(() =>
             {
                 if (api.IsLoggedIn)
-                    fetchAndSetLastRequestedBeatmap();
+                    performFetch();
             }));
         }
 
@@ -104,25 +103,20 @@ namespace osu.Game.Overlays
 
         public void FetchAndShowBeatmap(int beatmapId)
         {
-            lastRequestedBeatmapId = beatmapId;
-            lastBeatmapSetLookupType = BeatmapSetLookupType.BeatmapId;
-
+            lastLookup = (BeatmapSetLookupType.BeatmapId, beatmapId);
             beatmapSet.Value = null;
 
-            fetchAndSetBeatmap(beatmapId);
-
+            performFetch();
             Show();
         }
 
         public void FetchAndShowBeatmapSet(int beatmapSetId)
         {
-            lastRequestedBeatmapId = beatmapSetId;
-            lastBeatmapSetLookupType = BeatmapSetLookupType.SetId;
+            lastLookup = (BeatmapSetLookupType.SetId, beatmapSetId);
 
             beatmapSet.Value = null;
 
-            fetchAndSetBeatmapSet(beatmapSetId);
-
+            performFetch();
             Show();
         }
 
@@ -136,45 +130,22 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        private void fetchAndSetBeatmap(int beatmapId)
+        private void performFetch()
         {
             if (!api.IsLoggedIn)
                 return;
 
-            var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
+            if (lastLookup == null)
+                return;
+
+            var req = new GetBeatmapSetRequest(lastLookup.Value.id, BeatmapSetLookupType.BeatmapId);
             req.Success += res =>
             {
                 beatmapSet.Value = res;
-                Header.HeaderContent.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineID == beatmapId);
+                if (lastLookup.Value.type == BeatmapSetLookupType.BeatmapId)
+                    Header.HeaderContent.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineID == lastLookup.Value.id);
             };
             API.Queue(req);
-        }
-
-        private void fetchAndSetBeatmapSet(int beatmapSetId)
-        {
-            if (!api.IsLoggedIn)
-                return;
-
-            var req = new GetBeatmapSetRequest(beatmapSetId);
-            req.Success += res => beatmapSet.Value = res;
-            API.Queue(req);
-        }
-
-        private void fetchAndSetLastRequestedBeatmap()
-        {
-            if (lastRequestedBeatmapId == null)
-                return;
-
-            switch (lastBeatmapSetLookupType)
-            {
-                case BeatmapSetLookupType.SetId:
-                    fetchAndSetBeatmapSet(lastRequestedBeatmapId.Value);
-                    break;
-
-                case BeatmapSetLookupType.BeatmapId:
-                    fetchAndSetBeatmap(lastRequestedBeatmapId.Value);
-                    break;
-            }
         }
 
         private partial class CommentsSection : BeatmapSetLayoutSection
