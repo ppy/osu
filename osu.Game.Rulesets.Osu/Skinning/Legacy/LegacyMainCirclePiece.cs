@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private readonly bool hasNumber;
 
-        protected Drawable CircleSprite = null!;
-        protected Drawable OverlaySprite = null!;
+        protected LegacyKiaiFlashingDrawable CircleSprite = null!;
+        protected LegacyKiaiFlashingDrawable OverlaySprite = null!;
 
         protected Container OverlayLayer { get; private set; } = null!;
 
@@ -66,29 +66,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // at this point, any further texture fetches should be correctly using the priority source if the base texture was retrieved using it.
             // the conditional above handles the case where a sliderendcircle.png is retrieved from the skin, but sliderendcircleoverlay.png doesn't exist.
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png.
-
-            Color4 objectColour = drawableOsuObject!.AccentColour.Value;
-            int add = Math.Max(25, 300 - (int)(objectColour.R * 255) - (int)(objectColour.G * 255) - (int)(objectColour.B * 255));
-
-            Color4 finalColour = new Color4(
-                (byte)Math.Min((byte)(objectColour.R * 255) + add, 255),
-                (byte)Math.Min((byte)(objectColour.G * 255) + add, 255),
-                (byte)Math.Min((byte)(objectColour.B * 255) + add, 255),
-                255);
-
             InternalChildren = new[]
             {
                 CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = finalColour,
                 },
                 OverlayLayer = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = finalColour,
                     Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
                     {
                         Anchor = Anchor.Centre,
@@ -126,7 +114,21 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.LoadComplete();
 
-            accentColour.BindValueChanged(colour => CircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
+            accentColour.BindValueChanged(colour =>
+            {
+                Color4 objectColour = colour.NewValue;
+                int add = Math.Max(25, 300 - (int)(objectColour.R * 255) - (int)(objectColour.G * 255) - (int)(objectColour.B * 255));
+
+                var kiaiTintColour = new Color4(
+                    (byte)Math.Min((byte)(objectColour.R * 255) + add, 255),
+                    (byte)Math.Min((byte)(objectColour.G * 255) + add, 255),
+                    (byte)Math.Min((byte)(objectColour.B * 255) + add, 255),
+                    255);
+
+                CircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue);
+                OverlaySprite.KiaiGlowColour = CircleSprite.KiaiGlowColour = LegacyColourCompatibility.DisallowZeroAlpha(kiaiTintColour);
+            }, true);
+
             if (hasNumber)
                 indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
 
