@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     public partial class DrumTouchInputArea : VisibilityContainer
     {
+        public TaikoTouchControlScheme? ForceControlScheme { get; set; }
         // visibility state affects our child. we always want to handle input.
         public override bool PropagatePositionalInputSubTree => true;
         public override bool PropagateNonPositionalInputSubTree => true;
@@ -55,7 +56,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             const float centre_region = 0.80f;
 
-            config.BindWith(TaikoRulesetSetting.TouchControlScheme, configTouchControlScheme);
+            if (ForceControlScheme == null)
+                config.BindWith(TaikoRulesetSetting.TouchControlScheme, configTouchControlScheme);
+            else
+                configTouchControlScheme.Value = (TaikoTouchControlScheme)ForceControlScheme;
 
             Children = new Drawable[]
             {

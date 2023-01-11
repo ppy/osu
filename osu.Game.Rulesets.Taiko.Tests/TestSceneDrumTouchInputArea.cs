@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
+using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Tests.Visual;
 
@@ -14,35 +14,37 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         private DrumTouchInputArea drumTouchInputArea = null!;
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        private void createDrum(TaikoTouchControlScheme _forcedControlScheme)
         {
-            AddStep("create drum", () =>
+            Child = new TaikoInputManager(new TaikoRuleset().RulesetInfo)
             {
-                Child = new TaikoInputManager(new TaikoRuleset().RulesetInfo)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+    {
+                    new InputDrum
                     {
-                        new InputDrum
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Height = 0.2f,
-                        },
-                        drumTouchInputArea = new DrumTouchInputArea
-                        {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                        },
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Height = 0.2f,
                     },
-                };
-            });
+                    drumTouchInputArea = new DrumTouchInputArea
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        ForceControlScheme = _forcedControlScheme
+                    }
+                }
+            };
         }
 
         [Test]
         public void TestDrum()
         {
+            AddStep("create drum (kddk)", () => createDrum(TaikoTouchControlScheme.KDDK));
+            AddStep("show drum", () => drumTouchInputArea.Show());
+            AddStep("create drum (ddkk)", () => createDrum(TaikoTouchControlScheme.DDKK));
+            AddStep("show drum", () => drumTouchInputArea.Show());
+            AddStep("create drum (kkdd)", () => createDrum(TaikoTouchControlScheme.KKDD));
             AddStep("show drum", () => drumTouchInputArea.Show());
         }
 
