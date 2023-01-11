@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Profile.Header
         private UpdateableFlag userFlag = null!;
         private OsuSpriteText userCountryText = null!;
         private FillFlowContainer userStats = null!;
-        private GroupInfoContainer groupInfoContainer = null!;
+        private GroupBadgeFlow groupBadgeFlow = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                         Anchor = Anchor.CentreLeft,
                                                         Origin = Anchor.CentreLeft,
                                                     },
-                                                    groupInfoContainer = new GroupInfoContainer
+                                                    groupBadgeFlow = new GroupBadgeFlow
                                                     {
                                                         Anchor = Anchor.CentreLeft,
                                                         Origin = Anchor.CentreLeft,
@@ -190,7 +190,7 @@ namespace osu.Game.Overlays.Profile.Header
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
-            groupInfoContainer.User.Value = user;
+            groupBadgeFlow.User.Value = user;
 
             userStats.Clear();
 
