@@ -45,5 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             AddStep("show drum", () => drumTouchInputArea.Show());
         }
+
+        protected override Ruleset CreateRuleset() => new TaikoRuleset();
     }
 }
