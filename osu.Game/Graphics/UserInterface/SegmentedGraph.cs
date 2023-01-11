@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.UserInterface
             if (min < 0)
             {
                 for (int i = 0; i < floatValues.Length; i++)
-                    floatValues[i] += min;
+                    floatValues[i] += Math.Abs(min);
             }
 
             // Normalize values
