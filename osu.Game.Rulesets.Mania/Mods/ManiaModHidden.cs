@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Localisation;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Framework.Bindables;
 
