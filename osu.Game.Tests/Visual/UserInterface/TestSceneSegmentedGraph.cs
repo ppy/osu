@@ -2,9 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osuTK;
 using Vector4 = System.Numerics.Vector4;
 
@@ -42,6 +46,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("bumps of size 500", () => bumps(500));
             AddStep("100 random values", () => randomValues());
             AddStep("500 random values", () => randomValues(500));
+            AddStep("beatmap density with granularity of 200", () => beatmapDensity());
+            AddStep("beatmap density with granularity of 300", () => beatmapDensity(300));
             AddStep("reversed values from 1-10", () => graph.Values = Enumerable.Range(1, 10).Reverse().ToArray());
         }
 
@@ -88,6 +94,41 @@ namespace osu.Game.Tests.Visual.UserInterface
             for (int i = 0; i < size; i++)
             {
                 values[i] = rng.Next(255);
+            }
+
+            graph.Values = values;
+        }
+
+        private void beatmapDensity(int granularity = 200)
+        {
+            var ruleset = new OsuRuleset();
+            var beatmap = CreateBeatmap(ruleset.RulesetInfo);
+            IEnumerable<HitObject> objects = beatmap.HitObjects;
+
+            // Taken from SongProgressGraph
+            int[] values = new int[granularity];
+
+            if (!objects.Any())
+                return;
+
+            double firstHit = objects.First().StartTime;
+            double lastHit = objects.Max(o => o.GetEndTime());
+
+            if (lastHit == 0)
+                lastHit = objects.Last().StartTime;
+
+            double interval = (lastHit - firstHit + 1) / granularity;
+
+            foreach (var h in objects)
+            {
+                double endTime = h.GetEndTime();
+
+                Debug.Assert(endTime >= h.StartTime);
+
+                int startRange = (int)((h.StartTime - firstHit) / interval);
+                int endRange = (int)((endTime - firstHit) / interval);
+                for (int i = startRange; i <= endRange; i++)
+                    values[i]++;
             }
 
             graph.Values = values;
