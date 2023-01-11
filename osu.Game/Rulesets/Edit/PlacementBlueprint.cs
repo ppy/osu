@@ -101,6 +101,8 @@ namespace osu.Game.Rulesets.Edit
                     break;
             }
 
+            commit = commit && HitObject.StartTime >= 0;
+
             placementHandler.EndPlacement(HitObject, commit);
             PlacementActive = PlacementState.Finished;
         }
