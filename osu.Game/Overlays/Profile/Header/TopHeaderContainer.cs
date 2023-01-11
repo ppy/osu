@@ -39,6 +39,7 @@ namespace osu.Game.Overlays.Profile.Header
         private UpdateableFlag userFlag = null!;
         private OsuSpriteText userCountryText = null!;
         private FillFlowContainer userStats = null!;
+        private GroupBadgeFlow groupBadgeFlow = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -89,6 +90,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             {
                                                 AutoSizeAxes = Axes.Both,
                                                 Direction = FillDirection.Horizontal,
+                                                Spacing = new Vector2(5),
                                                 Children = new Drawable[]
                                                 {
                                                     usernameText = new OsuSpriteText
@@ -97,10 +99,14 @@ namespace osu.Game.Overlays.Profile.Header
                                                     },
                                                     openUserExternally = new ExternalLinkButton
                                                     {
-                                                        Margin = new MarginPadding { Left = 5 },
                                                         Anchor = Anchor.CentreLeft,
                                                         Origin = Anchor.CentreLeft,
                                                     },
+                                                    groupBadgeFlow = new GroupBadgeFlow
+                                                    {
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft,
+                                                    }
                                                 }
                                             },
                                             titleText = new OsuSpriteText
@@ -185,6 +191,7 @@ namespace osu.Game.Overlays.Profile.Header
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
+            groupBadgeFlow.User.Value = user;
 
             userStats.Clear();
 
