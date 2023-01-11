@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
     public partial class ManiaHealthProcessor : DrainingHealthProcessor
     {
         /// <inheritdoc/>
-        public ManiaHealthProcessor(double drainStartTime, double drainLenience = 0)
-            : base(drainStartTime, drainLenience)
+        public ManiaHealthProcessor(double drainStartTime)
+            : base(drainStartTime, 1.0)
         {
         }
 

@@ -39,8 +39,8 @@ namespace osu.Game.Tests.Visual.Online
                 Child = section = new HistoricalSection(),
             });
 
-            AddStep("Show peppy", () => section.UserProfile.Value = new UserProfile(new APIUser { Id = 2 }, new OsuRuleset().RulesetInfo));
-            AddStep("Show WubWoofWolf", () => section.UserProfile.Value = new UserProfile(new APIUser { Id = 39828 }, new OsuRuleset().RulesetInfo));
+            AddStep("Show peppy", () => section.User.Value = new UserProfileData(new APIUser { Id = 2 }, new OsuRuleset().RulesetInfo));
+            AddStep("Show WubWoofWolf", () => section.User.Value = new UserProfileData(new APIUser { Id = 39828 }, new OsuRuleset().RulesetInfo));
         }
     }
 }

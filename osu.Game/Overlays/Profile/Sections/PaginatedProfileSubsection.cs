@@ -46,8 +46,8 @@ namespace osu.Game.Overlays.Profile.Sections
         private OsuSpriteText missing = null!;
         private readonly LocalisableString? missingText;
 
-        protected PaginatedProfileSubsection(Bindable<UserProfile?> userProfile, LocalisableString? headerText = null, LocalisableString? missingText = null)
-            : base(userProfile, headerText, CounterVisibilityState.AlwaysVisible)
+        protected PaginatedProfileSubsection(Bindable<UserProfileData?> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
+            : base(user, headerText, CounterVisibilityState.AlwaysVisible)
         {
             this.missingText = missingText;
         }
@@ -89,10 +89,10 @@ namespace osu.Game.Overlays.Profile.Sections
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            UserProfile.BindValueChanged(onUserChanged, true);
+            User.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(ValueChangedEvent<UserProfile?> e)
+        private void onUserChanged(ValueChangedEvent<UserProfileData?> e)
         {
             loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
@@ -109,14 +109,14 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void showMore()
         {
-            if (UserProfile.Value == null)
+            if (User.Value == null)
                 return;
 
             loadCancellation = new CancellationTokenSource();
 
             CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new PaginationParameters(InitialItemsCount);
 
-            retrievalRequest = CreateRequest(UserProfile.Value, CurrentPage.Value);
+            retrievalRequest = CreateRequest(User.Value, CurrentPage.Value);
             retrievalRequest.Success += items => UpdateItems(items, loadCancellation);
 
             api.Queue(retrievalRequest);
@@ -154,7 +154,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
         }
 
-        protected abstract APIRequest<List<TModel>> CreateRequest(UserProfile userProfile, PaginationParameters pagination);
+        protected abstract APIRequest<List<TModel>> CreateRequest(UserProfileData user, PaginationParameters pagination);
 
         protected abstract Drawable? CreateDrawableItem(TModel model);
 

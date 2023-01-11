@@ -68,7 +68,7 @@ namespace osu.Game.Overlays
 
             Show();
 
-            if (user.OnlineID == Header.UserProfile.Value?.User.Id && ruleset?.MatchesOnlineID(Header.UserProfile.Value?.Ruleset) == true)
+            if (user.OnlineID == Header.User.Value?.User.Id && ruleset?.MatchesOnlineID(Header.User.Value?.Ruleset) == true)
                 return;
 
             if (sectionsContainer != null)
@@ -149,8 +149,8 @@ namespace osu.Game.Overlays
 
             var actualRuleset = rulesets.GetRuleset(ruleset?.ShortName ?? user.PlayMode).AsNonNull();
 
-            var userProfile = new UserProfile(user, actualRuleset);
-            Header.UserProfile.Value = userProfile;
+            var userProfile = new UserProfileData(user, actualRuleset);
+            Header.User.Value = userProfile;
 
             if (user.ProfileOrder != null)
             {
@@ -160,7 +160,7 @@ namespace osu.Game.Overlays
 
                     if (sec != null)
                     {
-                        sec.UserProfile.Value = userProfile;
+                        sec.User.Value = userProfile;
 
                         sectionsContainer.Add(sec);
                         tabs.AddItem(sec);

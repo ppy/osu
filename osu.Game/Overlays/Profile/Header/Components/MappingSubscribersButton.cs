@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class MappingSubscribersButton : ProfileHeaderStatisticsButton
     {
-        public readonly Bindable<UserProfile?> UserProfile = new Bindable<UserProfile?>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         public override LocalisableString TooltipText => FollowsStrings.MappingFollowers;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            UserProfile.BindValueChanged(user => SetValue(user.NewValue?.User.MappingFollowerCount ?? 0), true);
+            User.BindValueChanged(user => SetValue(user.NewValue?.User.MappingFollowerCount ?? 0), true);
         }
     }
 }
