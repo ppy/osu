@@ -1,0 +1,106 @@
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets;
+using osuTK;
+
+namespace osu.Game.Overlays.Profile.Header.Components
+{
+    public partial class GroupBadge : Container, IHasTooltip
+    {
+        public LocalisableString TooltipText { get; }
+
+        public int TextSize { get; set; } = 12;
+
+        private readonly APIUserGroup group;
+
+        public GroupBadge(APIUserGroup group)
+        {
+            this.group = group;
+
+            AutoSizeAxes = Axes.Both;
+            Masking = true;
+            CornerRadius = 8;
+
+            TooltipText = group.Name;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider? colourProvider, RulesetStore rulesets)
+        {
+            FillFlowContainer innerContainer;
+
+            AddRangeInternal(new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider?.Background6 ?? Colour4.Black
+                },
+                innerContainer = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Padding = new MarginPadding { Vertical = 2, Horizontal = 10 },
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(5),
+                    Children = new[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = group.ShortName,
+                            Colour = Color4Extensions.FromHex(group.Colour),
+                            Shadow = false,
+                            Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true)
+                        }
+                    }
+                }
+            });
+
+            if (group.Playmodes?.Length > 0)
+            {
+                innerContainer.AddRange(group.Playmodes.Select(p =>
+                        (rulesets.GetRuleset(p)?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }).With(icon =>
+                        {
+                            icon.Size = new Vector2(TextSize - 1);
+                        })).ToList()
+                );
+            }
+        }
+    }
+
+    public partial class GroupInfoContainer : FillFlowContainer
+    {
+        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
+
+        public GroupInfoContainer()
+        {
+            AutoSizeAxes = Axes.Both;
+            Direction = FillDirection.Horizontal;
+            Spacing = new Vector2(2);
+
+            User.BindValueChanged(val =>
+            {
+                if (val.NewValue?.Groups?.Length > 0)
+                {
+                    Clear(true);
+                    Children = val.NewValue?.Groups.Select(g => new GroupBadge(g)).ToList();
+                }
+            });
+        }
+    }
+}
