@@ -822,7 +822,7 @@ namespace osu.Game.Online.Multiplayer
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    tcs.SetCanceled();
+                    tcs.SetCanceled(cancellationToken);
                     return;
                 }
 

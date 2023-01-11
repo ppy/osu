@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Bindables;
 using osuTK;
 using osu.Framework.Graphics;
@@ -16,15 +14,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Resources.Localisation.Web;
 using osu.Framework.Localisation;
-using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public partial class KudosuInfo : Container
     {
-        private readonly Bindable<APIUser> user = new Bindable<APIUser>();
+        private readonly Bindable<UserProfileData?> user = new Bindable<UserProfileData?>();
 
-        public KudosuInfo(Bindable<APIUser> user)
+        public KudosuInfo(Bindable<UserProfileData?> user)
         {
             this.user.BindTo(user);
             CountSection total;
@@ -34,7 +31,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             CornerRadius = 3;
             Child = total = new CountTotal();
 
-            this.user.ValueChanged += u => total.Count = u.NewValue?.Kudosu.Total ?? 0;
+            this.user.ValueChanged += u => total.Count = u.NewValue?.User.Kudosu.Total ?? 0;
         }
 
         protected override bool OnClick(ClickEvent e) => true;

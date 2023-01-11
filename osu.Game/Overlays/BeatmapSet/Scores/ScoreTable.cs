@@ -95,8 +95,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersScore, Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, minSize: 60, maxSize: 70)),
                 new TableColumn("", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 25)), // flag
-                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersPlayer, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 125)),
-                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 120))
+                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersPlayer, Anchor.CentreLeft, new Dimension(minSize: 125)),
+                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, Anchor.CentreLeft, new Dimension(minSize: 70, maxSize: 120))
             };
 
             // All statistics across all scores, unordered.
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 var displayName = ruleset.GetDisplayNameForHitResult(result);
 
-                columns.Add(new TableColumn(displayName, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
+                columns.Add(new TableColumn(displayName, Anchor.CentreLeft, new Dimension(minSize: 35, maxSize: 60)));
                 statisticResultTypes.Add((result, displayName));
             }
 
