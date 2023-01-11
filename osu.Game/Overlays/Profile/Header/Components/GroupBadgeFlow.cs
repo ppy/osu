@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 Clear(true);
 
-                if (user.NewValue != null)
+                if (user.NewValue?.Groups != null)
                     AddRange(user.NewValue.Groups.Select(g => new GroupBadge(g)));
             });
         }
