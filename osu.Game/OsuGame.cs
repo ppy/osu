@@ -46,6 +46,7 @@ using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
@@ -306,6 +307,13 @@ namespace osu.Game
             // Transfer any runtime changes back to configuration file.
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
 
+            LocalUserPlaying.BindValueChanged(p =>
+            {
+                BeatmapManager.PauseImports = p.NewValue;
+                SkinManager.PauseImports = p.NewValue;
+                ScoreManager.PauseImports = p.NewValue;
+            }, true);
+
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
 
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
@@ -353,7 +361,18 @@ namespace osu.Game
                     break;
 
                 case LinkAction.SearchBeatmapSet:
-                    SearchBeatmapSet(argString);
+                    if (link.Argument is RomanisableString romanisable)
+                        SearchBeatmapSet(romanisable.GetPreferred(Localisation.CurrentParameters.Value.PreferOriginalScript));
+                    else
+                        SearchBeatmapSet(argString);
+                    break;
+
+                case LinkAction.FilterBeatmapSetGenre:
+                    FilterBeatmapSetGenre((SearchGenre)link.Argument);
+                    break;
+
+                case LinkAction.FilterBeatmapSetLanguage:
+                    FilterBeatmapSetLanguage((SearchLanguage)link.Argument);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -459,6 +478,10 @@ namespace osu.Game
         /// </summary>
         /// <param name="query">The query to search for.</param>
         public void SearchBeatmapSet(string query) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithSearch(query));
+
+        public void FilterBeatmapSetGenre(SearchGenre genre) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithGenreFilter(genre));
+
+        public void FilterBeatmapSetLanguage(SearchLanguage language) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithLanguageFilter(language));
 
         /// <summary>
         /// Show a wiki's page as an overlay
@@ -723,7 +746,7 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            var languages = Enum.GetValues(typeof(Language)).OfType<Language>();
+            var languages = Enum.GetValues<Language>();
 
             var mappings = languages.Select(language =>
             {

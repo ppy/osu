@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -24,11 +23,11 @@ namespace osu.Game.Overlays
 {
     public partial class UserProfileOverlay : FullscreenOverlay<ProfileHeader>
     {
-        private ProfileSection lastSection;
-        private ProfileSection[] sections;
-        private GetUserRequest userReq;
-        private ProfileSectionsContainer sectionsContainer;
-        private ProfileSectionTabControl tabs;
+        private ProfileSection? lastSection;
+        private ProfileSection[]? sections;
+        private GetUserRequest? userReq;
+        private ProfileSectionsContainer? sectionsContainer;
+        private ProfileSectionTabControl? tabs;
 
         public const float CONTENT_X_MARGIN = 70;
 
@@ -48,7 +47,7 @@ namespace osu.Game.Overlays
 
             Show();
 
-            if (user.OnlineID == Header?.User.Value?.Id)
+            if (user.OnlineID == Header?.User.Value?.User.Id)
                 return;
 
             if (sectionsContainer != null)
@@ -117,15 +116,6 @@ namespace osu.Game.Overlays
 
             sectionsContainer.ScrollToTop();
 
-            // Check arbitrarily whether this user has already been populated.
-            // This is only generally used by tests, but should be quite safe unless we want to force a refresh on loading a previous user in the future.
-            if (user is APIUser apiUser && apiUser.JoinDate != default)
-            {
-                userReq = null;
-                userLoadComplete(apiUser);
-                return;
-            }
-
             userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID) : new GetUserRequest(user.Username);
             userReq.Success += userLoadComplete;
             API.Queue(userReq);
@@ -133,7 +123,10 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(APIUser user)
         {
-            Header.User.Value = user;
+            Debug.Assert(sections != null && sectionsContainer != null && tabs != null);
+
+            var userProfile = new UserProfileData(user);
+            Header.User.Value = userProfile;
 
             if (user.ProfileOrder != null)
             {
@@ -143,7 +136,7 @@ namespace osu.Game.Overlays
 
                     if (sec != null)
                     {
-                        sec.User.Value = user;
+                        sec.User.Value = userProfile;
 
                         sectionsContainer.Add(sec);
                         tabs.AddItem(sec);

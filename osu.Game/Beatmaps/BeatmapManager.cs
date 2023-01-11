@@ -44,6 +44,16 @@ namespace osu.Game.Beatmaps
 
         public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
 
+        public override bool PauseImports
+        {
+            get => base.PauseImports;
+            set
+            {
+                base.PauseImports = value;
+                beatmapImporter.PauseImports = value;
+            }
+        }
+
         public BeatmapManager(Storage storage, RealmAccess realm, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
                               WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
             : base(storage, realm)
@@ -458,7 +468,8 @@ namespace osu.Game.Beatmaps
 
         public Task Import(ImportTask[] tasks, ImportParameters parameters = default) => beatmapImporter.Import(tasks, parameters);
 
-        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) => beatmapImporter.Import(notification, tasks, parameters);
+        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) =>
+            beatmapImporter.Import(notification, tasks, parameters);
 
         public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
             beatmapImporter.Import(task, parameters, cancellationToken);
