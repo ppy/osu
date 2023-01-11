@@ -1,9 +1,8 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -74,33 +73,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
             if (group.Playmodes?.Length > 0)
             {
                 innerContainer.AddRange(group.Playmodes.Select(p =>
-                        (rulesets.GetRuleset(p)?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }).With(icon =>
+                        (rulesets.GetRuleset((string)p)?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }).With(icon =>
                         {
                             icon.Size = new Vector2(TextSize - 1);
                         })).ToList()
                 );
             }
-        }
-    }
-
-    public partial class GroupInfoContainer : FillFlowContainer
-    {
-        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
-
-        public GroupInfoContainer()
-        {
-            AutoSizeAxes = Axes.Both;
-            Direction = FillDirection.Horizontal;
-            Spacing = new Vector2(2);
-
-            User.BindValueChanged(val =>
-            {
-                if (val.NewValue?.Groups?.Length > 0)
-                {
-                    Clear(true);
-                    Children = val.NewValue?.Groups.Select(g => new GroupBadge(g)).ToList();
-                }
-            });
         }
     }
 }
