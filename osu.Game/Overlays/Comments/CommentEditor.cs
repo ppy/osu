@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             Name = @"Footer",
                             RelativeSizeAxes = Axes.X,
-                            Height = 40,
+                            Height = 35,
                             Padding = new MarginPadding { Horizontal = side_padding },
                             Children = new Drawable[]
                             {
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Comments
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                                     Text = FooterText
                                 },
                                 new FillFlowContainer
@@ -113,13 +113,9 @@ namespace osu.Game.Overlays.Comments
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(5, 0),
-                                            Child = commitButton = new RoundedButton
+                                            Child = commitButton = new EditorButton
                                             {
-                                                Width = 100,
-                                                Height = 30,
                                                 Text = CommitButtonText,
-                                                Anchor = Anchor.CentreRight,
-                                                Origin = Anchor.CentreRight,
                                                 Action = () => OnCommit(Current.Value)
                                             }
                                         },
@@ -183,6 +179,24 @@ namespace osu.Game.Overlays.Comments
                 AutoSizeAxes = Axes.Both,
                 Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) }
             };
+        }
+
+        protected partial class EditorButton : RoundedButton
+        {
+            public EditorButton()
+            {
+                Width = 80;
+                Height = 25;
+                Anchor = Anchor.CentreRight;
+                Origin = Anchor.CentreRight;
+            }
+
+            protected override SpriteText CreateText()
+            {
+                var t = base.CreateText();
+                t.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12);
+                return t;
+            }
         }
     }
 }
