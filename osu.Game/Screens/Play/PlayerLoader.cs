@@ -16,6 +16,7 @@ using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Audio.Effects;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -128,6 +129,8 @@ namespace osu.Game.Screens.Play
 
         private EpilepsyWarning? epilepsyWarning;
 
+        private LovedWarning? lovedWarning;
+
         private bool quickRestart;
 
         [Resolved(CanBeNull = true)]
@@ -204,6 +207,15 @@ namespace osu.Game.Screens.Play
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                });
+            }
+
+            if (Beatmap.Value.BeatmapInfo.Status == BeatmapOnlineStatus.Loved)
+            {
+                AddInternal(lovedWarning = new LovedWarning
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
                 });
             }
         }
@@ -481,7 +493,35 @@ namespace osu.Game.Screens.Play
                 else
                 {
                     // This goes hand-in-hand with the restoration of low pass filter in contentOut().
-                    this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
+                    // Fade out the volume only if lovedWarning isnt created to prevent epilepsyWarning from fading out music and lovedWarning fading the music back in and then out again
+                    if (lovedWarning?.IsAlive == false)
+                    {
+                        this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
+                    }
+                }
+
+                if (lovedWarning?.IsAlive == true)
+                {
+                    const double loved_display_length = 3000;
+
+                    pushSequence
+                        .Delay(CONTENT_OUT_DURATION)
+                        .Schedule(() => lovedWarning.State.Value = Visibility.Visible)
+                        .TransformBindableTo(volumeAdjustment, 0.25, LovedWarning.FADE_DURATION, Easing.OutQuint)
+                        .Delay(loved_display_length)
+                        .Schedule(() =>
+                        {
+                            lovedWarning.Hide();
+                            lovedWarning.Expire();
+                        })
+                        .Delay(LovedWarning.FADE_DURATION);
+                }
+                else
+                {
+                    // This goes hand-in-hand with the restoration of low pass filter in contentOut().
+                    {
+                        this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
+                    }
                 }
 
                 pushSequence.Schedule(() =>
