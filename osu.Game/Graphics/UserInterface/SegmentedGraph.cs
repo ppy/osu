@@ -24,12 +24,15 @@ namespace osu.Game.Graphics.UserInterface
         private int[] tiers = Array.Empty<int>();
         private readonly SegmentManager segments;
 
-        private readonly int tierCount;
+        private int tierCount;
 
-        public SegmentedGraph(int tierCount)
+        public SegmentedGraph(int tierCount = 1)
         {
             this.tierCount = tierCount;
-            tierColours = new Colour4[tierCount];
+            tierColours = new[]
+            {
+                new Colour4(0, 0, 0, 0)
+            };
             segments = new SegmentManager(tierCount);
         }
 
@@ -55,25 +58,8 @@ namespace osu.Game.Graphics.UserInterface
                 if (value.Length == 0 || value == tierColours)
                     return;
 
-                if (value.Length == tierCount)
-                {
-                    tierColours = value;
-                }
-                else if (value.Length < tierCount)
-                {
-                    var colourList = new List<Colour4>(value);
-
-                    for (int i = value.Length; i < tierCount; i++)
-                    {
-                        colourList.Add(value.Last());
-                    }
-
-                    tierColours = colourList.ToArray();
-                }
-                else
-                {
-                    tierColours = value[..tierCount];
-                }
+                tierCount = value.Length;
+                tierColours = value;
 
                 graphNeedsUpdate = true;
             }

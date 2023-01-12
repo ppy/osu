@@ -52,6 +52,28 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("beatmap density with granularity of 200", () => beatmapDensity());
             AddStep("beatmap density with granularity of 300", () => beatmapDensity(300));
             AddStep("reversed values from 1-10", () => graph.Values = Enumerable.Range(1, 10).Reverse().ToArray());
+            AddStep("change colour", () =>
+            {
+                graph.TierColours = new[]
+                {
+                    Colour4.White,
+                    Colour4.LightBlue,
+                    Colour4.Aqua,
+                    Colour4.Blue
+                };
+            });
+            AddStep("reset colour", () =>
+            {
+                graph.TierColours = new[]
+                {
+                    Colour4.Red,
+                    Colour4.OrangeRed,
+                    Colour4.Orange,
+                    Colour4.Yellow,
+                    Colour4.YellowGreen,
+                    Colour4.Green
+                };
+            });
         }
 
         private void sinFunction(int size = 100)
