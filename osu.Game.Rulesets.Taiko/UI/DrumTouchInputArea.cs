@@ -35,10 +35,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private Container mainContent = null!;
 
-        private QuarterCircle leftCentre = null!;
-        private QuarterCircle rightCentre = null!;
-        private QuarterCircle leftRim = null!;
-        private QuarterCircle rightRim = null!;
+        private DrumSegment leftCentre = null!;
+        private DrumSegment rightCentre = null!;
+        private DrumSegment leftRim = null!;
+        private DrumSegment rightRim = null!;
 
         private readonly Bindable<TaikoTouchControlScheme> configTouchControlScheme = new Bindable<TaikoTouchControlScheme>();
 
@@ -99,27 +99,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(getDrumSegmentProperties(0))
+                                leftRim = new DrumSegment(getDrumSegmentProperties(0))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                leftCentre = new QuarterCircle(getDrumSegmentProperties(1))
+                                leftCentre = new DrumSegment(getDrumSegmentProperties(1))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightRim = new QuarterCircle(getDrumSegmentProperties(3))
+                                rightRim = new DrumSegment(getDrumSegmentProperties(3))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                rightCentre = new QuarterCircle(getDrumSegmentProperties(2))
+                                rightCentre = new DrumSegment(getDrumSegmentProperties(2))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
             throw new ArgumentOutOfRangeException();
         }
-        private partial class QuarterCircle : CompositeDrawable, IKeyBindingHandler<TaikoAction>
+        private partial class DrumSegment : CompositeDrawable, IKeyBindingHandler<TaikoAction>
         {
             private TaikoAction handledAction;
 
@@ -253,7 +253,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             public override bool Contains(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
 
-            public QuarterCircle(DrumSegmentProperties properties)
+            public DrumSegment(DrumSegmentProperties properties)
             {
                 handledAction = properties.TaikoAction;
 
