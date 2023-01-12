@@ -206,7 +206,7 @@ namespace osu.Game
         /// </summary>
         private readonly FramedBeatmapClock beatmapClock = new FramedBeatmapClock(true);
 
-        protected override Container<Drawable> Content => content ?? base.Content;
+        protected override Container<Drawable> Content => content;
 
         private Container content;
 
@@ -296,7 +296,7 @@ namespace osu.Game
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
 
             // Add after all the above cache operations as it depends on them.
-            Add(difficultyCache);
+            base.Content.Add(difficultyCache);
 
             // TODO: OsuGame or OsuGameBase?
             dependencies.CacheAs(beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage));
@@ -305,19 +305,19 @@ namespace osu.Game
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
             dependencies.CacheAs(soloStatisticsWatcher = new SoloStatisticsWatcher());
 
-            Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
+            base.Content.Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
             BeatmapManager.ProcessBeatmap = args => beatmapUpdater.Process(args.beatmapSet, !args.isBatch);
 
             dependencies.Cache(userCache = new UserLookupCache());
-            Add(userCache);
+            base.Content.Add(userCache);
 
             dependencies.Cache(beatmapCache = new BeatmapLookupCache());
-            Add(beatmapCache);
+            base.Content.Add(beatmapCache);
 
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
-            Add(scorePerformanceManager);
+            base.Content.Add(scorePerformanceManager);
 
             dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
@@ -344,28 +344,28 @@ namespace osu.Game
 
             // add api components to hierarchy.
             if (API is APIAccess apiAccess)
-                Add(apiAccess);
+                base.Content.Add(apiAccess);
 
-            Add(spectatorClient);
-            Add(MultiplayerClient);
-            Add(metadataClient);
-            Add(soloStatisticsWatcher);
+            base.Content.Add(spectatorClient);
+            base.Content.Add(MultiplayerClient);
+            base.Content.Add(metadataClient);
+            base.Content.Add(soloStatisticsWatcher);
 
-            Add(rulesetConfigCache);
+            base.Content.Add(rulesetConfigCache);
 
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
-            Add(previewTrackManager);
+            base.Content.Add(previewTrackManager);
 
-            Add(MusicController = new MusicController());
+            base.Content.Add(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);
 
             MusicController.TrackChanged += onTrackChanged;
-            Add(beatmapClock);
+            base.Content.Add(beatmapClock);
 
             GlobalActionContainer globalBindings;
 
-            Add(SafeAreaContainer = new SafeAreaContainer
+            base.Content.Add(SafeAreaContainer = new SafeAreaContainer
             {
                 SafeAreaOverrideEdges = SafeAreaOverrideEdges,
                 RelativeSizeAxes = Axes.Both,
@@ -374,16 +374,14 @@ namespace osu.Game
                     (GlobalCursorDisplay = new GlobalCursorDisplay
                     {
                         RelativeSizeAxes = Axes.Both
+                    }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
+                    {
+                        RelativeSizeAxes = Axes.Both
                     }),
                     // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
                     globalBindings = new GlobalActionContainer(this)
                 })
             });
-
-            GlobalCursorDisplay.Child = content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
-            {
-                RelativeSizeAxes = Axes.Both
-            };
 
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
