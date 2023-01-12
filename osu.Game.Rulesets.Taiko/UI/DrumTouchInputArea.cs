@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     public partial class DrumTouchInputArea : VisibilityContainer
     {
         public TaikoTouchControlScheme? ForceControlScheme { get; set; }
+
         // visibility state affects our child. we always want to handle input.
         public override bool PropagatePositionalInputSubTree => true;
         public override bool PropagateNonPositionalInputSubTree => true;
@@ -62,10 +63,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             var taikoAction = getTaikoActionFromDrumSegment(drumSegment);
             return new DrumSegmentProperties(taikoAction, getColourFromTaikoAction(taikoAction));
         }
+
         [BackgroundDependencyLoader]
         private void load(TaikoInputManager taikoInputManager, TaikoRulesetConfigManager config)
         {
             Debug.Assert(taikoInputManager.KeyBindingContainer != null);
+
             keyBindingContainer = taikoInputManager.KeyBindingContainer;
 
             // Container should handle input everywhere.
@@ -187,14 +190,14 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             Show();
 
-            TaikoAction TaikoAction = getTaikoActionFromPosition(position);
+            TaikoAction taikoAction = getTaikoActionFromPosition(position);
 
             // Not too sure how this can happen, but let's avoid throwing.
             if (trackedActions.ContainsKey(source))
                 return;
 
-            trackedActions.Add(source, TaikoAction);
-            keyBindingContainer.TriggerPressed(TaikoAction);
+            trackedActions.Add(source, taikoAction);
+            keyBindingContainer.TriggerPressed(taikoAction);
         }
 
         private void handleUp(object source)
@@ -236,20 +239,25 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case TaikoAction.LeftRim:
                 case TaikoAction.RightRim:
+
                     return colours.Blue;
+
                 case TaikoAction.LeftCentre:
                 case TaikoAction.RightCentre:
+
                     return colours.Red;
             }
+
             throw new ArgumentOutOfRangeException();
         }
+
         private partial class DrumSegment : CompositeDrawable, IKeyBindingHandler<TaikoAction>
         {
             private TaikoAction handledAction;
 
-            private Circle overlay;
+            private readonly Circle overlay;
 
-            private Circle circle;
+            private readonly Circle circle;
 
             public override bool Contains(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
 
