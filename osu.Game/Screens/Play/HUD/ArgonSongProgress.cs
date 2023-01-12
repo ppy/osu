@@ -54,8 +54,6 @@ namespace osu.Game.Screens.Play.HUD
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
-                    Masking = true,
-                    CornerRadius = 5,
                 },
                 bar = new ArgonSongProgressBar(bar_height)
                 {
