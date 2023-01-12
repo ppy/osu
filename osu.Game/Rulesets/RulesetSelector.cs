@@ -16,11 +16,23 @@ namespace osu.Game.Rulesets
 
         protected override Dropdown<RulesetInfo> CreateDropdown() => null;
 
+        private readonly bool legacyOnly;
+
+        public RulesetSelector(bool legacyOnly = false)
+        {
+            this.legacyOnly = legacyOnly;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
             foreach (var ruleset in Rulesets.AvailableRulesets)
             {
+                int id = ruleset.OnlineID;
+
+                if ((id < 0 || id > 3) && legacyOnly)
+                    continue;
+
                 try
                 {
                     AddItem(ruleset);

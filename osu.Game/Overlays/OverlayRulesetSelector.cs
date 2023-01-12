@@ -14,6 +14,7 @@ namespace osu.Game.Overlays
     public partial class OverlayRulesetSelector : RulesetSelector
     {
         public OverlayRulesetSelector()
+            : base(true)
         {
             AutoSizeAxes = Axes.Both;
         }
