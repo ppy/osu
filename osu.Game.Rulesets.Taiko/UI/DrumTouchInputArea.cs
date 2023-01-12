@@ -57,7 +57,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             const float centre_region = 0.80f;
 
             if (ForceControlScheme == null)
+            {
                 config.BindWith(TaikoRulesetSetting.TouchControlScheme, configTouchControlScheme);
+                configTouchControlScheme.ValueChanged += reloadTouchDrums;
+            }
             else
                 configTouchControlScheme.Value = ForceControlScheme.Value;
 
@@ -225,11 +228,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
         private partial class QuarterCircle : CompositeDrawable, IKeyBindingHandler<TaikoAction>
         {
-            private readonly Circle overlay;
+            private TaikoAction handledAction;
 
-            private readonly TaikoAction handledAction;
+            private Circle overlay;
 
-            private readonly Circle circle;
+            private Circle circle;
 
             public override bool Contains(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
 
@@ -280,6 +283,22 @@ namespace osu.Game.Rulesets.Taiko.UI
                 if (e.Action == handledAction)
                     overlay.FadeOut(1000, Easing.OutQuint);
             }
+
+            public void ReloadDrumSegmentProperties(TaikoAction handledAction, Color4 colour)
+            {
+                this.handledAction = handledAction;
+
+                circle.Colour = colour.Multiply(1.4f).Darken(2.8f);
+                overlay.Colour = colour;
+            }
+        }
+
+        private void reloadTouchDrums(object _)
+        {
+            leftRim.ReloadDrumSegmentProperties(getTaikoActionFromDrumSegment(0), getColourFromTaikoAction(getTaikoActionFromDrumSegment(0)));
+            leftCentre.ReloadDrumSegmentProperties(getTaikoActionFromDrumSegment(1), getColourFromTaikoAction(getTaikoActionFromDrumSegment(1)));
+            rightRim.ReloadDrumSegmentProperties(getTaikoActionFromDrumSegment(3), getColourFromTaikoAction(getTaikoActionFromDrumSegment(3)));
+            rightCentre.ReloadDrumSegmentProperties(getTaikoActionFromDrumSegment(2), getColourFromTaikoAction(getTaikoActionFromDrumSegment(2)));
         }
     }
 }
