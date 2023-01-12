@@ -14,13 +14,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         private DrumTouchInputArea drumTouchInputArea = null!;
 
-        private void createDrum(TaikoTouchControlScheme _forcedControlScheme)
+        private void createDrum(TaikoTouchControlScheme forcedControlScheme)
         {
             Child = new TaikoInputManager(new TaikoRuleset().RulesetInfo)
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
-    {
+                {
                     new InputDrum
                     {
                         Anchor = Anchor.TopCentre,
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        ForceControlScheme = _forcedControlScheme
+                        ForceControlScheme = forcedControlScheme
                     }
                 }
             };
