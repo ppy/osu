@@ -143,18 +143,35 @@ namespace osu.Game.Skinning.Components
                 //see above
                 updateLabel();
             });
-            IBindable<StarDifficulty?>? bindable = null;
+            Lazy<Task<IBindable<StarDifficulty?>>>? starRating = null;
             workingBeatmap.BindValueChanged(_ =>
             {
-                bindable?.UnbindAll();
-                bindable = null;
-                Lazy<Task<IBindable<StarDifficulty?>>> starRating = new Lazy<Task<IBindable<StarDifficulty?>>>(() => Task.Run(() => bindable = difficultyCache.GetBindableDifficulty(workingBeatmap.Value.BeatmapInfo)));
+                if (starRating is not null && starRating.IsValueCreated && starRating.Value.IsCompleted)
+                    starRating.Value.GetResultSafely().UnbindAll();
+                starRating = new Lazy<Task<IBindable<StarDifficulty?>>>(() => Task.Run(() => difficultyCache.GetBindableDifficulty(workingBeatmap.Value.BeatmapInfo)));
                 //populates CS, HP, OD, AR
                 modAction();
 
                 values[BeatmapAttribute.StarRating] = new Lazy<Task<LocalisableString>>(async () =>
                 {
-                    IBindable<StarDifficulty?> starDifficulty = await starRating.Value.ConfigureAwait(false);
+                    IBindable<StarDifficulty?> starDifficulty;
+
+                    if (!starRating.Value.IsCompleted)
+                    {
+                        starDifficulty = await starRating.Value.ConfigureAwait(false);
+                        starDifficulty.BindValueChanged(_ =>
+                        {
+                            //we actively need to check here. If we don't we always display old values.
+                            //If the Template or Attribute changes, we don't care. We call UpdateLabel there too, so it has the same effect.
+                            if (Template.Value.Contains($"{{{BeatmapAttribute.StarRating}}}") || (Template.Value.Contains(@"{Value}") && Attribute.Value == BeatmapAttribute.StarRating)) Schedule(updateLabel);
+
+                            values[BeatmapAttribute.StarRating] = new Lazy<Task<LocalisableString>>(
+                                () => Task.FromResult(starDifficulty.Value?.Stars.ToLocalisableString(@"F2") ?? workingBeatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2"))
+                            );
+                        });
+                    }
+                    else starDifficulty = starRating.Value.GetResultSafely();
+
                     //Whilst the starRating is not calculated yet, we just use the default StarDifficulty from the beatmap (which does have a default).
                     return starDifficulty.Value?.Stars.ToLocalisableString(@"F2") ?? workingBeatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
                 });
