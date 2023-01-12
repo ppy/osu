@@ -10,7 +10,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osuTK;
-using Vector4 = System.Numerics.Vector4;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -22,7 +21,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             Children = new Drawable[]
             {
-                graph = new SegmentedGraph<int>(10)
+                graph = new SegmentedGraph<int>(6)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -31,11 +30,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
             };
 
-            for (int i = 0; i < graph.TierColours.Length; i++)
+            graph.TierColours = new[]
             {
-                graph.TierColours[i] =
-                    new Colour4(Vector4.Lerp(Colour4.Blue.Vector, Colour4.White.Vector, i * 1f / (graph.TierColours.Length - 1)));
-            }
+                Colour4.Red,
+                Colour4.OrangeRed,
+                Colour4.Orange,
+                Colour4.Yellow,
+                Colour4.YellowGreen,
+                Colour4.Green
+            };
 
             AddStep("values from 1-10", () => graph.Values = Enumerable.Range(1, 10).ToArray());
             AddStep("values from 1-100", () => graph.Values = Enumerable.Range(1, 100).ToArray());

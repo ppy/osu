@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.UserInterface
         public SegmentedGraph(int tierCount)
         {
             this.tierCount = tierCount;
-            TierColours = new Colour4[tierCount];
+            tierColours = new Colour4[tierCount];
             segments = new SegmentManager(tierCount);
         }
 
@@ -45,7 +45,39 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public readonly Colour4[] TierColours;
+        private Colour4[] tierColours;
+
+        public Colour4[] TierColours
+        {
+            get => tierColours;
+            set
+            {
+                if (value.Length == 0 || value == tierColours)
+                    return;
+
+                if (value.Length == tierCount)
+                {
+                    tierColours = value;
+                }
+                else if (value.Length < tierCount)
+                {
+                    var colourList = new List<Colour4>(value);
+
+                    for (int i = value.Length; i < tierCount; i++)
+                    {
+                        colourList.Add(value.Last());
+                    }
+
+                    tierColours = colourList.ToArray();
+                }
+                else
+                {
+                    tierColours = value[..tierCount];
+                }
+
+                graphNeedsUpdate = true;
+            }
+        }
 
         private Texture texture = null!;
         private IShader shader = null!;
@@ -136,7 +168,7 @@ namespace osu.Game.Graphics.UserInterface
             segments.Sort();
         }
 
-        private Colour4 getTierColour(int tier) => tier >= 0 ? TierColours[tier] : new Colour4(0, 0, 0, 0);
+        private Colour4 getTierColour(int tier) => tier >= 0 ? tierColours[tier] : new Colour4(0, 0, 0, 0);
 
         protected override DrawNode CreateDrawNode() => new SegmentedGraphDrawNode(this);
 
