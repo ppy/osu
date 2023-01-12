@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Overlays.Profile.Header;
+using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 
@@ -34,6 +35,13 @@ namespace osu.Game.Overlays.Profile
 
             // todo: pending implementation.
             // TabControl.AddItem(LayoutStrings.HeaderUsersModding);
+
+            TabControlContainer.Add(new ProfileRulesetSelector
+            {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                User = { BindTarget = User }
+            });
 
             // Haphazardly guaranteed by OverlayHeader constructor (see CreateBackground / CreateContent).
             Debug.Assert(centreHeaderContainer != null);
