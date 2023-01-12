@@ -1,22 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class SquareNub : Container, IHasCurrentValue<bool>, IHasAccentColour
+    public partial class SquareNub : Container, IHasAccentColour
     {
         // Setting default to 30 since current use cases will be using this height
         public const float HEIGHT = 30;
@@ -25,7 +22,6 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float border_width = 3;
 
-        private readonly Box fill;
         private readonly Container main;
 
         public SquareNub()
@@ -45,10 +41,9 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.TopCentre,
                     Children = new Drawable[]
                     {
-                        fill = new Box
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
                             AlwaysPresent = true,
                         },
                     }
@@ -70,13 +65,6 @@ namespace osu.Game.Graphics.UserInterface
                 Radius = 8,
                 Roundness = 4,
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Current.BindValueChanged(onCurrentValueChanged, true);
         }
 
         private bool glowing;
@@ -103,20 +91,6 @@ namespace osu.Game.Graphics.UserInterface
                     main.FadeEdgeEffectTo(GlowColour.Opacity(0), 800, Easing.OutQuint);
                     main.FadeColour(AccentColour, 800, Easing.OutQuint);
                 }
-            }
-        }
-
-        private readonly Bindable<bool> current = new Bindable<bool>();
-
-        public Bindable<bool> Current
-        {
-            get => current;
-            set
-            {
-                ArgumentNullException.ThrowIfNull(value);
-
-                current.UnbindBindings();
-                current.BindTo(value);
             }
         }
 
@@ -158,24 +132,6 @@ namespace osu.Game.Graphics.UserInterface
                 var effect = main.EdgeEffect;
                 effect.Colour = Glowing ? value : value.Opacity(0);
                 main.EdgeEffect = effect;
-            }
-        }
-
-        private void onCurrentValueChanged(ValueChangedEvent<bool> filled)
-        {
-            const double duration = 200;
-
-            fill.FadeTo(filled.NewValue ? 1 : 0, duration, Easing.OutQuint);
-
-            if (filled.NewValue)
-            {
-                main.ResizeWidthTo(1, duration, Easing.OutElasticHalf);
-                main.TransformTo(nameof(BorderThickness), 8.5f, duration, Easing.OutElasticHalf);
-            }
-            else
-            {
-                main.ResizeWidthTo(0.75f, duration, Easing.OutQuint);
-                main.TransformTo(nameof(BorderThickness), border_width, duration, Easing.OutQuint);
             }
         }
     }

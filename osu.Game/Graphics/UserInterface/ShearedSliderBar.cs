@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
                         Child = sliderBoxes = new SliderBoxes
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 5
+                            Height = 30
                         }
                     },
                 },
@@ -104,7 +104,6 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
-                        Current = { Value = true }
                     },
                 },
                 sounds = new SliderSounds<T>(),
