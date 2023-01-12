@@ -6,6 +6,7 @@
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
+using osu.Game.Extensions;
 
 namespace osu.Game.Rulesets
 {
@@ -28,9 +29,7 @@ namespace osu.Game.Rulesets
         {
             foreach (var ruleset in Rulesets.AvailableRulesets)
             {
-                int id = ruleset.OnlineID;
-
-                if ((id < 0 || id > 3) && legacyOnly)
+                if (!ruleset.IsLegacyRuleset() && legacyOnly)
                     continue;
 
                 try
