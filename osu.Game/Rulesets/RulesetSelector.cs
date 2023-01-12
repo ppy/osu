@@ -17,19 +17,14 @@ namespace osu.Game.Rulesets
 
         protected override Dropdown<RulesetInfo> CreateDropdown() => null;
 
-        private readonly bool legacyOnly;
-
-        public RulesetSelector(bool legacyOnly = false)
-        {
-            this.legacyOnly = legacyOnly;
-        }
+        protected virtual bool LegacyOnly => false;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             foreach (var ruleset in Rulesets.AvailableRulesets)
             {
-                if (!ruleset.IsLegacyRuleset() && legacyOnly)
+                if (!ruleset.IsLegacyRuleset() && LegacyOnly)
                     continue;
 
                 try
