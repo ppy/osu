@@ -44,7 +44,9 @@ namespace osu.Game.Tests.Skins
             // Covers Argon variant of song progress bar
             "Archives/modified-argon-20221024.osk",
             // Covers TextElement and BeatmapInfoDrawable
-            "Archives/modified-default-20221102.osk"
+            "Archives/modified-default-20221102.osk",
+            // Covers BPM counter.
+            "Archives/modified-default-20221205.osk"
         };
 
         /// <summary>

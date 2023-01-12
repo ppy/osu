@@ -423,6 +423,8 @@ namespace osu.Game.Rulesets.Scoring
             score.Accuracy = Accuracy.Value;
             score.Rank = Rank.Value;
             score.HitEvents = hitEvents;
+            score.Statistics.Clear();
+            score.MaximumStatistics.Clear();
 
             foreach (var result in HitResultExtensions.ALL_TYPES)
                 score.Statistics[result] = scoreResultCounts.GetValueOrDefault(result);

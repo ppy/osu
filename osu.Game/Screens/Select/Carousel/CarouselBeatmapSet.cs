@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +31,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         public BeatmapSetInfo BeatmapSet;
 
-        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo> GetRecommendedBeatmap;
+        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo?>? GetRecommendedBeatmap;
 
         public CarouselBeatmapSet(BeatmapSetInfo beatmapSet)
         {
@@ -47,7 +45,7 @@ namespace osu.Game.Screens.Select.Carousel
                       .ForEach(AddItem);
         }
 
-        protected override CarouselItem GetNextToSelect()
+        protected override CarouselItem? GetNextToSelect()
         {
             if (LastSelected == null || LastSelected.Filtered.Value)
             {
@@ -132,8 +130,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             bool filtered = Items.All(i => i.Filtered.Value);
 
-            filtered |= criteria.Sort == SortMode.DateRanked && BeatmapSet?.DateRanked == null;
-            filtered |= criteria.Sort == SortMode.DateSubmitted && BeatmapSet?.DateSubmitted == null;
+            filtered |= criteria.Sort == SortMode.DateRanked && BeatmapSet.DateRanked == null;
+            filtered |= criteria.Sort == SortMode.DateSubmitted && BeatmapSet.DateSubmitted == null;
 
             Filtered.Value = filtered;
         }
