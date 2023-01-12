@@ -4,13 +4,11 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.Practice.PracticeOverlayComponents;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Play;
 using osuTK;
@@ -38,7 +36,7 @@ namespace osu.Game.Overlays.Practice
 
             addButtons(colour);
 
-            createHUDElements(colour);
+            createHUDElements();
         }
 
         [Resolved(CanBeNull = true)]
@@ -87,19 +85,14 @@ namespace osu.Game.Overlays.Practice
             practiceOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(PracticeOverlay);
 
             if (loader.IsFirstTry)
-            {
                 PracticeOverlay.Show();
-            }
+
             else
-            {
                 //Todo: PauseOverlay seems to be being triggered by something unduly
                 PauseOverlay.Hide();
-            }
 
             OnGameplayStarted += () =>
-            {
                 GameplayClockContainer.Delay(grace_period).Then().Schedule(() => BlockFail = false);
-            };
         }
 
         protected override void Dispose(bool isDisposing)
@@ -157,42 +150,18 @@ namespace osu.Game.Overlays.Practice
             FailOverlay.AddButton("Practice", colour.Blue, () => PracticeOverlay.Show());
         }
 
-        private void createHUDElements(OsuColour colour)
-        {
-            HUDOverlay.Add(new Container
+        private void createHUDElements() =>
+            HUDOverlay.Add(new PracticePercentageCounter(loader)
             {
+                State = { Value = Visibility.Visible },
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
 
                 //We don't want it clipping the health bars on the default skin, this offset also avoids elements on *Most* legacy skins
-                Position = new Vector2(-20, 110),
-                AutoSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = 5,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        Colour = colour.B5.Opacity(.5f),
-                        RelativeSizeAxes = Axes.Both,
-                        BypassAutoSizeAxes = Axes.Both
-                    },
-                    new OsuSpriteText
-                    {
-                        Colour = colour.YellowLight,
-                        Font = OsuFont.Torus.With(size: 20, weight: FontWeight.Bold),
-                        Padding = new MarginPadding(10),
-                        Text = $"Practicing {Math.Round(loader.CustomStart.Value * 100)}% to {Math.Round(loader.CustomEnd.Value * 100)}%"
-                    }
-                }
+                Position = new Vector2(-20, 120),
             });
-        }
 
-        protected override bool CheckModsAllowFailure()
-        {
-            if (BlockFail) return false;
-
-            return base.CheckModsAllowFailure();
-        }
+        protected override bool CheckModsAllowFailure() =>
+            !BlockFail && base.CheckModsAllowFailure();
     }
 }
