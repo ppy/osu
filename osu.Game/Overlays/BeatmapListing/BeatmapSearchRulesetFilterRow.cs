@@ -28,7 +28,14 @@ namespace osu.Game.Overlays.BeatmapListing
                 AddTabItem(new RulesetFilterTabItemAny());
 
                 foreach (var r in rulesets.AvailableRulesets)
+                {
+                    // Don't display non-legacy rulesets
+                    int id = r.OnlineID;
+                    if (id < 0 || id > 3)
+                        continue;
+
                     AddItem(r);
+                }
             }
         }
 
