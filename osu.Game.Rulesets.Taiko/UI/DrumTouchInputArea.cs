@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private QuarterCircle leftRim = null!;
         private QuarterCircle rightRim = null!;
 
-        private readonly Bindable<TaikoTouchControlScheme> configTouchControlScheme = new Bindable<TaikoTouchControlScheme>();
+        private static readonly Bindable<TaikoTouchControlScheme> configTouchControlScheme = new Bindable<TaikoTouchControlScheme>();
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -79,27 +79,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(getTaikoActionFromDrumSegment(0), getColourFromTaikoAction(getTaikoActionFromDrumSegment(0)))
+                                leftRim = new QuarterCircle(0, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                leftCentre = new QuarterCircle(getTaikoActionFromDrumSegment(1), getColourFromTaikoAction(getTaikoActionFromDrumSegment(1)))
+                                leftCentre = new QuarterCircle(1, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightRim = new QuarterCircle(getTaikoActionFromDrumSegment(3), getColourFromTaikoAction(getTaikoActionFromDrumSegment(3)))
+                                rightRim = new QuarterCircle(3, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                rightCentre = new QuarterCircle(getTaikoActionFromDrumSegment(2), getColourFromTaikoAction(getTaikoActionFromDrumSegment(2)))
+                                rightCentre = new QuarterCircle(2, colours)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             };
         }
 
-        private readonly TaikoAction[,] mappedTaikoAction =
+        private static readonly TaikoAction[,] mappedTaikoAction =
         {
             {
                 // KDDK
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         };
 
-        private TaikoAction getTaikoActionFromDrumSegment(int drumSegment)
+        private static TaikoAction getTaikoActionFromDrumSegment(int drumSegment)
         {
             return mappedTaikoAction[(int)configTouchControlScheme.Value, drumSegment];
         }
@@ -210,35 +210,34 @@ namespace osu.Game.Rulesets.Taiko.UI
             mainContent.FadeOut(300);
         }
 
-        private Color4 getColourFromTaikoAction(TaikoAction handledAction)
-        {
-            switch (handledAction)
-            {
-                case TaikoAction.LeftRim:
-                case TaikoAction.RightRim:
-                    return colours.Blue;
-                case TaikoAction.LeftCentre:
-                case TaikoAction.RightCentre:
-                    return colours.Red;
-            }
-            throw new ArgumentOutOfRangeException();
-        }
         private partial class QuarterCircle : CompositeDrawable, IKeyBindingHandler<TaikoAction>
         {
             private readonly Circle overlay;
 
-            private readonly TaikoAction handledAction;
+            private readonly int drumSegment;
+
+            private readonly TaikoAction taikoAction;
+
+            private readonly OsuColour colours;
+
+            private readonly Color4 colour;
 
             private readonly Circle circle;
 
             public override bool Contains(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
 
-            public QuarterCircle(TaikoAction handledAction, Color4 colour)
+            public QuarterCircle(int drumSegment, OsuColour colours)
             {
-                this.handledAction = handledAction;
+                this.drumSegment = drumSegment;
+                this.colours = colours;
+
                 RelativeSizeAxes = Axes.Both;
 
                 FillMode = FillMode.Fit;
+
+                taikoAction = getTaikoActionFromDrumSegment(drumSegment);
+
+                colour = getColorFromTaikoAction(taikoAction);
 
                 InternalChildren = new Drawable[]
                 {
@@ -268,16 +267,30 @@ namespace osu.Game.Rulesets.Taiko.UI
                 };
             }
 
+            private Color4 getColorFromTaikoAction(TaikoAction handledAction)
+            {
+                switch (handledAction)
+                {
+                    case TaikoAction.LeftRim:
+                    case TaikoAction.RightRim:
+                        return colours.Blue;
+                    case TaikoAction.LeftCentre:
+                    case TaikoAction.RightCentre:
+                        return colours.Red;
+                }
+                throw new ArgumentOutOfRangeException();
+            }
+
             public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
-                if (e.Action == handledAction)
+                if (e.Action == taikoAction)
                     overlay.FadeTo(1f, 80, Easing.OutQuint);
                 return false;
             }
 
             public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
             {
-                if (e.Action == handledAction)
+                if (e.Action == taikoAction)
                     overlay.FadeOut(1000, Easing.OutQuint);
             }
         }
