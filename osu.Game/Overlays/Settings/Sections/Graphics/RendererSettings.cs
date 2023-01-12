@@ -27,7 +27,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 new SettingsEnumDropdown<FrameSync>
                 {
                     LabelText = GraphicsSettingsStrings.FrameLimiter,
-                    Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync)
+                    Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync),
+                    Keywords = new[] { @"fps" },
                 },
                 new SettingsEnumDropdown<ExecutionMode>
                 {
