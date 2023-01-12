@@ -31,9 +31,9 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Vector2 sliderShear = new Vector2(4.7f / HEIGHT, 0);
 
         protected readonly SquareNub Nub;
-        private readonly SliderSounds<T> sounds;
         private readonly Container nubContainer;
         private readonly SliderBoxes sliderBoxes;
+        private readonly SliderSounds<T> sounds;
 
         public virtual LocalisableString TooltipText { get; private set; }
 
@@ -195,10 +195,7 @@ namespace osu.Game.Graphics.UserInterface
             sliderBoxes.RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding, 0, Math.Max(0, DrawWidth)), 1);
         }
 
-        protected override void UpdateValue(float value)
-        {
-            Nub.MoveToX(value, 250, Easing.OutQuint);
-        }
+        protected override void UpdateValue(float value) => Nub.MoveToX(value, 250, Easing.OutQuint);
 
         /// <summary>
         /// Removes all non-significant digits, keeping at most a requested number of decimal digits.

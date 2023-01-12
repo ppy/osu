@@ -22,14 +22,14 @@ namespace osu.Game.Graphics.UserInterface
                     EdgeSmoothness = new Vector2(0, 0.5f),
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight
                 },
                 LeftBox = new Box
                 {
                     EdgeSmoothness = new Vector2(0, 0.5f),
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft
                 }
             };
         }
