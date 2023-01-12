@@ -54,49 +54,43 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void sinFunction(int size = 100)
         {
             const int max_value = 255;
-            int[] values = new int[size];
+            graph.Values = new int[size];
 
             float step = 2 * MathF.PI / size;
             float x = 0;
 
             for (int i = 0; i < size; i++)
             {
-                values[i] = (int)(max_value * MathF.Sin(x));
+                graph.Values[i] = (int)(max_value * MathF.Sin(x));
                 x += step;
             }
-
-            graph.Values = values;
         }
 
         private void bumps(int size = 100)
         {
             const int max_value = 255;
-            int[] values = new int[size];
+            graph.Values = new int[size];
 
             float step = 2 * MathF.PI / size;
             float x = 0;
 
             for (int i = 0; i < size; i++)
             {
-                values[i] = (int)(max_value * Math.Abs(MathF.Sin(x)));
+                graph.Values[i] = (int)(max_value * Math.Abs(MathF.Sin(x)));
                 x += step;
             }
-
-            graph.Values = values;
         }
 
         private void randomValues(int size = 100)
         {
             Random rng = new Random();
 
-            int[] values = new int[size];
+            graph.Values = new int[size];
 
             for (int i = 0; i < size; i++)
             {
-                values[i] = rng.Next(255);
+                graph.Values[i] = rng.Next(255);
             }
-
-            graph.Values = values;
         }
 
         private void beatmapDensity(int granularity = 200)
@@ -106,7 +100,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             IEnumerable<HitObject> objects = beatmap.HitObjects;
 
             // Taken from SongProgressGraph
-            int[] values = new int[granularity];
+            graph.Values = new int[granularity];
 
             if (!objects.Any())
                 return;
@@ -128,10 +122,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 int startRange = (int)((h.StartTime - firstHit) / interval);
                 int endRange = (int)((endTime - firstHit) / interval);
                 for (int i = startRange; i <= endRange; i++)
-                    values[i]++;
+                    graph.Values[i]++;
             }
-
-            graph.Values = values;
         }
     }
 }
