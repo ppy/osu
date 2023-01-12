@@ -41,9 +41,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (value == values) return;
 
                 values = value;
-                recalculateTiers(values);
                 graphNeedsUpdate = true;
-                Invalidate(Invalidation.DrawNode);
             }
         }
 
@@ -65,8 +63,10 @@ namespace osu.Game.Graphics.UserInterface
 
             if (graphNeedsUpdate)
             {
+                recalculateTiers(values);
                 recalculateSegments();
                 Invalidate(Invalidation.DrawNode);
+                graphNeedsUpdate = false;
             }
         }
 
@@ -170,6 +170,11 @@ namespace osu.Game.Graphics.UserInterface
             /// The value is a normalized float (from 0 to 1).
             /// </remarks>
             public float Length => End - Start;
+
+            public override string ToString()
+            {
+                return $"({Tier}, {Start * 100}%, {End * 100}%)";
+            }
         }
 
         private class SegmentedGraphDrawNode : DrawNode
