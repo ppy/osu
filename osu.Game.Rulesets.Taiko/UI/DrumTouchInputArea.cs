@@ -45,6 +45,23 @@ namespace osu.Game.Rulesets.Taiko.UI
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        private class DrumSegmentProperties
+        {
+            public TaikoAction TaikoAction { get; set; }
+            public Color4 Color { get; set; }
+
+            public DrumSegmentProperties(TaikoAction taikoAction, Color4 color)
+            {
+                TaikoAction = taikoAction;
+                Color = color;
+            }
+        }
+
+        private DrumSegmentProperties getDrumSegmentProperties(int drumSegment)
+        {
+            var taikoAction = getTaikoActionFromDrumSegment(drumSegment);
+            return new DrumSegmentProperties(taikoAction, getColourFromTaikoAction(taikoAction));
+        }
         [BackgroundDependencyLoader]
         private void load(TaikoInputManager taikoInputManager, TaikoRulesetConfigManager config)
         {
@@ -82,27 +99,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(getTaikoActionFromDrumSegment(0), getColourFromTaikoAction(getTaikoActionFromDrumSegment(0)))
+                                leftRim = new QuarterCircle(getDrumSegmentProperties(0))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                leftCentre = new QuarterCircle(getTaikoActionFromDrumSegment(1), getColourFromTaikoAction(getTaikoActionFromDrumSegment(1)))
+                                leftCentre = new QuarterCircle(getDrumSegmentProperties(1))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightRim = new QuarterCircle(getTaikoActionFromDrumSegment(3), getColourFromTaikoAction(getTaikoActionFromDrumSegment(3)))
+                                rightRim = new QuarterCircle(getDrumSegmentProperties(3))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                rightCentre = new QuarterCircle(getTaikoActionFromDrumSegment(2), getColourFromTaikoAction(getTaikoActionFromDrumSegment(2)))
+                                rightCentre = new QuarterCircle(getDrumSegmentProperties(2))
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -236,12 +253,15 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             public override bool Contains(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
 
-            public QuarterCircle(TaikoAction handledAction, Color4 colour)
+            public QuarterCircle(DrumSegmentProperties properties)
             {
-                this.handledAction = handledAction;
+                handledAction = properties.TaikoAction;
+
                 RelativeSizeAxes = Axes.Both;
 
                 FillMode = FillMode.Fit;
+
+                var colour = properties.Color;
 
                 InternalChildren = new Drawable[]
                 {
@@ -284,9 +304,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                     overlay.FadeOut(1000, Easing.OutQuint);
             }
 
-            public void ReloadDrumSegmentProperties(TaikoAction handledAction, Color4 colour)
+            public void SetProperties(DrumSegmentProperties properties)
             {
-                this.handledAction = handledAction;
+                handledAction = properties.TaikoAction;
+
+                var colour = properties.Color;
 
                 circle.Colour = colour.Multiply(1.4f).Darken(2.8f);
                 overlay.Colour = colour;
@@ -295,10 +317,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private void reloadTouchDrums(object _)
         {
-            leftRim.ReloadDrumSegmentProperties(getTaikoActionFromDrumSegment(0), getColourFromTaikoAction(getTaikoActionFromDrumSegment(0)));
-            leftCentre.ReloadDrumSegmentProperties(getTaikoActionFromDrumSegment(1), getColourFromTaikoAction(getTaikoActionFromDrumSegment(1)));
-            rightRim.ReloadDrumSegmentProperties(getTaikoActionFromDrumSegment(3), getColourFromTaikoAction(getTaikoActionFromDrumSegment(3)));
-            rightCentre.ReloadDrumSegmentProperties(getTaikoActionFromDrumSegment(2), getColourFromTaikoAction(getTaikoActionFromDrumSegment(2)));
+            leftRim.SetProperties(getDrumSegmentProperties(0));
+            leftCentre.SetProperties(getDrumSegmentProperties(1));
+            rightRim.SetProperties(getDrumSegmentProperties(3));
+            rightCentre.SetProperties(getDrumSegmentProperties(2));
         }
     }
 }
