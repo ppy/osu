@@ -51,6 +51,31 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
             AddToggleStep("toggle visibility", visible => profile.State.Value = visible ? Visibility.Visible : Visibility.Hidden);
+            AddStep("log out", () => dummyAPI.Logout());
+            AddStep("log back in", () => dummyAPI.Login("username", "password"));
+        }
+
+        [Test]
+        public void TestLoading()
+        {
+            GetUserRequest pendingRequest = null!;
+
+            AddStep("set up request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (req is GetUserRequest getUserRequest)
+                    {
+                        pendingRequest = getUserRequest;
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+            AddWaitStep("wait some", 3);
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_USER));
         }
 
         public static readonly APIUser TEST_USER = new APIUser
@@ -103,6 +128,7 @@ namespace osu.Game.Tests.Visual.Online
             Title = "osu!volunteer",
             Colour = "ff0000",
             Achievements = Array.Empty<APIUserAchievement>(),
+            PlayMode = "osu"
         };
     }
 }
