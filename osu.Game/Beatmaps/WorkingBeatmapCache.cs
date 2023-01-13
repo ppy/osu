@@ -141,6 +141,9 @@ namespace osu.Game.Beatmaps
                 try
                 {
                     string fileStorePath = BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path);
+
+                    // TODO: check validity of file
+
                     var stream = GetStream(fileStorePath);
 
                     if (stream == null)

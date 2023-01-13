@@ -118,11 +118,18 @@ namespace osu.Game.Rulesets.Mods
             if (!(them is DifficultyBindable otherDifficultyBindable))
                 throw new InvalidOperationException($"Cannot bind to a non-{nameof(DifficultyBindable)}.");
 
+            // ensure that MaxValue and ExtendedMaxValue are copied across first before continuing.
+            // not doing so may cause the value of CurrentNumber to be truncated to 10.
+            otherDifficultyBindable.CopyTo(this);
+
+            // set up mutual binding for ExtendedLimits to correctly set the upper bound of CurrentNumber.
             ExtendedLimits.BindTarget = otherDifficultyBindable.ExtendedLimits;
 
-            // the actual values need to be copied after the max value constraints.
+            // set up mutual binding for CurrentNumber. this must happen after all of the above.
             CurrentNumber.BindTarget = otherDifficultyBindable.CurrentNumber;
 
+            // finish up the binding by setting up weak references via the base call.
+            // unfortunately this will call `.CopyTo()` again, but fixing that is problematic and messy.
             base.BindTo(them);
         }
 

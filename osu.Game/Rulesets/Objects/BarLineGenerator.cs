@@ -27,11 +27,8 @@ namespace osu.Game.Rulesets.Objects
             if (beatmap.HitObjects.Count == 0)
                 return;
 
-            HitObject firstObject = beatmap.HitObjects.First();
-            HitObject lastObject = beatmap.HitObjects.Last();
-
-            double firstHitTime = firstObject.StartTime;
-            double lastHitTime = 1 + lastObject.GetEndTime();
+            double firstHitTime = beatmap.HitObjects.First().StartTime;
+            double lastHitTime = 1 + beatmap.GetLastObjectTime();
 
             var timingPoints = beatmap.ControlPointInfo.TimingPoints;
 

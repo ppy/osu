@@ -9,7 +9,8 @@ namespace osu.Game.Online
     {
         public ProductionEndpointConfiguration()
         {
-            WebsiteRootUrl = APIEndpointUrl = @"https://osu.ppy.sh";
+            WebsiteRootUrl = @"https://osu.ppy.sh";
+            APIEndpointUrl = @"https://lazer.ppy.sh";
             APIClientSecret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
             APIClientID = "5";
             SpectatorEndpointUrl = "https://spectator.ppy.sh/spectator";
