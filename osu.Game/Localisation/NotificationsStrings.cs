@@ -32,7 +32,8 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Your battery level is low! Charge your device to prevent interruptions during gameplay."
         /// </summary>
-        public static LocalisableString LowBatteryWarning => new TranslatableString(getKey(@"low_battery_warning"), @"Your battery level is low! Charge your device to prevent interruptions during gameplay.");
+        public static LocalisableString LowBatteryWarning =>
+            new TranslatableString(getKey(@"low_battery_warning"), @"Your battery level is low! Charge your device to prevent interruptions during gameplay.");
 
         /// <summary>
         /// "Your game volume is too low to hear anything! Click here to restore it."
@@ -47,12 +48,14 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "osu! doesn&#39;t seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
         /// </summary>
-        public static LocalisableString AudioPlaybackIssue => new TranslatableString(getKey(@"audio_playback_issue"), @"osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting.");
+        public static LocalisableString AudioPlaybackIssue => new TranslatableString(getKey(@"audio_playback_issue"),
+            @"osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting.");
 
         /// <summary>
         /// "The score overlay is currently disabled. You can toggle this by pressing {0}."
         /// </summary>
-        public static LocalisableString TheScoreOverlayIsDisabled(LocalisableString arg0) => new TranslatableString(getKey(@"the_score_overlay_is_disabled"), @"The score overlay is currently disabled. You can toggle this by pressing {0}.", arg0);
+        public static LocalisableString TheScoreOverlayIsDisabled(LocalisableString arg0) => new TranslatableString(getKey(@"the_score_overlay_is_disabled"),
+            @"The score overlay is currently disabled. You can toggle this by pressing {0}.", arg0);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
