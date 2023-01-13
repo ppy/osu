@@ -209,8 +209,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                     this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
 
-                    // TODO: This "0.015" value should probably be replaced with whatever value Stable uses 
-                    MainPiece.MoveToX(-X, 0.015, Easing.None); // Visually snap hit object to hit target
+                    MainPiece.X = -X; // Visually snap hit object to hit target
 
                     this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
                         .Then()
