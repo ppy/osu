@@ -20,6 +20,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
@@ -550,7 +551,7 @@ namespace osu.Game.Screens.Play
 
             public MutedNotification()
             {
-                Text = "Your game volume is too low to hear anything! Click here to restore it.";
+                Text = NotificationsStrings.GameVolumeTooLow;
             }
 
             [BackgroundDependencyLoader]
@@ -605,7 +606,7 @@ namespace osu.Game.Screens.Play
 
             public BatteryWarningNotification()
             {
-                Text = "Your battery level is low! Charge your device to prevent interruptions during gameplay.";
+                Text = NotificationsStrings.LowBatteryWarning;
             }
 
             [BackgroundDependencyLoader]
