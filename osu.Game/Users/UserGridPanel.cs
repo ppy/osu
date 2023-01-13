@@ -196,18 +196,20 @@ namespace osu.Game.Users
 
             level.User.Value = new UserProfileData(User, ruleset.AsNonNull());
 
-            details.AddRange(new[]
+            // some API calls don't return PlayMode - we don't want to draw a ruleset icon in that case
+            if (ruleset != null)
             {
-                (ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }).With(
+                details.Add(ruleset.CreateInstance().CreateIcon().With(
                     icon =>
                     {
                         icon.Size = new Vector2(16);
                         icon.Margin = new MarginPadding { Right = 8 };
-                    }),
-                new GroupBadgeFlow
-                {
-                    User = { Value = User }
-                }
+                    }));
+            }
+
+            details.Add(new GroupBadgeFlow
+            {
+                User = { Value = User }
             });
 
             if (User.IsSupporter)
