@@ -5,16 +5,21 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
+using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -23,31 +28,47 @@ namespace osu.Game.Overlays
 {
     public partial class UserProfileOverlay : FullscreenOverlay<ProfileHeader>
     {
+        protected override Container<Drawable> Content => onlineViewContainer;
+
+        private readonly OnlineViewContainer onlineViewContainer;
+        private readonly LoadingLayer loadingLayer;
+
         private ProfileSection? lastSection;
         private ProfileSection[]? sections;
         private GetUserRequest? userReq;
         private ProfileSectionsContainer? sectionsContainer;
         private ProfileSectionTabControl? tabs;
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
         public const float CONTENT_X_MARGIN = 70;
 
         public UserProfileOverlay()
             : base(OverlayColourScheme.Pink)
         {
+            base.Content.AddRange(new Drawable[]
+            {
+                onlineViewContainer = new OnlineViewContainer($"Sign in to view the {Header.Title.Title}")
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                loadingLayer = new LoadingLayer(true)
+            });
         }
 
         protected override ProfileHeader CreateHeader() => new ProfileHeader();
 
         protected override Color4 BackgroundColour => ColourProvider.Background6;
 
-        public void ShowUser(IUser user)
+        public void ShowUser(IUser user, IRulesetInfo? ruleset = null)
         {
             if (user.OnlineID == APIUser.SYSTEM_USER_ID)
                 return;
 
             Show();
 
-            if (user.OnlineID == Header?.User.Value?.Id)
+            if (user.OnlineID == Header.User.Value?.User.Id && ruleset?.MatchesOnlineID(Header.User.Value?.Ruleset) == true)
                 return;
 
             if (sectionsContainer != null)
@@ -116,25 +137,20 @@ namespace osu.Game.Overlays
 
             sectionsContainer.ScrollToTop();
 
-            // Check arbitrarily whether this user has already been populated.
-            // This is only generally used by tests, but should be quite safe unless we want to force a refresh on loading a previous user in the future.
-            if (user is APIUser apiUser && apiUser.JoinDate != default)
-            {
-                userReq = null;
-                userLoadComplete(apiUser);
-                return;
-            }
-
-            userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID) : new GetUserRequest(user.Username);
-            userReq.Success += userLoadComplete;
+            userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID, ruleset) : new GetUserRequest(user.Username, ruleset);
+            userReq.Success += u => userLoadComplete(u, ruleset);
             API.Queue(userReq);
+            loadingLayer.Show();
         }
 
-        private void userLoadComplete(APIUser user)
+        private void userLoadComplete(APIUser user, IRulesetInfo? ruleset)
         {
             Debug.Assert(sections != null && sectionsContainer != null && tabs != null);
 
-            Header.User.Value = user;
+            var actualRuleset = rulesets.GetRuleset(ruleset?.ShortName ?? user.PlayMode).AsNonNull();
+
+            var userProfile = new UserProfileData(user, actualRuleset);
+            Header.User.Value = userProfile;
 
             if (user.ProfileOrder != null)
             {
@@ -144,13 +160,15 @@ namespace osu.Game.Overlays
 
                     if (sec != null)
                     {
-                        sec.User.Value = user;
+                        sec.User.Value = userProfile;
 
                         sectionsContainer.Add(sec);
                         tabs.AddItem(sec);
                     }
                 }
             }
+
+            loadingLayer.Hide();
         }
 
         private partial class ProfileSectionTabControl : OverlayTabControl<ProfileSection>
