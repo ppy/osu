@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
@@ -78,7 +79,7 @@ namespace osu.Game.Overlays.Login
         {
             public const float LABEL_LEFT_MARGIN = 20;
 
-            private readonly SpriteIcon statusIcon;
+            private readonly StatusIcon statusIcon;
 
             public Color4 StatusColour
             {
@@ -101,11 +102,10 @@ namespace osu.Game.Overlays.Login
                 Icon.Size = new Vector2(14);
                 Icon.Margin = new MarginPadding(0);
 
-                Foreground.Add(statusIcon = new SpriteIcon
+                Foreground.Add(statusIcon = new StatusIcon
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Icon = FontAwesome.Regular.Circle,
                     Size = new Vector2(14),
                 });
 
