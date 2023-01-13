@@ -50,10 +50,12 @@ namespace osu.Game.Skinning.Components
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
-        //idea: make this static, and also have a static instance of BeatmapAttributeText, that is allowed to modify the values.
-        //That would be the same as a cache, but without a actual [Resolved] and [Cached] attributes.
-        private static readonly Dictionary<BeatmapAttribute, Lazy<Task<LocalisableString>>> values = new Dictionary<BeatmapAttribute, Lazy<Task<LocalisableString>>>();
+        private static Dictionary<BeatmapAttribute, Lazy<Task<LocalisableString>>>? values;
 
+        //should only be accessed by modifyingInstance.
+        private static Dictionary<BeatmapAttribute, Lazy<Task<LocalisableString>>> getValue => values ??= new Dictionary<BeatmapAttribute, Lazy<Task<LocalisableString>>>();
+
+        //should only be invoked by modifyingInstance. Event handlers can be added/removed by anyone though.
         private static event Action<List<BeatmapAttribute>> valuesChanged = _ => { };
 
         //If this this stays null, even after ruleset, mods or beatmap changed, then there is no more BeatMapAttributeText in the scene.
@@ -63,10 +65,14 @@ namespace osu.Game.Skinning.Components
 
         //if modifyingInstance is the last Instance in the scene
         private static bool lastInstance = true;
+
+        //should only be accessed or modified by modifyingInstance.
         private static ModSettingChangeTracker? modSettingChangeTracker;
+
+        //should only be accessed or modified by modifyingInstance.
         private static CancellationTokenSource? preStarDifficultyCancellationSource;
 
-        //This lock is ONLY for reading/writing modfifyingInstance.
+        //This lock is ONLY for reading/writing modfifyingInstance, IF there is no modifyingInstance.
         //All of the other mutable static members can be written to by modifyingInstance.
         //modSettingChangeTracker and preStarDifficultyCancellationSource should only need to be read by modfiyingInstance.
         //values can be read by anyone. Changes are announced via valuesChanged.
@@ -76,25 +82,33 @@ namespace osu.Game.Skinning.Components
         {
             get
             {
-                //This should never block, because all updated are currently called sequentially afaik.
-                lock (modify_lock)
+                if (modifyingInstance is null)
                 {
-                    if (modifyingInstance is null)
-                    {
-                        modifyingInstance = this;
-                        //truth is, we don't know this for certain.
-                        //But it's better to be pessimistic here, because this is the first instance (of this class), that got updated (or otherwise modifyingInstance would already have been non-null).
-                        //If no more instances exist, then this guess is right.
-                        lastInstance = true;
-                    }
-                    else
-                    {
-                        //If more instances (of this class) exist they will get updated after this one, and set lastInstance to false again (the line below).
-                        lastInstance = false;
-                    }
-
-                    return modifyingInstance;
                 }
+
+                //This should never block, because all updated are currently called sequentially afaik.
+                if (modifyingInstance is null)
+                {
+                    lock (modify_lock)
+                    {
+                        //someone might have modified it in between time of check and time of use
+                        if (modifyingInstance is null)
+                        {
+                            modifyingInstance = this;
+                            //truth is, we don't know this for certain.
+                            //But it's better to be pessimistic here, because this is the first instance (of this class), that got updated (or otherwise modifyingInstance would already have been non-null).
+                            //If no more instances exist, then this guess is right.
+                            lastInstance = true;
+                        }
+                    }
+                }
+                else
+                {
+                    //If more instances (of this class) exist they will get updated after this one, and set lastInstance to false again (the line below).
+                    lastInstance = false;
+                }
+
+                return modifyingInstance;
             }
         }
 
@@ -146,6 +160,7 @@ namespace osu.Game.Skinning.Components
         {
             base.LoadComplete();
             valuesChanged += updateLabelIfNessesary;
+            Lazy<Task<IBindable<StarDifficulty?>>>? starRating = null;
 
             Attribute.BindValueChanged(_ => updateLabel());
             Template.BindValueChanged(_ => updateLabel());
@@ -162,16 +177,16 @@ namespace osu.Game.Skinning.Components
             {
                 //This is async, because who knows how long or not mod application can take.
                 Lazy<Task<BeatmapDifficulty>> difficulty = new Lazy<Task<BeatmapDifficulty>>(() => Task.Run(updateDifficulty));
-                values[BeatmapAttribute.CircleSize] = new Lazy<Task<LocalisableString>>(async () => (await difficulty.Value.ConfigureAwait(false)).CircleSize.ToLocalisableString(@"F2"));
-                values[BeatmapAttribute.HPDrain] = new Lazy<Task<LocalisableString>>(async () => (await difficulty.Value.ConfigureAwait(false)).DrainRate.ToLocalisableString(@"F2"));
-                values[BeatmapAttribute.Accuracy] = new Lazy<Task<LocalisableString>>(async () => (await difficulty.Value.ConfigureAwait(false)).OverallDifficulty.ToLocalisableString(@"F2"));
-                values[BeatmapAttribute.ApproachRate] = new Lazy<Task<LocalisableString>>(async () => (await difficulty.Value.ConfigureAwait(false)).ApproachRate.ToLocalisableString(@"F2"));
+                getValue[BeatmapAttribute.CircleSize] = new Lazy<Task<LocalisableString>>(async () => (await difficulty.Value.ConfigureAwait(false)).CircleSize.ToLocalisableString(@"F2"));
+                getValue[BeatmapAttribute.HPDrain] = new Lazy<Task<LocalisableString>>(async () => (await difficulty.Value.ConfigureAwait(false)).DrainRate.ToLocalisableString(@"F2"));
+                getValue[BeatmapAttribute.Accuracy] = new Lazy<Task<LocalisableString>>(async () => (await difficulty.Value.ConfigureAwait(false)).OverallDifficulty.ToLocalisableString(@"F2"));
+                getValue[BeatmapAttribute.ApproachRate] = new Lazy<Task<LocalisableString>>(async () => (await difficulty.Value.ConfigureAwait(false)).ApproachRate.ToLocalisableString(@"F2"));
                 //This should also be simple. Overall we don't do much, since we are not applying any mods.
                 Lazy<Task<(int, int, int, double)>> bpmAndLength = new Lazy<Task<(int, int, int, double)>>(() => Task.Run(() => workingBeatmap.Value.Beatmap.GetBPMAndLength(mods.Value.OfType<ModRateAdjust>())));
-                values[BeatmapAttribute.BPMMinimum] = new Lazy<Task<LocalisableString>>(async () => (await bpmAndLength.Value.ConfigureAwait(false)).Item1.ToLocalisableString(@"N"));
-                values[BeatmapAttribute.BPM] = new Lazy<Task<LocalisableString>>(async () => (await bpmAndLength.Value.ConfigureAwait(false)).Item2.ToLocalisableString(@"N"));
-                values[BeatmapAttribute.BPMMaximum] = new Lazy<Task<LocalisableString>>(async () => (await bpmAndLength.Value.ConfigureAwait(false)).Item3.ToLocalisableString(@"N"));
-                values[BeatmapAttribute.Length] = new Lazy<Task<LocalisableString>>(async () => TimeSpan.FromMilliseconds((await bpmAndLength.Value.ConfigureAwait(false)).Item4).ToFormattedDuration());
+                getValue[BeatmapAttribute.BPMMinimum] = new Lazy<Task<LocalisableString>>(async () => (await bpmAndLength.Value.ConfigureAwait(false)).Item1.ToLocalisableString(@"N"));
+                getValue[BeatmapAttribute.BPM] = new Lazy<Task<LocalisableString>>(async () => (await bpmAndLength.Value.ConfigureAwait(false)).Item2.ToLocalisableString(@"N"));
+                getValue[BeatmapAttribute.BPMMaximum] = new Lazy<Task<LocalisableString>>(async () => (await bpmAndLength.Value.ConfigureAwait(false)).Item3.ToLocalisableString(@"N"));
+                getValue[BeatmapAttribute.Length] = new Lazy<Task<LocalisableString>>(async () => TimeSpan.FromMilliseconds((await bpmAndLength.Value.ConfigureAwait(false)).Item4).ToFormattedDuration());
             };
             mods.BindValueChanged(_ =>
             {
@@ -212,7 +227,6 @@ namespace osu.Game.Skinning.Components
                     BeatmapAttribute.Length
                 });
             });
-            Lazy<Task<IBindable<StarDifficulty?>>>? starRating = null;
             workingBeatmap.BindValueChanged(_ =>
             {
                 if (modifyingInstanceValue != this) return;
@@ -223,7 +237,7 @@ namespace osu.Game.Skinning.Components
                 //populates CS, HP, OD, AR
                 modAction();
 
-                values[BeatmapAttribute.StarRating] = new Lazy<Task<LocalisableString>>(async () =>
+                getValue[BeatmapAttribute.StarRating] = new Lazy<Task<LocalisableString>>(async () =>
                 {
                     IBindable<StarDifficulty?> starDifficulty;
 
@@ -233,7 +247,7 @@ namespace osu.Game.Skinning.Components
                         starDifficulty.BindValueChanged(_ =>
                         {
                             valuesChanged(new List<BeatmapAttribute> { BeatmapAttribute.StarRating });
-                            values[BeatmapAttribute.StarRating] = new Lazy<Task<LocalisableString>>(
+                            getValue[BeatmapAttribute.StarRating] = new Lazy<Task<LocalisableString>>(
                                 () => Task.FromResult(starDifficulty.Value?.Stars.ToLocalisableString(@"F2") ?? workingBeatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2"))
                             );
                         });
@@ -245,23 +259,23 @@ namespace osu.Game.Skinning.Components
                 });
 
                 //These are all cheap. I will not asyncify them.
-                values[BeatmapAttribute.Title] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(new LocalisableString(workingBeatmap.Value.Metadata.Title)));
-                values[BeatmapAttribute.Artist] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(new LocalisableString(workingBeatmap.Value.Metadata.Artist)));
-                values[BeatmapAttribute.DifficultyName] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(new LocalisableString(workingBeatmap.Value.BeatmapInfo.DifficultyName)));
-                values[BeatmapAttribute.Creator] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(new LocalisableString(workingBeatmap.Value.Metadata.Author.Username)));
-                values[BeatmapAttribute.RankedStatus] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(workingBeatmap.Value.BeatmapInfo.Status.GetLocalisableDescription()));
-                values[BeatmapAttribute.PreModCircleSize] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(workingBeatmap.Value.BeatmapInfo.Difficulty.CircleSize.ToLocalisableString(@"F2")));
-                values[BeatmapAttribute.PreModHPDrain] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(workingBeatmap.Value.BeatmapInfo.Difficulty.DrainRate.ToLocalisableString(@"F2")));
-                values[BeatmapAttribute.PreModAccuracy] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(workingBeatmap.Value.BeatmapInfo.Difficulty.OverallDifficulty.ToLocalisableString(@"F2")));
-                values[BeatmapAttribute.PreModApproachRate] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(workingBeatmap.Value.BeatmapInfo.Difficulty.ApproachRate.ToLocalisableString(@"F2")));
+                getValue[BeatmapAttribute.Title] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(new LocalisableString(workingBeatmap.Value.Metadata.Title)));
+                getValue[BeatmapAttribute.Artist] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(new LocalisableString(workingBeatmap.Value.Metadata.Artist)));
+                getValue[BeatmapAttribute.DifficultyName] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(new LocalisableString(workingBeatmap.Value.BeatmapInfo.DifficultyName)));
+                getValue[BeatmapAttribute.Creator] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(new LocalisableString(workingBeatmap.Value.Metadata.Author.Username)));
+                getValue[BeatmapAttribute.RankedStatus] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(workingBeatmap.Value.BeatmapInfo.Status.GetLocalisableDescription()));
+                getValue[BeatmapAttribute.PreModCircleSize] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(workingBeatmap.Value.BeatmapInfo.Difficulty.CircleSize.ToLocalisableString(@"F2")));
+                getValue[BeatmapAttribute.PreModHPDrain] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(workingBeatmap.Value.BeatmapInfo.Difficulty.DrainRate.ToLocalisableString(@"F2")));
+                getValue[BeatmapAttribute.PreModAccuracy] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(workingBeatmap.Value.BeatmapInfo.Difficulty.OverallDifficulty.ToLocalisableString(@"F2")));
+                getValue[BeatmapAttribute.PreModApproachRate] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(workingBeatmap.Value.BeatmapInfo.Difficulty.ApproachRate.ToLocalisableString(@"F2")));
 
                 updatePreStarRating();
                 //This should also be simple. Overall we don't do much, since we are not applying any mods.
                 Lazy<(int, int, int, double)> bpmAndLength = new Lazy<(int, int, int, double)>(() => workingBeatmap.Value.Beatmap.GetBPMAndLength(Enumerable.Empty<IApplicableToRate>()));
-                values[BeatmapAttribute.PreModBPMMinimum] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(bpmAndLength.Value.Item1.ToLocalisableString(@"N")));
-                values[BeatmapAttribute.PreModBPM] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(bpmAndLength.Value.Item2.ToLocalisableString(@"N")));
-                values[BeatmapAttribute.PreModBPMMaximum] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(bpmAndLength.Value.Item3.ToLocalisableString(@"N")));
-                values[BeatmapAttribute.PreModLength] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(TimeSpan.FromMilliseconds(bpmAndLength.Value.Item4).ToFormattedDuration()));
+                getValue[BeatmapAttribute.PreModBPMMinimum] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(bpmAndLength.Value.Item1.ToLocalisableString(@"N")));
+                getValue[BeatmapAttribute.PreModBPM] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(bpmAndLength.Value.Item2.ToLocalisableString(@"N")));
+                getValue[BeatmapAttribute.PreModBPMMaximum] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(bpmAndLength.Value.Item3.ToLocalisableString(@"N")));
+                getValue[BeatmapAttribute.PreModLength] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(TimeSpan.FromMilliseconds(bpmAndLength.Value.Item4).ToFormattedDuration()));
 
                 valuesChanged(new List<BeatmapAttribute>
                 {
@@ -290,6 +304,7 @@ namespace osu.Game.Skinning.Components
                     BeatmapAttribute.PreModLength,
                 });
             }, true);
+
             Schedule(updateLabel);
         }
 
@@ -330,7 +345,7 @@ namespace osu.Game.Skinning.Components
                 return preStarRatingString;
             }
 
-            values[BeatmapAttribute.PreModStarRating] = new Lazy<Task<LocalisableString>>(updatePreStarRatingAsync());
+            getValue[BeatmapAttribute.PreModStarRating] = new Lazy<Task<LocalisableString>>(updatePreStarRatingAsync());
         }
 
         private void updateLabel()
@@ -348,37 +363,50 @@ namespace osu.Game.Skinning.Components
                 numberedTemplate = numberedTemplate.Replace($"{{{{{type}}}}}", $"{{{1 + (int)type}}}");
             }
 
-            IEnumerable<Lazy<Task<LocalisableString>>> args = values.OrderBy(pair => pair.Key)
-                                                                    .Select(pair => pair.Value);
+            IEnumerable<Lazy<Task<LocalisableString>>> args = values?.OrderBy(pair => pair.Key)
+                                                                    .Select(pair => pair.Value)
+                                                              ?? Enumerable.Empty<Lazy<Task<LocalisableString>>>();
 
             LocalisableString?[] argsArray = new LocalisableString?[enumValues.Length + 1];
 
             {
                 //This would normally be wrong, but I specifically reserve argsArray[0] for the label.
-                int i = 1;
                 var test = args.GetEnumerator();
 
-                while (test.MoveNext())
+                for (int i = 1; i < enumValues.Length + 1; i++)
                 {
-                    if (numberedTemplate.Contains($"{{{i}}}"))
+                    bool isContained = numberedTemplate.Contains($"{{{i}}}");
+
+                    if (test is null)
                     {
-                        Task<LocalisableString> task = test.Current.Value;
-
-                        //we don't want to wait on the update thread.
-                        if (task.IsCompleted)
-                            argsArray[i] = task.GetResultSafely();
-                        else
-                        {
-                            task.ContinueWithSequential(() => Schedule(updateLabel));
-                            argsArray[i] = "Computing...";
-                        }
+                        if (isContained) argsArray[i] = "null";
+                        else argsArray[i] = null;
+                        return;
                     }
-                    else argsArray[i] = null;
 
-                    i++;
+                    if (test.MoveNext())
+                    {
+                        if (isContained)
+                        {
+                            Task<LocalisableString> task = test.Current.Value;
+
+                            //we don't want to wait on the update thread.
+                            if (task.IsCompleted)
+                                argsArray[i] = task.GetResultSafely();
+                            else
+                            {
+                                task.ContinueWithSequential(() => Schedule(updateLabel));
+                                argsArray[i] = "Computing...";
+                            }
+                        }
+                        else argsArray[i] = null;
+                    }
+                    else
+                    {
+                        test.Dispose();
+                        test = null;
+                    }
                 }
-
-                test.Dispose();
             }
             argsArray[0] = label_dictionary[Attribute.Value];
 
@@ -398,19 +426,17 @@ namespace osu.Game.Skinning.Components
                 {
                     modSettingChangeTracker?.Dispose();
                     modSettingChangeTracker = null;
-                    //we might want to also dispose 'values' here, if we are really concerned about memory usage.
-                    //I will right now not do so, because I don't want to deal with a nullable dictionary type on values.
-                    //e.g. values could be null, but would then instantly get a value again, when a new instance is created.
-                    //That values pretty much has a value most of the time cannot be checked at compile time though.
-                    //So either we wrongly declare values then as not nullable, but set it to null in this case anyways (idk if that is possible)
-                    //or we ignore the nullability everytime, when we use values (which looks worse for code style imo).
+                    //we dispose 'values' here, to save memory usage.
+                    //We don't need the `values` Dictionary right now, because there will not be a instance after this is disposed.
+                    values = null;
+                    //only take care of the preStarDifficultyCancellationSource if there are no more instances, because only then are the calculations really unnessesary and unwanted.
+                    //if there are instances left, and something changes another instance will take care of disposing the cancellation source (like nothing even happened).
+                    preStarDifficultyCancellationSource?.Cancel();
+                    preStarDifficultyCancellationSource?.Dispose();
+                    preStarDifficultyCancellationSource = null;
                 }
 
-                //we do take care of the preStarDifficultyCancellationSource though, because if we didn't that might lead to unwanted & unneeded calculations.
-                //especially if the modifyingInstance was the last BeatmapAttributeDisplay.
-                preStarDifficultyCancellationSource?.Cancel();
-                preStarDifficultyCancellationSource?.Dispose();
-                preStarDifficultyCancellationSource = null;
+                //we do not need a lock here. we are the ModifyingInstance, and can relieve ourselves
                 modifyingInstance = null;
             }
         }
