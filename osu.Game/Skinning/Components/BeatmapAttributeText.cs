@@ -41,8 +41,6 @@ namespace osu.Game.Skinning.Components
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
-        private ModSettingChangeTracker? modSettingChangeTracker;
-
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
@@ -52,9 +50,53 @@ namespace osu.Game.Skinning.Components
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
-        private CancellationTokenSource? preStarDifficultyCancellationSource;
+        //idea: make this static, and also have a static instance of BeatmapAttributeText, that is allowed to modify the values.
+        //That would be the same as a cache, but without a actual [Resolved] and [Cached] attributes.
+        private static readonly Dictionary<BeatmapAttribute, Lazy<Task<LocalisableString>>> values = new Dictionary<BeatmapAttribute, Lazy<Task<LocalisableString>>>();
 
-        private readonly Dictionary<BeatmapAttribute, Lazy<Task<LocalisableString>>> values = new Dictionary<BeatmapAttribute, Lazy<Task<LocalisableString>>>();
+        private static event Action<List<BeatmapAttribute>> valuesChanged = _ => { };
+
+        //If this this stays null, even after ruleset, mods or beatmap changed, then there is no more BeatMapAttributeText in the scene.
+        //Once a new BeatmapAttributeText is added, the values will be updated because of the workingBeatmap.BindValueChanged running instantly.
+        //If this is null, and no ruleset, mod or beatmap update happens, then the values might not be updated.
+        private static BeatmapAttributeText? modifyingInstance;
+
+        //if modifyingInstance is the last Instance in the scene
+        private static bool lastInstance = true;
+        private static ModSettingChangeTracker? modSettingChangeTracker;
+        private static CancellationTokenSource? preStarDifficultyCancellationSource;
+
+        //This lock is ONLY for reading/writing modfifyingInstance.
+        //All of the other mutable static members can be written to by modifyingInstance.
+        //modSettingChangeTracker and preStarDifficultyCancellationSource should only need to be read by modfiyingInstance.
+        //values can be read by anyone. Changes are announced via valuesChanged.
+        private static readonly object modify_lock = new object();
+
+        private BeatmapAttributeText modifyingInstanceValue
+        {
+            get
+            {
+                //This should never block, because all updated are currently called sequentially afaik.
+                lock (modify_lock)
+                {
+                    if (modifyingInstance is null)
+                    {
+                        modifyingInstance = this;
+                        //truth is, we don't know this for certain.
+                        //But it's better to be pessimistic here, because this is the first instance (of this class), that got updated (or otherwise modifyingInstance would already have been non-null).
+                        //If no more instances exist, then this guess is right.
+                        lastInstance = true;
+                    }
+                    else
+                    {
+                        //If more instances (of this class) exist they will get updated after this one, and set lastInstance to false again (the line below).
+                        lastInstance = false;
+                    }
+
+                    return modifyingInstance;
+                }
+            }
+        }
 
         private static readonly ImmutableDictionary<BeatmapAttribute, LocalisableString> label_dictionary = new Dictionary<BeatmapAttribute, LocalisableString>
         {
@@ -103,15 +145,18 @@ namespace osu.Game.Skinning.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
+            valuesChanged += updateLabelIfNessesary;
 
             Attribute.BindValueChanged(_ => updateLabel());
             Template.BindValueChanged(_ => updateLabel());
             ruleset.BindValueChanged(_ =>
             {
+                if (modifyingInstanceValue != this) return;
+
                 //we only need to compute the starRating if we need it and there are mods, that could influence it.
                 updatePreStarRating();
                 //We do update the label here, so that if PreModStarRating is ever used, the task to calculate it get's started.
-                updateLabel();
+                valuesChanged(new List<BeatmapAttribute> { BeatmapAttribute.PreModStarRating });
             });
             Action modAction = () =>
             {
@@ -130,22 +175,48 @@ namespace osu.Game.Skinning.Components
             };
             mods.BindValueChanged(_ =>
             {
+                if (modifyingInstanceValue != this) return;
+
                 modSettingChangeTracker?.Dispose();
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.Value);
                 modSettingChangeTracker.SettingChanged += _ =>
                 {
+                    //we have already established here, that we are the modifying Instance, because the modifying Instance only get's changed, when the old value got disposed.
+                    //If the old value got disposed, we also dispose the modSettingChangeTracker.
                     modAction();
                     //We do update the label here, so that if CS, HP, OD, or AR is ever used, the task to calculate it get's started.
-                    updateLabel();
+                    valuesChanged(new List<BeatmapAttribute>
+                    {
+                        BeatmapAttribute.CircleSize,
+                        BeatmapAttribute.HPDrain,
+                        BeatmapAttribute.Accuracy,
+                        BeatmapAttribute.ApproachRate,
+                        BeatmapAttribute.BPMMinimum,
+                        BeatmapAttribute.BPM,
+                        BeatmapAttribute.BPMMaximum,
+                        BeatmapAttribute.Length
+                    });
                 };
 
                 modAction();
                 //see above
-                updateLabel();
+                valuesChanged(new List<BeatmapAttribute>
+                {
+                    BeatmapAttribute.CircleSize,
+                    BeatmapAttribute.HPDrain,
+                    BeatmapAttribute.Accuracy,
+                    BeatmapAttribute.ApproachRate,
+                    BeatmapAttribute.BPMMinimum,
+                    BeatmapAttribute.BPM,
+                    BeatmapAttribute.BPMMaximum,
+                    BeatmapAttribute.Length
+                });
             });
             Lazy<Task<IBindable<StarDifficulty?>>>? starRating = null;
             workingBeatmap.BindValueChanged(_ =>
             {
+                if (modifyingInstanceValue != this) return;
+
                 if (starRating is not null && starRating.IsValueCreated && starRating.Value.IsCompleted)
                     starRating.Value.GetResultSafely().UnbindAll();
                 starRating = new Lazy<Task<IBindable<StarDifficulty?>>>(() => Task.Run(() => difficultyCache.GetBindableDifficulty(workingBeatmap.Value.BeatmapInfo)));
@@ -161,10 +232,7 @@ namespace osu.Game.Skinning.Components
                         starDifficulty = await starRating.Value.ConfigureAwait(false);
                         starDifficulty.BindValueChanged(_ =>
                         {
-                            //we actively need to check here. If we don't we always display old values.
-                            //If the Template or Attribute changes, we don't care. We call UpdateLabel there too, so it has the same effect.
-                            if (Template.Value.Contains($"{{{BeatmapAttribute.StarRating}}}") || (Template.Value.Contains(@"{Value}") && Attribute.Value == BeatmapAttribute.StarRating)) Schedule(updateLabel);
-
+                            valuesChanged(new List<BeatmapAttribute> { BeatmapAttribute.StarRating });
                             values[BeatmapAttribute.StarRating] = new Lazy<Task<LocalisableString>>(
                                 () => Task.FromResult(starDifficulty.Value?.Stars.ToLocalisableString(@"F2") ?? workingBeatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2"))
                             );
@@ -195,10 +263,46 @@ namespace osu.Game.Skinning.Components
                 values[BeatmapAttribute.PreModBPMMaximum] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(bpmAndLength.Value.Item3.ToLocalisableString(@"N")));
                 values[BeatmapAttribute.PreModLength] = new Lazy<Task<LocalisableString>>(() => Task.FromResult(TimeSpan.FromMilliseconds(bpmAndLength.Value.Item4).ToFormattedDuration()));
 
-                // updateStarRating();
-
-                updateLabel();
+                valuesChanged(new List<BeatmapAttribute>
+                {
+                    BeatmapAttribute.CircleSize,
+                    BeatmapAttribute.HPDrain,
+                    BeatmapAttribute.Accuracy,
+                    BeatmapAttribute.ApproachRate,
+                    BeatmapAttribute.BPMMinimum,
+                    BeatmapAttribute.BPM,
+                    BeatmapAttribute.BPMMaximum,
+                    BeatmapAttribute.Length,
+                    BeatmapAttribute.StarRating,
+                    BeatmapAttribute.Title,
+                    BeatmapAttribute.Artist,
+                    BeatmapAttribute.DifficultyName,
+                    BeatmapAttribute.Creator,
+                    BeatmapAttribute.RankedStatus,
+                    BeatmapAttribute.PreModCircleSize,
+                    BeatmapAttribute.PreModHPDrain,
+                    BeatmapAttribute.PreModAccuracy,
+                    BeatmapAttribute.PreModApproachRate,
+                    BeatmapAttribute.PreModStarRating,
+                    BeatmapAttribute.PreModBPMMinimum,
+                    BeatmapAttribute.PreModBPM,
+                    BeatmapAttribute.PreModBPMMaximum,
+                    BeatmapAttribute.PreModLength,
+                });
             }, true);
+            Schedule(updateLabel);
+        }
+
+        private void updateLabelIfNessesary(List<BeatmapAttribute> list)
+        {
+            foreach (var entry in list)
+            {
+                if ((entry == Attribute.Value && Template.Value.Contains(@"{Value}")) || Template.Value.Contains($"{{{entry}}}"))
+                {
+                    Schedule(updateLabel);
+                    return;
+                }
+            }
         }
 
         private BeatmapDifficulty updateDifficulty()
@@ -284,7 +388,31 @@ namespace osu.Game.Skinning.Components
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            modSettingChangeTracker?.Dispose();
+            valuesChanged -= updateLabelIfNessesary;
+
+            if (modifyingInstanceValue == this)
+            {
+                //we do not dispose the modSettingChangeTracker here, so that mod changes are still tracked.
+                //otherwise, if you deleted the modifingInstance, mod setting changes would not propagate to CS, AR, HP, OD, the different BPM values and Length.
+                if (lastInstance)
+                {
+                    modSettingChangeTracker?.Dispose();
+                    modSettingChangeTracker = null;
+                    //we might want to also dispose 'values' here, if we are really concerned about memory usage.
+                    //I will right now not do so, because I don't want to deal with a nullable dictionary type on values.
+                    //e.g. values could be null, but would then instantly get a value again, when a new instance is created.
+                    //That values pretty much has a value most of the time cannot be checked at compile time though.
+                    //So either we wrongly declare values then as not nullable, but set it to null in this case anyways (idk if that is possible)
+                    //or we ignore the nullability everytime, when we use values (which looks worse for code style imo).
+                }
+
+                //we do take care of the preStarDifficultyCancellationSource though, because if we didn't that might lead to unwanted & unneeded calculations.
+                //especially if the modifyingInstance was the last BeatmapAttributeDisplay.
+                preStarDifficultyCancellationSource?.Cancel();
+                preStarDifficultyCancellationSource?.Dispose();
+                preStarDifficultyCancellationSource = null;
+                modifyingInstance = null;
+            }
         }
     }
 
