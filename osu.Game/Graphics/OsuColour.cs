@@ -156,13 +156,13 @@ namespace osu.Game.Graphics
                     return Lime1;
 
                 case ModType.Conversion:
-                    return Purple1;
+                    return Purple0;
 
                 case ModType.Fun:
-                    return Pink1;
+                    return Pink0;
 
                 case ModType.System:
-                    return Gray7;
+                    return Gray5;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(modType), modType, "Unknown mod type");
