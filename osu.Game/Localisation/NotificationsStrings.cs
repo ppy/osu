@@ -25,6 +25,11 @@ namespace osu.Game.Localisation
         public static LocalisableString RunningTasks => new TranslatableString(getKey(@"running_tasks"), @"Running Tasks");
 
         /// <summary>
+        /// "Clear All"
+        /// </summary>
+        public static LocalisableString ClearAll => new TranslatableString(getKey(@"clear_all"), @"Clear All");
+
+        /// <summary>
         /// "Cancel All"
         /// </summary>
         public static LocalisableString CancelAll => new TranslatableString(getKey(@"cancel_all"), @"Cancel All");
