@@ -79,12 +79,12 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public virtual bool AllowEditing => true;
 
-        public bool BeatmapSetsLoaded => IsLoaded && Carousel?.BeatmapSetsLoaded == true;
+        public bool BeatmapSetsLoaded => IsLoaded && Carousel.BeatmapSetsLoaded;
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
-        protected BeatmapCarousel? Carousel { get; private set; }
+        protected BeatmapCarousel Carousel { get; private set; } = null!;
 
         private ParallaxContainer wedgeBackground = null!;
 
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Select
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
-            transferRulesetValue();
+            transferRulesetValue(false);
 
             LoadComponentAsync(Carousel = new BeatmapCarousel
             {
@@ -314,10 +314,8 @@ namespace osu.Game.Screens.Select
         /// Creates the buttons to be displayed in the footer.
         /// </summary>
         /// <returns>A set of <see cref="FooterButton"/> and an optional <see cref="OverlayContainer"/> which the button opens when pressed.</returns>
-        protected virtual IEnumerable<(FooterButton, OverlayContainer?)> CreateFooterButtons()
-        {
-            Debug.Assert(Carousel != null);
-            return new (FooterButton, OverlayContainer?)[]
+        protected virtual IEnumerable<(FooterButton, OverlayContainer?)> CreateFooterButtons() =>
+            new (FooterButton, OverlayContainer?)[]
             {
                 (new FooterButtonMods { Current = Mods }, ModSelect),
                 (new FooterButtonRandom
@@ -327,7 +325,6 @@ namespace osu.Game.Screens.Select
                 }, null),
                 (beatmapOptionsButton = new FooterButtonOptions(), BeatmapOptions)
             };
-        }
 
         protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
 
@@ -336,7 +333,6 @@ namespace osu.Game.Screens.Select
             // if not the current screen, we want to get carousel in a good presentation state before displaying (resume or enter).
             bool shouldDebounce = this.IsCurrentScreen();
 
-            Debug.Assert(Carousel != null);
             Carousel.Filter(criteria, shouldDebounce);
         }
 
@@ -375,8 +371,6 @@ namespace osu.Game.Screens.Select
         /// <param name="customStartAction">An optional custom action to perform instead of <see cref="OnStart"/>.</param>
         public void FinaliseSelection(BeatmapInfo? beatmapInfo = null, RulesetInfo? ruleset = null, Action? customStartAction = null)
         {
-            Debug.Assert(Carousel != null);
-
             // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
             if (!Carousel.BeatmapSetsLoaded)
             {
@@ -430,8 +424,6 @@ namespace osu.Game.Screens.Select
             if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
             Logger.Log($"Song select working beatmap updated to {beatmap}");
-
-            Debug.Assert(Carousel != null);
 
             if (Carousel.SelectBeatmap(beatmap.BeatmapInfo, false)) return;
 
@@ -522,7 +514,6 @@ namespace osu.Game.Screens.Select
 
                 if (transferRulesetValue())
                 {
-                    Debug.Assert(Carousel != null);
                     // transferRulesetValue() may trigger a re-filter. If the current selection does not match the new ruleset, we want to switch away from it.
                     // The default logic on WorkingBeatmap change is to switch to a matching ruleset (see workingBeatmapChanged()), but we don't want that here.
                     // We perform an early selection attempt and clear out the beatmap selection to avoid a second ruleset change (revert).
@@ -609,7 +600,6 @@ namespace osu.Game.Screens.Select
             ModSelect.SelectedMods.Disabled = false;
             ModSelect.SelectedMods.BindTo(selectedMods);
 
-            Debug.Assert(Carousel != null);
             Carousel.AllowSelection = true;
 
             BeatmapDetails.Refresh();
@@ -672,7 +662,6 @@ namespace osu.Game.Screens.Select
 
             BeatmapOptions.Hide();
 
-            Debug.Assert(Carousel != null);
             Carousel.AllowSelection = false;
 
             endLooping();
@@ -803,7 +792,6 @@ namespace osu.Game.Screens.Select
         {
             bindBindables();
 
-            Debug.Assert(Carousel != null);
             Carousel.AllowSelection = true;
 
             // If a selection was already obtained, do not attempt to update the selected beatmap.
@@ -867,7 +855,7 @@ namespace osu.Game.Screens.Select
         /// Will immediately run filter operations if required.
         /// </summary>
         /// <returns>Whether a transfer occurred.</returns>
-        private bool transferRulesetValue()
+        private bool transferRulesetValue(bool carouselLoaded = true)
         {
             if (decoupledRuleset.Value?.Equals(Ruleset.Value) == true)
                 return false;
@@ -875,9 +863,12 @@ namespace osu.Game.Screens.Select
             Logger.Log($"decoupled ruleset transferred (\"{decoupledRuleset.Value}\" -> \"{Ruleset.Value}\")");
             rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
 
+            // We don't want to declare the carousel as nullable, so this check allows us to avoid running the carousel flush during the loading process
+            if (!carouselLoaded) return true;
+
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
-            Carousel?.FlushPendingFilterOperations();
+            Carousel.FlushPendingFilterOperations();
             return true;
         }
 

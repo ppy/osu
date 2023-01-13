@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -106,7 +105,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                     Schedule(() =>
                     {
-                        Debug.Assert(Carousel != null);
                         Carousel.AllowSelection = true;
                     });
                 });
