@@ -16,7 +16,6 @@ namespace osu.Game.Screens.Play.HUD
     {
         private const int fade_duration = 200;
 
-
         public bool ReplayLoaded;
 
         public readonly PlaybackSettings PlaybackSettings;
@@ -42,12 +41,11 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     //CollectionSettings = new CollectionSettings(),
                     //DiscussionSettings = new DiscussionSettings(),
-                    PlaybackSettings = new PlaybackSettings(),
-                    VisualSettings = new VisualSettings()
+                    PlaybackSettings = new PlaybackSettings { Expanded = { Value = false } },
+                    VisualSettings = new VisualSettings { Expanded = { Value = false } }
                 }
             };
         }
-
 
         protected override void PopIn() => this.FadeIn(fade_duration);
         protected override void PopOut() => this.FadeOut(fade_duration);
