@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,8 +9,8 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header;
+using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 
@@ -20,9 +18,9 @@ namespace osu.Game.Overlays.Profile
 {
     public partial class ProfileHeader : TabControlOverlayHeader<LocalisableString>
     {
-        private UserCoverBackground coverContainer;
+        private UserCoverBackground coverContainer = null!;
 
-        public Bindable<APIUser> User = new Bindable<APIUser>();
+        public Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
@@ -37,6 +35,13 @@ namespace osu.Game.Overlays.Profile
 
             // todo: pending implementation.
             // TabControl.AddItem(LayoutStrings.HeaderUsersModding);
+
+            TabControlContainer.Add(new ProfileRulesetSelector
+            {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                User = { BindTarget = User }
+            });
 
             // Haphazardly guaranteed by OverlayHeader constructor (see CreateBackground / CreateContent).
             Debug.Assert(centreHeaderContainer != null);
@@ -102,7 +107,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();
 
-        private void updateDisplay(APIUser user) => coverContainer.User = user;
+        private void updateDisplay(UserProfileData? user) => coverContainer.User = user?.User;
 
         private partial class ProfileHeaderTitle : OverlayTitle
         {

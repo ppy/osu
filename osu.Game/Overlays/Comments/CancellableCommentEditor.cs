@@ -3,8 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
@@ -16,14 +14,10 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load()
         {
-            ButtonsContainer.Add(new RoundedButton
+            ButtonsContainer.Add(new EditorButton
             {
-                Anchor = Anchor.CentreRight,
-                Origin = Anchor.CentreRight,
                 Action = () => OnCancel?.Invoke(),
                 Text = CommonStrings.ButtonsCancel,
-                Width = 100,
-                Height = 30,
             });
         }
     }

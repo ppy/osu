@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Judgements;
@@ -137,6 +138,29 @@ namespace osu.Game.Tests.Gameplay
             Assert.That(score.MaximumStatistics[HitResult.SmallTickHit], Is.EqualTo(2));
             Assert.That(score.MaximumStatistics[HitResult.SmallBonus], Is.EqualTo(1));
             Assert.That(score.MaximumStatistics[HitResult.LargeBonus], Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TestAccuracyModes()
+        {
+            var beatmap = new Beatmap<HitObject>
+            {
+                HitObjects = Enumerable.Range(0, 4).Select(_ => new TestHitObject(HitResult.Great)).ToList<HitObject>()
+            };
+
+            var scoreProcessor = new ScoreProcessor(new OsuRuleset());
+            scoreProcessor.ApplyBeatmap(beatmap);
+
+            Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(1));
+            Assert.That(scoreProcessor.MinimumAccuracy.Value, Is.EqualTo(0));
+            Assert.That(scoreProcessor.MaximumAccuracy.Value, Is.EqualTo(1));
+
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Ok });
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = HitResult.Great });
+
+            Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo((double)(100 + 300) / (2 * 300)).Within(Precision.DOUBLE_EPSILON));
+            Assert.That(scoreProcessor.MinimumAccuracy.Value, Is.EqualTo((double)(100 + 300) / (4 * 300)).Within(Precision.DOUBLE_EPSILON));
+            Assert.That(scoreProcessor.MaximumAccuracy.Value, Is.EqualTo((double)(100 + 3 * 300) / (4 * 300)).Within(Precision.DOUBLE_EPSILON));
         }
 
         private class TestJudgement : Judgement

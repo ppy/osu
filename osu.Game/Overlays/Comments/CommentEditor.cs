@@ -2,19 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Graphics.Sprites;
-using osuTK.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
-using osu.Framework.Bindables;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -30,9 +30,23 @@ namespace osu.Game.Overlays.Comments
 
         protected FillFlowContainer ButtonsContainer { get; private set; } = null!;
 
-        protected readonly Bindable<string> Current = new Bindable<string>();
+        protected readonly Bindable<string> Current = new Bindable<string>(string.Empty);
 
-        protected EditorCommitButton CommitButton = null!;
+        private RoundedButton commitButton = null!;
+        private LoadingSpinner loadingSpinner = null!;
+
+        protected bool ShowLoadingSpinner
+        {
+            set
+            {
+                if (value)
+                    loadingSpinner.Show();
+                else
+                    loadingSpinner.Hide();
+
+                updateCommitButtonState();
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -71,7 +85,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             Name = @"Footer",
                             RelativeSizeAxes = Axes.X,
-                            Height = 40,
+                            Height = 35,
                             Padding = new MarginPadding { Horizontal = side_padding },
                             Children = new Drawable[]
                             {
@@ -79,42 +93,59 @@ namespace osu.Game.Overlays.Comments
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                                     Text = FooterText
                                 },
-                                ButtonsContainer = new FillFlowContainer
+                                new FillFlowContainer
                                 {
-                                    Name = @"Buttons",
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(5, 0),
-                                    Child = CommitButton = new EditorCommitButton
+                                    Children = new Drawable[]
                                     {
-                                        Text = CommitButtonText,
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                        Action = () => OnCommit(Current.Value)
+                                        ButtonsContainer = new FillFlowContainer
+                                        {
+                                            Name = @"Buttons",
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(5, 0),
+                                            Child = commitButton = new EditorButton
+                                            {
+                                                Text = CommitButtonText,
+                                                Action = () => OnCommit(Current.Value)
+                                            }
+                                        },
+                                        loadingSpinner = new LoadingSpinner
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            Size = new Vector2(18),
+                                        },
                                     }
-                                }
+                                },
                             }
                         }
                     }
                 }
             });
 
-            textBox.OnCommit += (_, _) => CommitButton.TriggerClick();
+            textBox.OnCommit += (_, _) => commitButton.TriggerClick();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            Current.BindValueChanged(text => CommitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
+            Current.BindValueChanged(_ => updateCommitButtonState(), true);
         }
 
         protected abstract void OnCommit(string text);
+
+        private void updateCommitButtonState() =>
+            commitButton.Enabled.Value = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
 
         private partial class EditorTextBox : BasicTextBox
         {
@@ -150,57 +181,21 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
-        protected sealed partial class EditorCommitButton : RoundedButton
+        protected partial class EditorButton : RoundedButton
         {
-            private const int duration = 200;
-
-            private readonly LoadingSpinner spinner;
-            private SpriteText text = null!;
-
-            public readonly BindableBool IsBlocked = new BindableBool();
-
-            private bool isLoadingSpinnerShown;
-
-            /// <summary>
-            /// Whether loading spinner shown.
-            /// </summary>
-            public bool IsLoadingSpinnerShown
+            public EditorButton()
             {
-                get => isLoadingSpinnerShown;
-                set
-                {
-                    isLoadingSpinnerShown = value;
-                    Enabled.Value = !value && !IsBlocked.Value;
-                    spinner.FadeTo(value ? 1f : 0f, duration, Easing.OutQuint);
-                    text.FadeTo(value ? 0f : 1f, duration, Easing.OutQuint);
-                }
-            }
-
-            public EditorCommitButton()
-            {
-                Width = 100;
-                Height = 30;
-                Add(spinner = new LoadingSpinner
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(16),
-                    Depth = -2,
-                });
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                IsBlocked.BindValueChanged(e =>
-                {
-                    Enabled.Value = !IsLoadingSpinnerShown && !e.NewValue;
-                }, true);
+                Width = 80;
+                Height = 25;
+                Anchor = Anchor.CentreRight;
+                Origin = Anchor.CentreRight;
             }
 
             protected override SpriteText CreateText()
             {
-                return text = base.CreateText();
+                var t = base.CreateText();
+                t.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12);
+                return t;
             }
         }
     }
