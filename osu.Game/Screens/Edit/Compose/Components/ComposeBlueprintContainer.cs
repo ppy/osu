@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected new EditorSelectionHandler SelectionHandler => (EditorSelectionHandler)base.SelectionHandler;
 
-        private PlacementBlueprint currentPlacement;
+        public PlacementBlueprint currentPlacement { get; private set; }
 
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
