@@ -64,6 +64,11 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
+        /// <summary>
+        /// Whether the client responsible for channel notifications is connected.
+        /// </summary>
+        public bool NotificationsConnected => connector.IsConnected.Value;
+
         private readonly IAPIProvider api;
         private readonly NotificationsClientConnector connector;
 
