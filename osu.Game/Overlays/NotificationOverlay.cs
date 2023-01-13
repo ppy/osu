@@ -17,6 +17,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
+using WebNotificationsStrings = osu.Game.Resources.Localisation.Web.NotificationsStrings;
 
 namespace osu.Game.Overlays
 {
@@ -92,7 +93,8 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.X,
                                     Children = new[]
                                     {
-                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, NotificationsStrings.ClearAll),
+                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) },
+                                            WebNotificationsStrings.MarkRead(WebNotificationsStrings.FiltersDefault)),
                                         new NotificationSection(NotificationsStrings.RunningTasks, new[] { typeof(ProgressNotification) }, NotificationsStrings.CancelAll),
                                     }
                                 }
