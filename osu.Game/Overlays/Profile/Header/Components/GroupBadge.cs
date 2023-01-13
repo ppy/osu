@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -62,7 +63,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         new OsuSpriteText
                         {
                             Text = group.ShortName,
-                            Colour = Color4Extensions.FromHex(group.Colour),
+                            Colour = Color4Extensions.FromHex(group.Colour ?? Colour4.White.ToHex()),
                             Shadow = false,
                             Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true)
                         }
