@@ -19,6 +19,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString HeaderDescription => new TranslatableString(getKey(@"header_description"), @"waiting for 'ya");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        /// <summary>
+        /// "Running Tasks"
+        /// </summary>
+        public static LocalisableString RunningTasks => new TranslatableString(getKey(@"running_tasks"), @"Running Tasks");
+
+        /// <summary>
+        /// "Clear All"
+        /// </summary>
+        public static LocalisableString ClearAll => new TranslatableString(getKey(@"clear_all"), @"Clear All");
+
+        /// <summary>
+        /// "Cancel All"
+        /// </summary>
+        public static LocalisableString CancelAll => new TranslatableString(getKey(@"cancel_all"), @"Cancel All");
+
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
