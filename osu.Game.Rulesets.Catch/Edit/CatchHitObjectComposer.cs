@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                     if (EditorBeatmap.PlacementObject.Value is JuiceStream)
                     {
                         // Juice stream path is not subject to snapping.
-                        if (BlueprintContainer.currentPlacement.PlacementActive is PlacementBlueprint.PlacementState.Active)
+                        if (BlueprintContainer.CurrentPlacement.PlacementActive is PlacementBlueprint.PlacementState.Active)
                             return null;
                     }
 
