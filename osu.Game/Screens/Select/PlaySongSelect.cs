@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Select
     {
         private OsuScreen? playerLoader;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;

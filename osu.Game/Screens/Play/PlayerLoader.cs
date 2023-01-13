@@ -131,16 +131,16 @@ namespace osu.Game.Screens.Play
 
         private bool quickRestart;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private VolumeOverlay? volumeOverlay { get; set; }
 
         [Resolved]
         private AudioManager audioManager { get; set; } = null!;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private BatteryInfo? batteryInfo { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
