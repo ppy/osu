@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
@@ -25,14 +22,14 @@ namespace osu.Game.Overlays.Profile.Header
     public partial class DetailHeaderContainer : CompositeDrawable
     {
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
-        private OverlinedInfoContainer medalInfo;
-        private OverlinedInfoContainer ppInfo;
-        private OverlinedInfoContainer detailGlobalRank;
-        private OverlinedInfoContainer detailCountryRank;
-        private FillFlowContainer fillFlow;
-        private RankGraph rankGraph;
+        private OverlinedInfoContainer medalInfo = null!;
+        private OverlinedInfoContainer ppInfo = null!;
+        private OverlinedInfoContainer detailGlobalRank = null!;
+        private OverlinedInfoContainer detailCountryRank = null!;
+        private FillFlowContainer? fillFlow;
+        private RankGraph rankGraph = null!;
 
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         private bool expanded = true;
 
@@ -173,8 +170,10 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private void updateDisplay(APIUser user)
+        private void updateDisplay(UserProfileData? data)
         {
+            var user = data?.User;
+
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
             ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
 

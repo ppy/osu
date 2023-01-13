@@ -79,26 +79,28 @@ namespace osu.Game.Overlays.FirstRunSetup
                 Direction = FillDirection.Full;
                 Spacing = new Vector2(5);
 
-                ChildrenEnumerable = Enum.GetValues(typeof(Language))
-                                         .Cast<Language>()
+                ChildrenEnumerable = Enum.GetValues<Language>()
                                          .Select(l => new LanguageButton(l)
                                          {
                                              Action = () => frameworkLocale.Value = l.ToCultureCode()
                                          });
 
                 frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
+                frameworkLocale.BindValueChanged(_ => onLanguageChange());
 
                 localisationParameters = localisation.CurrentParameters.GetBoundCopy();
-                localisationParameters.BindValueChanged(p =>
-                {
-                    var language = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, p.NewValue);
+                localisationParameters.BindValueChanged(_ => onLanguageChange(), true);
+            }
 
-                    // Changing language may cause a short period of blocking the UI thread while the new glyphs are loaded.
-                    // Scheduling ensures the button animation plays smoothly after any blocking operation completes.
-                    // Note that a delay is required (the alternative would be a double-schedule; delay feels better).
-                    updateSelectedDelegate?.Cancel();
-                    updateSelectedDelegate = Scheduler.AddDelayed(() => updateSelectedStates(language), 50);
-                }, true);
+            private void onLanguageChange()
+            {
+                var language = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, localisationParameters.Value);
+
+                // Changing language may cause a short period of blocking the UI thread while the new glyphs are loaded.
+                // Scheduling ensures the button animation plays smoothly after any blocking operation completes.
+                // Note that a delay is required (the alternative would be a double-schedule; delay feels better).
+                updateSelectedDelegate?.Cancel();
+                updateSelectedDelegate = Scheduler.AddDelayed(() => updateSelectedStates(language), 50);
             }
 
             private void updateSelectedStates(Language language)
@@ -147,7 +149,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 [BackgroundDependencyLoader]
                 private void load()
                 {
-                    InternalChildren = new Drawable[]
+                    AddRange(new Drawable[]
                     {
                         backgroundBox = new Box
                         {
@@ -162,7 +164,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                             Colour = colourProvider.Light1,
                             Text = Language.GetDescription(),
                         }
-                    };
+                    });
                 }
 
                 protected override void LoadComplete()

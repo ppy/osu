@@ -7,8 +7,6 @@ using Newtonsoft.Json;
 
 namespace osu.Game.Online.Rooms
 {
-    // TODO: Remove disable below after merging https://github.com/ppy/osu-framework/pull/5548 and applying follow-up changes game-side.
-    // ReSharper disable once PartialTypeWithSinglePart
     public partial class APICreatedRoom : Room
     {
         [JsonProperty("error")]

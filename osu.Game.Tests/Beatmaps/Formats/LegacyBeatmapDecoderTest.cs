@@ -315,6 +315,24 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestGetLastObjectTime()
+        {
+            var decoder = new LegacyBeatmapDecoder();
+
+            using (var resStream = TestResources.OpenResource("mania-last-object-not-latest.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+
+                Assert.That(beatmap.HitObjects.Last().StartTime, Is.EqualTo(2494));
+                Assert.That(beatmap.HitObjects.Last().GetEndTime(), Is.EqualTo(2494));
+
+                Assert.That(beatmap.HitObjects.Max(h => h.GetEndTime()), Is.EqualTo(2582));
+                Assert.That(beatmap.GetLastObjectTime(), Is.EqualTo(2582));
+            }
+        }
+
+        [Test]
         public void TestDecodeBeatmapComboOffsetsOsu()
         {
             var decoder = new LegacyBeatmapDecoder();

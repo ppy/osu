@@ -109,6 +109,8 @@ namespace osu.Game.Audio
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            Stop();
             Track?.Dispose();
         }
     }
