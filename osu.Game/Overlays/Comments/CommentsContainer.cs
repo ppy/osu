@@ -429,15 +429,15 @@ namespace osu.Game.Overlays.Comments
 
             protected override void OnCommit(string text)
             {
-                CommitButton.IsLoadingSpinnerShown = true;
+                ShowLoadingSpinner = true;
                 CommentPostRequest req = new CommentPostRequest(CommentableType.Value, CommentableId.Value, text);
                 req.Failure += _ => Schedule(() =>
                 {
-                    CommitButton.IsLoadingSpinnerShown = false;
+                    ShowLoadingSpinner = false;
                 });
                 req.Success += cb => Schedule(() =>
                 {
-                    CommitButton.IsLoadingSpinnerShown = false;
+                    ShowLoadingSpinner = false;
                     Current.Value = string.Empty;
                     OnPost?.Invoke(cb);
                 });
