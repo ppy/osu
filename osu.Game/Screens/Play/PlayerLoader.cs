@@ -475,6 +475,11 @@ namespace osu.Game.Screens.Play
 
                 // only show if the warning was created (i.e. the beatmap needs it)
                 // and this is not a restart of the map (the warning expires after first load).
+                if (epilepsyWarning?.IsAlive == true || lovedWarning?.IsAlive == true)
+                {
+                    pushSequence.TransformBindableTo(volumeAdjustment, 0.25, EpilepsyWarning.FADE_DURATION, Easing.OutQuint);
+                }
+
                 if (epilepsyWarning?.IsAlive == true)
                 {
                     const double epilepsy_display_length = 3000;
@@ -482,7 +487,6 @@ namespace osu.Game.Screens.Play
                     pushSequence
                         .Delay(CONTENT_OUT_DURATION)
                         .Schedule(() => epilepsyWarning.State.Value = Visibility.Visible)
-                        .TransformBindableTo(volumeAdjustment, 0.25, EpilepsyWarning.FADE_DURATION, Easing.OutQuint)
                         .Delay(epilepsy_display_length)
                         .Schedule(() =>
                         {
@@ -490,15 +494,6 @@ namespace osu.Game.Screens.Play
                             epilepsyWarning.Expire();
                         })
                         .Delay(EpilepsyWarning.FADE_DURATION);
-                }
-                else
-                {
-                    // This goes hand-in-hand with the restoration of low pass filter in contentOut().
-                    // Fade out the volume only if lovedWarning isnt created to prevent epilepsyWarning from fading out music and lovedWarning fading the music back in and then out again
-                    if (lovedWarning?.IsAlive == false)
-                    {
-                        this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
-                    }
                 }
 
                 if (lovedWarning?.IsAlive == true)
@@ -508,7 +503,6 @@ namespace osu.Game.Screens.Play
                     pushSequence
                         .Delay(CONTENT_OUT_DURATION)
                         .Schedule(() => lovedWarning.State.Value = Visibility.Visible)
-                        .TransformBindableTo(volumeAdjustment, 0.25, LovedWarning.FADE_DURATION, Easing.OutQuint)
                         .Delay(loved_display_length)
                         .Schedule(() =>
                         {
@@ -517,12 +511,11 @@ namespace osu.Game.Screens.Play
                         })
                         .Delay(LovedWarning.FADE_DURATION);
                 }
-                else
+
+                if (epilepsyWarning?.IsAlive == false || lovedWarning?.IsAlive == false)
                 {
                     // This goes hand-in-hand with the restoration of low pass filter in contentOut().
-                    {
-                        this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
-                    }
+                    this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
                 }
 
                 pushSequence.Schedule(() =>
