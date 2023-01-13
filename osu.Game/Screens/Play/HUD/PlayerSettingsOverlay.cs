@@ -3,15 +3,12 @@
 
 #nullable disable
 
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osuTK;
 using osu.Game.Screens.Play.PlayerSettings;
 using osuTK.Input;
-using osu.Game.Configuration;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -19,9 +16,6 @@ namespace osu.Game.Screens.Play.HUD
     {
         private const int fade_duration = 200;
 
-        private Bindable<bool> playbackMenuExpanded;
-
-        private Bindable<bool> visualMenuExpanded;
 
         public bool ReplayLoaded;
 
@@ -54,15 +48,6 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(SessionStatics statics)
-        {
-            playbackMenuExpanded = statics.GetBindable<bool>(Static.ReplayPlaybackSettingExpanded);
-            visualMenuExpanded = statics.GetBindable<bool>(Static.ReplayVisualSettingsExpanded);
-
-            PlaybackSettings.Expanded.BindTo(playbackMenuExpanded);
-            VisualSettings.Expanded.BindTo(visualMenuExpanded);
-        }
 
         protected override void PopIn() => this.FadeIn(fade_duration);
         protected override void PopOut() => this.FadeOut(fade_duration);
