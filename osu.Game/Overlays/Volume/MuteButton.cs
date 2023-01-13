@@ -92,6 +92,8 @@ namespace osu.Game.Overlays.Volume
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             base.OnMouseDown(e);
+
+            // Block mouse down to avoid dismissing overlays sitting behind the mute button
             return true;
         }
     }
