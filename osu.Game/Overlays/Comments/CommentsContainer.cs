@@ -183,12 +183,12 @@ namespace osu.Game.Overlays.Comments
             });
 
             User.BindTo(api.LocalUser);
-            User.BindValueChanged(e => avatar.User = e.NewValue);
         }
 
         protected override void LoadComplete()
         {
             User.BindValueChanged(_ => refetchComments());
+            User.BindValueChanged(e => avatar.User = e.NewValue);
             Sort.BindValueChanged(_ => refetchComments(), true);
             base.LoadComplete();
         }
