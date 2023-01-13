@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Random";
         public override string Acronym => "RD";
         public override ModType Type => ModType.Conversion;
-        public override IconUsage? Icon => OsuIcon.Dice;
+        public override IconUsage? Icon => OsuIcon.ModRandom;
         public override double ScoreMultiplier => 1;
 
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SettingsNumberBox))]

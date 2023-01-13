@@ -10,6 +10,7 @@ namespace osu.Game.Graphics
     public static class OsuIcon
     {
         public static IconUsage Get(int icon) => new IconUsage((char)icon, "osuFont");
+        public static IconUsage GetMod(int icon) => new IconUsage((char)icon, "osuModsFont");
 
         // ruleset icons in circles
         public static IconUsage RulesetOsu => Get(0xe000);
@@ -75,22 +76,36 @@ namespace osu.Game.Graphics
         public static IconUsage ExpertMania => Get(0xe028);
 
         // mod icons
-        public static IconUsage ModPerfect => Get(0xe049);
-        public static IconUsage ModAutopilot => Get(0xe03a);
-        public static IconUsage ModAuto => Get(0xe03b);
-        public static IconUsage ModCinema => Get(0xe03c);
-        public static IconUsage ModDoubleTime => Get(0xe03d);
-        public static IconUsage ModEasy => Get(0xe03e);
-        public static IconUsage ModFlashlight => Get(0xe03f);
-        public static IconUsage ModHalftime => Get(0xe040);
-        public static IconUsage ModHardRock => Get(0xe041);
-        public static IconUsage ModHidden => Get(0xe042);
-        public static IconUsage ModNightcore => Get(0xe043);
-        public static IconUsage ModNoFail => Get(0xe044);
-        public static IconUsage ModRelax => Get(0xe045);
-        public static IconUsage ModSpunOut => Get(0xe046);
-        public static IconUsage ModSuddenDeath => Get(0xe047);
-        public static IconUsage ModTarget => Get(0xe048);
-        public static IconUsage ModBg => Get(0xe04a);
+        public static IconUsage ModBg => GetMod(0xe800);
+        public static IconUsage ModKey1 => GetMod(0xe801);
+        public static IconUsage ModKey2 => GetMod(0xe802);
+        public static IconUsage ModKey3 => GetMod(0xe803);
+        public static IconUsage ModKey4 => GetMod(0xe804);
+        public static IconUsage ModKey5 => GetMod(0xe805);
+        public static IconUsage ModKey6 => GetMod(0xe806);
+        public static IconUsage ModKey7 => GetMod(0xe807);
+        public static IconUsage ModKey8 => GetMod(0xe808);
+        public static IconUsage ModKey9 => GetMod(0xe809);
+        public static IconUsage ModAuto => GetMod(0xe80a);
+        public static IconUsage ModAutopilot => GetMod(0xe80b);
+        public static IconUsage ModCinema => GetMod(0xe80c);
+        public static IconUsage ModDoubleTime => GetMod(0xe80d);
+        public static IconUsage ModEasy => GetMod(0xe80e);
+        public static IconUsage ModFadeIn => GetMod(0xe80f);
+        public static IconUsage ModFlashlight => GetMod(0xe810);
+        public static IconUsage ModHalftime => GetMod(0xe811);
+        public static IconUsage ModHardRock => GetMod(0xe812);
+        public static IconUsage ModHidden => GetMod(0xe813);
+        public static IconUsage ModMirror => GetMod(0xe814);
+        public static IconUsage ModNightcore => GetMod(0xe815);
+        public static IconUsage ModNoFail => GetMod(0xe816);
+        public static IconUsage ModNoMod => GetMod(0xe817);
+        public static IconUsage ModPerfect => GetMod(0xe818);
+        public static IconUsage ModRandom => GetMod(0xe819);
+        public static IconUsage ModRelax => GetMod(0xe81a);
+        public static IconUsage ModSpunOut => GetMod(0xe81b);
+        public static IconUsage ModSuddenDeath => GetMod(0xe81c);
+        public static IconUsage ModTarget => GetMod(0xe81d);
+        public static IconUsage ModTouchDevice => GetMod(0xe81e);
     }
 }

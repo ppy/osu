@@ -27,11 +27,22 @@ namespace osu.Game.Rulesets.UI
     {
         public readonly BindableBool Selected = new BindableBool();
 
-        private readonly SpriteIcon modIcon;
+        private readonly SpriteText modIcon;
         private readonly SpriteText modAcronym;
         private readonly SpriteIcon background;
 
         private const float size = 80;
+
+        /// <remarks>
+        /// The font size for the mods font should be the height of the mod background.
+        /// The aspect ratio of the mod background is 10:7.
+        /// </remarks>
+        private const float mods_icon_font_size = size * .7f;
+
+        /// <remarks>
+        /// Other fonts are scaled down to match the apparent height of icons in the mods font.
+        /// </remarks>
+        private const float other_icon_font_size = mods_icon_font_size * .75f;
 
         public virtual LocalisableString TooltipText => showTooltip ? ((mod as Mod)?.IconTooltip ?? mod.Name) : null;
 
@@ -84,14 +95,14 @@ namespace osu.Game.Rulesets.UI
                     Alpha = 0,
                     Font = OsuFont.Numeric.With(null, 22f),
                     UseFullGlyphHeight = false,
-                    Text = mod.Acronym
                 },
-                modIcon = new SpriteIcon
+                modIcon = new OsuSpriteText
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Size = new Vector2(45),
-                    Icon = FontAwesome.Solid.Question
+                    Alpha = 0,
+                    Shadow = false,
+                    UseFullGlyphHeight = false,
                 },
             };
         }
@@ -109,20 +120,27 @@ namespace osu.Game.Rulesets.UI
         {
             var foregroundColour = value.Type == ModType.System ? Color4Extensions.FromHex(@"fc2") : colours.Gray5;
 
-            modAcronym.Colour = foregroundColour;
-            modAcronym.Text = value.Acronym;
-            modIcon.Colour = foregroundColour;
-            modIcon.Icon = value.Icon ?? FontAwesome.Solid.Question;
-
-            if (value.Icon is null)
+            if (value.Icon is IconUsage icon)
             {
-                modIcon.FadeOut();
-                modAcronym.FadeIn();
+                modIcon.Colour = foregroundColour;
+                modIcon.Font = new FontUsage
+                (
+                    icon.Family,
+                    icon.Family == @"osuModsFont" ? mods_icon_font_size : other_icon_font_size,
+                    icon.Weight
+                );
+                modIcon.Text = icon.Icon.ToString();
+
+                modIcon.FadeIn();
+                modAcronym.FadeOut();
             }
             else
             {
-                modIcon.FadeIn();
-                modAcronym.FadeOut();
+                modAcronym.Colour = foregroundColour;
+                modAcronym.Text = value.Acronym;
+
+                modIcon.FadeOut();
+                modAcronym.FadeIn();
             }
 
             backgroundColour = colours.ForModType(value.Type);
