@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
@@ -24,6 +25,9 @@ namespace osu.Game.Tests.Visual.Online
 
         private UserGridPanel boundPanel1;
         private TestUserListPanel boundPanel2;
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         [Resolved]
         private IRulesetStore rulesetStore { get; set; }
@@ -62,7 +66,15 @@ namespace osu.Game.Tests.Visual.Online
                         Id = 3103765,
                         CountryCode = CountryCode.JP,
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
-                        Status = { Value = new UserStatusOnline() }
+                        Status = { Value = new UserStatusOnline() },
+                        PlayMode = "taiko",
+                        Statistics = new UserStatistics
+                        {
+                            Level = new UserStatistics.LevelInfo
+                            {
+                                Current = 727
+                            }
+                        },
                     }) { Width = 300 },
                     boundPanel1 = new UserGridPanel(new APIUser
                     {
@@ -72,6 +84,16 @@ namespace osu.Game.Tests.Visual.Online
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                         IsSupporter = true,
                         SupportLevel = 3,
+                        Colour = "99EB47",
+                        PlayMode = "osu",
+                        Statistics = new UserStatistics
+                        {
+                            Level = new UserStatistics.LevelInfo
+                            {
+                                Current = 1
+                            }
+                        },
+                        Groups = new[] { new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" } }
                     }) { Width = 300 },
                     boundPanel2 = new TestUserListPanel(new APIUser
                     {
@@ -82,7 +104,7 @@ namespace osu.Game.Tests.Visual.Online
                         IsOnline = false,
                         LastVisit = DateTimeOffset.Now
                     })
-                },
+                }
             };
 
             boundPanel1.Status.BindTo(status);

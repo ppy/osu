@@ -33,7 +33,7 @@ namespace osu.Game.Users
 
         protected Action ViewProfile { get; private set; } = null!;
 
-        protected Drawable Background { get; private set; } = null!;
+        protected Drawable? Background { get; private set; }
 
         protected UserPanel(APIUser user)
             : base(HoverSampleSet.Button)
@@ -61,27 +61,31 @@ namespace osu.Game.Users
         [Resolved]
         protected OsuColour Colours { get; private set; } = null!;
 
+        protected virtual bool ShouldCreateUserCoverBackground { get; set; } = true;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             Masking = true;
 
-            AddRange(new[]
+            Add(new Box
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourProvider?.Background5 ?? Colours.Gray1
-                },
-                Background = new UserCoverBackground
+                RelativeSizeAxes = Axes.Both,
+                Colour = ColourProvider?.Background5 ?? Colours.Gray1
+            });
+
+            if (ShouldCreateUserCoverBackground)
+            {
+                Add(Background = new UserCoverBackground
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     User = User,
-                },
-                CreateLayout()
-            });
+                });
+            }
+
+            Add(CreateLayout());
 
             base.Action = ViewProfile = () =>
             {
