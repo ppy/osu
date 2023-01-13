@@ -23,6 +23,16 @@ namespace osu.Game.Online.API
 
         public class RegistrationRequestErrors
         {
+            /// <summary>
+            /// An optional error message.
+            /// </summary>
+            public string? Message;
+
+            /// <summary>
+            /// An optional URL which the user should be directed towards to complete registration.
+            /// </summary>
+            public string? Redirect;
+
             public UserErrors? User;
 
             public class UserErrors
