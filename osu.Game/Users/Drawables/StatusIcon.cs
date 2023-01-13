@@ -14,7 +14,7 @@ namespace osu.Game.Users.Drawables
         {
             Size = new Vector2(25);
             BorderThickness = 4;
-            BorderColour = Colour;
+            BorderColour = Colour4.White; // the colour is being applied through Colour - since it's multiplicative it applies to the border as well
             Masking = true;
             Child = new Box
             {
