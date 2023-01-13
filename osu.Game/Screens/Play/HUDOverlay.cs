@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = NotificationsStrings.TheScoreOverlayIsDisabled(config.LookupKeyBindings(GlobalAction.ToggleInGameInterface))
+                    Text = NotificationsStrings.ScoreOverlayDisabled(config.LookupKeyBindings(GlobalAction.ToggleInGameInterface))
                 });
             }
 

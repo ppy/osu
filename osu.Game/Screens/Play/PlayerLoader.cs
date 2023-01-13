@@ -606,7 +606,7 @@ namespace osu.Game.Screens.Play
 
             public BatteryWarningNotification()
             {
-                Text = NotificationsStrings.LowBatteryWarning;
+                Text = NotificationsStrings.BatteryLow;
             }
 
             [BackgroundDependencyLoader]
