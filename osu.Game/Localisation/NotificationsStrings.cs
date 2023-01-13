@@ -32,8 +32,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Your battery level is low! Charge your device to prevent interruptions during gameplay."
         /// </summary>
-        public static LocalisableString LowBatteryWarning =>
-            new TranslatableString(getKey(@"low_battery_warning"), @"Your battery level is low! Charge your device to prevent interruptions during gameplay.");
+        public static LocalisableString BatteryLow => new TranslatableString(getKey(@"battery_low"), @"Your battery level is low! Charge your device to prevent interruptions during gameplay.");
 
         /// <summary>
         /// "Your game volume is too low to hear anything! Click here to restore it."
@@ -54,7 +53,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "The score overlay is currently disabled. You can toggle this by pressing {0}."
         /// </summary>
-        public static LocalisableString TheScoreOverlayIsDisabled(LocalisableString arg0) => new TranslatableString(getKey(@"the_score_overlay_is_disabled"),
+        public static LocalisableString ScoreOverlayDisabled(LocalisableString arg0) => new TranslatableString(getKey(@"score_overlay_disabled"),
             @"The score overlay is currently disabled. You can toggle this by pressing {0}.", arg0);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
