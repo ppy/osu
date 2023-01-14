@@ -161,7 +161,9 @@ namespace osu.Game.Screens.Select.Carousel
                                     Children = new Drawable[]
                                     {
                                         starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small),
-                                        new TopLocalRank(beatmapInfo),
+
+                                        //Scaling is applied to size match components of row
+                                        new TopLocalRank(beatmapInfo) { Scale = new Vector2(8f / 11) },
                                         starCounter = new StarCounter
                                         {
                                             Margin = new MarginPadding { Top = 8 }, // Better aligns the stars with the star rating display

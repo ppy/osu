@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -59,7 +57,7 @@ namespace osu.Game.Screens.Select.Carousel
                         Direction = FillDirection.Horizontal,
                         AutoSizeAxes = Axes.Both,
                         Margin = new MarginPadding { Top = 5 },
-                        Spacing = new Vector2(5),
+                        Spacing = new Vector2(0, 5),
                         Children = new[]
                         {
                             beatmapSet.AllBeatmapsUpToDate
@@ -82,30 +80,16 @@ namespace osu.Game.Screens.Select.Carousel
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                 Status = beatmapSet.Status
                             },
-                            new FillFlowContainer<DifficultyIcon>
+                            new DifficultySpectrumDisplay(carouselSet.BeatmapSet)
                             {
-                                AutoSizeAxes = Axes.Both,
-                                Origin = Anchor.CentreLeft,
-                                Anchor = Anchor.CentreLeft,
-                                Spacing = new Vector2(3),
-                                ChildrenEnumerable = getDifficultyIcons(),
-                            },
+                                Margin = new MarginPadding { Left = 5 },
+                                DotSize = new Vector2(5, 10),
+                                DotSpacing = 2
+                            }
                         }
                     }
                 }
             };
-        }
-
-        private const int maximum_difficulty_icons = 18;
-
-        private IEnumerable<DifficultyIcon> getDifficultyIcons()
-        {
-            var beatmaps = carouselSet.Beatmaps.ToList();
-
-            return beatmaps.Count > maximum_difficulty_icons
-                ? beatmaps.GroupBy(b => b.BeatmapInfo.Ruleset)
-                          .Select(group => new GroupedDifficultyIcon(group.ToList(), group.Last().BeatmapInfo.Ruleset))
-                : beatmaps.Select(b => new FilterableDifficultyIcon(b));
         }
     }
 }
