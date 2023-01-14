@@ -342,7 +342,7 @@ namespace osu.Game.Overlays.Comments
             {
                 LoadComponentsAsync(topLevelComments, loaded =>
                 {
-                    if (content[0] is NoCommentsPlaceholder placeholder)
+                    if (content.Count > 0 && content[0] is NoCommentsPlaceholder placeholder)
                         content.Remove(placeholder, true);
 
                     foreach (var comment in loaded)
