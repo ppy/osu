@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,9 +28,9 @@ namespace osu.Game.Tests.Visual.Online
 
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-        private CommentsContainer commentsContainer;
+        private CommentsContainer commentsContainer = null!;
 
-        private TextBox editorTextBox;
+        private TextBox editorTextBox = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -148,8 +146,8 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("comment sent", () =>
             {
                 string writtenText = editorTextBox.Current.Value;
-                var comment = commentsContainer.ChildrenOfType<DrawableComment>().Last();
-                return comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText);
+                var comment = commentsContainer.ChildrenOfType<DrawableComment>().LastOrDefault();
+                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText);
             });
             AddAssert("no comments placeholder removed", () => !commentsContainer.ChildrenOfType<CommentsContainer.NoCommentsPlaceholder>().Any());
         }
@@ -167,8 +165,8 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("comment sent", () =>
             {
                 string writtenText = editorTextBox.Current.Value;
-                var comment = commentsContainer.ChildrenOfType<DrawableComment>().Last();
-                return comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText);
+                var comment = commentsContainer.ChildrenOfType<DrawableComment>().LastOrDefault();
+                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText);
             });
         }
 
