@@ -4,7 +4,6 @@
 #nullable disable
 
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Play.PlayerSettings
@@ -16,11 +15,16 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
         }
 
-        private ScheduledDelegate hoverExpandEvent;
+        private bool expandedByDefault = true;
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateHoverExpansion();
+            if (IsHovered && !Expanded.Value)
+            {
+                Expanded.Value = true;
+                expandedByDefault = false;
+            }
+
             base.OnHover(e);
 
             // Importantly, return true to correctly take focus away from PlayerLoader.
@@ -29,23 +33,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (hoverExpandEvent != null)
-            {
-                hoverExpandEvent?.Cancel();
-                hoverExpandEvent = null;
-
+            if (!expandedByDefault)
                 Expanded.Value = false;
-            }
 
             base.OnHoverLost(e);
-        }
-
-        private void updateHoverExpansion()
-        {
-            hoverExpandEvent?.Cancel();
-
-            if (IsHovered && !Expanded.Value)
-                hoverExpandEvent = Scheduler.AddDelayed(() => Expanded.Value = true, 0);
         }
     }
 }
