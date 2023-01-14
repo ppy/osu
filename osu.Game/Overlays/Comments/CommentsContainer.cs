@@ -390,7 +390,7 @@ namespace osu.Game.Overlays.Comments
             base.Dispose(isDisposing);
         }
 
-        private partial class NoCommentsPlaceholder : CompositeDrawable
+        internal partial class NoCommentsPlaceholder : CompositeDrawable
         {
             [BackgroundDependencyLoader]
             private void load()

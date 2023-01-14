@@ -32,13 +32,18 @@ namespace osu.Game.Tests.Visual.Online
 
         private CommentsContainer commentsContainer;
 
+        private TextBox editorTextBox;
+
         [SetUp]
         public void SetUp() => Schedule(() =>
+        {
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = commentsContainer = new CommentsContainer()
-            });
+            };
+            editorTextBox = commentsContainer.ChildrenOfType<TextBox>().First();
+        });
 
         [Test]
         public void TestIdleState()
@@ -129,21 +134,41 @@ namespace osu.Game.Tests.Visual.Online
                 commentsContainer.ChildrenOfType<DrawableComment>().Count(d => d.Comment.Pinned == withPinned) == 1);
         }
 
-        [TestCase]
+        [Test]
         public void TestPost()
+        {
+            setUpCommentsResponse(new CommentBundle { Comments = new List<Comment>() });
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddAssert("no comments placeholder shown", () => commentsContainer.ChildrenOfType<CommentsContainer.NoCommentsPlaceholder>().Any());
+
+            setUpPostResponse();
+            AddStep("enter text", () => editorTextBox.Current.Value = "comm");
+            AddStep("submit", () => commentsContainer.ChildrenOfType<RoundedButton>().First().TriggerClick());
+
+            AddUntilStep("comment sent", () =>
+            {
+                string writtenText = editorTextBox.Current.Value;
+                var comment = commentsContainer.ChildrenOfType<DrawableComment>().Last();
+                return comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText);
+            });
+            AddAssert("no comments placeholder removed", () => !commentsContainer.ChildrenOfType<CommentsContainer.NoCommentsPlaceholder>().Any());
+        }
+
+        [Test]
+        public void TestPostWithExistingComments()
         {
             setUpCommentsResponse(getExampleComments());
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+
             setUpPostResponse();
-            AddStep("Enter text", () => this.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<TextBox>().Single().Current.Value = "comm");
-            AddStep("Submit", () => this.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<RoundedButton>().First().TriggerClick());
-            AddUntilStep("Comment sent", () =>
+            AddStep("enter text", () => editorTextBox.Current.Value = "comm");
+            AddStep("submit", () => commentsContainer.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<RoundedButton>().First().TriggerClick());
+
+            AddUntilStep("comment sent", () =>
             {
-                string text = this.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<TextBox>().Single().Current.Value;
-                return this.ChildrenOfType<DrawableComment>().Any(x =>
-                {
-                    return x.ChildrenOfType<SpriteText>().Any(y => y.Text == text);
-                });
+                string writtenText = editorTextBox.Current.Value;
+                var comment = commentsContainer.ChildrenOfType<DrawableComment>().Last();
+                return comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText);
             });
         }
 
