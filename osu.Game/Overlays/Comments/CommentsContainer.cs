@@ -409,6 +409,7 @@ namespace osu.Game.Overlays.Comments
 
             public Action<CommentBundle> OnPost;
 
+            //TODO should match web, left empty due to no multiline support
             protected override LocalisableString FooterText => default;
 
             protected override LocalisableString CommitButtonText => CommonStrings.ButtonsPost;
