@@ -181,7 +181,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddStep("exit", () => Player.Exit());
 
-            AddAssert("ensure failing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == false);
+            AddUntilStep("wait for submission", () => Player.SubmittedScore != null);
+            AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Passed == false);
         }
 
         [Test]
@@ -209,7 +210,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             addFakeHit();
 
             AddStep("exit", () => Player.Exit());
-            AddAssert("ensure failing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == false);
+
+            AddUntilStep("wait for submission", () => Player.SubmittedScore != null);
+            AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Passed == false);
         }
 
         [Test]
