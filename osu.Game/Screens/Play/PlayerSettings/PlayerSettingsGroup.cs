@@ -29,12 +29,13 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (hoverExpandEvent == null) return;
+            if (hoverExpandEvent != null)
+            {
+                hoverExpandEvent?.Cancel();
+                hoverExpandEvent = null;
 
-            hoverExpandEvent?.Cancel();
-            hoverExpandEvent = null;
-
-            Expanded.Value = false;
+                Expanded.Value = false;
+            }
 
             base.OnHoverLost(e);
         }
