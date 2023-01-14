@@ -344,15 +344,7 @@ namespace osu.Game.Overlays.Comments
 
                     foreach (var comment in loaded)
                     {
-                        int pos = -1;
-
-                        if (content.Count > 0)
-                        {
-                            var first = content.FlowingChildren.First();
-                            pos = (int)(content.GetLayoutPosition(first) - 1);
-                        }
-
-                        content.Insert(pos, comment);
+                        content.Insert((int)-Clock.CurrentTime, comment);
                     }
                 }, (loadCancellation = new CancellationTokenSource()).Token);
             }
