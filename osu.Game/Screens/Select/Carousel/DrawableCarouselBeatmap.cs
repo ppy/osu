@@ -11,6 +11,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -87,6 +88,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             Header.Height = height;
             Header.HasBorder = false;
+            Header.BorderContainer.EdgeEffect = new EdgeEffectParameters();
 
             if (songSelect != null)
             {
@@ -209,6 +211,7 @@ namespace osu.Game.Screens.Select.Carousel
             MovementContainer.MoveToX(-50, 500, Easing.OutExpo);
 
             Header.Height = height + 2;
+
             colourUnderline.FadeInFromZero();
         }
 
@@ -219,6 +222,15 @@ namespace osu.Game.Screens.Select.Carousel
             MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
             Header.Height = height;
+
+            Header.BorderContainer.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Offset = new Vector2(1),
+                Radius = 10,
+                Colour = Colour4.Black.Opacity(100),
+            };
+
             colourUnderline.FadeOutFromOne();
         }
 
@@ -254,6 +266,15 @@ namespace osu.Game.Screens.Select.Carousel
 
                     starCounter.Colour = colourBox.Colour = colourUnderline.Colour =
                         colours.ForStarDifficulty(d.NewValue.Value.Stars);
+
+                    if (Item!.State.Value == CarouselItemState.NotSelected) return;
+
+                    Header.BorderContainer.EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = starCounter.Colour.MultiplyAlpha(.3f),
+                        Radius = 20
+                    };
                 }, true);
             }
 

@@ -82,6 +82,8 @@ namespace osu.Game.Screens.Select.Carousel
                 case CarouselItemState.Selected:
                     if (!HasBorder) return;
 
+                    hoverLayer.InsetForBorder = true;
+
                     BorderContainer.BorderThickness = border_thickness;
                     BorderContainer.EdgeEffect = new EdgeEffectParameters
                     {
