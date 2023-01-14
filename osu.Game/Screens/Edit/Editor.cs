@@ -51,7 +51,6 @@ using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK.Input;
-using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.Edit
 {
@@ -294,40 +293,40 @@ namespace osu.Game.Screens.Edit
                                 RelativeSizeAxes = Axes.Both,
                                 Items = new[]
                                 {
-                                    new MenuItem("File")
+                                    new MenuItem(EditorStrings.File)
                                     {
                                         Items = createFileMenuItems()
                                     },
-                                    new MenuItem(CommonStrings.ButtonsEdit)
+                                    new MenuItem(EditorStrings.Edit)
                                     {
                                         Items = new[]
                                         {
-                                            undoMenuItem = new EditorMenuItem("Undo", MenuItemType.Standard, Undo),
-                                            redoMenuItem = new EditorMenuItem("Redo", MenuItemType.Standard, Redo),
+                                            undoMenuItem = new EditorMenuItem(EditorStrings.Undo, MenuItemType.Standard, Undo),
+                                            redoMenuItem = new EditorMenuItem(EditorStrings.Redo, MenuItemType.Standard, Redo),
                                             new EditorMenuItemSpacer(),
-                                            cutMenuItem = new EditorMenuItem("Cut", MenuItemType.Standard, Cut),
-                                            copyMenuItem = new EditorMenuItem("Copy", MenuItemType.Standard, Copy),
-                                            pasteMenuItem = new EditorMenuItem("Paste", MenuItemType.Standard, Paste),
-                                            cloneMenuItem = new EditorMenuItem("Clone", MenuItemType.Standard, Clone),
+                                            cutMenuItem = new EditorMenuItem(EditorStrings.Cut, MenuItemType.Standard, Cut),
+                                            copyMenuItem = new EditorMenuItem(EditorStrings.Copy, MenuItemType.Standard, Copy),
+                                            pasteMenuItem = new EditorMenuItem(EditorStrings.Paste, MenuItemType.Standard, Paste),
+                                            cloneMenuItem = new EditorMenuItem(EditorStrings.Clone, MenuItemType.Standard, Clone),
                                         }
                                     },
-                                    new MenuItem("View")
+                                    new MenuItem(EditorStrings.View)
                                     {
                                         Items = new MenuItem[]
                                         {
                                             new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
                                             new BackgroundDimMenuItem(editorBackgroundDim),
-                                            new ToggleMenuItem("Show hit markers")
+                                            new ToggleMenuItem(EditorStrings.ShowHitMarkers)
                                             {
                                                 State = { BindTarget = editorHitMarkers },
                                             }
                                         }
                                     },
-                                    new MenuItem("Timing")
+                                    new MenuItem(EditorStrings.Timing)
                                     {
                                         Items = new MenuItem[]
                                         {
-                                            new EditorMenuItem("Set preview point to current time", MenuItemType.Standard, SetPreviewPointToCurrentTime)
+                                            new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime)
                                         }
                                     }
                                 }
@@ -716,7 +715,7 @@ namespace osu.Game.Screens.Edit
 
             if (!(refetchedBeatmap is DummyWorkingBeatmap))
             {
-                Logger.Log("Editor providing re-fetched beatmap post edit session");
+                Logger.Log(@"Editor providing re-fetched beatmap post edit session");
                 Beatmap.Value = refetchedBeatmap;
             }
         }
@@ -952,15 +951,15 @@ namespace osu.Game.Screens.Edit
 
         private List<MenuItem> createFileMenuItems() => new List<MenuItem>
         {
-            new EditorMenuItem("Save", MenuItemType.Standard, () => Save()),
-            new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+            new EditorMenuItem(EditorStrings.Save, MenuItemType.Standard, () => Save()),
+            new EditorMenuItem(EditorStrings.ExportPackage, MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
             new EditorMenuItemSpacer(),
             createDifficultyCreationMenu(),
             createDifficultySwitchMenu(),
             new EditorMenuItemSpacer(),
-            new EditorMenuItem("Delete difficulty", MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } },
+            new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } },
             new EditorMenuItemSpacer(),
-            new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit)
+            new EditorMenuItem(EditorStrings.Exit, MenuItemType.Standard, this.Exit)
         };
 
         private void exportBeatmap()
@@ -1009,7 +1008,7 @@ namespace osu.Game.Screens.Edit
             foreach (var ruleset in rulesets.AvailableRulesets)
                 rulesetItems.Add(new EditorMenuItem(ruleset.Name, MenuItemType.Standard, () => CreateNewDifficulty(ruleset)));
 
-            return new EditorMenuItem("Create new difficulty") { Items = rulesetItems };
+            return new EditorMenuItem(EditorStrings.CreateNewDifficulty) { Items = rulesetItems };
         }
 
         protected void CreateNewDifficulty(RulesetInfo rulesetInfo)
@@ -1045,7 +1044,7 @@ namespace osu.Game.Screens.Edit
                 }
             }
 
-            return new EditorMenuItem("Change difficulty") { Items = difficultyItems };
+            return new EditorMenuItem(EditorStrings.ChangeDifficulty) { Items = difficultyItems };
         }
 
         protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap.Ruleset));
