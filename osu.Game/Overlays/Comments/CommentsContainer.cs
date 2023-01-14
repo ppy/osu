@@ -29,13 +29,10 @@ namespace osu.Game.Overlays.Comments
     [Cached]
     public partial class CommentsContainer : CompositeDrawable
     {
-        private const string cid = "commentableId";
-
-        [Cached]
         private readonly Bindable<CommentableType> type = new Bindable<CommentableType>();
-
-        [Cached(name: cid)]
         private readonly BindableLong id = new BindableLong();
+        public IBindable<CommentableType> Type => type;
+        public IBindable<long> Id => id;
 
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
@@ -413,24 +410,23 @@ namespace osu.Game.Overlays.Comments
         private partial class NewCommentEditor : CommentEditor
         {
             [Resolved]
-            public Bindable<CommentableType> CommentableType { get; set; }
-
-            [Resolved(name: cid)]
-            public BindableLong CommentableId { get; set; }
-
-            protected override LocalisableString FooterText => default;
-            protected override LocalisableString CommitButtonText => CommonStrings.ButtonsPost;
-            protected override LocalisableString TextBoxPlaceholder => CommentsStrings.PlaceholderNew;
+            private CommentsContainer commentsContainer { get; set; }
 
             [Resolved]
             private IAPIProvider api { get; set; }
 
             public Action<CommentBundle> OnPost;
 
+            protected override LocalisableString FooterText => default;
+
+            protected override LocalisableString CommitButtonText => CommonStrings.ButtonsPost;
+
+            protected override LocalisableString TextBoxPlaceholder => CommentsStrings.PlaceholderNew;
+
             protected override void OnCommit(string text)
             {
                 ShowLoadingSpinner = true;
-                CommentPostRequest req = new CommentPostRequest(CommentableType.Value, CommentableId.Value, text);
+                CommentPostRequest req = new CommentPostRequest(commentsContainer.Type.Value, commentsContainer.Id.Value, text);
                 req.Failure += _ => Schedule(() =>
                 {
                     ShowLoadingSpinner = false;
