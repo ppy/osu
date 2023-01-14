@@ -7,28 +7,22 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -45,16 +39,20 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly BeatmapInfo beatmapInfo;
 
-        private Sprite background = null!;
-
         private Action<BeatmapInfo>? startRequested;
         private Action<BeatmapInfo>? editRequested;
         private Action<BeatmapInfo>? hideRequested;
 
-        private Triangles triangles = null!;
-
         private StarCounter starCounter = null!;
-        private DifficultyIcon difficultyIcon = null!;
+
+        private Box colourbox = null!;
+        private Box colourUnderline = null!;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
         private BeatmapSetOverlay? beatmapOverlay { get; set; }
@@ -81,6 +79,7 @@ namespace osu.Game.Screens.Select.Carousel
         private void load(BeatmapManager? manager, SongSelect? songSelect)
         {
             Header.Height = height;
+            Header.HasBorder = false;
 
             if (songSelect != null)
             {
@@ -94,31 +93,47 @@ namespace osu.Game.Screens.Select.Carousel
 
             Header.Children = new Drawable[]
             {
-                background = new Box
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        colourbox = new Box
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 40,
+                        },
+                        colourUnderline = new Box
+                        {
+                            Alpha = 0,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 3
+                        },
+                    }
                 },
-                triangles = new Triangles
+                new Container
                 {
-                    TriangleScale = 2,
-                    RelativeSizeAxes = Axes.Both,
-                    ColourLight = Color4Extensions.FromHex(@"3a7285"),
-                    ColourDark = Color4Extensions.FromHex(@"123744")
+                    Masking = true,
+                    CornerRadius = 10,
+                    RelativeSizeAxes = Axes.X,
+                    // We don't want to match the header's size when its selected, hence no relative sizing.
+                    Height = height,
+                    X = 30,
+                    Colour = colourProvider.Background3,
+                    Child = new Box { RelativeSizeAxes = Axes.Both },
                 },
                 new FillFlowContainer
                 {
-                    Padding = new MarginPadding(5),
+                    // Padding ould be 10, but the header is offset by 2 because of the border container.
+                    Padding = new MarginPadding { Top = 8 },
                     Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        difficultyIcon = new DifficultyIcon(beatmapInfo)
-                        {
-                            ShowTooltip = false,
-                            Scale = new Vector2(1.8f),
-                        },
                         new FillFlowContainer
                         {
                             Padding = new MarginPadding { Left = 5 },
@@ -126,6 +141,18 @@ namespace osu.Game.Screens.Select.Carousel
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
+                                new FillFlowContainer
+                                {
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(4, 0),
+                                    Scale = new Vector2(0.8f),
+                                    AutoSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new TopLocalRank(beatmapInfo),
+                                        starCounter = new StarCounter { Scale = new Vector2(0.8f) }
+                                    }
+                                },
                                 new FillFlowContainer
                                 {
                                     Direction = FillDirection.Horizontal,
@@ -145,19 +172,7 @@ namespace osu.Game.Screens.Select.Carousel
                                             Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmapInfo.Metadata.Author.Username),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
-                                        },
-                                    }
-                                },
-                                new FillFlowContainer
-                                {
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(4, 0),
-                                    Scale = new Vector2(0.8f),
-                                    AutoSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new TopLocalRank(beatmapInfo),
-                                        starCounter = new StarCounter()
+                                        }
                                     }
                                 }
                             }
@@ -173,11 +188,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(-50, 500, Easing.OutExpo);
 
-            background.Colour = ColourInfo.GradientVertical(
-                new Color4(20, 43, 51, 255),
-                new Color4(40, 86, 102, 255));
-
-            triangles.Colour = Color4.White;
+            Header.Height = height + 2;
+            colourUnderline.FadeInFromZero();
         }
 
         protected override void Deselected()
@@ -186,8 +198,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
-            background.Colour = new Color4(20, 43, 51, 255);
-            triangles.Colour = OsuColour.Gray(0.5f);
+            Header.Height = height;
+            colourUnderline.FadeInFromZero();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -213,8 +225,10 @@ namespace osu.Game.Screens.Select.Carousel
                 starDifficultyBindable.BindValueChanged(d =>
                 {
                     starCounter.Current = (float)(d.NewValue?.Stars ?? 0);
-                    if (d.NewValue != null)
-                        difficultyIcon.Current.Value = d.NewValue.Value;
+
+                    if (d.NewValue == null) return;
+
+                    colourbox.Colour = colourUnderline.Colour = colours.ForStarDifficulty(d.NewValue.Value.Stars);
                 }, true);
             }
 

@@ -7,6 +7,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
@@ -29,6 +30,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
+        public bool HasBorder = true;
+
         private const float corner_radius = 10;
         private const float border_thickness = 2.5f;
 
@@ -42,7 +45,7 @@ namespace osu.Game.Screens.Select.Carousel
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 CornerRadius = corner_radius,
-                BorderColour = new Color4(221, 255, 255, 255),
+                BorderColour = ColourInfo.GradientVertical(Colour4.Transparent, new Color4(221, 255, 255, 255)),
                 Children = new Drawable[]
                 {
                     Content,
@@ -77,7 +80,7 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case CarouselItemState.Selected:
-                    hoverLayer.InsetForBorder = true;
+                    if (!HasBorder) return;
 
                     BorderContainer.BorderThickness = border_thickness;
                     BorderContainer.EdgeEffect = new EdgeEffectParameters
