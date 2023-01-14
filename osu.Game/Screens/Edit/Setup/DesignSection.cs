@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Globalization;
 using System.Linq;
@@ -19,16 +17,16 @@ namespace osu.Game.Screens.Edit.Setup
 {
     internal partial class DesignSection : SetupSection
     {
-        protected LabelledSwitchButton EnableCountdown;
+        protected LabelledSwitchButton EnableCountdown = null!;
 
-        protected FillFlowContainer CountdownSettings;
-        protected LabelledEnumDropdown<CountdownType> CountdownSpeed;
-        protected LabelledNumberBox CountdownOffset;
+        protected FillFlowContainer CountdownSettings = null!;
+        protected LabelledEnumDropdown<CountdownType> CountdownSpeed = null!;
+        protected LabelledNumberBox CountdownOffset = null!;
 
-        private LabelledSwitchButton widescreenSupport;
-        private LabelledSwitchButton epilepsyWarning;
-        private LabelledSwitchButton letterboxDuringBreaks;
-        private LabelledSwitchButton samplesMatchPlaybackRate;
+        private LabelledSwitchButton widescreenSupport = null!;
+        private LabelledSwitchButton epilepsyWarning = null!;
+        private LabelledSwitchButton letterboxDuringBreaks = null!;
+        private LabelledSwitchButton samplesMatchPlaybackRate = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DesignHeader;
 
