@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,10 +16,10 @@ namespace osu.Game.Screens.Edit.Setup
     public partial class SetupScreenHeaderBackground : CompositeDrawable
     {
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private IBindable<WorkingBeatmap> working { get; set; }
+        private IBindable<WorkingBeatmap> working { get; set; } = null!;
 
         private readonly Container content;
 
