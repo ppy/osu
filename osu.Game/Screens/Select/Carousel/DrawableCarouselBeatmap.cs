@@ -269,6 +269,7 @@ namespace osu.Game.Screens.Select.Carousel
 
                     if (Item!.State.Value == CarouselItemState.NotSelected) return;
 
+                    // We want to update the EdgeEffect here instead of in selected() to make sure the colours are correct
                     Header.BorderContainer.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
