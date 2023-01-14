@@ -12,14 +12,14 @@ namespace osu.Game.Online.API.Requests
         public readonly CommentableType Commentable;
         public readonly long CommentableId;
         public readonly string Message;
-        public readonly long? ReplyTo;
+        public readonly long? ParentCommentId;
 
-        public CommentPostRequest(CommentableType commentable, long commentableId, string message, long? replyTo = null)
+        public CommentPostRequest(CommentableType commentable, long commentableId, string message, long? parentCommentId = null)
         {
             Commentable = commentable;
             CommentableId = commentableId;
             Message = message;
-            ReplyTo = replyTo;
+            ParentCommentId = parentCommentId;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -30,8 +30,8 @@ namespace osu.Game.Online.API.Requests
             req.AddParameter(@"comment[commentable_type]", Commentable.ToString().ToLowerInvariant());
             req.AddParameter(@"comment[commentable_id]", $"{CommentableId}");
             req.AddParameter(@"comment[message]", Message);
-            if (ReplyTo.HasValue)
-                req.AddParameter(@"comment[parent_id]", $"{ReplyTo}");
+            if (ParentCommentId.HasValue)
+                req.AddParameter(@"comment[parent_id]", $"{ParentCommentId}");
 
             return req;
         }
