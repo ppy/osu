@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Components.Menus
@@ -10,13 +11,13 @@ namespace osu.Game.Screens.Edit.Components.Menus
     {
         private const int min_text_length = 40;
 
-        public EditorMenuItem(string text, MenuItemType type = MenuItemType.Standard)
-            : base(text.PadRight(min_text_length), type)
+        public EditorMenuItem(LocalisableString text, MenuItemType type = MenuItemType.Standard)
+            : base(LocalisableString.Interpolate($"{text,-min_text_length}"), type)
         {
         }
 
-        public EditorMenuItem(string text, MenuItemType type, Action action)
-            : base(text.PadRight(min_text_length), type, action)
+        public EditorMenuItem(LocalisableString text, MenuItemType type, Action action)
+            : base(LocalisableString.Interpolate($"{text,-min_text_length}"), type, action)
         {
         }
     }

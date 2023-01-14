@@ -56,11 +56,6 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 Bar.Expire();
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-            }
-
             protected override void OnActivated()
             {
                 base.OnActivated();
