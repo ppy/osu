@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -45,8 +46,11 @@ namespace osu.Game.Screens.Select.Carousel
         private Action<BeatmapInfo>? hideRequested;
 
         private StarCounter starCounter = null!;
+        private ConstrainedIconContainer iconContainer = null!;
 
-        private Box colourbox = null!;
+        private Box colourBox = null!;
+
+        // The purpose of this underline is to avoid the bleed caused by making the colourBox fill the container, without incurring the performance hit of using a buffered container
         private Box colourUnderline = null!;
 
         private StarRatingDisplay starRatingDisplay = null!;
@@ -101,7 +105,7 @@ namespace osu.Game.Screens.Select.Carousel
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        colourbox = new Box
+                        colourBox = new Box
                         {
                             RelativeSizeAxes = Axes.Y,
                             Width = 40,
@@ -127,9 +131,18 @@ namespace osu.Game.Screens.Select.Carousel
                     Colour = colourProvider.Background3,
                     Child = new Box { RelativeSizeAxes = Axes.Both },
                 },
+
+                iconContainer = new ConstrainedIconContainer
+                {
+                    X = 15,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.CentreLeft,
+                    Icon = beatmapInfo.Ruleset.CreateInstance().CreateIcon(),
+                    Size = new Vector2(20)
+                },
                 new FillFlowContainer
                 {
-                    Padding = new MarginPadding { Top = 10, Left = 40 },
+                    Padding = new MarginPadding { Top = 8, Left = 40 },
                     Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -147,21 +160,19 @@ namespace osu.Game.Screens.Select.Carousel
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
-                                        {
-                                        },
+                                        starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small),
                                         new TopLocalRank(beatmapInfo),
                                         starCounter = new StarCounter
                                         {
                                             Margin = new MarginPadding { Top = 8 }, // Better aligns the stars with the star rating display
-                                            Scale = new Vector2(8 / 20f),
+                                            Scale = new Vector2(8 / 20f)
                                         }
                                     }
                                 },
                                 new FillFlowContainer
                                 {
                                     Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(4, 0),
+                                    Spacing = new Vector2(11, 0),
                                     AutoSizeAxes = Axes.Both,
                                     Children = new[]
                                     {
@@ -206,7 +217,7 @@ namespace osu.Game.Screens.Select.Carousel
             MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
             Header.Height = height;
-            colourUnderline.FadeInFromZero();
+            colourUnderline.FadeOutFromOne();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -236,7 +247,10 @@ namespace osu.Game.Screens.Select.Carousel
 
                     if (d.NewValue == null) return;
 
-                    starCounter.Colour = colourbox.Colour = colourUnderline.Colour =
+                    // Every other element in song select that uses this cut off uses yellow for the upper range but the designs use white here for whatever reason.
+                    iconContainer.Colour = d.NewValue.Value.Stars > 6.5f ? Colour4.White : colours.B5;
+
+                    starCounter.Colour = colourBox.Colour = colourUnderline.Colour =
                         colours.ForStarDifficulty(d.NewValue.Value.Stars);
                 }, true);
             }
