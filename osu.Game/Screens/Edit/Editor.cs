@@ -51,7 +51,7 @@ using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK.Input;
-using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.Edit
 {
@@ -294,24 +294,24 @@ namespace osu.Game.Screens.Edit
                                 RelativeSizeAxes = Axes.Both,
                                 Items = new[]
                                 {
-                                    new MenuItem(EditorStrings.File)
+                                    new MenuItem(CommonStrings.MenuBarFile)
                                     {
                                         Items = createFileMenuItems()
                                     },
-                                    new MenuItem(EditorStrings.Edit)
+                                    new MenuItem(CommonStrings.MenuBarEdit)
                                     {
                                         Items = new[]
                                         {
-                                            undoMenuItem = new EditorMenuItem(EditorStrings.Undo, MenuItemType.Standard, Undo),
-                                            redoMenuItem = new EditorMenuItem(EditorStrings.Redo, MenuItemType.Standard, Redo),
+                                            undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo),
+                                            redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo),
                                             new EditorMenuItemSpacer(),
-                                            cutMenuItem = new EditorMenuItem(EditorStrings.Cut, MenuItemType.Standard, Cut),
-                                            copyMenuItem = new EditorMenuItem(EditorStrings.Copy, MenuItemType.Standard, Copy),
-                                            pasteMenuItem = new EditorMenuItem(EditorStrings.Paste, MenuItemType.Standard, Paste),
-                                            cloneMenuItem = new EditorMenuItem(EditorStrings.Clone, MenuItemType.Standard, Clone),
+                                            cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut),
+                                            copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy),
+                                            pasteMenuItem = new EditorMenuItem(CommonStrings.Paste, MenuItemType.Standard, Paste),
+                                            cloneMenuItem = new EditorMenuItem(CommonStrings.Clone, MenuItemType.Standard, Clone),
                                         }
                                     },
-                                    new MenuItem(EditorStrings.View)
+                                    new MenuItem(CommonStrings.MenuBarView)
                                     {
                                         Items = new MenuItem[]
                                         {
@@ -344,7 +344,6 @@ namespace osu.Game.Screens.Edit
                     bottomBar = new BottomBar(),
                 }
             });
-
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
@@ -952,7 +951,7 @@ namespace osu.Game.Screens.Edit
 
         private List<MenuItem> createFileMenuItems() => new List<MenuItem>
         {
-            new EditorMenuItem(CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
+            new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
             new EditorMenuItem(EditorStrings.ExportPackage, MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
             new EditorMenuItemSpacer(),
             createDifficultyCreationMenu(),
@@ -960,7 +959,7 @@ namespace osu.Game.Screens.Edit
             new EditorMenuItemSpacer(),
             new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } },
             new EditorMenuItemSpacer(),
-            new EditorMenuItem(EditorStrings.Exit, MenuItemType.Standard, this.Exit)
+            new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, this.Exit)
         };
 
         private void exportBeatmap()

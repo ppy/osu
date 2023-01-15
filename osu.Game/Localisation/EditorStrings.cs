@@ -10,51 +10,6 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.Editor";
 
         /// <summary>
-        /// "File"
-        /// </summary>
-        public static LocalisableString File => new TranslatableString(getKey(@"file"), @"File");
-
-        /// <summary>
-        /// "Edit"
-        /// </summary>
-        public static LocalisableString Edit => new TranslatableString(getKey(@"edit"), @"Edit");
-
-        /// <summary>
-        /// "Undo"
-        /// </summary>
-        public static LocalisableString Undo => new TranslatableString(getKey(@"undo"), @"Undo");
-
-        /// <summary>
-        /// "Redo"
-        /// </summary>
-        public static LocalisableString Redo => new TranslatableString(getKey(@"redo"), @"Redo");
-
-        /// <summary>
-        /// "Cut"
-        /// </summary>
-        public static LocalisableString Cut => new TranslatableString(getKey(@"cut"), @"Cut");
-
-        /// <summary>
-        /// "Copy"
-        /// </summary>
-        public static LocalisableString Copy => new TranslatableString(getKey(@"copy"), @"Copy");
-
-        /// <summary>
-        /// "Paste"
-        /// </summary>
-        public static LocalisableString Paste => new TranslatableString(getKey(@"paste"), @"Paste");
-
-        /// <summary>
-        /// "Clone"
-        /// </summary>
-        public static LocalisableString Clone => new TranslatableString(getKey(@"clone"), @"Clone");
-
-        /// <summary>
-        /// "View"
-        /// </summary>
-        public static LocalisableString View => new TranslatableString(getKey(@"view"), @"View");
-
-        /// <summary>
         /// "Waveform opacity"
         /// </summary>
         public static LocalisableString WaveformOpacity => new TranslatableString(getKey(@"waveform_opacity"), @"Waveform opacity");
@@ -93,11 +48,6 @@ namespace osu.Game.Localisation
         /// "Delete difficulty"
         /// </summary>
         public static LocalisableString DeleteDifficulty => new TranslatableString(getKey(@"delete_difficulty"), @"Delete difficulty");
-
-        /// <summary>
-        /// "Exit"
-        /// </summary>
-        public static LocalisableString Exit => new TranslatableString(getKey(@"exit"), @"Exit");
 
         /// <summary>
         /// "setup"
