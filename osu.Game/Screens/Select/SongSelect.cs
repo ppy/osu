@@ -314,17 +314,16 @@ namespace osu.Game.Screens.Select
         /// Creates the buttons to be displayed in the footer.
         /// </summary>
         /// <returns>A set of <see cref="FooterButton"/> and an optional <see cref="OverlayContainer"/> which the button opens when pressed.</returns>
-        protected virtual IEnumerable<(FooterButton, OverlayContainer?)> CreateFooterButtons() =>
-            new (FooterButton, OverlayContainer?)[]
+        protected virtual IEnumerable<(FooterButton, OverlayContainer?)> CreateFooterButtons() => new (FooterButton, OverlayContainer?)[]
+        {
+            (new FooterButtonMods { Current = Mods }, ModSelect),
+            (new FooterButtonRandom
             {
-                (new FooterButtonMods { Current = Mods }, ModSelect),
-                (new FooterButtonRandom
-                {
-                    NextRandom = () => Carousel.SelectNextRandom(),
-                    PreviousRandom = Carousel.SelectPreviousRandom
-                }, null),
-                (beatmapOptionsButton = new FooterButtonOptions(), BeatmapOptions)
-            };
+                NextRandom = () => Carousel.SelectNextRandom(),
+                PreviousRandom = Carousel.SelectPreviousRandom
+            }, null),
+            (beatmapOptionsButton = new FooterButtonOptions(), BeatmapOptions)
+        };
 
         protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
 
@@ -425,25 +424,26 @@ namespace osu.Game.Screens.Select
 
             Logger.Log($"Song select working beatmap updated to {beatmap}");
 
-            if (Carousel.SelectBeatmap(beatmap.BeatmapInfo, false)) return;
-
-            // A selection may not have been possible with filters applied.
-
-            // There was possibly a ruleset mismatch. This is a case we can help things along by updating the game-wide ruleset to match.
-            if (!beatmap.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
+            if (!Carousel.SelectBeatmap(beatmap.BeatmapInfo, false))
             {
-                Ruleset.Value = beatmap.BeatmapInfo.Ruleset;
-                transferRulesetValue();
+                // A selection may not have been possible with filters applied.
+
+                // There was possibly a ruleset mismatch. This is a case we can help things along by updating the game-wide ruleset to match.
+                if (!beatmap.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
+                {
+                    Ruleset.Value = beatmap.BeatmapInfo.Ruleset;
+                    transferRulesetValue();
+                }
+
+                // Even if a ruleset mismatch was not the cause (ie. a text filter is applied),
+                // we still want to temporarily show the new beatmap, bypassing filters.
+                // This will be undone the next time the user changes the filter.
+                var criteria = FilterControl.CreateCriteria();
+                criteria.SelectedBeatmapSet = beatmap.BeatmapInfo.BeatmapSet;
+                Carousel.Filter(criteria);
+
+                Carousel.SelectBeatmap(beatmap.BeatmapInfo);
             }
-
-            // Even if a ruleset mismatch was not the cause (ie. a text filter is applied),
-            // we still want to temporarily show the new beatmap, bypassing filters.
-            // This will be undone the next time the user changes the filter.
-            var criteria = FilterControl.CreateCriteria();
-            criteria.SelectedBeatmapSet = beatmap.BeatmapInfo.BeatmapSet;
-            Carousel.Filter(criteria);
-
-            Carousel.SelectBeatmap(beatmap.BeatmapInfo);
         }
 
         // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
