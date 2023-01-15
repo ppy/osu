@@ -24,11 +24,12 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osu.Game.Skinning;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play
 {
     [Cached]
-    public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
+    public partial class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         public const float FADE_DURATION = 300;
 
@@ -38,6 +39,17 @@ namespace osu.Game.Screens.Play
         /// The total height of all the bottom of screen scoring elements.
         /// </summary>
         public float BottomScoringElementsHeight { get; private set; }
+
+        protected override bool ShouldBeConsideredForInput(Drawable child)
+        {
+            // HUD uses AlwaysVisible on child components so they can be in an updated state for next display.
+            // Without blocking input, this would also allow them to be interacted with in such a state.
+            if (ShowHud.Value)
+                return base.ShouldBeConsideredForInput(child);
+
+            // hold to quit button should always be interactive.
+            return child == bottomRightElements;
+        }
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly ModDisplay ModDisplay;
@@ -161,7 +173,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = $"The score overlay is currently disabled. You can toggle this by pressing {config.LookupKeyBindings(GlobalAction.ToggleInGameInterface)}."
+                    Text = NotificationsStrings.ScoreOverlayDisabled(config.LookupKeyBindings(GlobalAction.ToggleInGameInterface))
                 });
             }
 
@@ -372,7 +384,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class MainComponentsContainer : SkinnableTargetContainer
+        private partial class MainComponentsContainer : SkinnableTargetContainer
         {
             private Bindable<ScoringMode> scoringMode;
 
@@ -380,7 +392,7 @@ namespace osu.Game.Screens.Play
             private OsuConfigManager config { get; set; }
 
             public MainComponentsContainer()
-                : base(SkinnableTarget.MainHUDComponents)
+                : base(GlobalSkinComponentLookup.LookupType.MainHUDComponents)
             {
                 RelativeSizeAxes = Axes.Both;
             }

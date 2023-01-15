@@ -16,7 +16,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class RollingCounter<T> : Container, IHasCurrentValue<T>
+    public abstract partial class RollingCounter<T> : Container, IHasCurrentValue<T>
         where T : struct, IEquatable<T>
     {
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();

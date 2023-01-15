@@ -16,7 +16,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneRankingsCountryFilter : OsuTestScene
+    public partial class TestSceneRankingsCountryFilter : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);

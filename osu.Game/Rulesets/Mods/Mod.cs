@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Mods
 
                 foreach ((SettingSourceAttribute attr, PropertyInfo property) in this.GetOrderedSettingsSourceProperties())
                 {
-                    var bindable = (IBindable)property.GetValue(this);
+                    var bindable = (IBindable)property.GetValue(this)!;
 
                     if (!bindable.IsDefault)
                         tooltipTexts.Add($"{attr.Label} {bindable}");
@@ -100,9 +100,6 @@ namespace osu.Game.Rulesets.Mods
 
         [JsonIgnore]
         public virtual bool ValidForMultiplayerAsFreeMod => true;
-
-        [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override and set UserPlayable to false.")] // Can be removed 20211009
-        public virtual bool Ranked => false;
 
         /// <summary>
         /// Whether this mod requires configuration to apply changes to the game.
@@ -137,7 +134,7 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         public virtual Mod DeepClone()
         {
-            var result = (Mod)Activator.CreateInstance(GetType());
+            var result = (Mod)Activator.CreateInstance(GetType())!;
             result.CopyFrom(this);
             return result;
         }
@@ -153,8 +150,8 @@ namespace osu.Game.Rulesets.Mods
 
             foreach (var (_, prop) in this.GetSettingsSourceProperties())
             {
-                var targetBindable = (IBindable)prop.GetValue(this);
-                var sourceBindable = (IBindable)prop.GetValue(source);
+                var targetBindable = (IBindable)prop.GetValue(this)!;
+                var sourceBindable = (IBindable)prop.GetValue(source)!;
 
                 CopyAdjustedSetting(targetBindable, sourceBindable);
             }
@@ -186,9 +183,9 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public bool Equals(IMod other) => other is Mod them && Equals(them);
+        public bool Equals(IMod? other) => other is Mod them && Equals(them);
 
-        public bool Equals(Mod other)
+        public bool Equals(Mod? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -212,16 +209,16 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Reset all custom settings for this mod back to their defaults.
         /// </summary>
-        public virtual void ResetSettingsToDefaults() => CopyFrom((Mod)Activator.CreateInstance(GetType()));
+        public virtual void ResetSettingsToDefaults() => CopyFrom((Mod)Activator.CreateInstance(GetType())!);
 
         private class ModSettingsEqualityComparer : IEqualityComparer<IBindable>
         {
             public static ModSettingsEqualityComparer Default { get; } = new ModSettingsEqualityComparer();
 
-            public bool Equals(IBindable x, IBindable y)
+            public bool Equals(IBindable? x, IBindable? y)
             {
-                object xValue = x.GetUnderlyingSettingValue();
-                object yValue = y.GetUnderlyingSettingValue();
+                object? xValue = x?.GetUnderlyingSettingValue();
+                object? yValue = y?.GetUnderlyingSettingValue();
 
                 return EqualityComparer<object>.Default.Equals(xValue, yValue);
             }

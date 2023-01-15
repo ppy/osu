@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,26 +9,45 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class MetadataSection : Container
+    public abstract partial class MetadataSection : MetadataSection<string>
+    {
+        public override string Metadata
+        {
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    this.FadeOut(TRANSITION_DURATION);
+                    return;
+                }
+
+                base.Metadata = value;
+            }
+        }
+
+        protected MetadataSection(MetadataType type, Action<string>? searchAction = null)
+            : base(type, searchAction)
+        {
+        }
+    }
+
+    public abstract partial class MetadataSection<T> : Container
     {
         private readonly FillFlowContainer textContainer;
-        private readonly MetadataType type;
-        private TextFlowContainer textFlow;
+        private TextFlowContainer? textFlow;
 
-        private readonly Action<string> searchAction;
+        protected readonly Action<T>? SearchAction;
 
-        private const float transition_duration = 250;
+        protected const float TRANSITION_DURATION = 250;
 
-        public MetadataSection(MetadataType type, Action<string> searchAction = null)
+        protected MetadataSection(MetadataType type, Action<T>? searchAction = null)
         {
-            this.type = type;
-            this.searchAction = searchAction;
+            SearchAction = searchAction;
 
             Alpha = 0;
 
@@ -53,7 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         AutoSizeAxes = Axes.Y,
                         Child = new OsuSpriteText
                         {
-                            Text = this.type.GetLocalisableDescription(),
+                            Text = type.GetLocalisableDescription(),
                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                         },
                     },
@@ -61,23 +78,23 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
-        public string Text
+        public virtual T Metadata
         {
             set
             {
-                if (string.IsNullOrEmpty(value))
+                if (value == null)
                 {
-                    this.FadeOut(transition_duration);
+                    this.FadeOut(TRANSITION_DURATION);
                     return;
                 }
 
-                this.FadeIn(transition_duration);
+                this.FadeIn(TRANSITION_DURATION);
 
-                setTextAsync(value);
+                setTextFlowAsync(value);
             }
         }
 
-        private void setTextAsync(string text)
+        private void setTextFlowAsync(T metadata)
         {
             LoadComponentAsync(new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
             {
@@ -88,44 +105,15 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 textFlow?.Expire();
 
-                switch (type)
-                {
-                    case MetadataType.Tags:
-                        string[] tags = text.Split(" ");
-
-                        for (int i = 0; i <= tags.Length - 1; i++)
-                        {
-                            string tag = tags[i];
-
-                            if (searchAction != null)
-                                loaded.AddLink(tag, () => searchAction(tag));
-                            else
-                                loaded.AddLink(tag, LinkAction.SearchBeatmapSet, tag);
-
-                            if (i != tags.Length - 1)
-                                loaded.AddText(" ");
-                        }
-
-                        break;
-
-                    case MetadataType.Source:
-                        if (searchAction != null)
-                            loaded.AddLink(text, () => searchAction(text));
-                        else
-                            loaded.AddLink(text, LinkAction.SearchBeatmapSet, text);
-
-                        break;
-
-                    default:
-                        loaded.AddText(text);
-                        break;
-                }
+                AddMetadata(metadata, loaded);
 
                 textContainer.Add(textFlow = loaded);
 
                 // fade in if we haven't yet.
-                textContainer.FadeIn(transition_duration);
+                textContainer.FadeIn(TRANSITION_DURATION);
             });
         }
+
+        protected abstract void AddMetadata(T metadata, LinkFlowContainer loaded);
     }
 }

@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    public class Stage : ScrollingPlayfield
+    public partial class Stage : ScrollingPlayfield
     {
         [Cached]
         public readonly StageDefinition Definition;
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageBackground), _ => new DefaultStageBackground())
+                        new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.StageBackground), _ => new DefaultStageBackground())
                         {
                             RelativeSizeAxes = Axes.Both
                         },
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 RelativeSizeAxes = Axes.Y,
                             }
                         },
-                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageForeground), _ => null)
+                        new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.StageForeground), _ => null)
                         {
                             RelativeSizeAxes = Axes.Both
                         },
@@ -156,6 +156,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override void Dispose(bool isDisposing)
         {
+            // must happen before children are disposed in base call to prevent illegal accesses to the judgement pool.
+            NewResult -= OnNewResult;
+
             base.Dispose(isDisposing);
 
             if (currentSkin != null)

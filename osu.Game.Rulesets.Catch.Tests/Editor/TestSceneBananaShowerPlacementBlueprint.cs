@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public class TestSceneBananaShowerPlacementBlueprint : CatchPlacementBlueprintTestScene
+    public partial class TestSceneBananaShowerPlacementBlueprint : CatchPlacementBlueprintTestScene
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableBananaShower((BananaShower)hitObject);
 

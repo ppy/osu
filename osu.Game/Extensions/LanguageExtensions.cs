@@ -3,6 +3,8 @@
 
 using System;
 using System.Globalization;
+using osu.Framework.Configuration;
+using osu.Framework.Localisation;
 using osu.Game.Localisation;
 
 namespace osu.Game.Extensions
@@ -29,5 +31,28 @@ namespace osu.Game.Extensions
         /// <returns>Whether the parsing succeeded.</returns>
         public static bool TryParseCultureCode(string cultureCode, out Language language)
             => Enum.TryParse(cultureCode.Replace("-", "_"), out language);
+
+        /// <summary>
+        /// Parses the <see cref="Language"/> that is specified in <paramref name="frameworkLocale"/>,
+        /// or if that is not valid, the language of the current <see cref="ResourceManagerLocalisationStore"/> as exposed by <paramref name="localisationParameters"/>.
+        /// </summary>
+        /// <param name="frameworkLocale">The current <see cref="FrameworkSetting.Locale"/>.</param>
+        /// <param name="localisationParameters">The current <see cref="LocalisationParameters"/> of the <see cref="LocalisationManager"/>.</param>
+        /// <returns>The parsed language.</returns>
+        public static Language GetLanguageFor(string frameworkLocale, LocalisationParameters localisationParameters)
+        {
+            // the usual case when the user has changed the language
+            if (TryParseCultureCode(frameworkLocale, out var language))
+                return language;
+
+            if (localisationParameters.Store != null)
+            {
+                // startup case, locale not explicitly set, or the set language was removed in an update
+                if (TryParseCultureCode(localisationParameters.Store.EffectiveCulture.Name, out language))
+                    return language;
+            }
+
+            return Language.en;
+        }
     }
 }

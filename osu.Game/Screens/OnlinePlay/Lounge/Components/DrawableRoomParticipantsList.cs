@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -21,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class DrawableRoomParticipantsList : OnlinePlayComposite
+    public partial class DrawableRoomParticipantsList : OnlinePlayComposite
     {
         private const float avatar_size = 36;
 
@@ -197,11 +198,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Debug.Assert(e.NewItems != null);
+
                     foreach (var added in e.NewItems.OfType<APIUser>())
                         addUser(added);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (var removed in e.OldItems.OfType<APIUser>())
                         removeUser(removed);
                     break;
@@ -270,7 +275,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private class CircularAvatar : CompositeDrawable
+        private partial class CircularAvatar : CompositeDrawable
         {
             public APIUser User
             {
@@ -302,7 +307,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        public class HiddenUserCount : CompositeDrawable
+        public partial class HiddenUserCount : CompositeDrawable
         {
             public int Count
             {

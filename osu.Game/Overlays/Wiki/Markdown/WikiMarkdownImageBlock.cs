@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Wiki.Markdown
 {
-    public class WikiMarkdownImageBlock : FillFlowContainer
+    public partial class WikiMarkdownImageBlock : FillFlowContainer
     {
         [Resolved]
         private IMarkdownTextFlowComponent parentFlowComponent { get; set; }
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
             textFlow.AddText(linkInline.Title);
         }
 
-        private class BlockMarkdownImage : WikiMarkdownImage
+        private partial class BlockMarkdownImage : WikiMarkdownImage
         {
             public BlockMarkdownImage(LinkInline linkInline)
                 : base(linkInline)
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
 
             protected override ImageContainer CreateImageContainer(string url) => new BlockImageContainer(url);
 
-            private class BlockImageContainer : ImageContainer
+            private partial class BlockImageContainer : ImageContainer
             {
                 public BlockImageContainer(string url)
                     : base(url)
@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
 
                 protected override Sprite CreateImageSprite() => new ImageSprite();
 
-                private class ImageSprite : Sprite
+                private partial class ImageSprite : Sprite
                 {
                     public ImageSprite()
                     {

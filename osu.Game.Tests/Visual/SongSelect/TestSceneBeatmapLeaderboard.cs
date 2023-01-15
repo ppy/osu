@@ -27,7 +27,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneBeatmapLeaderboard : OsuTestScene
+    public partial class TestSceneBeatmapLeaderboard : OsuTestScene
     {
         private readonly FailableLeaderboard leaderboard;
 
@@ -381,7 +381,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
-        private class FailableLeaderboard : BeatmapLeaderboard
+        private partial class FailableLeaderboard : BeatmapLeaderboard
         {
             public new void SetErrorState(LeaderboardState state) => base.SetErrorState(state);
             public new void SetScores(IEnumerable<ScoreInfo>? scores, ScoreInfo? userScore = null) => base.SetScores(scores, userScore);

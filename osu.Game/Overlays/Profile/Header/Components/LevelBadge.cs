@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,13 +16,13 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class LevelBadge : CompositeDrawable, IHasTooltip
+    public partial class LevelBadge : CompositeDrawable, IHasTooltip
     {
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         public LocalisableString TooltipText { get; private set; }
 
-        private OsuSpriteText levelText;
+        private OsuSpriteText levelText = null!;
 
         public LevelBadge()
         {
@@ -50,13 +48,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 }
             };
 
-            User.BindValueChanged(user => updateLevel(user.NewValue));
+            User.BindValueChanged(user => updateLevel(user.NewValue?.User));
         }
 
-        private void updateLevel(APIUser user)
+        private void updateLevel(APIUser? user)
         {
-            levelText.Text = user?.Statistics?.Level.Current.ToString() ?? "0";
-            TooltipText = UsersStrings.ShowStatsLevel(user?.Statistics?.Level.Current.ToString());
+            string level = user?.Statistics?.Level.Current.ToString() ?? "0";
+            levelText.Text = level;
+            TooltipText = UsersStrings.ShowStatsLevel(level);
         }
     }
 }

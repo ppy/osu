@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -21,14 +22,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             this.beatmap = (ManiaBeatmap)beatmap;
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
-                case GameplaySkinComponent<HitResult> resultComponent:
+                case GameplaySkinComponentLookup<HitResult> resultComponent:
+                    // This should eventually be moved to a skin setting, when supported.
+                    if (Skin is ArgonProSkin && resultComponent.Component >= HitResult.Great)
+                        return Drawable.Empty();
+
                     return new ArgonJudgementPiece(resultComponent.Component);
 
-                case ManiaSkinComponent maniaComponent:
+                case ManiaSkinComponentLookup maniaComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (maniaComponent.Component)
                     {
@@ -61,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     break;
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
 
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
@@ -89,13 +94,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         Color4 colour;
 
+                        const int total_colours = 7;
+
                         if (stage.IsSpecialColumn(column))
                             colour = new Color4(159, 101, 255, 255);
                         else
                         {
-                            switch (column % 8)
+                            switch (column % total_colours)
                             {
-                                default:
+                                case 0:
                                     colour = new Color4(240, 216, 0, 255);
                                     break;
 
@@ -112,20 +119,19 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                     break;
 
                                 case 4:
-                                    colour = new Color4(178, 0, 240, 255);
-                                    break;
-
-                                case 5:
                                     colour = new Color4(0, 96, 240, 255);
                                     break;
 
-                                case 6:
+                                case 5:
                                     colour = new Color4(0, 226, 240, 255);
                                     break;
 
-                                case 7:
+                                case 6:
                                     colour = new Color4(0, 240, 96, 255);
                                     break;
+
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
                         }
 

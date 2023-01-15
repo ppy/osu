@@ -10,7 +10,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
 {
-    public class SoloSpectatorPlayer : SpectatorPlayer
+    public partial class SoloSpectatorPlayer : SpectatorPlayer
     {
         private readonly Score score;
 

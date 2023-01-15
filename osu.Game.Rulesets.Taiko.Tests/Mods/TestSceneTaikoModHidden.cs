@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Taiko.Mods;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Mods
 {
-    public class TestSceneTaikoModHidden : TaikoModTestScene
+    public partial class TestSceneTaikoModHidden : TaikoModTestScene
     {
         [Test]
         public void TestDefaultBeatmapTest() => CreateModTest(new ModTestData

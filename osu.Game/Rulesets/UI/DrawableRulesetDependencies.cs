@@ -115,7 +115,11 @@ namespace osu.Game.Rulesets.UI
 
             public Sample Get(string name) => primary.Get(name) ?? fallback.Get(name);
 
-            public Task<Sample> GetAsync(string name, CancellationToken cancellationToken = default) => primary.GetAsync(name, cancellationToken) ?? fallback.GetAsync(name, cancellationToken);
+            public async Task<Sample> GetAsync(string name, CancellationToken cancellationToken = default)
+            {
+                return await primary.GetAsync(name, cancellationToken).ConfigureAwait(false)
+                       ?? await fallback.GetAsync(name, cancellationToken).ConfigureAwait(false);
+            }
 
             public Stream GetStream(string name) => primary.GetStream(name) ?? fallback.GetStream(name);
 
