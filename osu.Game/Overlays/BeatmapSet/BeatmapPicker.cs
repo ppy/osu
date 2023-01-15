@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (BeatmapSet != null)
             {
-                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Concat(BeatmapSet.Converts)
+                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Concat(BeatmapSet.Converts ?? Array.Empty<APIBeatmap>())
                                                             .Where(b => b.Ruleset.MatchesOnlineID(ruleset.Value))
                                                             .OrderBy(b => !b.Convert)
                                                             .ThenBy(b => b.StarRating)
