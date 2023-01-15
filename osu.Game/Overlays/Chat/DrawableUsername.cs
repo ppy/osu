@@ -17,9 +17,11 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -30,7 +32,7 @@ namespace osu.Game.Overlays.Chat
         public Color4 AccentColour { get; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            Child.ReceivePositionalInputAt(screenSpacePos);
+            colouredDrawable.ReceivePositionalInputAt(screenSpacePos);
 
         public float FontSize
         {
@@ -87,13 +89,13 @@ namespace osu.Game.Overlays.Chat
             {
                 AccentColour = default_colours[user.Id % default_colours.Length];
 
-                Child = colouredDrawable = drawableText;
+                Add(colouredDrawable = drawableText);
             }
             else
             {
                 AccentColour = Color4Extensions.FromHex(user.Colour);
 
-                Child = new Container
+                Add(new Container
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -127,7 +129,7 @@ namespace osu.Game.Overlays.Chat
                             }
                         }
                     }
-                };
+                });
             }
         }
 
@@ -148,11 +150,11 @@ namespace osu.Game.Overlays.Chat
 
                 List<MenuItem> items = new List<MenuItem>
                 {
-                    new OsuMenuItem("View Profile", MenuItemType.Highlighted, openUserProfile)
+                    new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, openUserProfile)
                 };
 
                 if (!user.Equals(api.LocalUser.Value))
-                    items.Add(new OsuMenuItem("Start Chat", MenuItemType.Standard, openUserChannel));
+                    items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
 
                 return items.ToArray();
             }

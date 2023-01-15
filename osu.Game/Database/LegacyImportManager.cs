@@ -54,6 +54,19 @@ namespace osu.Game.Database
 
         public void UpdateStorage(string stablePath) => cachedStorage = new StableStorage(stablePath, gameHost as DesktopGameHost);
 
+        public bool CheckSongsFolderHardLinkAvailability()
+        {
+            var stableStorage = GetCurrentStableStorage();
+
+            if (stableStorage == null || gameHost is not DesktopGameHost desktopGameHost)
+                return false;
+
+            string testExistingPath = stableStorage.GetSongStorage().GetFullPath(string.Empty);
+            string testDestinationPath = desktopGameHost.Storage.GetFullPath(string.Empty);
+
+            return HardLinkHelper.CheckAvailability(testDestinationPath, testExistingPath);
+        }
+
         public virtual async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
         {
             var stableStorage = GetCurrentStableStorage();
@@ -66,16 +79,16 @@ namespace osu.Game.Database
             switch (content)
             {
                 case StableContent.Beatmaps:
-                    return await new LegacyBeatmapImporter(beatmaps).GetAvailableCount(stableStorage);
+                    return await new LegacyBeatmapImporter(beatmaps).GetAvailableCount(stableStorage).ConfigureAwait(false);
 
                 case StableContent.Skins:
-                    return await new LegacySkinImporter(skins).GetAvailableCount(stableStorage);
+                    return await new LegacySkinImporter(skins).GetAvailableCount(stableStorage).ConfigureAwait(false);
 
                 case StableContent.Collections:
-                    return await new LegacyCollectionImporter(realmAccess).GetAvailableCount(stableStorage);
+                    return await new LegacyCollectionImporter(realmAccess).GetAvailableCount(stableStorage).ConfigureAwait(false);
 
                 case StableContent.Scores:
-                    return await new LegacyScoreImporter(scores).GetAvailableCount(stableStorage);
+                    return await new LegacyScoreImporter(scores).GetAvailableCount(stableStorage).ConfigureAwait(false);
 
                 default:
                     throw new ArgumentException($"Only one {nameof(StableContent)} flag should be specified.");
