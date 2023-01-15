@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit
         private readonly Dictionary<float, TernaryStateRadioMenuItem> menuItemLookup = new Dictionary<float, TernaryStateRadioMenuItem>();
 
         public BackgroundDimMenuItem(Bindable<float> backgroundDim)
-            : base(EditorStrings.BackgroundDim)
+            : base(GameplaySettingsStrings.BackgroundDim)
         {
             Items = new[]
             {
