@@ -49,6 +49,36 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString BorderFull => new TranslatableString(getKey(@"full_borders"), @"Full");
 
+        /// <summary>
+        /// "Scrolling direction"
+        /// </summary>
+        public static LocalisableString ScrollingDirection => new TranslatableString(getKey(@"scrolling_direction"), @"Scrolling direction");
+
+        /// <summary>
+        /// "Up"
+        /// </summary>
+        public static LocalisableString Up => new TranslatableString(getKey(@"scrolling_up"), @"Up");
+
+        /// <summary>
+        /// "Down"
+        /// </summary>
+        public static LocalisableString Down => new TranslatableString(getKey(@"scrolling_down"), @"Down");
+
+        /// <summary>
+        /// "Scroll speed"
+        /// </summary>
+        public static LocalisableString ScrollSpeed => new TranslatableString(getKey(@"scroll_speed"), @"Scroll speed");
+
+        /// <summary>
+        /// "Timing-based note colouring"
+        /// </summary>
+        public static LocalisableString TimingBasedColouring => new TranslatableString(getKey(@"Timing_based_colouring"), @"Timing-based note colouring");
+
+        /// <summary>
+        /// "{0}ms (speed {1})"
+        /// </summary>
+        public static LocalisableString ScrollSpeedTooltip(double arg0, int arg1) => new TranslatableString(getKey(@"ruleset"), @"{0}ms (speed {1})", arg0, arg1);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
