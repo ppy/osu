@@ -22,12 +22,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "home"
         /// </summary>
-        public static LocalisableString HomeHeaderTitle => new TranslatableString(getKey(@"header_title"), @"home");
+        public static LocalisableString HomeHeaderTitle => new TranslatableString(getKey(@"home_header_title"), @"home");
 
         /// <summary>
         /// "return to the main menu"
         /// </summary>
-        public static LocalisableString HomeHeaderDescription => new TranslatableString(getKey(@"header_description"), @"return to the main menu");
+        public static LocalisableString HomeHeaderDescription => new TranslatableString(getKey(@"home_header_description"), @"return to the main menu");
 
         /// <summary>
         /// "play some {0}"
