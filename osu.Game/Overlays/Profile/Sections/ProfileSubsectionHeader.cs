@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
@@ -30,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private readonly LocalisableString text;
         private readonly CounterVisibilityState counterState;
 
-        private CounterPill counterPill;
+        private CounterPill counterPill = null!;
 
         public ProfileSubsectionHeader(LocalisableString text, CounterVisibilityState counterState)
         {

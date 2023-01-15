@@ -50,6 +50,8 @@ namespace osu.Game.Tests.Visual.Online
         private ChannelManager channelManager;
 
         private TestStandAloneChatDisplay chatDisplay;
+        private TestStandAloneChatDisplay chatWithTextBox;
+        private TestStandAloneChatDisplay chatWithTextBox2;
         private int messageIdSequence;
 
         private Channel testChannel;
@@ -78,7 +80,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private void reinitialiseDrawableDisplay()
         {
-            Children = new[]
+            Children = new Drawable[]
             {
                 chatDisplay = new TestStandAloneChatDisplay
                 {
@@ -88,13 +90,28 @@ namespace osu.Game.Tests.Visual.Online
                     Size = new Vector2(400, 80),
                     Channel = { Value = testChannel },
                 },
-                new TestStandAloneChatDisplay(true)
+                new FillFlowContainer
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
                     Margin = new MarginPadding(20),
-                    Size = new Vector2(400, 150),
-                    Channel = { Value = testChannel },
+                    Children = new[]
+                    {
+                        chatWithTextBox = new TestStandAloneChatDisplay(true)
+                        {
+                            Margin = new MarginPadding(20),
+                            Size = new Vector2(400, 150),
+                            Channel = { Value = testChannel },
+                        },
+                        chatWithTextBox2 = new TestStandAloneChatDisplay(true)
+                        {
+                            Margin = new MarginPadding(20),
+                            Size = new Vector2(400, 150),
+                            Channel = { Value = testChannel },
+                        },
+                    }
                 }
             };
         }
@@ -349,6 +366,13 @@ namespace osu.Game.Tests.Visual.Online
 
             sendMessage();
             checkScrolledToBottom();
+        }
+
+        [Test]
+        public void TestTextBoxSync()
+        {
+            AddStep("type 'hello' to text box 1", () => chatWithTextBox.ChildrenOfType<StandAloneChatDisplay.ChatTextBox>().Single().Text = "hello");
+            AddAssert("text box 2 contains 'hello'", () => chatWithTextBox2.ChildrenOfType<StandAloneChatDisplay.ChatTextBox>().Single().Text == "hello");
         }
 
         private void fillChat(int count = 10)

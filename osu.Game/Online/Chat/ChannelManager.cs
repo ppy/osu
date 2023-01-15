@@ -64,6 +64,11 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
+        /// <summary>
+        /// Whether the client responsible for channel notifications is connected.
+        /// </summary>
+        public bool NotificationsConnected => connector.IsConnected.Value;
+
         private readonly IAPIProvider api;
         private readonly NotificationsClientConnector connector;
 
@@ -71,7 +76,6 @@ namespace osu.Game.Online.Chat
         private UserLookupCache users { get; set; }
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-        private bool channelsInitialised;
         private ScheduledDelegate scheduledAck;
 
         private long? lastSilenceMessageId;
@@ -95,15 +99,7 @@ namespace osu.Game.Online.Chat
 
             connector.NewMessages += msgs => Schedule(() => addMessages(msgs));
 
-            connector.PresenceReceived += () => Schedule(() =>
-            {
-                if (!channelsInitialised)
-                {
-                    channelsInitialised = true;
-                    // we want this to run after the first presence so we can see if the user is in any channels already.
-                    initializeChannels();
-                }
-            });
+            connector.PresenceReceived += () => Schedule(initializeChannels);
 
             connector.Start();
 
@@ -118,8 +114,7 @@ namespace osu.Game.Online.Chat
         /// <param name="name"></param>
         public void OpenChannel(string name)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            ArgumentNullException.ThrowIfNull(name);
 
             CurrentChannel.Value = AvailableChannels.FirstOrDefault(c => c.Name == name) ?? throw new ChannelNotFoundException(name);
         }
@@ -130,8 +125,7 @@ namespace osu.Game.Online.Chat
         /// <param name="user">The user the private channel is opened with.</param>
         public void OpenPrivateChannel(APIUser user)
         {
-            if (user == null)
-                throw new ArgumentNullException(nameof(user));
+            ArgumentNullException.ThrowIfNull(user);
 
             if (user.Id == api.LocalUser.Value.Id)
                 return;
@@ -337,6 +331,11 @@ namespace osu.Game.Online.Chat
 
         private void initializeChannels()
         {
+            // This request is self-retrying until it succeeds.
+            // To avoid requests piling up when not logged in (ie. API is unavailable) exit early.
+            if (!api.IsLoggedIn)
+                return;
+
             var req = new ListChannelsRequest();
 
             bool joinDefaults = JoinedChannels.Count == 0;
@@ -352,10 +351,11 @@ namespace osu.Game.Online.Chat
                         joinChannel(ch);
                 }
             };
+
             req.Failure += error =>
             {
                 Logger.Error(error, "Fetching channel list failed");
-                initializeChannels();
+                Scheduler.AddDelayed(initializeChannels, 60000);
             };
 
             api.Queue(req);

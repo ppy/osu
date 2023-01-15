@@ -20,6 +20,7 @@ using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -147,6 +148,8 @@ namespace osu.Game.Tests.Visual
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
 
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
+
+            public new SpectatorClient SpectatorClient => base.SpectatorClient;
 
             // if we don't apply these changes, when running under nUnit the version that gets populated is that of nUnit.
             public override Version AssemblyVersion => new Version(0, 0);

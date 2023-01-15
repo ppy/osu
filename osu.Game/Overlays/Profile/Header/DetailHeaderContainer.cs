@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
@@ -25,41 +22,16 @@ namespace osu.Game.Overlays.Profile.Header
     public partial class DetailHeaderContainer : CompositeDrawable
     {
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
-        private OverlinedInfoContainer medalInfo;
-        private OverlinedInfoContainer ppInfo;
-        private OverlinedInfoContainer detailGlobalRank;
-        private OverlinedInfoContainer detailCountryRank;
-        private FillFlowContainer fillFlow;
-        private RankGraph rankGraph;
+        private ProfileValueDisplay medalInfo = null!;
+        private ProfileValueDisplay ppInfo = null!;
+        private ProfileValueDisplay detailGlobalRank = null!;
+        private ProfileValueDisplay detailCountryRank = null!;
+        private RankGraph rankGraph = null!;
 
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
-
-        private bool expanded = true;
-
-        public bool Expanded
-        {
-            set
-            {
-                if (expanded == value) return;
-
-                expanded = value;
-
-                if (fillFlow == null) return;
-
-                fillFlow.ClearTransforms();
-
-                if (expanded)
-                    fillFlow.AutoSizeAxes = Axes.Y;
-                else
-                {
-                    fillFlow.AutoSizeAxes = Axes.None;
-                    fillFlow.ResizeHeightTo(0, 200, Easing.OutQuint);
-                }
-            }
-        }
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             AutoSizeAxes = Axes.Y;
 
@@ -72,18 +44,48 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
                 },
-                fillFlow = new FillFlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = expanded ? Axes.Y : Axes.None,
+                    AutoSizeAxes = Axes.Y,
                     AutoSizeDuration = 200,
                     AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
                     Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 20),
+                    Spacing = new Vector2(0, 15),
                     Children = new Drawable[]
                     {
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(20),
+                            Children = new Drawable[]
+                            {
+                                detailGlobalRank = new ProfileValueDisplay(true)
+                                {
+                                    Title = UsersStrings.ShowRankGlobalSimple,
+                                },
+                                detailCountryRank = new ProfileValueDisplay(true)
+                                {
+                                    Title = UsersStrings.ShowRankCountrySimple,
+                                },
+                            }
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 60,
+                            Children = new Drawable[]
+                            {
+                                rankGraph = new RankGraph
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                            }
+                        },
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
@@ -99,19 +101,17 @@ namespace osu.Game.Overlays.Profile.Header
                                     Spacing = new Vector2(10, 0),
                                     Children = new Drawable[]
                                     {
-                                        new OverlinedTotalPlayTime
-                                        {
-                                            User = { BindTarget = User }
-                                        },
-                                        medalInfo = new OverlinedInfoContainer
+                                        medalInfo = new ProfileValueDisplay
                                         {
                                             Title = UsersStrings.ShowStatsMedals,
-                                            LineColour = colours.GreenLight,
                                         },
-                                        ppInfo = new OverlinedInfoContainer
+                                        ppInfo = new ProfileValueDisplay
                                         {
                                             Title = "pp",
-                                            LineColour = colours.Red,
+                                        },
+                                        new TotalPlayTime
+                                        {
+                                            User = { BindTarget = User }
                                         },
                                     }
                                 },
@@ -133,48 +133,15 @@ namespace osu.Game.Overlays.Profile.Header
                                 }
                             }
                         },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Right = 130 },
-                            Children = new Drawable[]
-                            {
-                                rankGraph = new RankGraph
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Y,
-                                    Width = 130,
-                                    Anchor = Anchor.TopRight,
-                                    Direction = FillDirection.Vertical,
-                                    Padding = new MarginPadding { Horizontal = 10 },
-                                    Spacing = new Vector2(0, 20),
-                                    Children = new Drawable[]
-                                    {
-                                        detailGlobalRank = new OverlinedInfoContainer(true, 110)
-                                        {
-                                            Title = UsersStrings.ShowRankGlobalSimple,
-                                            LineColour = colourProvider.Highlight1,
-                                        },
-                                        detailCountryRank = new OverlinedInfoContainer(false, 110)
-                                        {
-                                            Title = UsersStrings.ShowRankCountrySimple,
-                                            LineColour = colourProvider.Highlight1,
-                                        },
-                                    }
-                                }
-                            }
-                        },
                     }
                 },
             };
         }
 
-        private void updateDisplay(APIUser user)
+        private void updateDisplay(UserProfileData? data)
         {
+            var user = data?.User;
+
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
             ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
 
@@ -202,14 +169,14 @@ namespace osu.Game.Overlays.Profile.Header
                 InternalChild = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
-                    Width = 56,
+                    Width = 44,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
                         new DrawableRank(rank)
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 30,
+                            Height = 22,
                         },
                         rankCount = new OsuSpriteText
                         {

@@ -47,7 +47,7 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// Whether the local user is playing.
         /// </summary>
-        protected bool IsPlaying { get; private set; }
+        protected internal bool IsPlaying { get; private set; }
 
         /// <summary>
         /// Called whenever new frames arrive from the server.
@@ -65,6 +65,11 @@ namespace osu.Game.Online.Spectator
         public virtual event Action<int, SpectatorState>? OnUserFinishedPlaying;
 
         /// <summary>
+        /// Called whenever a user-submitted score has been fully processed.
+        /// </summary>
+        public virtual event Action<int, long>? OnUserScoreProcessed;
+
+        /// <summary>
         /// A dictionary containing all users currently being watched, with the number of watching components for each user.
         /// </summary>
         private readonly Dictionary<int, int> watchedUsersRefCounts = new Dictionary<int, int>();
@@ -76,6 +81,7 @@ namespace osu.Game.Online.Spectator
 
         private IBeatmap? currentBeatmap;
         private Score? currentScore;
+        private long? currentScoreToken;
 
         private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
 
@@ -108,7 +114,7 @@ namespace osu.Game.Online.Spectator
                     // re-send state in case it wasn't received
                     if (IsPlaying)
                         // TODO: this is likely sent out of order after a reconnect scenario. needs further consideration.
-                        BeginPlayingInternal(currentState);
+                        BeginPlayingInternal(currentScoreToken, currentState);
                 }
                 else
                 {
@@ -159,7 +165,14 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
-        public void BeginPlaying(GameplayState state, Score score)
+        Task ISpectatorClient.UserScoreProcessed(int userId, long scoreId)
+        {
+            Schedule(() => OnUserScoreProcessed?.Invoke(userId, scoreId));
+
+            return Task.CompletedTask;
+        }
+
+        public void BeginPlaying(long? scoreToken, GameplayState state, Score score)
         {
             // This schedule is only here to match the one below in `EndPlaying`.
             Schedule(() =>
@@ -174,12 +187,13 @@ namespace osu.Game.Online.Spectator
                 currentState.RulesetID = score.ScoreInfo.RulesetID;
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
                 currentState.State = SpectatedUserState.Playing;
-                currentState.MaximumScoringValues = state.ScoreProcessor.MaximumScoringValues;
+                currentState.MaximumStatistics = state.ScoreProcessor.MaximumStatistics;
 
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
+                currentScoreToken = scoreToken;
 
-                BeginPlayingInternal(currentState);
+                BeginPlayingInternal(currentScoreToken, currentState);
             });
         }
 
@@ -264,7 +278,7 @@ namespace osu.Game.Online.Spectator
             });
         }
 
-        protected abstract Task BeginPlayingInternal(SpectatorState state);
+        protected abstract Task BeginPlayingInternal(long? scoreToken, SpectatorState state);
 
         protected abstract Task SendFramesInternal(FrameDataBundle bundle);
 
