@@ -55,11 +55,6 @@ namespace osu.Game.Localisation
         public static LocalisableString View => new TranslatableString(getKey(@"view"), @"View");
 
         /// <summary>
-        /// "Background dim"
-        /// </summary>
-        public static LocalisableString BackgroundDim => new TranslatableString(getKey(@"background_dim"), @"Background dim");
-
-        /// <summary>
         /// "Waveform opacity"
         /// </summary>
         public static LocalisableString WaveformOpacity => new TranslatableString(getKey(@"waveform_opacity"), @"Waveform opacity");
@@ -78,11 +73,6 @@ namespace osu.Game.Localisation
         /// "Set preview point to current time"
         /// </summary>
         public static LocalisableString SetPreviewPointToCurrent => new TranslatableString(getKey(@"set_preview_point_to_current"), @"Set preview point to current time");
-
-        /// <summary>
-        /// "Save"
-        /// </summary>
-        public static LocalisableString Save => new TranslatableString(getKey(@"save"), @"Save");
 
         /// <summary>
         /// "Export package"
@@ -153,11 +143,6 @@ namespace osu.Game.Localisation
         /// "Ticks"
         /// </summary>
         public static LocalisableString TimelineTicks => new TranslatableString(getKey(@"timeline_ticks"), @"Ticks");
-
-        /// <summary>
-        /// "BPM"
-        /// </summary>
-        public static LocalisableString TimelineBpm => new TranslatableString(getKey(@"timeline_bpm"), @"BPM");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

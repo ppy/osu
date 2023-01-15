@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -86,7 +87,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                             },
                                             controlPointsCheckbox = new OsuCheckbox
                                             {
-                                                LabelText = EditorStrings.TimelineBpm,
+                                                LabelText = BeatmapsetsStrings.ShowStatsBpm,
                                                 Current = { Value = true },
                                             },
                                         }

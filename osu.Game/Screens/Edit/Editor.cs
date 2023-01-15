@@ -51,6 +51,7 @@ using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK.Input;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.Edit
 {
@@ -951,7 +952,7 @@ namespace osu.Game.Screens.Edit
 
         private List<MenuItem> createFileMenuItems() => new List<MenuItem>
         {
-            new EditorMenuItem(EditorStrings.Save, MenuItemType.Standard, () => Save()),
+            new EditorMenuItem(CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
             new EditorMenuItem(EditorStrings.ExportPackage, MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
             new EditorMenuItemSpacer(),
             createDifficultyCreationMenu(),
