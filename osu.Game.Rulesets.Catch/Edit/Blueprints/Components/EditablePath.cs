@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         private readonly List<VertexState> previousVertexStates = new List<VertexState>();
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private IBeatSnapProvider? beatSnapProvider { get; set; }
 
         protected EditablePath(Func<float, double> positionToTime)
