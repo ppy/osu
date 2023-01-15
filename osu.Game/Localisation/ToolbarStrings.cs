@@ -30,10 +30,9 @@ namespace osu.Game.Localisation
         public static LocalisableString HomeHeaderDescription => new TranslatableString(getKey(@"header_description"), @"return to the main menu");
 
         /// <summary>
-        /// "play some"
+        /// "play some {0}"
         /// </summary>
-
-        public static LocalisableString RulesetHeaderDescription => new TranslatableString(getKey(@"header_description"), @"play some");
+        public static LocalisableString PlaySomeRuleset(string arg0) => new TranslatableString(getKey(@"play_some_ruleset"), @"play some {0}", arg0);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
