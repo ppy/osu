@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework;
@@ -38,10 +36,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public readonly DifficultiesContainer Difficulties;
 
-        public readonly Bindable<APIBeatmap> Beatmap = new Bindable<APIBeatmap>();
-        private APIBeatmapSet beatmapSet;
+        public readonly Bindable<APIBeatmap?> Beatmap = new Bindable<APIBeatmap?>();
+        private APIBeatmapSet? beatmapSet;
 
-        public APIBeatmapSet BeatmapSet
+        public APIBeatmapSet? BeatmapSet
         {
             get => beatmapSet;
             set
@@ -142,7 +140,7 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -200,9 +198,9 @@ namespace osu.Game.Overlays.BeatmapSet
             updateDifficultyButtons();
         }
 
-        private void showBeatmap(IBeatmapInfo beatmapInfo)
+        private void showBeatmap(IBeatmapInfo? beatmapInfo)
         {
-            version.Text = beatmapInfo?.DifficultyName;
+            version.Text = beatmapInfo?.DifficultyName ?? string.Empty;
         }
 
         private void updateDifficultyButtons()
@@ -212,7 +210,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public partial class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
         {
-            public Action OnLostHover;
+            public Action? OnLostHover;
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
@@ -233,9 +231,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public readonly APIBeatmap Beatmap;
 
-            public Action<APIBeatmap> OnHovered;
-            public Action<APIBeatmap> OnClicked;
-            public event Action<DifficultySelectorState> StateChanged;
+            public Action<APIBeatmap>? OnHovered;
+            public Action<APIBeatmap>? OnClicked;
+            public event Action<DifficultySelectorState>? StateChanged;
 
             private DifficultySelectorState state;
 
