@@ -9,15 +9,13 @@ namespace osu.Game.Screens.Edit.Components.Menus
 {
     public class EditorMenuItem : OsuMenuItem
     {
-        private const int min_text_length = 40;
-
         public EditorMenuItem(LocalisableString text, MenuItemType type = MenuItemType.Standard)
-            : base(LocalisableString.Interpolate($"{text,-min_text_length}"), type)
+            : base(text, type)
         {
         }
 
         public EditorMenuItem(LocalisableString text, MenuItemType type, Action action)
-            : base(LocalisableString.Interpolate($"{text,-min_text_length}"), type, action)
+            : base(text, type, action)
         {
         }
     }
