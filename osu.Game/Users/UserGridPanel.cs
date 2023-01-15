@@ -101,7 +101,7 @@ namespace osu.Game.Users
                                             Child = new Box
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Colour = string.IsNullOrEmpty(User.Colour) ? Color4Extensions.FromHex("0087ca") : Color4Extensions.FromHex(User.Colour)
+                                                Colour = Color4Extensions.FromHex(User.Colour ?? @"0087ca"),
                                             }
                                         },
                                         new FillFlowContainer
