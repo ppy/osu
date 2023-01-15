@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -117,9 +116,6 @@ namespace osu.Game.Beatmaps.Drawables
 
         private Drawable getRulesetIcon()
         {
-            if ((beatmap as APIBeatmap)?.Convert == true)
-                return rulesets.GetRuleset(0)!.CreateInstance().CreateIcon();
-
             int? onlineID = ruleset.OnlineID;
 
             if (onlineID >= 0 && rulesets.GetRuleset(onlineID.Value)?.CreateInstance() is Ruleset rulesetInstance)

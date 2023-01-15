@@ -170,7 +170,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                             .Where(b => b.Ruleset.MatchesOnlineID(ruleset.Value))
                                                             .OrderBy(b => !b.Convert)
                                                             .ThenBy(b => b.StarRating)
-                                                            .Select(b => new DifficultySelectorButton(b)
+                                                            .Select(b => new DifficultySelectorButton(b, b.Convert ? new RulesetInfo { OnlineID = 0 } : null)
                                                             {
                                                                 State = DifficultySelectorState.NotSelected,
                                                                 OnHovered = beatmap =>
@@ -254,7 +254,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
             }
 
-            public DifficultySelectorButton(APIBeatmap beatmapInfo)
+            public DifficultySelectorButton(APIBeatmap beatmapInfo, IRulesetInfo? ruleset)
             {
                 Beatmap = beatmapInfo;
                 Size = new Vector2(size);
@@ -273,7 +273,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Alpha = 0.5f
                         }
                     },
-                    icon = new DifficultyIcon(beatmapInfo)
+                    icon = new DifficultyIcon(beatmapInfo, ruleset)
                     {
                         ShowTooltip = false,
                         Current = { Value = new StarDifficulty(beatmapInfo.StarRating, 0) },
