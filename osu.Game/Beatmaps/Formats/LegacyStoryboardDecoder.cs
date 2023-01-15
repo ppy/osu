@@ -79,6 +79,8 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(string line)
         {
+            decodeVariables(ref line);
+
             int depth = 0;
 
             foreach (char c in line)
@@ -90,8 +92,6 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             line = line.Substring(depth);
-
-            decodeVariables(ref line);
 
             string[] split = line.Split(',');
 
@@ -301,11 +301,11 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string parseLayer(string value) => Enum.Parse(typeof(LegacyStoryLayer), value).ToString();
+        private string parseLayer(string value) => Enum.Parse<LegacyStoryLayer>(value).ToString();
 
         private Anchor parseOrigin(string value)
         {
-            var origin = (LegacyOrigins)Enum.Parse(typeof(LegacyOrigins), value);
+            var origin = Enum.Parse<LegacyOrigins>(value);
 
             switch (origin)
             {
@@ -343,13 +343,13 @@ namespace osu.Game.Beatmaps.Formats
 
         private AnimationLoopType parseAnimationLoopType(string value)
         {
-            var parsed = (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), value);
-            return Enum.IsDefined(typeof(AnimationLoopType), parsed) ? parsed : AnimationLoopType.LoopForever;
+            var parsed = Enum.Parse<AnimationLoopType>(value);
+            return Enum.IsDefined(parsed) ? parsed : AnimationLoopType.LoopForever;
         }
 
         private void handleVariables(string line)
         {
-            var pair = SplitKeyVal(line, '=');
+            var pair = SplitKeyVal(line, '=', false);
             variables[pair.Key] = pair.Value;
         }
 

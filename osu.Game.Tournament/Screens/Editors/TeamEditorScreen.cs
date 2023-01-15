@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -23,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public class TeamEditorScreen : TournamentEditorScreen<TeamEditorScreen.TeamRow, TournamentTeam>
+    public partial class TeamEditorScreen : TournamentEditorScreen<TeamEditorScreen.TeamRow, TournamentTeam>
     {
         protected override BindableList<TournamentTeam> Storage => LadderInfo.Teams;
 
@@ -44,7 +43,7 @@ namespace osu.Game.Tournament.Screens.Editors
         {
             var countries = new List<TournamentTeam>();
 
-            foreach (var country in Enum.GetValues(typeof(CountryCode)).Cast<CountryCode>().Skip(1))
+            foreach (var country in Enum.GetValues<CountryCode>().Skip(1))
             {
                 countries.Add(new TournamentTeam
                 {
@@ -54,13 +53,11 @@ namespace osu.Game.Tournament.Screens.Editors
                 });
             }
 
-            Debug.Assert(countries != null);
-
             foreach (var c in countries)
                 Storage.Add(c);
         }
 
-        public class TeamRow : CompositeDrawable, IModelBacked<TournamentTeam>
+        public partial class TeamRow : CompositeDrawable, IModelBacked<TournamentTeam>
         {
             public TournamentTeam Model { get; }
 
@@ -181,7 +178,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 drawableContainer.Child = new DrawableTeamFlag(Model);
             }
 
-            public class PlayerEditor : CompositeDrawable
+            public partial class PlayerEditor : CompositeDrawable
             {
                 private readonly TournamentTeam team;
                 private readonly FillFlowContainer flow;
@@ -209,7 +206,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     flow.Add(new PlayerRow(team, player));
                 }
 
-                public class PlayerRow : CompositeDrawable
+                public partial class PlayerRow : CompositeDrawable
                 {
                     private readonly TournamentUser user;
 

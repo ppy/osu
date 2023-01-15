@@ -10,7 +10,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
-    public class HitResultStatistic : CounterStatistic
+    public partial class HitResultStatistic : CounterStatistic
     {
         public readonly HitResult Result;
 

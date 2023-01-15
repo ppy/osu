@@ -19,7 +19,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public class TestSceneJuiceStreamPlacementBlueprint : CatchPlacementBlueprintTestScene
+    public partial class TestSceneJuiceStreamPlacementBlueprint : CatchPlacementBlueprintTestScene
     {
         private const double velocity_factor = 0.5;
 

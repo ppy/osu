@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual
     /// Provides a clock, beat-divisor, and scrolling capability for test cases of editor components that
     /// are preferrably tested within the presence of a clock and seek controls.
     /// </summary>
-    public abstract class EditorClockTestScene : OsuManualInputManagerTestScene
+    public abstract partial class EditorClockTestScene : OsuManualInputManagerTestScene
     {
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Aquamarine);

@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 using osuTK.Input;
@@ -25,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// A container which provides a "blueprint" display of items.
     /// Includes selection and manipulation support via a <see cref="Components.SelectionHandler{T}"/>.
     /// </summary>
-    public abstract class BlueprintContainer<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
+    public abstract partial class BlueprintContainer<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
         where T : class
     {
         protected DragBox DragBox { get; private set; }
@@ -57,6 +58,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         foreach (object o in args.NewItems)
                         {
                             if (blueprintMap.TryGetValue((T)o, out var blueprint))
@@ -66,6 +69,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
+                        Debug.Assert(args.OldItems != null);
+
                         foreach (object o in args.OldItems)
                         {
                             if (blueprintMap.TryGetValue((T)o, out var blueprint))
@@ -105,11 +110,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected virtual SelectionBlueprint<T> CreateBlueprintFor(T item) => null;
 
         protected virtual DragBox CreateDragBox() => new DragBox();
-
-        /// <summary>
-        /// Whether this component is in a state where items outside a drag selection should be deselected. If false, selection will only be added to.
-        /// </summary>
-        protected virtual bool AllowDeselectionDuringDrag => true;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
@@ -174,10 +174,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             finishSelectionMovement();
         }
 
+        private MouseButtonEvent lastDragEvent;
+
         protected override bool OnDragStart(DragStartEvent e)
         {
             if (e.Button == MouseButton.Right)
                 return false;
+
+            lastDragEvent = e;
 
             if (movementBlueprints != null)
             {
@@ -193,22 +197,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void OnDrag(DragEvent e)
         {
-            if (e.Button == MouseButton.Right)
-                return;
-
-            if (DragBox.State == Visibility.Visible)
-            {
-                DragBox.HandleDrag(e);
-                UpdateSelectionFromDragBox();
-            }
+            lastDragEvent = e;
 
             moveCurrentSelection(e);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            if (e.Button == MouseButton.Right)
-                return;
+            lastDragEvent = null;
 
             if (isDraggingBlueprint)
             {
@@ -217,6 +213,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             DragBox.Hide();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (lastDragEvent != null && DragBox.State == Visibility.Visible)
+            {
+                lastDragEvent.Target = this;
+                DragBox.HandleDrag(lastDragEvent);
+                UpdateSelectionFromDragBox();
+            }
         }
 
         /// <summary>
@@ -389,12 +397,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach (var blueprint in SelectionBlueprints)
             {
-                if (blueprint.IsSelected && !AllowDeselectionDuringDrag)
-                    continue;
+                switch (blueprint.State)
+                {
+                    case SelectionState.Selected:
+                        // Selection is preserved even after blueprint becomes dead.
+                        if (!quad.Contains(blueprint.ScreenSpaceSelectionPoint))
+                            blueprint.Deselect();
+                        break;
 
-                bool shouldBeSelected = blueprint.IsAlive && blueprint.IsPresent && quad.Contains(blueprint.ScreenSpaceSelectionPoint);
-                if (blueprint.IsSelected != shouldBeSelected)
-                    blueprint.ToggleSelection();
+                    case SelectionState.NotSelected:
+                        if (blueprint.IsAlive && blueprint.IsPresent && quad.Contains(blueprint.ScreenSpaceSelectionPoint))
+                            blueprint.Select();
+                        break;
+                }
             }
         }
 

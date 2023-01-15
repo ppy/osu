@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public abstract class CircularDistanceSnapGrid : DistanceSnapGrid
+    public abstract partial class CircularDistanceSnapGrid : DistanceSnapGrid
     {
         protected CircularDistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
             : base(referenceObject, startPosition, startTime, endTime)
@@ -53,9 +53,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float maxDistance = new Vector2(dx, dy).Length;
             int requiredCircles = Math.Min(MaxIntervals, (int)(maxDistance / DistanceBetweenTicks));
 
+            // We need to offset the drawn lines to the next valid snap for the currently selected divisor.
+            //
+            // Picture the scenario where the user has just placed an object on a 1/2 snap, then changes to
+            // 1/3 snap and expects to be able to place the next object on a valid 1/3 snap, regardless of the
+            // fact that the 1/2 snap reference object is not valid for 1/3 snapping.
+            float offset = SnapProvider.FindSnappedDistance(ReferenceObject, 0);
+
             for (int i = 0; i < requiredCircles; i++)
             {
-                float diameter = (i + 1) * DistanceBetweenTicks * 2;
+                float diameter = (offset + (i + 1) * DistanceBetweenTicks) * 2;
 
                 AddInternal(new Ring(ReferenceObject, GetColourForIndexFromPlacement(i))
                 {
@@ -110,7 +117,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return (snappedPosition, snappedTime);
         }
 
-        private class Ring : CircularProgress
+        private partial class Ring : CircularProgress
         {
             [Resolved]
             private IDistanceSnapProvider snapProvider { get; set; }

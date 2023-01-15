@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -14,11 +12,11 @@ using osu.Framework.Extensions.LocalisationExtensions;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class CounterPill : CircularContainer
+    public partial class CounterPill : CircularContainer
     {
         public readonly BindableInt Current = new BindableInt();
 
-        private OsuSpriteText counter;
+        private OsuSpriteText counter = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)

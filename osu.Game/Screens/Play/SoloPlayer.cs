@@ -17,7 +17,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.Play
 {
-    public class SoloPlayer : SubmittingPlayer
+    public partial class SoloPlayer : SubmittingPlayer
     {
         public SoloPlayer()
             : this(null)

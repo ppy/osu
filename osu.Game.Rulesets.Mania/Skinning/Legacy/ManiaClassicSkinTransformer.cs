@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
         }
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             if (lookup is ManiaSkinConfigurationLookup maniaLookup)
             {

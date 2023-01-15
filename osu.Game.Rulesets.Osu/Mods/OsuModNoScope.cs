@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
@@ -9,6 +10,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osu.Game.Utils;
 
@@ -33,9 +35,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            bool shouldAlwaysShowCursor = IsBreakTime.Value || spinnerPeriods.IsInAny(playfield.Clock.CurrentTime);
+            var osuPlayfield = (OsuPlayfield)playfield;
+            Debug.Assert(osuPlayfield.Cursor != null);
+
+            bool shouldAlwaysShowCursor = IsBreakTime.Value || spinnerPeriods.IsInAny(osuPlayfield.Clock.CurrentTime);
             float targetAlpha = shouldAlwaysShowCursor ? 1 : ComboBasedAlpha;
-            playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, targetAlpha, Math.Clamp(playfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
+            float currentAlpha = (float)Interpolation.Lerp(osuPlayfield.Cursor.Alpha, targetAlpha, Math.Clamp(osuPlayfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
+
+            osuPlayfield.Cursor.Alpha = currentAlpha;
+            osuPlayfield.Smoke.Alpha = currentAlpha;
         }
     }
 }

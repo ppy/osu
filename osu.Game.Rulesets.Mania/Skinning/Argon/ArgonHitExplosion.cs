@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    public class ArgonHitExplosion : CompositeDrawable, IHitExplosion
+    public partial class ArgonHitExplosion : CompositeDrawable, IHitExplosion
     {
         public override bool RemoveWhenNotAlive => true;
 

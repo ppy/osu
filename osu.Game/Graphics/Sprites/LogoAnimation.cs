@@ -11,13 +11,12 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public class LogoAnimation : Sprite
+    public partial class LogoAnimation : Sprite
     {
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, @"LogoAnimation");
-            RoundedTextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, @"LogoAnimation"); // Masking isn't supported for now
         }
 
         private float animationProgress;
@@ -58,7 +57,7 @@ namespace osu.Game.Graphics.Sprites
 
             protected override void Blit(IRenderer renderer)
             {
-                GetAppropriateShader(renderer).GetUniform<float>("progress").UpdateValue(ref progress);
+                TextureShader.GetUniform<float>("progress").UpdateValue(ref progress);
 
                 base.Blit(renderer);
             }

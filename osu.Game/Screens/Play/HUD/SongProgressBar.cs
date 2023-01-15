@@ -15,7 +15,7 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SongProgressBar : SliderBar<double>
+    public partial class SongProgressBar : SliderBar<double>
     {
         public Action<double> OnSeek;
 

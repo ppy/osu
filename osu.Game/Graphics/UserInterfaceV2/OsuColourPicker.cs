@@ -7,7 +7,7 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class OsuColourPicker : ColourPicker
+    public partial class OsuColourPicker : ColourPicker
     {
         public OsuColourPicker()
         {

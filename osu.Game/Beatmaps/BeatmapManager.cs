@@ -44,6 +44,16 @@ namespace osu.Game.Beatmaps
 
         public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
 
+        public override bool PauseImports
+        {
+            get => base.PauseImports;
+            set
+            {
+                base.PauseImports = value;
+                beatmapImporter.PauseImports = value;
+            }
+        }
+
         public BeatmapManager(Storage storage, RealmAccess realm, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
                               WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
             : base(storage, realm)
@@ -311,6 +321,8 @@ namespace osu.Game.Beatmaps
                 if (existingFileInfo != null)
                     DeleteFile(setInfo, existingFileInfo);
 
+                string oldMd5Hash = beatmapInfo.MD5Hash;
+
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
@@ -327,6 +339,8 @@ namespace osu.Game.Beatmaps
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
 
+                    beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
+
                     ProcessBeatmap?.Invoke((liveBeatmapSet, false));
                 });
             }
@@ -336,7 +350,7 @@ namespace osu.Game.Beatmaps
             static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
             {
                 var metadata = beatmapInfo.Metadata;
-                return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
+                return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidFilename();
             }
         }
 
@@ -452,15 +466,16 @@ namespace osu.Game.Beatmaps
 
         public Task Import(params string[] paths) => beatmapImporter.Import(paths);
 
-        public Task Import(params ImportTask[] tasks) => beatmapImporter.Import(tasks);
+        public Task Import(ImportTask[] tasks, ImportParameters parameters = default) => beatmapImporter.Import(tasks, parameters);
 
-        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => beatmapImporter.Import(notification, tasks);
+        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) =>
+            beatmapImporter.Import(notification, tasks, parameters);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            beatmapImporter.Import(task, batchImport, cancellationToken);
+        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
+            beatmapImporter.Import(task, parameters, cancellationToken);
 
         public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) =>
-            beatmapImporter.ImportModel(item, archive, false, cancellationToken);
+            beatmapImporter.ImportModel(item, archive, default, cancellationToken);
 
         public IEnumerable<string> HandledExtensions => beatmapImporter.HandledExtensions;
 

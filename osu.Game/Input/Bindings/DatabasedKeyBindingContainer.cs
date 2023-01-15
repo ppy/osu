@@ -18,7 +18,7 @@ namespace osu.Game.Input.Bindings
     /// A KeyBindingInputManager with a database backing for custom overrides.
     /// </summary>
     /// <typeparam name="T">The type of the custom action.</typeparam>
-    public class DatabasedKeyBindingContainer<T> : KeyBindingContainer<T>
+    public partial class DatabasedKeyBindingContainer<T> : KeyBindingContainer<T>
         where T : struct
     {
         private readonly RulesetInfo ruleset;

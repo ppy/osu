@@ -7,7 +7,7 @@ using osu.Framework.Extensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuNumberBox : OsuTextBox
+    public partial class OsuNumberBox : OsuTextBox
     {
         protected override bool AllowIme => false;
 

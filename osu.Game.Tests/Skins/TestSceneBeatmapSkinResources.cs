@@ -17,7 +17,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Skins
 {
     [HeadlessTest]
-    public class TestSceneBeatmapSkinResources : OsuTestScene
+    public partial class TestSceneBeatmapSkinResources : OsuTestScene
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }

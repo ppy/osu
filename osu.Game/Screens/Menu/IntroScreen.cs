@@ -20,6 +20,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -32,7 +33,7 @@ using Realms;
 
 namespace osu.Game.Screens.Menu
 {
-    public abstract class IntroScreen : StartupScreen
+    public abstract partial class IntroScreen : StartupScreen
     {
         /// <summary>
         /// Whether we have loaded the menu previously.
@@ -201,7 +202,7 @@ namespace osu.Game.Screens.Menu
                 {
                     notifications.Post(new SimpleErrorNotification
                     {
-                        Text = "osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
+                        Text = NotificationsStrings.AudioPlaybackIssue
                     });
                 }
             }, 5000);
@@ -278,11 +279,11 @@ namespace osu.Game.Screens.Menu
 
             if (!UsingThemedIntro)
             {
-                initialBeatmap?.PrepareTrackForPreview(false);
+                initialBeatmap?.PrepareTrackForPreview(false, -2600);
 
                 drawableTrack.VolumeTo(0);
                 drawableTrack.Restart();
-                drawableTrack.VolumeTo(1, 2200, Easing.InCubic);
+                drawableTrack.VolumeTo(1, 2600, Easing.InCubic);
             }
             else
             {

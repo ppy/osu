@@ -15,7 +15,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests
 {
-    public abstract class ImportTest
+    public abstract partial class ImportTest
     {
         protected virtual TestOsuGameBase LoadOsuIntoHost(GameHost host, bool withBeatmap = false)
         {
@@ -45,7 +45,7 @@ namespace osu.Game.Tests
             Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
 
-        public class TestOsuGameBase : OsuGameBase
+        public partial class TestOsuGameBase : OsuGameBase
         {
             public RealmAccess Realm => Dependencies.Get<RealmAccess>();
 

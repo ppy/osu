@@ -20,7 +20,7 @@ using osu.Game.Tests.Beatmaps.IO;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneDifficultySwitching : EditorTestScene
+    public partial class TestSceneDifficultySwitching : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

@@ -12,7 +12,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneResumeOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneResumeOverlay : OsuManualInputManagerTestScene
     {
         public TestSceneResumeOverlay()
         {
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("dismissed", () => resumeFired && resume.State.Value == Visibility.Hidden);
         }
 
-        private class ManualOsuInputManager : OsuInputManager
+        private partial class ManualOsuInputManager : OsuInputManager
         {
             public ManualOsuInputManager(RulesetInfo ruleset)
                 : base(ruleset)

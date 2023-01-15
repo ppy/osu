@@ -11,7 +11,7 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaBlueprintContainer : ComposeBlueprintContainer
+    public partial class ManiaBlueprintContainer : ComposeBlueprintContainer
     {
         public ManiaBlueprintContainer(HitObjectComposer composer)
             : base(composer)
@@ -33,5 +33,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         }
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new ManiaSelectionHandler();
+
+        protected sealed override DragBox CreateDragBox() => new ScrollingDragBox(Composer.Playfield);
     }
 }

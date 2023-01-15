@@ -15,7 +15,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class TotalCommentsCounter : CompositeDrawable
+    public partial class TotalCommentsCounter : CompositeDrawable
     {
         public readonly BindableInt Current = new BindableInt();
 

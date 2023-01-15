@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
 {
-    public class DrawablePippidonHitObject : DrawableHitObject<PippidonHitObject>
+    public partial class DrawablePippidonHitObject : DrawableHitObject<PippidonHitObject>
     {
         private BindableNumber<int> currentLane;
 

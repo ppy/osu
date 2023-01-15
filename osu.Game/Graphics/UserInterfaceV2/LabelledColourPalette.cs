@@ -9,7 +9,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class LabelledColourPalette : LabelledDrawable<ColourPalette>
+    public partial class LabelledColourPalette : LabelledDrawable<ColourPalette>
     {
         public LabelledColourPalette()
             : base(true)

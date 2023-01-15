@@ -13,9 +13,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// <summary>
     /// Calculates the stamina coefficient of taiko difficulty.
     /// </summary>
-    /// <remarks>
-    /// The reference play style chosen uses two hands, with full alternating (the hand changes after every hit).
-    /// </remarks>
     public class Stamina : StrainDecaySkill
     {
         protected override double SkillMultiplier => 1.1;

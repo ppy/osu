@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace osu.Game.Tests.Visual.Playlists
 {
     [TestFixture]
-    public class TestScenePlaylistsScreen : ScreenTestScene
+    public partial class TestScenePlaylistsScreen : ScreenTestScene
     {
         protected override bool UseOnlineAPI => true;
 

@@ -17,7 +17,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButtonRandom : FooterButton
+    public partial class FooterButtonRandom : FooterButton
     {
         public Action NextRandom { get; set; }
         public Action PreviousRandom { get; set; }
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Select
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (e.Button == MouseButton.Right)
+            if (e.Button == MouseButton.Right && IsHovered)
             {
                 rewindSearch = true;
                 TriggerClick();

@@ -19,7 +19,7 @@ using Realms;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class TopLocalRank : CompositeDrawable
+    public partial class TopLocalRank : CompositeDrawable
     {
         private readonly BeatmapInfo beatmapInfo;
 

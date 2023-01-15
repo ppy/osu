@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModFlashlight : ModFlashlight<ManiaHitObject>
+    public partial class ManiaModFlashlight : ModFlashlight<ManiaHitObject>
     {
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
@@ -29,14 +29,14 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         protected override Flashlight CreateFlashlight() => new ManiaFlashlight(this);
 
-        private class ManiaFlashlight : Flashlight
+        private partial class ManiaFlashlight : Flashlight
         {
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
 
             public ManiaFlashlight(ManiaModFlashlight modFlashlight)
                 : base(modFlashlight)
             {
-                FlashlightSize = new Vector2(DrawWidth, GetSizeFor(0));
+                FlashlightSize = new Vector2(DrawWidth, GetSize());
 
                 AddLayout(flashlightProperties);
             }
@@ -54,9 +54,9 @@ namespace osu.Game.Rulesets.Mania.Mods
                 }
             }
 
-            protected override void OnComboChange(ValueChangedEvent<int> e)
+            protected override void UpdateFlashlightSize(float size)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(DrawWidth, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(DrawWidth, size), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "RectangularFlashlight";

@@ -360,7 +360,7 @@ namespace osu.Game.Tests.Skins.IO
         private async Task<Live<SkinInfo>> loadSkinIntoOsu(OsuGameBase osu, ImportTask import, bool batchImport = false)
         {
             var skinManager = osu.Dependencies.Get<SkinManager>();
-            return await skinManager.Import(import, batchImport);
+            return await skinManager.Import(import, new ImportParameters { Batch = batchImport });
         }
     }
 }

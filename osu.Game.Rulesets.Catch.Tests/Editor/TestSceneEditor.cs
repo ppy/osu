@@ -9,7 +9,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
     [TestFixture]
-    public class TestSceneEditor : EditorTestScene
+    public partial class TestSceneEditor : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new CatchRuleset();
     }

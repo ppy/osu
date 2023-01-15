@@ -18,7 +18,7 @@ using Realms;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModPresetColumn : ModSelectColumn
+    public partial class ModPresetColumn : ModSelectColumn
     {
         [Resolved]
         private RealmAccess realm { get; set; } = null!;

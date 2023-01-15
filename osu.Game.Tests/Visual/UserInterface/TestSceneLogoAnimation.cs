@@ -13,7 +13,7 @@ using osu.Game.Graphics.Sprites;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneLogoAnimation : OsuTestScene
+    public partial class TestSceneLogoAnimation : OsuTestScene
     {
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)

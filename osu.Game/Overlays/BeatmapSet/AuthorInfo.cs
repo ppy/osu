@@ -21,7 +21,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class AuthorInfo : Container
+    public partial class AuthorInfo : Container
     {
         private const float height = 50;
 
@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private class Field : FillFlowContainer
+        private partial class Field : FillFlowContainer
         {
             public Field(string first, string second, FontUsage secondFont)
             {

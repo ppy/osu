@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchBeatmapDetailArea : OnlinePlayTestScene
+    public partial class TestSceneMatchBeatmapDetailArea : OnlinePlayTestScene
     {
         public override void SetUpSteps()
         {

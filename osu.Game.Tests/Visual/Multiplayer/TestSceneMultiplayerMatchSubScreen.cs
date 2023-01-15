@@ -39,7 +39,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerMatchSubScreen : MultiplayerTestScene
+    public partial class TestSceneMultiplayerMatchSubScreen : MultiplayerTestScene
     {
         private MultiplayerMatchSubScreen screen;
 
@@ -286,7 +286,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen
+        private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen
         {
             [Resolved(canBeNull: true)]
             [CanBeNull]

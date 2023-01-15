@@ -7,14 +7,14 @@ using osu.Game.Tournament.Screens.Setup;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneStablePathSelectScreen : TournamentTestScene
+    public partial class TestSceneStablePathSelectScreen : TournamentTestScene
     {
         public TestSceneStablePathSelectScreen()
         {
             AddStep("Add screen", () => Add(new StablePathSelectTestScreen()));
         }
 
-        private class StablePathSelectTestScreen : StablePathSelectScreen
+        private partial class StablePathSelectTestScreen : StablePathSelectScreen
         {
             protected override void ChangePath()
             {

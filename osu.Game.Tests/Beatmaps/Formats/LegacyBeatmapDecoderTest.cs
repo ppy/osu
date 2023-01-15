@@ -308,9 +308,27 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(255, 177, 140, 255),
                     new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
                 };
-                Assert.AreEqual(expectedColors.Length, comboColors.Count);
+                Assert.AreEqual(expectedColors.Length, comboColors?.Count);
                 for (int i = 0; i < expectedColors.Length; i++)
                     Assert.AreEqual(expectedColors[i], comboColors[i]);
+            }
+        }
+
+        [Test]
+        public void TestGetLastObjectTime()
+        {
+            var decoder = new LegacyBeatmapDecoder();
+
+            using (var resStream = TestResources.OpenResource("mania-last-object-not-latest.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+
+                Assert.That(beatmap.HitObjects.Last().StartTime, Is.EqualTo(2494));
+                Assert.That(beatmap.HitObjects.Last().GetEndTime(), Is.EqualTo(2494));
+
+                Assert.That(beatmap.HitObjects.Max(h => h.GetEndTime()), Is.EqualTo(2582));
+                Assert.That(beatmap.GetLastObjectTime(), Is.EqualTo(2582));
             }
         }
 

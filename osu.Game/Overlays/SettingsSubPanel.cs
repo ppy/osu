@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public abstract class SettingsSubPanel : SettingsPanel
+    public abstract partial class SettingsSubPanel : SettingsPanel
     {
         protected SettingsSubPanel()
             : base(true)
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays
 
         protected override bool DimMainContent => false; // dimming is handled by main overlay
 
-        public class BackButton : SidebarButton
+        public partial class BackButton : SidebarButton
         {
             private Container content;
 

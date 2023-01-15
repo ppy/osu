@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector
 {
-    public abstract class PageSelectorButton : OsuClickableContainer
+    public abstract partial class PageSelectorButton : OsuClickableContainer
     {
         protected const int DURATION = 200;
 

@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableHUDOverlay : SkinnableTestScene
+    public partial class TestSceneSkinnableHUDOverlay : SkinnableTestScene
     {
         private HUDOverlay hudOverlay;
 

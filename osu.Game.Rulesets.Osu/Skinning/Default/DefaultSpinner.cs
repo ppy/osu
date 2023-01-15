@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -16,14 +15,14 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class DefaultSpinner : CompositeDrawable
+    public partial class DefaultSpinner : CompositeDrawable
     {
-        private DrawableSpinner drawableSpinner;
+        private DrawableSpinner drawableSpinner = null!;
 
-        private OsuSpriteText bonusCounter;
+        private OsuSpriteText bonusCounter = null!;
 
-        private Container spmContainer;
-        private OsuSpriteText spmCounter;
+        private Container spmContainer = null!;
+        private OsuSpriteText spmCounter = null!;
 
         public DefaultSpinner()
         {
@@ -81,8 +80,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             });
         }
 
-        private IBindable<double> gainedBonus;
-        private IBindable<double> spinsPerMinute;
+        private IBindable<double> gainedBonus = null!;
+        private IBindable<double> spinsPerMinute = null!;
 
         protected override void LoadComplete()
         {
@@ -135,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Dispose(isDisposing);
 
-            if (drawableSpinner != null)
+            if (drawableSpinner.IsNotNull())
                 drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }

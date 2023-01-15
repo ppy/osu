@@ -13,7 +13,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Users.Drawables
 {
-    public class UpdateableFlag : ModelBackedDrawable<CountryCode>
+    public partial class UpdateableFlag : ModelBackedDrawable<CountryCode>
     {
         public CountryCode CountryCode
         {

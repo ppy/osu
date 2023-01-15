@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint placed above a displaying item adding editing functionality.
     /// </summary>
-    public abstract class SelectionBlueprint<T> : CompositeDrawable, IStateful<SelectionState>
+    public abstract partial class SelectionBlueprint<T> : CompositeDrawable, IStateful<SelectionState>
     {
         public readonly T Item;
 

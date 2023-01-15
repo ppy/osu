@@ -14,7 +14,7 @@ using osu.Game.Overlays.Dashboard.Friends;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneFriendsOnlineStatusControl : OsuTestScene
+    public partial class TestSceneFriendsOnlineStatusControl : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);

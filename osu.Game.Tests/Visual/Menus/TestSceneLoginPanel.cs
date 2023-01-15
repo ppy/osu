@@ -16,7 +16,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestSceneLoginPanel : OsuManualInputManagerTestScene
+    public partial class TestSceneLoginPanel : OsuManualInputManagerTestScene
     {
         private LoginPanel loginPanel;
         private int hideCount;

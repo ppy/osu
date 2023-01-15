@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps
     /// A class which will recommend the most suitable difficulty for the local user from a beatmap set.
     /// This requires the user to be logged in, as it sources from the user's online profile.
     /// </summary>
-    public class DifficultyRecommender : Component
+    public partial class DifficultyRecommender : Component
     {
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -51,11 +51,11 @@ namespace osu.Game.Beatmaps
                 if (!recommendedDifficultyMapping.TryGetValue(r, out double recommendation))
                     continue;
 
-                BeatmapInfo beatmapInfo = beatmaps.Where(b => b.Ruleset.ShortName.Equals(r)).OrderBy(b =>
+                BeatmapInfo beatmapInfo = beatmaps.Where(b => b.Ruleset.ShortName.Equals(r, StringComparison.Ordinal)).MinBy(b =>
                 {
                     double difference = b.StarRating - recommendation;
                     return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
-                }).FirstOrDefault();
+                });
 
                 if (beatmapInfo != null)
                     return beatmapInfo;
@@ -90,7 +90,7 @@ namespace osu.Game.Beatmaps
                 return recommendedDifficultyMapping
                        .OrderByDescending(pair => pair.Value)
                        .Select(pair => pair.Key)
-                       .Where(r => !r.Equals(ruleset.Value.ShortName))
+                       .Where(r => !r.Equals(ruleset.Value.ShortName, StringComparison.Ordinal))
                        .Prepend(ruleset.Value.ShortName);
             }
         }

@@ -17,7 +17,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneHostOnlyQueueMode : QueueModeTestScene
+    public partial class TestSceneHostOnlyQueueMode : QueueModeTestScene
     {
         protected override QueueMode Mode => QueueMode.HostOnly;
 

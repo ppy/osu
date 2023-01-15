@@ -15,7 +15,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuInputManager : RulesetInputManager<OsuAction>
+    public partial class OsuInputManager : RulesetInputManager<OsuAction>
     {
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu
             return base.HandleMouseTouchStateChange(e);
         }
 
-        private class OsuKeyBindingContainer : RulesetKeyBindingContainer
+        private partial class OsuKeyBindingContainer : RulesetKeyBindingContainer
         {
             private bool allowGameplayInputs = true;
 

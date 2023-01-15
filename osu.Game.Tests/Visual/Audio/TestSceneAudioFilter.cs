@@ -19,7 +19,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tests.Visual.Audio
 {
-    public class TestSceneAudioFilter : OsuTestScene
+    public partial class TestSceneAudioFilter : OsuTestScene
     {
         private OsuSpriteText lowPassText;
         private AudioFilter lowPassFilter;

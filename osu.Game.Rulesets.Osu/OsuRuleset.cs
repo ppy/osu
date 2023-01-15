@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu
                 yield return new OsuModSpunOut();
 
             if (mods.HasFlagFast(LegacyMods.Target))
-                yield return new OsuModTarget();
+                yield return new OsuModTargetPractice();
 
             if (mods.HasFlagFast(LegacyMods.TouchDevice))
                 yield return new OsuModTouchDevice();
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu
                         value |= LegacyMods.SpunOut;
                         break;
 
-                    case OsuModTarget:
+                    case OsuModTargetPractice:
                         value |= LegacyMods.Target;
                         break;
 
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu
                 case ModType.Conversion:
                     return new Mod[]
                     {
-                        new OsuModTarget(),
+                        new OsuModTargetPractice(),
                         new OsuModDifficultyAdjust(),
                         new OsuModClassic(),
                         new OsuModRandom(),
@@ -201,7 +201,8 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModMuted(),
                         new OsuModNoScope(),
                         new MultiMod(new OsuModMagnetised(), new OsuModRepel()),
-                        new ModAdaptiveSpeed()
+                        new ModAdaptiveSpeed(),
+                        new OsuModFreezeFrame()
                     };
 
                 case ModType.System:
