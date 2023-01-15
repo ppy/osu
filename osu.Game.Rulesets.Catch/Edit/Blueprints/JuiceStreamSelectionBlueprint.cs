@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
         private Vector2 rightMouseDownPosition;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private EditorBeatmap? editorBeatmap { get; set; }
 
         public JuiceStreamSelectionBlueprint(JuiceStream hitObject)

@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         // To handle when the editor is scrolled while dragging.
         private Vector2 dragStartPosition;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private IEditorChangeHandler? changeHandler { get; set; }
 
         public SelectionEditablePath(Func<float, double> positionToTime)
