@@ -45,65 +45,100 @@ namespace osu.Game.Tests.Visual.Online
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
                 Spacing = new Vector2(10f),
-                Children = new Drawable[]
+                Direction = FillDirection.Vertical,
+                Children = new[]
                 {
-                    new UserBrickPanel(new APIUser
+                    new FillFlowContainer
                     {
-                        Username = @"flyte",
-                        Id = 3103765,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
-                    }),
-                    new UserBrickPanel(new APIUser
-                    {
-                        Username = @"peppy",
-                        Id = 2,
-                        Colour = "99EB47",
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
-                    }),
-                    new UserGridPanel(new APIUser
-                    {
-                        Username = @"flyte",
-                        Id = 3103765,
-                        CountryCode = CountryCode.JP,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
-                        Status = { Value = new UserStatusOnline() },
-                        PlayMode = "taiko",
-                        Statistics = new UserStatistics
+                        Name = "Brick cards",
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Spacing = new Vector2(10f),
+                        Children = new Drawable[]
                         {
-                            Level = new UserStatistics.LevelInfo
+                            new UserBrickPanel(new APIUser
                             {
-                                Current = 727
-                            }
-                        },
-                    }) { Width = 300 },
-                    boundPanel1 = new UserGridPanel(new APIUser
+                                Username = @"flyte",
+                                Id = 3103765,
+                                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+                            }),
+                            new UserBrickPanel(new APIUser
+                            {
+                                Username = @"peppy",
+                                Id = 2,
+                                Colour = "99EB47",
+                                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                            })
+                        }
+                    },
+                    new FillFlowContainer
                     {
-                        Username = @"peppy",
-                        Id = 2,
-                        CountryCode = CountryCode.AU,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
-                        IsSupporter = true,
-                        SupportLevel = 3,
-                        Colour = "99EB47",
-                        PlayMode = "osu",
-                        Statistics = new UserStatistics
+                        Name = "Grid cards",
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Spacing = new Vector2(10f),
+                        Children = new Drawable[]
                         {
-                            Level = new UserStatistics.LevelInfo
+                            new UserGridPanel(new APIUser
                             {
-                                Current = 1
-                            }
-                        },
-                        Groups = new[] { new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" } }
-                    }) { Width = 300 },
-                    boundPanel2 = new TestUserListPanel(new APIUser
+                                Username = @"flyte",
+                                Id = 3103765,
+                                CountryCode = CountryCode.JP,
+                                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
+                                Status = { Value = new UserStatusOnline() },
+                                PlayMode = "taiko",
+                                Statistics = new UserStatistics
+                                {
+                                    Level = new UserStatistics.LevelInfo
+                                    {
+                                        Current = 727
+                                    }
+                                },
+                            }) { Width = 350 },
+                            boundPanel1 = new UserGridPanel(new APIUser
+                            {
+                                Username = @"peppy",
+                                Id = 2,
+                                CountryCode = CountryCode.AU,
+                                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                                IsSupporter = true,
+                                SupportLevel = 3,
+                                Colour = "99EB47",
+                                PlayMode = "osu",
+                                Statistics = new UserStatistics
+                                {
+                                    Level = new UserStatistics.LevelInfo
+                                    {
+                                        Current = 1
+                                    }
+                                },
+                                Groups = new[]
+                                {
+                                    new APIUserGroup { Colour = "#0066FF", ShortName = "PPY", Name = "ppy" },
+                                    new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" }
+                                }
+                            }) { Width = 350 }
+                        }
+                    },
+                    new FillFlowContainer
                     {
-                        Username = @"Evast",
-                        Id = 8195163,
-                        CountryCode = CountryCode.BY,
-                        CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
-                        IsOnline = false,
-                        LastVisit = DateTimeOffset.Now
-                    })
+                        Name = "List cards",
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Spacing = new Vector2(10f),
+                        Children = new Drawable[]
+                        {
+                            boundPanel2 = new TestUserListPanel(new APIUser
+                            {
+                                Username = @"Evast",
+                                Id = 8195163,
+                                CountryCode = CountryCode.BY,
+                                CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
+                                IsOnline = false,
+                                LastVisit = DateTimeOffset.Now
+                            })
+                        }
+                    }
                 }
             };
 

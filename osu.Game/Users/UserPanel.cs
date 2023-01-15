@@ -33,7 +33,7 @@ namespace osu.Game.Users
 
         protected Action ViewProfile { get; private set; } = null!;
 
-        protected Drawable? Background { get; private set; }
+        protected Drawable Background { get; private set; } = null!;
 
         protected UserPanel(APIUser user)
             : base(HoverSampleSet.Button)
@@ -61,8 +61,6 @@ namespace osu.Game.Users
         [Resolved]
         protected OsuColour Colours { get; private set; } = null!;
 
-        protected virtual bool ShouldCreateUserCoverBackground { get; set; } = true;
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -74,16 +72,9 @@ namespace osu.Game.Users
                 Colour = ColourProvider?.Background5 ?? Colours.Gray1
             });
 
-            if (ShouldCreateUserCoverBackground)
-            {
-                Add(Background = new UserCoverBackground
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    User = User,
-                });
-            }
+            var background = CreateBackground();
+            if (background != null)
+                Add(background);
 
             Add(CreateLayout());
 
@@ -101,6 +92,14 @@ namespace osu.Game.Users
             Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
             Shadow = false,
             Text = User.Username,
+        };
+
+        protected virtual Drawable? CreateBackground() => Background = new UserCoverBackground
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            User = User
         };
 
         public MenuItem[] ContextMenuItems

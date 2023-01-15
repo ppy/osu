@@ -1,18 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Rulesets;
 using osuTK;
@@ -22,16 +18,15 @@ namespace osu.Game.Users
 {
     public partial class UserGridPanel : ExtendedUserPanel
     {
-        private FillFlowContainer details;
-        private LevelBadge level;
-        private Box hoverDim;
+        private FillFlowContainer details = null!;
+        private LevelBadge level = null!;
+        private Box hoverDim = null!;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private RulesetStore? rulesets { get; set; }
 
-        protected override bool ShouldCreateUserCoverBackground { get; set; } = false;
-
-        private const int main_panel_heigth = 60;
+        private const int main_panel_height = 60;
+        private const int transition_duration = 400; // similar to BeatmapCard.TRANSITION_DURATION
 
         public UserGridPanel(APIUser user)
             : base(user)
@@ -48,11 +43,17 @@ namespace osu.Game.Users
                 AutoSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
+                    hoverDim = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.Black,
+                        Alpha = 0
+                    },
                     new Container
                     {
                         Name = "Main content",
                         RelativeSizeAxes = Axes.X,
-                        Height = main_panel_heigth,
+                        Height = main_panel_height,
                         CornerRadius = 10,
                         Masking = true,
                         Children = new Drawable[]
@@ -64,12 +65,6 @@ namespace osu.Game.Users
                                 Origin = Anchor.Centre,
                                 User = User,
                                 Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0f), Color4.White.Opacity(0.4f))
-                            },
-                            hoverDim = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Colour4.Black,
-                                Alpha = 0
                             },
                             new GridContainer
                             {
@@ -91,7 +86,7 @@ namespace osu.Game.Users
                                         {
                                             avatar.Anchor = Anchor.CentreLeft;
                                             avatar.Origin = Anchor.CentreLeft;
-                                            avatar.Size = new Vector2(main_panel_heigth);
+                                            avatar.Size = new Vector2(main_panel_height);
                                             avatar.Masking = true;
                                             avatar.CornerRadius = 10;
                                         }),
@@ -155,7 +150,7 @@ namespace osu.Game.Users
                     new GridContainer
                     {
                         Name = "Bottom content",
-                        Margin = new MarginPadding { Top = main_panel_heigth },
+                        Margin = new MarginPadding { Top = main_panel_height },
                         Height = 30,
                         RelativeSizeAxes = Axes.X,
                         ColumnDimensions = new[]
@@ -191,9 +186,9 @@ namespace osu.Game.Users
         {
             base.LoadComplete();
 
-            var ruleset = rulesets?.GetRuleset(User.PlayMode);
+            level.LevelInfo.Value = User.Statistics?.Level;
 
-            level.User.Value = new UserProfileData(User, ruleset.AsNonNull());
+            var ruleset = rulesets?.GetRuleset(User.PlayMode);
 
             // some API calls don't return PlayMode - we don't want to draw a ruleset icon in that case
             if (ruleset != null)
@@ -221,15 +216,17 @@ namespace osu.Game.Users
             }
         }
 
+        protected override Drawable? CreateBackground() => null;
+
         protected override bool OnHover(HoverEvent e)
         {
-            hoverDim?.FadeTo(0.2f, 200);
+            hoverDim.FadeTo(0.4f, transition_duration, Easing.OutQuint);
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            hoverDim?.FadeTo(0f, 200);
+            hoverDim.FadeOut(transition_duration / 3f, Easing.OutQuint);
         }
     }
 }

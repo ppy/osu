@@ -227,7 +227,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     {
                         panel.Anchor = Anchor.TopCentre;
                         panel.Origin = Anchor.TopCentre;
-                        panel.Width = 290;
+                        panel.Width = 350;
                     });
 
                 case OverlayPanelDisplayStyle.List:

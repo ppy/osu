@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Profile.Header
 
         private OverlinedInfoContainer hiddenDetailGlobal = null!;
         private OverlinedInfoContainer hiddenDetailCountry = null!;
+        private LevelBadge levelBadge = null!;
 
         public CentreHeaderContainer()
         {
@@ -87,12 +88,11 @@ namespace osu.Game.Overlays.Profile.Header
                     Margin = new MarginPadding { Right = UserProfileOverlay.CONTENT_X_MARGIN },
                     Children = new Drawable[]
                     {
-                        new LevelBadge
+                        levelBadge = new LevelBadge
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Size = new Vector2(40),
-                            User = { BindTarget = User }
+                            Size = new Vector2(40)
                         },
                         expandedDetailContainer = new Container
                         {
@@ -148,6 +148,7 @@ namespace osu.Game.Overlays.Profile.Header
         {
             hiddenDetailGlobal.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
             hiddenDetailCountry.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            levelBadge.LevelInfo.Value = user?.Statistics?.Level;
         }
     }
 }

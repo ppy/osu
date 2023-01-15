@@ -194,7 +194,7 @@ namespace osu.Game.Overlays.Dashboard
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(2),
-                        Width = 290,
+                        Width = 350,
                         Children = new Drawable[]
                         {
                             new UserGridPanel(User)
