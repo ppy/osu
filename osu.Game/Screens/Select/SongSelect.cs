@@ -34,6 +34,7 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
 using System.Diagnostics;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
@@ -118,7 +119,7 @@ namespace osu.Game.Screens.Select
         private IDisposable? modSelectOverlayRegistration;
 
         [Resolved]
-        private MusicController? music { get; set; }
+        private MusicController music { get; set; } = null!;
 
         [Resolved]
         internal IOverlayManager? OverlayManager { get; private set; }
@@ -616,7 +617,6 @@ namespace osu.Game.Screens.Select
                 {
                     // restart playback on returning to song select, regardless.
                     // not sure this should be a permanent thing (we may want to leave a user pause paused even on returning)
-                    Debug.Assert(music != null);
                     music.ResetTrackAdjustments();
                     music.Play(requestedByUser: true);
                 }
@@ -692,7 +692,6 @@ namespace osu.Game.Screens.Select
 
             ensureTrackLooping(Beatmap.Value, TrackChangeDirection.None);
 
-            Debug.Assert(music != null);
             music.TrackChanged += ensureTrackLooping;
         }
 
@@ -702,7 +701,6 @@ namespace osu.Game.Screens.Select
             if (!isHandlingLooping)
                 return;
 
-            Debug.Assert(music != null);
             music.CurrentTrack.Looping = isHandlingLooping = false;
 
             music.TrackChanged -= ensureTrackLooping;
@@ -728,7 +726,7 @@ namespace osu.Game.Screens.Select
 
             decoupledRuleset.UnbindAll();
 
-            if (music != null)
+            if (music.IsNotNull())
                 music.TrackChanged -= ensureTrackLooping;
 
             modSelectOverlayRegistration?.Dispose();
@@ -774,7 +772,6 @@ namespace osu.Game.Screens.Select
             if (!ControlGlobalMusic)
                 return;
 
-            Debug.Assert(music != null);
             ITrack track = music.CurrentTrack;
 
             bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
