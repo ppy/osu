@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
 using osuTK;
 
@@ -83,10 +84,16 @@ namespace osu.Game.Overlays.Profile.Header
                                 User = { BindTarget = User }
                             }
                         },
-                            }
-                        }
+                    }
+                }
             };
+
+            User.BindValueChanged(user => updateDisplay(user.NewValue?.User));
         }
+
+        private void updateDisplay(APIUser? user)
+        {
             levelBadge.LevelInfo.Value = user?.Statistics?.Level;
         }
     }
+}
