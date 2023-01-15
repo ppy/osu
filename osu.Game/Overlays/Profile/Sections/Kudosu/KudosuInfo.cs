@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Resources.Localisation.Web;
 using osu.Framework.Localisation;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
@@ -42,7 +43,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 : base(UsersStrings.ShowExtraKudosuTotal)
             {
                 DescriptionText.AddText("Based on how much of a contribution the user has made to beatmap moderation. See ");
-                DescriptionText.AddLink("this page", "https://osu.ppy.sh/wiki/Kudosu");
+                DescriptionText.AddLink("this page", LinkAction.OpenWiki, @"Modding/Kudosu");
                 DescriptionText.AddText(" for more information.");
             }
         }

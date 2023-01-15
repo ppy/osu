@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         new OsuSpriteText
                         {
                             Text = group.ShortName,
-                            Colour = Color4Extensions.FromHex(group.Colour),
+                            Colour = Color4Extensions.FromHex(group.Colour ?? Colour4.White.ToHex()),
                             Shadow = false,
                             Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true)
                         }

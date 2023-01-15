@@ -86,11 +86,20 @@ namespace osu.Game.Tests.Visual.Online
             CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
-            ProfileOrder = new[] { "me" },
             Groups = new[]
             {
                 new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" },
                 new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators", Playmodes = new[] { "osu", "taiko" } }
+            },
+            ProfileOrder = new[]
+            {
+                @"me",
+                @"recent_activity",
+                @"beatmaps",
+                @"historical",
+                @"kudosu",
+                @"top_ranks",
+                @"medals"
             },
             Statistics = new UserStatistics
             {
@@ -128,7 +137,12 @@ namespace osu.Game.Tests.Visual.Online
             Title = "osu!volunteer",
             Colour = "ff0000",
             Achievements = Array.Empty<APIUserAchievement>(),
-            PlayMode = "osu"
+            PlayMode = "osu",
+            Kudosu = new APIUser.KudosuCount
+            {
+                Available = 10,
+                Total = 50
+            }
         };
     }
 }
