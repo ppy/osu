@@ -1,17 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.States;
 using osu.Framework.Testing;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -31,18 +35,32 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("Create tests", () =>
             {
-                Child = osuInputManager = new OsuInputManager(new OsuRuleset().RulesetInfo)
+                Children = new Drawable[]
                 {
-                    Child = new Container
+                    osuInputManager = new OsuInputManager(new OsuRuleset().RulesetInfo)
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Children = new Drawable[]
+                        Child = new Container
                         {
-                            leftKeyCounter = new TestActionKeyCounter(OsuAction.LeftButton),
-                            rightKeyCounter = new TestActionKeyCounter(OsuAction.RightButton) { Margin = new MarginPadding { Left = 150 } }
-                        },
-                    }
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Children = new Drawable[]
+                            {
+                                leftKeyCounter = new TestActionKeyCounter(OsuAction.LeftButton)
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.CentreRight,
+                                    X = -100,
+                                },
+                                rightKeyCounter = new TestActionKeyCounter(OsuAction.RightButton)
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.CentreLeft,
+                                    X = 100,
+                                }
+                            },
+                        }
+                    },
+                    new TouchVisualiser(),
                 };
             });
         }
@@ -165,10 +183,18 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         private void beginTouch(TouchSource source, Vector2? screenSpacePosition = null) =>
-            AddStep($"Begin touch for {source}", () => InputManager.BeginTouch(new Touch(source, screenSpacePosition ?? osuInputManager.ScreenSpaceDrawQuad.Centre)));
+            AddStep($"Begin touch for {source}", () => InputManager.BeginTouch(new Touch(source, screenSpacePosition ??= getSanePositionForSource(source))));
 
-        private void endTouch(TouchSource source) =>
-            AddStep($"Release touch for {source}", () => InputManager.EndTouch(new Touch(source, osuInputManager.ScreenSpaceDrawQuad.Centre)));
+        private void endTouch(TouchSource source, Vector2? screenSpacePosition = null) =>
+            AddStep($"Release touch for {source}", () => InputManager.EndTouch(new Touch(source, screenSpacePosition ??= getSanePositionForSource(source))));
+
+        private Vector2 getSanePositionForSource(TouchSource source)
+        {
+            return new Vector2(
+                osuInputManager.ScreenSpaceDrawQuad.Centre.X + osuInputManager.ScreenSpaceDrawQuad.Width * (-1 + (int)source) / 8,
+                osuInputManager.ScreenSpaceDrawQuad.Centre.Y - 100
+            );
+        }
 
         private void assertKeyCounter(int left, int right)
         {
@@ -211,6 +237,79 @@ namespace osu.Game.Rulesets.Osu.Tests
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
                 if (e.Action == Action) IsLit = false;
+            }
+        }
+
+        public partial class TouchVisualiser : CompositeDrawable
+        {
+            private readonly Drawable?[] drawableTouches = new Drawable?[10];
+
+            public TouchVisualiser()
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+            protected override bool OnTouchDown(TouchDownEvent e)
+            {
+                if (IsDisposed)
+                    return false;
+
+                var circle = new Circle
+                {
+                    Alpha = 0.5f,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(20),
+                    Position = e.Touch.Position,
+                    Colour = colourFor(e.Touch.Source),
+                };
+
+                AddInternal(circle);
+                drawableTouches[(int)e.Touch.Source] = circle;
+                return false;
+            }
+
+            protected override void OnTouchMove(TouchMoveEvent e)
+            {
+                if (IsDisposed)
+                    return;
+
+                var circle = drawableTouches[(int)e.Touch.Source];
+
+                Debug.Assert(circle != null);
+
+                AddInternal(new FadingCircle(circle));
+                circle.Position = e.Touch.Position;
+            }
+
+            protected override void OnTouchUp(TouchUpEvent e)
+            {
+                var circle = drawableTouches[(int)e.Touch.Source];
+                circle.FadeOut(200, Easing.OutQuint).Expire();
+                drawableTouches[(int)e.Touch.Source] = null;
+            }
+
+            private Color4 colourFor(TouchSource source)
+            {
+                return Color4.FromHsv(new Vector4((float)source / TouchState.MAX_TOUCH_COUNT, 1f, 1f, 1f));
+            }
+
+            private partial class FadingCircle : Circle
+            {
+                public FadingCircle(Drawable source)
+                {
+                    Origin = Anchor.Centre;
+                    Size = source.Size;
+                    Position = source.Position;
+                    Colour = source.Colour;
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+                    this.FadeOut(200).Expire();
+                }
             }
         }
     }
