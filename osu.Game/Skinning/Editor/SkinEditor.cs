@@ -122,14 +122,14 @@ namespace osu.Game.Skinning.Editor
                                         RelativeSizeAxes = Axes.Both,
                                         Items = new[]
                                         {
-                                            new MenuItem("File")
+                                            new MenuItem(CommonStrings.MenuBarFile)
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem("Save", MenuItemType.Standard, Save),
-                                                    new EditorMenuItem("Revert to default", MenuItemType.Destructive, revert),
+                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, Save),
+                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
                                                     new EditorMenuItemSpacer(),
-                                                    new EditorMenuItem("Exit", MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
+                                                    new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
                                             },
                                         }
