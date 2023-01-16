@@ -71,13 +71,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             beginTouch(TouchSource.Touch1);
 
             assertKeyCounter(1, 0);
-            expectPressedCurrently(OsuAction.LeftButton);
+            checkPressed(OsuAction.LeftButton);
 
             beginTouch(TouchSource.Touch2);
 
             assertKeyCounter(1, 1);
-            expectPressedCurrently(OsuAction.LeftButton);
-            expectPressedCurrently(OsuAction.RightButton);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
 
             // Subsequent touches should be ignored.
             beginTouch(TouchSource.Touch3);
@@ -85,8 +85,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             assertKeyCounter(1, 1);
 
-            expectPressedCurrently(OsuAction.LeftButton);
-            expectPressedCurrently(OsuAction.RightButton);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
 
             assertKeyCounter(1, 1);
         }
@@ -97,35 +97,36 @@ namespace osu.Game.Rulesets.Osu.Tests
             beginTouch(TouchSource.Touch1);
 
             assertKeyCounter(1, 0);
-            expectPressedCurrently(OsuAction.LeftButton);
+            checkPressed(OsuAction.LeftButton);
 
             beginTouch(TouchSource.Touch2);
 
             assertKeyCounter(1, 1);
-            expectPressedCurrently(OsuAction.LeftButton);
-            expectPressedCurrently(OsuAction.RightButton);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
 
-            endTouch(TouchSource.Touch1);
+            for (int i = 0; i < 2; i++)
+            {
+                endTouch(TouchSource.Touch1);
 
-            assertKeyCounter(1, 1);
-            expectPressedCurrently(OsuAction.RightButton);
+                checkPressed(OsuAction.RightButton);
+                checkNotPressed(OsuAction.LeftButton);
 
-            beginTouch(TouchSource.Touch1);
+                beginTouch(TouchSource.Touch1);
 
-            assertKeyCounter(2, 1);
-            expectPressedCurrently(OsuAction.LeftButton);
-            expectPressedCurrently(OsuAction.RightButton);
+                checkPressed(OsuAction.LeftButton);
+                checkPressed(OsuAction.RightButton);
 
-            endTouch(TouchSource.Touch2);
+                endTouch(TouchSource.Touch2);
 
-            assertKeyCounter(2, 1);
-            expectPressedCurrently(OsuAction.LeftButton);
+                checkPressed(OsuAction.LeftButton);
+                checkNotPressed(OsuAction.RightButton);
 
-            beginTouch(TouchSource.Touch2);
+                beginTouch(TouchSource.Touch2);
 
-            assertKeyCounter(2, 2);
-            expectPressedCurrently(OsuAction.LeftButton);
-            expectPressedCurrently(OsuAction.RightButton);
+                checkPressed(OsuAction.LeftButton);
+                checkPressed(OsuAction.RightButton);
+            }
         }
 
         [Test]
@@ -136,25 +137,25 @@ namespace osu.Game.Rulesets.Osu.Tests
             beginTouch(TouchSource.Touch3);
 
             assertKeyCounter(1, 1);
-            expectPressedCurrently(OsuAction.LeftButton);
-            expectPressedCurrently(OsuAction.RightButton);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
 
             // Touch 3 was ignored, but let's ensure that if 1 or 2 are released, 3 will be handled a second attempt.
             endTouch(TouchSource.Touch1);
 
             assertKeyCounter(1, 1);
-            expectPressedCurrently(OsuAction.RightButton);
+            checkPressed(OsuAction.RightButton);
 
             endTouch(TouchSource.Touch3);
 
             assertKeyCounter(1, 1);
-            expectPressedCurrently(OsuAction.RightButton);
+            checkPressed(OsuAction.RightButton);
 
             beginTouch(TouchSource.Touch3);
 
             assertKeyCounter(2, 1);
-            expectPressedCurrently(OsuAction.LeftButton);
-            expectPressedCurrently(OsuAction.RightButton);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
         }
 
         [Test]
@@ -163,12 +164,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             beginTouch(TouchSource.Touch1);
 
             assertKeyCounter(1, 0);
-            expectPressedCurrently(OsuAction.LeftButton);
+            checkPressed(OsuAction.LeftButton);
 
             beginTouch(TouchSource.Touch2);
 
             assertKeyCounter(1, 1);
-            expectPressedCurrently(OsuAction.RightButton);
+            checkPressed(OsuAction.RightButton);
 
             // Subsequent touches should be ignored.
             beginTouch(TouchSource.Touch3);
@@ -176,8 +177,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             assertKeyCounter(1, 1);
 
-            expectPressedCurrently(OsuAction.LeftButton);
-            expectPressedCurrently(OsuAction.RightButton);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
 
             assertKeyCounter(1, 1);
         }
@@ -211,7 +212,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        private void expectPressedCurrently(OsuAction action) => AddAssert($"Is pressing {action}", () => osuInputManager.PressedActions.Contains(action));
+        private void checkNotPressed(OsuAction action) => AddAssert($"Not pressing {action}", () => !osuInputManager.PressedActions.Contains(action));
+        private void checkPressed(OsuAction action) => AddAssert($"Is pressing {action}", () => osuInputManager.PressedActions.Contains(action));
 
         public partial class TestActionKeyCounter : KeyCounter, IKeyBindingHandler<OsuAction>
         {
