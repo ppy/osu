@@ -215,6 +215,15 @@ namespace osu.Game.Online.Leaderboards
                             }
                         }
                     },
+                    new FillFlowContainer
+                    {
+                        Shear = -shear,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        Children = statisticsLabels
+                    }
                 }
             };
 
