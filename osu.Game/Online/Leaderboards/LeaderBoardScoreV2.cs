@@ -4,20 +4,31 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Scoring;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Online.Leaderboards
 {
     public partial class LeaderBoardScoreV2 : OsuClickableContainer
     {
-        private readonly bool isPersonalBest;
+        private readonly ScoreInfo score;
+
         private const int HEIGHT = 60;
         private const int corner_radius = 10;
         private const int transition_duration = 200;
+
+        private readonly int? rank;
+
+        private readonly bool isPersonalBest;
 
         private Colour4 foregroundColour;
         private Colour4 backgroundColour;
@@ -31,8 +42,10 @@ namespace osu.Game.Online.Leaderboards
         private Box background = null!;
         private Box foreground = null!;
 
-        public LeaderBoardScoreV2(bool isPersonalBest = false)
+        public LeaderBoardScoreV2(ScoreInfo score, int? rank, bool isPersonalBest = false)
         {
+            this.score = score;
+            this.rank = rank;
             this.isPersonalBest = isPersonalBest;
         }
 
@@ -70,7 +83,14 @@ namespace osu.Game.Online.Leaderboards
                         {
                             new[]
                             {
-                                Empty(),
+                                new RankLabel(rank)
+                                {
+                                    Shear = -shear,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Width = 35
+                                },
                                 createCentreContent(),
                                 Empty(),
                             }
@@ -114,6 +134,25 @@ namespace osu.Game.Online.Leaderboards
         {
             foreground.FadeColour(IsHovered ? foregroundColour.Lighten(0.2f) : foregroundColour, transition_duration, Easing.OutQuint);
             background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, transition_duration, Easing.OutQuint);
+        }
+
+        private partial class RankLabel : Container, IHasTooltip
+        {
+            public RankLabel(int? rank)
+            {
+                if (rank >= 1000)
+                    TooltipText = $"#{rank:N0}";
+
+                Child = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold, italics: true),
+                    Text = rank == null ? "-" : rank.Value.FormatRank().Insert(0, "#")
+                };
+            }
+
+            public LocalisableString TooltipText { get; }
         }
     }
 }
