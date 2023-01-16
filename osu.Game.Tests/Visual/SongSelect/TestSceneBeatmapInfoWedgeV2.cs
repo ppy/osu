@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -91,6 +92,15 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestTruncation()
         {
             selectBeatmap(createLongMetadata());
+        }
+
+        [Test]
+        public void TestNullBeatmap()
+        {
+            selectBeatmap(null);
+            AddAssert("check default title", () => infoWedge.Info!.TitleLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Title);
+            AddAssert("check default artist", () => infoWedge.Info!.ArtistLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Artist);
+            AddAssert("check no info labels", () => !infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Any());
         }
 
         private void setRuleset(RulesetInfo rulesetInfo)
