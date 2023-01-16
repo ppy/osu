@@ -15,7 +15,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -39,7 +38,7 @@ namespace osu.Game.Screens.Select
             new Func<BeatmapInfo, MenuItem>[]
             {
                 b => new OsuMenuItem("Play", MenuItemType.Highlighted, () => FinaliseSelection(b)),
-                b => new OsuMenuItem(CommonStrings.ButtonsEdit, MenuItemType.Standard, () => Edit(b))
+                b => new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsEdit, MenuItemType.Standard, () => Edit(b))
             };
 
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();

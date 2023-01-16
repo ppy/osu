@@ -47,10 +47,10 @@ namespace osu.Game.Screens.Select.Carousel
 
         private Sprite background = null!;
 
-        private MenuItem[] customMenuItems;
+        private MenuItem[]? customMenuItems;
 
-        private Action<BeatmapInfo> selectRequested;
-        private Action<BeatmapInfo> hideRequested;
+        private Action<BeatmapInfo>? selectRequested;
+        private Action<BeatmapInfo>? hideRequested;
 
         private Triangles triangles = null!;
 
@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Item.State.Value == CarouselItemState.Selected)
+            if (Item?.State.Value == CarouselItemState.Selected)
                 selectRequested?.Invoke(beatmapInfo);
 
             return base.OnClick(e);
