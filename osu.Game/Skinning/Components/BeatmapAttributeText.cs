@@ -24,6 +24,7 @@ using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Skinning.Editor;
 
 namespace osu.Game.Skinning.Components
 {
@@ -63,8 +64,11 @@ namespace osu.Game.Skinning.Components
         //If this is null, and no ruleset, mod or beatmap update happens, then the values might not be updated.
         private static BeatmapAttributeText? modifyingInstance;
 
-        //if modifyingInstance is the last Instance in the scene
-        private static bool lastInstance = true;
+        //The number of instances, that listen to changes.
+        //should only be accessed or modified atomically.
+        //The programm counts on the correctness of the value in the Dispose method.
+        private static long instances = 0;
+        private bool enabled = true;
 
         //should only be accessed or modified by modifyingInstance.
         private static ModSettingChangeTracker? modSettingChangeTracker;
@@ -72,40 +76,15 @@ namespace osu.Game.Skinning.Components
         //should only be accessed or modified by modifyingInstance.
         private static CancellationTokenSource? preStarDifficultyCancellationSource;
 
-        //This lock is ONLY for reading/writing modfifyingInstance, IF there is no modifyingInstance.
-        //All of the other mutable static members can be written to by modifyingInstance.
-        //modSettingChangeTracker and preStarDifficultyCancellationSource should only need to be read by modfiyingInstance.
-        //values can be read by anyone. Changes are announced via valuesChanged.
-        private static readonly object modify_lock = new object();
-
-        private BeatmapAttributeText modifyingInstanceValue
+        private BeatmapAttributeText? modifyingInstanceValue
         {
             get
             {
-                if (modifyingInstance is null)
-                {
-                }
+                if (!enabled) return null;
 
-                //This should never block, because all updated are currently called sequentially afaik.
                 if (modifyingInstance is null)
                 {
-                    lock (modify_lock)
-                    {
-                        //someone might have modified it in between time of check and time of use
-                        if (modifyingInstance is null)
-                        {
-                            modifyingInstance = this;
-                            //truth is, we don't know this for certain.
-                            //But it's better to be pessimistic here, because this is the first instance (of this class), that got updated (or otherwise modifyingInstance would already have been non-null).
-                            //If no more instances exist, then this guess is right.
-                            lastInstance = true;
-                        }
-                    }
-                }
-                else
-                {
-                    //If more instances (of this class) exist they will get updated after this one, and set lastInstance to false again (the line below).
-                    lastInstance = false;
+                    Interlocked.CompareExchange(ref modifyingInstance, this, null);
                 }
 
                 return modifyingInstance;
@@ -161,6 +140,11 @@ namespace osu.Game.Skinning.Components
             base.LoadComplete();
             valuesChanged += updateLabelIfNessesary;
             Lazy<Task<IBindable<StarDifficulty?>>>? starRating = null;
+
+            //our parents should be defined here, since dependencies are only loaded once we are added to the scene graph.
+            //Also we need to explicitly exclude the preview instance, because otherwise we never have a "last" instance, and `values`,`modSettingChangeTracker` and `preStarDifficultyCancellationSource` will never be deassigned.
+            if (this.FindClosestParent<SkinEditor>() is not null) enabled = false;
+            else Interlocked.Increment(ref instances); //increment atomically, if we are actually a user skin element.
 
             Attribute.BindValueChanged(_ => updateLabel());
             Template.BindValueChanged(_ => updateLabel());
@@ -377,14 +361,7 @@ namespace osu.Game.Skinning.Components
                 {
                     bool isContained = numberedTemplate.Contains($"{{{i}}}");
 
-                    if (test is null)
-                    {
-                        if (isContained) argsArray[i] = "null";
-                        else argsArray[i] = null;
-                        return;
-                    }
-
-                    if (test.MoveNext())
+                    if (test is not null && test.MoveNext())
                     {
                         if (isContained)
                         {
@@ -403,8 +380,14 @@ namespace osu.Game.Skinning.Components
                     }
                     else
                     {
-                        test.Dispose();
-                        test = null;
+                        if (test is not null)
+                        {
+                            test.Dispose();
+                            test = null;
+                        }
+
+                        if (isContained) argsArray[i] = "null";
+                        else argsArray[i] = null;
                     }
                 }
             }
@@ -417,18 +400,22 @@ namespace osu.Game.Skinning.Components
         {
             base.Dispose(isDisposing);
             valuesChanged -= updateLabelIfNessesary;
+            Interlocked.Decrement(ref instances);
 
             if (modifyingInstanceValue == this)
             {
-                //we do not dispose the modSettingChangeTracker here, so that mod changes are still tracked.
-                //otherwise, if you deleted the modifingInstance, mod setting changes would not propagate to CS, AR, HP, OD, the different BPM values and Length.
-                if (lastInstance)
+                //we do cleanup, if we are the last instance.
+                if (Interlocked.Read(ref instances) <= 0)
                 {
+                    //if instances < 0, then something went wrong.
+                    //do we log that somewhere?
                     modSettingChangeTracker?.Dispose();
                     modSettingChangeTracker = null;
                     //we dispose 'values' here, to save memory usage.
                     //We don't need the `values` Dictionary right now, because there will not be a instance after this is disposed.
                     values = null;
+                    //update the disabled Skinnable instances.
+                    valuesChanged?.Invoke(Enum.GetValues<BeatmapAttribute>().ToList());
                     //only take care of the preStarDifficultyCancellationSource if there are no more instances, because only then are the calculations really unnessesary and unwanted.
                     //if there are instances left, and something changes another instance will take care of disposing the cancellation source (like nothing even happened).
                     preStarDifficultyCancellationSource?.Cancel();
@@ -437,7 +424,7 @@ namespace osu.Game.Skinning.Components
                 }
 
                 //we do not need a lock here. we are the ModifyingInstance, and can relieve ourselves
-                modifyingInstance = null;
+                Interlocked.Exchange(ref modifyingInstance, null);
             }
         }
     }
