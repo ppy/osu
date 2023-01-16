@@ -154,6 +154,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Exit => new TranslatableString(getKey(@"exit"), @"Exit");
 
+        /// <summary>
+        /// "Revert to default"
+        /// </summary>
+        public static LocalisableString RevertToDefault => new TranslatableString(getKey(@"revert_to_default"), @"Revert to default");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
