@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -61,7 +62,7 @@ namespace osu.Game.Screens.Edit.Setup
                         },
                         new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 24))
                         {
-                            Text = "Drag image here to set beatmap background!",
+                            Text = EditorSetupStrings.DragToSetBackground,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             AutoSizeAxes = Axes.Both
