@@ -135,6 +135,9 @@ namespace osu.Game.Screens.Edit.Setup
         {
             var tags = beatmap.Track.Tags;
 
+            if (tags == null)
+                return;
+
             if (tags.Artist != null)
                 Beatmap.Metadata.ArtistUnicode = ArtistTextBox.Current.Value = tags.Artist;
 
