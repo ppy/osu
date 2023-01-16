@@ -40,25 +40,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Position = 110000,
-                    Rank = ScoreRank.X,
-                    Accuracy = 1,
-                    MaxCombo = 244,
-                    TotalScore = 1707827,
-                    Ruleset = new OsuRuleset().RulesetInfo,
-                    User = new APIUser
-                    {
-                        Id = 4608074,
-                        Username = @"Skycries",
-                        CountryCode = CountryCode.BR,
-                    },
-                },
-                new ScoreInfo
-                {
                     Position = 22333,
                     Rank = ScoreRank.S,
-                    Accuracy = 1,
-                    MaxCombo = 244,
+                    Accuracy = 0.1f,
+                    MaxCombo = 2404,
                     TotalScore = 1707827,
                     Ruleset = new OsuRuleset().RulesetInfo,
                     User = new APIUser
@@ -80,7 +65,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Children = new Drawable[]
                 {
                     new LeaderBoardScoreV2(scores[0], 1),
-                    new LeaderBoardScoreV2(scores[2], 3, true)
+                    new LeaderBoardScoreV2(scores[1], null, true)
                 }
             };
         }

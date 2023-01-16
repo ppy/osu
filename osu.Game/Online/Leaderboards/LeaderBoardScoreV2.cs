@@ -40,7 +40,7 @@ namespace osu.Game.Online.Leaderboards
     {
         private readonly ScoreInfo score;
 
-        private const int HEIGHT = 60;
+        private const int height = 60;
         private const int corner_radius = 10;
         private const int transition_duration = 200;
 
@@ -102,7 +102,7 @@ namespace osu.Game.Online.Leaderboards
 
             Shear = shear;
             RelativeSizeAxes = Axes.X;
-            Height = HEIGHT;
+            Height = height;
             Child = content = new Container
             {
                 Masking = true,
@@ -176,11 +176,11 @@ namespace osu.Game.Online.Leaderboards
                         })
                     {
                         RelativeSizeAxes = Axes.None,
-                        Size = new Vector2(HEIGHT)
+                        Size = new Vector2(height)
                     },
                     new FillFlowContainer
                     {
-                        Position = new Vector2(HEIGHT + 9, 9),
+                        Position = new Vector2(height + 9, 9),
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
@@ -217,6 +217,7 @@ namespace osu.Game.Online.Leaderboards
                     },
                     new FillFlowContainer
                     {
+                        Spacing = new Vector2(5, 0),
                         Shear = -shear,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
@@ -346,6 +347,8 @@ namespace osu.Game.Online.Leaderboards
             background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, transition_duration, Easing.OutQuint);
         }
 
+        #region Subclasses
+
         private partial class DateLabel : DrawableDate
         {
             public DateLabel(DateTimeOffset date)
@@ -374,13 +377,12 @@ namespace osu.Game.Online.Leaderboards
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, OverlayColourProvider colourProvider)
             {
-                AutoSizeAxes = Axes.Both;
+                AutoSizeAxes = Axes.Y;
                 OsuSpriteText value;
                 Child = content = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Right = 25 },
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
@@ -397,8 +399,18 @@ namespace osu.Game.Online.Leaderboards
                     }
                 };
 
-                if (score.Combo == score.MaxCombo && statisticInfo.Name == EditorSetupStrings.ComboColourPrefix.ToUpper())
+                if (statisticInfo.Name == EditorSetupStrings.ComboColourPrefix.ToUpper())
+                {
+                    Width = 45;
+
+                    if (score.Combo != score.MaxCombo) return;
+
                     value.Colour = colours.Lime1;
+
+                    return;
+                }
+
+                Width = statisticInfo.Name == BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper() ? 60 : 120;
             }
         }
 
@@ -447,6 +459,8 @@ namespace osu.Game.Online.Leaderboards
                 Background.Colour = colours.Yellow;
             }
         }
+
+        #endregion
 
         public MenuItem[] ContextMenuItems
         {
