@@ -15,11 +15,6 @@ namespace osu.Game.Localisation
         public static LocalisableString SkinEditor => new TranslatableString(getKey(@"skin_editor"), @"Skin editor");
 
         /// <summary>
-        /// "Currently editing"
-        /// </summary>
-        public static LocalisableString CurrentlyEditing => new TranslatableString(getKey(@"currently_editing"), @"Currently editing");
-
-        /// <summary>
         /// "Components"
         /// </summary>
         public static LocalisableString Components => new TranslatableString(getKey(@"components"), @"Components");
