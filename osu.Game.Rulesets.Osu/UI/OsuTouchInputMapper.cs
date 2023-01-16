@@ -3,10 +3,13 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -23,9 +26,17 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         private readonly List<TrackedTouch> trackedTouches = new List<TrackedTouch>();
 
+        private Bindable<bool> mouseDisabled = null!;
+
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
             osuInputManager = inputManager;
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config)
+        {
+            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
 
         protected override void OnTouchMove(TouchMoveEvent e)
@@ -42,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             handleTouchMovement(e);
 
-            if (trackedTouches.All(t => t.Action != action))
+            if (!mouseDisabled.Value && trackedTouches.All(t => t.Action != action))
             {
                 trackedTouches.Add(new TrackedTouch(e.Touch, action));
                 osuInputManager.KeyBindingContainer.TriggerPressed(action);
