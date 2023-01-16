@@ -9,10 +9,10 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public enum ManiaScrollingDirection
     {
-        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.Up))]
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.ScrollingDirectionUp))]
         Up = ScrollingDirection.Up,
 
-        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.Down))]
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.ScrollingDirectionDown))]
         Down = ScrollingDirection.Down
     }
 }

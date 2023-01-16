@@ -57,12 +57,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Up"
         /// </summary>
-        public static LocalisableString Up => new TranslatableString(getKey(@"scrolling_up"), @"Up");
+        public static LocalisableString ScrollingDirectionUp => new TranslatableString(getKey(@"scrolling_up"), @"Up");
 
         /// <summary>
         /// "Down"
         /// </summary>
-        public static LocalisableString Down => new TranslatableString(getKey(@"scrolling_down"), @"Down");
+        public static LocalisableString ScrollingDirectionDown => new TranslatableString(getKey(@"scrolling_down"), @"Down");
 
         /// <summary>
         /// "Scroll speed"
