@@ -1,24 +1,34 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Screens.Select;
 using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public partial class LeaderBoardScoreV2 : OsuClickableContainer
+    public partial class LeaderBoardScoreV2 : OsuClickableContainer, IHasContextMenu
     {
         private readonly ScoreInfo score;
 
@@ -38,9 +48,24 @@ namespace osu.Game.Online.Leaderboards
         [Cached]
         private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
+        [Resolved]
+        private SongSelect? songSelect { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Resolved]
+        private Storage storage { get; set; } = null!;
+
         private Container content = null!;
         private Box background = null!;
         private Box foreground = null!;
+
+        protected Container RankContainer { get; private set; } = null!;
+        private FillFlowContainer<ColouredModSwitchTiny> modsContainer = null!;
+
+        private OsuSpriteText scoreText = null!;
+        private Drawable scoreRank = null!;
 
         public LeaderBoardScoreV2(ScoreInfo score, int? rank, bool isPersonalBest = false)
         {
@@ -50,7 +75,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ScoreManager scoreManager)
         {
             foregroundColour = isPersonalBest ? colourProvider.Background1 : colourProvider.Background5;
             backgroundColour = isPersonalBest ? colourProvider.Background2 : colourProvider.Background4;
@@ -81,7 +106,7 @@ namespace osu.Game.Online.Leaderboards
                         },
                         Content = new[]
                         {
-                            new[]
+                            new Drawable[]
                             {
                                 new RankLabel(rank)
                                 {
@@ -92,12 +117,15 @@ namespace osu.Game.Online.Leaderboards
                                     Width = 35
                                 },
                                 createCentreContent(),
-                                Empty(),
+                                createRightSideContent(scoreManager)
                             }
                         }
                     }
                 }
             };
+
+            modsContainer.Spacing = new Vector2(modsContainer.Children.Count > 5 ? -20 : 2, 0);
+            modsContainer.Padding = new MarginPadding { Top = modsContainer.Children.Count > 0 ? 4 : 0 };
         }
 
         private Container createCentreContent() =>
@@ -114,6 +142,63 @@ namespace osu.Game.Online.Leaderboards
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = foregroundColour
+                    }
+                }
+            };
+
+        private FillFlowContainer createRightSideContent(ScoreManager scoreManager) =>
+            new FillFlowContainer
+            {
+                Padding = new MarginPadding { Left = 11, Right = 15 },
+                Y = -5,
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(13, 0f),
+                Children = new Drawable[]
+                {
+                    new Container
+                    {
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Children = new Drawable[]
+                        {
+                            scoreText = new OsuSpriteText
+                            {
+                                Shear = -shear,
+                                Current = scoreManager.GetBindableTotalScoreString(score),
+
+                                //Does not match figma, adjusted to allow 8 digits to fit comfortably
+                                Font = OsuFont.GetFont(size: 28, weight: FontWeight.SemiBold, fixedWidth: false),
+                            },
+                            RankContainer = new Container
+                            {
+                                BypassAutoSizeAxes = Axes.Both,
+                                Y = 2,
+                                Shear = -shear,
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                AutoSizeAxes = Axes.Both,
+                                Children = new[]
+                                {
+                                    scoreRank = new UpdateableRank(score.Rank)
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Size = new Vector2(32)
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    modsContainer = new FillFlowContainer<ColouredModSwitchTiny>
+                    {
+                        Shear = -shear,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        ChildrenEnumerable = score.Mods.Select(mod => new ColouredModSwitchTiny(mod) { Scale = new Vector2(0.375f) })
                     }
                 }
             };
@@ -153,6 +238,41 @@ namespace osu.Game.Online.Leaderboards
             }
 
             public LocalisableString TooltipText { get; }
+        }
+
+        private partial class ColouredModSwitchTiny : ModSwitchTiny
+        {
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            public ColouredModSwitchTiny(IMod mod)
+                : base(mod)
+            {
+            }
+
+            protected override void UpdateState()
+            {
+                AcronymText.Colour = Colour4.FromHex("#555555");
+                Background.Colour = colours.Yellow;
+            }
+        }
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
+
+                if (score.Files.Count <= 0) return items.ToArray();
+
+                items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(score)));
+                items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
+
+                return items.ToArray();
+            }
         }
     }
 }
