@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
@@ -25,7 +24,7 @@ namespace osu.Game.Users
 
         protected TextFlowContainer LastVisitMessage { get; private set; }
 
-        private SpriteIcon statusIcon;
+        private StatusIcon statusIcon;
         private OsuSpriteText statusMessage;
 
         protected ExtendedUserPanel(APIUser user)
@@ -59,11 +58,7 @@ namespace osu.Game.Users
             Action = Action,
         };
 
-        protected SpriteIcon CreateStatusIcon() => statusIcon = new SpriteIcon
-        {
-            Icon = FontAwesome.Regular.Circle,
-            Size = new Vector2(25)
-        };
+        protected Container CreateStatusIcon() => statusIcon = new StatusIcon();
 
         protected FillFlowContainer CreateStatusMessage(bool rightAlignedChildren)
         {

@@ -19,6 +19,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly CarouselBeatmapSet carouselSet;
 
+        private FillFlowContainer<DifficultyIcon> iconFlow = null!;
+
         public SetPanelContent(CarouselBeatmapSet carouselSet)
         {
             this.carouselSet = carouselSet;
@@ -86,7 +88,7 @@ namespace osu.Game.Screens.Select.Carousel
                                 DotSize = new Vector2(5, 10),
                                 DotSpacing = 2
                             }
-                        }
+                        },
                     }
                 }
             };
