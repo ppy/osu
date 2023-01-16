@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -13,16 +14,19 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
+using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using osuTK;
 
@@ -61,7 +65,14 @@ namespace osu.Game.Online.Leaderboards
         private Box background = null!;
         private Box foreground = null!;
 
+        private Drawable avatar = null!;
+        private ClickableAvatar innerAvatar = null!;
+
+        private OsuSpriteText nameLabel = null!;
+
         protected Container RankContainer { get; private set; } = null!;
+
+        private FillFlowContainer flagBadgeAndDateContainer = null!;
         private FillFlowContainer<ColouredModSwitchTiny> modsContainer = null!;
 
         private OsuSpriteText scoreText = null!;
@@ -77,6 +88,8 @@ namespace osu.Game.Online.Leaderboards
         [BackgroundDependencyLoader]
         private void load(ScoreManager scoreManager)
         {
+            var user = score.User;
+
             foregroundColour = isPersonalBest ? colourProvider.Background1 : colourProvider.Background5;
             backgroundColour = isPersonalBest ? colourProvider.Background2 : colourProvider.Background4;
 
@@ -116,7 +129,7 @@ namespace osu.Game.Online.Leaderboards
                                     RelativeSizeAxes = Axes.Y,
                                     Width = 35
                                 },
-                                createCentreContent(),
+                                createCentreContent(user),
                                 createRightSideContent(scoreManager)
                             }
                         }
@@ -124,11 +137,13 @@ namespace osu.Game.Online.Leaderboards
                 }
             };
 
+            innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
+
             modsContainer.Spacing = new Vector2(modsContainer.Children.Count > 5 ? -20 : 2, 0);
             modsContainer.Padding = new MarginPadding { Top = modsContainer.Children.Count > 0 ? 4 : 0 };
         }
 
-        private Container createCentreContent() =>
+        private Container createCentreContent(APIUser user) =>
             new Container
             {
                 Anchor = Anchor.CentreLeft,
@@ -136,13 +151,63 @@ namespace osu.Game.Online.Leaderboards
                 Masking = true,
                 CornerRadius = corner_radius,
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                Children = new[]
                 {
                     foreground = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = foregroundColour
-                    }
+                    },
+                    avatar = new MaskedWrapper(
+                        innerAvatar = new ClickableAvatar(user)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(1.1f),
+                            Shear = -shear,
+                            RelativeSizeAxes = Axes.Both,
+                        })
+                    {
+                        RelativeSizeAxes = Axes.None,
+                        Size = new Vector2(HEIGHT)
+                    },
+                    new FillFlowContainer
+                    {
+                        Position = new Vector2(HEIGHT + 9, 9),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            flagBadgeAndDateContainer = new FillFlowContainer
+                            {
+                                Shear = -shear,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(5f, 0f),
+                                Size = new Vector2(87, 16),
+                                Masking = true,
+                                Children = new Drawable[]
+                                {
+                                    new UpdateableFlag(user.CountryCode)
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Size = new Vector2(24, 16),
+                                    },
+                                    new DateLabel(score.Date)
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                    }
+                                }
+                            },
+                            nameLabel = new OsuSpriteText
+                            {
+                                Shear = -shear,
+                                Text = user.Username,
+                                Font = OsuFont.GetFont(size: 24, weight: FontWeight.SemiBold)
+                            }
+                        }
+                    },
                 }
             };
 
@@ -221,6 +286,17 @@ namespace osu.Game.Online.Leaderboards
             background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, transition_duration, Easing.OutQuint);
         }
 
+        private partial class DateLabel : DrawableDate
+        {
+            public DateLabel(DateTimeOffset date)
+                : base(date)
+            {
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Medium, italics: true);
+            }
+
+            protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
+        }
+
         private partial class RankLabel : Container, IHasTooltip
         {
             public RankLabel(int? rank)
@@ -238,6 +314,16 @@ namespace osu.Game.Online.Leaderboards
             }
 
             public LocalisableString TooltipText { get; }
+        }
+
+        private partial class MaskedWrapper : DelayedLoadWrapper
+        {
+            public MaskedWrapper(Drawable content, double timeBeforeLoad = 500)
+                : base(content, timeBeforeLoad)
+            {
+                CornerRadius = corner_radius;
+                Masking = true;
+            }
         }
 
         private partial class ColouredModSwitchTiny : ModSwitchTiny
