@@ -51,24 +51,26 @@ namespace osu.Game.Rulesets.Osu.UI
                 ? OsuAction.RightButton
                 : OsuAction.LeftButton;
 
+            // Ignore any taps which trigger an action which is already handled. But track them for potential positional input in the future.
+            bool shouldResultInAction = !mouseDisabled.Value && trackedTouches.All(t => t.Action != action);
+
+            trackedTouches.Add(new TrackedTouch(e.Touch, shouldResultInAction ? action : null));
+
+            // Important to update position before triggering the pressed action.
             handleTouchMovement(e);
 
-            if (!mouseDisabled.Value && trackedTouches.All(t => t.Action != action))
-            {
-                trackedTouches.Add(new TrackedTouch(e.Touch, action));
+            if (shouldResultInAction)
                 osuInputManager.KeyBindingContainer.TriggerPressed(action);
-            }
-            else
-            {
-                // Ignore any taps which trigger an action which is already handled. But track them for potential positional input in the future.
-                trackedTouches.Add(new TrackedTouch(e.Touch, null));
-            }
 
             return true;
         }
 
         private void handleTouchMovement(TouchEvent touchEvent)
         {
+            // Movement should only be tracked for the most recent touch.
+            if (touchEvent.Touch != trackedTouches.Last().Touch)
+                return;
+
             new MousePositionAbsoluteInput { Position = touchEvent.ScreenSpaceTouch.Position }.Apply(osuInputManager.CurrentState, osuInputManager);
         }
 
