@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -27,17 +28,24 @@ namespace osu.Game.Rulesets.Osu.UI
             osuInputManager = inputManager;
         }
 
-        private OsuAction? lastAction;
+        protected override void OnTouchMove(TouchMoveEvent e)
+        {
+            base.OnTouchMove(e);
+            handleTouchMovement(e);
+        }
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
-            OsuAction action = lastAction == OsuAction.LeftButton && trackedTouches.Count > 0 ? OsuAction.RightButton : OsuAction.LeftButton;
+            OsuAction action = trackedTouches.Any(t => t.Action == OsuAction.LeftButton)
+                ? OsuAction.RightButton
+                : OsuAction.LeftButton;
+
+            handleTouchMovement(e);
 
             if (trackedTouches.All(t => t.Action != action))
             {
                 trackedTouches.Add(new TrackedTouch(e.Touch, action));
                 osuInputManager.KeyBindingContainer.TriggerPressed(action);
-                lastAction = action;
             }
             else
             {
@@ -46,6 +54,11 @@ namespace osu.Game.Rulesets.Osu.UI
             }
 
             return true;
+        }
+
+        private void handleTouchMovement(TouchEvent touchEvent)
+        {
+            new MousePositionAbsoluteInput { Position = touchEvent.ScreenSpaceTouch.Position }.Apply(osuInputManager.CurrentState, osuInputManager);
         }
 
         protected override void OnTouchUp(TouchUpEvent e)
