@@ -9,6 +9,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -451,6 +452,15 @@ namespace osu.Game.Online.Leaderboards
             public ColouredModSwitchTiny(IMod mod)
                 : base(mod)
             {
+                Masking = true;
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Roundness = 15,
+                    Type = EdgeEffectType.Shadow,
+                    Colour = Colour4.Black.Opacity(0.15f),
+                    Radius = 3,
+                    Offset = new Vector2(-2, 0)
+                };
             }
 
             protected override void UpdateState()
