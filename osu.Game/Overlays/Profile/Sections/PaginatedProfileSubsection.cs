@@ -109,14 +109,14 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void showMore()
         {
-            if (User.Value?.User == null)
+            if (User.Value == null)
                 return;
 
             loadCancellation = new CancellationTokenSource();
 
             CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new PaginationParameters(InitialItemsCount);
 
-            retrievalRequest = CreateRequest(User.Value.User, CurrentPage.Value);
+            retrievalRequest = CreateRequest(User.Value, CurrentPage.Value);
             retrievalRequest.Success += items => UpdateItems(items, loadCancellation);
 
             api.Queue(retrievalRequest);
@@ -154,7 +154,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
         }
 
-        protected abstract APIRequest<List<TModel>> CreateRequest(APIUser user, PaginationParameters pagination);
+        protected abstract APIRequest<List<TModel>> CreateRequest(UserProfileData user, PaginationParameters pagination);
 
         protected abstract Drawable? CreateDrawableItem(TModel model);
 

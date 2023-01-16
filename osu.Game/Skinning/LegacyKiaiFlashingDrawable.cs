@@ -9,11 +9,18 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
     public partial class LegacyKiaiFlashingDrawable : BeatSyncedContainer
     {
+        public Color4 KiaiGlowColour
+        {
+            get => flashingDrawable.Colour;
+            set => flashingDrawable.Colour = value;
+        }
+
         private readonly Drawable flashingDrawable;
         private readonly Bindable<float> flashOpacity = new BindableFloat();
 

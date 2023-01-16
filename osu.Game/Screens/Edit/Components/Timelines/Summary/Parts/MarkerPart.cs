@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -20,10 +18,10 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     public partial class MarkerPart : TimelinePart
     {
-        private Drawable marker;
+        private Drawable marker = null!;
 
         [Resolved]
-        private EditorClock editorClock { get; set; }
+        private EditorClock editorClock { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -44,7 +42,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             return true;
         }
 
-        private ScheduledDelegate scheduledSeek;
+        private ScheduledDelegate? scheduledSeek;
 
         /// <summary>
         /// Seeks the <see cref="SummaryTimeline"/> to the time closest to a position on the screen relative to the <see cref="SummaryTimeline"/>.

@@ -9,6 +9,7 @@ using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -29,7 +30,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestBasic()
         {
-            AddStep("Show example user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER));
+            AddStep("Show example user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER, new OsuRuleset().RulesetInfo));
         }
 
         [Test]
@@ -41,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = "IAmOnline",
                 LastVisit = DateTimeOffset.Now,
                 IsOnline = true,
-            }));
+            }, new OsuRuleset().RulesetInfo));
 
             AddStep("Show offline user", () => header.User.Value = new UserProfileData(new APIUser
             {
@@ -49,7 +50,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = "IAmOffline",
                 LastVisit = DateTimeOffset.Now.AddDays(-10),
                 IsOnline = false,
-            }));
+            }, new OsuRuleset().RulesetInfo));
         }
 
         [Test]
@@ -71,7 +72,7 @@ namespace osu.Game.Tests.Visual.Online
                         Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
                     },
                 }
-            }));
+            }, new OsuRuleset().RulesetInfo));
 
             AddStep("Show unranked user", () => header.User.Value = new UserProfileData(new APIUser
             {
@@ -87,7 +88,7 @@ namespace osu.Game.Tests.Visual.Online
                         Data = Enumerable.Range(2345, 85).ToArray()
                     },
                 }
-            }));
+            }, new OsuRuleset().RulesetInfo));
         }
     }
 }

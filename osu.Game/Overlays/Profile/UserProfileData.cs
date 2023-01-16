@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -15,11 +16,15 @@ namespace osu.Game.Overlays.Profile
         /// </summary>
         public APIUser User { get; }
 
-        // TODO: add ruleset
+        /// <summary>
+        /// The ruleset that the user profile is being shown with.
+        /// </summary>
+        public RulesetInfo Ruleset { get; }
 
-        public UserProfileData(APIUser user)
+        public UserProfileData(APIUser user, RulesetInfo ruleset)
         {
             User = user;
+            Ruleset = ruleset;
         }
     }
 }

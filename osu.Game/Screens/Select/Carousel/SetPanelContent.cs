@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly CarouselBeatmapSet carouselSet;
 
+        private FillFlowContainer<DifficultyIcon> iconFlow = null!;
+
         public SetPanelContent(CarouselBeatmapSet carouselSet)
         {
             this.carouselSet = carouselSet;
@@ -82,18 +84,23 @@ namespace osu.Game.Screens.Select.Carousel
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                 Status = beatmapSet.Status
                             },
-                            new FillFlowContainer<DifficultyIcon>
+                            iconFlow = new FillFlowContainer<DifficultyIcon>
                             {
                                 AutoSizeAxes = Axes.Both,
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                                 Spacing = new Vector2(3),
-                                ChildrenEnumerable = getDifficultyIcons(),
                             },
                         }
                     }
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            iconFlow.ChildrenEnumerable = getDifficultyIcons();
         }
 
         private const int maximum_difficulty_icons = 18;
