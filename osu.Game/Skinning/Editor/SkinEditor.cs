@@ -109,7 +109,7 @@ namespace osu.Game.Skinning.Editor
                         {
                             new Container
                             {
-                                Name = "Menu container",
+                                Name = @"Menu container",
                                 RelativeSizeAxes = Axes.X,
                                 Depth = float.MinValue,
                                 Height = MENU_HEIGHT,
@@ -234,7 +234,6 @@ namespace osu.Game.Skinning.Editor
 
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
             content?.Clear();
-
             Scheduler.AddOnce(loadBlueprintContainer);
             Scheduler.AddOnce(populateSettings);
 
@@ -253,15 +252,15 @@ namespace osu.Game.Skinning.Editor
         {
             headerText.Clear();
 
-            headerText.AddParagraph("Skin editor", cp => cp.Font = OsuFont.Default.With(size: 16));
+            headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
             headerText.NewParagraph();
-            headerText.AddText("Currently editing ", cp =>
+            headerText.AddText(SkinEditorStrings.CurrentlyEditing, cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12);
                 cp.Colour = colours.Yellow;
             });
 
-            headerText.AddText($"{currentSkin.Value.SkinInfo}", cp =>
+            headerText.AddText($" {currentSkin.Value.SkinInfo}", cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12, weight: FontWeight.Bold);
                 cp.Colour = colours.Yellow;
