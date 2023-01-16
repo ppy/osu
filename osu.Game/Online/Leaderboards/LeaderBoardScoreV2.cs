@@ -37,7 +37,7 @@ using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public partial class LeaderBoardScoreV2 : OsuClickableContainer, IHasContextMenu
+    public partial class LeaderBoardScoreV2 : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         private readonly ScoreInfo score;
 
@@ -77,12 +77,14 @@ namespace osu.Game.Online.Leaderboards
         private List<ScoreComponentLabel> statisticsLabels = null!;
 
         protected Container RankContainer { get; private set; } = null!;
-
         private FillFlowContainer flagBadgeAndDateContainer = null!;
         private FillFlowContainer<ColouredModSwitchTiny> modsContainer = null!;
 
         private OsuSpriteText scoreText = null!;
         private Drawable scoreRank = null!;
+
+        public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
+        public virtual ScoreInfo TooltipContent => score;
 
         public LeaderBoardScoreV2(ScoreInfo score, int? rank, bool isPersonalBest = false)
         {
