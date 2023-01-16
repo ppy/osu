@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 }
             };
 
-            LevelInfo.BindValueChanged(user => updateLevel(user.NewValue));
+            LevelInfo.BindValueChanged(level => updateLevel(level.NewValue));
         }
 
         private void updateLevel(UserStatistics.LevelInfo? levelInfo)
