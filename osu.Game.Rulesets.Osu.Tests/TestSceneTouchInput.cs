@@ -4,6 +4,7 @@
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,6 +13,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -22,6 +24,9 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public partial class TestSceneTouchInput : OsuManualInputManagerTestScene
     {
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         private TestActionKeyCounter leftKeyCounter = null!;
 
         private TestActionKeyCounter rightKeyCounter = null!;
@@ -89,6 +94,23 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPressed(OsuAction.RightButton);
 
             assertKeyCounter(1, 1);
+        }
+
+        [Test]
+        public void TestSimpleInputButtonsDisabled()
+        {
+            AddStep("Disable mouse buttons", () => config.SetValue(OsuSetting.MouseDisableButtons, true));
+
+            beginTouch(TouchSource.Touch1);
+
+            assertKeyCounter(0, 0);
+            checkNotPressed(OsuAction.LeftButton);
+
+            beginTouch(TouchSource.Touch2);
+
+            assertKeyCounter(0, 0);
+            checkNotPressed(OsuAction.LeftButton);
+            checkNotPressed(OsuAction.RightButton);
         }
 
         [Test]
@@ -207,6 +229,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Release all touches", () =>
             {
+                config.SetValue(OsuSetting.MouseDisableButtons, false);
                 foreach (TouchSource source in InputManager.CurrentState.Touch.ActiveSources)
                     InputManager.EndTouch(new Touch(source, osuInputManager.ScreenSpaceDrawQuad.Centre));
             });
