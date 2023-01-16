@@ -47,8 +47,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     Font = OsuFont.GetFont(size: 20)
                 }
             };
+        }
 
-            LevelInfo.BindValueChanged(level => updateLevel(level.NewValue));
+        protected override void LoadComplete()
+        {
+            LevelInfo.BindValueChanged(level => updateLevel(level.NewValue), true);
         }
 
         private void updateLevel(UserStatistics.LevelInfo? levelInfo)
