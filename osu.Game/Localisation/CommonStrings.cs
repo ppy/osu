@@ -154,6 +154,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Exit => new TranslatableString(getKey(@"exit"), @"Exit");
 
+        /// <summary>
+        /// "caps lock is active"
+        /// </summary>
+        public static LocalisableString CapsLockIsActive => new TranslatableString(getKey(@"caps_lock_is_active"), @"caps lock is active");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
