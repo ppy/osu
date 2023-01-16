@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
@@ -9,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -26,6 +28,9 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledTextBox tagsTextBox = null!;
 
         public override LocalisableString Title => EditorSetupStrings.MetadataHeader;
+
+        [Resolved]
+        private MusicController music { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -56,6 +61,8 @@ namespace osu.Game.Screens.Edit.Setup
 
             foreach (var item in Children.OfType<LabelledTextBox>())
                 item.OnCommit += onCommit;
+
+            music.TrackChanged += (beatmap, direction) => onTrackChanged(beatmap);
         }
 
         private TTextBox createTextBox<TTextBox>(LocalisableString label, string initialValue)
@@ -84,6 +91,10 @@ namespace osu.Game.Screens.Edit.Setup
         {
             if (MetadataUtils.IsRomanised(value))
                 target.Current.Value = value;
+            else
+                // clear the field's value so that when a romanised track is replaced with a non-romanised
+                // track the previous track's metadata isn't retained
+                target.Current.Value = String.Empty;
 
             updateReadOnlyState();
             Scheduler.AddOnce(updateMetadata);
@@ -116,6 +127,19 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.BeatmapInfo.DifficultyName = difficultyTextBox.Current.Value;
             Beatmap.Metadata.Source = sourceTextBox.Current.Value;
             Beatmap.Metadata.Tags = tagsTextBox.Current.Value;
+
+            Beatmap.SaveState();
+        }
+
+        private void onTrackChanged(WorkingBeatmap beatmap)
+        {
+            var tags = beatmap.Track.Tags;
+
+            if (tags.Artist != null)
+                Beatmap.Metadata.ArtistUnicode = ArtistTextBox.Current.Value = tags.Artist;
+
+            if (tags.Title != null)
+                Beatmap.Metadata.TitleUnicode = TitleTextBox.Current.Value = tags.Title;
 
             Beatmap.SaveState();
         }
