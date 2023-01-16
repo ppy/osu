@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Login
         [LocalisableDescription(typeof(LoginPanelStrings), nameof(LoginPanelStrings.AppearOffline))]
         AppearOffline,
 
-        [LocalisableDescription(typeof(LoginPanelStrings), nameof(LoginPanelStrings.SignOut))]
+        [LocalisableDescription(typeof(UserVerificationStrings), nameof(UserVerificationStrings.BoxInfoLogoutLink))]
         SignOut,
     }
 }

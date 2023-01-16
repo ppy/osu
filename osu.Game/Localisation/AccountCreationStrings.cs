@@ -35,11 +35,6 @@ namespace osu.Game.Localisation
         public static LocalisableString AccountIsntForMe => new TranslatableString(getKey(@"account_isnt_for_me"), @"I understand. This account isn't for me.");
 
         /// <summary>
-        /// "email address"
-        /// </summary>
-        public static LocalisableString EmailAddress => new TranslatableString(getKey(@"email_address"), @"email address");
-
-        /// <summary>
         /// "This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!"
         /// </summary>
         public static LocalisableString ThisWillBeYourPublic => new TranslatableString(getKey(@"this_will_be_your_public"),
