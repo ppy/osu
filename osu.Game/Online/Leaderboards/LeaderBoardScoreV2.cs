@@ -446,14 +446,17 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private partial class ColouredModSwitchTiny : ModSwitchTiny
+        private partial class ColouredModSwitchTiny : ModSwitchTiny, IHasTooltip
         {
+            private readonly IMod mod;
+
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
             public ColouredModSwitchTiny(IMod mod)
                 : base(mod)
             {
+                this.mod = mod;
                 Masking = true;
                 EdgeEffect = new EdgeEffectParameters
                 {
@@ -470,6 +473,8 @@ namespace osu.Game.Online.Leaderboards
                 AcronymText.Colour = Colour4.FromHex("#555555");
                 Background.Colour = colours.Yellow;
             }
+
+            public virtual LocalisableString TooltipText => (mod as Mod)?.IconTooltip ?? mod.Name;
         }
 
         #endregion
