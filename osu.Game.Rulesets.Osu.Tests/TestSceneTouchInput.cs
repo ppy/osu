@@ -102,6 +102,26 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
+        public void TestPositionalInputUpdatesOnlyFromMostRecentTouch()
+        {
+            beginTouch(TouchSource.Touch1);
+            checkPosition(TouchSource.Touch1);
+
+            beginTouch(TouchSource.Touch2);
+            checkPosition(TouchSource.Touch2);
+
+            beginTouch(TouchSource.Touch1, Vector2.One);
+            checkPosition(TouchSource.Touch2);
+
+            endTouch(TouchSource.Touch2);
+            checkPosition(TouchSource.Touch2);
+
+            // note that touch1 was never ended, but becomes active for tracking again.
+            beginTouch(TouchSource.Touch1);
+            checkPosition(TouchSource.Touch1);
+        }
+
+        [Test]
         public void TestSimpleInputButtonsDisabled()
         {
             AddStep("Disable mouse buttons", () => config.SetValue(OsuSetting.MouseDisableButtons, true));
