@@ -77,16 +77,21 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             assertKeyCounter(1, 0);
             checkPressed(OsuAction.LeftButton);
+            checkPosition(TouchSource.Touch1);
 
             beginTouch(TouchSource.Touch2);
 
             assertKeyCounter(1, 1);
             checkPressed(OsuAction.LeftButton);
             checkPressed(OsuAction.RightButton);
+            checkPosition(TouchSource.Touch2);
 
-            // Subsequent touches should be ignored.
+            // Subsequent touches should be ignored (except position).
             beginTouch(TouchSource.Touch3);
+            checkPosition(TouchSource.Touch3);
+
             beginTouch(TouchSource.Touch4);
+            checkPosition(TouchSource.Touch4);
 
             assertKeyCounter(1, 1);
 
@@ -105,12 +110,14 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             assertKeyCounter(0, 0);
             checkNotPressed(OsuAction.LeftButton);
+            checkPosition(TouchSource.Touch1);
 
             beginTouch(TouchSource.Touch2);
 
             assertKeyCounter(0, 0);
             checkNotPressed(OsuAction.LeftButton);
             checkNotPressed(OsuAction.RightButton);
+            checkPosition(TouchSource.Touch2);
         }
 
         [Test]
@@ -218,6 +225,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 osuInputManager.ScreenSpaceDrawQuad.Centre.Y - 100
             );
         }
+
+        private void checkPosition(TouchSource touchSource) =>
+            AddAssert("Cursor position is correct", () => osuInputManager.CurrentState.Mouse.Position, () => Is.EqualTo(getSanePositionForSource(touchSource)));
 
         private void assertKeyCounter(int left, int right)
         {
