@@ -4,7 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Scoring;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -14,6 +20,56 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load()
         {
+            var scores = new[]
+            {
+                new ScoreInfo
+                {
+                    Position = 999,
+                    Rank = ScoreRank.XH,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                    User = new APIUser
+                    {
+                        Id = 6602580,
+                        Username = @"waaiiru",
+                        CountryCode = CountryCode.ES,
+                    },
+                },
+                new ScoreInfo
+                {
+                    Position = 110000,
+                    Rank = ScoreRank.X,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                    User = new APIUser
+                    {
+                        Id = 4608074,
+                        Username = @"Skycries",
+                        CountryCode = CountryCode.BR,
+                    },
+                },
+                new ScoreInfo
+                {
+                    Position = 22333,
+                    Rank = ScoreRank.S,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                    User = new APIUser
+                    {
+                        Id = 1541390,
+                        Username = @"Toukai",
+                        CountryCode = CountryCode.CA,
+                    },
+                }
+            };
+
             Child = new FillFlowContainer
             {
                 Width = 900,
@@ -23,8 +79,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 AutoSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
-                    new LeaderBoardScoreV2(),
-                    new LeaderBoardScoreV2(true)
+                    new LeaderBoardScoreV2(scores[0], 1),
+                    new LeaderBoardScoreV2(scores[2], 3, true)
                 }
             };
         }
