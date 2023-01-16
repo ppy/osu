@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Leaderboards;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
@@ -13,13 +14,18 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new Container
+            Child = new FillFlowContainer
             {
                 Width = 900,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Spacing = new Vector2(0, 10),
                 AutoSizeAxes = Axes.Y,
-                Child = new LeaderBoardScoreV2()
+                Children = new Drawable[]
+                {
+                    new LeaderBoardScoreV2(),
+                    new LeaderBoardScoreV2(true)
+                }
             };
         }
     }
