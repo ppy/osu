@@ -86,7 +86,7 @@ namespace osu.Game.Online.Leaderboards
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
         public virtual ScoreInfo TooltipContent => score;
 
-        public LeaderBoardScoreV2(ScoreInfo score, int? rank, bool isPersonalBest = false)
+        public LeaderboardScoreV2(ScoreInfo score, int? rank, bool isPersonalBest = false)
         {
             this.score = score;
             this.rank = rank;

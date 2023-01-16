@@ -65,8 +65,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 AutoSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
-                    new LeaderBoardScoreV2(scores[0], 1),
-                    new LeaderBoardScoreV2(scores[1], null, true)
+                    new LeaderboardScoreV2(scores[0], 1),
+                    new LeaderboardScoreV2(scores[1], null, true)
                 }
             };
         }
