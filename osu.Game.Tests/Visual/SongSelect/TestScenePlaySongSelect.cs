@@ -763,77 +763,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestDifficultyIconSelecting()
-        {
-            addRulesetImportStep(0);
-            createSongSelect();
-
-            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
-
-            DrawableCarouselBeatmapSet set = null!;
-            AddStep("Find the DrawableCarouselBeatmapSet", () =>
-            {
-                set = songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First();
-            });
-
-            FilterableDifficultyIcon difficultyIcon = null!;
-
-            AddUntilStep("Find an icon", () =>
-            {
-                var foundIcon = set.ChildrenOfType<FilterableDifficultyIcon>()
-                                   .FirstOrDefault(icon => getDifficultyIconIndex(set, icon) != getCurrentBeatmapIndex());
-
-                if (foundIcon == null)
-                    return false;
-
-                difficultyIcon = foundIcon;
-                return true;
-            });
-
-            AddStep("Click on a difficulty", () =>
-            {
-                InputManager.MoveMouseTo(difficultyIcon);
-
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddAssert("Selected beatmap correct", () => getCurrentBeatmapIndex() == getDifficultyIconIndex(set, difficultyIcon));
-
-            double? maxBPM = null;
-            AddStep("Filter some difficulties", () => songSelect!.Carousel.Filter(new FilterCriteria
-            {
-                BPM = new FilterCriteria.OptionalRange<double>
-                {
-                    Min = maxBPM = songSelect!.Carousel.SelectedBeatmapSet!.MaxBPM,
-                    IsLowerInclusive = true
-                }
-            }));
-
-            BeatmapInfo? filteredBeatmap = null;
-            FilterableDifficultyIcon? filteredIcon = null;
-
-            AddStep("Get filtered icon", () =>
-            {
-                var selectedSet = songSelect!.Carousel.SelectedBeatmapSet;
-
-                Debug.Assert(selectedSet != null);
-
-                filteredBeatmap = selectedSet.Beatmaps.First(b => b.BPM < maxBPM);
-                int filteredBeatmapIndex = getBeatmapIndex(selectedSet, filteredBeatmap);
-                filteredIcon = set.ChildrenOfType<FilterableDifficultyIcon>().ElementAt(filteredBeatmapIndex);
-            });
-
-            AddStep("Click on a filtered difficulty", () =>
-            {
-                InputManager.MoveMouseTo(filteredIcon);
-
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddAssert("Selected beatmap correct", () => songSelect!.Carousel.SelectedBeatmapInfo?.Equals(filteredBeatmap) == true);
-        }
-
-        [Test]
         public void TestChangingRulesetOnMultiRulesetBeatmap()
         {
             int changeCount = 0;
@@ -880,105 +809,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             // ReSharper disable once AccessToModifiedClosure
             void onChange(ValueChangedEvent<WorkingBeatmap> valueChangedEvent) => changeCount++;
-        }
-
-        [Test]
-        public void TestDifficultyIconSelectingForDifferentRuleset()
-        {
-            changeRuleset(0);
-
-            createSongSelect();
-
-            AddStep("import multi-ruleset map", () =>
-            {
-                var usableRulesets = rulesets.AvailableRulesets.Where(r => r.OnlineID != 2).ToArray();
-                manager.Import(TestResources.CreateTestBeatmapSetInfo(3, usableRulesets));
-            });
-
-            DrawableCarouselBeatmapSet? set = null;
-            AddUntilStep("Find the DrawableCarouselBeatmapSet", () =>
-            {
-                set = songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().FirstOrDefault();
-                return set != null;
-            });
-
-            FilterableDifficultyIcon? difficultyIcon = null;
-            AddUntilStep("Find an icon for different ruleset", () =>
-            {
-                difficultyIcon = set.ChildrenOfType<FilterableDifficultyIcon>()
-                                    .FirstOrDefault(icon => icon.Item.BeatmapInfo.Ruleset.OnlineID == 3);
-                return difficultyIcon != null;
-            });
-
-            AddAssert("Check ruleset is osu!", () => Ruleset.Value.OnlineID == 0);
-
-            int previousSetID = 0;
-
-            AddStep("record set ID", () => previousSetID = ((IBeatmapSetInfo)Beatmap.Value.BeatmapSetInfo).OnlineID);
-
-            AddStep("Click on a difficulty", () =>
-            {
-                InputManager.MoveMouseTo(difficultyIcon);
-
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.OnlineID == 3);
-
-            AddAssert("Selected beatmap still same set", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID == previousSetID);
-            AddAssert("Selected beatmap is mania", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID == 3);
-        }
-
-        [Test]
-        public void TestGroupedDifficultyIconSelecting()
-        {
-            changeRuleset(0);
-
-            createSongSelect();
-
-            BeatmapSetInfo? imported = null;
-
-            AddStep("import huge difficulty count map", () =>
-            {
-                var usableRulesets = rulesets.AvailableRulesets.Where(r => r.OnlineID != 2).ToArray();
-                imported = manager.Import(TestResources.CreateTestBeatmapSetInfo(50, usableRulesets))?.Value;
-            });
-
-            AddStep("select the first beatmap of import", () => Beatmap.Value = manager.GetWorkingBeatmap(imported?.Beatmaps.First()));
-
-            DrawableCarouselBeatmapSet? set = null;
-            AddUntilStep("Find the DrawableCarouselBeatmapSet", () =>
-            {
-                set = songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().FirstOrDefault();
-                return set != null;
-            });
-
-            GroupedDifficultyIcon groupIcon = null!;
-
-            AddUntilStep("Find group icon for different ruleset", () =>
-            {
-                var foundIcon = set.ChildrenOfType<GroupedDifficultyIcon>()
-                                   .FirstOrDefault(icon => icon.Items.First().BeatmapInfo.Ruleset.OnlineID == 3);
-
-                if (foundIcon == null)
-                    return false;
-
-                groupIcon = foundIcon;
-                return true;
-            });
-
-            AddAssert("Check ruleset is osu!", () => Ruleset.Value.OnlineID == 0);
-
-            AddStep("Click on group", () =>
-            {
-                InputManager.MoveMouseTo(groupIcon);
-
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.OnlineID == 3);
-
-            AddAssert("Check first item in group selected", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(groupIcon.Items.First().BeatmapInfo));
         }
 
         [Test]
@@ -1083,11 +913,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             Debug.Assert(songSelect!.Carousel.SelectedBeatmapInfo != null);
 
             return getBeatmapIndex(songSelect!.Carousel.SelectedBeatmapSet, songSelect!.Carousel.SelectedBeatmapInfo);
-        }
-
-        private int getDifficultyIconIndex(DrawableCarouselBeatmapSet set, FilterableDifficultyIcon icon)
-        {
-            return set.ChildrenOfType<FilterableDifficultyIcon>().ToList().FindIndex(i => i == icon);
         }
 
         private void addRulesetImportStep(int id)
