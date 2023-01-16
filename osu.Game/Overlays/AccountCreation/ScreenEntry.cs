@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         emailTextBox = new OsuTextBox
                         {
-                            PlaceholderText = AccountCreationStrings.EmailAddress,
+                            PlaceholderText = ModelValidationStrings.UserAttributesUserEmail.ToLower(),
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this
                         },

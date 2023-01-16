@@ -20,11 +20,6 @@ namespace osu.Game.Localisation
         public static LocalisableString AppearOffline => new TranslatableString(getKey(@"appear_offline"), @"Appear offline");
 
         /// <summary>
-        /// "Sign out"
-        /// </summary>
-        public static LocalisableString SignOut => new TranslatableString(getKey(@"sign_out"), @"Sign out");
-
-        /// <summary>
         /// "Signed in"
         /// </summary>
         public static LocalisableString SignedIn => new TranslatableString(getKey(@"signed_in"), @"Signed in");
