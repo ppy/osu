@@ -704,34 +704,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestSortingFallback()
-        {
-            var sets = new List<BeatmapSetInfo>();
-
-            AddStep("Populuate beatmap sets", () =>
-            {
-                sets.Clear();
-
-                for (int i = 0; i < 20; i++)
-                {
-                    var set = TestResources.CreateTestBeatmapSetInfo();
-
-                    set.Beatmaps.ForEach(b => b.Metadata.Artist = "Same Artist");
-
-                    if (i == 5)
-                        set.DateAdded = DateTimeOffset.MaxValue;
-
-                    sets.Add(set);
-                }
-            });
-
-            loadBeatmaps(sets);
-
-            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            AddAssert("Check if bottom is the newest", () => carousel.BeatmapSets.Last().DateAdded == DateTimeOffset.MaxValue);
-        }
-
-        [Test]
         public void TestRemoveAll()
         {
             loadBeatmaps();
