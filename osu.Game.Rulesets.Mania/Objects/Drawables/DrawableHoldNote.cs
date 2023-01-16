@@ -250,6 +250,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 float yOffset = Math.Max(0, Direction.Value == ScrollingDirection.Up ? -Y : Y);
                 sizingContainer.Height = Math.Clamp(1 - yOffset / DrawHeight, 0, 1);
             }
+        }
+
+        // check child when they not alive.
+        public override void CheckRevert()
+        {
+            base.CheckRevert();
+
+            // Head should alive? just in case.
+            if (!Head.IsAlive)
+            {
+                Head.CheckRevert();
+            }
 
             if (!Tail.IsAlive)
                 Tail.CheckRevert();
@@ -263,6 +275,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
+            // Tail may not updated, so check here.
+            CheckRevert();
+
             if (Tail.AllJudged)
             {
                 foreach (var tick in tickContainer)

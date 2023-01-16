@@ -584,7 +584,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             CheckRevert();
         }
 
-        public void CheckRevert()
+        /// <summary>
+        /// Check if object is due to revert and reset its state.
+        /// </summary>
+        public virtual void CheckRevert()
         {
             if (Result != null && Result.HasResult)
             {
