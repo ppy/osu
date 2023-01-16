@@ -581,7 +581,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected override void Update()
         {
             base.Update();
+            CheckRevert();
+        }
 
+        public void CheckRevert()
+        {
             if (Result != null && Result.HasResult)
             {
                 double endTime = HitObject.GetEndTime();

@@ -250,6 +250,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 float yOffset = Math.Max(0, Direction.Value == ScrollingDirection.Up ? -Y : Y);
                 sizingContainer.Height = Math.Clamp(1 - yOffset / DrawHeight, 0, 1);
             }
+
+            if (!Tail.IsAlive)
+                Tail.CheckRevert();
+
+            foreach (var tick in tickContainer)
+            {
+                if (!tick.IsAlive)
+                    Tail.CheckRevert();
+            }
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
