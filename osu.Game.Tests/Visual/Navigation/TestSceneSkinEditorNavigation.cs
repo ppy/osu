@@ -219,7 +219,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("Click gameplay scene button", () =>
             {
-                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay"));
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().Skip(1).First());
                 InputManager.Click(MouseButton.Left);
             });
 
