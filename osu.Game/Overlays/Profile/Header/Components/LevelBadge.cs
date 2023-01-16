@@ -51,6 +51,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             LevelInfo.BindValueChanged(level => updateLevel(level.NewValue), true);
         }
 
