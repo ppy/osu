@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -19,16 +20,19 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using osuTK;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -69,6 +73,7 @@ namespace osu.Game.Online.Leaderboards
         private ClickableAvatar innerAvatar = null!;
 
         private OsuSpriteText nameLabel = null!;
+        private List<ScoreComponentLabel> statisticsLabels = null!;
 
         protected Container RankContainer { get; private set; } = null!;
 
@@ -92,6 +97,8 @@ namespace osu.Game.Online.Leaderboards
 
             foregroundColour = isPersonalBest ? colourProvider.Background1 : colourProvider.Background5;
             backgroundColour = isPersonalBest ? colourProvider.Background2 : colourProvider.Background4;
+
+            statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s, score)).ToList();
 
             Shear = shear;
             RelativeSizeAxes = Axes.X;
@@ -268,6 +275,50 @@ namespace osu.Game.Online.Leaderboards
                 }
             };
 
+        protected (CaseTransformableString, LocalisableString DisplayAccuracy)[] GetStatistics(ScoreInfo model) => new[]
+        {
+            (EditorSetupStrings.ComboColourPrefix.ToUpper(), model.MaxCombo.ToString().Insert(model.MaxCombo.ToString().Length, "x")),
+            (BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), model.DisplayAccuracy),
+            (getResultNames(score).ToUpper(), getResults(score).ToUpper())
+        };
+
+        public override void Show()
+        {
+            foreach (var d in new[] { avatar, nameLabel, scoreText, scoreRank, flagBadgeAndDateContainer, modsContainer }.Concat(statisticsLabels))
+                d.FadeOut();
+
+            Alpha = 0;
+
+            content.MoveToY(75);
+            avatar.MoveToX(75);
+            nameLabel.MoveToX(150);
+
+            this.FadeIn(200);
+            content.MoveToY(0, 800, Easing.OutQuint);
+
+            using (BeginDelayedSequence(100))
+            {
+                avatar.FadeIn(300, Easing.OutQuint);
+                nameLabel.FadeIn(350, Easing.OutQuint);
+
+                avatar.MoveToX(0, 300, Easing.OutQuint);
+                nameLabel.MoveToX(0, 350, Easing.OutQuint);
+
+                using (BeginDelayedSequence(250))
+                {
+                    scoreText.FadeIn(200);
+                    scoreRank.FadeIn(200);
+
+                    using (BeginDelayedSequence(50))
+                    {
+                        var drawables = new Drawable[] { flagBadgeAndDateContainer, modsContainer }.Concat(statisticsLabels).ToArray();
+                        for (int i = 0; i < drawables.Length; i++)
+                            drawables[i].FadeIn(100 + i * 50);
+                    }
+                }
+            }
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
             updateState();
@@ -295,6 +346,51 @@ namespace osu.Game.Online.Leaderboards
             }
 
             protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
+        }
+
+        private partial class ScoreComponentLabel : Container
+        {
+            private readonly (LocalisableString Name, LocalisableString Value) statisticInfo;
+            private readonly ScoreInfo score;
+
+            private FillFlowContainer content = null!;
+            public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
+
+            public ScoreComponentLabel((LocalisableString Name, LocalisableString Value) statisticInfo, ScoreInfo score)
+            {
+                this.statisticInfo = statisticInfo;
+                this.score = score;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, OverlayColourProvider colourProvider)
+            {
+                AutoSizeAxes = Axes.Both;
+                OsuSpriteText value;
+                Child = content = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding { Right = 25 },
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Colour = colourProvider.Content2,
+                            Text = statisticInfo.Name,
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                        },
+                        value = new OsuSpriteText
+                        {
+                            Text = statisticInfo.Value,
+                            Font = OsuFont.GetFont(size: 19, weight: FontWeight.Medium),
+                        }
+                    }
+                };
+
+                if (score.Combo == score.MaxCombo && statisticInfo.Name == EditorSetupStrings.ComboColourPrefix.ToUpper())
+                    value.Colour = colours.Lime1;
+            }
         }
 
         private partial class RankLabel : Container, IHasTooltip
@@ -359,6 +455,56 @@ namespace osu.Game.Online.Leaderboards
 
                 return items.ToArray();
             }
+        }
+
+        private LocalisableString getResults(ScoreInfo score)
+        {
+            string resultString = score.GetStatisticsForDisplay().Where(s => s.Result.IsBasic()).Aggregate(string.Empty, (current, result) =>
+                current.Insert(current.Length, $"{result.Count}/"));
+
+            return resultString.Remove(resultString.Length - 1);
+        }
+
+        private LocalisableString getResultNames(ScoreInfo score)
+        {
+            string resultName = string.Empty;
+
+            foreach (var hitResult in score.GetStatisticsForDisplay().Where(s => s.Result.IsBasic()))
+            {
+                switch (hitResult.Result)
+                {
+                    case HitResult.Perfect:
+                        appendToString("320/");
+                        break;
+
+                    case HitResult.Great:
+                        appendToString("300/");
+                        break;
+
+                    case HitResult.Good:
+                        appendToString("200/");
+                        break;
+
+                    case HitResult.Ok:
+                        appendToString("100/");
+                        break;
+
+                    case HitResult.Meh:
+                        appendToString("50/");
+                        break;
+
+                    case HitResult.Miss:
+                        appendToString("X");
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            void appendToString(string appendedString) => resultName = resultName.Insert(resultName.Length, appendedString);
+
+            return resultName.Remove(resultName.Length);
         }
     }
 }
