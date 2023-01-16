@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Select.Carousel
                                         },
                                         new OsuSpriteText
                                         {
-                                            Colour = Colour4.FromHex("#DBF0E9"),
+                                            Colour = colourProvider.Content2,
                                             Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
                                             Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmapInfo.Metadata.Author.Username),
                                             Anchor = Anchor.BottomLeft,
