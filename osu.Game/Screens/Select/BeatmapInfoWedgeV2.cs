@@ -31,6 +31,7 @@ namespace osu.Game.Screens.Select
         private const float wedge_height = 120;
         private const float transition_duration = 250;
         private const float corner_radius = 10;
+        private const float colour_bar_width = 30;
 
         /// Todo: move this const out to song select when more new design elements are implemented for the beatmap details area, since it applies to text alignment of various elements
         private const float text_margin = 62;
@@ -49,6 +50,7 @@ namespace osu.Game.Screens.Select
 
         public BeatmapInfoWedgeV2()
         {
+            Height = wedge_height;
             Shear = wedged_container_shear;
             Masking = true;
             EdgeEffect = new EdgeEffectParameters
@@ -72,7 +74,7 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.Y,
 
                     // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
-                    Width = 40,
+                    Width = colour_bar_width + corner_radius,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
                 starCounter = new StarCounter
@@ -82,7 +84,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.Centre,
                     Scale = new Vector2(0.35f),
                     Shear = -wedged_container_shear,
-                    X = -15,
+                    X = -colour_bar_width / 2,
                     Direction = FillDirection.Vertical
                 }
             };
@@ -163,7 +165,7 @@ namespace osu.Game.Screens.Select
                 {
                     Masking = true,
                     // We offset this by the portion of the colour bar underneath we wish to show
-                    X = -30,
+                    X = -colour_bar_width,
                     CornerRadius = corner_radius,
                     RelativeSizeAxes = Axes.Both,
                     Depth = DisplayedContent?.Depth + 1 ?? 0,
@@ -268,8 +270,7 @@ namespace osu.Game.Screens.Select
                     {
                         Name = "Top-left aligned metadata",
                         Direction = FillDirection.Vertical,
-                        Position = new Vector2(text_margin + shear_width, 12),
-                        Width = .7f,
+                        Padding = new MarginPadding { Horizontal = text_margin + shear_width, Top = 12 },
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]

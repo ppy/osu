@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             Add(infoWedge = new TestBeatmapInfoWedgeV2
             {
-                Size = new Vector2(0.6f, 120),
+                Width = 0.6f,
                 RelativeSizeAxes = Axes.X,
                 Margin = new MarginPadding { Top = 20 }
             });
