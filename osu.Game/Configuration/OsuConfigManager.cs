@@ -273,12 +273,6 @@ namespace osu.Game.Configuration
                         // TODO: implement lookup for framework platform key bindings
                     )
                 ),
-                new TrackedSetting<float>(OsuSetting.KiaiFlashIntensity, strength => new SettingDescription(
-                        rawValue: strength,
-                        name: GraphicsSettingsStrings.KiaiFlashIntensity,
-                        value: $"{strength * 100:N0}%"
-                    )
-                ),
             };
         }
 
