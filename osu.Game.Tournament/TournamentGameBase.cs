@@ -159,6 +159,18 @@ namespace osu.Game.Tournament
                     saveChanges();
 
                 ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
+
+                ladder.Ruleset.BindValueChanged(r =>
+                {
+                    // Refetch player rank data on next startup as the ruleset has changed.
+                    foreach (var team in ladder.Teams)
+                    {
+                        foreach (var player in team.Players)
+                            player.Rank = null;
+                    }
+
+                    SaveChanges();
+                });
             }
             catch (Exception e)
             {
