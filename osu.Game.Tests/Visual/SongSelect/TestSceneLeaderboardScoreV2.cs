@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Position = 22333,
                     Rank = ScoreRank.S,
                     Accuracy = 0.1f,
-                    MaxCombo = 2404,
+                    MaxCombo = 32040,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), new OsuModAlternate(), new OsuModFlashlight(), new OsuModFreezeFrame(), new OsuModClassic() },
                     TotalScore = 1707827,
                     Ruleset = new OsuRuleset().RulesetInfo,
