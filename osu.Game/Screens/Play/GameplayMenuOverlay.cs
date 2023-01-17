@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
         /// </summary>
-        protected virtual Action BackAction => () => InternalButtons.Children.LastOrDefault()?.TriggerClick();
+        protected virtual Action BackAction => () => InternalButtons.LastOrDefault()?.TriggerClick();
 
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Select"/> is triggered.
