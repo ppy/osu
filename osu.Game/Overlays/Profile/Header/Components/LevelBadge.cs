@@ -51,9 +51,17 @@ namespace osu.Game.Overlays.Profile.Header.Components
             LevelInfo.BindValueChanged(user => updateLevel(user.NewValue));
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            LevelInfo.BindValueChanged(level => updateLevel(level.NewValue), true);
+        }
+
         private void updateLevel(UserStatistics.LevelInfo? levelInfo)
         {
             string level = levelInfo?.Current.ToString() ?? "0";
+
             levelText.Text = level;
             TooltipText = UsersStrings.ShowStatsLevel(level);
         }

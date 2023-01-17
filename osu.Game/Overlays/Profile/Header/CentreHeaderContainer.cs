@@ -91,6 +91,13 @@ namespace osu.Game.Overlays.Profile.Header
             User.BindValueChanged(user => updateDisplay(user.NewValue?.User));
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            User.BindValueChanged(user => updateDisplay(user.NewValue?.User), true);
+        }
+
         private void updateDisplay(APIUser? user)
         {
             levelBadge.LevelInfo.Value = user?.Statistics?.Level;
