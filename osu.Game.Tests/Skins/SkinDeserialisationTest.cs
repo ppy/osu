@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Skins
             // Covers BPM counter.
             "Archives/modified-default-20221205.osk",
             // Covers judgement counter.
-            "Archives/modified-default-20230111.osk"
+            "Archives/modified-default-20230117.osk"
         };
 
         /// <summary>
