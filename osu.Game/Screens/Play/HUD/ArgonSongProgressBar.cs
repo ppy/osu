@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -30,11 +31,18 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly BindableBool showBackground = new BindableBool();
 
+        private readonly ColourInfo mainColour;
+        private readonly ColourInfo mainColourDarkened;
+        private ColourInfo altColour;
+        private ColourInfo altColourDarkened;
+
         public bool ShowBackground
         {
             get => showBackground.Value;
             set => showBackground.Value = value;
         }
+
+        public BindableBool Darken = new BindableBool();
 
         private const float alpha_threshold = 2500;
 
@@ -91,6 +99,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
+                    Colour = Colour4.White.Darken(1 + 1 / 4f)
                 },
                 catchupBar = new RoundedBar
                 {
@@ -107,11 +116,12 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     CornerRadius = 5,
-                    AccentColour = Color4.White,
+                    AccentColour = mainColour = Color4.White,
                     RelativeSizeAxes = Axes.Both
                 },
             };
             catchupBaseDepth = catchupBar.Depth;
+            mainColourDarkened = Colour4.White.Darken(1 / 3f);
         }
 
         private void setupAlternateValue()
@@ -135,13 +145,16 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            catchupBar.AccentColour = colours.BlueLight;
+            catchupBar.AccentColour = altColour = colours.BlueLight;
+            altColourDarkened = colours.BlueLight.Darken(1 / 3f);
             showBackground.BindValueChanged(_ => updateBackground(), true);
         }
 
         private void updateBackground()
         {
-            background.FadeTo(showBackground.Value ? 1 : 0, 200, Easing.In);
+            background.FadeTo(showBackground.Value ? 1 / 4f : 0, 200, Easing.In);
+            catchupBar.TransformTo(nameof(catchupBar.AccentColour), ShowBackground ? altColour : altColourDarkened, 200, Easing.In);
+            playfieldBar.TransformTo(nameof(playfieldBar.AccentColour), ShowBackground ? mainColour : mainColourDarkened, 200, Easing.In);
         }
 
         protected override bool OnHover(HoverEvent e)
