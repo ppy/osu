@@ -5,23 +5,32 @@ using System;
 using System.Globalization;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModAccuracyChallenge : ModFailCondition
+    public class ModAccuracyChallenge : ModFailCondition, IApplicableToScoreProcessor
     {
         public override string Name => "Accuracy Challenge";
+
         public override string Acronym => "AC";
-        public override string Description => "Fail the map if you don't maintain a certain accuracy.";
+
+        public override LocalisableString Description => "Fail if your accuracy drops too low!";
+
         public override ModType Type => ModType.DifficultyIncrease;
+
         public override double ScoreMultiplier => 1.0;
+
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModEasyWithExtraLives), typeof(ModPerfect) }).ToArray();
+
         public override bool RequiresConfiguration => false;
+
         public override string SettingDescription => base.SettingDescription.Replace(MinimumAccuracy.ToString(), MinimumAccuracy.Value.ToString("##%", NumberFormatInfo.InvariantInfo));
 
         [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(SettingsSlider<double, PercentSlider>))]
@@ -34,9 +43,14 @@ namespace osu.Game.Rulesets.Mods
             Value = 0.9,
         };
 
-        private double baseScore;
-        private double maxBaseScore;
-        private double accuracy => maxBaseScore > 0 ? baseScore / maxBaseScore : 1;
+        private ScoreProcessor scoreProcessor = null!;
+
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        {
+            this.scoreProcessor = scoreProcessor;
+        }
+
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
@@ -44,14 +58,11 @@ namespace osu.Game.Rulesets.Mods
             if (!result.Type.IsScorable() || result.Type.IsBonus())
                 return false;
 
-            baseScore += result.Type.IsHit() ? result.Judgement.NumericResultFor(result) : 0;
-            maxBaseScore += result.Judgement.MaxNumericResult;
-
-            return accuracy < MinimumAccuracy.Value;
+            return scoreProcessor.Accuracy.Value < MinimumAccuracy.Value;
         }
     }
 
-    public class PercentSlider : OsuSliderBar<double>
+    public partial class PercentSlider : OsuSliderBar<double>
     {
         public PercentSlider()
         {
